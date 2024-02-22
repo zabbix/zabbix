@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -34,6 +36,13 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 
 	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	// returns list of item prototypes from a template
 	public static function update() {
@@ -53,9 +62,11 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid='.
-				$data['parent_itemid']);
-		$this->zbxTestClickWait('update');
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
+				$this->discoveryRuleId.'&context=template');
+		$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$data['itemid']))->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Update')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('Item prototype updated');
 
@@ -91,16 +102,20 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?form=Create+item+prototype&context=host&parent_discoveryid='.$this->discoveryRuleId);
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
+				$this->discoveryRuleId.'&context=template');
+		$this->query('button:Create item prototype')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+		$form->fill([
+			'Name' => $data['name'],
+			'Key' => $data['key']
+		]);
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
-		$this->zbxTestInputType('name', $data['name']);
-		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));
-		$this->zbxTestInputType('key', $data['key']);
-		$this->assertEquals($data['key'], $this->zbxTestGetValue("//input[@id='key']"));
-
-		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				COverlayDialogElement::ensureNotPresent();
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
 				$this->zbxTestTextPresent($data['name']);
 
@@ -137,8 +152,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->assertMessage(TEST_BAD, 'Cannot add item prototype', $data['errors']);
 				break;
 		}
 	}

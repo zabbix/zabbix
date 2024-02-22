@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -303,7 +303,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'status', 'proxy_hostid', 'tls_subject', 'maintenance_status',
+				'output' => ['hostid', 'host', 'name', 'status', 'proxyid', 'tls_subject', 'maintenance_status',
 					'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 					'tls_issuer', 'tls_connect'
 				],
@@ -336,14 +336,14 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function getHostProxies() {
 		$proxies = API::Proxy()->get([
-			'output' => ['host'],
+			'output' => ['name'],
 			'preservekeys' => true
 		]);
 
-		CArrayHelper::sort($proxies, [['field' => 'host', 'order' => ZBX_SORT_UP]]);
+		CArrayHelper::sort($proxies, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
 		foreach ($proxies as &$proxy) {
-			$proxy = $proxy['host'];
+			$proxy = $proxy['name'];
 		}
 		unset($proxy);
 
@@ -415,17 +415,17 @@ abstract class CControllerPopupItemTest extends CController {
 
 		// Set proxy.
 		if (in_array($this->item_type, $this->items_support_proxy)) {
-			if (array_key_exists('data', $input) && array_key_exists('proxy_hostid', $input['data'])) {
-				$data['proxy_hostid'] = $input['data']['proxy_hostid'];
+			if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
+				$data['proxyid'] = $input['data']['proxyid'];
 			}
-			elseif (array_key_exists('proxy_hostid', $input)) {
-				$data['proxy_hostid'] = $input['proxy_hostid'];
+			elseif (array_key_exists('proxyid', $input)) {
+				$data['proxyid'] = $input['proxyid'];
 			}
-			elseif (array_key_exists('proxy_hostid', $this->host)) {
-				$data['proxy_hostid'] = $this->host['proxy_hostid'];
+			elseif (array_key_exists('proxyid', $this->host)) {
+				$data['proxyid'] = $this->host['proxyid'];
 			}
 			else {
-				$data['proxy_hostid'] = 0;
+				$data['proxyid'] = 0;
 			}
 		}
 
@@ -433,6 +433,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_ZABBIX:
 				$data += [
 					'key' => array_key_exists('key', $input) ? $input['key'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -495,6 +496,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				$data += [
 					'snmp_oid' => array_key_exists('snmp_oid', $input) ? $input['snmp_oid'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'flags' => $item_flag,
 					'host' => [
 						'host' => $this->host['host']
@@ -523,7 +525,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_EXTERNAL:
 				$data += [
-					'key' => $input['key']
+					'key' => $input['key'],
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
 				];
 				break;
 
@@ -532,7 +535,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'params_ap' => array_key_exists('params_ap', $input) ? $input['params_ap'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
 				];
 				break;
 
@@ -606,6 +610,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -623,6 +628,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 				break;
@@ -649,9 +655,10 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SIMPLE:
 				$data += [
 					'key' => $input['key'],
-					'interface' => $this->getHostInterface($interface_input),
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
+					'interface' => $this->getHostInterface($interface_input)
 				];
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
@@ -853,12 +860,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				unset($data['interface']['type']);
 			}
-			elseif ($key === 'query_fields') {
-				if ($value === '[]') {
-					unset($data[$key]);
-				}
-			}
-			elseif ($key === 'parameters') {
+			elseif ($key === 'query_fields' || $key === 'headers' || $key === 'parameters') {
 				if (!$value) {
 					unset($data[$key]);
 				}
@@ -925,76 +927,6 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
-	 * Transform front-end familiar array of http query fields to the form server is capable to handle.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return string
-	 */
-	protected function transformQueryFields(array $data) {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result[] = [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return json_encode($result);
-	}
-
-	/**
-	 * Transform front-end familiar array of parameters fields to the form server is capable to handle. Server expects
-	 * one object where parameter names are keys and parameter values are values. Note that parameter names are unique.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return array
-	 */
-	protected function transformParametersFields(array $data): array {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result += [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Transform front-end familiar array of http header fields to the form server is capable to handle.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return string
-	 */
-	protected function transformHeaderFields(array $data) {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result[] = $data['name'][$num].': '.$data['value'][$num];
-				}
-			}
-		}
-
-		return implode("\r\n", $result);
-	}
-
-	/**
 	 * Resolve macros used in preprocessing step parameter fields.
 	 *
 	 * @param array $steps  Steps from item test input form.
@@ -1017,7 +949,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			// Resolve macros in parameter fields before send data to Zabbix server.
 			foreach (['params', 'error_handler_params'] as $field) {
-				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
+				$matched_macros = CMacrosResolverGeneral::getMacroPositions($step[$field], $macros_types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$macro_value = array_key_exists($macro, $macros_posted)
@@ -1120,6 +1052,11 @@ abstract class CControllerPopupItemTest extends CController {
 											);
 											$expression[] = CFilterParser::quoteString($string);
 											break;
+
+										case CFilterParser::TOKEN_TYPE_KEYWORD:
+										case CFilterParser::TOKEN_TYPE_OPERATOR:
+											$expression[] = $filter_token['match'];
+											break;
 									}
 								}
 								break;
@@ -1195,31 +1132,39 @@ abstract class CControllerPopupItemTest extends CController {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					foreach (array_keys($inputs[$field][$key]) as $nr) {
-						$str = &$inputs[$field][$key][$nr];
-						if (strstr($str, '{') !== false) {
-							$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($str, $types);
+				foreach ($inputs[$field] as &$entry) {
+					if (strpos($entry['name'], '{') !== false) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['name'], $types);
 
-							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-								$macro_value = array_key_exists($macro, $macros_posted)
-									? $macros_posted[$macro]
-									: '';
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
 
-								$str = substr_replace($str, $macro_value, $pos, strlen($macro));
-							}
+							$entry['name'] = substr_replace($entry['name'], $macro_value, $pos, strlen($macro));
 						}
+					}
 
-						unset($str);
+					if (strpos($entry['value'], '{') !== false) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['value'], $types);
+
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
+
+							$entry['value'] = substr_replace($entry['value'], $macro_value, $pos, strlen($macro));
+						}
 					}
 				}
+				unset($entry);
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
 				if ($field === 'key') {
 					$inputs[$field] = CMacrosResolverGeneral::resolveItemKeyMacros($inputs[$field], $macros_posted, $types);
 				}
 				else {
-					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
+					$matched_macros = CMacrosResolverGeneral::getMacroPositions($inputs[$field], $types);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 						$macro_value = array_key_exists($macro, $macros_posted)
@@ -1247,7 +1192,7 @@ abstract class CControllerPopupItemTest extends CController {
 		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
 			foreach ($inputs['interface']['details'] as &$field) {
 				if (strstr($field, '{') !== false) {
-					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($field, ['usermacros' => true]);
+					$matched_macros = CMacrosResolverGeneral::getMacroPositions($field, ['usermacros' => true]);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 						// If matching macro is not found, return unresolved macro string.
@@ -1349,5 +1294,38 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	protected static function transformFields(array &$data): void {
+		if (array_key_exists('query_fields', $data)) {
+			foreach ($data['query_fields'] as &$query_field) {
+				$query_field = [$query_field['name'] => $query_field['value']];
+			}
+			unset($query_field);
+
+			$data['query_fields'] = json_encode(array_values($data['query_fields']), JSON_UNESCAPED_UNICODE);
+		}
+
+		if (array_key_exists('headers', $data)) {
+			foreach ($data['headers'] as &$header) {
+				$header = $header['name'].': '.$header['value'];
+			}
+			unset($header);
+
+			$data['headers'] = implode("\r\n", $data['headers']);
+		}
+
+		if (array_key_exists('parameters', $data)) {
+			$parameters = [];
+
+			foreach ($data['parameters'] as $parameter) {
+				$parameters += [$parameter['name'] => $parameter['value']];
+			}
+
+			$data['parameters'] = $parameters;
+		}
 	}
 }

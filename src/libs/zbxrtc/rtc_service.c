@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcommon.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 
@@ -429,6 +430,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			return;
 		case ZBX_RTC_SNMP_CACHE_RELOAD:
 #ifdef HAVE_NETSNMP
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_SNMP_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
@@ -549,6 +551,7 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 			break;
 		case ZBX_RTC_CONFIG_SYNC_NOTIFY:
+		case ZBX_RTC_SERVICE_SYNC_NOTIFY:
 			rtc_notify_hooks(rtc, message->code, message->data, message->size);
 			break;
 		default:
@@ -561,11 +564,11 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: wait for configuration sync notification while optionally         *
- *          dispatching runtime control commands                              *
+ * Purpose: wait for sync notification while optionally dispatching runtime   *
+ * control commands                                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func_t cb_proc_req)
+int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func_t cb_proc_req)
 {
 	zbx_timespec_t	rtc_timeout = {1, 0};
 	int		sync = 0;
@@ -582,6 +585,7 @@ int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func_t c
 			switch (message->code)
 			{
 				case ZBX_RTC_CONFIG_SYNC_NOTIFY:
+				case ZBX_RTC_SERVICE_SYNC_NOTIFY:
 					sync = 1;
 					break;
 				case ZBX_RTC_LOG_LEVEL_DECREASE:

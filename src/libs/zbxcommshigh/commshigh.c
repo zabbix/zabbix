@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -216,14 +216,15 @@ out:
  *             info     - [IN] info message (optional)                        *
  *             version  - [IN] the version data (optional)                    *
  *             protocol - [IN] the transport protocol                         *
- *             timeout - [IN] timeout for this operation                      *
+ *             timeout  - [IN] timeout for this operation                     *
+ *             ext      - [IN] additional data to merge into response json    *
  *                                                                            *
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
-		int timeout)
+int	zbx_send_response_json(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
+		int timeout, const char *ext)
 {
 	struct zbx_json	json;
 	const char	*resp;
@@ -231,7 +232,7 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init_with(&json, ext);
 
 	resp = SUCCEED == result ? ZBX_PROTO_VALUE_SUCCESS : ZBX_PROTO_VALUE_FAILED;
 
@@ -257,6 +258,27 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send json SUCCEED or FAIL to socket along with an info message    *
+ *                                                                            *
+ * Parameters: sock     - [IN] socket descriptor                              *
+ *             result   - [IN] SUCCEED or FAIL                                *
+ *             info     - [IN] info message (optional)                        *
+ *             version  - [IN] the version data (optional)                    *
+ *             protocol - [IN] the transport protocol                         *
+ *             timeout  - [IN] timeout for this operation                     *
+ *                                                                            *
+ * Return value: SUCCEED - data successfully transmitted                      *
+ *               NETWORK_ERROR - network related error occurred               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
+		int timeout)
+{
+	return zbx_send_response_json(sock, result, info, version, protocol, timeout, NULL);
 }
 
 /******************************************************************************

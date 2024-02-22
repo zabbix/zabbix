@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
-#include "zbxexpression.h"
+#include "zbxeval.h"
 
 #include "zbxtypes.h"
 #include "zbxcacheconfig.h"

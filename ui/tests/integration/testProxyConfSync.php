@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
  * @backup hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
  * @backup lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
- * @backup lld_override_opstatus
+ * @backup lld_override_opstatus, proxy, proxy_rtdata, auditlog, changelog, proxy_history, config_autoreg_tls
+ * @backup expressions, ha_node, regexps
  */
 class testProxyConfSync extends CIntegrationTest
 {
@@ -300,6 +301,14 @@ class testProxyConfSync extends CIntegrationTest
 		],
 		[
 			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'proxy' =>
 			[
 				'insert' => '0',
 				'update' => '0',
@@ -680,6 +689,17 @@ class testProxyConfSync extends CIntegrationTest
 				'delete' =>
 				'0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -1042,12 +1062,21 @@ class testProxyConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
 	private static $regexpid;
 	private static $vaultmacroid;
 	private static $secretmacroid;
+	private static $tlshostid;
 
 	/**
 	 * @inheritdoc
@@ -1069,15 +1098,11 @@ class testProxyConfSync extends CIntegrationTest
 	public function createProxy()
 	{
 		$response = $this->call('proxy.create', [
-			'host' => 'Proxy',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'name' => 'Proxy',
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [],
-			'interface' => [
-				"ip" => "127.0.0.1",
-				"dns" => "",
-				"useip" => "1",
-				"port" => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
-			]
+			'address' => '127.0.0.1',
+			'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 	}
@@ -1097,7 +1122,7 @@ class testProxyConfSync extends CIntegrationTest
 				'VaultURL' => 'https://127.0.0.1:1858'
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => 1,
+				'ProxyMode' => PROXY_OPERATING_MODE_PASSIVE,
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
 				'Hostname' => 'Proxy',
@@ -1480,6 +1505,32 @@ class testProxyConfSync extends CIntegrationTest
 		$this->assertArrayHasKey("regexpids", $response['result']);
 	}
 
+	private function setupTlsForHost()
+	{
+		$response = $this->call('host.get', [
+			'output' => 'hostids',
+			'filter' => [
+				'host' => ['Host1']
+			],
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+		self::$tlshostid = array_key_first($response['result']);
+
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
+
 	public function loadInitialConfiguration()
 	{
 		$this->createRegexp();
@@ -1546,6 +1597,8 @@ class testProxyConfSync extends CIntegrationTest
 
 			]
 		]);
+
+		$this->setupTlsForHost();
 	}
 
 	private function disableAllHosts()
@@ -1568,6 +1621,19 @@ class testProxyConfSync extends CIntegrationTest
 				'status' => 1
 			]);
 		}
+	}
+
+	private function updateTlsForHost()
+	{
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
 	}
 
 	/**
@@ -1672,6 +1738,7 @@ class testProxyConfSync extends CIntegrationTest
 		]);
 
 		$this->updateGlobalMacro();
+		$this->updateTlsForHost();
 		$this->disableAllHosts();
 
 		self::startComponent(self::COMPONENT_SERVER);

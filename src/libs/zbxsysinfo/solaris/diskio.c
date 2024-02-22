@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
-
-#include "zbxlog.h"
 
 typedef struct
 {
@@ -181,7 +179,6 @@ MODE_FUNCTION;
 static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, const MODE_FUNCTION *fl)
 {
 	const char	*devname, *mode;
-	int		i;
 
 	if (2 < request->nparam)
 	{
@@ -199,7 +196,7 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 	if (NULL == mode || '\0' == *mode)
 		mode = "bytes";
 
-	for (i = 0; NULL != fl[i].mode; i++)
+	for (int i = 0; NULL != fl[i].mode; i++)
 	{
 		if (0 == strcmp(mode, fl[i].mode))
 			return (fl[i].function)(devname, result);

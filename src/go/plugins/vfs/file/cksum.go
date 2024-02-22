@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ func crc32(file std.File, start time.Time, timeout int) (result interface{}, err
 	return ^crc, nil
 }
 
-func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
+func (p *Plugin) exportCksum(params []string, timeout int) (result interface{}, err error) {
 	if len(params) > 2 {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
@@ -145,5 +145,5 @@ func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
 	}
 	defer file.Close()
 
-	return ckSum(file, start, p.options.Timeout)
+	return ckSum(file, start, timeout)
 }

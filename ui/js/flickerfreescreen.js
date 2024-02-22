@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -84,11 +84,20 @@
 			}
 		},
 
-		refresh: function(id) {
+		refresh: function(id, time_object = null) {
 			var screen = this.screens[id];
 
 			if (empty(screen.id)) {
 				return;
+			}
+
+			if (time_object !== null) {
+				screen.timeline = $.extend(screen.timeline, {
+					from: time_object.from,
+					to: time_object.to,
+					from_ts: time_object.from_ts,
+					to_ts: time_object.to_ts
+				});
 			}
 
 			// Do not update screen if displaying static hintbox.
@@ -215,14 +224,8 @@
 			for (var id in this.screens) {
 				var screen = this.screens[id];
 
-				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
-					screen.timeline = $.extend(screen.timeline, {
-						from: time_object.from,
-						to: time_object.to,
-						from_ts: time_object.from_ts,
-						to_ts: time_object.to_ts
-					});
-
+				if (!empty(screen.id) && typeof screen.timeline !== 'undefined'
+						&& (!('useCustomEvents' in screen) || screen.useCustomEvents !== 1)) {
 					// Reset pager on time range update (SCREEN_RESOURCE_HISTORY).
 					if (screen.resourcetype == 17) {
 						screen.page = 1;
@@ -230,7 +233,7 @@
 
 					// restart refresh execution starting from Now
 					clearTimeout(screen.timeoutHandler);
-					this.refresh(id);
+					this.refresh(id, time_object);
 				}
 			}
 		},
@@ -452,24 +455,6 @@
 			}
 			else {
 				screen.isReRefreshRequire = true;
-			}
-		},
-
-		cleanAll: function() {
-			for (var id in this.screens) {
-				var screen = this.screens[id];
-
-				if (!empty(screen.id)) {
-					clearTimeout(screen.timeoutHandler);
-				}
-			}
-
-			this.screens = [];
-
-			for (var id in timeControl.objectList) {
-				if (timeControl.objectList.hasOwnProperty(id)) {
-					timeControl.removeObject(id);
-				}
 			}
 		}
 	};

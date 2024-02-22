@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,11 +37,16 @@
 #endif
 
 #ifdef HAVE_PCRE2_H
-#define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
-#ifdef PCRE2_NO_AUTO_CAPTURE
-#define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
-#endif
-#define ZBX_REGEXP_CASELESS PCRE2_CASELESS
+#	define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
+#	ifdef PCRE2_NO_AUTO_CAPTURE
+#		define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
+#	endif
+#	define ZBX_REGEXP_CASELESS PCRE2_CASELESS
+#	ifdef PCRE2_MATCH_INVALID_UTF
+#		define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_MATCH_INVALID_UTF | PCRE2_UTF)
+#	else
+#		define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_UTF)
+#	endif
 #endif
 
 struct zbx_regexp
@@ -70,6 +75,22 @@ zbx_regmatch_t;
 
 ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
 
+#if defined(HAVE_PCRE2_H)
+static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, int flags)
+{
+	/* 120 code units buffer is recommended in "man pcre2api" */
+#define BUF_SIZE	(120 * PCRE2_CODE_UNIT_WIDTH / 8)
+	int		ret;
+	char		buf[BUF_SIZE];
+
+	if (0 > (ret = pcre2_get_error_message(error_code, (PCRE2_UCHAR *)buf, sizeof(buf))))
+		return zbx_dsprintf(NULL, "pcre2_get_error_message(%d, ...) failed with error %d", error_code, ret);
+
+	return zbx_dsprintf(NULL, "%s, position %zu, flags:0x%x", buf, (size_t)error_offset, (unsigned int)flags);
+#undef BUF_SIZE
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compiles a regular expression                                     *
@@ -78,31 +99,30 @@ ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
  *     pattern   - [IN] regular expression as a text string. Empty            *
  *                      string ("") is allowed, it will match everything.     *
  *                      NULL is not allowed.                                  *
- *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
+ *     flags     - [IN] regexp compilation parameters passed to pcre_compile  *
+ *                      or pcre2_compile.                                     *
  *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
  *                      ZBX_REGEXP_MULTILINE.                                 *
- *     regexp    - [OUT] compiled regular expression.                         *
- *     err_msg   - [OUT] error message if any.                                *
- *                       Free with zbx_regexp_err_msg_free()                  *
+ *     regexp    - [OUT] compiled regexp. Can be NULL if only regexp          *
+ *                       compilation is checked, Cleanup in caller.           *
+ *     err_msg   - [OUT] dynamically allocated error message. Can be NULL to  *
+ *                       discard the error message.                           *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg)
+static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, char **err_msg)
 {
 #ifdef HAVE_PCRE_H
-	int			error_offset = -1;
-	pcre			*pcre_regexp;
-	struct pcre_extra	*extra;
+	const char	*err_msg_static = NULL;
+	int		error_offset = -1;
+	pcre		*pcre_regexp;
 #endif
 #ifdef HAVE_PCRE2_H
-	pcre2_code		*pcre2_regexp;
-	pcre2_match_context	*match_ctx;
-	int			error = 0;
-	PCRE2_SIZE 		error_offset = 0;
-	char			*err_msg_buff = NULL;
+	pcre2_code	*pcre2_regexp;
+	int		error = 0;
+	PCRE2_SIZE 	error_offset = 0;
 #endif
-
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
 	/* If ZBX_REGEXP_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
 	/* capturing groups then reset ZBX_REGEXP_NO_AUTO_CAPTURE bit. */
@@ -130,13 +150,29 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	}
 #endif
 #ifdef HAVE_PCRE_H
-	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, err_msg, &error_offset, NULL)))
+	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, &err_msg_static, &error_offset, NULL)))
+	{
+		if (NULL != err_msg)
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "%s, position %d, flags:0x%x", err_msg_static, error_offset,
+					(unsigned int)flags);
+		}
+
 		return FAIL;
+	}
 
 	if (NULL != regexp)
 	{
-		if (NULL == (extra = pcre_study(pcre_regexp, 0, err_msg)) && NULL != *err_msg)
+		struct pcre_extra	*extra;
+
+		if (NULL == (extra = pcre_study(pcre_regexp, 0, &err_msg_static)) && NULL != err_msg_static)
 		{
+			if (NULL != err_msg)
+			{
+				*err_msg = zbx_dsprintf(*err_msg, "pcre_study() error: %s, flags:0x%x", err_msg_static,
+						(unsigned int)flags);
+			}
+
 			pcre_free(pcre_regexp);
 			return FAIL;
 		}
@@ -149,30 +185,23 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 #endif
 #ifdef HAVE_PCRE2_H
-#define ZBX_REGEXP_ERR_MSG_SIZE 256
-
 	*err_msg = NULL;
 
-	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags,
-			&error, &error_offset, NULL)))
+	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED,
+			ZBX_REGEXP_COMPILE_FLAGS | flags, &error, &error_offset, NULL)))
 	{
-		err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
-
-		if (0 > pcre2_get_error_message(error, (PCRE2_UCHAR*)err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
-			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "unknown regexp error");
-
-		*err_msg = (const char*)err_msg_buff;
+		*err_msg = decode_pcre2_compile_error(error, error_offset, flags);
 		return FAIL;
 	}
 
 	if (NULL != regexp)
 	{
+		pcre2_match_context	*match_ctx;
+
 		if (NULL == (match_ctx = pcre2_match_context_create(NULL)))
 		{
 			pcre2_code_free(pcre2_regexp);
-			err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
-			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "cannot create pcre2 match context");
-			*err_msg = (const char*)err_msg_buff;
+			*err_msg = zbx_strdup(*err_msg, "cannot create pcre2 match context");
 			return FAIL;
 		}
 
@@ -182,15 +211,16 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	}
 	else
 		pcre2_code_free(pcre2_regexp);
-
-#undef ZBX_REGEXP_ERR_MSG_SIZE
 #endif
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: public wrapper to compile a regular expression                    *
+ * Purpose: Compile a regular expression with default options. Capture groups *
+ *          are disabled by default (if PCRE_NO_AUTO_CAPTURE is supported).   *
+ *          If you need to compile a regular expression that contains capture *
+ *          groups use function zbx_regexp_compile_ext() instead.             *
  *                                                                            *
  * Parameters:                                                                *
  *     pattern   - [IN] regular expression as a text string. Empty            *
@@ -198,12 +228,11 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
  *                      NULL is not allowed.                                  *
  *     regexp    - [OUT] compiled regular expression.                         *
  *     err_msg   - [OUT] error message if any.                                *
- *                       Free with zbx_regexp_err_msg_free()                  *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg)
+int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_msg)
 {
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
 	return regexp_compile(pattern, ZBX_REGEXP_MULTILINE | ZBX_REGEXP_NO_AUTO_CAPTURE, regexp, err_msg);
@@ -214,7 +243,8 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
 
 /******************************************************************************
  *                                                                            *
- * Purpose: public wrapper for regexp_compile                                 *
+ * Purpose: Compile a regular expression with no or specified regular         *
+ *          expression compilation parameters.                                *
  *                                                                            *
  * Parameters:                                                                *
  *     pattern   - [IN] regular expression as a text string. Empty            *
@@ -225,10 +255,9 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
  *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
  *                      ZBX_REGEXP_MULTILINE.                                 *
  *     err_msg   - [OUT] error message if any.                                *
- *                       Free with zbx_regexp_err_msg_free()                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg)
+int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, char **err_msg)
 {
 	return regexp_compile(pattern, flags, regexp, err_msg);
 }
@@ -238,7 +267,7 @@ int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags
  * Purpose: wrapper for zbx_regexp_compile. Caches and reuses the last used regexp.                 *
  *                                                                                                  *
  ****************************************************************************************************/
-static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg)
+static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL zbx_regexp_t	*curr_regexp = NULL;
 	static ZBX_THREAD_LOCAL char		*curr_pattern = NULL;
@@ -319,10 +348,29 @@ static unsigned long int	compute_recursion_limit(void)
 #undef REGEXP_RECURSION_LIMIT
 #undef REGEXP_RECURSION_STEP
 
+#if defined(HAVE_PCRE2_H)
+static char	*decode_pcre2_match_error(int error_code)
+{
+	/* 120 code units buffer is recommended in "man pcre2api" */
+	const size_t	err_msg_size = 120 * PCRE2_CODE_UNIT_WIDTH / 8;
+
+	char	*err_msg = (char *)zbx_malloc(NULL, err_msg_size);
+	int	ret;
+
+	if (0 > (ret = pcre2_get_error_message(error_code, (PCRE2_UCHAR *)err_msg, err_msg_size)))
+	{
+		zbx_snprintf(err_msg, err_msg_size, "pcre2_get_error_message(%d, ...) failed with error %d",
+				error_code, ret);
+	}
+
+	return err_msg;
+}
+#endif
+
 /***********************************************************************************
  *                                                                                 *
- * Purpose: wrapper for pcre_exec(), searches for a given pattern, specified by    *
- *          regexp, in the string                                                  *
+ * Purpose: wrapper for pcre_exec() and pcre2_match(), searches for a given        *
+ *          pattern, specified by regexp, in the string                            *
  *                                                                                 *
  * Parameters:                                                                     *
  *     string         - [IN] string to be matched against 'regexp'                 *
@@ -331,6 +379,7 @@ static unsigned long int	compute_recursion_limit(void)
  *     count          - [IN] count of elements in matches array                    *
  *     matches        - [OUT] matches (can be NULL if matching results are         *
  *                      not required)                                              *
+ *     err_msg        - [OUT] dynamically allocated error message (can be NULL).   *
  *                                                                                 *
  * Return value: ZBX_REGEXP_MATCH     - successful match                           *
  *               ZBX_REGEXP_NO_MATCH  - no match                                   *
@@ -338,7 +387,7 @@ static unsigned long int	compute_recursion_limit(void)
  *                                                                                 *
  ***********************************************************************************/
 static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, int count,
-		zbx_regmatch_t *matches)
+		zbx_regmatch_t *matches, char **err_msg)
 {
 #ifdef HAVE_PCRE_H
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
@@ -367,7 +416,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	pextra->match_limit_recursion = compute_recursion_limit();
 #endif
 	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
-	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, strlen(string), flags, 0, ovector, ovecsize)))
+	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, (int)strlen(string), flags, 0, ovector, ovecsize)))
 	{
 		if (NULL != matches)
 			memcpy(matches, ovector, (size_t)((0 < r) ? MIN(r, count) : count) * sizeof(zbx_regmatch_t));
@@ -380,7 +429,13 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() failed with error %d", __func__, r);
+		if (NULL != err_msg)
+		{
+			*err_msg = zbx_dsprintf(NULL, "pcre_exec() returned %d. See PCRE library documentation or"
+			" \"man pcreapi\", section \"Error return values from pcre_exec()\" for explanation"
+			" or /usr/include/pcre.h", r);
+		}
+
 		result = FAIL;
 	}
 
@@ -397,8 +452,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
 
-	pcre2_set_recursion_limit(regexp->match_ctx, compute_recursion_limit());
-	match_data = pcre2_match_data_create(count, NULL);
+	pcre2_set_recursion_limit(regexp->match_ctx, (uint32_t)compute_recursion_limit());
+	match_data = pcre2_match_data_create((uint32_t)count, NULL);
 
 	if (NULL == match_data)
 	{
@@ -407,7 +462,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
+#ifdef PCRE2_MATCH_INVALID_UTF
 		flags |= PCRE2_NO_UTF_CHECK;
+#endif
 
 		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, 0, flags,
 			match_data, regexp->match_ctx)))
@@ -434,7 +491,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() failed with error %d", __func__, r);
+			if (NULL != err_msg)
+				*err_msg = decode_pcre2_match_error(r);
+
 			result = FAIL;
 		}
 
@@ -485,9 +544,31 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
  *           be matched against the same regular expression                   *
  *                                                                            *
  ******************************************************************************/
-int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp)
+int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp)
 {
-	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, 0, NULL)) ? 0 : -1;
+	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, 0, NULL, NULL)) ? 0 : -1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if string matches a precompiled regular expression without *
+ *          returning matching groups                                         *
+ *                                                                            *
+ * Parameters: string - [IN] string to be matched                             *
+ *             regexp - [IN] precompiled regular expression                   *
+ *            err_msg - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: ZBX_REGEXP_MATCH     - successful match                      *
+ *               ZBX_REGEXP_NO_MATCH  - no match                              *
+ *               FAIL                 - error occurred                        *
+ *                                                                            *
+ * Comments: use this function for better performance if many strings need to *
+ *           be matched against the same regular expression                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp, char **err_msg)
+{
+	return regexp_exec(string, regexp, 0, 0, NULL, err_msg);
 }
 
 /****************************************************************************************************
@@ -511,8 +592,7 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
  ****************************************************************************************************/
 static char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
 {
-	const char	*error = NULL;
-	char		*c = NULL;
+	char		*error = NULL, *c = NULL;
 	zbx_regmatch_t	match;
 	zbx_regexp_t	*regexp = NULL;
 
@@ -520,13 +600,16 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 		*len = FAIL;
 
 	if (SUCCEED != regexp_prepare(pattern, flags, &regexp, &error))
+	{
+		zbx_free(error);
 		return NULL;
+	}
 
 	if (NULL != string)
 	{
 		int	r;
 
-		if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match)))
+		if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, NULL)))
 		{
 			c = (char *)string + match.rm_so;
 
@@ -538,6 +621,60 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 	}
 
 	return c;
+}
+
+/****************************************************************************************************
+ *                                                                                                  *
+ * Purpose: compiles and executes a regex pattern                                                   *
+ *                                                                                                  *
+ * Parameters:                                                                                      *
+ *     string      - [IN] string to be matched against 'pattern'                                    *
+ *     pattern     - [IN] regular expression pattern                                                *
+ *     flags       - [IN] execution flags for matching                                              *
+ *     matched_pos - [OUT] pointer to the matched substring, can be NULL                            *
+ *     len         - [OUT] pointer to length of matched string, can be NULL                         *
+ *     err_msg     - [OUT] error message. Deallocate in caller.                                     *
+ *                                                                                                  *
+ * Return value: if success:                                                                        *
+ *                   ZBX_REGEXP_MATCH or                                                            *
+ *                   ZBX_REGEXP_NO_MATCH                                                            *
+ *               if errors:                                                                         *
+ *                   ZBX_REGEXP_COMPILE_FAIL or                                                     *
+ *                   ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'                        *
+ *                                                                                                  *
+ ****************************************************************************************************/
+static int	zbx_regexp2(const char *string, const char *pattern, int flags, char **matched_pos, int *len,
+		char **err_msg)
+{
+	zbx_regmatch_t	match;
+	zbx_regexp_t	*regexp = NULL;
+	int		r;
+
+	if (SUCCEED != regexp_prepare(pattern, flags, &regexp, err_msg))
+		return ZBX_REGEXP_COMPILE_FAIL;
+
+	/* 'regexp' ownership was taken by regexp_prepare(), do not cleanup */
+
+	if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, err_msg)))
+	{
+		if (NULL != matched_pos)
+			*matched_pos = (char *)(uintptr_t)string + match.rm_so;
+
+		if (NULL != len)
+			*len = match.rm_eo - match.rm_so;
+
+		return ZBX_REGEXP_MATCH;
+	}
+
+	if (ZBX_REGEXP_NO_MATCH == r)
+	{
+		if (NULL != len)
+			*len = 0;
+
+		return ZBX_REGEXP_NO_MATCH;
+	}
+
+	return ZBX_REGEXP_RUNTIME_FAIL;
 }
 
 /*************************************************************************************************
@@ -717,7 +854,7 @@ out:
  *********************************************************************************/
 static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags, char **out)
 {
-	const char	*error = NULL;
+	char		*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
 	unsigned int	i;
@@ -735,7 +872,10 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 #endif
 
 	if (FAIL == regexp_prepare(pattern, flags, &regexp, &error))
+	{
+		zbx_free(error);
 		return FAIL;
+	}
 
 	zbx_free(*out);
 
@@ -743,10 +883,75 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 	for (i = 0; i < ARRSIZE(match); i++)
 		match[i].rm_so = match[i].rm_eo = -1;
 
-	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
+	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL))
 		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 
 	return SUCCEED;
+#undef MATCH_SIZE
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: Test if a string matches the specified regular expression. If yes    *
+ *          then create a return value by substituting '\<n>' sequences in       *
+ *          output template with the captured groups.                            *
+ *                                                                               *
+ * Parameters: string          - [IN] the string to parse                        *
+ *             pattern         - [IN] the regular expression                     *
+ *             output_template - [IN] the output string template. The output     *
+ *                                    string is constructed from template by     *
+ *                                    replacing \<n> sequences with the captured *
+ *                                    regexp group.                              *
+ *                                    If output template is NULL or contains     *
+ *                                    empty string then the whole input string   *
+ *                                    is used as output value.                   *
+ *            flags            - [IN] the pcre_compile() function flags.         *
+ *                                    See pcre_compile() manual.                 *
+ *            out              - [OUT] the output value if the input string      *
+ *                                     matches the specified regular expression  *
+ *                                     or NULL otherwise                         *
+ *            err_msg          - [OUT] error message. Deallocate in caller.      *
+ *                                                                               *
+ * Return value: if success:                                                     *
+ *                   ZBX_REGEXP_MATCH or                                         *
+ *                   ZBX_REGEXP_NO_MATCH                                         *
+ *               if errors:                                                      *
+ *                   ZBX_REGEXP_COMPILE_FAIL or                                  *
+ *                   ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'     *
+ *                                                                               *
+ *********************************************************************************/
+static int	regexp_sub2(const char *string, const char *pattern, const char *output_template, int flags, char **out,
+		char **err_msg)
+{
+	zbx_regexp_t	*regexp = NULL;
+	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
+	unsigned int	i;
+	int		ret;
+
+#ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
+	/* no subpatterns without an output template */
+	if (NULL == output_template || '\0' == *output_template)
+		flags |= ZBX_REGEXP_NO_AUTO_CAPTURE;
+#endif
+
+	if (SUCCEED != regexp_prepare(pattern, flags, &regexp, err_msg))
+		return ZBX_REGEXP_COMPILE_FAIL;
+
+	zbx_free(*out);
+
+	/* -1 is special pcre value for unused patterns */
+	for (i = 0; i < ARRSIZE(match); i++)
+		match[i].rm_so = match[i].rm_eo = -1;
+
+	/* 'regexp' ownership was taken by regexp_prepare(), do not cleanup */
+
+	if (ZBX_REGEXP_MATCH == (ret = regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, err_msg)))
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
+
+	if (FAIL == ret)
+		ret = ZBX_REGEXP_RUNTIME_FAIL;
+
+	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or ZBX_REGEXP_RUNTIME_FAIL */
 #undef MATCH_SIZE
 }
 
@@ -789,7 +994,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 	for (i = 0; i < ARRSIZE(match); i++)
 		match[i].rm_so = match[i].rm_eo = -1;
 
-	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match) &&
+	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL) &&
 			NULL != (*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX,
 			limit)))
 	{
@@ -951,6 +1156,65 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 
 /**********************************************************************************
  *                                                                                *
+ * Purpose: Test if the string matches regular expression with the specified      *
+ *          case sensitivity option and allocates output variable to store the    *
+ *          result if necessary.                                                  *
+ *                                                                                *
+ * Parameters: string          - [IN] the string to check                         *
+ *             pattern         - [IN] the regular expression                      *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive match.   *
+ *                                    ZBX_CASE_SENSITIVE - case sensitive match.  *
+ *             output_template - [IN] the output string template. The output      *
+ *                                    string is constructed from the template by  *
+ *                                    replacing \<n> sequences with the captured  *
+ *                                    regexp group.                               *
+ *                                    If output_template is NULL the whole        *
+ *                                    matched string is returned.                 *
+ *             output         - [OUT] a reference to the variable where allocated *
+ *                                    memory containing the resulting value       *
+ *                                    (substitution) is stored.                   *
+ *                                    Specify NULL to skip output value creation. *
+ *             err_msg        - [OUT] dynamically allocated error message         *
+ *                                                                                *
+ * Return value: ZBX_REGEXP_MATCH    - the string matches the specified regular   *
+ *                                     expression                                 *
+ *               ZBX_REGEXP_NO_MATCH - the string does not match the regular      *
+ *                                     expression                                 *
+ *               If errors:                                                       *
+ *               ZBX_REGEXP_COMPILE_FAIL or                                       *
+ *               ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'          *
+ *                                                                                *
+ **********************************************************************************/
+static int	regexp_match_ex_regsub2(const char *string, const char *pattern, int case_sensitive,
+		const char *output_template, char **output, char **err_msg)
+{
+	int	regexp_flags = ZBX_REGEXP_MULTILINE, ret;
+	char	*err_msg_local = NULL;
+
+	if (ZBX_IGNORE_CASE == case_sensitive)
+		regexp_flags |= ZBX_REGEXP_CASELESS;
+
+	if (NULL == output)
+		ret = zbx_regexp2(string, pattern, regexp_flags, NULL, NULL, &err_msg_local);
+	else
+		ret = regexp_sub2(string, pattern, output_template, regexp_flags, output, &err_msg_local);
+
+	if (ZBX_REGEXP_MATCH == ret || ZBX_REGEXP_NO_MATCH == ret)
+		return ret;
+
+	if (NULL != err_msg)
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "%s regular expression: %s", (ZBX_REGEXP_COMPILE_FAIL == ret) ?
+				"Invalid" : "Error occurred while matching", err_msg_local);
+	}
+
+	zbx_free(err_msg_local);
+
+	return ret;
+}
+
+/**********************************************************************************
+ *                                                                                *
  * Purpose: Test if the string contains substring with the specified case         *
  *          sensitivity option.                                                   *
  *                                                                                *
@@ -1057,15 +1321,15 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *           the whole string is stored into 'output' variable.                   *
  *                                                                                *
  **********************************************************************************/
-int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
-		int case_sensitive, const char *output_template, char **output)
-{
 /* regular expressions */
 #define EXPRESSION_TYPE_INCLUDED	0
 #define EXPRESSION_TYPE_ANY_INCLUDED	1
 #define EXPRESSION_TYPE_NOT_INCLUDED	2
 #define EXPRESSION_TYPE_TRUE		3
 #define EXPRESSION_TYPE_FALSE		4
+int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
+		int case_sensitive, const char *output_template, char **output)
+{
 	int	i, ret = FAIL;
 	char	*output_accu;	/* accumulator for 'output' when looping over global regexp subexpressions */
 
@@ -1160,12 +1424,181 @@ out:
 	}
 
 	return ret;
+}
+
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: Test if the string matches regular expression with the specified      *
+ *          case sensitivity option and allocates output variable to store the    *
+ *          result if necessary.                                                  *
+ *                                                                                *
+ * Parameters: regexps         - [IN] the global regular expression array         *
+ *             string          - [IN] the string to check                         *
+ *             pattern         - [IN] the regular expression or global regular    *
+ *                                    expression name (@<global regexp name>).    *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive match    *
+ *                                    ZBX_CASE_SENSITIVE - case sensitive match   *
+ *             output_template - [IN] the output string template. For regular     *
+ *                                    expressions (type Result is TRUE) output    *
+ *                                    string is constructed from the template by  *
+ *                                    replacing '\<n>' sequences with the         *
+ *                                    captured regexp group.                      *
+ *                                    If output_template is NULL then the whole   *
+ *                                    matched string is returned.                 *
+ *             output         - [OUT] a reference to the variable where allocated *
+ *                                    memory containing the resulting value       *
+ *                                    (substitution) is stored.                   *
+ *                                    Specify NULL to skip output value creation. *
+ *             err_msg        - [OUT] dynamically allocated error message         *
+ *                                                                                *
+ * Return value: ZBX_REGEXP_MATCH    - the string matches the specified regular   *
+ *                                     expression                                 *
+ *               ZBX_REGEXP_NO_MATCH - the string does not match the specified    *
+ *                                     regular expression                         *
+ *               If errors:                                                       *
+ *               ZBX_REGEXP_COMPILE_FAIL or                                       *
+ *               ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'          *
+ *                                                                                *
+ * Comments: For regular expressions and global regular expressions with 'Result  *
+ *           is TRUE' type the 'output_template' substitution result is stored    *
+ *           into 'output' variable. For other global regular expression types    *
+ *           the whole string is stored into 'output' variable.                   *
+ *                                                                                *
+ **********************************************************************************/
+int	zbx_regexp_sub_ex2(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
+		int case_sensitive, const char *output_template, char **output, char **err_msg)
+{
+	int	i, ret = ZBX_REGEXP_NO_MATCH;
+	char	*output_accu = NULL;	/* accumulator for 'output' when looping over global regexp subexpressions */
+
+	if (NULL == pattern || '\0' == *pattern)
+	{
+		/* always match when no pattern is specified */
+		ret = ZBX_REGEXP_MATCH;
+		goto out;
+	}
+
+	if ('@' != *pattern)				/* not a global regexp */
+	{
+		ret = regexp_match_ex_regsub2(string, pattern, case_sensitive, output_template, output, err_msg);
+		goto out;
+	}
+
+	pattern++;
+
+	for (i = 0; i < regexps->values_num; i++)	/* loop over global regexp subexpressions */
+	{
+		const zbx_expression_t	*regexp = (const zbx_expression_t *)regexps->values[i];
+
+		if (0 != strcmp(regexp->name, pattern))
+			continue;
+
+		switch (regexp->expression_type)
+		{
+			case EXPRESSION_TYPE_TRUE:
+				if (NULL != output)
+				{
+					char	*output_tmp = NULL;
+
+					if (ZBX_REGEXP_MATCH == (ret = regexp_match_ex_regsub2(string,
+							regexp->expression, regexp->case_sensitive, output_template,
+							&output_tmp, err_msg)))
+					{
+						zbx_free(output_accu);
+						output_accu = output_tmp;
+					}
+				}
+				else
+				{
+					ret = regexp_match_ex_regsub2(string, regexp->expression,
+							regexp->case_sensitive, NULL, NULL, err_msg);
+				}
+
+				if (ZBX_REGEXP_COMPILE_FAIL == ret || ZBX_REGEXP_RUNTIME_FAIL == ret)
+				{
+					zbx_free(output_accu);
+					return ret;
+				}
+
+				break;
+			case EXPRESSION_TYPE_FALSE:
+				ret = regexp_match_ex_regsub2(string, regexp->expression, regexp->case_sensitive,
+						NULL, NULL, err_msg);
+
+				if (ZBX_REGEXP_MATCH == ret)	/* invert output value */
+				{
+					ret = ZBX_REGEXP_NO_MATCH;
+				}
+				else if (ZBX_REGEXP_NO_MATCH == ret)
+				{
+					ret = ZBX_REGEXP_MATCH;
+				}
+				else if (ZBX_REGEXP_COMPILE_FAIL == ret || ZBX_REGEXP_RUNTIME_FAIL == ret)
+				{
+					zbx_free(output_accu);
+					return ret;
+				}
+
+				break;
+			case EXPRESSION_TYPE_INCLUDED:
+				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
+				break;
+			case EXPRESSION_TYPE_NOT_INCLUDED:
+				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
+				/* invert output value */
+				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
+				break;
+			case EXPRESSION_TYPE_ANY_INCLUDED:
+				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
+						regexp->exp_delimiter);
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_WARNING, "%s() Invalid regular expression_type: %d, name:'%s',"
+						" expression:'%s'", __func__, regexp->expression_type, regexp->name,
+						regexp->expression);
+
+				if (NULL != err_msg)
+				{
+					*err_msg = zbx_dsprintf(*err_msg, "Invalid regular expression type: %d",
+							regexp->expression_type);
+				}
+
+				zbx_free(output_accu);
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				return ZBX_REGEXP_COMPILE_FAIL;	/* to make it NOTSUPPORTED */
+		}
+
+		if (ZBX_REGEXP_NO_MATCH == ret)
+		{
+			zbx_free(output_accu);
+			break;
+		}
+	}
+
+	if (ZBX_REGEXP_MATCH == ret && NULL != output_accu)
+	{
+		*output = output_accu;
+		return ZBX_REGEXP_MATCH;
+	}
+out:
+	if (ZBX_REGEXP_MATCH == ret && NULL != output && NULL == *output)
+	{
+		/* Handle output value allocation for global regular expression types   */
+		/* that cannot perform output_template substitution (practically        */
+		/* all global regular expression types except EXPRESSION_TYPE_TRUE).    */
+		size_t	offset = 0, size = 0;
+
+		zbx_strcpy_alloc(output, &size, &offset, string);
+	}
+
+	return ret;
+}
 #undef EXPRESSION_TYPE_INCLUDED
 #undef EXPRESSION_TYPE_ANY_INCLUDED
 #undef EXPRESSION_TYPE_NOT_INCLUDED
 #undef EXPRESSION_TYPE_TRUE
 #undef EXPRESSION_TYPE_FALSE
-}
 
 int	zbx_regexp_match_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
 		int case_sensitive)
@@ -1392,20 +1825,4 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 		wildcard++;
 
 	return '\0' == *wildcard;
-}
-
-void	zbx_regexp_err_msg_free(const char *err_msg)
-{
-#ifdef HAVE_PCRE_H
-	ZBX_UNUSED(err_msg);
-#endif
-#ifdef HAVE_PCRE2_H
-	char	*ptr;
-
-	if (NULL != err_msg)
-	{
-		ptr = (char*)err_msg;
-		zbx_free(ptr);
-	}
-#endif
 }

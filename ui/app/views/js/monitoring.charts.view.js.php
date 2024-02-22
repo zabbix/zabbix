@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,13 +28,23 @@
 		_resize_observer: null,
 		_container: null,
 
-		init({filter_form_name, data}) {
+		init({filter_form_name, data, timeline}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
 			this._container = document.querySelector('main');
 			this._data = data;
 
 			this.initSubfilter();
 			this.initCharts();
+
+			timeControl.addObject('charts_view', timeline, {
+				id: 'timeline_1',
+				domid: 'charts_view',
+				loadSBox: 0,
+				loadImage: 0,
+				dynamic: 0
+			});
+
+			timeControl.processObjects();
 		},
 
 		initSubfilter() {
@@ -230,6 +240,7 @@
 		this.curl.setArgument('height', this.dimensions.graphHeight);
 		this.curl.setArgument('width', Math.max(1000, width));
 		this.curl.setArgument('profileIdx', 'web.charts.filter');
+		this.curl.setArgument('resolve_macros', 1);
 		this.curl.setArgument('_', (+new Date).toString(34));
 
 		const unsetLoading = this.setLoading(delay_loading);

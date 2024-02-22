@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxip.h"
@@ -105,7 +103,7 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 	}
 	request;
 
-	int			ret = FAIL, fd, status, i;
+	int			ret = FAIL, fd, status;
 	int			families[] = {AF_INET, AF_INET6, AF_UNSPEC};
 	unsigned int		sequence = 0x58425A;
 	struct timeval		timeout = { 1, 500 * 1000 };
@@ -142,7 +140,7 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 
 	nlerr = NLERR_OK;
 
-	for (i = 0; AF_UNSPEC != families[i]; i++)
+	for (int i = 0; AF_UNSPEC != families[i]; i++)
 	{
 		request.r.idiag_family = families[i];
 
@@ -294,12 +292,12 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads /proc/net/tcp(6) file by chunks until the last line in      *
- *          in buffer has non-listening socket state                          *
+ * Purpose: Reads /proc/net/tcp(6) file by chunks until the last line in      *
+ *          in buffer has non-listening socket state.                         *
  *                                                                            *
- * Parameters: filename     - [IN] the file to read                           *
- *             buffer       - [IN/OUT] the output buffer                      *
- *             buffer_alloc - [IN/OUT] the output buffer size                 *
+ * Parameters: filename     - [IN] file to read                               *
+ *             buffer       - [IN/OUT] output buffer                          *
+ *             buffer_alloc - [IN/OUT] output buffer size                     *
  *                                                                            *
  * Return value: -1 error occurred during reading                             *
  *                0 empty file (shouldn't happen)                             *
@@ -377,11 +375,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads whole file into a buffer in a single read operation         *
+ * Purpose: reads whole file into buffer in single read operation             *
  *                                                                            *
- * Parameters: filename     - [IN] the file to read                           *
- *             buffer       - [IN/OUT] the output buffer                      *
- *             buffer_alloc - [IN/OUT] the output buffer size                 *
+ * Parameters: filename     - [IN] file to read                               *
+ *             buffer       - [IN/OUT] output buffer                          *
+ *             buffer_alloc - [IN/OUT] output buffer size                     *
  *                                                                            *
  * Return value: -1 error occurred during reading                             *
  *                0 empty file (shouldn't happen)                             *
@@ -822,11 +820,9 @@ static unsigned char	get_connection_state_udp(const char *name)
 #ifdef HAVE_IPV6
 static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
 {
-	int	i, k;
-
-	for (i = 0; i < 16; i += 4)
+	for (int i = 0; i < 16; i += 4)
 	{
-		for (k = 0; k < 4; k++)
+		for (int k = 0; k < 4; k++)
 		{
 			if (1 != sscanf(addr + i * 2 + k * 2, "%2hhx", &sa6->sin6_addr.s6_addr[i + 3 - k]))
 				return FAIL;
@@ -893,10 +889,10 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l,
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, &sockaddr_l,
 				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r,
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, &sockaddr_r,
 				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;
@@ -953,10 +949,10 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l,
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, &sockaddr_l,
 				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r,
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, &sockaddr_r,
 				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;

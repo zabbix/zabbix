@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @onBeforeOnce prepareTemplateRemoveMacrosData
 	 */
 	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, 'template', self::$templateid_remove_inherited);
+		$this->checkRemoveInheritedMacros($data, 'template', self::$templateid_remove_inherited,
+				false, null, 'Template for Inherited macros removing');
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -202,14 +203,16 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
+		$this->createSecretMacros($data, 'zabbix.php?action=template.list&filter_name=Template with item graph&filter_set=1',
+				'templates', 'Template with item graph');
 	}
 
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormMacrosTemplate_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'templates.php?form=update&templateid=99137', 'templates');
+		$this->revertSecretMacroChanges($data, 'zabbix.php?action=template.list&filter_name=Test Item Template&filter_set=1',
+				'templates', 'Test Item Template');
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -253,22 +256,25 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosTemplate_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'templates.php?form=update&templateid=99137', 'templates');
+		$this->updateSecretMacros($data, 'zabbix.php?action=template.list&filter_name=Test Item Template&filter_set=1',
+				'templates', 'Test Item Template');
 	}
 
 	/**
 	 * Check Vault macros validation.
 	 */
 	public function testFormMacrosTemplate_checkVaultValidation() {
-		$this->checkVaultValidation('templates.php?form=update&templateid=50002', 'templates');
+		$this->checkVaultValidation('zabbix.php?action=template.list&filter_name=Template ZBX6663 Second&filter_set=1',
+			'templates', 'Template ZBX6663 Second');
 	}
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateVaultMacros($data) {
-		$templateid = ($data['vault'] === 'Hashicorp') ? '99022' : '50000';
-		$this->createVaultMacros($data, 'templates.php?form=update&templateid='.$templateid, 'templates');
+		$template_name = ($data['vault'] === 'Hashicorp') ? 'Template with item graph' : 'Template ZBX6663 First';
+		$this->createVaultMacros($data, 'zabbix.php?action=template.list&filter_name='.$template_name.'&filter_set=1',
+				'templates', $template_name);
 	}
 
 	/**
@@ -276,6 +282,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');
+		$this->updateVaultMacros($data, 'zabbix.php?action=template.list&filter_name=Empty template&filter_set=1',
+			'templates', 'Empty template');
 	}
 }

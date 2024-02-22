@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxshmem.h"
+
+#define ZBX_DIAG_PREPROC_INFO	0x00000001
+#define ZBX_DIAG_PREPROC_SIMPLE	(ZBX_DIAG_PREPROC_INFO)
 
 typedef enum
 {
@@ -65,7 +68,6 @@ int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t
 		*field_mask, zbx_vector_ptr_t *top_views, char **error);
 void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats);
 int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
-int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void	zbx_diag_add_locks_info(struct zbx_json *json);
 int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 

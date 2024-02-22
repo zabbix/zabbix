@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,9 +116,16 @@ $fields = [
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
-	'timeout' => 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+	'custom_timeout' =>			[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
+									null
+								],
+	'timeout' =>				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 									'(isset({add}) || isset({update})) && isset({type})'.
-										' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+									' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
+										ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+										ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+									], 'type'),
 									_('Timeout')
 								],
 	'url' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -251,7 +258,7 @@ $itemid = getRequest('itemid');
 if ($itemid) {
 	$items = API::DiscoveryRule()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['hostid', 'status', 'name'],
+		'selectHosts' => ['hostid', 'proxyid', 'status', 'name'],
 		'itemids' => $itemid,
 		'editable' => true
 	]);
@@ -267,7 +274,7 @@ else {
 
 	if ($hostid) {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'status', 'name'],
+			'output' => ['hostid', 'proxyid', 'status', 'name'],
 			'hostids' => $hostid,
 			'templated_hosts' => true,
 			'editable' => true
@@ -341,7 +348,7 @@ $filter_groupids = CProfile::getArray($prefix.'host_discovery.filter.groupids', 
 $filter_hostids = CProfile::getArray($prefix.'host_discovery.filter.hostids', []);
 
 // Get host groups.
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
@@ -445,8 +452,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				? getRequest('http_password', DB::getDefault('items', 'password'))
 				: getRequest('password', DB::getDefault('items', 'password')),
 			'params' => getRequest('params', DB::getDefault('items', 'params')),
-			'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
+			'timeout' => getRequest('custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
+				? getRequest('timeout', DB::getDefault('items', 'timeout'))
+				: DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
 
 			// Dependent item type specific fields.
@@ -608,7 +617,7 @@ if (hasRequest('form')) {
 	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$items = API::DiscoveryRule()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid', 'name', 'status', 'flags'],
+			'selectHosts' => ['hostid', 'proxyid', 'name', 'status', 'flags'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -640,11 +649,11 @@ if (hasRequest('form')) {
 		}
 	}
 
-	$data = getItemFormData($item, ['form' => getRequest('form'), 'is_discovery_rule' => true]);
+	$data = getItemFormData($item);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
-	$data['evaltype'] = getRequest('evaltype');
+	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
-	$data['conditions'] = getRequest('conditions', []);
+	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $hosts[0];
@@ -652,6 +661,19 @@ if (hasRequest('form')) {
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = in_array($hosts[0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
+
+	$default_timeout = DB::getDefault('items', 'timeout');
+	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
+	$data['inherited_timeouts'] = getInheritedTimeouts($host['proxyid']);
+	$data['can_edit_source_timeouts'] = $data['inherited_timeouts']['source'] === 'proxy'
+		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+
+	if (!$data['custom_timeout']) {
+		$data['timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
+			? $data['inherited_timeouts']['timeouts'][$data['type']]
+			: $default_timeout;
+	}
 
 	if (!hasRequest('form_refresh')) {
 		$i = 0;
@@ -667,14 +689,12 @@ if (hasRequest('form')) {
 		unset($step);
 	}
 
-	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
-
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
-		$data['conditions'] = $item['filter']['conditions'];
+		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
@@ -684,6 +704,15 @@ if (hasRequest('form')) {
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
+	}
+
+	if (!$data['conditions']) {
+		$data['conditions'] = [[
+			'macro' => '',
+			'operator' => CONDITION_OPERATOR_REGEXP,
+			'value' => '',
+			'formulaid' => num2letter(0)
+		]];
 	}
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
@@ -762,7 +791,7 @@ else {
 			$options['filter']['delay'] = $filter['delay'];
 		}
 		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT
-				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) === 0)) {
+				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) == 0)) {
 			$options['filter']['delay'] = -1;
 		}
 		else {

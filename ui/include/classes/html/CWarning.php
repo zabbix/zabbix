@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,11 +32,13 @@ class CWarning extends Ctag {
 			->addClass(ZBX_STYLE_MSG_BAD);
 
 		if ($messages) {
-			$this->addItem(
-				(new CDiv(
-					(new CList($messages))->addClass(ZBX_STYLE_LIST_DASHED)
-				))->addClass(ZBX_STYLE_MSG_DETAILS)
-			);
+			$this
+				->addItem(
+					(new CDiv(
+						(new CList($messages))->addClass(ZBX_STYLE_LIST_DASHED)
+					))->addClass(ZBX_STYLE_MSG_DETAILS)
+				)
+				->addClass(ZBX_STYLE_COLLAPSIBLE);
 		}
 
 		$this->addItem(

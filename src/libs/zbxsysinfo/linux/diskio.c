@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,12 +77,11 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
-	int		i, ret = FAIL, dev_exists = FAIL;
+	int		ret = FAIL, dev_exists = FAIL, found = 0;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
 	zbx_stat_t	dev_st;
-	int		found = 0;
 
-	for (i = 0; i < ZBX_DSTAT_MAX; i++)
+	for (int i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
 
 	if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
@@ -133,7 +132,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 /******************************************************************************
  *                                                                            *
- * Comments: Translate device name to the one used internally by kernel. The  *
+ * Comments: Translates device name to the one used internally by kernel. The *
  *           translation is done based on minor and major device numbers      *
  *           listed in INFO_FILE_NAME . If the names differ it is usually an  *
  *           LVM device which is listed in kernel device mapper.              *
@@ -175,7 +174,7 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA	*device;
+	zbx_single_diskdevice_data	*device;
 	char				*devname, *tmp, kernel_devname[MAX_STRING_LEN];
 	int				type, mode;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
@@ -240,7 +239,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		/* CPU statistics collector and (optionally) disk statistics collector is started only when Zabbix */
 		/* agentd is running as a daemon. When Zabbix agent or agentd is started with "-p" or "-t" parameter */
@@ -296,20 +295,102 @@ int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }
 
+#define DEVTYPE_STR	"DEVTYPE="
+#define DEVTYPE_STR_LEN	ZBX_CONST_STRLEN(DEVTYPE_STR)
+static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysfs_found, struct zbx_json *j)
+{
 /* SCSI device type CD/DVD-ROM. http://en.wikipedia.org/wiki/SCSI_Peripheral_Device_Type */
 #define SCSI_TYPE_ROM			0x05
+	char		tmp[MAX_STRING_LEN];
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
+
+	if (0 == zbx_stat(tmp, stat_buf) && 0 != S_ISBLK(stat_buf->st_mode))
+	{
+		int	devtype_found = 0, dev_bypass = 0, uevent_found = 0, offset = 0;
+		char	sys_blkdev_pfx_uevent[MAX_STRING_LEN];
+
+		if (1 == sysfs_found)
+		{
+			int		type;
+			FILE		*f;
+			zbx_stat_t	lstat_buf;
+
+			if (0 == lstat(tmp, &lstat_buf))
+			{
+				char	sys_blkdev_pfx_device_type[MAX_STRING_LEN];
+
+				zbx_snprintf(sys_blkdev_pfx_device_type, sizeof(sys_blkdev_pfx_device_type),
+						ZBX_SYS_BLKDEV_PFX "%u:%u/device/type", major(stat_buf->st_rdev),
+						minor(stat_buf->st_rdev));
+
+				if (NULL != (f = fopen(sys_blkdev_pfx_device_type, "r")) &&
+						1 == fscanf(f, "%d", &type) && SCSI_TYPE_ROM == type)
+				{
+					devtype_found = 1;
+
+					if (0 != S_ISLNK(lstat_buf.st_mode))
+						dev_bypass = 1;
+					else
+						zbx_snprintf(tmp, sizeof(tmp), "rom");
+				}
+
+				zbx_fclose(f);
+			}
+			else
+				return;
+
+			if (0 == devtype_found)
+			{
+				zbx_snprintf(sys_blkdev_pfx_uevent, sizeof(sys_blkdev_pfx_uevent),
+						ZBX_SYS_BLKDEV_PFX "%u:%u/uevent", major(stat_buf->st_rdev),
+						minor(stat_buf->st_rdev));
+
+				if (NULL != (f = fopen(sys_blkdev_pfx_uevent, "r")))
+				{
+					while (NULL != fgets(sys_blkdev_pfx_uevent, sizeof(sys_blkdev_pfx_uevent), f))
+					{
+						if (0 == strncmp(sys_blkdev_pfx_uevent, DEVTYPE_STR, DEVTYPE_STR_LEN))
+						{
+							char	*p;
+							size_t	l;
+
+							l = strlen(sys_blkdev_pfx_uevent);
+							/* dismiss trailing \n */
+							p = sys_blkdev_pfx_uevent + l - 1;
+							if ('\n' == *p)
+								*p = '\0';
+
+							uevent_found = 1;
+							offset = DEVTYPE_STR_LEN;
+							break;
+						}
+					}
+					zbx_fclose(f);
+				}
+			}
+		}
+
+		if (0 == dev_bypass)
+		{
+			zbx_json_addobject(j, NULL);
+			zbx_json_addstring(j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset :
+					(1 == uevent_found ? sys_blkdev_pfx_uevent : ""),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_close(j);
+		}
+	}
+#undef SCSI_TYPE_ROM
+}
 
 int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#define DEVTYPE_STR	"DEVTYPE="
-#define DEVTYPE_STR_LEN	ZBX_CONST_STRLEN(DEVTYPE_STR)
-
 	DIR		*dir;
+	zbx_stat_t	stat_buf;
+	int		sysfs_found;
 	struct dirent	*entries;
-	char		tmp[MAX_STRING_LEN];
-	zbx_stat_t	stat_buf, lstat_buf;
 	struct zbx_json	j;
-	int		devtype_found, sysfs_found, dev_bypass;
 
 	ZBX_UNUSED(request);
 
@@ -325,80 +406,7 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		while (NULL != (entries = readdir(dir)))
 		{
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
-
-			if (0 == zbx_stat(tmp, &stat_buf) && 0 != S_ISBLK(stat_buf.st_mode))
-			{
-				int	offset = 0;
-
-				devtype_found = 0;
-				dev_bypass = 0;
-
-				if (1 == sysfs_found)
-				{
-					int	type;
-					FILE	*f;
-
-					if (0 == lstat(tmp, &lstat_buf))
-					{
-						zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/device/type",
-								major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
-
-						if (NULL != (f = fopen(tmp, "r")) && 1 == fscanf(f, "%d", &type) &&
-								SCSI_TYPE_ROM == type)
-						{
-							devtype_found = 1;
-
-							if (0 != S_ISLNK(lstat_buf.st_mode))
-								dev_bypass = 1;
-							else
-								zbx_snprintf(tmp, sizeof(tmp), "rom");
-						}
-
-						zbx_fclose(f);
-					}
-					else
-						continue;
-
-					if (0 == devtype_found)
-					{
-						zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
-								major(stat_buf.st_rdev), minor(stat_buf.st_rdev));
-
-						if (NULL != (f = fopen(tmp, "r")))
-						{
-							while (NULL != fgets(tmp, sizeof(tmp), f))
-							{
-								if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
-								{
-									char	*p;
-									size_t	l;
-
-									l = strlen(tmp);
-									/* dismiss trailing \n */
-									p = tmp + l - 1;
-									if ('\n' == *p)
-										*p = '\0';
-
-									devtype_found = 1;
-									offset = DEVTYPE_STR_LEN;
-									break;
-								}
-							}
-							zbx_fclose(f);
-						}
-					}
-				}
-
-				if (0 == dev_bypass)
-				{
-					zbx_json_addobject(&j, NULL);
-					zbx_json_addstring(&j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
-					zbx_json_addstring(&j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset : "",
-							ZBX_JSON_TYPE_STRING);
-					zbx_json_close(&j);
-				}
-			}
+			process_entry(entries, &stat_buf, sysfs_found, &j);
 		}
 		closedir(dir);
 	}

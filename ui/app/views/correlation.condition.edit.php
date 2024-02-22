@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ $inline_js = getPagePostJs().$this->readJsFile('correlation.condition.edit.js.ph
 $form = (new CForm())
 	->setId('correlation-condition-form')
 	->setName('conditions')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('conditiontype', $data['conditiontype'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
@@ -67,7 +67,7 @@ switch ($condition_type) {
 				new CFormField([$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
 			])
 			->addItem([
-				new CLabel(_('Tag'), 'tag'),
+				(new CLabel(_('Tag'), 'tag'))->setAsteriskMark(),
 				new CFormField($new_condition_tag)
 			]);
 		break;
@@ -102,7 +102,7 @@ switch ($condition_type) {
 				new CFormField($operator)
 			])
 			->addItem([
-				new CLabel(_('Host groups'), 'groupids__ms'),
+				(new CLabel(_('Host groups'), 'groupids__ms'))->setAsteriskMark(),
 				new CFormField($hostgroup_multiselect)
 			]);
 		break;
@@ -125,7 +125,7 @@ switch ($condition_type) {
 
 		$form_grid
 			->addItem([
-				new CLabel(_('Old tag name'), 'oldtag'),
+				(new CLabel(_('Old tag name'), 'oldtag'))->setAsteriskMark(),
 				new CFormField($new_condition_oldtag)
 			])
 			->addItem([
@@ -133,7 +133,7 @@ switch ($condition_type) {
 				new CFormField([$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
 			])
 			->addItem([
-				new CLabel(_('New tag name'), 'newtag'),
+				(new CLabel(_('New tag name'), 'newtag'))->setAsteriskMark(),
 				new CFormField($new_condition_newtag)
 			]);
 		break;
@@ -157,7 +157,7 @@ switch ($condition_type) {
 
 		$form_grid
 			->addItem([
-				new CLabel(_('Tag'), 'tag'),
+				(new CLabel(_('Tag'), 'tag'))->setAsteriskMark(),
 				new CFormField($new_condition_tag)
 			])
 			->addItem([

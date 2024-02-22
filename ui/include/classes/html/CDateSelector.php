@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,11 +78,11 @@ class CDateSelector extends CTag {
 	private $enabled = true;
 
 	/**
-	 * Maxlength attribute of the input field. Aligned with the date format by default.
+	 * Maxlength attribute of the input field.
 	 *
 	 * @var int
 	 */
-	private $maxlength;
+	private $maxlength = 255;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -129,7 +129,7 @@ class CDateSelector extends CTag {
 	/**
 	 * Add placeholder to date textbox field.
 	 *
-	 * @param string $text  Placeholder text for date textbox field.
+	 * @param string|null $text  Placeholder text for date textbox field.
 	 *
 	 * @return CDateSelector
 	 */
@@ -189,9 +189,9 @@ class CDateSelector extends CTag {
 		$this
 			->addItem(
 				(new CTextBox($this->name, $this->value))
-					->setId($this->name)
+					->setId(zbx_formatDomId($this->name))
 					->setAttribute('placeholder', $this->placeholder)
-					->setAttribute('maxlength', $this->maxlength ?? strlen(date($this->date_format)))
+					->setAttribute('maxlength', $this->maxlength)
 					->setAriaRequired($this->is_required)
 					->setEnabled($this->enabled)
 					->setReadonly($this->readonly)
@@ -200,7 +200,7 @@ class CDateSelector extends CTag {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CALENDAR)
 				->setEnabled($this->enabled && !$this->readonly)
-				->onClick('toggleCalendar(this, "'.$this->name.'", "'.$this->date_format.'");'));
+				->onClick('toggleCalendar(this, "'.zbx_formatDomId($this->name).'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);
 	}

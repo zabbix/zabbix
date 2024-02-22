@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,23 +107,5 @@ typedef struct
 zbx_pp_item_t;
 
 void	zbx_pp_item_clear(zbx_pp_item_t *item);
-
-#define ZBX_PP_VALUE_OPT_NONE		0x0000
-#define ZBX_PP_VALUE_OPT_META		0x0001
-#define ZBX_PP_VALUE_OPT_LOG		0x0002
-
-typedef struct
-{
-	zbx_uint32_t	flags;
-	int		mtime;
-	int		timestamp;
-	int		severity;
-	int		logeventid;
-	zbx_uint64_t	lastlogsize;
-	char		*source;
-}
-zbx_pp_value_opt_t;
-
-void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 
 #endif

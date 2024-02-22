@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 namespace Widgets\Graph\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CGraphDraw,
@@ -29,8 +30,6 @@ use API,
 	CRoleHelper,
 	CUrl,
 	CWebUser;
-
-use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -40,9 +39,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'dynamic_hostid' => 'db hosts.hostid',
 			'contents_width' => 'int32',
-			'contents_height' => 'int32'
+			'contents_height' => 'int32',
+			'has_custom_time_period' => 'in 1'
 		]);
 	}
 
@@ -52,7 +51,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$width = (int) $this->getInput('contents_width', 100);
 		$height = (int) $this->getInput('contents_height', 100);
 
-		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$resourceid = null;
 		$profileIdx = 'web.dashboard.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
@@ -87,7 +85,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'objDims' => $graph_dims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
-			'reloadOnAdd' => 1
+			'reloadOnAdd' => 1,
+			'useCustomEvents' => 1
 		];
 
 		$flickerfreescreen_data = [
@@ -96,14 +95,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'timeline' => [],
 			'resourcetype' => $resource_type,
 			'profileIdx' => $profileIdx,
-			'profileIdx2' => $profileIdx2
+			'profileIdx2' => $profileIdx2,
+			'useCustomEvents' => 1
 		];
 
-		$is_dynamic_item = $this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM;
-
-		// Replace graph item by particular host item if dynamic items are used.
-		if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
-			// Find same simple-graph item in selected $dynamic_hostid host.
+		// Replace graph item by particular host item if the host has been overridden.
+		if ($this->fields_values['override_hostid'] && $resourceid) {
+			// Find same simple-graph item in the overridden host.
 			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
 					'output' => ['key_'],
@@ -112,20 +110,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name'],
+					'output' => ['itemid', 'name_resolved'],
 					'selectHosts' => ['name'],
-					'hostids' => $dynamic_hostid,
+					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
 						'key_' => $src_items[0]['key_'],
 						'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
 					],
 					'webitems' => true
 				]);
-
 				$item = reset($items);
-				$resourceid = $items ? $item['itemid'] : null;
 
-				if ($resourceid === null) {
+				if ($item) {
+					$resourceid = $item['itemid'];
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+				}
+				else {
+					$resourceid = null;
 					$is_resource_available = false;
 				}
 			}
@@ -134,7 +135,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				// get host
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'host', 'name'],
-					'hostids' => $dynamic_hostid
+					'hostids' => $this->fields_values['override_hostid']
 				]);
 				$host = reset($hosts);
 
@@ -152,7 +153,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
 						$new_dynamic = getSameGraphItemsForHost(
 							[['itemid' => $graph['ymax_itemid']]],
-							$dynamic_hostid,
+							$this->fields_values['override_hostid'][0],
 							false
 						);
 						$new_dynamic = reset($new_dynamic);
@@ -168,7 +169,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
 						$new_dynamic = getSameGraphItemsForHost(
 							[['itemid' => $graph['ymin_itemid']]],
-							$dynamic_hostid,
+							$this->fields_values['override_hostid'][0],
 							false
 						);
 						$new_dynamic = reset($new_dynamic);
@@ -185,8 +186,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if ($graph) {
 					$graph['hosts'] = $hosts;
 
-					// Search if there are any items available for this dynamic host.
-					$new_dynamic = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+					// Search if there are any items available for the overridden host.
+					$new_dynamic = getSameGraphItemsForHost($graph['gitems'],
+						$this->fields_values['override_hostid'][0], false
+					);
 
 					if ($new_dynamic) {
 						// Add destination host data required by CMacrosResolver::resolveGraphNames().
@@ -212,7 +215,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$items = API::Item()->get([
-					'output' => ['name', 'key_', 'delay', 'hostid'],
+					'output' => [!$this->isTemplateDashboard() ? 'name_resolved' : 'name', 'key_', 'delay', 'hostid'],
 					'selectHosts' => ['name'],
 					'itemids' => $resourceid,
 					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
@@ -222,6 +225,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if (!$item) {
 					$is_resource_available = false;
+				}
+				elseif (!$this->isTemplateDashboard()) {
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
 				}
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
@@ -243,7 +249,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($is_resource_available) {
 			// Build graph action and data source links.
 			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				if (!$edit_mode) {
+				if (!$edit_mode && !$this->hasInput('has_custom_time_period')) {
 					$time_control_data['loadSBox'] = 1;
 				}
 
@@ -271,13 +277,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				$prepend_host_name = $this->isTemplateDashboard()
 					? false
-					: count($graph['hosts']) == 1 || ($is_dynamic_item && $dynamic_hostid != 0);
+					: count($graph['hosts']) == 1 || $this->fields_values['override_hostid'];
 
 				$header_name = $prepend_host_name
 					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
 					: $graph['name'];
 
-				if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
+				if ($this->fields_values['override_hostid'] && $resourceid) {
 					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 						$graph_src = (new CUrl('chart7.php'))
 							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
@@ -300,7 +306,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 							->setArgument('percent_right', $graph['percent_right']);
 					}
 
-					$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+					$new_graph_items = getSameGraphItemsForHost($graph['gitems'],
+						$this->fields_values['override_hostid'][0], false
+					);
 
 					foreach ($new_graph_items as &$new_graph_item) {
 						unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
@@ -311,18 +319,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-					if (!$is_dynamic_item || $graph_src === '') {
+					if (!$this->fields_values['override_hostid'] || $graph_src === '') {
 						$graph_src = (new CUrl('chart6.php'))
 							->setArgument('graphid', $resourceid)
 							->setArgument('graph3d', $graph['show_3d']);
 					}
 				}
 				else {
-					if (!$is_dynamic_item || $graph_src === '') {
+					if (!$this->fields_values['override_hostid'] || $graph_src === '') {
 						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 
-					if (!$edit_mode) {
+					if (!$edit_mode && !$this->hasInput('has_custom_time_period')) {
 						$time_control_data['loadSBox'] = 1;
 					}
 				}
@@ -333,6 +341,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					->setArgument('legend', $this->fields_values['show_legend'] && $graph['show_legend'] ? 1 : 0)
 					->setArgument('from')
 					->setArgument('to');
+			}
+
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				$graph_src->setArgument('resolve_macros', 1);
 			}
 
 			$graph_src
@@ -346,15 +358,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($edit_mode || ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid'))) {
+			if ($edit_mode || ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
 				$graph_url = null;
 			}
 			else {
 				if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-					$has_host_graph = $is_dynamic_item && $dynamic_hostid != 0
+					$has_host_graph = $this->fields_values['override_hostid']
 						? (bool) API::Graph()->get([
 							'output' => [],
-							'hostids' => [$dynamic_hostid],
+							'hostids' => $this->fields_values['override_hostid'],
 							'filter' => [
 								'name' => $graph['name']
 							]
@@ -396,11 +408,30 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_control_data' => $time_control_data,
 				'flickerfreescreen_data' => $flickerfreescreen_data
 			],
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
 		$this->setResponse(new CControllerResponseData($response));
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

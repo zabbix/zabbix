@@ -16,7 +16,8 @@ libzbxdbwrap_a_SOURCES = \
 	graph_linking.c \
 	graph_linking.h \
 	host.c \
-	user.c
+	user.c \
+	permission.c
 
 libzbxdbwrap_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

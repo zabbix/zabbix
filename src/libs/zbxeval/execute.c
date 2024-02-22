@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,12 @@
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
-#include "zbxexpression.h"
+#include "zbxtime.h"
+#include "zbxjson.h"
+
+#ifdef HAVE_LIBXML2
+#	include "zbxxml.h"
+#endif
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
@@ -2770,6 +2775,194 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: evaluates jsonpath() function                                     *
+ *                                                                            *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             output - [IN/OUT] output value stack                           *
+ *             error  - [OUT] error message in case of failure                *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int		ret = FAIL;
+	char		*ret_value = NULL;
+	zbx_variant_t	*json_value, *path, value, *default_value = NULL;
+	zbx_jsonobj_t	obj;
+
+	if (2 > token->opt || 3 < token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return ret;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	ret = FAIL;
+	json_value = &output->values[output->values_num - token->opt];
+
+	if (ZBX_VARIANT_NONE != json_value->type && SUCCEED != zbx_variant_convert(json_value, ZBX_VARIANT_STR))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		return ret;
+	}
+
+	path = &output->values[output->values_num - token->opt + 1];
+
+	if (ZBX_VARIANT_NONE != path->type && SUCCEED != zbx_variant_convert(path, ZBX_VARIANT_STR))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		return ret;
+	}
+
+	if (2 < token->opt)
+	{
+		default_value = &output->values[output->values_num - token->opt + 2];
+
+		if (ZBX_VARIANT_NONE != default_value->type &&
+				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
+		{
+			*error = zbx_strdup(*error, "invalid third parameter");
+			return ret;
+		}
+	}
+
+	if (FAIL == zbx_jsonobj_open(json_value->data.str, &obj))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		return ret;
+	}
+
+	if (FAIL == zbx_jsonobj_query(&obj, path->data.str, &ret_value))
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto clean;
+	}
+
+	if (NULL == ret_value)
+	{
+		if (NULL == default_value)
+		{
+			*error = zbx_strdup(*error, "jsonpath returned no value");
+			goto clean;
+		}
+
+		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
+	}
+	else
+		zbx_variant_set_str(&value, zbx_strdup(NULL, ret_value));
+
+	eval_function_return(token->opt, &value, output);
+	ret = SUCCEED;
+clean:
+	zbx_free(ret_value);
+	zbx_jsonobj_clear(&obj);
+
+	return ret;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluates xmlxpath() function                                     *
+ *                                                                            *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             output - [IN/OUT] output value stack                           *
+ *             error  - [OUT] error message in case of failure                *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(ctx);
+	ZBX_UNUSED(token);
+	ZBX_UNUSED(output);
+
+	*error = zbx_strdup(*error, "Support for XML was not compiled in.");
+	return FAIL;
+#else
+	int		ret, is_empty;
+	zbx_variant_t	*xml_value, *path, value, *default_value = NULL;
+
+	if (2 > token->opt || 3 < token->opt)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	xml_value = &output->values[output->values_num - token->opt];
+
+	if (ZBX_VARIANT_NONE != xml_value->type && SUCCEED != zbx_variant_convert(xml_value, ZBX_VARIANT_STR))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		return FAIL;
+	}
+
+	path = &output->values[output->values_num - token->opt + 1];
+
+	if (ZBX_VARIANT_NONE != path->type && SUCCEED != zbx_variant_convert(path, ZBX_VARIANT_STR))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		return FAIL;
+	}
+
+	if (2 < token->opt)
+	{
+		default_value = &output->values[output->values_num - token->opt + 2];
+
+		if (ZBX_VARIANT_NONE != default_value->type &&
+				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
+		{
+			*error = zbx_strdup(*error, "invalid third parameter");
+			return FAIL;
+		}
+	}
+
+	zbx_variant_set_str(&value, zbx_strdup(NULL, xml_value->data.str));
+	ret = zbx_query_xpath_contents(&value, path->data.str, &is_empty, error);
+
+	if (FAIL == ret)
+	{
+		zbx_variant_clear(&value);
+		return FAIL;
+	}
+
+	if (SUCCEED == is_empty)
+	{
+		zbx_variant_clear(&value);
+
+		if (NULL == default_value)
+		{
+			*error = zbx_strdup(*error, "XML xpath returned empty nodeset");
+			return FAIL;
+		}
+
+		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
+	}
+
+	eval_function_return(token->opt, &value, output);
+
+	return SUCCEED;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: evaluates common function                                         *
  *                                                                            *
  * Parameters: ctx    - [IN] evaluation context                               *
@@ -2936,6 +3129,10 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	{
 		return eval_execute_function_histogram_quantile(ctx, token, output, error);
 	}
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "jsonpath", ZBX_CONST_STRLEN("jsonpath")))
+		return eval_execute_function_jsonpath(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "xmlxpath", ZBX_CONST_STRLEN("xmlxpath")))
+		return eval_execute_function_xmlxpath(ctx, token, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
@@ -2993,8 +3190,17 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 	}
 
 	arg = &output->values[output->values_num - 1];
-	zbx_variant_convert(arg, ZBX_VARIANT_STR);
-	*error = arg->data.str;
+
+	if (FAIL == zbx_variant_convert(arg, ZBX_VARIANT_STR))
+	{
+		*error = zbx_dsprintf(*error, "unknown exception of type '%s'", zbx_variant_type_desc(arg));
+
+		zabbix_log(LOG_LEVEL_CRIT, *error);
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+	else
+		*error = arg->data.str;
+
 	zbx_variant_set_none(arg);
 }
 

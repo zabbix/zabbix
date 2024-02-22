@@ -51,8 +51,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB: Get instance metrics|<p>Get TiDB instance metrics.</p>|HTTP agent|tidb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
-|TiDB: Get instance status|<p>Get TiDB instance status info.</p>|HTTP agent|tidb.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"status": "0"}`</p></li></ul>|
+|TiDB: Get instance metrics|<p>Get TiDB instance metrics.</p>|HTTP agent|tidb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
+|TiDB: Get instance status|<p>Get TiDB instance status info.</p>|HTTP agent|tidb.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"status": "0"}`</p></li></ul>|
 |TiDB: Status|<p>Status of PD instance.</p>|Dependent item|tidb.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |TiDB: Get total server query metrics|<p>Get information about server queries.</p>|Dependent item|tidb.server_query.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tidb_server_query_total")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |TiDB: Total "error" server query, rate|<p>The number of queries on TiDB instance per second with failure of command execution results.</p>|Dependent item|tidb.server_query.error.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.result == "Error")].value.sum()`</p></li><li>Change per second</li></ul>|

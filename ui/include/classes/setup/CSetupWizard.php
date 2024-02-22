@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -514,6 +514,7 @@ class CSetupWizard extends CForm {
 
 	private function stageDbConnection(): array {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
+		$db_warning = _('Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions.');
 
 		$table = (new CFormList())
 			->addItem([
@@ -521,13 +522,14 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_certificate', 0))->removeId(),
 				(new CVar('verify_host', 0))->removeId()
 			])
-			->addRow(new CLabel(_('Database type'), 'label-type'),
+			->addRow(new CLabel(_('Database type'), 'label-type'), [
 				(new CSelect('type'))
 					->setId('type')
 					->setFocusableElementId('label-type')
 					->setValue($DB['TYPE'])
-					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
-			)
+					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases())),
+				makeWarningIcon($db_warning)->setId('db_warning')
+			])
 			->addRow(_('Database host'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

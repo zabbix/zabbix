@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class CControllerHostEdit extends CController {
 			'status'				=> 'db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
 											HOST_STATUS_NOT_MONITORED
 										]),
-			'proxy_hostid'			=> 'db hosts.proxy_hostid',
+			'proxyid'				=> 'db hosts.proxyid',
 			'interfaces'			=> 'array',
 			'mainInterfaces'		=> 'array',
 			'groups'				=> 'array',
@@ -135,7 +135,7 @@ class CControllerHostEdit extends CController {
 			}
 			else {
 				$hosts = API::Host()->get([
-					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
+					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxyid', 'ipmi_authtype',
 						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
 						'tls_subject', 'flags', 'inventory_mode'
 					],
@@ -416,23 +416,23 @@ class CControllerHostEdit extends CController {
 	 */
 	protected function extendProxies(?array &$proxies): void {
 		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$proxies = ($this->host['proxy_hostid'] !== '0')
+			$proxies = $this->host['proxyid'] != 0
 				? API::Proxy()->get([
-					'output' => ['host', 'proxyid'],
-					'proxyids' => [$this->host['proxy_hostid']],
+					'output' => ['name', 'proxyid'],
+					'proxyids' => [$this->host['proxyid']],
 					'preservekeys' => true
 				])
 				: [];
 		}
 		else {
 			$proxies = API::Proxy()->get([
-				'output' => ['host', 'proxyid'],
+				'output' => ['name', 'proxyid'],
 				'preservekeys' => true
 			]);
-			CArrayHelper::sort($proxies, ['host']);
+			CArrayHelper::sort($proxies, ['name']);
 		}
 
-		$proxies = array_column($proxies, 'host', 'proxyid');
+		$proxies = array_column($proxies, 'name', 'proxyid');
 	}
 
 	/**
@@ -490,7 +490,7 @@ class CControllerHostEdit extends CController {
 			$inputs['inventory'] = $this->getInput('host_inventory', []);
 
 			$this->getInputs($inputs, [
-				'host', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				'host', 'description', 'status', 'proxyid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tls_psk_identity',
 				'tls_psk', 'tags', 'inventory_mode', 'host_inventory'
 			]);
@@ -568,7 +568,7 @@ class CControllerHostEdit extends CController {
 			'hostid' => null,
 			'name' => '',
 			'host' => '',
-			'proxy_hostid' => '0',
+			'proxyid' => '0',
 			'status' => HOST_STATUS_MONITORED,
 			'ipmi_authtype' => IPMI_AUTHTYPE_DEFAULT,
 			'ipmi_privilege' => IPMI_PRIVILEGE_USER,

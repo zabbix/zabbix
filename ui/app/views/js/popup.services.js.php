@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ window.services_popup = new class {
 
 			PopUp('popup.services', getFormFields(filter_form), {
 				dialogueid: 'services',
+				dialogue_class: 'modal-popup-generic',
 				trigger_element: e.target
 			});
 		}, {passive: false});
@@ -51,6 +52,7 @@ window.services_popup = new class {
 
 			PopUp('popup.services', getFormFields(filter_form), {
 				dialogueid: 'services',
+				dialogue_class: 'modal-popup-generic',
 				trigger_element: e.target
 			});
 		}, {passive: false});

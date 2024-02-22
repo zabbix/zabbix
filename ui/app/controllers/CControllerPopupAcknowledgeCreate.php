@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			'object' => EVENT_OBJECT_TRIGGER
 		]);
 
-		return ($events == count($eventids));
+		return $events == count($eventids);
 	}
 
 	protected function doAction() {
@@ -333,7 +333,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		// Select details for all affected events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'r_eventid'],
-			'select_acknowledges' => $this->close_problems || $this->suppress || $this->unsuppress ? ['action'] : null,
+			'selectAcknowledges' => $this->close_problems || $this->suppress || $this->unsuppress ? ['action'] : null,
 			'selectSuppressionData' => $this->unsuppress ? ['maintenanceid'] : null,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,

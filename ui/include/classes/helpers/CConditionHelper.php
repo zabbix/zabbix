@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -230,5 +230,32 @@ class CConditionHelper {
 		}
 
 		return $nextFormulaId;
+	}
+
+
+	/**
+	 * Sorts the conditions based on the given formula.
+	 *
+	 * @param array $filter  Array containing the formula and conditions.
+	 *
+	 * $filter = [
+	 *     'conditions' =>  (array)   Array of conditions.
+	 *     'formula' =>     (string)  Action condition formula.
+	 * ]
+	 *
+	 * @return array
+	 */
+	public static function sortConditionsByFormula(array $filter): array {
+		$formula = $filter['formula'];
+
+		usort($filter['conditions'], static function (array $a, array $b) use ($formula) {
+			$pattern = '/([A-Z]+)/';
+			preg_match_all($pattern, $formula, $matches);
+			$upper_letters = $matches[0];
+
+			return array_search($a['formulaid'], $upper_letters) <=> array_search($b['formulaid'], $upper_letters);
+		});
+
+		return $filter['conditions'];
 	}
 }

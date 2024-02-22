@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,64 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-/**
- * Returns the names of supported event sources.
- *
- * If the $source parameter is passed, returns the name of the specific source, otherwise - returns an array of all
- * supported sources.
- *
- * @param int $source
- *
- * @return array|string
- */
-function eventSource($source = null) {
-	$sources = [
-		EVENT_SOURCE_TRIGGERS => _('trigger'),
-		EVENT_SOURCE_DISCOVERY => _('discovery'),
-		EVENT_SOURCE_AUTOREGISTRATION => _('autoregistration'),
-		EVENT_SOURCE_INTERNAL => _x('internal', 'event source'),
-		EVENT_SOURCE_SERVICE => _('service')
-	];
-
-	if ($source === null) {
-		return $sources;
-	}
-
-	return array_key_exists($source, $sources) ?  $sources[$source] : _('Unknown');
-}
-
-/**
- * Returns the names of supported event objects.
- *
- * If the $source parameter is passed, returns the name of the specific object, otherwise - returns an array of all
- * supported objects.
- *
- * @param int $object
- *
- * @return array|string
- */
-function eventObject($object = null) {
-	$objects = [
-		EVENT_OBJECT_TRIGGER => _('trigger'),
-		EVENT_OBJECT_DHOST => _('discovered host'),
-		EVENT_OBJECT_DSERVICE => _('discovered service'),
-		EVENT_OBJECT_AUTOREGHOST => _('autoregistered host'),
-		EVENT_OBJECT_ITEM => _('item'),
-		EVENT_OBJECT_LLDRULE => _('low-level discovery rule'),
-		EVENT_OBJECT_SERVICE => _('service')
-	];
-
-	if ($object === null) {
-		return $objects;
-	}
-	elseif (isset($objects[$object])) {
-		return $objects[$object];
-	}
-	else {
-		return _('Unknown');
-	}
-}
 
 /**
  * Returns all supported event source-object pairs.
@@ -310,7 +252,7 @@ function isEventUpdating(bool $in_closing, array $event): bool {
 /**
  * Calculate and return a rank change icon depending on current event rank change. If event is currently a cause event
  * and it is undergoing a rank change, return cause event icon. If event is currently a symptom event and it is
- * undergoing a rank change, return symptom event icon. Icon can be displayed regarless if current status is in closing.
+ * undergoing a rank change, return symptom event icon. Icon can be displayed regardless if current status is in closing.
  *
  * @param array  $event                              Event data.
  * @param array  $event['acknowledges']              List of event acknowledges.
@@ -404,7 +346,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid',
 			'cause_eventid'
 		],
-		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+		'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 			'suppress_until', 'taskid'
 		],
 		'source' => EVENT_SOURCE_TRIGGERS,
@@ -471,7 +413,6 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		if ($event['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
 			$value_clock = $event['r_clock'];
 			$can_be_closed = false;
 		}

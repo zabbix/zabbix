@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,27 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			'url' => 'http://test.url'
 		]);
 		$this->assertArrayHasKey('connectorids', $connectors);
+
+		// Create event correlation.
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for element remove',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'element remove'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
 	}
 
 	public static function getElementRemoveData() {
@@ -114,16 +135,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=create',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'create'
 				]
 			],
 			// #7 Template update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=update&templateid=10169',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'update'
 				]
 			],
 			// #8 Host create.
@@ -144,32 +165,32 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'overlay' => 'item_update'
 				]
 			],
 			// #11 Item create.
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=create&hostid=50011&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'overlay' => 'create'
 				]
 			],
 			// #12 Trigger update.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'triggers.php?form=update&triggerid=100034&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
+					'overlay' => 'trigger_update'
 				]
 			],
 			// #13 Trigger create.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'triggers.php?hostid=50011&form=create&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
+					'overlay' => 'create'
 				]
 			],
 			// #14 Graph update.
@@ -344,7 +365,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=20',
+					'link' => 'zabbix.php?action=regex.edit&regexid=2',
 					'return_button' => true
 				]
 			],
@@ -619,6 +640,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'link' => 'zabbix.php?action=audit.settings.edit',
 					'return_button' => true
 				]
+			],
+			// #70 Timeout options update.
+			[
+				[
+					'db' => 'SELECT * FROM config',
+					'link' => 'zabbix.php?action=timeouts.edit',
+					'return_button' => true
+				]
 			]
 		];
 	}
@@ -637,6 +666,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			$selectors = [
 				'create' => "//div[@class=\"header-controls\"]//button",
 				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
+				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
+				'item_update' => "//table[@class=\"list-table\"]//tr[1]/td[3]/a",
 				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];
@@ -676,15 +707,15 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 	public static function getCheckTokenData() {
 		return [
-			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update item).
+			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update LLD).
 			[
 				[
 					'token' => true,
-					'token_url' => 'items.php?form=update&hostid=99134&itemid=99114&context=host',
+					'token_url' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host',
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=99134&itemid=99114&context=host&name=4_item&description='.
-							'&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT&update=Update'.
-							'&_csrf_token=',
+					'link' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host&name=test'.
+						'&description=&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT'.
+						'&lifetime=1&formula=test&evaltype=1&update=Update&_csrf_token=',
 					'error' => self::INCORRECT_REQUEST
 				]
 			],

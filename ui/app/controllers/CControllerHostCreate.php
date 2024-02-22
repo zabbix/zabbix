@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+				'proxyid' => $this->getInput('proxyid', 0),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,12 +46,11 @@ $usergroup_multiselect = (new CMultiSelect([
 			'srcfld1' => 'usrgrpid',
 			'srcfld2' => 'name',
 			'dstfrm' => $form->getName(),
-			'dstfld1' => 'user_groups'
+			'dstfld1' => 'user_groups_'
 		]
 	]
 ]))
-	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-	->setId('user_groups');
+	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 $inline_js = $usergroup_multiselect->getPostJS();
 
 $user_role_multiselect = (new CMultiSelect([
@@ -85,12 +84,13 @@ $name_hint_icon = makeHelpIcon([
 $form
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel([_s('%1$s group pattern', $source), $name_hint_icon], 'name'))->setAsteriskMark(),
+			(new CLabel([_s('%1$s group pattern', $source), $name_hint_icon], 'group_pattern'))->setAsteriskMark(),
 			new CFormField(
 				(new CTextBox('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 					->setAriaRequired()
+					->setId('group_pattern')
 			)
 		])
 		->addItem([

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "zbxtasks.h"
 #include "zbxcompress.h"
 #include "zbxtime.h"
-#include "../taskmanager/taskmanager.h"
+#include "../taskmanager/taskmanager_proxy.h"
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
 
@@ -62,11 +62,11 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 	if (NULL == buffer || '\0' == *buffer || SUCCEED != zbx_json_open(buffer, &jp))
 		return;
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROXY_UPLOAD, value, sizeof(value), NULL))
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, value, sizeof(value), NULL))
 	{
-		if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED))
+		if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED))
 			*state = ZBX_PROXY_UPLOAD_ENABLED;
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED))
+		else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
 			*state = ZBX_PROXY_UPLOAD_DISABLED;
 	}
 }
@@ -296,7 +296,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg,
+			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

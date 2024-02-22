@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,31 +27,39 @@ class CControllerProxyUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'proxyid' =>				'required|id',
-			'host' =>					'required|string|not_empty',
-			'status' =>					'required|in '.implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]),
-			'ip' =>						'string',
-			'dns' =>					'string',
-			'useip' =>					'in '.implode(',', [INTERFACE_USE_IP, INTERFACE_USE_DNS]),
-			'port' =>					'string',
-			'proxy_address' =>			'string',
-			'description' =>			'string',
-			'tls_connect' =>			'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
+			'proxyid' =>				'required|db proxy.proxyid',
+			'name' =>					'required|not_empty|db proxy.name',
+			'operating_mode' =>			'required|db proxy.operating_mode|in '.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
+			'address' =>				'db proxy.address',
+			'port' =>					'db proxy.port',
+			'allowed_addresses' =>		'db proxy.allowed_addresses',
+			'description' =>			'db proxy.description',
+			'tls_connect' =>			'db proxy.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
 			'tls_accept_none' =>		'in 1',
 			'tls_accept_psk' =>			'in 1',
 			'tls_accept_certificate' =>	'in 1',
-			'tls_psk_identity' =>		'string',
-			'tls_psk' =>				'string',
-			'tls_issuer' =>				'string',
-			'tls_subject' =>			'string',
-			'update_psk' =>				'required|bool'
+			'tls_psk_identity' =>		'db proxy.tls_psk_identity',
+			'tls_psk' =>				'db proxy.tls_psk',
+			'tls_issuer' =>				'db proxy.tls_issuer',
+			'tls_subject' =>			'db proxy.tls_subject',
+			'update_psk' =>				'required|bool',
+			'custom_timeouts' =>		'db proxy.custom_timeouts|in '.implode(',', [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]),
+			'timeout_zabbix_agent' =>	'db proxy.timeout_zabbix_agent',
+			'timeout_simple_check' =>	'db proxy.timeout_simple_check',
+			'timeout_snmp_agent' =>		'db proxy.timeout_snmp_agent',
+			'timeout_external_check' =>	'db proxy.timeout_external_check',
+			'timeout_db_monitor' =>		'db proxy.timeout_db_monitor',
+			'timeout_http_agent' =>		'db proxy.timeout_http_agent',
+			'timeout_ssh_agent' =>		'db proxy.timeout_ssh_agent',
+			'timeout_telnet_agent' =>	'db proxy.timeout_telnet_agent',
+			'timeout_script' =>			'db proxy.timeout_script'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			switch ($this->getInput('status')) {
-				case HOST_STATUS_PROXY_ACTIVE:
+			switch ($this->getInput('operating_mode')) {
+				case PROXY_OPERATING_MODE_ACTIVE:
 					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
 							&& !$this->hasInput('tls_accept_certificate')) {
 						info(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
@@ -63,17 +71,9 @@ class CControllerProxyUpdate extends CController {
 
 					break;
 
-				case HOST_STATUS_PROXY_PASSIVE:
-					if ($this->getInput('useip', INTERFACE_USE_IP) == INTERFACE_USE_IP
-							&& $this->getInput('ip', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('IP address'), _('cannot be empty')));
-
-						$ret = false;
-					}
-
-					if ($this->getInput('useip', INTERFACE_USE_IP) == INTERFACE_USE_DNS
-							&& $this->getInput('dns', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('DNS name'), _('cannot be empty')));
+				case PROXY_OPERATING_MODE_PASSIVE:
+					if ($this->getInput('address', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty')));
 
 						$ret = false;
 					}
@@ -88,8 +88,8 @@ class CControllerProxyUpdate extends CController {
 			}
 
 			if ($this->getInput('update_psk')) {
-				if (($this->getInput('status') == HOST_STATUS_PROXY_ACTIVE && $this->hasInput('tls_accept_psk'))
-						|| ($this->getInput('status') == HOST_STATUS_PROXY_PASSIVE
+				if (($this->getInput('operating_mode') == PROXY_OPERATING_MODE_ACTIVE && $this->hasInput('tls_accept_psk'))
+						|| ($this->getInput('operating_mode') == PROXY_OPERATING_MODE_PASSIVE
 							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK)) {
 					if ($this->getInput('tls_psk_identity', '') === '') {
 						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
@@ -103,6 +103,30 @@ class CControllerProxyUpdate extends CController {
 						$ret = false;
 					}
 				}
+			}
+
+			$custom_timeouts = $this->getInput('custom_timeouts', ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED);
+
+			if ($custom_timeouts == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+				$fields = [
+					'timeout_zabbix_agent' =>	'required|not_empty',
+					'timeout_simple_check' =>	'required|not_empty',
+					'timeout_snmp_agent' =>		'required|not_empty',
+					'timeout_external_check' =>	'required|not_empty',
+					'timeout_db_monitor' =>		'required|not_empty',
+					'timeout_http_agent' =>		'required|not_empty',
+					'timeout_ssh_agent' =>		'required|not_empty',
+					'timeout_telnet_agent' =>	'required|not_empty',
+					'timeout_script' =>			'required|not_empty'
+				];
+
+				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				$ret = !$validator->isErrorFatal() && !$validator->isError();
 			}
 		}
 
@@ -135,13 +159,13 @@ class CControllerProxyUpdate extends CController {
 	protected function doAction() {
 		$proxy = [];
 
-		$this->getInputs($proxy, ['proxyid', 'host', 'status', 'description', 'tls_connect', 'tls_psk_identity',
-			'tls_psk', 'tls_issuer', 'tls_subject'
+		$this->getInputs($proxy, ['proxyid', 'name', 'operating_mode', 'description', 'tls_connect',
+			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject'
 		]);
 
-		switch ($this->getInput('status')) {
-			case HOST_STATUS_PROXY_ACTIVE:
-				$proxy['proxy_address'] = $this->getInput('proxy_address', '');
+		switch ($this->getInput('operating_mode')) {
+			case PROXY_OPERATING_MODE_ACTIVE:
+				$proxy['allowed_addresses'] = $this->getInput('allowed_addresses', '');
 
 				$proxy['tls_accept'] = ($this->hasInput('tls_accept_none') ? HOST_ENCRYPTION_NONE : 0)
 					| ($this->hasInput('tls_accept_psk') ? HOST_ENCRYPTION_PSK : 0)
@@ -149,12 +173,20 @@ class CControllerProxyUpdate extends CController {
 
 				break;
 
-			case HOST_STATUS_PROXY_PASSIVE:
-				$proxy['interface'] = [];
-
-				$this->getInputs($proxy['interface'], ['dns', 'ip', 'useip', 'port']);
+			case PROXY_OPERATING_MODE_PASSIVE:
+				$proxy['address'] = $this->getInput('address', '');
+				$proxy['port'] = $this->getInput('port', '');
 
 				break;
+		}
+
+		$proxy['custom_timeouts'] = $this->getInput('custom_timeouts', ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED);
+
+		if ($proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+			$this->getInputs($proxy, ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+				'timeout_telnet_agent', 'timeout_script'
+			]);
 		}
 
 		$result = API::Proxy()->update($proxy);

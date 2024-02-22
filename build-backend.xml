@@ -4,7 +4,7 @@
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
 	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers -Wstrict-prototypes warning -->
-	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers -Wincompatible-pointer-types -Wnull-dereference -Wold-style-definition -Wmissing-declarations -Wunused-parameter -Winit-self -Wnested-externs -Wjump-misses-init -Wdangling-else -Wformat-signedness"/>
+	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wpointer-arith -Wno-null-pointer-subtraction -Wno-overlength-strings -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wincompatible-pointer-types -Wnull-dereference -Wold-style-definition -Wmissing-declarations -Wunused-parameter -Winit-self -Wnested-externs -Wjump-misses-init -Wdangling-else -Wformat-signedness -Wfloat-conversion -Wredundant-decls"/>
 	<property name="COMP_FLAGS" value="-Wstrict-prototypes ${COMP_FLAGS_ORACLE}"/>
 	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
 
@@ -140,8 +140,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
 						<arg line="@{target}"/>
 					</exec>
 					<if>
@@ -212,15 +210,13 @@
 			<exec executable="./configure" failonerror="on">
 				<arg line="@{conf}"/>
 			</exec>
-				<exec executable="make" failonerror="on">
-					<arg line="-s"/>
-					<arg line="-j5"/>
-					<arg line="tests_build"/>
-				</exec>
-				<mkdir dir="tests_results/@{conf-name}"/>
-				<exec executable="tests/tests_run.pl" failonerror="off" output="tests_results/@{conf-name}/output.xml">
-					<arg line="-x @{conf-name}"/>
-				</exec>
+			<exec executable="make" failonerror="on">
+				<arg line="tests_build"/>
+			</exec>
+			<mkdir dir="tests_results/@{conf-name}"/>
+			<exec executable="tests/tests_run.pl" failonerror="off" output="tests_results/@{conf-name}/output.xml">
+				<arg line="-x @{conf-name}"/>
+			</exec>
 		</sequential>
 	</macrodef>
 

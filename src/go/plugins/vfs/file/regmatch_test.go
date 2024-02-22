@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"zabbix.com/pkg/zbxtest"
 )
 
 func TestFileRegmatch(t *testing.T) {
-
-	impl.options.Timeout = 3
-
+	var ctx zbxtest.MockEmptyCtx
 	filename := "/tmp/zbx_vfs_file_regmatch_test.dat"
 
 	type testCase struct {
@@ -144,7 +144,7 @@ func TestFileRegmatch(t *testing.T) {
 		{fileContents: hostsFile_RU, targetSearch: "локалхост",
 			targetEncoding: "UTF-32LE", lineStart: "", lineEnd: "", match: 1},
 
-		// wrong encodings, but we cannot detect this and there is no expected match
+		// wrong file encodings, but we cannot detect this and there is no expected match
 		{fileContents: fileContents_1_UTF_16LE, targetSearch: "(error)", targetEncoding: "iso-8859-5",
 			lineStart: "", lineEnd: "", match: 0},
 		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5",
@@ -164,7 +164,7 @@ func TestFileRegmatch(t *testing.T) {
 		var err error
 
 		if result, err = impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd}, nil); err != nil {
+			c.lineStart, c.lineEnd}, ctx); err != nil {
 			t.Errorf("vfs.file.regmatch[%d] returned error %s", i, err.Error())
 
 			return
@@ -193,8 +193,8 @@ func TestFileRegmatch(t *testing.T) {
 	fileManyCharsNoNewLine := []byte{
 		0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x65, 0x74, 0x61}
 
-	// wrong encodings, but we can detect this
-	testsWrongEncodings := []*testCase{
+	// wrong encodings in file, but we can detect this
+	testsWrongEncodingsInFile := []*testCase{
 		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-16LE",
 			lineStart: "", lineEnd: "", match: 1},
 		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-32BE",
@@ -206,7 +206,7 @@ func TestFileRegmatch(t *testing.T) {
 		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE",
 			lineStart: "2", lineEnd: "", match: 0}}
 	expectedError := "Cannot read from file. Wrong encoding detected."
-	for i, c := range testsWrongEncodings {
+	for i, c := range testsWrongEncodingsInFile {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
 
@@ -214,13 +214,52 @@ func TestFileRegmatch(t *testing.T) {
 		}
 
 		if _, err := impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd}, nil); err != nil {
+			c.lineStart, c.lineEnd}, ctx); err != nil {
 			if err.Error() != expectedError {
 				t.Errorf(`vfs.file.regmatch testcase[%d] failed with unexpected error: %s,
 					expected: %s`, i, err.Error(), expectedError)
 			}
 		} else {
 			t.Errorf("vfs.file.regmatch testcase[%d] did NOT return error", i)
+		}
+	}
+
+	// wrong targets encodings
+	testsWrongTargetEncodings := []*testCase{
+		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "BADGER",
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-16L",
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-",
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileSingleCharNoNewLine, targetSearch: "a", targetEncoding: "UUTF-32BE",
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileManyCharsNoNewLine, targetSearch: "a", targetEncoding: "TF-32BE",
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "хух", targetEncoding: "-32",
+			lineStart: "2", lineEnd: "", match: 0}}
+	for i, c := range testsWrongTargetEncodings {
+		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
+			t.Errorf("failed to created file: %s", err1.Error())
+
+			return
+		}
+
+		var err error
+		_, err = impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
+			c.lineStart, c.lineEnd}, ctx)
+
+		if nil == err {
+			t.Errorf("vfs.file.regmatch (testCase[%d]) did not return error: ->%s<- when wrong target "+
+				"encoding:->%s<- was used", i, expectedErrorUTF8Convert, c.targetEncoding)
+
+			return
+		} else if err.Error() != expectedErrorUTF8Convert {
+			t.Errorf("vfs.file.regmatch (testCase[%d]) expected error: ->%s<-,"+
+				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
+				expectedErrorUTF8Convert, err.Error(), c.targetEncoding)
+
+			return
 		}
 	}
 }

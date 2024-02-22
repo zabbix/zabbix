@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,23 +42,23 @@ class CImportDataAdapterTest extends TestCase {
 	public function testEmptyXml() {
 		$adapter = $this->getAdapter($this->getEmptyXml());
 
-		$this->assertEquals($adapter->getHostGroups(), []);
-		$this->assertEquals($adapter->getTemplateGroups(), []);
-		$this->assertEquals($adapter->getHosts(), []);
-		$this->assertEquals($adapter->getTemplates(), []);
-		$this->assertEquals($adapter->getItems(), []);
-		$this->assertEquals($adapter->getTriggers(), []);
-		$this->assertEquals($adapter->getGraphs(), []);
-		$this->assertEquals($adapter->getDiscoveryRules(), []);
-		$this->assertEquals($adapter->getImages(), []);
-		$this->assertEquals($adapter->getMaps(), []);
-		$this->assertEquals($adapter->getMediaTypes(), []);
+		$this->assertEquals([], $adapter->getHostGroups());
+		$this->assertEquals([], $adapter->getTemplateGroups());
+		$this->assertEquals([], $adapter->getHosts());
+		$this->assertEquals([], $adapter->getTemplates());
+		$this->assertEquals([], $adapter->getItems());
+		$this->assertEquals([], $adapter->getTriggers());
+		$this->assertEquals([], $adapter->getGraphs());
+		$this->assertEquals([], $adapter->getDiscoveryRules());
+		$this->assertEquals([], $adapter->getImages());
+		$this->assertEquals([], $adapter->getMaps());
+		$this->assertEquals([], $adapter->getMediaTypes());
 	}
 
 	public function testGetGroups() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getHostGroups(), [
+		$this->assertEquals([
 			[
 				'name' => 'Linux servers',
 				'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8'
@@ -67,20 +67,20 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'Zabbix servers',
 				'uuid' => '6f6799aa69e844b4b3918f779f2abf08'
 			]
-		]);
+		], $adapter->getHostGroups());
 
-		$this->assertEquals($adapter->getTemplateGroups(), [
+		$this->assertEquals([
 			[
 				'name' => 'Templates',
 				'uuid' => '7df96b18c230490a9a0a9e2307226338'
 			]
-		]);
+		], $adapter->getTemplateGroups());
 	}
 
 	public function testGetHosts() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getHosts(), [
+		$this->assertEquals([
 			[
 				'inventory' => [],
 				'proxy' => [],
@@ -282,13 +282,13 @@ class CImportDataAdapterTest extends TestCase {
 				'tags' => [],
 				'valuemaps' => []
 			]
-		]);
+		], $adapter->getHosts());
 	}
 
 	public function testGetTemplates() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getTemplates(), [
+		$this->assertEquals([
 			[
 				'uuid' => 'c2fe64e562a040bd96333fb6b2de815a',
 				'groups' => [
@@ -343,13 +343,13 @@ class CImportDataAdapterTest extends TestCase {
 				'tags' => [],
 				'valuemaps' => []
 			]
-		]);
+		], $adapter->getTemplates());
 	}
 
 	public function testGetItems() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getItems(), [
+		$this->assertEquals([
 			'export-host' => [
 				'item' => [
 					'name' => 'item',
@@ -376,7 +376,7 @@ class CImportDataAdapterTest extends TestCase {
 					'interface_ref' => 'if1',
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -425,7 +425,7 @@ class CImportDataAdapterTest extends TestCase {
 					'interface_ref' => 'if3',
 					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -479,7 +479,7 @@ class CImportDataAdapterTest extends TestCase {
 					'interface_ref' => 'if1',
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -530,7 +530,7 @@ class CImportDataAdapterTest extends TestCase {
 					'logtimefmt' => '',
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -579,7 +579,7 @@ class CImportDataAdapterTest extends TestCase {
 					'logtimefmt' => '',
 					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -633,7 +633,7 @@ class CImportDataAdapterTest extends TestCase {
 					'logtimefmt' => '',
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -658,13 +658,13 @@ class CImportDataAdapterTest extends TestCase {
 					'preprocessing' => []
 				]
 			]
-		]);
+		], $adapter->getItems());
 	}
 
 	public function testGetTriggers() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getTriggers(), [
+		$this->assertEquals([
 			[
 				'uuid' => 'ed06ed0623ef4e23bfd1a7e5e5ffce72',
 				'expression' => 'last(/export-host/item)<>0',
@@ -757,13 +757,13 @@ class CImportDataAdapterTest extends TestCase {
 				'comments' => '',
 				'description' => 'trigger2'
 			]
-		]);
+		], $adapter->getTriggers());
 	}
 
 	public function testGetGraphs() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getGraphs(), [
+		$this->assertEquals([
 			[
 				'uuid' => '0b6a0bf1bcf24329b51cc7633d229d9d',
 				'name' => 'simple',
@@ -830,834 +830,13 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				]
 			]
-		]);
+		], $adapter->getGraphs());
 	}
 
 	public function testGetDiscoveryRules() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
-$lld_rules = $adapter->getDiscoveryRules();
-// file_put_contents('test.txt', print_r(json_encode($lld_rules), true) . "\n", FILE_APPEND);
-$expected = [
-	'export-host' => [
-		'empty-lld-rule' => [
-			'name' => 'empty-lld-rule',
-			'type' => '0',
-			'snmp_oid' => '',
-			'delay' => '30',
-			'status' => '0',
-			'params' => '',
-			'ipmi_sensor' => '',
-			'authtype' => '0',
-			'username' => '',
-			'password' => '',
-			'publickey' => '',
-			'privatekey' => '',
-			'filter' => [
-				'evaltype' => 0,
-				'formula' => '',
-				'conditions' => []
-			],
-			'lifetime' => '30d',
-			'description' => '',
-			'item_prototypes' => [],
-			'trigger_prototypes' => [],
-			'graph_prototypes' => [],
-			'host_prototypes' => [],
-			'interface_ref' => 'if1',
-			'jmx_endpoint' => '',
-			'timeout' => '3s',
-			'url' => '',
-			'posts' => '',
-			'status_codes' => '200',
-			'follow_redirects' => '1',
-			'post_type' => '0',
-			'http_proxy' => '',
-			'retrieve_mode' => '0',
-			'request_method' => '0',
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'verify_peer' => '0',
-			'verify_host' => '0',
-			'allow_traps' => '0',
-			'query_fields' => [],
-			'parameters' => [],
-			'headers' => [],
-			'key_' => 'empty-lld-rule',
-			'trapper_hosts' => '',
-			'lld_macro_paths' => [],
-			'preprocessing' => [],
-			'overrides' => [],
-			'master_item' => []
-		],
-		'empty-lld-rule-jmx' => [
-			'name' => 'empty-lld-rule-jmx',
-			'type' => '16',
-			'snmp_oid' => '',
-			'delay' => '30',
-			'status' => '0',
-			'params' => '',
-			'ipmi_sensor' => '',
-			'authtype' => '0',
-			'username' => '',
-			'password' => '',
-			'publickey' => '',
-			'privatekey' => '',
-			'filter' => [
-				'evaltype' => 0,
-				'formula' => '',
-				'conditions' => []
-			],
-			'lifetime' => '30d',
-			'description' => '',
-			'item_prototypes' => [],
-			'trigger_prototypes' => [],
-			'graph_prototypes' => [],
-			'host_prototypes' => [],
-			'interface_ref' => 'if3',
-			'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-			'timeout' => '3s',
-			'url' => '',
-			'posts' => '',
-			'status_codes' => '200',
-			'follow_redirects' => '1',
-			'post_type' => '0',
-			'http_proxy' => '',
-			'retrieve_mode' => '0',
-			'request_method' => '0',
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'verify_peer' => '0',
-			'verify_host' => '0',
-			'allow_traps' => '0',
-			'query_fields' => [],
-			'parameters' => [],
-			'headers' => [],
-			'key_' => 'empty-lld-rule-jmx',
-			'trapper_hosts' => '',
-			'lld_macro_paths' => [],
-			'preprocessing' => [],
-			'overrides' => [],
-			'master_item' => []
-		],
-		'lld-rule' => [
-			'name' => 'lld-rule',
-			'type' => '0',
-			'snmp_oid' => '',
-			'delay' => '30',
-			'status' => '0',
-			'params' => '',
-			'ipmi_sensor' => '',
-			'authtype' => '0',
-			'username' => '',
-			'password' => '',
-			'publickey' => '',
-			'privatekey' => '',
-			'filter' => [
-				'evaltype' => '0',
-				'formula' => '',
-				'conditions' => [
-					[
-						'macro' => '{#FSTYPE}',
-						'value' => '1',
-						'operator' => '8',
-						'formulaid' => 'A'
-					],
-					[
-						'macro' => '{#FSTYPE2}',
-						'value' => '2',
-						'operator' => '8',
-						'formulaid' => 'B'
-					]
-				]
-			],
-			'lifetime' => '30d',
-			'interface_ref' => 'if3',
-			'description' => '',
-			'item_prototypes' => [
-				[
-					'name' => 'lld-item',
-					'type' => '0',
-					'snmp_oid' => '',
-					'discover' => '0',
-					'delay' => '30',
-					'history' => '90d',
-					'trends' => '365d',
-					'status' => '0',
-					'value_type' => '3',
-					'units' => '',
-					'params' => '',
-					'ipmi_sensor' => '',
-					'authtype' => '0',
-					'username' => '',
-					'password' => '',
-					'publickey' => '',
-					'privatekey' => '',
-					'description' => '',
-					'tags' => [],
-					'valuemap' => [],
-					'logtimefmt' => '',
-					'interface_ref' => 'if1',
-					'jmx_endpoint' => '',
-					'master_item' => [],
-					'timeout' => '3s',
-					'url' => '',
-					'posts' => '',
-					'status_codes' => '200',
-					'follow_redirects' => '1',
-					'post_type' => '0',
-					'http_proxy' => '',
-					'retrieve_mode' => '0',
-					'request_method' => '0',
-					'output_format' => '0',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => '',
-					'ssl_key_password' => '',
-					'verify_peer' => '0',
-					'verify_host' => '0',
-					'allow_traps' => '0',
-					'query_fields' => [],
-					'parameters' => [],
-					'headers' => [],
-					'key_' => 'lld-item',
-					'trigger_prototypes' => [],
-					'trapper_hosts' => '',
-					'preprocessing' => []
-				],
-				[
-					'name' => 'lld-item-jmx',
-					'type' => '16',
-					'snmp_oid' => '',
-					'discover' => '0',
-					'delay' => '30',
-					'history' => '90d',
-					'trends' => '365d',
-					'status' => '0',
-					'value_type' => '3',
-					'units' => '',
-					'params' => '',
-					'ipmi_sensor' => '',
-					'authtype' => '0',
-					'username' => '',
-					'password' => '',
-					'publickey' => '',
-					'privatekey' => '',
-					'description' => '',
-					'tags' => [],
-					'valuemap' => [],
-					'logtimefmt' => '',
-					'interface_ref' => 'if3',
-					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-					'master_item' => [],
-					'timeout' => '3s',
-					'url' => '',
-					'posts' => '',
-					'status_codes' => '200',
-					'follow_redirects' => '1',
-					'post_type' => '0',
-					'http_proxy' => '',
-					'retrieve_mode' => '0',
-					'request_method' => '0',
-					'output_format' => '0',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => '',
-					'ssl_key_password' => '',
-					'verify_peer' => '0',
-					'verify_host' => '0',
-					'allow_traps' => '0',
-					'query_fields' => [],
-					'parameters' => [],
-					'headers' => [],
-					'key_' => 'lld-item-jmx',
-					'trigger_prototypes' => [],
-					'trapper_hosts' => '',
-					'preprocessing' => []
-				],
-				[
-					'name' => 'lld-item2',
-					'type' => '0',
-					'snmp_oid' => '',
-					'discover' => '0',
-					'delay' => '30',
-					'history' => '90d',
-					'trends' => '365d',
-					'status' => '0',
-					'value_type' => '3',
-					'units' => '',
-					'params' => '',
-					'ipmi_sensor' => '',
-					'authtype' => '0',
-					'username' => '',
-					'password' => '',
-					'publickey' => '',
-					'privatekey' => '',
-					'description' => '',
-					'tags' => [
-						[
-							'tag' => 'Application',
-							'value' => 'app'
-						]
-					],
-					'valuemap' => [],
-					'logtimefmt' => '',
-					'interface_ref' => 'if1',
-					'jmx_endpoint' => '',
-					'master_item' => [],
-					'timeout' => '3s',
-					'url' => '',
-					'posts' => '',
-					'status_codes' => '200',
-					'follow_redirects' => '1',
-					'post_type' => '0',
-					'http_proxy' => '',
-					'retrieve_mode' => '0',
-					'request_method' => '0',
-					'output_format' => '0',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => '',
-					'ssl_key_password' => '',
-					'verify_peer' => '0',
-					'verify_host' => '0',
-					'allow_traps' => '0',
-					'query_fields' => [],
-					'parameters' => [],
-					'headers' => [],
-					'key_' => 'lld-item2',
-					'trigger_prototypes' => [],
-					'trapper_hosts' => '',
-					'preprocessing' => []
-				]
-			],
-			'trigger_prototypes' => [
-				[
-					'expression' => 'last(/export-host/lld-item)=0',
-					'description' => 'lld-trigger',
-					'url' => '',
-					'discover' => '0',
-					'status' => '0',
-					'priority' => '0',
-					'comments' => '',
-					'type' => '0',
-					'recovery_expression' => '',
-					'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
-					'tags' => [],
-					'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
-					'correlation_tag' => '',
-					'event_name' => '',
-					'opdata' => '',
-					'url_name' => '',
-					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-					'dependencies' => []
-				]
-			],
-			'graph_prototypes' => [
-				[
-					'name' => 'lld-graph',
-					'width' => '900',
-					'height' => '200',
-					'yaxismin' => '0.0000',
-					'yaxismax' => '100.0000',
-					'show_work_period' => '1',
-					'show_triggers' => '1',
-					'show_legend' => '1',
-					'show_3d' => '0',
-					'percent_left' => '0.0000',
-					'percent_right' => '0.0000',
-					'ymin_item_1' => '0',
-					'ymax_item_1' => '0',
-					'discover' => '0',
-					'graphtype' => '0',
-					'ymin_type' => '0',
-					'ymax_type' => '0',
-					'gitems' => [
-						[
-							'sortorder' => '0',
-							'drawtype' => '0',
-							'color' => '00C800',
-							'yaxisside' => '0',
-							'calc_fnc' => '2',
-							'type' => '0',
-							'item' => [
-								'host' => 'export-host',
-								'key' => 'lld-item'
-							]
-						]
-					]
-				]
-			],
-			'host_prototypes' => [
-				[
-					'host' => '{#VMID}',
-					'name' => '{#VMID}',
-					'status' => '0',
-					'group_links' => [
-						[
-							'group' => [
-								'name' => 'Zabbix servers'
-							]
-						]
-					],
-					'group_prototypes' => [
-						[
-							'name' => '{#VMNAME}'
-						]
-					],
-					'discover' => '0',
-					'inventory_mode' => '0',
-					'templates' => [],
-					'macros' => [],
-					'tags' => [],
-					'custom_interfaces' => '0'
-				]
-			],
-			'jmx_endpoint' => '',
-			'timeout' => '3s',
-			'url' => '',
-			'posts' => '',
-			'status_codes' => '200',
-			'follow_redirects' => '1',
-			'post_type' => '0',
-			'http_proxy' => '',
-			'interface_ref' => 'if1',
-			'retrieve_mode' => '0',
-			'request_method' => '0',
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'verify_peer' => '0',
-			'verify_host' => '0',
-			'allow_traps' => '0',
-			'query_fields' => [],
-			'parameters' => [],
-			'headers' => [],
-			'key_' => 'lld-rule',
-			'trapper_hosts' => '',
-			'lld_macro_paths' => [],
-			'preprocessing' => [],
-			'overrides' => [],
-			'master_item' => []
-		]
-	],
-	'export-template' => [
-		'empty-lld-rule' => [
-			'uuid' => '6ff04b5a5e8443c7aa9d5ce5f60ea4f9',
-			'name' => 'empty-lld-rule',
-			'type' => '0',
-			'snmp_oid' => '',
-			'delay' => '30',
-			'status' => '0',
-			'params' => '',
-			'ipmi_sensor' => '',
-			'authtype' => '0',
-			'username' => '',
-			'password' => '',
-			'publickey' => '',
-			'privatekey' => '',
-			'filter' => [
-				'evaltype' => 0,
-				'formula' => '',
-				'conditions' => []
-			],
-			'lifetime' => '30d',
-			'description' => '',
-			'item_prototypes' => [],
-			'trigger_prototypes' => [],
-			'graph_prototypes' => [],
-			'host_prototypes' => [],
-			'jmx_endpoint' => '',
-			'timeout' => '3s',
-			'url' => '',
-			'posts' => '',
-			'status_codes' => '200',
-			'follow_redirects' => '1',
-			'post_type' => '0',
-			'http_proxy' => '',
-			'retrieve_mode' => '0',
-			'request_method' => '0',
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'verify_peer' => '0',
-			'verify_host' => '0',
-			'allow_traps' => '0',
-			'query_fields' => [],
-			'parameters' => [],
-			'headers' => [],
-			'key_' => 'empty-lld-rule',
-			'trapper_hosts' => '',
-			'lld_macro_paths' => [],
-			'preprocessing' => [],
-			'overrides' => [],
-			'master_item' => []
-		],
-		'lld-rule-jmx' => [
-			'uuid' => '96c257b7f1104833ad3bb18f6a2e8d96',
-			'name' => 'lld-rule-jmx',
-			'type' => '16',
-			'snmp_oid' => '',
-			'delay' => '30',
-			'status' => '0',
-			'params' => '',
-			'ipmi_sensor' => '',
-			'authtype' => '0',
-			'username' => '',
-			'password' => '',
-			'publickey' => '',
-			'privatekey' => '',
-			'filter' => [
-				'evaltype' => 0,
-				'formula' => '',
-				'conditions' => []
-			],
-			'lifetime' => '30d',
-			'description' => '',
-			'item_prototypes' => [],
-			'trigger_prototypes' => [],
-			'graph_prototypes' => [],
-			'host_prototypes' => [],
-			'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-			'timeout' => '3s',
-			'url' => '',
-			'posts' => '',
-			'status_codes' => '200',
-			'follow_redirects' => '1',
-			'post_type' => '0',
-			'http_proxy' => '',
-			'retrieve_mode' => '0',
-			'request_method' => '0',
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'verify_peer' => '0',
-			'verify_host' => '0',
-			'allow_traps' => '0',
-			'query_fields' => [],
-			'parameters' => [],
-			'headers' => [],
-			'key_' => 'lld-rule-jmx',
-			'trapper_hosts' => '',
-			'lld_macro_paths' => [],
-			'preprocessing' => [],
-			'overrides' => [],
-			'master_item' => []
-		],
-		'lld-rule' => [
-			'uuid' => 'cdcd6fb3277e481baa22573c8c349b3b',
-			'name' => 'lld-rule',
-			'type' => '0',
-			'snmp_oid' => '',
-			'delay' => '30',
-			'status' => '0',
-			'params' => '',
-			'ipmi_sensor' => '',
-			'authtype' => '0',
-			'username' => '',
-			'password' => '',
-			'publickey' => '',
-			'privatekey' => '',
-			'filter' => [
-				'evaltype' => '0',
-				'formula' => '',
-				'conditions' => [
-					[
-						'macro' => '{#FSTYPE}',
-						'value' => '1',
-						'operator' => '8',
-						'formulaid' => 'A'
-					],
-					[
-						'macro' => '{#FSTYPE2}',
-						'value' => '2',
-						'operator' => '8',
-						'formulaid' => 'B'
-					]
-				]
-			],
-			'lifetime' => '30d',
-			'description' => '',
-			'item_prototypes' => [
-				[
-					'uuid' => '2d2820fb2c2244df8dc75c92b2fc0f52',
-					'name' => 'lld-item',
-					'type' => '0',
-					'snmp_oid' => '',
-					'discover' => '0',
-					'delay' => '30',
-					'history' => '90d',
-					'trends' => '365d',
-					'status' => '0',
-					'value_type' => '3',
-					'units' => '',
-					'params' => '',
-					'ipmi_sensor' => '',
-					'authtype' => '0',
-					'username' => '',
-					'password' => '',
-					'publickey' => '',
-					'privatekey' => '',
-					'description' => '',
-					'tags' => [],
-					'valuemap' => [],
-					'logtimefmt' => '',
-					'jmx_endpoint' => '',
-					'master_item' => [],
-					'timeout' => '3s',
-					'url' => '',
-					'posts' => '',
-					'preprocessing' => [],
-					'status_codes' => '200',
-					'follow_redirects' => '1',
-					'post_type' => '0',
-					'http_proxy' => '',
-					'retrieve_mode' => '0',
-					'request_method' => '0',
-					'output_format' => '0',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => '',
-					'ssl_key_password' => '',
-					'verify_peer' => '0',
-					'verify_host' => '0',
-					'allow_traps' => '0',
-					'query_fields' => [],
-					'parameters' => [],
-					'headers' => [],
-					'key_' => 'lld-item',
-					'trigger_prototypes' => [],
-					'trapper_hosts' => ''
-				],
-				[
-					'uuid' => 'd51ab907cd2840d99a1deda0bc6ba887',
-					'name' => 'lld-item-jmx',
-					'type' => '16',
-					'snmp_oid' => '',
-					'discover' => '0',
-					'delay' => '30',
-					'history' => '90d',
-					'trends' => '365d',
-					'status' => '0',
-					'value_type' => '3',
-					'units' => '',
-					'params' => '',
-					'ipmi_sensor' => '',
-					'authtype' => '0',
-					'username' => '',
-					'password' => '',
-					'publickey' => '',
-					'privatekey' => '',
-					'description' => '',
-					'tags' => [],
-					'valuemap' => [],
-					'logtimefmt' => '',
-					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-					'master_item' => [],
-					'timeout' => '3s',
-					'url' => '',
-					'posts' => '',
-					'preprocessing' => [],
-					'status_codes' => '200',
-					'follow_redirects' => '1',
-					'post_type' => '0',
-					'http_proxy' => '',
-					'retrieve_mode' => '0',
-					'request_method' => '0',
-					'output_format' => '0',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => '',
-					'ssl_key_password' => '',
-					'verify_peer' => '0',
-					'verify_host' => '0',
-					'allow_traps' => '0',
-					'query_fields' => [],
-					'parameters' => [],
-					'headers' => [],
-					'key_' => 'lld-item-jmx',
-					'trigger_prototypes' => [],
-					'trapper_hosts' => ''
-				],
-				[
-					'uuid' => '350f8c141fd94a8385a83a3dca077126',
-					'name' => 'lld-item2',
-					'type' => '0',
-					'snmp_oid' => '',
-					'discover' => '0',
-					'delay' => '30',
-					'history' => '90d',
-					'trends' => '365d',
-					'status' => '0',
-					'value_type' => '3',
-					'units' => '',
-					'params' => '',
-					'ipmi_sensor' => '',
-					'authtype' => '0',
-					'username' => '',
-					'password' => '',
-					'publickey' => '',
-					'privatekey' => '',
-					'description' => '',
-					'tags' => [
-						[
-							'tag' => 'Application',
-							'value' => 'app'
-						]
-					],
-					'valuemap' => [],
-					'logtimefmt' => '',
-					'jmx_endpoint' => '',
-					'master_item' => [],
-					'timeout' => '3s',
-					'url' => '',
-					'posts' => '',
-					'preprocessing' => [],
-					'status_codes' => '200',
-					'follow_redirects' => '1',
-					'post_type' => '0',
-					'http_proxy' => '',
-					'retrieve_mode' => '0',
-					'request_method' => '0',
-					'output_format' => '0',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => '',
-					'ssl_key_password' => '',
-					'verify_peer' => '0',
-					'verify_host' => '0',
-					'allow_traps' => '0',
-					'query_fields' => [],
-					'parameters' => [],
-					'headers' => [],
-					'key_' => 'lld-item2',
-					'trigger_prototypes' => [],
-					'trapper_hosts' => ''
-				]
-			],
-			'trigger_prototypes' => [
-				[
-					'uuid' => '4650de0e6c2e4bfe8abe5a4225b477db',
-					'expression' => 'last(/export-template/lld-item)=0',
-					'description' => 'lld-trigger',
-					'url' => '',
-					'discover' => '0',
-					'status' => '0',
-					'priority' => '0',
-					'comments' => '',
-					'type' => '0',
-					'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
-					'recovery_expression' => '',
-					'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
-					'correlation_tag' => '',
-					'event_name' => '',
-					'opdata' => '',
-					'url_name' => '',
-					'tags' => [],
-					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-					'dependencies' => []
-				]
-			],
-			'graph_prototypes' => [
-				[
-					'uuid' => '0d284e97f2724d1ca5b6ddf1f8cadf1a',
-					'name' => 'lld-graph',
-					'width' => '900',
-					'height' => '200',
-					'yaxismin' => '0.0000',
-					'yaxismax' => '100.0000',
-					'show_work_period' => '1',
-					'show_triggers' => '1',
-					'show_legend' => '1',
-					'show_3d' => '0',
-					'percent_left' => '0.0000',
-					'percent_right' => '0.0000',
-					'ymin_item_1' => '0',
-					'ymax_item_1' => '0',
-					'discover' => '0',
-					'graphtype' => '0',
-					'ymin_type' => '0',
-					'ymax_type' => '0',
-					'gitems' => [
-						[
-							'sortorder' => '0',
-							'drawtype' => '0',
-							'color' => '00C800',
-							'yaxisside' => '0',
-							'calc_fnc' => '2',
-							'type' => '0',
-							'item' => [
-								'host' => 'export-template',
-								'key' => 'lld-item'
-							]
-						]
-					]
-				]
-			],
-			'host_prototypes' => [
-				[
-					'uuid' => '63c71dad71754b1c8746ba88679ecd89',
-					'host' => '{#VMID}',
-					'name' => '{#VMID}',
-					'status' => '0',
-					'group_links' => [
-						[
-							'group' => [
-								'name' => 'Zabbix servers'
-							]
-						]
-					],
-					'group_prototypes' => [
-						[
-							'name' => '{#VMNAME}'
-						]
-					],
-					'discover' => '0',
-					'templates' => [],
-					'macros' => [],
-					'tags' => [],
-					'custom_interfaces' => '0',
-					'inventory_mode' => '-1'
-				]
-			],
-			'jmx_endpoint' => '',
-			'timeout' => '3s',
-			'url' => '',
-			'posts' => '',
-			'status_codes' => '200',
-			'follow_redirects' => '1',
-			'post_type' => '0',
-			'http_proxy' => '',
-			'retrieve_mode' => '0',
-			'request_method' => '0',
-			'ssl_cert_file' => '',
-			'ssl_key_file' => '',
-			'ssl_key_password' => '',
-			'verify_peer' => '0',
-			'verify_host' => '0',
-			'allow_traps' => '0',
-			'query_fields' => [],
-			'parameters' => [],
-			'headers' => [],
-			'key_' => 'lld-rule',
-			'trapper_hosts' => '',
-			'lld_macro_paths' => [],
-			'preprocessing' => [],
-			'overrides' => [],
-			'master_item' => []
-		]
-	]
-];
 
-foreach ($expected as $export_type => $e_lld_rules) {
-	foreach ($e_lld_rules as $lld_rule_name => $e_lld_rule) {
-		if ($lld_rule_name === 'lld-rule') {
-		// if ($e_lld_rule != $lld_rules[$export_type][$lld_rule_name]) {
-file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_name]) . "\n", FILE_APPEND);
-// file_put_contents('test.txt', json_encode($e_lld_rule) . "\n", FILE_APPEND);
-			$a = 'heellloo';
-		}
-	}
-}
-
-// file_put_contents('test.txt', print_r(json_encode($expected), true) . "\n", FILE_APPEND);
-		$this->assertEquals($lld_rules, [
-		// $this->assertEquals($adapter->getDiscoveryRules(), [
+		$this->assertEquals([
 			'export-host' => [
 				'empty-lld-rule' => [
 					'name' => 'empty-lld-rule',
@@ -1685,7 +864,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'interface_ref' => 'if1',
 					'jmx_endpoint' => '',
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -1736,7 +915,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'interface_ref' => 'if3',
 					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -1793,7 +972,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 						]
 					],
 					'lifetime' => '30d',
-					'interface_ref' => 'if3',
+					'interface_ref' => 'if1',
 					'description' => '',
 					'item_prototypes' => [
 						[
@@ -1821,7 +1000,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'interface_ref' => 'if1',
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'posts' => '',
 							'status_codes' => '200',
@@ -1870,7 +1049,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'interface_ref' => 'if3',
 							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'posts' => '',
 							'status_codes' => '200',
@@ -1924,7 +1103,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'interface_ref' => 'if1',
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'posts' => '',
 							'status_codes' => '200',
@@ -2032,14 +1211,13 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 						]
 					],
 					'jmx_endpoint' => '',
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
 					'post_type' => '0',
 					'http_proxy' => '',
-					'interface_ref' => 'if1',
 					'retrieve_mode' => '0',
 					'request_method' => '0',
 					'ssl_cert_file' => '',
@@ -2086,7 +1264,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -2137,7 +1315,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
 					'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -2222,7 +1400,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'logtimefmt' => '',
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'posts' => '',
 							'preprocessing' => [],
@@ -2271,7 +1449,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'logtimefmt' => '',
 							'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'posts' => '',
 							'preprocessing' => [],
@@ -2325,7 +1503,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'logtimefmt' => '',
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'posts' => '',
 							'preprocessing' => [],
@@ -2436,7 +1614,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 						]
 					],
 					'jmx_endpoint' => '',
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'posts' => '',
 					'status_codes' => '200',
@@ -2462,25 +1640,25 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'master_item' => []
 				]
 			]
-		]);
+		], $adapter->getDiscoveryRules());
 	}
 
 	public function testGetImages() {
 		$adapter = $this->getAdapter($this->getMapXml());
 
-		$this->assertEquals($adapter->getImages(), [
+		$this->assertEquals([
 			[
 				'name' => 'Server_(96)',
 				'imagetype' => '1',
 				'image' => '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'
 			]
-		]);
+		], $adapter->getImages());
 	}
 
 	public function testGetMaps() {
 		$adapter = $this->getAdapter($this->getMapXml());
 
-		$this->assertEquals($adapter->getMaps(), [
+		$this->assertEquals([
 			[
 				'name' => 'empty-map',
 				'width' => '800',
@@ -2736,7 +1914,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 				]],
 				'lines' => []
 			]
-		]);
+		], $adapter->getMaps());
 	}
 
 	public function testGetMediaTypes() {
@@ -2744,7 +1922,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 
 		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
 
-		$this->assertEquals($adapter->getMediaTypes(), [
+		$this->assertEquals([
 			[
 				'name' => 'Email',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_EMAIL,
@@ -2811,479 +1989,472 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 				'script' => 'return true;',
 				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults
-		]);
+		], $adapter->getMediaTypes());
 	}
 
 	public function testConversion() {
 		$adapter = $this->getAdapter($this->get18Xml());
 
-		$this->assertEquals($adapter->getHostGroups(), [
-				[
-					'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8',
-					'name' => 'Linux servers'
-				]
+		$this->assertEquals([
+			[
+				'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8',
+				'name' => 'Linux servers'
 			]
-		);
+		], $adapter->getHostGroups());
 
-		$this->assertEquals($adapter->getTemplateGroups(), [
-				[
-					'uuid' => '7df96b18c230490a9a0a9e2307226338',
-					'name' => 'Templates'
-				]
+		$this->assertEquals([
+			[
+				'uuid' => '7df96b18c230490a9a0a9e2307226338',
+				'name' => 'Templates'
 			]
-		);
+		], $adapter->getTemplateGroups());
 
-		$this->assertEquals($adapter->getHosts(), [
-				[
-					'macros' => [],
-					'interfaces' => [
-						[
-							'type' => '1',
-							'useip' => '1',
-							'ip' => '10.0.0.6',
-							'dns' => 'localhost',
-							'port' => '10050',
-							'interface_ref' => 'if0',
-							'details' => [],
-							'main' => '1'
-						]
-					],
-					'host' => 'host',
-					'status' => '0',
-					'ipmi_authtype' => '0',
-					'ipmi_privilege' => '2',
-					'ipmi_username' => '',
-					'ipmi_password' => '',
-					'inventory_mode' => '-1',
-					'inventory' => [],
-					'groups' =>	[
-						[
-							'name' => 'Linux servers'
-						]
-					],
-					'templates' => [],
-					'proxy' => [],
-					'description' => '',
-					'name' => 'host',
-					'tags' => [],
-					'valuemaps' => []
-				]
-			]
-		);
-
-		$this->assertEquals($adapter->getTemplates(), [
-				[
-					'uuid' => '0f5ffb0773844d77b8a8622f7819ccdf',
-					'macros' => [
-						[
-							'value' => '21',
-							'macro' => '{$PORT.FTP}',
-							'type' => '0',
-							'description' => ''
-						],
-						[
-							'value' => '22',
-							'macro' => '{$PORT.SSH}',
-							'type' => '0',
-							'description' => ''
-						]
-					],
-					'host' => 'Template_Linux',
-					'groups' =>	[
-						[
-							'name' => 'Templates'
-						]
-					],
-					'templates' => [],
-					'name' => 'Template_Linux',
-					'description' => '',
-					'vendor_name' => '',
-					'vendor_version' => '',
-					'tags' => [],
-					'valuemaps' => []
+		$this->assertEquals([
+			[
+				'macros' => [],
+				'interfaces' => [
+					[
+						'type' => '1',
+						'useip' => '1',
+						'ip' => '10.0.0.6',
+						'dns' => 'localhost',
+						'port' => '10050',
+						'interface_ref' => 'if0',
+						'details' => [],
+						'main' => '1'
+					]
 				],
-				[
-					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
-					'macros' => [],
-					'host' => 'Template_Simple',
-					'groups' =>	[
-						[
-							'name' => 'Templates'
-						]
-					],
-					'templates' => [],
-					'name' => 'Template_Simple',
-					'description' => '',
-					'vendor_name' => '',
-					'vendor_version' => '',
-					'tags' => [],
-					'valuemaps' => []
-				]
+				'host' => 'host',
+				'status' => '0',
+				'ipmi_authtype' => '0',
+				'ipmi_privilege' => '2',
+				'ipmi_username' => '',
+				'ipmi_password' => '',
+				'inventory_mode' => '-1',
+				'inventory' => [],
+				'groups' =>	[
+					[
+						'name' => 'Linux servers'
+					]
+				],
+				'templates' => [],
+				'proxy' => [],
+				'description' => '',
+				'name' => 'host',
+				'tags' => [],
+				'valuemaps' => []
 			]
-		);
+		], $adapter->getHosts());
 
-		$this->assertEquals($adapter->getItems(), [
-				'Template_Linux' => [
-					'vfs.fs.size[/,pfree]' => [
-						'uuid' => '1af0599983904849aed77e1bc145a8c2',
+		$this->assertEquals([
+			[
+				'uuid' => '0f5ffb0773844d77b8a8622f7819ccdf',
+				'macros' => [
+					[
+						'value' => '21',
+						'macro' => '{$PORT.FTP}',
 						'type' => '0',
-						'value_type' => '0',
-						'ipmi_sensor' => '',
-						'delay' => '30',
-						'history' => '7d',
-						'trends' => '365d',
-						'status' => '0',
-						'units' => '%',
-						'logtimefmt' => '',
-						'authtype' => '0',
-						'username' => '',
-						'password' => '',
-						'publickey' => '',
-						'privatekey' => '',
-						'params' => '',
-						'trapper_hosts' => '',
-						'snmp_oid' => '',
-						'tags' => [
-							[
-								'tag' => 'Application',
-								'value' => 'Filesystem'
-							],
-							[
-								'tag' => 'Application',
-								'value' => 'Availability'
-							]
-						],
-						'name' => 'Free disk space on / in %',
-						'key_' => 'vfs.fs.size[/,pfree]',
-						'jmx_endpoint' => '',
-						'master_item' => [],
-						'timeout' => '3s',
-						'url' => '',
-						'query_fields' => [],
-						'parameters' => [],
-						'posts' => '',
-						'status_codes' => '200',
-						'follow_redirects' => '1',
-						'post_type' => '0',
-						'http_proxy' => '',
-						'headers' => [],
-						'retrieve_mode' => '0',
-						'request_method' => '0',
-						'output_format' => '0',
-						'allow_traps' => '0',
-						'ssl_cert_file' => '',
-						'ssl_key_file' => '',
-						'ssl_key_password' => '',
-						'triggers' => [],
-						'verify_peer' => '0',
-						'verify_host' => '0',
-						'description' => 'Free disk space on / in %',
-						'inventory_link' => '0',
-						'preprocessing' => [],
-						'valuemap' => []
+						'description' => ''
+					],
+					[
+						'value' => '22',
+						'macro' => '{$PORT.SSH}',
+						'type' => '0',
+						'description' => ''
 					]
 				],
-				'Template_Simple' => [
-					'net.tcp.service[ftp,,21]' => [
-						'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
-						'type' => '3',
-						'value_type' => '3',
-						'ipmi_sensor' => '',
-						'delay' => '30',
-						'history' => '90d',
-						'trends' => '365d',
-						'status' => '0',
-						'units' => '',
-						'logtimefmt' => '',
-						'authtype' => '0',
-						'username' => '',
-						'password' => '',
-						'publickey' => '',
-						'privatekey' => '',
-						'params' => '',
-						'trapper_hosts' => '',
-						'snmp_oid' => '',
-						'tags' => [
-							[
-								'tag' => 'Application',
-								'value' => 'Simple checks'
-							]
-						],
-						'name' => 'FTP check',
-						'key_' => 'net.tcp.service[ftp,,21]',
-						'jmx_endpoint' => '',
-						'master_item' => [],
-						'timeout' => '3s',
-						'url' => '',
-						'query_fields' => [],
-						'parameters' => [],
-						'posts' => '',
-						'status_codes' => '200',
-						'follow_redirects' => '1',
-						'post_type' => '0',
-						'http_proxy' => '',
-						'headers' => [],
-						'retrieve_mode' => '0',
-						'request_method' => '0',
-						'output_format' => '0',
-						'allow_traps' => '0',
-						'ssl_cert_file' => '',
-						'ssl_key_file' => '',
-						'ssl_key_password' => '',
-						'triggers' => [],
-						'verify_peer' => '0',
-						'verify_host' => '0',
-						'description' => 'FTP check',
-						'inventory_link' => '0',
-						'preprocessing' => [],
-						'valuemap' => []
-					],
-					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
-						'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
-						'type' => '3',
-						'value_type' => '3',
-						'ipmi_sensor' => '',
-						'delay' => '30',
-						'history' => '90d',
-						'trends' => '365d',
-						'status' => '0',
-						'units' => '',
-						'logtimefmt' => '',
-						'authtype' => '0',
-						'username' => '',
-						'password' => '',
-						'publickey' => '',
-						'privatekey' => '',
-						'params' => '',
-						'trapper_hosts' => '',
-						'snmp_oid' => '',
-						'tags' => [
-							[
-								'tag' => 'Application',
-								'value' => 'Simple checks'
-							]
-						],
-						'name' => 'FTP check with macro',
-						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
-						'jmx_endpoint' => '',
-						'master_item' => [],
-						'timeout' => '3s',
-						'url' => '',
-						'query_fields' => [],
-						'parameters' => [],
-						'posts' => '',
-						'status_codes' => '200',
-						'follow_redirects' => '1',
-						'post_type' => '0',
-						'http_proxy' => '',
-						'headers' => [],
-						'retrieve_mode' => '0',
-						'request_method' => '0',
-						'output_format' => '0',
-						'allow_traps' => '0',
-						'ssl_cert_file' => '',
-						'ssl_key_file' => '',
-						'ssl_key_password' => '',
-						'triggers' => [],
-						'verify_peer' => '0',
-						'verify_host' => '0',
-						'description' => 'FTP check with macro',
-						'inventory_link' => '0',
-						'preprocessing' => [],
-						'valuemap' => []
+				'host' => 'Template_Linux',
+				'groups' =>	[
+					[
+						'name' => 'Templates'
 					]
-				]
+				],
+				'templates' => [],
+				'name' => 'Template_Linux',
+				'description' => '',
+				'vendor_name' => '',
+				'vendor_version' => '',
+				'tags' => [],
+				'valuemaps' => []
+			],
+			[
+				'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
+				'macros' => [],
+				'host' => 'Template_Simple',
+				'groups' =>	[
+					[
+						'name' => 'Templates'
+					]
+				],
+				'templates' => [],
+				'name' => 'Template_Simple',
+				'description' => '',
+				'vendor_name' => '',
+				'vendor_version' => '',
+				'tags' => [],
+				'valuemaps' => []
 			]
-		);
+		], $adapter->getTemplates());
 
-		$this->assertEquals($adapter->getTriggers(), [
-				[
-					'uuid' => '4b481ada990d4511894db8f49239c611',
+		$this->assertEquals([
+			'Template_Linux' => [
+				'vfs.fs.size[/,pfree]' => [
+					'uuid' => '1af0599983904849aed77e1bc145a8c2',
 					'type' => '0',
-					'expression' => 'last(/Template_Linux/vfs.fs.size[/,pfree])<10',
-					'url' => 'http://www.zabbix.com/',
+					'value_type' => '0',
+					'ipmi_sensor' => '',
+					'delay' => '30',
+					'history' => '7d',
+					'trends' => '365d',
 					'status' => '0',
-					'priority' => '4',
-					'comments' => 'test comments',
-					'description' => 'Low free disk space on {HOSTNAME} volume /',
-					'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
-					'recovery_expression' => '',
-					'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
-					'correlation_tag' => '',
-					'event_name' => '',
-					'opdata' => '',
-					'url_name' => '',
-					'tags' => [],
-					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-					'dependencies' => []
+					'units' => '%',
+					'logtimefmt' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'params' => '',
+					'trapper_hosts' => '',
+					'snmp_oid' => '',
+					'tags' => [
+						[
+							'tag' => 'Application',
+							'value' => 'Filesystem'
+						],
+						[
+							'tag' => 'Application',
+							'value' => 'Availability'
+						]
+					],
+					'name' => 'Free disk space on / in %',
+					'key_' => 'vfs.fs.size[/,pfree]',
+					'jmx_endpoint' => '',
+					'master_item' => [],
+					'timeout' => '',
+					'url' => '',
+					'query_fields' => [],
+					'parameters' => [],
+					'posts' => '',
+					'status_codes' => '200',
+					'follow_redirects' => '1',
+					'post_type' => '0',
+					'http_proxy' => '',
+					'headers' => [],
+					'retrieve_mode' => '0',
+					'request_method' => '0',
+					'output_format' => '0',
+					'allow_traps' => '0',
+					'ssl_cert_file' => '',
+					'ssl_key_file' => '',
+					'ssl_key_password' => '',
+					'triggers' => [],
+					'verify_peer' => '0',
+					'verify_host' => '0',
+					'description' => 'Free disk space on / in %',
+					'inventory_link' => '0',
+					'preprocessing' => [],
+					'valuemap' => []
+				]
+			],
+			'Template_Simple' => [
+				'net.tcp.service[ftp,,21]' => [
+					'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
+					'type' => '3',
+					'value_type' => '3',
+					'ipmi_sensor' => '',
+					'delay' => '30',
+					'history' => '90d',
+					'trends' => '365d',
+					'status' => '0',
+					'units' => '',
+					'logtimefmt' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'params' => '',
+					'trapper_hosts' => '',
+					'snmp_oid' => '',
+					'tags' => [
+						[
+							'tag' => 'Application',
+							'value' => 'Simple checks'
+						]
+					],
+					'name' => 'FTP check',
+					'key_' => 'net.tcp.service[ftp,,21]',
+					'jmx_endpoint' => '',
+					'master_item' => [],
+					'timeout' => '',
+					'url' => '',
+					'query_fields' => [],
+					'parameters' => [],
+					'posts' => '',
+					'status_codes' => '200',
+					'follow_redirects' => '1',
+					'post_type' => '0',
+					'http_proxy' => '',
+					'headers' => [],
+					'retrieve_mode' => '0',
+					'request_method' => '0',
+					'output_format' => '0',
+					'allow_traps' => '0',
+					'ssl_cert_file' => '',
+					'ssl_key_file' => '',
+					'ssl_key_password' => '',
+					'triggers' => [],
+					'verify_peer' => '0',
+					'verify_host' => '0',
+					'description' => 'FTP check',
+					'inventory_link' => '0',
+					'preprocessing' => [],
+					'valuemap' => []
 				],
-				[
-					'uuid' => '37d8550be8a64440a265004dfdad0a4a',
-					'type' => '1',
-					'expression' => 'last(/Template_Simple/net.tcp.service[ftp,,21])<>0 or last(/Template_Simple/net.tcp.service[ftp,,{$PORT.FTP}])<>0',
-					'url' => 'triggers.php',
-					'status' => '1',
-					'priority' => '3',
-					'comments' => 'comments',
-					'description' => 'simple triggert',
-					'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
-					'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
-					'recovery_expression' => '',
-					'correlation_tag' => '',
-					'event_name' => '',
-					'opdata' => '',
-					'url_name' => '',
-					'tags' => [],
-					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
-					'dependencies' => []
+				'net.tcp.service[ftp,,{$PORT.FTP}]' => [
+					'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
+					'type' => '3',
+					'value_type' => '3',
+					'ipmi_sensor' => '',
+					'delay' => '30',
+					'history' => '90d',
+					'trends' => '365d',
+					'status' => '0',
+					'units' => '',
+					'logtimefmt' => '',
+					'authtype' => '0',
+					'username' => '',
+					'password' => '',
+					'publickey' => '',
+					'privatekey' => '',
+					'params' => '',
+					'trapper_hosts' => '',
+					'snmp_oid' => '',
+					'tags' => [
+						[
+							'tag' => 'Application',
+							'value' => 'Simple checks'
+						]
+					],
+					'name' => 'FTP check with macro',
+					'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
+					'jmx_endpoint' => '',
+					'master_item' => [],
+					'timeout' => '',
+					'url' => '',
+					'query_fields' => [],
+					'parameters' => [],
+					'posts' => '',
+					'status_codes' => '200',
+					'follow_redirects' => '1',
+					'post_type' => '0',
+					'http_proxy' => '',
+					'headers' => [],
+					'retrieve_mode' => '0',
+					'request_method' => '0',
+					'output_format' => '0',
+					'allow_traps' => '0',
+					'ssl_cert_file' => '',
+					'ssl_key_file' => '',
+					'ssl_key_password' => '',
+					'triggers' => [],
+					'verify_peer' => '0',
+					'verify_host' => '0',
+					'description' => 'FTP check with macro',
+					'inventory_link' => '0',
+					'preprocessing' => [],
+					'valuemap' => []
 				]
 			]
-		);
+		], $adapter->getItems());
 
-		$this->assertEquals($adapter->getGraphs(), [
-				[
-					'uuid' => '0b0dcd48bc5248f0a5fd0bb62ab7ee94',
-					'name' => 'simple graph fixed',
-					'width' => '755',
-					'height' => '332',
-					'ymin_type' => '1',
-					'ymax_type' => '1',
-					'show_work_period' => '1',
-					'show_triggers' => '1',
-					'yaxismin' => '5.5000',
-					'yaxismax' => '95.6000',
-					'show_3d' => '0',
-					'percent_left' => '25.5000',
-					'percent_right' => '27.6000',
-					'ymin_item_1' => '0',
-					'ymax_item_1' => '0',
-					'graphtype' => '0',
-					'gitems' => [
-						[
-							'item' => [
-								'host' => 'Template_Simple',
-								'key' => 'net.tcp.service[ftp,,21]'
-							],
-							'drawtype' => '0',
-							'sortorder' => '0',
-							'color' => '3333FF',
-							'yaxisside' => '0',
-							'calc_fnc' => '7',
-							'type' => '0'
-						],
-						[
-							'item' => [
-								'host' => 'Template_Simple',
-								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-							],
-							'drawtype' => '1',
-							'sortorder' => '1',
-							'color' => '009999',
-							'yaxisside' => '1',
-							'calc_fnc' => '4',
-							'type' => '0'
-						]
-					],
-					'show_legend' => '0'
-				],
-				[
-					'uuid' => '7f147b35d45646e59bc973b21adaac6b',
-					'name' => 'simple graph',
-					'width' => '900',
-					'height' => '200',
-					'ymin_type' => '0',
-					'ymax_type' => '0',
-					'show_work_period' => '0',
-					'show_triggers' => '0',
-					'yaxismin' => '0.0000',
-					'yaxismax' => '100.0000',
-					'show_3d' => '0',
-					'percent_left' => '0.0000',
-					'percent_right' => '0.0000',
-					'ymin_item_1' => '0',
-					'ymax_item_1' => '0',
-					'graphtype' => '0',
-					'gitems' => [
-						[
-							'item' => [
-								'host' => 'Template_Simple',
-								'key' => 'net.tcp.service[ftp,,21]'
-							],
-							'drawtype' => '0',
-							'sortorder' => '0',
-							'color' => '3333FF',
-							'yaxisside' => '0',
-							'calc_fnc' => '2',
-							'type' => '0'
-						],
-						[
-							'item' => [
-								'host' => 'Template_Simple',
-								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-							],
-							'drawtype' => '0',
-							'sortorder' => '1',
-							'color' => '009999',
-							'yaxisside' => '0',
-							'calc_fnc' => '2',
-							'type' => '0'
-						]
-					],
-					'show_legend' => '0'
-				],
-				[
-					'uuid' => '733df972eb904450bc90c63c13fcf6f6',
-					'name' => 'simple graph min/max',
-					'width' => '1024',
-					'height' => '768',
-					'ymin_type' => '2',
-					'ymax_type' => '2',
-					'show_work_period' => '1',
-					'show_triggers' => '1',
-					'yaxismin' => '0.0000',
-					'yaxismax' => '0.0000',
-					'show_3d' => '0',
-					'percent_left' => '0.0000',
-					'percent_right' => '0.0000',
-					'ymin_item_1' => [
-						'host' => 'Template_Simple',
-						'key' => 'net.tcp.service[ftp,,21]'
-					],
-					'ymax_item_1' => [
-						'host' => 'Template_Simple',
-						'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-					],
-					'graphtype' => '1',
-					'gitems' => [
-						[
-							'item' => [
-								'host' => 'Template_Simple',
-								'key' => 'net.tcp.service[ftp,,21]'
-							],
-							'drawtype' => '0',
-							'sortorder' => '0',
-							'color' => '3333FF',
-							'yaxisside' => '0',
-							'calc_fnc' => '2',
-							'type' => '0'
-						],
-						[
-							'item' => [
-								'host' => 'Template_Simple',
-								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-							],
-							'drawtype' => '0',
-							'sortorder' => '1',
-							'color' => '009999',
-							'yaxisside' => '0',
-							'calc_fnc' => '2',
-							'type' => '0'
-						]
-					],
-					'show_legend' => '0'
-				]
+		$this->assertEquals([
+			[
+				'uuid' => '4b481ada990d4511894db8f49239c611',
+				'type' => '0',
+				'expression' => 'last(/Template_Linux/vfs.fs.size[/,pfree])<10',
+				'url' => 'http://www.zabbix.com/',
+				'status' => '0',
+				'priority' => '4',
+				'comments' => 'test comments',
+				'description' => 'Low free disk space on {HOSTNAME} volume /',
+				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
+				'recovery_expression' => '',
+				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
+				'correlation_tag' => '',
+				'event_name' => '',
+				'opdata' => '',
+				'url_name' => '',
+				'tags' => [],
+				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+				'dependencies' => []
+			],
+			[
+				'uuid' => '37d8550be8a64440a265004dfdad0a4a',
+				'type' => '1',
+				'expression' => 'last(/Template_Simple/net.tcp.service[ftp,,21])<>0 or last(/Template_Simple/net.tcp.service[ftp,,{$PORT.FTP}])<>0',
+				'url' => 'triggers.php',
+				'status' => '1',
+				'priority' => '3',
+				'comments' => 'comments',
+				'description' => 'simple triggert',
+				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
+				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
+				'recovery_expression' => '',
+				'correlation_tag' => '',
+				'event_name' => '',
+				'opdata' => '',
+				'url_name' => '',
+				'tags' => [],
+				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
+				'dependencies' => []
 			]
-		);
+		], $adapter->getTriggers());
+
+		$this->assertEquals([
+			[
+				'uuid' => '0b0dcd48bc5248f0a5fd0bb62ab7ee94',
+				'name' => 'simple graph fixed',
+				'width' => '755',
+				'height' => '332',
+				'ymin_type' => '1',
+				'ymax_type' => '1',
+				'show_work_period' => '1',
+				'show_triggers' => '1',
+				'yaxismin' => '5.5000',
+				'yaxismax' => '95.6000',
+				'show_3d' => '0',
+				'percent_left' => '25.5000',
+				'percent_right' => '27.6000',
+				'ymin_item_1' => '0',
+				'ymax_item_1' => '0',
+				'graphtype' => '0',
+				'gitems' => [
+					[
+						'item' => [
+							'host' => 'Template_Simple',
+							'key' => 'net.tcp.service[ftp,,21]'
+						],
+						'drawtype' => '0',
+						'sortorder' => '0',
+						'color' => '3333FF',
+						'yaxisside' => '0',
+						'calc_fnc' => '7',
+						'type' => '0'
+					],
+					[
+						'item' => [
+							'host' => 'Template_Simple',
+							'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+						],
+						'drawtype' => '1',
+						'sortorder' => '1',
+						'color' => '009999',
+						'yaxisside' => '1',
+						'calc_fnc' => '4',
+						'type' => '0'
+					]
+				],
+				'show_legend' => '0'
+			],
+			[
+				'uuid' => '7f147b35d45646e59bc973b21adaac6b',
+				'name' => 'simple graph',
+				'width' => '900',
+				'height' => '200',
+				'ymin_type' => '0',
+				'ymax_type' => '0',
+				'show_work_period' => '0',
+				'show_triggers' => '0',
+				'yaxismin' => '0.0000',
+				'yaxismax' => '100.0000',
+				'show_3d' => '0',
+				'percent_left' => '0.0000',
+				'percent_right' => '0.0000',
+				'ymin_item_1' => '0',
+				'ymax_item_1' => '0',
+				'graphtype' => '0',
+				'gitems' => [
+					[
+						'item' => [
+							'host' => 'Template_Simple',
+							'key' => 'net.tcp.service[ftp,,21]'
+						],
+						'drawtype' => '0',
+						'sortorder' => '0',
+						'color' => '3333FF',
+						'yaxisside' => '0',
+						'calc_fnc' => '2',
+						'type' => '0'
+					],
+					[
+						'item' => [
+							'host' => 'Template_Simple',
+							'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+						],
+						'drawtype' => '0',
+						'sortorder' => '1',
+						'color' => '009999',
+						'yaxisside' => '0',
+						'calc_fnc' => '2',
+						'type' => '0'
+					]
+				],
+				'show_legend' => '0'
+			],
+			[
+				'uuid' => '733df972eb904450bc90c63c13fcf6f6',
+				'name' => 'simple graph min/max',
+				'width' => '1024',
+				'height' => '768',
+				'ymin_type' => '2',
+				'ymax_type' => '2',
+				'show_work_period' => '1',
+				'show_triggers' => '1',
+				'yaxismin' => '0.0000',
+				'yaxismax' => '0.0000',
+				'show_3d' => '0',
+				'percent_left' => '0.0000',
+				'percent_right' => '0.0000',
+				'ymin_item_1' => [
+					'host' => 'Template_Simple',
+					'key' => 'net.tcp.service[ftp,,21]'
+				],
+				'ymax_item_1' => [
+					'host' => 'Template_Simple',
+					'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+				],
+				'graphtype' => '1',
+				'gitems' => [
+					[
+						'item' => [
+							'host' => 'Template_Simple',
+							'key' => 'net.tcp.service[ftp,,21]'
+						],
+						'drawtype' => '0',
+						'sortorder' => '0',
+						'color' => '3333FF',
+						'yaxisside' => '0',
+						'calc_fnc' => '2',
+						'type' => '0'
+					],
+					[
+						'item' => [
+							'host' => 'Template_Simple',
+							'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+						],
+						'drawtype' => '0',
+						'sortorder' => '1',
+						'color' => '009999',
+						'yaxisside' => '0',
+						'calc_fnc' => '2',
+						'type' => '0'
+					]
+				],
+				'show_legend' => '0'
+			]
+		], $adapter->getGraphs());
 	}
 
 	public function testUnsupportedVersion() {
@@ -3302,190 +2473,187 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 	public function test10SchemaTransformationToLatest() {
 		$adapter = $this->getAdapter($this->get10Xml());
 
-		$this->assertEquals($adapter->getHosts(), [
-				[
-					'name' => 'host',
-					'status' => '0',
-					'ipmi_authtype' => '0',
-					'ipmi_privilege' => '2',
-					'groups' => [
-						[
-							'name' => 'Linux servers'
-						]
-					],
-					'templates' => [],
-					'host' => 'host',
-					'interfaces' =>
+		$this->assertEquals([
+			[
+				'name' => 'host',
+				'status' => '0',
+				'ipmi_authtype' => '0',
+				'ipmi_privilege' => '2',
+				'groups' => [
 					[
-						[
-							'type' => '1',
-							'useip' => '1',
-							'ip' => '10.0.0.6',
-							'dns' => 'localhost',
-							'port' => '10050',
-							'main' => '1',
-							'interface_ref' => 'if0',
-							'details' => []
-						]
-					],
-					'proxy' => [],
-					'inventory_mode' => '-1',
-					'description' => '',
-					'inventory' => [],
-					'ipmi_password' => '',
-					'ipmi_username' => '',
-					'macros' => [],
-					'tags' => [],
-					'valuemaps' => []
-				]
-			]
-		);
-
-		$this->assertEquals($adapter->getTemplates(), [
-				[
-					'groups' => [
-						[
-							'name' => 'Templates'
-						]
-					],
-					'macros' => [
-						[
-							'value' => '23',
-							'macro' => '{#VALUE}',
-							'type' => '0',
-							'description' => ''
-						]
-					],
-					'templates' => [
-						[
-							'name' => 'template'
-						]
-					],
-					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
-					'host' => 'Template_Simple',
-					'name' => 'Template_Simple',
-					'description' => '',
-					'vendor_name' => '',
-					'vendor_version' => '',
-					'tags' => [],
-					'valuemaps' => []
-				]
-			]
-		);
-
-		$this->assertEquals($adapter->getItems(), [
-				'Template_Simple' => [
-					'net.tcp.service[ftp,,21]' => [
-						'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
-						'type' => '3',
-						'value_type' => '3',
-						'description' => 'FTP check',
-						'delay' => '30',
-						'history' => '90d',
-						'trends' => '365d',
-						'status' => '0',
-						'authtype' => '0',
-						'tags' => [
-							[
-								'tag' => 'Application',
-								'value' => 'Simple checks'
-							]
-						],
-						'name' => 'FTP check',
-						'timeout' => '3s',
-						'status_codes' => '200',
-						'follow_redirects' => '1',
-						'post_type' => '0',
-						'retrieve_mode' => '0',
-						'request_method' => '0',
-						'output_format' => '0',
-						'verify_peer' => '0',
-						'verify_host' => '0',
-						'allow_traps' => '0',
-						'headers' => [],
-						'http_proxy' => '',
-						'inventory_link' => '0',
-						'ipmi_sensor' => '',
-						'jmx_endpoint' => '',
-						'logtimefmt' => '',
-						'master_item' => [],
-						'params' => '',
-						'password' => '',
-						'posts' => '',
-						'preprocessing' => [],
-						'privatekey' => '',
-						'publickey' => '',
-						'query_fields' => [],
-						'parameters' => [],
-						'snmp_oid' => '',
-						'ssl_cert_file' => '',
-						'ssl_key_file' => '',
-						'ssl_key_password' => '',
-						'triggers' => [],
-						'units' => '',
-						'url' => '',
-						'username' => '',
-						'valuemap' => [],
-						'key_' => 'net.tcp.service[ftp,,21]',
-						'trapper_hosts' => ''
-					],
-					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
-						'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
-						'type' => '3',
-						'value_type' => '3',
-						'description' => 'FTP check with macro',
-						'delay' => '30',
-						'history' => '90d',
-						'trends' => '365d',
-						'status' => '0',
-						'authtype' => '0',
-						'tags' => [
-							[
-								'tag' => 'Application',
-								'value' => 'Simple checks'
-							]
-						],
-						'name' => 'FTP check with macro',
-						'timeout' => '3s',
-						'status_codes' => '200',
-						'follow_redirects' => '1',
-						'post_type' => '0',
-						'retrieve_mode' => '0',
-						'request_method' => '0',
-						'output_format' => '0',
-						'verify_peer' => '0',
-						'verify_host' => '0',
-						'allow_traps' => '0',
-						'headers' => [],
-						'http_proxy' => '',
-						'inventory_link' => '0',
-						'ipmi_sensor' => '',
-						'jmx_endpoint' => '',
-						'logtimefmt' => '',
-						'master_item' => [],
-						'params' => '',
-						'password' => '',
-						'posts' => '',
-						'preprocessing' => [],
-						'privatekey' => '',
-						'publickey' => '',
-						'query_fields' => [],
-						'parameters' => [],
-						'snmp_oid' => '',
-						'ssl_cert_file' => '',
-						'ssl_key_file' => '',
-						'ssl_key_password' => '',
-						'triggers' => [],
-						'units' => '',
-						'url' => '',
-						'username' => '',
-						'valuemap' => [],
-						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
-						'trapper_hosts' => ''
+						'name' => 'Linux servers'
 					]
+				],
+				'templates' => [],
+				'host' => 'host',
+				'interfaces' =>
+				[
+					[
+						'type' => '1',
+						'useip' => '1',
+						'ip' => '10.0.0.6',
+						'dns' => 'localhost',
+						'port' => '10050',
+						'main' => '1',
+						'interface_ref' => 'if0',
+						'details' => []
+					]
+				],
+				'proxy' => [],
+				'inventory_mode' => '-1',
+				'description' => '',
+				'inventory' => [],
+				'ipmi_password' => '',
+				'ipmi_username' => '',
+				'macros' => [],
+				'tags' => [],
+				'valuemaps' => []
+			]
+		], $adapter->getHosts());
+
+		$this->assertEquals([
+			[
+				'groups' => [
+					[
+						'name' => 'Templates'
+					]
+				],
+				'macros' => [
+					[
+						'value' => '23',
+						'macro' => '{#VALUE}',
+						'type' => '0',
+						'description' => ''
+					]
+				],
+				'templates' => [
+					[
+						'name' => 'template'
+					]
+				],
+				'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
+				'host' => 'Template_Simple',
+				'name' => 'Template_Simple',
+				'description' => '',
+				'vendor_name' => '',
+				'vendor_version' => '',
+				'tags' => [],
+				'valuemaps' => []
+			]
+		], $adapter->getTemplates());
+
+		$this->assertEquals([
+			'Template_Simple' => [
+				'net.tcp.service[ftp,,21]' => [
+					'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
+					'type' => '3',
+					'value_type' => '3',
+					'description' => 'FTP check',
+					'delay' => '30',
+					'history' => '90d',
+					'trends' => '365d',
+					'status' => '0',
+					'authtype' => '0',
+					'tags' => [
+						[
+							'tag' => 'Application',
+							'value' => 'Simple checks'
+						]
+					],
+					'name' => 'FTP check',
+					'timeout' => '',
+					'status_codes' => '200',
+					'follow_redirects' => '1',
+					'post_type' => '0',
+					'retrieve_mode' => '0',
+					'request_method' => '0',
+					'output_format' => '0',
+					'verify_peer' => '0',
+					'verify_host' => '0',
+					'allow_traps' => '0',
+					'headers' => [],
+					'http_proxy' => '',
+					'inventory_link' => '0',
+					'ipmi_sensor' => '',
+					'jmx_endpoint' => '',
+					'logtimefmt' => '',
+					'master_item' => [],
+					'params' => '',
+					'password' => '',
+					'posts' => '',
+					'preprocessing' => [],
+					'privatekey' => '',
+					'publickey' => '',
+					'query_fields' => [],
+					'parameters' => [],
+					'snmp_oid' => '',
+					'ssl_cert_file' => '',
+					'ssl_key_file' => '',
+					'ssl_key_password' => '',
+					'triggers' => [],
+					'units' => '',
+					'url' => '',
+					'username' => '',
+					'valuemap' => [],
+					'key_' => 'net.tcp.service[ftp,,21]',
+					'trapper_hosts' => ''
+				],
+				'net.tcp.service[ftp,,{$PORT.FTP}]' => [
+					'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
+					'type' => '3',
+					'value_type' => '3',
+					'description' => 'FTP check with macro',
+					'delay' => '30',
+					'history' => '90d',
+					'trends' => '365d',
+					'status' => '0',
+					'authtype' => '0',
+					'tags' => [
+						[
+							'tag' => 'Application',
+							'value' => 'Simple checks'
+						]
+					],
+					'name' => 'FTP check with macro',
+					'timeout' => '',
+					'status_codes' => '200',
+					'follow_redirects' => '1',
+					'post_type' => '0',
+					'retrieve_mode' => '0',
+					'request_method' => '0',
+					'output_format' => '0',
+					'verify_peer' => '0',
+					'verify_host' => '0',
+					'allow_traps' => '0',
+					'headers' => [],
+					'http_proxy' => '',
+					'inventory_link' => '0',
+					'ipmi_sensor' => '',
+					'jmx_endpoint' => '',
+					'logtimefmt' => '',
+					'master_item' => [],
+					'params' => '',
+					'password' => '',
+					'posts' => '',
+					'preprocessing' => [],
+					'privatekey' => '',
+					'publickey' => '',
+					'query_fields' => [],
+					'parameters' => [],
+					'snmp_oid' => '',
+					'ssl_cert_file' => '',
+					'ssl_key_file' => '',
+					'ssl_key_password' => '',
+					'triggers' => [],
+					'units' => '',
+					'url' => '',
+					'username' => '',
+					'valuemap' => [],
+					'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
+					'trapper_hosts' => ''
 				]
 			]
-		);
+		], $adapter->getItems());
 	}
 
 	public function testConstantConverter() {
@@ -3511,18 +2679,17 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 		];
 		$source = (new CConstantImportConverter($schema))->convert($source);
 
-		$this->assertEquals($source, [
-				'zabbix_export' => [
-					'constants' => [
-						'constant' => [
-							'first' => '1',
-							'second' => '2',
-							'third' => 'test'
-						]
+		$this->assertEquals([
+			'zabbix_export' => [
+				'constants' => [
+					'constant' => [
+						'first' => '1',
+						'second' => '2',
+						'third' => 'test'
 					]
 				]
 			]
-		);
+		], $source);
 	}
 
 	public function constantConverterExRules(array $data) {
@@ -3580,22 +2747,21 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 		];
 		$source = (new CDefaultImportConverter($schema))->convert($source);
 
-		$this->assertEquals($source, [
-				'zabbix_export' => [
-					'default_values' => [
-						'values' => [
-							'var0' => 'test',
-							'var1' => '1',
-							'var2' => '',
-							'var3' => [],
-							'var4' => [
-								'subvar1' => 'array'
-							]
+		$this->assertEquals([
+			'zabbix_export' => [
+				'default_values' => [
+					'values' => [
+						'var0' => 'test',
+						'var1' => '1',
+						'var2' => '',
+						'var3' => [],
+						'var4' => [
+							'subvar1' => 'array'
 						]
 					]
 				]
 			]
-		);
+		], $source);
 	}
 
 	public function testArrayKeysConverter() {
@@ -3648,48 +2814,47 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 		];
 		$source = (new CImportDataNormalizer($schema))->normalize($source);
 
-		$this->assertEquals($source, [
-				'zabbix_export' => [
-					'tests' => [
-						[
-							'values' => [
-								[
-									'host' => ''
-								],
-								[
-									'host' => ''
-								],
-								[
-									'host' => ''
-								]
+		$this->assertEquals([
+			'zabbix_export' => [
+				'tests' => [
+					[
+						'values' => [
+							[
+								'host' => ''
+							],
+							[
+								'host' => ''
+							],
+							[
+								'host' => ''
 							]
-						],
-						[
-							'value' => ''
-						],
-						[
-							'values' => [
-								[
-									'host' => ''
-								],
-								[
-									'host' => ''
-								],
-								[
-									'host' => ''
-								]
+						]
+					],
+					[
+						'value' => ''
+					],
+					[
+						'values' => [
+							[
+								'host' => ''
+							],
+							[
+								'host' => ''
+							],
+							[
+								'host' => ''
 							]
 						]
 					]
 				]
 			]
-		);
+		], $source);
 	}
 
 	public function testTemplateSnmpConverter() {
 		$adapter = $this->getAdapter($this->getSNMPTemplateXml());
 
-		$this->assertEquals($adapter->getTemplates(), [
+		$this->assertEquals([
 			[
 				'groups' => [
 					[
@@ -3707,9 +2872,9 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 				'tags' => [],
 				'valuemaps' => []
 			]
-		]);
+		], $adapter->getTemplates());
 
-		$this->assertEquals($adapter->getItems(), [
+		$this->assertEquals([
 			'Test 1' => [
 				'test' => [
 					'uuid' => '86491ebd3d2549eaab7bbba6537c5e9b',
@@ -3737,7 +2902,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -3786,7 +2951,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -3835,7 +3000,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -3884,7 +3049,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -3933,7 +3098,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -3982,7 +3147,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4006,9 +3171,9 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'trapper_hosts' => ''
 				]
 			]
-		]);
+		], $adapter->getItems());
 
-		$this->assertEquals($adapter->getDiscoveryRules(), [
+		$this->assertEquals([
 			'Test 1' => [
 				'drule' => [
 					'uuid' => '3b7d292c10354838805205cfcbc444cc',
@@ -4042,7 +3207,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'preprocessing' => [],
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'query_fields' => [],
 							'parameters' => [],
@@ -4087,7 +3252,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4143,7 +3308,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'preprocessing' => [],
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'query_fields' => [],
 							'parameters' => [],
@@ -4188,7 +3353,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4244,7 +3409,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'preprocessing' => [],
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'query_fields' => [],
 							'parameters' => [],
@@ -4289,7 +3454,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4314,13 +3479,13 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'trapper_hosts' => ''
 				]
 			]
-		]);
+		], $adapter->getDiscoveryRules());
 	}
 
 	public function testHostSnmpConverter() {
 		$adapter = $this->getAdapter($this->getSNMPHostXml());
 
-		$this->assertEquals($adapter->getHosts(), [
+		$this->assertEquals([
 			[
 				'inventory' => [],
 				'proxy' => [],
@@ -4509,9 +3674,9 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 				'tags' => [],
 				'valuemaps' => []
 			]
-		]);
+		], $adapter->getHosts());
 
-		$this->assertEquals($adapter->getItems(), [
+		$this->assertEquals([
 			'SNMP host' => [
 				'test' => [
 					'name' => 'Item SNMPv1 without port',
@@ -4539,7 +3704,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4588,7 +3753,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4637,7 +3802,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4686,7 +3851,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4735,7 +3900,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4784,7 +3949,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'preprocessing' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4808,9 +3973,9 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'trapper_hosts' => ''
 				]
 			]
-		]);
+		], $adapter->getItems());
 
-		$this->assertEquals($adapter->getDiscoveryRules(), [
+		$this->assertEquals([
 			'SNMP host' => [
 				'drule' => [
 					'name' => 'Discovery Rule 1',
@@ -4844,7 +4009,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'preprocessing' => [],
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'query_fields' => [],
 							'parameters' => [],
@@ -4889,7 +4054,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -4945,7 +4110,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'preprocessing' => [],
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'query_fields' => [],
 							'parameters' => [],
@@ -4990,7 +4155,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -5046,7 +4211,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 							'preprocessing' => [],
 							'jmx_endpoint' => '',
 							'master_item' => [],
-							'timeout' => '3s',
+							'timeout' => '',
 							'url' => '',
 							'query_fields' => [],
 							'parameters' => [],
@@ -5091,7 +4256,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
-					'timeout' => '3s',
+					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
 					'parameters' => [],
@@ -5116,13 +4281,13 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 					'trapper_hosts' => ''
 				]
 			]
-		]);
+		], $adapter->getDiscoveryRules());
 	}
 
 	public function testTemplateVendorFields() {
 		$adapter = $this->getAdapter($this->getFile('vendor_fields.xml'));
 
-		$this->assertEquals($adapter->getTemplates(), [
+		$this->assertEquals([
 			[
 				'groups' => [
 					[
@@ -5140,7 +4305,7 @@ file_put_contents('test.txt', json_encode($lld_rules[$export_type][$lld_rule_nam
 				'tags' => [],
 				'valuemaps' => []
 			]
-		]);
+		], $adapter->getTemplates());
 	}
 
 	protected function getAdapter($source) {

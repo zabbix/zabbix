@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 $table = (new CTable())
-	->setId('valuemap-table')
-	->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE)
+	->setId($data['table_id'])
 	->setColumns([
 		(new CTableColumn(_('Name')))
 			->addStyle('width: '.ZBX_TEXTAREA_MAPPING_VALUE_WIDTH.'px;')
@@ -35,6 +35,13 @@ $table = (new CTable())
 		(new CTableColumn(_('Action')))
 			->addClass('table-col-handle')
 	]);
+
+if (array_key_exists('with_label', $data) && $data['with_label'] === true) {
+	$table->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+}
+else {
+	$table->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE);
+}
 
 $buttons = [
 	(new CButton('valuemap_add', _('Add')))
@@ -56,4 +63,7 @@ $table->addItem((new CTag('tfoot', true))->addItem([new CCol($buttons)]));
 
 $table->show();
 
-$this->includeJsFile('configuration.valuemap.js.php', ['valuemaps' => $data['valuemaps']]);
+$this->includeJsFile('configuration.valuemap.js.php', [
+	'valuemaps' => $data['valuemaps'],
+	'table_id' => $data['table_id']
+]);

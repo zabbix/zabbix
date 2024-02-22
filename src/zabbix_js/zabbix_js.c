@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,19 +22,18 @@
 #include "zbxembed.h"
 #include "zbxmutexs.h"
 #include "zbxstr.h"
+#include "zbxnix.h"
 
-const char	*progname;
-const char	title_message[] = "zabbix_js";
-const char	syslog_app_name[] = "zabbix_js";
-const char	*usage_message[] = {
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+static const char	title_message[] = "zabbix_js";
+static const char	syslog_app_name[] = "zabbix_js";
+static const char	*usage_message[] = {
 	"-s script-file", "-p input-param", "[-l log-level]", "[-t timeout]", NULL,
 	"-s script-file", "-i input-file", "[-l log-level]", "[-t timeout]", NULL,
 	"-h", NULL,
 	"-V", NULL,
 	NULL	/* end of text */
 };
-
-unsigned char	program_type;
 
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
@@ -43,7 +42,7 @@ unsigned char	program_type;
 #define JS_TIMEOUT_MAX_STR	ZBX_STR(JS_TIMEOUT_MAX)
 #define JS_TIMEOUT_DEF_STR	ZBX_STR(JS_TIMEOUT_DEF)
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"Execute script using Zabbix embedded scripting engine.",
 	"",
 	"General options:",
@@ -81,11 +80,6 @@ struct zbx_option	longopts[] =
 static char	shortopts[] = "s:i:p:hVl:t:";
 
 /* end of COMMAND LINE OPTIONS */
-
-/* not related with tls from libzbxcomms.a */
-char	*CONFIG_SSL_CA_LOCATION		= NULL;
-char	*CONFIG_SSL_CERT_LOCATION	= NULL;
-char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static char	*read_file(const char *filename, char **error)
 {
@@ -139,10 +133,12 @@ int	main(int argc, char **argv)
 
 	const char		*config_source_ip = NULL;
 
-	progname = get_program_name(argv[0]);
+	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl);
-
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+#ifndef _WINDOWS
+	zbx_init_library_nix(get_zbx_progname);
+#endif
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
 			&zbx_optind)))
@@ -175,15 +171,15 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_help();
+				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
-				zbx_version();
+				zbx_print_version(title_message);
 				ret = SUCCEED;
 				goto clean;
 			default:
-				zbx_usage();
+				zbx_print_usage(usage_message, zbx_progname);
 				goto clean;
 		}
 	}
@@ -194,7 +190,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;
@@ -202,7 +198,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		zbx_usage();
+		zbx_print_usage(usage_message, zbx_progname);
 		goto close;
 	}
 

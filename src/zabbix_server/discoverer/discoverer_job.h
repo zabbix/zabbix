@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ typedef struct
 	zbx_uint64_t			druleid;
 	zbx_list_t			tasks;
 	zbx_uint64_t			drule_revision;
-	int				config_timeout;
 	int				workers_used;
 	int				workers_max;
 	unsigned char			status;
@@ -56,6 +55,6 @@ void			discoverer_task_free(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_task_check_count_get(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout);
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule);
 
 #endif

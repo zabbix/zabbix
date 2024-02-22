@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 /*#define HOST_STATUS_UNREACHABLE	2*/
 #define HOST_STATUS_TEMPLATE		3
 /*#define HOST_STATUS_DELETED		4*/
-#define HOST_STATUS_PROXY_ACTIVE	5
-#define HOST_STATUS_PROXY_PASSIVE	6
 
 /* host group types */
 #define HOSTGROUP_TYPE_HOST		0

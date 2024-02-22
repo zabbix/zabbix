@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,10 +37,29 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 )
 
+func GetCheckIntervalSeconds(itemid uint64, delay string, from time.Time, prev time.Time) int {
+	nextcheck, _, nextcheck_err := GetNextcheck(itemid, delay, from)
+
+	if nextcheck_err == nil {
+		return int((nextcheck.Sub(from) + time.Second/2) / time.Second)
+	}
+
+	if prev.IsZero() {
+		return 1
+	}
+
+	return int((from.Sub(prev) + time.Second/2) / time.Second)
+}
+
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
 	var cnextcheck, cscheduling C.int
 	var cerr *C.char
+
 	cdelay := C.CString(delay)
+	defer func() {
+		log.Tracef("Calling C function \"free(cdelay)\"")
+		C.free(unsafe.Pointer(cdelay))
+	}()
 
 	now := from.Unix()
 	log.Tracef("Calling C function \"zbx_get_agent_item_nextcheck()\"")
@@ -57,8 +76,6 @@ func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.T
 			scheduling = true
 		}
 	}
-	log.Tracef("Calling C function \"free()\"")
-	C.free(unsafe.Pointer(cdelay))
 
 	return
 }

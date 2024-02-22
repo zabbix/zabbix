@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerResponseData extends CControllerResponse {
 
 	private $data;
-	private $title = null;
+	private string $title = '';
 	private $file_name = null;
 
 	/**
@@ -38,11 +38,11 @@ class CControllerResponseData extends CControllerResponse {
 		return $this->data;
 	}
 
-	public function setTitle($title) {
+	public function setTitle(string $title) {
 		$this->title = $title;
 	}
 
-	public function getTitle() {
+	public function getTitle(): string {
 		return $this->title;
 	}
 

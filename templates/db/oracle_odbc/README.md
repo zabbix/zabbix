@@ -22,85 +22,109 @@ This template has been tested on:
 
 1. Create an Oracle DB user for monitoring:
 
-In CDB installations it is possible to monitor tablespaces from CDB _(container database)_ and all PDBs _(pluggable databases)_. In such case, a common user is needed with the correct rights:
+    In CDB installations it is possible to monitor tablespaces from CDB _(container database)_ and all PDBs _(pluggable databases)_. In such case, a common user is needed with the correct rights:
 
-```
-CREATE USER c##zabbix_mon IDENTIFIED BY <PASSWORD>;
--- Grant access to the c##zabbix_mon user.
-ALTER USER c##zabbix_mon SET CONTAINER_DATA=ALL CONTAINER=CURRENT;
-GRANT CONNECT, CREATE SESSION TO c##zabbix_mon;
-GRANT SELECT_CATALOG_ROLE to c##zabbix_mon;
-GRANT SELECT ON v_$instance TO c##zabbix_mon;
-GRANT SELECT ON v_$database TO c##zabbix_mon;
-GRANT SELECT ON v_$sysmetric TO c##zabbix_mon;
-GRANT SELECT ON v_$system_parameter TO c##zabbix_mon;
-GRANT SELECT ON v_$session TO c##zabbix_mon;
-GRANT SELECT ON v_$recovery_file_dest TO c##zabbix_mon;
-GRANT SELECT ON v_$active_session_history TO c##zabbix_mon;
-GRANT SELECT ON v_$osstat TO c##zabbix_mon;
-GRANT SELECT ON v_$restore_point TO c##zabbix_mon;
-GRANT SELECT ON v_$process TO c##zabbix_mon;
-GRANT SELECT ON v_$datafile TO c##zabbix_mon;
-GRANT SELECT ON v_$pgastat TO c##zabbix_mon;
-GRANT SELECT ON v_$sgastat TO c##zabbix_mon;
-GRANT SELECT ON v_$log TO c##zabbix_mon;
-GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
-GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
-GRANT SELECT ON sys.dba_data_files TO c##zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
-GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
-```
-This is needed because the template uses ```CDB_*``` views to monitor tablespaces from CDB and different PDBs, and, therefore, the monitoring user needs access to the container data objects on all PDBs.
+    ```
+    CREATE USER c##zabbix_mon IDENTIFIED BY <PASSWORD>;
+    -- Grant access to the c##zabbix_mon user.
+    ALTER USER c##zabbix_mon SET CONTAINER_DATA=ALL CONTAINER=CURRENT;
+    GRANT CONNECT, CREATE SESSION TO c##zabbix_mon;
+    GRANT SELECT_CATALOG_ROLE to c##zabbix_mon;
+    GRANT SELECT ON v_$instance TO c##zabbix_mon;
+    GRANT SELECT ON v_$database TO c##zabbix_mon;
+    GRANT SELECT ON v_$sysmetric TO c##zabbix_mon;
+    GRANT SELECT ON v_$system_parameter TO c##zabbix_mon;
+    GRANT SELECT ON v_$session TO c##zabbix_mon;
+    GRANT SELECT ON v_$recovery_file_dest TO c##zabbix_mon;
+    GRANT SELECT ON v_$active_session_history TO c##zabbix_mon;
+    GRANT SELECT ON v_$osstat TO c##zabbix_mon;
+    GRANT SELECT ON v_$restore_point TO c##zabbix_mon;
+    GRANT SELECT ON v_$process TO c##zabbix_mon;
+    GRANT SELECT ON v_$datafile TO c##zabbix_mon;
+    GRANT SELECT ON v_$pgastat TO c##zabbix_mon;
+    GRANT SELECT ON v_$sgastat TO c##zabbix_mon;
+    GRANT SELECT ON v_$log TO c##zabbix_mon;
+    GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
+    GRANT SELECT ON sys.dba_data_files TO c##zabbix_mon;
+    GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
+    GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
+    GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
+    ```
+    This is needed because the template uses ```CDB_*``` views to monitor tablespaces from CDB and different PDBs, and, therefore, the monitoring user needs access to the container data objects on all PDBs.
 
-However, if you wish to monitor only a single PDB or non-CDB instance, a local user is sufficient:
- 
-```
- CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
- -- Grant access to the zabbix_mon user.
- GRANT CONNECT, CREATE SESSION TO zabbix_mon;
- GRANT SELECT_CATALOG_ROLE to zabbix_mon;
- GRANT SELECT ON v_$instance TO zabbix_mon;
- GRANT SELECT ON v_$database TO zabbix_mon;
- GRANT SELECT ON v_$sysmetric TO zabbix_mon;
- GRANT SELECT ON v_$system_parameter TO zabbix_mon;
- GRANT SELECT ON v_$session TO zabbix_mon;
- GRANT SELECT ON v_$recovery_file_dest TO zabbix_mon;
- GRANT SELECT ON v_$active_session_history TO zabbix_mon;
- GRANT SELECT ON v_$osstat TO zabbix_mon;
- GRANT SELECT ON v_$restore_point TO zabbix_mon;
- GRANT SELECT ON v_$process TO zabbix_mon;
- GRANT SELECT ON v_$datafile TO zabbix_mon;
- GRANT SELECT ON v_$pgastat TO zabbix_mon;
- GRANT SELECT ON v_$sgastat TO zabbix_mon;
- GRANT SELECT ON v_$log TO zabbix_mon;
- GRANT SELECT ON v_$archive_dest TO zabbix_mon;
- GRANT SELECT ON v_$asm_diskgroup TO zabbix_mon;
- GRANT SELECT ON sys.dba_data_files TO zabbix_mon;
- GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
- GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
- GRANT SELECT ON DBA_USERS TO zabbix_mon;
- ```
-**Note! Ensure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,'. It is important for displaying the float numbers in Zabbix correctly.**
+    However, if you wish to monitor only a single PDB or non-CDB instance, a local user is sufficient:
+    
+    ```
+    CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
+    -- Grant access to the zabbix_mon user.
+    GRANT CONNECT, CREATE SESSION TO zabbix_mon;
+    GRANT SELECT_CATALOG_ROLE to zabbix_mon;
+    GRANT SELECT ON v_$instance TO zabbix_mon;
+    GRANT SELECT ON v_$database TO zabbix_mon;
+    GRANT SELECT ON v_$sysmetric TO zabbix_mon;
+    GRANT SELECT ON v_$system_parameter TO zabbix_mon;
+    GRANT SELECT ON v_$session TO zabbix_mon;
+    GRANT SELECT ON v_$recovery_file_dest TO zabbix_mon;
+    GRANT SELECT ON v_$active_session_history TO zabbix_mon;
+    GRANT SELECT ON v_$osstat TO zabbix_mon;
+    GRANT SELECT ON v_$restore_point TO zabbix_mon;
+    GRANT SELECT ON v_$process TO zabbix_mon;
+    GRANT SELECT ON v_$datafile TO zabbix_mon;
+    GRANT SELECT ON v_$pgastat TO zabbix_mon;
+    GRANT SELECT ON v_$sgastat TO zabbix_mon;
+    GRANT SELECT ON v_$log TO zabbix_mon;
+    GRANT SELECT ON v_$archive_dest TO zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup TO zabbix_mon;
+    GRANT SELECT ON sys.dba_data_files TO zabbix_mon;
+    GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
+    GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
+    GRANT SELECT ON DBA_USERS TO zabbix_mon;
+    ```
+    **Note! Ensure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,'. It is important for displaying the float numbers in Zabbix correctly.**
 
 2. Install the ODBC driver on Zabbix server or Zabbix proxy.
   See the [Oracle documentation](https://www.oracle.com/database/technologies/releasenote-odbc-ic.html) for instructions.
 
 3. Configure Zabbix server or Zabbix proxy for the usage of Oracle Environment:
 
-   Edit or add a new file:
+    This step is required only when:
+    
+    * installing Oracle Instant Client with .rpm packages with version < 19.3 (if Instant Client is the only Oracle Software installed on Zabbix server or Zabbix proxy);
+    
+    * installing Oracle Instant Client manually with .zip files.
+  
+    There are multiple ways of achieving this:
+    
+      1. Using `LDCONFIG` utility **(recommended option)**:
+  
+          To update the runtime link path, it is recommended to use the ```LDCONFIG``` utility, for example:
+    
+          ```
+          # sh -c "echo /opt/oracle/instantclient_19_18 > /etc/ld.so.conf.d/oracle-instantclient.conf"
+          # ldconfig
+          ```
+  
+      2. Using application configuration file:
+  
+          An alternative solution is to export the required variables by editing or adding a new application configuration file:
+    
+           * ```/etc/sysconfig/zabbix-server # for server```
+    
+           * ```/etc/sysconfig/zabbix-proxy # for proxy```
+    
+          And then, adding:
+        
+          ```
+          # Oracle Instant Client library
+          LD_LIBRARY_PATH=/opt/oracle/instantclient_19_18:$LD_LIBRARY_PATH
+          export LD_LIBRARY_PATH
+          ```
+    
+    Keep in mind that the library paths will vary depending on your installation.
 
-   * ```/etc/sysconfig/zabbix-server # for server```
-
-   * ```/etc/sysconfig/zabbix-proxy # for proxy```
-
-   Then, add:
-   ```
-   export ORACLE_HOME=/usr/lib/oracle/19.6/client64
-   export PATH=$PATH:$ORACLE_HOME/bin
-   export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/usr/lib64:/usr/lib:$ORACLE_HOME/bin
-   export TNS_ADMIN=$ORACLE_HOME/network/admin
-   ```
+    This is a minimal configuration example. Depending on the Oracle Instant Client version, required functionality and host operating system, a different set of additional packages might need to be installed.
+    For more detailed configuration instructions, see the [official Oracle Instant Client installation instructions for Linux](https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html).
 
 4. Restart Zabbix server or Zabbix proxy.
 
@@ -108,14 +132,14 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 
 6. Set the {$ORACLE.DRIVER} and {$ORACLE.SERVICE} in the host macros.
   
-    * {$ORACLE.DRIVER} is a path to the driver location in OS.
+    * ```{$ORACLE.DRIVER}``` is a path to the driver location in OS. The ODBC driver file should be found in __Instant Client__ directory and named ```libsqora.so.XX.Y```.
     
-    * {$ORACLE.SERVICE} is a service name to which the host will connect to. The value in this macro is important as it determines if the connection is established to a non-CDB, CDB or PDB. If you wish to monitor tablespaces of all PDBs, you will need to set a service name that points to the CDB.
+    * ```{$ORACLE.SERVICE}``` is a service name to which the host will connect to. The value in this macro is important as it determines if the connection is established to a non-CDB, CDB or PDB. If you wish to monitor tablespaces of all PDBs, you will need to set a service name that points to the CDB.
       Active service names can be seen from the instance running Oracle Database with ```lsnrctl status```.
       
     **Note! Make sure that the user created in step #1 is present on the specified service.**
 
-  The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
+    The "Service's TCP port state" item uses ```{HOST.CONN}``` and ```{$ORACLE.PORT}``` macros to check the availability of the listener.
 
 ### Macros used
 
@@ -132,6 +156,8 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |{$ORACLE.TABLESPACE.CONTAINER.NOT_MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$ORACLE.TABLESPACE.NAME.MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`.*`|
 |{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.</p>|`90`|
+|{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}|<p>High severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.</p>|`95`|
 |{$ORACLE.TBS.USED.PCT.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p>|`90`|
 |{$ORACLE.TBS.USED.PCT.MAX.HIGH}|<p>High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p>|`95`|
 |{$ORACLE.TBS.UTIL.PCT.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p>|`80`|
@@ -307,6 +333,7 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace free, bytes|<p>Free bytes of the allocated space.</p>|Dependent item|oracle.tbs_free_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FREE_BYTES`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, percent|<p>Allocated bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_PCT_MAX`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage, percent|<p>Used bytes/allocated bytes*100.</p>|Dependent item|oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_FILE_PCT`</p></li></ul>|
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX, percent|<p>Used bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_FROM_MAX_PCT`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Open status|<p>The tablespace status where:</p><p>1 - 'ONLINE';</p><p>2 - 'OFFLINE';</p><p>3 - 'READ ONLY'.</p>|Dependent item|oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.STATUS`</p></li></ul>|
 
 ### Trigger prototypes for Tablespace discovery
@@ -317,6 +344,8 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by ODBC/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`|High||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high||`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high</li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high||`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}`|High||
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high||`min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high</li></ul>|
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high||`min(/Oracle by ODBC/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`|High||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2`|Warning||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
 
@@ -339,7 +368,7 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Archivelog '{#DEST_NAME}': Log Archive is not valid|<p>The trigger will launch if the archive log destination is not in one of these states:2 - 'DEFERRED';3 - 'VALID'."</p>|`last(/Oracle by ODBC/oracle.archivelog_log_status["{#DEST_NAME}"])<2`|High||
+|Archivelog '{#DEST_NAME}': Log Archive is not valid|<p>The trigger will launch if the archive log destination is not in one of these states:<br>2 - 'DEFERRED';<br>3 - 'VALID'."</p>|`last(/Oracle by ODBC/oracle.archivelog_log_status["{#DEST_NAME}"])<2`|High||
 
 ### LLD rule ASM disk groups discovery
 

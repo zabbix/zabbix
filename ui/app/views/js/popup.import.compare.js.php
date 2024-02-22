@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,42 +27,44 @@
 
 window.popup_import_compare = new class {
 
-	constructor() {
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
-	}
+	/**
+	 * @var {Overlay}
+	 */
+	#overlay;
+
+	/**
+	 * @var {HTMLFormElement}
+	 */
+	#form;
 
 	init() {
-		this.overlay = overlays_stack.getById('popup_import_compare');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.footer = this.overlay.$dialogue.$footer[0];
+		this.#overlay = overlays_stack.getById('popup_import_compare');
+		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
 
-		this.addEventListeners();
+		this.#addEventListeners();
 	}
 
-	addEventListeners() {
-		this.form.addEventListener('click', (e) => {
+	submitImportComparePopup() {
+		if (window.popup_import.isDeleteMissingChecked()) {
+			return window.popup_import.confirmSubmit(this.#overlay);
+		}
+
+		overlayDialogueDestroy(this.#overlay.dialogueid);
+		return window.popup_import.submitImportPopup();
+	}
+
+	#addEventListeners() {
+		this.#form.addEventListener('click', (e) => {
 			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')
 					|| e.target.parentNode.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
 				const btn = e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>') ? e.target : e.target.parentNode;
 				const arrow = btn.querySelector('span');
-				const show = arrow.classList.contains('<?= ZBX_STYLE_ARROW_UP ?>');
+				const is_expanded = arrow.classList.contains('<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-				btn.parentNode.nextSibling.style.display = show ? '' : 'none';
-				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_UP ?>');
+				btn.parentNode.nextSibling.style.display = is_expanded ? 'none' : '';
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
+				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_RIGHT ?>');
 			}
 		});
-	}
-
-	submitImportComparePopup() {
-		if (popup_import.isDeleteMissingChecked()) {
-			return popup_import.confirmSubmit(this.overlay);
-		}
-
-		overlayDialogueDestroy(this.overlay.dialogueid);
-		return popup_import.submitImportPopup();
 	}
 }

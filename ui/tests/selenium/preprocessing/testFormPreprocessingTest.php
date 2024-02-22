@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,20 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * @backup items
  */
 class testFormPreprocessingTest extends CWebTest {
 
+	/**
+	 * Attach PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CPreprocessingBehavior::class];
+	}
+
 	const HOST_ID = 40001;		//'Simple form test host'
 
 	private static $key;
-
-	use PreprocessingTrait;
+	private static $name;
 
 	public $change_types = [
 		'Discard unchanged with heartbeat',
@@ -501,8 +510,7 @@ class testFormPreprocessingTest extends CWebTest {
 
 		// Test all steps right away after adding.
 		$this->query('button:Test all steps')->waitUntilPresent()->one()->click();
-
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$table = $dialog->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
 
 		foreach ($preprocessing as $i => $step) {
@@ -510,22 +518,24 @@ class testFormPreprocessingTest extends CWebTest {
 		}
 
 		$dialog->close();
-
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		// Assert right steps order after item saving.
-		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr(self::$key));
-		$this->page->open('items.php?form=update&context=host&hostid='.self::HOST_ID.'&itemid='.$id);
+		$this->page->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->query('link', self::$name)->one()->click();
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($preprocessing);
 	}
 
 	private function openPreprocessing($data) {
-		$this->page->login()->open('items.php?form=create&context=host&hostid='.self::HOST_ID);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->query('button:Create item')->one()->click();
+		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		self::$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key'.time();
+		self::$name = 'Test name'.time();
 
-		$form->fill(['Name' => 'Test name', 'Key' => self::$key]);
+		$form->fill(['Name' => self::$name, 'Key' => self::$key]);
 		$form->selectTab('Preprocessing');
 
 		return $form;
@@ -541,13 +551,13 @@ class testFormPreprocessingTest extends CWebTest {
 	 */
 	private function checkTestOverlay($data, $selector, $prev_enabled, $id = null) {
 		$this->query($selector)->waitUntilPresent()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_BAD:
 				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
-				$dialog->close();
+				$dialog->query('class:btn-overlay-close')->one()->click();
 				break;
 
 			case TEST_GOOD:
@@ -617,7 +627,7 @@ class testFormPreprocessingTest extends CWebTest {
 	}
 
 	private function chooseDialogActions($data) {
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
 		switch ($data['action']) {
 			case 'Test':
@@ -640,16 +650,15 @@ class testFormPreprocessingTest extends CWebTest {
 				$message = $form->getOverlayMessage();
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost:10051" refused. Possible reasons:'));
-				$dialog->close();
+				$dialog->query('class:btn-overlay-close')->one()->click();
 				break;
 
 			case 'Cancel':
 				$dialog->query('button:Cancel')->one()->click();
-				$dialog->waitUntilNotPresent();
 				break;
 
 			default:
-				$dialog->close();
+				$dialog->query('class:btn-overlay-close')->one()->click();
 		}
 	}
 }

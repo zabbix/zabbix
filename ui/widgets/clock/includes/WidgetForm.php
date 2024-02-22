@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTimeZone
@@ -51,6 +52,24 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_TIME_SIZE = 30;
 	private const DEFAULT_TIMEZONE_SIZE = 20;
 
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->getFieldValue('time_type') == TIME_TYPE_HOST && !$this->getFieldValue('itemid')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
+		}
+
+		if ($this->getFieldValue('clock_type') == Widget::TYPE_DIGITAL && !$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+		}
+
+		return $errors;
+	}
+
 	public function addFields(): self {
 		$time_type = array_key_exists('time_type', $this->values) ? $this->values['time_type'] : null;
 
@@ -62,11 +81,10 @@ class WidgetForm extends CWidgetForm {
 					TIME_TYPE_HOST => _('Host time')
 				]))->setDefault(TIME_TYPE_LOCAL)
 			)
-			->addField($time_type == TIME_TYPE_HOST
-				? (new CWidgetFieldMultiSelectItem('itemid', _('Item')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			->addField(
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
-				: null
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('clock_type', _('Clock type'), [
@@ -134,6 +152,9 @@ class WidgetForm extends CWidgetForm {
 					Widget::TIMEZONE_SHORT => _('Short'),
 					Widget::TIMEZONE_FULL => _('Full')
 				]))->setDefault(Widget::TIMEZONE_SHORT)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

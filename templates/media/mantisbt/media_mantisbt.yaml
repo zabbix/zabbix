@@ -1,0 +1,350 @@
+zabbix_export:
+  version: '7.0'
+  media_types:
+    - name: MantisBT
+      type: WEBHOOK
+      parameters:
+        - name: alert_message
+          value: '{ALERT.MESSAGE}'
+        - name: alert_sendto
+          value: '{ALERT.SENDTO}'
+        - name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        - name: event_id
+          value: '{EVENT.ID}'
+        - name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        - name: event_recovery_value
+          value: '{EVENT.RECOVERY.VALUE}'
+        - name: event_source
+          value: '{EVENT.SOURCE}'
+        - name: event_tagsjson
+          value: '{EVENT.TAGSJSON}'
+        - name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
+        - name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        - name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        - name: event_value
+          value: '{EVENT.VALUE}'
+        - name: mantisbt_category
+          value: '[All Projects] General'
+        - name: mantisbt_issue_number
+          value: '{EVENT.TAGS.__zbx_mantisbt_issue_number}'
+        - name: mantisbt_token
+          value: '<PLACE MANTISBT TOKEN>'
+        - name: mantisbt_url
+          value: '<PLACE MANTISBT URL>'
+        - name: mantisbt_use_zabbix_tags
+          value: 'true'
+        - name: trigger_id
+          value: '{TRIGGER.ID}'
+        - name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      attempts: '1'
+      script: |
+        var Mantisbt = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+                Mantisbt.params = params;
+            },
+        
+            setProxy: function (HTTPProxy) {
+                Mantisbt.HTTPProxy = HTTPProxy;
+            },
+        
+            checkUrlFormat: function (url) {
+                if (typeof url === 'string' && !url.endsWith('/')) {
+                    url += '/';
+                }
+        
+                if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
+                    url = 'https://' + url;
+                }
+        
+                return url;
+            },
+        
+            getProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
+                var problem_url = zabbix_url;
+        
+                if (event_source === '0') {
+                    problem_url += 'tr_events.php?triggerid=' + triggerid + '&eventid=' + eventid;
+                }
+        
+                return problem_url;
+            },
+        
+            request: function (method, url, data) {
+                ['token', 'url', 'category'].forEach(function (field) {
+                    if (typeof Mantisbt.params !== 'object' || typeof Mantisbt.params[field] === 'undefined' || Mantisbt.params[field] === '') {
+                        throw 'Required MantisBT param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    request = new HttpRequest();
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: ' + Mantisbt.params.token);
+        
+                if (typeof Mantisbt.HTTPProxy !== 'undefined' && Mantisbt.HTTPProxy !== '') {
+                    request.setProxy(Mantisbt.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ MantisBT Webhook ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
+        
+                switch (method) {
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'patch':
+                        response = request.patch(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ MantisBT Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ MantisBT Webhook ] Failed to parse the response received from MantisBT');
+                        response = null;
+                    }
+                }
+        
+                if (typeof response !== 'object') {
+                    throw 'Failed to process the response received from MantisBT. Check debug log for more information.';
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (typeof response.message !== 'undefined') {
+                        message += ': ' + response.message;
+                    }
+        
+                    throw message;
+                }
+        
+                return response;
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                mantisbt = {},
+                url = '',
+                data = {},
+                result = { tags: {} },
+                required_params = [
+                    'alert_subject', 'alert_message', 'event_source', 'event_value', 'event_update_action',
+                    'event_update_status', 'event_recovery_value', 'event_nseverity', 'event_tagsjson',
+                    'event_id', 'trigger_id', 'zabbix_url', 'alert_sendto',
+                    'mantisbt_token', 'mantisbt_url', 'mantisbt_category', 'mantisbt_issue_number', 'mantisbt_use_zabbix_tags'
+                ],
+                method,
+                severities = ['none', 'low', 'normal', 'high', 'urgent', 'immediate'];
+        
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('mantisbt_')) {
+                        mantisbt[key.substring(9)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
+                        throw 'Parameter "' + key + '" cannot be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1' && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_recovery_value === '0') {
+                throw 'Recovery operations are supported for trigger-based actions only.';
+            }
+        
+            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '' || params.zabbix_url === '{$ZABBIX.URL}') {
+                throw 'Field "zabbix_url" cannot be empty.';
+            }
+        
+            // Check for backslash in the end of url and schema.
+            mantisbt.url = Mantisbt.checkUrlFormat(mantisbt.url);
+            params.zabbix_url = Mantisbt.checkUrlFormat(params.zabbix_url);
+        
+            // In case of resolve event.
+            if (params.event_source === '0' && params.event_value === '0') {
+                method = "patch";
+                url = mantisbt.url + 'api/rest/issues/' + mantisbt.issue_number;
+                data = {
+                    summary: params.alert_subject,
+                    status: {
+                        name: "resolved"
+                    }
+                };
+                if (/commented/.test(params.event_update_action)) {
+                    data.additional_information = params.event_update_message;
+                }
+                process_tags = false;
+            }
+            // In case of update event.
+            else if (params.event_source === '0' && params.event_update_status === '1') {
+                method = "patch";
+                url = mantisbt.url + 'api/rest/issues/' + mantisbt.issue_number;
+                data = {
+                    status: {},
+                    priority: {
+                        name: severities[parseInt(params.event_nseverity, 10)]
+                    }
+                };
+                if (/commented/.test(params.event_update_action)) {
+                    data.additional_information = params.event_update_message;
+                }
+                if (/acknowledged/.test(params.event_update_action)) {
+                    data.status.name = "acknowledged";
+                }
+                if (/unacknowledged/.test(params.event_update_action)) {
+                    data.status.name = "new";
+                }
+                process_tags = false;
+            }
+            else {
+                method = 'post';
+                url = mantisbt.url + 'api/rest/issues';
+        
+                data = {
+                    summary: params.alert_subject,
+                    description: params.alert_message,
+                    project: { name: params.alert_sendto },
+                    category: { name: mantisbt.category },
+                    priority: {
+                        name: parseInt(params.event_nseverity, 10) ? severities[parseInt(params.event_nseverity, 10)] : "none"
+                    }
+                };
+                if (params.event_source === '0') {
+                    problem_url = Mantisbt.getProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source);
+                    data.description += '\n' + problem_url;
+        
+                    if (mantisbt.use_zabbix_tags === "true") {
+                        var alert_tags = JSON.parse(params.event_tagsjson);
+                        data.tags = alert_tags.map(function (t) { return { name: t.value ? (t.tag + ': ' + t.value) : t.tag }; });
+                    }
+                }
+                process_tags = true;
+            }
+        
+            Mantisbt.setParams(mantisbt);
+            Mantisbt.setProxy(params.HTTPProxy);
+        
+            var response = Mantisbt.request(method, url, data);
+        
+            if (process_tags) {
+                result.tags.__zbx_mantisbt_issue_number = response.issue.id;
+                result.tags.__zbx_mantisbt_link = mantisbt.url + 'view.php?id=' + response.issue.id;
+            }
+        
+            Zabbix.log(4, '[ MantisBT Webhook ] Result: ' + JSON.stringify(result));
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(4, '[ MantisBT Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_mantisbt_link}'
+      event_menu_name: 'MantisBT: Issue ID {EVENT.TAGS.__zbx_mantisbt_issue_number}'
+      message_templates:
+        - event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        - event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        - event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}

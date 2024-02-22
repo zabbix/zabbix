@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		];
 
 	$table->addRow([
-		$proxy['host'],
+		$proxy['name'],
 		($proxy_queue['delay5'] == 0) ? 0 : (new CCol($proxy_queue['delay5']))
 			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
 		($proxy_queue['delay10'] == 0) ? 0 : (new CCol($proxy_queue['delay10']))

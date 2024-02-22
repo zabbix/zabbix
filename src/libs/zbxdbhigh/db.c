@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@
 #endif
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
+ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 
 static int	connection_failure;
 
@@ -336,6 +337,14 @@ void	zbx_db_rollback(void)
 
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+	}
+	else
+	{
+		if (ZBX_DB_DOWN == zbx_db_txn_end_error() && ERR_Z3009 == zbx_db_last_errcode())
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
 	}
 }
 
@@ -833,16 +842,56 @@ void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 	zbx_db_close();
 }
 
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Purpose: connects to DB and tries to detect DB extension version info      *
+ * Purpose: retrieves TimescaleDB (TSDB) license information                  *
+ *                                                                            *
+ * Return value: license information from datase as string                    *
+ *               "apache"    for TimescaleDB Apache 2 Edition                 *
+ *               "timescale" for TimescaleDB Community Edition                *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
+static char	*zbx_tsdb_get_license(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*tsdb_lic = NULL;
+
+	result = zbx_db_select("show timescaledb.license");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
+	{
+		tsdb_lic = zbx_strdup(NULL, row[0]);
+	}
+
+	zbx_db_free_result(result);
+
+	return tsdb_lic;
+}
+#endif
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: verify that Zabbix can work with DB extension                        *
+ *                                                                               *
+ * Parameters: info              - [IN] DB version information                   *
+ *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *                                                                               *
+ * Return value: SUCCEED if the operation completed successfully or              *
+ *               FAIL otherwise.                                                 *
+ *********************************************************************************/
+int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported)
 {
 #ifdef HAVE_POSTGRESQL
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
+	char		*tsdb_lic = NULL;
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -854,17 +903,105 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 		goto out;
 
 	if (NULL == (row = zbx_db_fetch(result)) || '\0' == *row[0])
-		goto clean;
+	{
+		zbx_db_free_result(result);
+		goto out;
+	}
 
-	version_info->extension = zbx_strdup(NULL, row[0]);
+	info->extension = zbx_strdup(NULL, row[0]);
 
-	zbx_tsdb_info_extract(version_info);
-clean:
 	zbx_db_free_result(result);
+
+	if (0 != zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+		goto out;
+
+	/* at this point we know the TimescaleDB extension is enabled in Zabbix */
+
+	zbx_tsdb_info_extract(info);
+
+	if (DB_VERSION_FAILED_TO_RETRIEVE == info->ext_flag)
+	{
+		info->ext_err_code = ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE;
+		ret = FAIL;
+		goto out;
+	}
+
+	if (DB_VERSION_LOWER_THAN_MINIMUM == info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version must be at least %d. Recommended version is at least"
+				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_STR,
+				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
+		info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
+		ret = FAIL;
+		goto out;
+	}
+
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
+				" is at least %s %s.", info->ext_current_version,
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
+		info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
+
+		if (0 == allow_unsupported)
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+	}
+
+	if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->ext_flag)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version is too new. Recommended version is up to %s %s.",
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MAX_VERSION_STR);
+		info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
+
+		if (0 == allow_unsupported)
+		{
+			info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			ret = FAIL;
+			goto out;
+		}
+
+		info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+	}
+
+	tsdb_lic = zbx_tsdb_get_license();
+
+	zbx_tsdb_extract_compressed_chunk_flags(info);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB license: [%s]", ZBX_NULL2EMPTY_STR(tsdb_lic));
+
+	if (0 != zbx_strcmp_null(tsdb_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
+				" supported in %s.", ZBX_NULL2EMPTY_STR(tsdb_lic),
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
+		info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
+			ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
+
+	if (ZBX_EXT_ERR_UNDEFINED == info->ext_err_code)
+		info->ext_err_code = ZBX_EXT_SUCCEED;
+
+	zbx_tsdb_set_compression_availability(ON);
 out:
+	zbx_free(tsdb_lic);
 	zbx_db_close();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 #else
-	ZBX_UNUSED(version_info);
+	ZBX_UNUSED(info);
+	ZBX_UNUSED(allow_unsupported);
+
+	return SUCCEED;
 #endif
 }
 
@@ -974,127 +1111,13 @@ void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
 	zbx_free(version_info->friendly_current_version);
 	zbx_free(version_info->extension);
 	zbx_free(version_info->ext_friendly_current_version);
-	zbx_free(version_info->ext_lic);
 }
 
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Purpose: checks if TimescaleDB version is allowed and if it supports       *
- *          compression                                                       *
- *                                                                            *
- * Parameters: allow_unsupported_ver - [IN] flag that indicates whether to    *
- *                                          allow unsupported versions of     *
- *                                          TimescaleDB or not                *
- *             db_version_info       - [IN/OUT] information about version of  *
- *                                              DB and its extensions         *
- *                                                                            *
- * Return value: SUCCEED - if there are no critical errors                    *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
-{
-	int	ret = SUCCEED;
-
-	if (0 != zbx_strcmp_null(db_version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-	{
-		goto out;
-	}
-
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
-	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
-	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
-	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
-				" required is %d.", (unsigned long)db_version_info->current_version,
-				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
-		ret = FAIL;
-		goto out;
-	}
-
-	if (DB_VERSION_FAILED_TO_RETRIEVE == db_version_info->ext_flag)
-	{
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE;
-		ret = FAIL;
-		goto out;
-	}
-
-	if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info->ext_flag)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
-				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_STR,
-				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
-		ret = FAIL;
-		goto out;
-	}
-
-	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info->ext_flag)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
-				" should be at least %s %s.", db_version_info->ext_current_version,
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
-
-		if (0 == allow_unsupported_ver)
-		{
-			ret = FAIL;
-			goto out;
-		}
-
-		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-	}
-
-	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MAX_VERSION_STR);
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
-
-		if (0 == allow_unsupported_ver)
-		{
-			db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
-			ret = FAIL;
-			goto out;
-		}
-
-		db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
-	}
-
-	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > db_version_info->ext_current_version)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %u. TimescaleDB license and compression"
-				" availability detection is possible starting from TimescaleDB 2.0.",
-				db_version_info->ext_current_version);
-		zbx_tsdb_set_compression_availability(ON);
-		goto out;
-	}
-
-	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
-				" supported in %s.", ZBX_NULL2EMPTY_STR(db_version_info->ext_lic),
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
-		goto out;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
-			ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
-
-	if (ZBX_EXT_ERR_UNDEFINED == db_version_info->ext_err_code)
-		db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
-
-	zbx_tsdb_set_compression_availability(ON);
-out:
-	return ret;
-}
-#endif
-
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 #ifdef HAVE_ORACLE
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
@@ -1344,7 +1367,11 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num)
 {
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 	int	i, cnt = 0;
 	char	*value_esc;
@@ -1652,6 +1679,8 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 			(*sql_offset)--;
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
+#else
+		ZBX_UNUSED(sql_alloc);
 #endif
 #if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 		/* make sure we are not called twice without */
@@ -2880,7 +2909,7 @@ static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
  *                                                                            *
  * Parameters: self - [IN] the bulk insert data                               *
  *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
+ * Return value: SUCCEED if the operation completed successfully or           *
  *               FAIL otherwise.                                              *
  *                                                                            *
  ******************************************************************************/
@@ -2973,8 +3002,22 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 #ifdef HAVE_ORACLE
 	for (i = 0; i < self->fields.values_num; i++)
 	{
+		char	*field_prefix, *field_suffix;
+
+		if (0 != (self->table->fields[i].flags & ZBX_UPPER))
+		{
+			field_prefix = "upper(";
+			field_suffix = ")";
+		}
+		else
+		{
+			field_prefix = "";
+			field_suffix = "";
+		}
+
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
-		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ":%d", i + 1);
+		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, "%s:%d%s",
+				field_prefix, i + 1, field_suffix);
 	}
 	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ')');
 
@@ -3006,7 +3049,7 @@ retry_oracle:
 
 			str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
 					self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), ZBX_NULL2EMPTY_STR(str));
 			zbx_free(str);
 		}
 	}
@@ -3061,15 +3104,26 @@ retry_oracle:
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
-					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					if (0 != (field->flags & ZBX_UPPER))
+					{
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "upper(\'");
+					}
+					else
+						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
-					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+
+					if (0 != (field->flags & ZBX_UPPER))
+					{
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "\')");
+					}
+					else
+						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 					decode_and_escape_binary_value_for_sql(&(value->str));
-#elif defined(HAVE_ORACLE)
 					/* Oracle converts base64 to binary when it formats prepared statement */
 #endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);

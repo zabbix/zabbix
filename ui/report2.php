@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,13 +40,23 @@ $fields = [
 	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,				DB_ID,	null],
-	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
-	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null]
+	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,				null,	null],
+	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,				null,	null],
+	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,				null,	null],
+	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,				null,	null]
 ];
 check_fields($fields);
-validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
+
+if (hasRequest('from') || hasRequest('to')) {
+	validateTimeSelectorPeriod(
+		hasRequest('from') ? getRequest('from') : null,
+		hasRequest('to') ? getRequest('to') : null
+	);
+}
+
+$timeselector_from = getRequest('from', CProfile::get('web.avail_report.filter.from',
+	'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)));
+$timeselector_to = getRequest('to', CProfile::get('web.avail_report.filter.to', 'now'));
 
 $report_mode = getRequest('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $report_mode, PROFILE_TYPE_INT);
@@ -92,6 +102,8 @@ if (hasRequest('filter_set')) {
 		CProfile::update($key_prefix.'.hostgroupid', getRequest('hostgroupid', 0), PROFILE_TYPE_ID);
 	}
 	else {
+		CProfile::update('web.avail_report.filter.from', $timeselector_from, PROFILE_TYPE_STR);
+		CProfile::update('web.avail_report.filter.to', $timeselector_to, PROFILE_TYPE_STR);
 		CProfile::updateArray($key_prefix.'.groupids', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($key_prefix.'.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 	}
@@ -127,15 +139,6 @@ $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 		// 'Hosts' field.
 		'hostids' => CProfile::getArray($key_prefix.'.hostids', getRequest('filter_hostids', []))
 	];
-
-// Get time selector filter values.
-$timeselector_options = [
-	'profileIdx' => 'web.avail_report.filter',
-	'profileIdx2' => 0,
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
-];
-updateTimeSelectorPeriod($timeselector_options);
 
 /*
  * Header
@@ -204,7 +207,12 @@ else {
 	 * Filter
 	 */
 	$data['filter'] += [
-		'timeline' => getTimeSelectorPeriod($timeselector_options),
+		'timeline' => getTimeSelectorPeriod([
+			'profileIdx' => 'web.avail_report.filter',
+			'profileIdx2' => 0,
+			'from' => $timeselector_from,
+			'to' => $timeselector_to
+		]),
 		'active_tab' => CProfile::get('web.avail_report.filter.active', 1)
 	];
 
@@ -244,7 +252,7 @@ else {
 		$select_filter_hostid = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
 			->setFocusableElementId('filter-templateid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($templates as $templateid => $template) {
 			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
@@ -287,7 +295,7 @@ else {
 		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
 			->setFocusableElementId('tpl-triggerid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		$tpl_triggerids = [];
 
@@ -314,7 +322,7 @@ else {
 		$select_hostgroupid = (new CSelect('hostgroupid'))
 			->setValue($data['filter']['hostgroupid'])
 			->setFocusableElementId('hostgroupid')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($host_groups as $groupid => $group) {
 			$select_hostgroupid->addOption(new CSelectOption($groupid, $group['name']));
@@ -371,7 +379,7 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
-			->addOption(new CSelectOption(0, _('all')));
+			->addOption(new CSelectOption(0, _('All')));
 
 		foreach ($groups as $groupid => $group) {
 			$select_filter_groupid->addOption(new CSelectOption($groupid, $group['name']));
@@ -493,7 +501,8 @@ else {
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('mode', $report_mode))->removeId())
 			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true,
-				ZBX_DATE_TIME)
+				'web.avail_report.filter', ZBX_DATE_TIME
+			)
 			->addFilterTab(_('Filter'), [$filter_column])
 	);
 

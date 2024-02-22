@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxy_hostid,h.host,h.tls_connect");
+	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxyid,h.host,h.tls_connect");
 #ifdef HAVE_OPENIPMI
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
@@ -91,7 +91,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from autoreg_host a,hosts h"
-					" where " ZBX_SQL_NULLCMP("a.proxy_hostid", "h.proxy_hostid")
+					" where " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
 						" and a.host=h.host"
 						" and h.status=%d"
 						" and h.flags<>%d"
@@ -125,7 +125,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		}
 
 		ZBX_STR2UINT64(host->hostid, row[0]);
-		ZBX_DBROW2UINT64(host->proxy_hostid, row[1]);
+		ZBX_DBROW2UINT64(host->proxyid, row[1]);
 		zbx_strscpy(host->host, row[2]);
 		ZBX_STR2UCHAR(host->tls_connect, row[3]);
 

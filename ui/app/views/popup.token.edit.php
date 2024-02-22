@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ $token_from_grid->addItem([
 		(new CLabel(_('Expires at'), 'expires_at'))->setAsteriskMark(),
 		new CFormField(
 			(new CDateSelector('expires_at', $data['expires_at']))
-				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
+				->setDateFormat(ZBX_FULL_DATE_TIME)
 				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 				->setAriaRequired()
 				->setId('expires-at-row')

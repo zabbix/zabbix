@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.  
+The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
@@ -33,19 +33,18 @@ This template has been tested on:
 
 The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.  
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.  
+Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.
 ```json
 {
     "Version":"2012-10-17",
     "Statement":[
         {
           "Action":[
-              "cloudwatch:Describe*",
-              "cloudwatch:Get*",
-              "cloudwatch:List*",
-              "ec2:Describe*"
+              "ec2:DescribeVolumes",
+              "cloudwatch:"DescribeAlarms",
+              "cloudwatch:GetMetricData"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -54,9 +53,37 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
+If you are using role-based authorization, set the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeVolumes",
+                "cloudwatch:"DescribeAlarms",
+                "cloudwatch:GetMetricData"
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-iam.html) on the AWS website.
 
-Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.EC2.INSTANCE.ID}"
+Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.EC2.INSTANCE.ID}".
+
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -77,6 +104,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -95,9 +123,9 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS EC2: Get metrics data|<p>Get instance metrics.</p><p>Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html</p>|Script|aws.ec2.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS CloudWatch: Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ec2.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS EBS: Get volumes data|<p>Get volumes attached to instance.</p><p>DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html</p>|Script|aws.ec2.get_volumes<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS EC2: Get metrics data|<p>Get instance metrics.</p><p>Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html</p>|Script|aws.ec2.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS CloudWatch: Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ec2.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS EBS: Get volumes data|<p>Get volumes attached to instance.</p><p>DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html</p>|Script|aws.ec2.get_volumes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS EC2: Get metrics check|<p>Check result of the instance metric data has been got correctly.</p>|Dependent item|aws.ec2.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS EC2: Get alarms check|<p>Check result of the alarm data has been got correctly.</p>|Dependent item|aws.ec2.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS EC2: Get volumes info check|<p>Check result of the volume information has been got correctly.</p>|Dependent item|aws.ec2.volumes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -137,8 +165,8 @@ Additional information about metrics and used API methods:
 |AWS EC2: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
 |AWS EC2: Byte Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS EC2: I/O Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|AWS EC2: Instance status check failed|<p>These checks detect problems that require your involvement to repair.The following are examples of problems that can cause instance status checks to fail:Failed system status checksIncorrect networking or startup configurationExhausted memoryCorrupted file systemIncompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||
-|AWS EC2: System status check failed|<p>These checks detect underlying problems with your instance that require AWS involvement to repair.The following are examples of problems that can cause system status checks to fail:Loss of network connectivityLoss of system powerSoftware issues on the physical hostHardware issues on the physical host that impact network reachability</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1`|Average||
+|AWS EC2: Instance status check failed|<p>These checks detect problems that require your involvement to repair.<br>The following are examples of problems that can cause instance status checks to fail:<br><br>Failed system status checks<br>Incorrect networking or startup configuration<br>Exhausted memory<br>Corrupted file system<br>Incompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||
+|AWS EC2: System status check failed|<p>These checks detect underlying problems with your instance that require AWS involvement to repair.<br>The following are examples of problems that can cause system status checks to fail:<br><br>Loss of network connectivity<br>Loss of system power<br>Software issues on the physical host<br>Hardware issues on the physical host that impact network reachability</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1`|Average||
 
 ### LLD rule Instance Alarms discovery
 
@@ -158,7 +186,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS EC2 Alarms: "{#ALARM_NAME}" has 'Insufficient data' state||`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Instance Volumes discovery
@@ -177,7 +205,7 @@ Additional information about metrics and used API methods:
 |AWS EBS: ["{#VOLUME_ID}"]: Attachment state|<p>The attachment state of the volume. Possible values: 0 (attaching), 1 (attached), 2 (detaching).</p>|Dependent item|aws.ec2.ebs.attachment_status["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS EBS: ["{#VOLUME_ID}"]: Attachment time|<p>The time stamp when the attachment initiated.</p>|Dependent item|aws.ec2.ebs.attachment_time["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS EBS: ["{#VOLUME_ID}"]: Device|<p>The device name specified in the block device mapping (for example, /dev/sda1).</p>|Dependent item|aws.ec2.ebs.device["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|AWS EBS: ["{#VOLUME_ID}"]: Get metrics|<p>Get metrics of EBS volume.</p><p>Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html</p>|Script|aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS EBS: ["{#VOLUME_ID}"]: Get metrics|<p>Get metrics of EBS volume.</p><p>Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html</p>|Script|aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS EBS: ["{#VOLUME_ID}"]: Read, bytes|<p>Provides information on the read operations in a specified period of time.</p><p>The average size of each read operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.</p><p>For Xen instances, data is reported only when there is read activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.read_bytes["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeReadBytes")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS EBS: ["{#VOLUME_ID}"]: Write, bytes|<p>Provides information on the write operations in a specified period of time.</p><p>The average size of each write operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.</p><p>For Xen instances, data is reported only when there is write activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.write_bytes["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeWriteBytes")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS EBS: ["{#VOLUME_ID}"]: Write, ops|<p>The total number of write operations in a specified period of time. Note: write operations are counted on completion.</p>|Dependent item|aws.ec2.ebs.volume.write_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeWriteOps")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

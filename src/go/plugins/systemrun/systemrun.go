@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,14 +24,16 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/zbxcmd"
 )
 
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
 }
 
@@ -41,14 +43,18 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+
+	impl.SetHandleTimeout(true)
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 }
 
@@ -74,7 +80,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(p.options.Timeout), "")
+		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(ctx.Timeout()), "")
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +90,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return stdoutStderr, nil
 	} else if params[1] == "nowait" {
 		err := zbxcmd.ExecuteBackground(params[0])
-
 		if err != nil {
 			return nil, err
 		}
@@ -93,8 +98,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, fmt.Errorf("Invalid second parameter.")
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
+
+/*
  * Template class implements token replacement logic for strings containing HTML and tokens.
  *
  * The following format is used for tokens: #{token_name}.
@@ -28,89 +29,110 @@
  *
  * Nested object properties could be used in templated by using square bracket token syntax (for example, #{a[b][c]}).
  * Previous example will look for nested value a->b->c ({'a': {'b': {'c': 'value'}}}).
- *
- * @param {string} template    template string
- *
- * @return {Template}
  */
-var Template = function(template) {
-	this.template = template;
-};
 
-Template.prototype = {
+class Template {
+
 	/**
-	 * Helper function called when match is found in template.
-	 *
-	 * @param {array}  match     result of regex matching
-	 * @param {object} object    object containing data
-	 *
-	 * @return {string}
+	 * @type {string}
 	 */
-	onMatch: function (match, object) {
-		if (object == null) {
-			return match[1] + '';
-		}
+	#template;
 
-		var before = match[1] || '';
-		if (before == '\\') {
-			return match[2];
-		}
-
-		var ctx = object,
-			expr = match[3],
-			escape = (expr.substring(0, 1) !== '*');
-
-		if(!escape) {
-			expr = expr.substring(1);
-		}
-
-		var pattern = /^([^.[]+|\[((?:.*?[^\\])?)\])(\.|\[|$)/;
-		match = pattern.exec(expr);
-		if (match == null) {
-			return before;
-		}
-
-		while (match != null) {
-			var comp = match[1].substring(0, 1) === '[' ? match[2].replace(/\\\\]/g, ']') : match[1];
-
-			ctx = ctx[comp];
-			if (null == ctx || '' == match[3]) {
-				break;
-			}
-
-			expr = expr.substring('[' == match[3] ? match[1].length : match[0].length);
-			match = pattern.exec(expr);
-		}
-
-		ctx = '' + (((typeof ctx === 'undefined') || (ctx === null)) ? '' : ctx);
-		return before + (escape ? ctx.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-				.replace(/\"/g,'&quot;').replace(/\'/g,'&apos;') : ctx);
-	},
+	/**
+	 * @param {string} template
+	 */
+	constructor(template) {
+		this.#template = template;
+	}
 
 	/**
 	 * Fill template with data defined in object.
 	 *
-	 * @param {object} object    object containing data
+	 * @param {Object} data
 	 *
 	 * @return {string}
 	 */
-	evaluate: function(object) {
-		var result = '',
-			source = this.template;
+	evaluate(data) {
+		let template = this.#template;
+		let result = '';
 
-		while (source.length > 0) {
-			var match = source.match(/(^|.|\r|\n)(#\{(.*?)\})/);
+		while (template.length > 0) {
+			const match = template.match(/(^|.|\r|\n)(#\{(.*?)\})/);
+
 			if (match) {
-				result += source.substring(0, match.index);
-				result += this.onMatch(match, object);
-				source = source.substring(match.index + match[0].length);
+				result += template.substring(0, match.index);
+				result += this.#match(match, data);
+				template = template.substring(match.index + match[0].length);
 			}
 			else {
-				result += source;
+				result += template;
 				break;
 			}
 		}
 
 		return result;
 	}
-};
+
+	/**
+	 * Fill template with data defined in object and return as HTMLElement.
+	 *
+	 * @param {Object} data
+	 *
+	 * @return {HTMLElement}
+	 */
+	evaluateToElement(data = {}) {
+		return new DOMParser().parseFromString(this.evaluate(data), 'text/html').body.firstElementChild;
+	}
+
+	/**
+	 * Helper function called when match is found in template.
+	 *
+	 * @param {array}  match  Result of regex matching.
+	 * @param {Object} data   Object containing data.
+	 *
+	 * @return {string}
+	 */
+	#match(match, data) {
+		if (data === undefined || data === null) {
+			return `${match[1]}`;
+		}
+
+		const before = match[1] || '';
+
+		if (before === '\\') {
+			return match[2];
+		}
+
+		let expr = match[3];
+
+		const escape = expr.substring(0, 1) !== '*';
+
+		if (!escape) {
+			expr = expr.substring(1);
+		}
+
+		const pattern = /^([^.[]+|\[((?:.*?[^\\])?)\])(\.|\[|$)/;
+
+		match = pattern.exec(expr);
+
+		if (match === null) {
+			return before;
+		}
+
+		while (match !== null) {
+			const comp = match[1].substring(0, 1) === '[' ? match[2].replace(/\\\\]/g, ']') : match[1];
+
+			data = data[comp];
+			if (data === undefined || data === null || match[3] === '') {
+				break;
+			}
+
+			expr = expr.substring('[' === match[3] ? match[1].length : match[0].length);
+			match = pattern.exec(expr);
+		}
+
+		data = data === undefined || data === null ? '' : `${data}`;
+
+		return before + (escape ? escapeHtml(data) : data);
+	}
+}

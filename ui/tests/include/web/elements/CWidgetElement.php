@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
+require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
@@ -85,12 +85,21 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		// Edit can sometimes fail so we have to retry this operation.
+		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
+
+		if ($button->isVisible(false)) {
+			$button->hoverMouse();
+		}
+
+		// Edit can sometimes fail, so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
-			$this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one()->click(true);
+			// TODO: remove force: true parameter after DEV-2621 is fixed.
+			$button->click(true);
 
 			try {
-				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();
+				// TODO: fix formatting after git-hook improvements DEV-2396.
+				return $this->query("xpath://div[@data-dialogueid=\"widget_properties\"]//form")->waitUntilVisible()
+						->asForm()->one();
 			}
 			catch (\Exception $e) {
 				if ($i === 1) {

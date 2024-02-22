@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				zbx_prometheus_clear((zbx_prometheus_t *)cache->data);
 				break;
-			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				zbx_snmp_value_cache_clear((zbx_snmp_value_cache_t *)cache->data);
 				break;
 		}
@@ -163,7 +163,7 @@ int	pp_cache_is_supported(zbx_pp_item_preproc_t *preproc)
 			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				return SUCCEED;
 		}
 	}

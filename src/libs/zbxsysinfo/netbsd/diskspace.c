@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #include "inodes.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxalgo.h"
 
 static zbx_mntopt_t	mntopts[] = {
@@ -239,7 +238,7 @@ int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		i, rc;
+	int		rc;
 	struct statvfs	*mntbuf;
 	struct zbx_json	j;
 
@@ -251,11 +250,9 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
-		char	*options;
-
-		options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flag & MNT_VISFLAGMASK);
+		char	*options = zbx_format_mntopt_string(mntopts, mntbuf[i].f_flag & MNT_VISFLAGMASK);
 
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mntbuf[i].f_mntonname, ZBX_JSON_TYPE_STRING);
@@ -277,18 +274,15 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			i, rc;
+	int			rc, ret = SYSINFO_RET_FAIL;
 	struct statvfs		*mntbuf;
 	struct zbx_json		j;
-	zbx_uint64_t		total, not_used, used;
-	zbx_uint64_t		itotal, inot_used, iused;
-	double			pfree, pused;
-	double			ipfree, ipused;
+	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
+	double			pfree, pused, ipfree, ipused;
 	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
 	zbx_fsname_t		fsname;
-	int			ret = SYSINFO_RET_FAIL;
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (0 == (rc = getmntinfo(&mntbuf, MNT_NOWAIT)))
@@ -299,7 +293,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&mntpoints);
 
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
 		fsname.mpoint = mntbuf[i].f_mntonname;
 
@@ -340,7 +334,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
 		int	idx;
 

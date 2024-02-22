@@ -29,7 +29,8 @@ SERVER_tests = \
 	zbx_get_report_nextcheck \
 	zbx_ltrim_utf8 \
 	zbx_rtrim_utf8 \
-	zbx_get_week_number
+	zbx_get_week_number \
+	zbx_function_param_parse_ext
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -40,6 +41,7 @@ COMMON_SRC_FILES = \
 
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
@@ -76,7 +78,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
@@ -153,6 +154,7 @@ calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
 calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 
 zbx_function_get_param_dyn_SOURCES = \
 	zbx_function_get_param_dyn.c \
@@ -510,5 +512,18 @@ zbx_get_week_number_LDADD += @SERVER_LIBS@
 zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_get_week_number_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+zbx_function_param_parse_ext_SOURCES = \
+	zbx_function_param_parse_ext.c \
+	$(COMMON_SRC_FILES)
+
+zbx_function_param_parse_ext_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
+
+zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_function_param_parse_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

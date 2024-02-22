@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,8 +77,10 @@ static int		db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
+static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static int			txn_begin = 0;	/* transaction begin statement is executed */
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -102,6 +104,10 @@ static ub4	OCI_DBserver_status(void);
 #define ORA_ERR_UNIQ_CONSTRAINT	-1
 
 #elif defined(HAVE_POSTGRESQL)
+#define ZBX_PG_READ_ONLY	"25006"
+#define ZBX_PG_UNIQUE_VIOLATION	"23505"
+#define ZBX_PG_DEADLOCK		"40P01"
+
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
 static int			ZBX_TSDB_VERSION = -1;
@@ -157,7 +163,12 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, last_db_strerror);
 			break;
 		case ERR_Z3008:
-			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno,
+					last_db_strerror);
+			break;
+		case ERR_Z3009:
+			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
+					last_db_strerror);
 			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
@@ -337,11 +348,35 @@ static int	is_recoverable_mysql_error(int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		case ER_CLIENT_INTERACTION_TIMEOUT:
+#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
 #ifdef ER_CONNECTION_KILLED
 		case ER_CONNECTION_KILLED:
+#endif
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	is_inhibited_mysql_error(int err_no)
+{
+	if (1 < mysql_err_cnt)
+		return FAIL;
+
+	if (0 < txn_level && 0 == txn_begin)
+		return FAIL;
+
+	switch (err_no)
+	{
+		case CR_SERVER_GONE_ERROR:
+		case CR_SERVER_LOST:
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		case ER_CLIENT_INTERACTION_TIMEOUT:
 #endif
 			return SUCCEED;
 	}
@@ -354,7 +389,10 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (CONNECTION_OK != PQstatus(pg_conn))
 		return SUCCEED;
 
-	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
+		return SUCCEED;
+
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
 
 	return FAIL;
@@ -384,11 +422,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-#if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
-	bool		mysql_reconnect = 1;
-#else
-	my_bool		mysql_reconnect = 1;
-#endif
 	int		err_no = 0;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
@@ -561,15 +594,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 		ret = ZBX_DB_FAIL;
 	}
 
-	/* The RECONNECT option setting is placed here, AFTER the connection	*/
-	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
-	/* reset the options value to the default, regardless of what it was	*/
-	/* set to prior to the connection. MySQL allows changing connection	*/
-	/* options on an open connection, so setting it here is safe.		*/
-
-	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
-
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -599,6 +623,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err_no))
 		ret = ZBX_DB_DOWN;
 
+	mysql_err_cnt = ZBX_DB_OK == ret ? 0 : mysql_err_cnt + 1;
 #elif defined(HAVE_ORACLE)
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -858,6 +883,12 @@ out:
 	if (ZBX_DB_OK != ret)
 		goto out;
 
+	if (0 < (ret = zbx_db_execute_basic("pragma foreign_keys=on")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
 	if (0 < (ret = zbx_db_execute_basic("pragma temp_store=2")))
 		ret = ZBX_DB_OK;
 
@@ -1016,7 +1047,9 @@ int	zbx_db_begin_basic(void)
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
 		assert(0);
 	}
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 1;
+#endif
 	txn_level++;
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1028,7 +1061,9 @@ int	zbx_db_begin_basic(void)
 
 	if (ZBX_DB_DOWN == rc)
 		txn_level--;
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 0;
+#endif
 	return rc;
 }
 
@@ -1493,7 +1528,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			err_no = (int)mysql_errno(conn);
 			errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-			zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
+				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
 
 			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
@@ -1516,7 +1554,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				{
 					err_no = (int)mysql_errno(conn);
 					errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-					zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+					mysql_err_cnt++;
+
+					if (FAIL == is_inhibited_mysql_error(err_no))
+						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
 
 					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
@@ -1550,8 +1591,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 		zbx_postgresql_error(&error, result);
 
-		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), "23505"))
+		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_UNIQUE_VIOLATION))
 			errcode = ERR_Z3008;
+		else if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
 		else
 			errcode = ERR_Z3005;
 
@@ -1671,10 +1714,12 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
-			int err_no;
+			int err_no = (int)mysql_errno(conn);
 
-			err_no = (int)mysql_errno(conn);
-			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
+				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (zbx_db_result_t)ZBX_DB_DOWN : NULL);
@@ -2542,13 +2587,13 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 	else if (min_version > current_version && ZBX_DBVERSION_UNDEFINED != min_version)
 	{
 		flag = DB_VERSION_LOWER_THAN_MINIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is smaller than minimum of %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is older than %lu",
 				database, (unsigned long)current_version, (unsigned long)min_version);
 	}
 	else if (max_version < current_version && ZBX_DBVERSION_UNDEFINED != max_version)
 	{
 		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is higher than maximum of %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is newer than %lu",
 				database, (unsigned long)current_version, (unsigned long)max_version);
 	}
 	else if (min_supported_version > current_version && ZBX_DBVERSION_UNDEFINED != min_supported_version)
@@ -2900,15 +2945,8 @@ static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 	zbx_db_result_t	result;
 	int		ret;
 
-	if (1 == ZBX_DB_TSDB_V1) {
-		result = zbx_db_select_basic("select null from timescaledb_information.compressed_chunk_stats"
-				" where hypertable_name in (%s) and compression_status='Compressed'", table_names);
-	}
-	else
-	{
-		result = zbx_db_select_basic("select null from timescaledb_information.chunks"
-				" where hypertable_name in (%s) and is_compressed='t'", table_names);
-	}
+	result = zbx_db_select_basic("select null from timescaledb_information.chunks"
+			" where hypertable_name in (%s) and is_compressed='t'", table_names);
 
 	if ((zbx_db_result_t)ZBX_DB_DOWN == result)
 	{
@@ -2928,54 +2966,17 @@ out:
 
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB1_HISTORY_TABLES "'history_uint'::regclass,'history_log'::regclass,'history_str'::regclass,'history_text'::regclass,'history'::regclass"
-#define ZBX_TSDB2_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
-#define ZBX_TSDB1_TRENDS_TABLES "'trends'::regclass,'trends_uint'::regclass"
-#define ZBX_TSDB2_TRENDS_TABLES "'trends','trends_uint'"
-	const char	*history_tables, *trends_tables;
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB_TRENDS_TABLES "'trends','trends_uint'"
 
-	history_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
-	trends_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+	version_info->history_compressed_chunks =
+			(SUCCEED == zbx_tsdb_table_has_compressed_chunks(ZBX_TSDB_HISTORY_TABLES)) ? 1 : 0;
 
-	version_info->history_compressed_chunks = (SUCCEED == zbx_tsdb_table_has_compressed_chunks(history_tables)) ?
-			1 : 0;
+	version_info->trends_compressed_chunks =
+			(SUCCEED == zbx_tsdb_table_has_compressed_chunks(ZBX_TSDB_TRENDS_TABLES)) ? 1 : 0;
 
-	version_info->trends_compressed_chunks = (SUCCEED == zbx_tsdb_table_has_compressed_chunks(trends_tables)) ?
-			1 : 0;
-
-#undef ZBX_TSDB1_HISTORY_TABLES
-#undef ZBX_TSDB2_HISTORY_TABLES
-#undef ZBX_TSDB1_TRENDS_TABLES
-#undef ZBX_TSDB2_TRENDS_TABLES
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) license information                   *
- *                                                                            *
- * Return value: license information from datase as string                    *
- *               "apache"    for TimescaleDB Apache 2 Edition                 *
- *               "timescale" for TimescaleDB Community Edition                *
- *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
- *                                                                            *
- ******************************************************************************/
-static char	*zbx_tsdb_get_license(void)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*tsdb_lic = NULL;
-
-	result = zbx_db_select_basic("show timescaledb.license");
-
-	if ((zbx_db_result_t)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch_basic(result)))
-	{
-		tsdb_lic = zbx_strdup(NULL, row[0]);
-	}
-
-	zbx_db_free_result(result);
-
-	return tsdb_lic;
+#undef ZBX_TSDB_HISTORY_TABLES
+#undef ZBX_TSDB_TRENDS_TABLES
 }
 
 /***************************************************************************************************************
@@ -2985,7 +2986,7 @@ static char	*zbx_tsdb_get_license(void)
  **************************************************************************************************************/
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
-	int		tsdb_ver;
+	int	tsdb_ver;
 
 	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		return;
@@ -3008,13 +3009,7 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 			version_info->ext_min_version, version_info->ext_max_version,
 			version_info->ext_min_supported_version);
 
-	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT <= tsdb_ver)
-		version_info->ext_lic = zbx_tsdb_get_license();
-
-	zbx_tsdb_extract_compressed_chunk_flags(version_info);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver,
-		ZBX_NULL2EMPTY_STR(version_info->ext_lic));
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d]", tsdb_ver);
 }
 
 /******************************************************************************
@@ -3095,7 +3090,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) compression availability              *
+ * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
  * Return value: compression availability as as integer                       *
  *               0 (OFF): compression is not available                        *

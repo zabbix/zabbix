@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+
 #include "../common/zbxsysinfo_common.h"
 
 #include "zbxnum.h"
-#include "zbxlog.h"
 
 static struct ifmibdata	ifmd;
 
@@ -181,7 +181,7 @@ int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -203,7 +203,7 @@ int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (ret = execute_int(command, result)))
+	if (SYSINFO_RET_FAIL == (ret = execute_int(command, result, request->timeout)))
 		return ret;
 
 	if (1 < result->ui64)
@@ -234,7 +234,7 @@ int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (ret = execute_int(command, result)))
+	if (SYSINFO_RET_FAIL == (ret = execute_int(command, result, request->timeout)))
 		return ret;
 
 	if (1 < result->ui64)

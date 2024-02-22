@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 
 use Zabbix\Widgets\CWidgetField;
 
+use Zabbix\Widgets\Fields\CWidgetFieldReference;
+
 class CWidgetFormView {
 
 	private array $data;
@@ -32,9 +34,15 @@ class CWidgetFormView {
 
 	private CFormGrid $form_grid;
 
+	private array $registered_fields = [];
+
 	public function __construct(array $data, string $name = 'widget_dialogue_form') {
 		$this->data = $data;
 		$this->name = $name;
+
+		if (array_key_exists(CWidgetFieldReference::FIELD_NAME, $data['fields'])) {
+			$this->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
+		}
 
 		$this->makeFormGrid();
 	}
@@ -77,16 +85,15 @@ class CWidgetFormView {
 	 * Add configuration row based on single CWidgetFieldView.
 	 */
 	public function addField(?CWidgetFieldView $field): self {
-		if ($field === null) {
+		if ($field === null || in_array($field->getName(), $this->registered_fields, true)) {
 			return $this;
 		}
 
 		$this->registerField($field);
 
-		$this->form_grid->addItem([
-			$field->getLabel(),
-			(new CFormField($field->getView()))->addClass($field->getClass())
-		]);
+		foreach ($field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+			$this->form_grid->addItem([$label, (new CFormField($view))->addClass($class)]);
+		}
 
 		return $this;
 	}
@@ -114,6 +121,8 @@ class CWidgetFormView {
 	}
 
 	public function registerField(CWidgetFieldView $field): CWidgetFieldView {
+		$this->registered_fields[] = $field->getName();
+
 		$field->setFormName($this->name);
 
 		$this->addJavaScript($field->getJavaScript());
@@ -153,9 +162,13 @@ class CWidgetFormView {
 	 * @throws JsonException
 	 */
 	public function show(): void {
+		$messages = get_and_clear_messages();
+		$message_box = $messages ? makeMessageBox(ZBX_STYLE_MSG_BAD, $messages) : '';
+
 		$output = [
 			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
 			'body' => implode('', [
+				$message_box,
 				(new CForm())
 					->setId('widget-dialogue-form')
 					->setName($this->name)
@@ -166,7 +179,7 @@ class CWidgetFormView {
 					// Submit button is needed to enable submit event on Enter on inputs.
 					->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)),
 				implode('', $this->templates),
-				$this->javascript ? new CScriptTag($this->javascript) : ''
+				(new CScriptTag('ZABBIX.Dashboard.initWidgetPropertiesForm();'))->addItem($this->javascript)
 			]),
 			'buttons' => [
 				[
@@ -179,21 +192,8 @@ class CWidgetFormView {
 			],
 			'doc_url' => $this->data['url'] === ''
 				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
-				: $this->data['url'],
-			'data' => [
-				'original_properties' => [
-					'type' => $this->data['type'],
-					'unique_id' => $this->data['unique_id'],
-					'dashboard_page_unique_id' => $this->data['dashboard_page_unique_id']
-				]
-			]
+				: $this->data['url']
 		];
-
-		if ($error = get_and_clear_messages()) {
-			$output['error'] = [
-				'messages' => array_column($error, 'message')
-			];
-		}
 
 		if ($this->data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();

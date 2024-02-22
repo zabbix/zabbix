@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,11 +84,9 @@ static const char	*registry_type_to_string(DWORD type)
 
 static void	registry_get_multistring_value(const wchar_t *wbuffer, struct zbx_json *j)
 {
-	char	*buffer;
-
 	while (L'\0' != *wbuffer)
 	{
-		buffer = zbx_unicode_to_utf8(wbuffer);
+		char	*buffer = zbx_unicode_to_utf8(wbuffer);
 		zbx_json_addstring(j, NULL, buffer, ZBX_JSON_TYPE_STRING);
 		zbx_free(buffer);
 		wbuffer += wcslen(wbuffer) + 1 ;

@@ -43,6 +43,8 @@ Test availability:
 |{$ORACLE.TABLESPACE.CONTAINER.NOT_MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$ORACLE.TABLESPACE.NAME.MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`.*`|
 |{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.</p>|`90`|
+|{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}|<p>High severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.</p>|`95`|
 |{$ORACLE.TBS.USED.PCT.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p>|`90`|
 |{$ORACLE.TBS.USED.PCT.MAX.HIGH}|<p>High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p>|`95`|
 |{$ORACLE.TBS.UTIL.PCT.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p>|`80`|
@@ -67,7 +69,7 @@ Test availability:
 |----|-----------|----|-----------------------|
 |Oracle: Ping|<p>Test the connection to Oracle Database state.</p>|Zabbix agent|oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Oracle: Get instance state|<p>The item gets its state of the current instance.</p>|Zabbix agent|oracle.instance.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]|
-|Oracle: Version|<p>The Oracle Server version.</p>|Dependent item|oracle.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Oracle: Version|<p>The Oracle Server version.</p>|Zabbix agent|oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Oracle: Uptime|<p>The Oracle instance uptime expressed in seconds.</p>|Dependent item|oracle.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li></ul>|
 |Oracle: Instance status|<p>The status of the instance.</p>|Dependent item|oracle.instance_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li></ul>|
 |Oracle: Archiver state|<p>The status of automatic archiving.</p>|Dependent item|oracle.archiver_state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..archiver.first()`</p></li></ul>|
@@ -143,7 +145,7 @@ Test availability:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle: Connection to database is unavailable|<p>Connection to Oracle Database is currently unavailable.</p>|`last(/Oracle by Zabbix agent 2/oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])=0`|Disaster||
-|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0`|Info|**Manual close**: Yes|
+|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],#2) and length(last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]))>0`|Info|**Manual close**: Yes|
 |Oracle: Failed to fetch info data|<p>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</p>|`nodata(/Oracle by Zabbix agent 2/oracle.uptime,30m)=1`|Info||
 |Oracle: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Oracle by Zabbix agent 2/oracle.uptime)<10m`|Info|**Manual close**: Yes|
 |Oracle: Instance name has changed|<p>Oracle DB Instance name has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_name,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_name))>0`|Info|**Manual close**: Yes|
@@ -221,6 +223,7 @@ Test availability:
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace free, bytes|<p>Free bytes of the allocated space.</p>|Dependent item|oracle.tbs_free_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].free_bytes.first()`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage, percent|<p>Used bytes/allocated bytes*100.</p>|Dependent item|oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].used_file_pct.first()`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, percent|<p>Allocated bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].used_pct_max.first()`</p></li></ul>|
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX, percent|<p>Used bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].used_from_max_pct.first()`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Open status|<p>The tablespace status where:</p><p>1 - 'ONLINE';</p><p>2 - 'OFFLINE';</p><p>3 - 'READ ONLY'.</p>|Dependent item|oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].status.first()`</p></li></ul>|
 
 ### Trigger prototypes for Tablespace discovery
@@ -231,6 +234,8 @@ Test availability:
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}`|High||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high</li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`|High||
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage from MAX is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization from MAX is too high</li></ul>|
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace utilization from MAX is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`|High||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2`|Warning||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
 
@@ -253,7 +258,7 @@ Test availability:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Archivelog '{#DEST_NAME}': Log Archive is not valid|<p>The trigger will launch if the archive log destination is not in one of these states:2 - 'DEFERRED';3 - 'VALID'.</p>|`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2`|High||
+|Archivelog '{#DEST_NAME}': Log Archive is not valid|<p>The trigger will launch if the archive log destination is not in one of these states:<br>2 - 'DEFERRED';<br>3 - 'VALID'.</p>|`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2`|High||
 
 ### LLD rule ASM disk groups discovery
 

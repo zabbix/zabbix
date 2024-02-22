@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ class testZBX6663 extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Template ZBX6663 First',
-					'link' => 'Discovery rules',
+					'link' => 'Discovery',
 					'checkbox' => 'items'
 				]
 			],
@@ -153,7 +153,7 @@ class testZBX6663 extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Template ZBX6663 First',
-					'link' => 'Web scenarios',
+					'link' => 'Web',
 					'checkbox' => 'httptests'
 				]
 			]
@@ -189,22 +189,20 @@ class testZBX6663 extends CLegacyWebTest {
 		}
 
 		if (isset($zbx_data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$form->fill(['Name' => $zbx_data['template']]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->zbxTestClickLinkText($zbx_data['template']);
 
 			if (isset($zbx_data['discoveryRule'])) {
-				$this->zbxTestClickLinkTextWait('Discovery rules');
+				$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
 				$this->zbxTestCheckHeader('Discovery rules');
 				$this->zbxTestClickLinkTextWait($this->discoveryRule);
 				$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
 			}
 			else {
-				$link = $zbx_data['link'];
-				$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="'.$link.'"]');
+				$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link', $zbx_data['link'])->waitUntilVisible()->one()->click();
 			}
 		}
 

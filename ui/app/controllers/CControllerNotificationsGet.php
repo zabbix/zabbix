@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class CControllerNotificationsGet extends CController {
 	 */
 	private $known_eventids = [];
 
-	protected function init() {
+	protected function init(): void {
 		parent::init();
 
 		$this->disableCsrfValidation();
@@ -69,7 +69,7 @@ class CControllerNotificationsGet extends CController {
 		$this->time_from = max([$this->settings['last.clock'], $this->timeout_time]);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'known_eventids' => 'array_db events.eventid'
 		];
@@ -89,11 +89,11 @@ class CControllerNotificationsGet extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (!CWebUser::isGuest() && $this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if (!$this->settings['enabled']) {
 			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
 			return;
@@ -106,7 +106,7 @@ class CControllerNotificationsGet extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
 	}
 
-	protected function loadNotifications() {
+	protected function loadNotifications(): void {
 		// Select problem events.
 		$options = [
 			'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
@@ -217,7 +217,11 @@ class CControllerNotificationsGet extends CController {
 			]);
 
 			foreach ($problems_by_triggerid as $triggerid => $notification_eventids) {
-				$trigger = $triggers[$triggerid];
+				$trigger = array_key_exists($triggerid, $triggers) ? $triggers[$triggerid] : null;
+
+				if ($trigger === null) {
+					continue;
+				}
 
 				$url_problems = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
@@ -244,7 +248,9 @@ class CControllerNotificationsGet extends CController {
 						'title' => (new CLink($trigger['hosts'][0]['name'], $url_problems))->toString(),
 						'body' => [
 							(new CLink($notification['name'], $url_events))->toString(),
-							(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']), $url_trigger_events))->toString()
+							(new CLink(
+								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']), $url_trigger_events)
+							)->toString()
 						]
 					];
 				}
@@ -254,7 +260,7 @@ class CControllerNotificationsGet extends CController {
 		$this->notifications = array_values($this->notifications);
 	}
 
-	protected function makeResponseData() {
+	protected function makeResponseData(): string {
 		CArrayHelper::sort($this->notifications, [
 			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 			['field' => 'severity', 'order' => ZBX_SORT_DOWN],
@@ -275,16 +281,18 @@ class CControllerNotificationsGet extends CController {
 		return json_encode([
 			'notifications' => $this->notifications,
 			'settings' => [
+				'username' => CApiService::$userData['username'],
 				'enabled' => (bool) $this->settings['enabled'],
 				'alarm_timeout' => (int) $this->settings['sounds.repeat'],
 				'msg_recovery_timeout' => $this->settings['ok_timeout'],
 				'msg_timeout' => $this->settings['timeout'],
 				'muted' => (bool) $this->settings['sounds.mute'],
+				'snoozed_eventid' => (int) $this->settings['snoozed.eventid'],
 				'severity_styles' => [
 					-1 => ZBX_STYLE_NORMAL_BG,
 					TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
 					TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
-					TRIGGER_SEVERITY_HIGH  => ZBX_STYLE_HIGH_BG,
+					TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
 					TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG,
 					TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG

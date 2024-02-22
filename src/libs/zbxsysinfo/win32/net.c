@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,19 +47,18 @@ zbx_ifrow_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize the zbx_ifrow_t variable                               *
+ * Purpose: initializes zbx_ifrow_t variable                                  *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN/OUT] pointer to zbx_ifrow_t variable with all        *
  *                            members set to NULL                             *
  *                                                                            *
- * Comments: allocates memory, call zbx_ifrow_clean() with the same pointer   *
- *           to free it                                                       *
+ * Comments: allocates memory, calls zbx_ifrow_clean() with pointer to free   *
+ *           it                                                               *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 {
-
 	HMODULE		module;
 	static	char	check_done = FALSE;
 
@@ -92,12 +91,12 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clean the zbx_ifrow_t variable                                    *
+ * Purpose: cleans zbx_ifrow_t variable                                       *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN/OUT] pointer to initialized zbx_ifrow_t variable     *
  *                                                                            *
- * Comments: sets the members to NULL so the variable can be reused           *
+ * Comments: sets members to NULL so variable can be reused                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
@@ -108,14 +107,15 @@ static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: call either GetIfEntry() or GetIfEntry2() based on the Windows    *
+ * Purpose: Calls either GetIfEntry() or GetIfEntry2() based on the Windows   *
  *          release to fill the passed MIB interface structure.               *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN/OUT] pointer to initialized zbx_ifrow_t variable     *
  *                                                                            *
- * Comments: the index of the interface must be set with                      *
- *           zbx_ifrow_set_index(), otherwise this function will return error *
+ * Comments: The index of the interface must be set with                      *
+ *           zbx_ifrow_set_index(), otherwise this function will return       *
+ *           error.                                                           *
  *                                                                            *
  ******************************************************************************/
 static DWORD	zbx_ifrow_call_get_if_entry(zbx_ifrow_t *pIfRow)
@@ -275,7 +275,7 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 	else
 	{
 		static wchar_t *(*mb_to_unicode)(const char *) = NULL;
-		wchar_t 	*wdescr;
+		wchar_t		*wdescr;
 		char		*utf8_descr;
 
 		if (NULL == mb_to_unicode)
@@ -330,12 +330,14 @@ static char	*zbx_ifrow_get_guid_str(const zbx_ifrow_t *pIfRow)
 	return guid_cstr;
 }
 
-/*
- * returns interface statistics by IP address or interface name
- */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns interface statistics by IP address or interface name      *
+ *                                                                            *
+ ******************************************************************************/
 static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 {
-	DWORD		dwSize, dwRetVal, i, j;
+	DWORD		dwSize, dwRetVal;
 	int		ret = FAIL;
 	char		ip[16];
 	/* variables used for GetIfTable and GetIfEntry */
@@ -378,7 +380,7 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 		goto clean;
 	}
 
-	for (i = 0; i < pIfTable->dwNumEntries; i++)
+	for (DWORD i = 0; i < pIfTable->dwNumEntries; i++)
 	{
 		char	*utf8_descr;
 
@@ -403,7 +405,7 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 		if (SUCCEED == ret)
 			break;
 
-		for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
+		for (DWORD j = 0; j < pIPAddrTable->dwNumEntries; j++)
 		{
 			if (pIPAddrTable->table[j].dwIndex == zbx_ifrow_get_index(ifrow))
 			{
@@ -581,7 +583,7 @@ clean:
 
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	DWORD		dwSize, dwRetVal, i;
+	DWORD		dwSize, dwRetVal;
 	int		ret = SYSINFO_RET_FAIL;
 
 	/* variables used for GetIfTable and GetIfEntry */
@@ -589,7 +591,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_ifrow_t	ifrow = {NULL, NULL};
 
 	struct zbx_json	j;
-	char 		*utf8_descr, *guid;
+	char		*utf8_descr, *guid;
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
@@ -614,7 +616,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_ifrow_init(&ifrow);
 
-	for (i = 0; i < pIfTable->dwNumEntries; i++)
+	for (DWORD i = 0; i < pIfTable->dwNumEntries; i++)
 	{
 		zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
 		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
@@ -681,7 +683,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 
 int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	DWORD		dwSize, dwRetVal, i, j;
+	DWORD		dwSize, dwRetVal;
 	char		*buf = NULL;
 	size_t		buf_alloc = 512, buf_offset = 0;
 	int		ret = SYSINFO_RET_FAIL;
@@ -737,9 +739,9 @@ int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_ifrow_init(&ifrow);
 
-		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
+		for (DWORD i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
-			char		*utf8_descr;
+			char	*utf8_descr;
 
 			zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
 			if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
@@ -755,7 +757,9 @@ int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 					" %-8s", get_if_adminstatus_string(zbx_ifrow_get_admin_status(&ifrow)));
 
-			for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
+			DWORD	j = 0;
+
+			for (; j < pIPAddrTable->dwNumEntries; j++)
 				if (pIPAddrTable->table[j].dwIndex == zbx_ifrow_get_index(&ifrow))
 				{
 					in_addr.S_un.S_addr = pIPAddrTable->table[j].dwAddr;
@@ -789,7 +793,7 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MIB_TCPTABLE	*pTcpTable = NULL;
 	DWORD		dwSize, dwRetVal;
-	int		i, ret = SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
 	unsigned short	port;
 	char		*port_str;
 
@@ -819,7 +823,7 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 	   the actual data we require */
 	if (NO_ERROR == (dwRetVal = GetTcpTable(pTcpTable, &dwSize, TRUE)))
 	{
-		for (i = 0; i < (int)pTcpTable->dwNumEntries; i++)
+		for (int i = 0; i < (int)pTcpTable->dwNumEntries; i++)
 		{
 			if (MIB_TCP_STATE_LISTEN == pTcpTable->table[i].dwState &&
 					port == ntohs((u_short)pTcpTable->table[i].dwLocalPort))

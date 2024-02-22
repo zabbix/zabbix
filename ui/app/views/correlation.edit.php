@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,7 +218,6 @@ $form_grid
 					->addClass(ZBX_STYLE_CELL)
 					->addClass(ZBX_STYLE_CELL_EXPRESSION)
 					->addStyle('width: 100%;')
-					->addStyle('white-space: initial;')
 			]
 		))->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	])

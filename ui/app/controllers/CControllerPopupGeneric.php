@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,7 +214,7 @@ class CControllerPopupGeneric extends CController {
 			'proxies' => [
 				'title' => _('Proxies'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'proxyid,host',
+				'allowed_src_fields' => 'proxyid,name',
 				'form' => [
 					'name' => 'proxiesform',
 					'id' => 'proxies'
@@ -582,7 +582,8 @@ class CControllerPopupGeneric extends CController {
 			'host_pattern' =>						'array|not_empty',
 			'host_pattern_wildcard_allowed' =>		'in 1',
 			'host_pattern_multiple' =>				'in 1',
-			'hide_host_filter' =>					'in 1'
+			'hide_host_filter' =>					'in 1',
+			'resolve_macros' =>						'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -1471,8 +1472,12 @@ class CControllerPopupGeneric extends CController {
 
 			case 'items':
 			case 'item_prototypes':
+				$name_field = $this->source_table === 'items' && $this->getInput('resolve_macros', 0)
+					? 'name_resolved'
+					: 'name';
+
 				$options += [
-					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'output' => ['itemid', $name_field, 'key_', 'flags', 'type', 'value_type', 'status'],
 					'selectHosts' => ['name'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
@@ -1504,13 +1509,19 @@ class CControllerPopupGeneric extends CController {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					if ($this->hasInput('normal_only')) {
-						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-					}
+					$records = [];
 
-					$records = !$this->host_preselect_required || $this->hostids
-						? API::Item()->get($options + ['webitems' => true])
-						: [];
+					if (!$this->host_preselect_required || $this->hostids) {
+						if ($this->hasInput('normal_only')) {
+							$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+						}
+
+						$records = API::Item()->get($options + ['webitems' => true]);
+
+						if ($this->getInput('resolve_macros', 0)) {
+							$records = CArrayHelper::renameObjectsKeys($records, ['name_resolved' => 'name']);
+						}
+					}
 				}
 
 				CArrayHelper::sort($records, ['name']);
@@ -1599,12 +1610,12 @@ class CControllerPopupGeneric extends CController {
 
 			case 'proxies':
 				$options += [
-					'output' => ['proxyid', 'host']
+					'output' => ['proxyid', 'name']
 				];
 
 				$records = API::Proxy()->get($options);
-				CArrayHelper::sort($records, ['host']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id']);
 				break;
 
 			case 'roles':

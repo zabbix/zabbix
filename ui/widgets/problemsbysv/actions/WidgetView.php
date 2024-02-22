@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,14 +35,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction(): void {
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$this->setResponse(new CControllerResponseData([
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'error' => _('No data.'),
@@ -59,7 +58,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: null,
 				'hostids' => !$this->isTemplateDashboard()
 					? $this->fields_values['hostids']
-					: [$this->getInput('dynamic_hostid')],
+					: $this->fields_values['override_hostid'],
 				'problem' => $this->fields_values['problem'],
 				'severities' => $this->fields_values['severities'],
 				'show_type' => !$this->isTemplateDashboard() ? $this->fields_values['show_type'] : Widget::SHOW_TOTALS,

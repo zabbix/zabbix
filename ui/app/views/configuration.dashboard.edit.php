@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
  * @var array $data
  */
 
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -36,7 +37,12 @@ $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget-field.checkbox-list.js');
+$this->addJsFile('class.widget-field.multiselect.js');
+$this->addJsFile('class.widget-field.time-period.js');
+$this->addJsFile('class.widget-select.popup.js');
 $this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('class.coverride.js');
@@ -46,13 +52,12 @@ $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
@@ -124,7 +129,7 @@ $html_page
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
-		'time_period' => $data['time_period'],
+		'dashboard_time_period' => $data['dashboard_time_period'],
 		'page' => $data['page']
 	]).');
 '))

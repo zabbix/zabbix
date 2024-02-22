@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,18 +48,18 @@ class testGeneric extends CLegacyWebTest {
 			// reports
 			['zabbix.php?action=report.status',					'System information'],
 			['report2.php',										'Availability report'],
-			['toptriggers.php',									'100 busiest triggers'],
-			['toptriggers.php?severities[0]=0&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[1]=1&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[2]=2&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[3]=3&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[4]=4&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[5]=5&filter_set=Filter',	'100 busiest triggers'],
+			['zabbix.php?action=toptriggers.list',				'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&filter_severities[0]=0&filter_set=1',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&filter_severities[1]=1&filter_set=1',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&filter_severities[2]=2&filter_set=1',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&filter_severities[3]=3&filter_set=1',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&filter_severities[4]=4&filter_set=1',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&filter_severities[5]=5&filter_set=1',	'Top 100 triggers'],
 
 			// configuration
 			['zabbix.php?action=hostgroup.list',		'Configuration of host groups'],
 			['zabbix.php?action=templategroup.list',	'Configuration of template groups'],
-			['templates.php',					'Configuration of templates'],
+			['zabbix.php?action=template.list',			'Configuration of templates'],
 			[self::HOST_LIST_PAGE,				'Configuration of hosts'],
 			['zabbix.php?action=maintenance.list',		'Configuration of maintenance periods'],
 			['httpconf.php',					'Configuration of web monitoring'],

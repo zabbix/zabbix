@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -243,13 +243,8 @@ class CScreenProblem extends CScreenBase {
 					$options['time_from'] = time() - $filter['age'] * SEC_PER_DAY + 1;
 				}
 			}
-			if (array_key_exists('severities', $filter)) {
-				$filter_severities = implode(',', $filter['severities']);
-				$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-				if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-					$options['severities'] = $filter['severities'];
-				}
+			if (array_key_exists('severities', $filter) && $filter['severities']) {
+				$options['severities'] = $filter['severities'];
 			}
 			if (array_key_exists('evaltype', $filter)) {
 				$options['evaltype'] = $filter['evaltype'];
@@ -266,10 +261,8 @@ class CScreenProblem extends CScreenBase {
 				unset($options['symptom']);
 			}
 
-			$filter_options = [];
-
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
-				$filter_options['cause_eventid'] = $filter['cause_eventid'];
+				$options['filter']['cause_eventid'] = $filter['cause_eventid'];
 			}
 
 			if (array_key_exists('acknowledgement_status', $filter)) {
@@ -282,17 +275,13 @@ class CScreenProblem extends CScreenBase {
 						$options['acknowledged'] = true;
 
 						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {
-							$filter_options += [
+							$options += [
 								'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-								'action_userid' => CUser::$userData['userid']
+								'action_userids' => CUser::$userData['userid']
 							];
 						}
 						break;
 				}
-			}
-
-			if ($filter_options) {
-				$options['filter'] = $filter_options;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -359,13 +348,13 @@ class CScreenProblem extends CScreenBase {
 		$data['problems'] = array_slice($data['problems'], 0, $limit + 1, true);
 
 		if ($show_opdata && $data['triggers']) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'name', 'value_type', 'units'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'name_resolved', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			foreach ($data['triggers'] as &$trigger) {
 				foreach ($trigger['functions'] as $function) {
@@ -516,11 +505,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -573,11 +562,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -664,7 +653,7 @@ class CScreenProblem extends CScreenBase {
 		// get additional data
 		$eventids = array_keys($data['problems']);
 
-		$problems_data = ($filter['show'] == TRIGGERS_OPTION_ALL)
+		$problems_data = $filter['show'] == TRIGGERS_OPTION_ALL
 			? self::getExDataEvents($eventids)
 			: self::getExDataProblems($eventids);
 
@@ -867,7 +856,7 @@ class CScreenProblem extends CScreenBase {
 		$symptom_cause_eventids = [];
 		$cause_eventids_with_symptoms = [];
 		$do_causes_have_symptoms = false;
-		$symptom_data['problems'] = [];
+		$symptom_data = ['problems' => []];
 
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
@@ -916,67 +905,81 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($cause_eventids_with_symptoms) {
-			// Get all symptoms for given cause event IDs.
-			$symptom_data = self::getData([
-				'show_symptoms' => true,
-				'show_suppressed' => true,
-				'cause_eventid' => $cause_eventids_with_symptoms,
-				'show' => $this->data['filter']['show'],
-				'details' => $this->data['filter']['details'],
-				'show_opdata' => $this->data['filter']['show_opdata']
-			], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
-
-			if ($symptom_data['problems']) {
-				$symptom_data = self::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $this->data['sort'],
-					$this->data['sortorder']
-				);
-
-				// Filter does not matter.
-				$symptom_data = self::makeData($symptom_data, [
+			foreach ($cause_eventids_with_symptoms as $cause_eventid) {
+				// Get all symptoms for given cause event ID.
+				$_symptom_data = self::getData([
+					'show_symptoms' => true,
+					'show_suppressed' => true,
+					'cause_eventid' => $cause_eventid,
 					'show' => $this->data['filter']['show'],
 					'details' => $this->data['filter']['details'],
 					'show_opdata' => $this->data['filter']['show_opdata']
-				], true);
+				], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
-				$data['users'] += $symptom_data['users'];
-				$data['correlations'] += $symptom_data['correlations'];
+				if ($_symptom_data['problems']) {
+					$_symptom_data = self::sortData($_symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $this->data['sort'],
+						$this->data['sortorder']
+					);
 
-				foreach ($symptom_data['actions'] as $key => $actions) {
-					$data['actions'][$key] += $actions;
-				}
+					/*
+					 * Since getData returns +1 more in order to show the "+" sign for paging or sortData should not cut
+					 * off any excess problems, in order to display actual limit of symptoms, one more slice is
+					 * necessary.
+					 */
+					$_symptom_data['problems'] = array_slice($_symptom_data['problems'], 0, ZBX_PROBLEM_SYMPTOM_LIMIT,
+						true
+					);
 
-				if ($symptom_data['triggers']) {
-					$triggerids = array_keys($symptom_data['triggers']);
+					// Filter does not matter.
+					$_symptom_data = self::makeData($_symptom_data, [
+						'show' => $this->data['filter']['show'],
+						'details' => $this->data['filter']['details'],
+						'show_opdata' => $this->data['filter']['show_opdata']
+					], true);
 
-					$db_triggers = API::Trigger()->get([
-						'output' => [],
-						'selectDependencies' => ['triggerid'],
-						'triggerids' => $triggerids,
-						'preservekeys' => true
-					]);
+					$data['users'] += $_symptom_data['users'];
+					$data['correlations'] += $_symptom_data['correlations'];
 
-					foreach ($symptom_data['triggers'] as $triggerid => &$trigger) {
-						$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
-							? $db_triggers[$triggerid]['dependencies']
-							: [];
+					foreach ($_symptom_data['actions'] as $key => $actions) {
+						$data['actions'][$key] += $actions;
 					}
-					unset($trigger);
 
-					// Add hosts from symptoms to the list.
-					$triggers_hosts += getTriggersHostsList($symptom_data['triggers']);
+					if ($_symptom_data['triggers']) {
+						$triggerids = array_keys($_symptom_data['triggers']);
 
-					// Store all known triggers in one place.
-					$data['triggers'] += $symptom_data['triggers'];
-				}
+						$db_triggers = API::Trigger()->get([
+							'output' => [],
+							'selectDependencies' => ['triggerid'],
+							'triggerids' => $triggerids,
+							'preservekeys' => true
+						]);
 
-				foreach ($data['problems'] as &$problem) {
-					foreach ($symptom_data['problems'] as $symptom) {
-						if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
-							$problem['symptoms'][] = $symptom;
+						foreach ($_symptom_data['triggers'] as $triggerid => &$trigger) {
+							$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
+								? $db_triggers[$triggerid]['dependencies']
+								: [];
+						}
+						unset($trigger);
+
+						// Add hosts from symptoms to the list.
+						$triggers_hosts += getTriggersHostsList($_symptom_data['triggers']);
+
+						// Store all known triggers in one place.
+						$data['triggers'] += $_symptom_data['triggers'];
+					}
+
+					foreach ($data['problems'] as &$problem) {
+						foreach ($_symptom_data['problems'] as $symptom) {
+							if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
+								$problem['symptoms'][] = $symptom;
+							}
 						}
 					}
+					unset($problem);
+
+					// Combine symptom problems, to show tags later at some point.
+					$symptom_data['problems'] += $_symptom_data['problems'];
 				}
-				unset($problem);
 			}
 		}
 
@@ -1041,7 +1044,7 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			$this->data['filter']['compact_view']
-				? $header_clock->addStyle('width: 115px;')
+				? $header_clock->addStyle('width: 132px;')
 				: $header_clock->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			if ($show_timeline) {
@@ -1080,7 +1083,7 @@ class CScreenProblem extends CScreenBase {
 					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 						$link
 					)->addStyle('width: 120px;'),
-					$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
+					$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 132px;') : null,
 					$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
 					(new CColHeader(_('Info')))->addStyle('width: 24px;'),
 					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
@@ -1460,10 +1463,16 @@ class CScreenProblem extends CScreenBase {
 				? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 				: [];
 			$description[] = (new CLinkAction($problem['name']))
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid'],
-					['show_rank_change_cause' => true, 'show_rank_change_symptom' => true]
-				))
-				->addClass(ZBX_STYLE_WORDBREAK);
+				->addClass(ZBX_STYLE_WORDBREAK)
+				->setMenuPopup(CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->getUrl(),
+					'eventid' => $problem['eventid'],
+					'show_rank_change_cause' => true,
+					'show_rank_change_symptom' => true
+				]));
 
 			$opdata = null;
 
@@ -1767,7 +1776,7 @@ class CScreenProblem extends CScreenBase {
 		)));
 
 		if ($html) {
-			$hint_table = (new CTable())->addClass('list-table');
+			$hint_table = (new CTable())->addClass(ZBX_STYLE_LIST_TABLE);
 		}
 
 		foreach ($items as $itemid => $item) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,22 +21,23 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * Base class for Host and Template group form.
  */
 class testFormGroups extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -47,9 +48,11 @@ class testFormGroups extends CWebTest {
 	const LLD = 'LLD for Discovered host tests';
 
 	/**
-	 * Host and template group name for cancel, clone and delete test scenario.
+	 * Objects created in dataSource HostTemplateGroups.
 	 */
-	const DELETE_GROUP = 'Group for Delete test';
+	const DELETE_ONE_GROUP = 'One group belongs to one object for Delete test';
+	const DELETE_GROUP = 'Group empty for Delete test';
+	const DELETE_GROUP2 = 'First group to one object for Delete test';
 
 	/**
 	 * Host and template subgroup name for clone test scenario.
@@ -104,25 +107,10 @@ class testFormGroups extends CWebTest {
 				'name' => 'Group for Update test'
 			],
 			[
-				'name' => 'Group for Delete test'
-			],
-			[
-				'name' => 'One group for Delete'
-			],
-			[
 				'name' => 'Templates/Update'
 			],
 			[
 				'name' => 'Group1/Subgroup1/Subgroup2'
-			]
-		]);
-		$template_groupids = CDataHelper::getIds('name');
-		CDataHelper::createTemplates([
-			[
-				'host' => 'Template for group testing',
-				'groups' => [
-					'groupid' => $template_groupids['One group for Delete']
-				]
 			]
 		]);
 
@@ -132,124 +120,10 @@ class testFormGroups extends CWebTest {
 				'name' => 'Group for Update test'
 			],
 			[
-				'name' => 'Group for Delete test'
-			],
-			[
-				'name' => 'One group for Delete'
-			],
-			[
-				'name' => 'Group for Script'
-			],
-			[
-				'name' => 'Group for Action'
-			],
-			[
-				'name' => 'Group for Maintenance'
-			],
-			[
-				'name' => 'Group for Host prototype'
-			],
-			[
-				'name' => 'Group for Correlation'
-			],
-			[
 				'name' => 'Hosts/Update'
 			],
 			[
 				'name' => 'Group1/Subgroup1/Subgroup2'
-			]
-		]);
-		$host_groupids = CDataHelper::getIds('name');
-
-		// Create elements with host groups.
-		$host = CDataHelper::createHosts([
-			[
-				'host' => 'Host for host group testing',
-				'interfaces' => [],
-				'groups' => [
-					'groupid' => $host_groupids['One group for Delete']
-				]
-			]
-		]);
-		$hostid = $host['hostids']['Host for host group testing'];
-
-		$lld = CDataHelper::call('discoveryrule.create', [
-			'name' => 'LLD for host group test',
-			'key_' => 'lld.hostgroup',
-			'hostid' => $hostid,
-			'type' => ITEM_TYPE_TRAPPER,
-			'delay' => 0
-		]);
-		$lldid = $lld['itemids'][0];
-		CDataHelper::call('hostprototype.create', [
-			'host' => 'Host prototype {#KEY} for host group testing',
-			'ruleid' => $lldid,
-			'groupLinks' => [
-				[
-					'groupid' => $host_groupids['Group for Host prototype']
-				]
-			]
-		]);
-
-		CDataHelper::call('script.create', [
-			[
-				'name' => 'Script for host group testing',
-				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
-				'command' => 'return 1',
-				'groupid' => $host_groupids['Group for Script']
-			]
-		]);
-
-		CDataHelper::call('action.create', [
-			[
-				'name' => 'Discovery action for host group testing',
-				'eventsource' => EVENT_SOURCE_DISCOVERY,
-				'status' => ACTION_STATUS_ENABLED,
-				'operations' => [
-					[
-						'operationtype' => OPERATION_TYPE_GROUP_ADD,
-						'opgroup' => [
-							[
-								'groupid' => $host_groupids['Group for Action']
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		CDataHelper::call('maintenance.create', [
-			[
-				'name' => 'Maintenance for host group testing',
-				'active_since' => 1358844540,
-				'active_till' => 1390466940,
-				'groups' => [
-					[
-						'groupid' => $host_groupids['Group for Maintenance']
-					]
-				],
-				'timeperiods' => [[]]
-			]
-		]);
-
-		CDataHelper::call('correlation.create', [
-			[
-				'name' => 'Corellation for host group testing',
-				'filter' => [
-					'evaltype' => ZBX_CORR_OPERATION_CLOSE_OLD,
-					'conditions' => [
-						[
-							'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-							'groupid' => $host_groupids['Group for Correlation']
-						]
-					]
-				],
-				'operations' => [
-					[
-						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
-					]
-				]
 			]
 		]);
 	}
@@ -508,7 +382,7 @@ class testFormGroups extends CWebTest {
 			$form = $this->openForm($data['fields']['Group name']);
 			$form->checkValue($data['fields']['Group name']);
 
-			// Change group name after succefull update scenario.
+			// Change group name after successful update scenario.
 			if ($action === 'update') {
 				static::$update_group = $data['fields']['Group name'];
 			}
@@ -707,10 +581,18 @@ class testFormGroups extends CWebTest {
 
 	public static function getDeleteData() {
 		return [
+			// Empty group without Host/Template.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => self::DELETE_GROUP
+				]
+			],
+			// Host/Template has two groups, one of them can be deleted.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => self::DELETE_GROUP2
 				]
 			]
 		];
@@ -888,75 +770,100 @@ class testFormGroups extends CWebTest {
 		return [
 			[
 				[
+					// All 'Europe/Test' subgroups are changing permissions.
 					'apply_permissions' => 'Europe/Test',
+					// Permissions do not apply to a first-level group from existing subgroup.
 					'create' => 'Cities',
 					// "groups_before" parameter isn't used in test, but groups are listed here for test clarity.
 					'groups_before' => [
-						'All groups' => 'None',
-						'Cities/Cesis' => 'Read',
-						'Europe' =>	'Deny',
-						'Europe/Latvia' => 'Read',
-						'Europe/Latvia/Riga/Zabbix' => 'None',
-						'Europe/Test' => 'Read-write',
-						'Europe/Test/Zabbix' => 'None',
-						'Streets' => 'Deny'
+						[
+							'groups' => 'Europe/Test',
+							'Permissions' => 'Read-write'
+						],
+						[
+							'groups' => ['Cities/Cesis', 'Europe/Latvia'],
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Streets'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_before' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						['Host group' => 'Streets', 'Tags' => 'street']
+						['Host groups' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
+						['Host groups' => 'Europe', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test', 'Tags' => 'country: test'],
+						['Host groups' => 'Streets', 'Tags' => 'street']
 					],
 					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe' =>	'Deny',
-						'Europe/Latvia' => 'Read',
-						'Europe/Latvia/Riga/Zabbix' => 'None',
-						'Europe/Test (including subgroups)' => 'Read-write',
-						'Streets' => 'Deny'
+						[
+							'groups' => ['Europe/Test', 'Europe/Test/Zabbix'],
+							'Permissions' => 'Read-write'
+						],
+						[
+							'groups' => ['Cities/Cesis', 'Europe/Latvia'],
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Streets'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe' , 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'country: test'],
-						['Host group' => 'Streets', 'Tags' => 'street']
+						['Host groups' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
+						['Host groups' => 'Europe', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test', 'Tags' => 'country: test'],
+						['Host groups' => 'Europe/Test/Zabbix', 'Tags' => 'country: test'],
+						['Host groups' => 'Streets', 'Tags' => 'street']
 					]
 				]
 			],
 			[
 				[
+					// All 'Europe' subgroups are changing permissions.
 					'apply_permissions' => 'Europe',
+					// The new subgroup inherits the permissions of the first-level group.
 					'create' => 'Streets/Dzelzavas',
 					'groups_before' => [
-						'All groups' => 'None',
-						'Cities/Cesis' => 'Read',
-						'Europe' =>	'Deny',
-						'Europe/Latvia (including subgroups)' => 'Read',
-						'Europe/Test (including subgroups)' => 'Read-write',
-						'Streets' => 'Deny'
+						[
+							'groups' => ['Europe/Test', 'Europe/Test/Zabbix'],
+							'Permissions' => 'Read-write'
+						],
+						[
+							'groups' => ['Cities/Cesis', 'Europe/Latvia'],
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Streets'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_before' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						// For host group scenario, there will be additional tag 'country: test' for 'Europe/Test/Zabbix'
-						['Host group' => 'Streets', 'Tags' => 'street']
+						['Host groups' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
+						['Host groups' => 'Europe', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test', 'Tags' => 'country: test'],
+						['Host groups' => 'Streets', 'Tags' => 'street']
 					],
 					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe (including subgroups)' => 'Deny',
-						'Streets (including subgroups)' => 'Deny'
+						[
+							'groups' => 'Cities/Cesis',
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Europe/Latvia', 'Europe/Latvia/Riga/Zabbix',
+								'Europe/Test', 'Europe/Test/Zabbix', 'Streets', 'Streets/Dzelzavas'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Streets', 'Tags' => 'street'],
-						['Host group' => 'Streets/Dzelzavas', 'Tags' => 'street']
+						['Host groups' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
+						['Host groups' => 'Europe', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Latvia', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
+						['Host groups' => 'Streets', 'Tags' => 'street'],
+						['Host groups' => 'Streets/Dzelzavas', 'Tags' => 'street']
 					]
 				]
 			]
@@ -969,20 +876,12 @@ class testFormGroups extends CWebTest {
 	 * @param array $data  data provider
 	 */
 	public function checkSubgroupsPermissions($data) {
-		// Prepare groups array according framework function assertTableData().
-		$selector = 'xpath:.//input[@checked]/following-sibling::label';
-		$groups = [];
-		foreach ($data['groups_after'] as $group => $permissions) {
-			$groups[] = [
-				ucfirst($this->object).' group' => $group,
-				'Permissions' => [
-					'text' => $permissions,
-					'selector' => $selector
-				]
-			];
+		// Prepare groups array, change key to 'Host groups' or 'Template groups'.
+		foreach ($data['groups_after'] as &$group_permissions) {
+			$group_permissions[ucfirst($this->object).' groups'] = $group_permissions['groups'];
+			unset($group_permissions['groups']);
 		}
-		$data['groups_after'] = $groups;
-		array_unshift($data['groups_after'], [ucfirst($this->object).' group' => 'All groups', 'Permissions' => 'None']);
+		unset($group_permissions);
 
 		// Create new parent or subgroup to check nested permissions.
 		if (array_key_exists('create', $data)) {
@@ -1017,10 +916,9 @@ class testFormGroups extends CWebTest {
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.self::$user_groupid)->waitUntilReady();
 		$group_form = $this->query('id:user-group-form')->asForm()->one();
 		$group_form->selectTab(ucfirst($this->object).' permissions');
-		$this->assertTableData($data['groups_after'],
-				'id:'.(($this->object === 'template') ? 'template' : '').'group-right-table'
-		);
+		$group_form->getField('Permissions')->asMultifieldTable()->checkValue($data['groups_after']);
 		$group_form->selectTab('Problem tag filter');
+		// Tag permissions do not change for template groups.
 		$this->assertTableData(($this->object === 'template') ? $data['tags_before'] : $data['tags_after'],
 				'id:tag-filter-table'
 		);

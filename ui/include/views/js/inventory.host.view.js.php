@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,50 +43,41 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this._events.hostCreate);
-			overlay.$dialogue[0].addEventListener('dialogue.update', this._events.hostUpdate);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this._events.hostDelete);
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			});
 		}
 
+		_editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		}
+
 		_registerEvents() {
-			this._events = {
-				hostCreate(e) {
-					if ('success' in e.detail) {
-						clearMessages();
+			this.events = {
+				elementSuccess(e) {
+					const data = e.detail;
+					let curl = null;
 
-						const message_box = makeMessageBox('good', e.detail.success.messages ?? [],
-							e.detail.success.title
-						);
+					if ('success' in data) {
+						postMessageOk(data.success.title);
 
-						addMessage(message_box);
-					}
-				},
+						if ('messages' in data.success) {
+							postMessageDetails('success', data.success.messages);
+						}
 
-				hostUpdate(e) {
-					if ('success' in e.detail) {
-						postMessageOk(e.detail.success.title);
-
-						if ('messages' in e.detail.success) {
-							postMessageDetails('success', e.detail.success.messages);
+						if ('action' in data.success && data.success.action === 'delete') {
+							curl = new Curl('hostinventories.php').getUrl();
 						}
 					}
 
-					location.href = location.href;
-				},
-
-				hostDelete(e) {
-					if ('success' in e.detail) {
-						postMessageOk(e.detail.success.title);
-
-						if ('messages' in e.detail.success) {
-							postMessageDetails('success', e.detail.success.messages);
-						}
-					}
-
-					location.href = new Curl('hostinventories.php').getUrl();
+					location.href = curl === null ? location.href : curl;
 				}
 			};
 		}

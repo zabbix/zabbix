@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class CTableRowElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getColumns() {
-		$headers = $this->parent->getHeadersText();
+		$headers = $this->parent->getColumnNames();
 		$columns = [];
 
 		foreach ($this->query($this->column_selector)->all() as $i => $column) {
@@ -73,7 +73,7 @@ class CTableRowElement extends CElement {
 	 * @return CElement
 	 */
 	public function getColumn($column) {
-		$headers = $this->parent->getHeadersText();
+		$headers = $this->parent->getColumnNames();
 
 		if (is_string($column)) {
 			$index = array_search($column, $headers);

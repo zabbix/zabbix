@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,9 +93,9 @@ foreach ($data['groups'] as $group) {
 		}
 
 		if ($data['allowed_ui_conf_templates']) {
-			$templates_output[] = (new CLink($template['name'], (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $template['templateid'])))
+			$templates_output[] = (new CLink($template['name']))
+				->addClass('js-edit-template')
+				->setAttribute('data-templateid', $template['templateid'])
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
@@ -117,7 +117,8 @@ foreach ($data['groups'] as $group) {
 	$count = '';
 	if ($template_count > 0) {
 		if ($data['allowed_ui_conf_templates']) {
-			$count = new CLink($template_count, (new CUrl('templates.php'))
+			$count = new CLink($template_count, (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_groups', [$group['groupid']]));
 		}

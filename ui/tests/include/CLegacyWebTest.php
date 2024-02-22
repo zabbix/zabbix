@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,7 +247,7 @@ class CLegacyWebTest extends CWebTest {
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
 		$this->zbxTestClickXpathWait(
-			"//div[contains(@class, 'multiselect') and @id='$id']/../div[@class='multiselect-button']/button"
+			"//div[contains(@class, 'multiselect') and @id='$id']/..//button[contains(@class, 'multiselect-button')]"
 		);
 	}
 

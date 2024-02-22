@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @dataSource EntitiesTags
@@ -33,7 +33,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormServicesServices extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	const UPDATE = true;
 	const EDIT_BUTTON_PATH = 'xpath:.//button[@title="Edit"]';
@@ -42,15 +52,6 @@ class testFormServicesServices extends CWebTest {
 	private static $update_service = 'Update service';
 	private static $delete_service = 'Service for delete';
 	private static $serviceids;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function prepareServicesData() {
 		self::$serviceids = CDataHelper::get('Services.serviceids');
@@ -614,7 +615,7 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Service for duplitate check'
+						'Name' => 'Service for duplicate check'
 					],
 					'duplicate' => true
 				]
@@ -881,7 +882,7 @@ class testFormServicesServices extends CWebTest {
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
-				// There are 3 tables with class list-table, so it is specifified that is should be in the service list.
+				// There are 3 tables with class list-table, so it is specified that is should be in the service list.
 				$table = $this->query('xpath://form[@name="service_list"]//table')->asTable()->one()->waitUntilPresent();
 				$table->findRow('Name', $data['fields']['Name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 						->one()->click();

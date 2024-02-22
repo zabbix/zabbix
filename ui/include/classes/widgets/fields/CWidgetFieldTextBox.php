@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldTextBox extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTextBoxView::class;
 	public const DEFAULT_VALUE = '';
 
 	/**
@@ -33,26 +34,16 @@ class CWidgetFieldTextBox extends CWidgetField {
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this
-			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 */
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
 
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
+		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
 		}
 
-		return $this;
+		return $validation_rules;
 	}
 }

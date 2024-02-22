@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,9 +179,9 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 }
 
 // Watch MQTT plugin
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
+func (p *Plugin) Watch(items []*plugin.Item, ctx plugin.ContextProvider) {
 	impl.manager.Lock()
-	impl.manager.Update(ctx.ClientID(), ctx.Output(), requests)
+	impl.manager.Update(ctx.ClientID(), ctx.Output(), items)
 	impl.manager.Unlock()
 }
 

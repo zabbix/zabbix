@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,9 +23,8 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
-
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp,
-		int config_timeout, const char *config_source_ip);
+		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type);
 
 #endif

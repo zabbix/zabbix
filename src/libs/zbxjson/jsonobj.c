@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -272,11 +272,11 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 	switch (*data)
 	{
 		case '{':
-			if (0 == json_parse_object(data, obj, &error))
+			if (0 == json_parse_object(data, obj, 0, &error))
 				goto out;
 			break;
 		case '[':
-			if (0 == json_parse_array(data, obj, &error))
+			if (0 == json_parse_array(data, obj, 0, &error))
 				goto out;
 			break;
 		default:

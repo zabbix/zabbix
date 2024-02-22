@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,9 +119,9 @@ class CSortable extends CBaseComponent {
 	}
 
 	/**
-	 * Get list of items.
+	 * Get list element.
 	 *
-	 * @returns {HTMLCollection}
+	 * @returns {HTMLUListElement}
 	 */
 	getList() {
 		return this._list;

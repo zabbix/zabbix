@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +28,13 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup items
  */
 class testFormItemHttpAgent extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	/**
 	 * Host id used in test.
@@ -36,24 +45,21 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Check form fields after create or update item.
 	 */
 	private function checkFormFields($rows) {
-		$this->zbxTestClickLinkTextWait($rows['Name']);
+		$this->query('link:'.$rows['Name'])->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 
 		foreach ($rows as $field_name => $value) {
-			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@id]';
-			$tag = $this->query('xpath', $field_xpath)->one()->getTagName();
-			$field_id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
+			$form_field = $form->getField($field_name);
 
-			if ($tag === 'input' || $tag === 'textarea') {
-				if ($tag !== 'textarea' && $this->zbxTestGetAttributeValue($field_xpath, 'type') === 'checkbox') {
-					$this->assertEquals($value, $this->zbxTestCheckboxSelected($field_id));
-				}
-				else {
-					$this->zbxTestAssertElementValue($field_id, $value);
-				}
+			if ($field_name === 'Value mapping') {
+				$this->assertEquals($rows['Value mapping'], implode($form->getField('Value mapping')->asMultiselect()
+						->getSelected())
+				);
 			}
-			elseif ($tag === 'select') {
-				$this->zbxTestDropdownAssertSelected($field_id, $value);
+			else {
+			$this->assertEquals($value, $form_field->getValue());
 			}
 		}
 	}
@@ -62,29 +68,33 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Add, update, delete query or headers fields.
 	 */
 	private function processPairFields($rows, $id_part) {
+
+	$element_id = ($id_part === 'query_fields') ? 'query-fields' : 'headers';
+
 		foreach ($rows as $i => $field_pair) {
 			$i++;
 
 			switch (CTestArrayHelper::get($field_pair, 'action', 'add')) {
 				case 'add':
-					if (!$this->zbxTestElementPresentId($id_part.'_name_'.$i)) {
-						$this->zbxTestClickXpathWait('//div[contains(@id, "'.$id_part.'")]//button[@data-row-action="add_row"]');
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i));
+					if (!$this->zbxTestElementPresentId($id_part.'_'.($i-1).'_name')) {
+						COverlayDialogElement::find()->one()->waitUntilReady()
+								->query('xpath://div[contains(@id, "'.$element_id.'")]//button[@class="btn-link element-table-add"]')
+								->one()->click();
 					}
 					// break is not missing here.
 				case 'update':
 					if (array_key_exists('name', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i));
-						$this->zbxTestInputType($id_part.'_name_'.$i, $field_pair['name']);
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_'.($i-1).'_name'));
+						$this->zbxTestInputType($id_part.'_'.($i-1).'_name', $field_pair['name']);
 					}
 					if (array_key_exists('value', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_value_'.$i));
-						$this->zbxTestInputType($id_part.'_value_'.$i, $field_pair['value']);
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_'.($i-1).'_value'));
+						$this->zbxTestInputType($id_part.'_'.($i-1).'_value', $field_pair['value']);
 					}
 					break;
 
 				case 'remove':
-					$this->zbxTestClickXpathWait("//input[@id='".$id_part."_name_".$i."']/../..//button");
+					$this->query('xpath://table[@id="'.$element_id.'-table"]/tbody/tr['.$i.']/td[5]/button')->one()->click();
 					break;
 			}
 		}
@@ -94,15 +104,15 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Parse url and check result in query fields.
 	 */
 	private function parseUrlAndCheckQuery($rows, $parsed_url = false) {
-		$this->zbxTestClick('httpcheck_parseurl');
+		COverlayDialogElement::find()->one()->waitUntilready()->query('button:Parse')->one()->click();
 
 		foreach ($rows as $i => $parsed_query) {
-			$i += (!$this->zbxTestElementPresentId('query_fields_name_1') ? 2 : 1);
-			$name = $this->zbxTestGetValue("//input[@id='query_fields_name_".$i."']");
+			$i += (!$this->zbxTestElementPresentId('query_fields_0_name') ? 1 : 0);
+			$name = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_name']");
 			$this->assertEquals($parsed_query['name'], $name);
 
 			if (array_key_exists('value', $parsed_query)) {
-				$value = $this->zbxTestGetValue("//input[@id='query_fields_value_".$i."']");
+				$value = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_value']");
 				$this->assertEquals($value, $parsed_query['value']);
 			}
 		}
@@ -215,11 +225,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'step_name' => 'Step URL fragment part ignored',
-					'url' => 'http://www.zabbix.com/enterprise_ready#test',
+					'url' => 'https://www.zabbix.com/enterprise_ready#test',
 					'parsed_query' => [
 						['name' => '', 'value' => '']
 					],
-					'parsed_url' => 'http://www.zabbix.com/enterprise_ready'
+					'parsed_url' => 'https://www.zabbix.com/enterprise_ready'
 				]
 			],
 			// User macro in url.
@@ -273,10 +283,12 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getUrlParseData
 	 */
 	public function testFormItemHttpAgent_UrlParse($data) {
-		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID.'&context=host');
-		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
-
-		$this->zbxTestInputTypeWait('url', $data['url']);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->query('button:Create item')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+		$form = $dialog->asForm();
+		$form->getField('Type')->asDropdown()->select('HTTP agent');
+		$form->getField('URL')->type($data['url']);
 
 		// Type query fields.
 		if (array_key_exists('query', $data)) {
@@ -290,8 +302,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		// Check that URL parse failed.
 		if (array_key_exists('error', $data)) {
-			$this->zbxTestClick('httpcheck_parseurl');
-
+			$dialog->query('button:Parse')->one()->click();
 			$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");
 			$result = trim(preg_replace('/\s\s+/', ' ', $get_text));
 			$this->assertEquals($result, $data['error']);
@@ -302,12 +313,14 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Test form validation.
 	 */
 	private function executeValidation($data, $action) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 
 		switch ($action) {
 			case 'create':
 				$this->zbxTestContentControlButtonClickTextWait('Create item');
-				$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
+				$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+				$form = $dialog->asForm();
+				$form->getField('Type')->asDropdown()->select('HTTP agent');
 				break;
 
 			case 'update':
@@ -315,6 +328,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 				$old_hash = CDBHelper::getHash($sql_hash);
 				$this->zbxTestClickLinkTextWait($update_item);
+				$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+				$form = $dialog->asForm();
 				break;
 
 			case 'clone':
@@ -322,13 +337,15 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 				$old_hash = CDBHelper::getHash($sql_hash);
 				$this->zbxTestClickLinkTextWait($clone_item);
-				$this->zbxTestClickWait('clone');
+				COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Clone')->one()->click();
+				$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+				$form = $dialog->asForm();
 				break;
 		}
 
 		// Fill in fields.
 		if (array_key_exists('fields', $data)) {
-			$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
+			$form->fill($data['fields']);
 		}
 		if (array_key_exists('request_type', $data)) {
 			$this->zbxTestClickXpathWait("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
@@ -343,14 +360,14 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Press action button and check the result in DB.
 		switch ($action) {
 			case 'create':
-				$this->zbxTestClickWait('add');
+				$dialog->getFooter()->query('button:Add')->one()->click();
 				if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
 					$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
 				}
 				break;
 
 			case 'update':
-				$this->zbxTestClickWait('update');
+				$dialog->getFooter()->query('button:Update')->one()->click();
 				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 				if (!array_key_exists('error', $data)) {
 					$data['error'] = 'Cannot update item';
@@ -358,7 +375,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				break;
 
 			case 'clone':
-				$this->zbxTestClickWait('add');
+				$dialog->getFooter()->query('button:Add')->one()->click();
 				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 				if (!array_key_exists('error', $data)) {
 					$data['error'] = 'Cannot add item';
@@ -367,8 +384,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		}
 
 		// Check error message on posting the form.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
-		$this->zbxTestTextPresentInMessageDetails($data['error_details']);
+		$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
 	}
 
 	public static function getCreateValidationData() {
@@ -377,12 +393,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'error_details' => [
-						'Incorrect value for field "Name": cannot be empty.',
-						'Incorrect value for field "Key": cannot be empty.',
-						'Incorrect value for field "URL": cannot be empty.'
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "key": cannot be empty.'
 					],
 					'check_db' => false,
-					'error' => 'Page received incorrect data'
+					'error' => 'Cannot add item'
 				]
 			],
 			[
@@ -391,9 +406,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Name' => 'item without url',
 						'Key' => 'item-without-url'
 					],
-					'error' => 'Page received incorrect data',
+					'error' => 'Cannot add item',
 					'error_details' => [
-						'Incorrect value for field "URL": cannot be empty.'
+						'Invalid parameter "/1/url": cannot be empty.'
 					]
 				]
 			],
@@ -404,9 +419,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Key' => 'item-space-url',
 						'URL' => ' '
 					],
-					'error' => 'Page received incorrect data',
+					'error' => 'Cannot add item',
 					'error_details' => [
-						'Incorrect value for field "URL": cannot be empty.'
+						'Invalid parameter "/1/url": cannot be empty.'
 					]
 				]
 			],
@@ -423,7 +438,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -440,7 +455,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -456,7 +471,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -473,7 +488,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -490,24 +505,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item without second header value',
-						'Key' => 'item-without-second-header-value',
-						'URL' => 'zabbix.com'
-					],
-					'headers' => [
-						['name' => 'user', 'value' => 'admin'],
-						['name' => 'password']
-					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -523,7 +521,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -652,11 +650,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Key' => '',
 						'URL' => ''
 					],
-					'error' => 'Page received incorrect data',
 					'error_details' => [
-						'Incorrect value for field "Name": cannot be empty.',
-						'Incorrect value for field "Key": cannot be empty.',
-						'Incorrect value for field "URL": cannot be empty.'
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "key": cannot be empty.'
 					]
 				]
 			],
@@ -667,7 +663,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -678,18 +674,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
-					]
-				]
-			],
-			// Check header fields.
-			[
-				[
-					'headers' => [
-						['name' => 'user update', 'value' => '', 'action' => 'update']
-					],
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -699,7 +684,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin update', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -710,18 +695,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
-					]
-				]
-			],
-			[
-				[
-					'headers' => [
-						['name' => 'user update', 'value' => 'admin update', 'action' => 'update'],
-						['name' => 'user']
-					],
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -867,33 +841,28 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						// major fields
 						'Name' => 'item with all fields',
 						'Key' => 'all.fields',
-						'URL' => 'zabbix.com',
-						// selects
-						'Request type' => 'PUT',
-						'HTTP authentication' => 'Basic',
 						'Type of information' => 'Character',
-						'Value mapping' => 'Service state',
-						// inputs
-						'Timeout' => '1m',
+						'URL' => 'zabbix.com',
+						'Request type' => 'PUT',
+						'Request body' => '{"key":"value"}',
 						'Required status codes' => '0, 100-500',
+						'Follow redirects' => true,
+						'Convert to JSON' => true,
 						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
+						'HTTP authentication' => 'Basic',
 						'User name' => 'admin',
 						'Password' => 'zabbix',
+						'SSL verify peer' => true,
+						'SSL verify host' => true,
 						'SSL certificate file' => 'ssl_file',
 						'SSL key file' => 'ssl_key',
 						'SSL key password' => 'ssl_password',
-						// textarea
-						'Request body' => '{"key":"value"}',
-						'Description' => 'awesome item',
-						// checkbox
-						'Follow redirects' => true,
-						'Convert to JSON' => true,
+						'id:timeout' => '1m',
+						'Value mapping' => 'Service state',
 						'Enable trapping' => true,
-						'SSL verify peer' => true,
-						'SSL verify host' => true,
+						'Description' => 'awesome item',
 						'Enabled' => false
 					],
 					'query' => [
@@ -905,6 +874,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => 'Content-Type', 'value' => 'application/xml']
 					],
 					'request_type' => 'JSON data',
+					'override_timeout' => true,
 					'check_form' => true,
 					'screenshot' => true
 				]
@@ -968,15 +938,37 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getCreataData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
-		$this->zbxTestContentControlButtonClickTextWait('Create item');
-		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->query('button:Create item')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+		$form = $dialog->asForm();
+		$form->getField('Type')->asDropdown()->select('HTTP agent');
 
-		if (array_key_exists('request_type', $data)) {
-			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
+		if (array_key_exists('query', $data)) {
+			$this->processPairFields($data['query'], 'query_fields');
 		}
 
-		$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
+		if (array_key_exists('headers', $data)) {
+			$this->processPairFields($data['headers'], 'headers');
+		}
+
+		// Take a screenshot to test draggable object position of query and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($this->query('id:headers-table')->one(), 'Headers fields');
+		}
+
+		if (array_key_exists('request_type', $data)) {
+			$form->getField('id:post_type')->asSegmentedRadio()->select($data['request_type']);
+		}
+
+		if (array_key_exists('override_timeout', $data)) {
+			$form->getField('id:custom_timeout')->asSegmentedRadio()->select('Override');
+		}
+
+		$form->fill($data['fields']);
+
 		if (array_key_exists('HTTP authentication', $data['fields']) && $data['fields']['HTTP authentication'] != 'None') {
 			$this->zbxTestAssertVisibleId('http_username');
 			$this->zbxTestAssertVisibleId('http_password');
@@ -995,27 +987,12 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->$check("//input[@id='retrieve_mode_".$i."'][@disabled]");
 		}
 
-		if (array_key_exists('query', $data)) {
-			$this->processPairFields($data['query'], 'query_fields');
-		}
-
-		if (array_key_exists('headers', $data)) {
-			$this->processPairFields($data['headers'], 'headers');
-		}
-
-		// Take a screenshot to test draggable object position of query and headers fields.
-		if (array_key_exists('screenshot', $data)) {
-			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('id:query_fields_pairs')->one(), 'Query fields');
-			$this->assertScreenshot($this->query('id:headers_pairs')->one(), 'Headers fields');
-		}
-
 		// Check query fields after url parse.
 		if (array_key_exists('parsed_query', $data)) {
 			$this->parseUrlAndCheckQuery($data['parsed_query'], $data['parsed_url']);
 		}
 
-		$this->zbxTestClickWait('add');
+		$dialog->getFooter()->query('button:Add')->one()->click();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
 		$this->zbxTestTextPresent($data['fields']['Name']);
 
@@ -1135,32 +1112,26 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						// major fields
 						'Name' => 'Http agent item updated',
 						'Key' => 'update.all.fields',
 						'URL' => 'updatezabbix.com',
-						// selects
-						'Request type' => 'PUT',
-						'HTTP authentication' => 'Basic',
 						'Type of information' => 'Character',
-						'Value mapping' => 'Service state',
-						// inputs
-						'Timeout' => '1m',
+						'Request type' => 'PUT',
+						'Request body' => '{"key":"value"}',
+						'Follow redirects' => true,
+						'Convert to JSON' => true,
 						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
+						'HTTP authentication' => 'Basic',
 						'User name' => 'admin',
 						'Password' => 'zabbix',
 						'SSL certificate file' => 'ssl_file_update',
 						'SSL key file' => 'ssl_key_update',
 						'SSL key password' => 'ssl_password_update',
-						// textarea
-						'Request body' => '{"key":"value"}',
-						'Description' => 'awesome item update',
-						// checkbox
-						'Follow redirects' => true,
-						'Convert to JSON' => true,
-						'Enable trapping' => true,
 						'SSL verify peer' => true,
 						'SSL verify host' => true,
+						'id:timeout' => '1m',
+						'Value mapping' => 'Service state',
+						'Enable trapping' => true,
 						'Enabled' => false
 					],
 					'query' => [
@@ -1170,6 +1141,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['action' => 'remove']
 					],
 					'request_type' => 'JSON data',
+					'override_timeout' => true,
 					'check_form' => true
 				]
 			]
@@ -1188,21 +1160,29 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$data['fields']['Name'] = $update_item;
 		}
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($update_item);
+		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+		$form = $dialog->asForm();
 
-		$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
-		if (array_key_exists('request_type', $data)) {
-			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
-		}
 		if (array_key_exists('query', $data)) {
 			$this->processPairFields($data['query'], 'query_fields');
 		}
+
 		if (array_key_exists('headers', $data)) {
 			$this->processPairFields($data['headers'], 'headers');
 		}
 
-		$this->zbxTestClick('update');
+		if (array_key_exists('request_type', $data)) {
+			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
+		}
+
+		if (array_key_exists('override_timeout', $data)) {
+			$form->getField('id:custom_timeout')->asSegmentedRadio()->select('Override');
+		}
+
+		$form->fill($data['fields']);
+		$dialog->getFooter()->query('button:Update')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
@@ -1225,7 +1205,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 
 		$sql = 'SELECT name'.
 				' FROM items'.
@@ -1236,7 +1216,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		foreach (CDBHelper::getAll($sql) as $item) {
 			$this->zbxTestClickLinkText($item['name']);
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestClickWait('update');
+			$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+			$dialog->getFooter()->query('button:Update')->one()->click();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item updated');
 		}
 
@@ -1256,22 +1237,31 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE name='.zbx_dbstr($clone_item);
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($clone_item);
-		$this->zbxTestClickWait('clone');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+		$dialog->getFooter()->query('button:Clone')->one()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$cloned_form = $overlay->asForm();
 
-		$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
 		if (array_key_exists('request_type', $data)) {
 			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
+
 		if (array_key_exists('query', $data)) {
 			$this->processPairFields($data['query'], 'query_fields');
 		}
+
 		if (array_key_exists('headers', $data)) {
 			$this->processPairFields($data['headers'], 'headers');
 		}
 
-		$this->zbxTestClick('add');
+		if (array_key_exists('override_timeout', $data)) {
+			$cloned_form->getField('id:custom_timeout')->asSegmentedRadio()->select('Override');
+		}
+
+		$cloned_form->fill($data['fields']);
+		$overlay->getFooter()->query('button:Add')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
@@ -1295,9 +1285,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_Delete() {
 		$name = 'Http agent item for delete';
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickAndAcceptAlert('delete');
+		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item deleted');
@@ -1320,11 +1311,12 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
-		$this->zbxTestContentControlButtonClickTextWait('Create item');
-
-		$this->query('id:item-form')->asForm()->one()->fill($data);
-		$this->zbxTestClick('cancel');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->query('button:Create item')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+		$form = $dialog->asForm();
+		$form->fill($data);
+		$dialog->getFooter()->query('button:Cancel')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -1340,30 +1332,32 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	private function executeCancelAction($action) {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 
 		foreach (CDBHelper::getRandom('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.
 				' AND hostid='.self::HOSTID , 1) as $item) {
 			$name = $item['name'];
 			$this->zbxTestClickLinkText($name);
-
+			$dialog = COverlayDialogElement::find()->one()->waitUntilready();
+			$form = $dialog->asForm();
 			switch ($action) {
 				case 'update':
 					$name .= ' (updated)';
-					$this->zbxTestInputTypeOverwrite('name', $name);
-					$this->zbxTestClick('cancel');
+					$form->getField('Name')->fill('$name');
+					$dialog->getFooter()->query('button:Cancel')->one()->click();
 					break;
 
 				case 'clone':
 					$name .= ' (cloned)';
-					$this->zbxTestInputTypeOverwrite('name', $name);
-					$this->zbxTestClickWait('clone');
-					$this->zbxTestClickWait('cancel');
+					$form->getField('Name')->fill('$name');
+					$dialog->getFooter()->query('button:Clone')->one()->click();
+					$dialog->getFooter()->query('button:Cancel')->one()->click();
 					break;
 
 				case 'delete':
-					$this->zbxTestClickWait('delete');
-					$this->zbxTestDismissAlert();
+					$dialog->getFooter()->query('button:Delete')->one()->click();
+					$this->page->dismissAlert();
+					$dialog->close();
 					break;
 			}
 

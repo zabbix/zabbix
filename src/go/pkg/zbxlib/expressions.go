@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,14 @@ func MatchGlobalRegexp(
 
 	cvalue := C.CString(value)
 	cpattern := C.CString(pattern)
+
+	defer func() {
+		log.Tracef("Calling C function \"free(cvalue)\"")
+		defer C.free(unsafe.Pointer(cvalue))
+		log.Tracef("Calling C function \"free(cpattern)\"")
+		defer C.free(unsafe.Pointer(cpattern))
+	}()
+
 	var ctemplate, coutput *C.char
 	if output_template != nil {
 		ctemplate = C.CString(*output_template)
@@ -105,10 +113,6 @@ func MatchGlobalRegexp(
 		err = errors.New("invalid global regular expression")
 	}
 
-	log.Tracef("Calling C function \"free()\"")
-	C.free(unsafe.Pointer(cvalue))
-	log.Tracef("Calling C function \"free()\"")
-	C.free(unsafe.Pointer(cpattern))
 	if coutput != nil {
 		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(coutput))

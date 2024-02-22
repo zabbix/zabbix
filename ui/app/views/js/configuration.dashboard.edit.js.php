@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, widget_defaults, widget_last_type, time_period, page}) {
+		init({dashboard, widget_defaults, widget_last_type, dashboard_time_period, page}) {
 			this.dashboard = dashboard;
 			this.page = page;
 
@@ -53,7 +53,7 @@
 				},
 				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-				cell_height: 70,
+				cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
@@ -64,17 +64,29 @@
 				is_edit_mode: true,
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
-				time_period,
-				dynamic_hostid: null
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				}
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
 
 			ZABBIX.Dashboard.activate();
 
@@ -197,6 +209,23 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
+		},
+
 		events: {
 			addClick(e) {
 				const menu = [
@@ -258,6 +287,31 @@
 			idle() {
 				view.is_busy = false;
 				view.updateBusy();
+			},
+
+			templateSuccess(e) {
+				const data = e.detail;
+				let curl = null;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('zabbix.php');
+						curl.setArgument('action', 'template.list');
+					}
+				}
+
+				if (curl == null) {
+					location.href = location.href;
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			}
 		}
 	}

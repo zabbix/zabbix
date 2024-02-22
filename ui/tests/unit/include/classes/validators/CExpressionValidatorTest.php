@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,9 +50,17 @@ class CExpressionValidatorTest extends TestCase {
 
 			['avg(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['kurtosis(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['mad(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['max(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['min(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['skewness(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['stddevpop(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['stddevsamp(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sumofsquares(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['varpop(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['varsamp(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
 			['avg(max_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(max_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
@@ -161,7 +169,19 @@ class CExpressionValidatorTest extends TestCase {
 			['foo(1, 2, 3)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
 			['change(1, 2, 3)', [], ['rc' => false, 'error' => 'incorrect usage of function "change"']],
 			['count(123)', [], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
-			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']]
+			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']],
+			['jsonpath(/host/item)', [], ['rc' => false, 'error' => 'incorrect usage of function "jsonpath"']],
+			['jsonpath(/host/item, "$.path")', [], ['rc' => false, 'error' => 'incorrect usage of function "jsonpath"']],
+			['jsonpath(last(/host/item))', [], ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+			['jsonpath(last(/host/item), "$.path")', [], ['rc' => true, 'error' => null]],
+			['jsonpath(last(/host/item), "$.path", "fallback")', [], ['rc' => true, 'error' => null]],
+			['jsonpath(last(/host/item), "$.path", "fallback", "extra param")', [], ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+			['xmlxpath(/host/item)', [], ['rc' => false, 'error' => 'incorrect usage of function "xmlxpath"']],
+			['xmlxpath(/host/item, "/path")', [], ['rc' => false, 'error' => 'incorrect usage of function "xmlxpath"']],
+			['xmlxpath(last(/host/item))', [], ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']],
+			['xmlxpath(last(/host/item), "/path")', [], ['rc' => true, 'error' => null]],
+			['xmlxpath(last(/host/item), "/path", "fallback")', [], ['rc' => true, 'error' => null]],
+			['xmlxpath(last(/host/item), "/path", "fallback", "extra param")', [], ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']]
 		];
 	}
 

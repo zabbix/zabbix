@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ class CAuditOld {
 		CAudit::RESOURCE_MAP =>					['sysmapid', 'name', 'sysmaps', 'map'],
 		CAudit::RESOURCE_MEDIA_TYPE =>			['mediatypeid', 'name', 'media_type', 'mediatype'],
 		CAudit::RESOURCE_MODULE =>				['moduleid', 'id', 'module', 'module'],
-		CAudit::RESOURCE_PROXY =>				['proxyid', 'host', 'hosts', 'proxy'],
+		CAudit::RESOURCE_PROXY =>				['proxyid', 'name', 'proxy', 'proxy'],
 		CAudit::RESOURCE_SCENARIO =>			['httptestid', 'name', 'httptest', 'httptest'],
 		CAudit::RESOURCE_SCHEDULED_REPORT =>	['reportid', 'name', 'report', 'report'],
 		CAudit::RESOURCE_SCRIPT =>				['scriptid', 'name', 'scripts', 'script'],

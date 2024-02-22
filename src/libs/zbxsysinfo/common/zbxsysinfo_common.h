@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ zbx_metric_t	*get_parameters_common(void);
 zbx_metric_t	*get_parameters_common_local(void);
 
 int	execute_user_parameter(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	execute_str(const char *command, AGENT_RESULT *result);
-int	execute_dbl(const char *command, AGENT_RESULT *result);
-int	execute_int(const char *command, AGENT_RESULT *result);
+int	execute_str(const char *command, AGENT_RESULT *result, int timeout);
+int	execute_dbl(const char *command, AGENT_RESULT *result, int timeout);
+int	execute_int(const char *command, AGENT_RESULT *result, int timeout);
 
 #endif

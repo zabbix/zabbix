@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -358,6 +358,7 @@ void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source)
  *                                                                            *
  * Parameters: data_source - [IN] pointer to data source structure            *
  *             query       - [IN] SQL query                                   *
+ *             timeout     - [IN] query / connection timeout                  *
  *             error       - [OUT] error message                              *
  *                                                                            *
  * Return value: pointer to opaque query result structure or NULL in case of  *
@@ -366,7 +367,8 @@ void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source)
  * Comments: It is caller's responsibility to free error buffer!              *
  *                                                                            *
  ******************************************************************************/
-zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_source, const char *query, char **error)
+zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_source, const char *query, int timeout,
+		char **error)
 {
 	char			*diag = NULL;
 	zbx_odbc_query_result_t	*query_result = NULL;
@@ -386,6 +388,12 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 
 	if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 	{
+		rc = SQLSetStmtAttr(query_result->hstmt, SQL_ATTR_QUERY_TIMEOUT, (SQLPOINTER)(intptr_t)timeout,
+				(SQLINTEGER)0);
+
+		if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot set SQL_ATTR_QUERY_TIMEOUT statement attribute: %s", diag);
+
 		rc = SQLExecDirect(query_result->hstmt, (SQLCHAR *)query, SQL_NTS);
 
 		if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))

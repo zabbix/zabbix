@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import (
 	"zabbix.com/pkg/pdh"
 )
 
-func (p *Plugin) getUsersNum() (num int, err error) {
+func (p *Plugin) getUsersNum(timeout int) (num int, err error) {
 	var value *int64
 	value, err = pdh.GetCounterInt64(pdh.CounterPath(pdh.ObjectTerminalServices, pdh.CounterTotalSessions))
 	if err != nil || value == nil {

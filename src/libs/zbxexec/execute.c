@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -216,7 +216,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 		exit(EXIT_FAILURE);
 	}
 
-	execl("/bin/sh", "sh", "-c", command, NULL);
+	execl("/bin/sh", "sh", "-c", command, (char *)NULL);
 
 	/* restore original stdout and stderr, because we don't want our output to be confused with script's output */
 
@@ -659,7 +659,7 @@ int	zbx_execute_nowait(const char *command)
 			zbx_redirect_stdio(NULL);
 
 			/* replace the process with actual command to be executed */
-			execl("/bin/sh", "sh", "-c", command, NULL);
+			execl("/bin/sh", "sh", "-c", command, (char *)NULL);
 
 			/* execl() returns only when an error occurs */
 			zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));

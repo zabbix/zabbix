@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ static int	DBpatch_6030000(void)
 			"'ui.services.actions',"
 			"'ui.administration.general')");
 
-	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
+			(char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -541,7 +542,8 @@ static int	DBpatch_6030063(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
+	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config",
+			(char *)NULL);
 
 	for (i = 0; i < (int)ARRSIZE(modules); i++)
 	{
@@ -1605,7 +1607,7 @@ static int	DBpatch_6030188(void)
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "media_type_param", "mediatype_paramid", "mediatypeid", "name", "value",
-			"sortorder", NULL);
+			"sortorder", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{

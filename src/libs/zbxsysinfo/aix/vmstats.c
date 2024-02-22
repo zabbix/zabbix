@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
 	int	wait = ZBX_MAX_WAIT_VMSTAT;
 #undef ZBX_MAX_WAIT_VMSTAT
+	zbx_collector_data	*collector = get_collector();
+
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
@@ -271,12 +273,12 @@ static zbx_uint64_t	last_rblks = 0;			/* 512 bytes blocks read from all disks */
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update vmstat values at most once per second                      *
+ * Purpose: updates vmstat values at most once per second                     *
  *                                                                            *
- * Parameters: vmstat - a structure containing vmstat data                    *
+ * Parameters: vmstat - structure containing vmstat data                      *
  *                                                                            *
- * Comments: on first iteration only save last data, on second - set vmstat   *
- *           data and indicate that it is available                           *
+ * Comments: On the first iteration only saves last data, on the second -     *
+ *           sets vmstat data and indicates that it is available.             *
  *                                                                            *
  ******************************************************************************/
 static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)

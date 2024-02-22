@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectItemPrototype;
 
 class CWidgetFieldMultiSelectItemPrototypeView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectItemPrototype $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectItemPrototype $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
 		return 'item_prototypes';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Item prototype'), 'objects' => _('Item prototypes')];
 	}
 
 	protected function getPopupParameters(): array {

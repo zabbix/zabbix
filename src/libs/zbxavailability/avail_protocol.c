@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,18 +187,18 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 }
 
 zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_proxy_hostdata_ptr_t *hosts,
-		zbx_uint64_t proxy_hostid)
+		zbx_uint64_t proxyid)
 {
 	zbx_uint32_t	data_len = 0;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, proxy_hostid);
+	zbx_serialize_prepare_value(data_len, proxyid);
 	zbx_serialize_prepare_value(data_len, hosts->values_num);
 
 	data_len += (zbx_uint32_t)(sizeof(zbx_uint64_t) + sizeof(int)) * (zbx_uint32_t)hosts->values_num;
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
-	ptr += zbx_serialize_value(ptr, proxy_hostid);
+	ptr += zbx_serialize_value(ptr, proxyid);
 	ptr += zbx_serialize_value(ptr, hosts->values_num);
 
 	for (int i = 0; i < hosts->values_num; i++)
@@ -215,11 +215,11 @@ zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx
 }
 
 void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
-		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxy_hostid)
+		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxyid)
 {
 	int	values_num;
 
-	data += zbx_deserialize_value(data, proxy_hostid);
+	data += zbx_deserialize_value(data, proxyid);
 	data += zbx_deserialize_value(data, &values_num);
 
 	if (0 == values_num)

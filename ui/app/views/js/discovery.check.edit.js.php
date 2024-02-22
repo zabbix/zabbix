@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ window.check_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this._loadViews();
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	_loadViews() {
@@ -174,11 +176,14 @@ window.check_popup = new class {
 		];
 
 		return results.some(result => {
-			if (!result.type) {
+			if (!result.type || result.dcheckid === dcheck.dcheckid) {
 				return false;
 			}
-			if (result.dcheckid === dcheck.dcheckid) {
-				return false;
+
+			if ([<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(result.type))
+					&& "key_" in result) {
+				result.snmp_oid = result.key_;
+				delete result.key_;
 			}
 
 			const check = lookup.find(entry => entry.types.includes(parseInt(result.type)));

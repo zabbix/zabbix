@@ -144,7 +144,7 @@ out:
   return: SUCCEED
 
 ---
-test case: utf16 BE noBOM with enconding
+test case: utf16 BE noBOM with encoding
 in:
   encoding: 'UTF-16BE'
   buffer_length: 4
@@ -195,6 +195,58 @@ in:
   buffer:
     - '\xFF\xFE\x00\x00\x11\x00\x00\x00'
 out:
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: SUCCEED
+---
+test case: invalid encoding supplied 1
+in:
+  encoding: 'BADGER'
+  buffer_length: 2
+  buffer:
+    - '\xFE\xFF'
+out:
+  error: "Failed to convert from encoding BADGER to utf8. Error: [22] Invalid argument."
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: FAIL
+---
+test case: invalid encoding supplied 2
+in:
+  encoding: 'UTF'
+  buffer_length: 2
+  buffer:
+    - '\xFE\xFF'
+out:
+  error: "Failed to convert from encoding UTF to utf8. Error: [22] Invalid argument."
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: FAIL
+---
+test case: invalid encoding supplied, but iconv cannot detect this
+in:
+  encoding: '🌭'
+  buffer_length: 2
+  buffer:
+    - '\xFE\xFF'
+out:
+  error: ""
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: SUCCEED
+---
+test case: invalid encoding supplied, but iconv cannot detect this 2
+in:
+  encoding: 'кирпич'
+  buffer_length: 2
+  buffer:
+    - '\xFE\xFF'
+out:
+  error: ""
   expected_result_buffer_length: 0
   expected_result_buffer:
     - ''

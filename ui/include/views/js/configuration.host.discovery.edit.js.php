@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,9 +99,12 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 <script>
 	const view = {
 		form_name: null,
+		context: null,
 
-		init({form_name, counter}) {
+		init({form_name, counter, context, token}) {
 			this.form_name = form_name;
+			this.context = context;
+			this.token = token;
 
 			$('#conditions')
 				.dynamicRows({
@@ -173,6 +176,12 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.on('click', 'button.element-table-add', () => {
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});
+
+			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-item`);
+
+			if (button instanceof Element) {
+				button.addEventListener('click', e => this.executeNow(e.target));
+			}
 		},
 
 		updateExpression() {
@@ -203,19 +212,22 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}
 		},
 
-		checkNow(button) {
+		executeNow(button) {
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
+			curl.setArgument('action', 'item.execute');
+
+			const data = {
+				...this.token,
+				itemids: [document.querySelector(`[name="${this.form_name}"] [name="itemid"]`).value],
+				discovery_rule: 1
+			};
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: [document.getElementById('itemid').value], discovery_rule: 1})
+				body: JSON.stringify(data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -256,6 +268,13 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			this.openHostPopup(host_data);
 		},
 
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
 		openHostPopup(host_data) {
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
@@ -264,12 +283,43 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+		},
+
+		editProxy(e, proxyid) {
+			e.preventDefault();
+			const proxy_data = {proxyid};
+
+			this.openProxyPopup(proxy_data);
+		},
+
+		openProxyPopup(proxy_data) {
+			const overlay = PopUp('popup.proxy.edit', proxy_data, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context)
+			);
 		},
 
 		refresh() {
@@ -292,8 +342,9 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -301,26 +352,19 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				view.refresh();
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('host_discovery.php');
+						curl.setArgument('context', context);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
+				if (curl) {
+					location.href = curl.getUrl();
+				}
+				else {
+					view.refresh();
+				}
 			}
 		}
 	};

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
-
-extern int	CONFIG_TRAPPER_TIMEOUT;
 
 void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 **/
 
 #include "zbxcommon.h"
+
+#include "zbxstr.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 {
@@ -228,14 +230,14 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: print application parameters on stdout with layout suitable for   *
+ * Purpose: prints application parameters on stdout with layout suitable for  *
  *          80-column terminal                                                *
  *                                                                            *
- * Comments:  usage_message - is global variable which must be initialized    *
- *                            in each zabbix application                      *
+ * Parameters:  usage_message - [IN]                                          *
+ *              progname      - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_usage(void)
+void	zbx_print_usage(const char **usage_message, const char *progname)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -243,7 +245,7 @@ void	zbx_usage(void)
 	const char	**p = usage_message;
 
 	if (NULL != *p)
-		printf("usage:\n");
+		printf("Usage:\n");
 
 	while (NULL != *p)
 	{
@@ -281,34 +283,48 @@ void	zbx_usage(void)
 }
 
 static const char	copyright_message[] =
-	"Copyright (C) 2023 Zabbix SIA\n"
+	"Copyright (C) 2024 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
 static const char	help_message_footer[] =
 	"Report bugs to: <https://support.zabbix.com>\n"
-	"Zabbix home page: <http://www.zabbix.com>\n"
+	"Zabbix home page: <https://www.zabbix.com>\n"
 	"Documentation: <https://www.zabbix.com/documentation>";
 
 /******************************************************************************
  *                                                                            *
- * Purpose: print help of application parameters on stdout by application     *
+ * Purpose: prints help of application parameters on stdout by application    *
  *          request with parameter '-h'                                       *
  *                                                                            *
- * Comments:  help_message - is global variable which must be initialized     *
- *                            in each zabbix application                      *
+ * Parameters: param         - [IN] pointer to modification parameter         *
+ *             help_message  - [IN]                                           *
+ *             usage_message - [IN]                                           *
+ *             progname      - [IN]                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_help(void)
+void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname)
 {
 	const char	**p = help_message;
 
-	zbx_usage();
+	zbx_print_usage(usage_message, progname);
 	printf("\n");
 
 	while (NULL != *p)
+	{
+		if (NULL != param && NULL != strstr(*p, "{DEFAULT_CONFIG_FILE}"))
+		{
+			char	*ptr;
+
+			ptr = zbx_string_replace(*p++, "{DEFAULT_CONFIG_FILE}", param);
+			printf("%s\n", ptr);
+			zbx_free(ptr);
+			continue;
+		}
+
 		printf("%s\n", *p++);
+	}
 
 	printf("\n");
 	puts(help_message_footer);
@@ -319,11 +335,8 @@ void	zbx_help(void)
  * Purpose: print version and compilation time of application on stdout       *
  *          by application request with parameter '-V'                        *
  *                                                                            *
- * Comments:  title_message - is global variable which must be initialized    *
- *                            in each zabbix application                      *
- *                                                                            *
  ******************************************************************************/
-void	zbx_version(void)
+void	zbx_print_version(const char *title_message)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
@@ -535,27 +548,6 @@ unsigned int	zbx_alarm_off(void)
 int	zbx_alarm_timed_out(void)
 {
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Print error text to the stderr                                    *
- *                                                                            *
- * Parameters: fmt - format of message                                        *
- *                                                                            *
- ******************************************************************************/
-void	zbx_error(const char *fmt, ...)
-{
-	va_list	args;
-
-	va_start(args, fmt);
-
-	fprintf(stderr, "%s [%li]: ", progname, zbx_get_thread_id());
-	vfprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
-	fflush(stderr);
-
-	va_end(args);
 }
 
 zbx_uint64_t	suffix2factor(char c)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,10 +147,12 @@ class CZabbixServer {
 	 * @param string      $sid
 	 * @param null|string $hostid
 	 * @param null|string $eventid
+	 * @param null|string $manualinput
 	 *
 	 * @return bool|array
 	 */
-	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null) {
+	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null,
+			$manualinput = null) {
 		$params = [
 			'request' => 'command',
 			'scriptid' => $scriptid,
@@ -166,7 +168,32 @@ class CZabbixServer {
 			$params['eventid'] = $eventid;
 		}
 
+		if ($manualinput !== null) {
+			$params['manualinput'] = $manualinput;
+		}
+
 		return $this->request($params);
+	}
+
+	/**
+	 * @param array  $data
+	 *        string $data['itemid']  (optional) Item ID.
+	 *        string $data['host']    (optional) Technical name of the host.
+	 *        string $data['key']     (optional) Item key.
+	 *        string $data['value']   Item value.
+	 *        string $data['clock']   (optional) Time when the value was received.
+	 *        string $data['ns']      (optional) Nanoseconds when the value was received.
+	 * @param string $sid             User session ID or user API token.
+	 *
+	 * @return array|bool
+	 */
+	public function pushHistory(array $data, string $sid) {
+		return $this->request([
+			'request' => 'history.push',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
 	}
 
 	/**
@@ -198,18 +225,12 @@ class CZabbixServer {
 	/**
 	 * Request server to test item.
 	 *
-	 * @param array  $data    Array of item properties to test.
-	 * @param string $sid     User session ID.
+	 * @param array  $data  Array of item properties to test.
+	 * @param string $sid   User session ID.
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
-	public function testItem(array $data, $sid) {
-		/*
-		 * Timeout for 'item.test' request is increased because since message can be forwarded from server to proxy and
-		 * later to agent, it might take more time due network latency.
-		 */
-		$this->timeout = 60;
-
+	public function testItem(array $data, string $sid) {
 		return $this->request([
 			'request' => 'item.test',
 			'data' => $data,

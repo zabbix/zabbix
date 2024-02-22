@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,9 +63,7 @@ class CControllerDashboardWidgetView extends CController {
 	protected function checkInput(): bool {
 		$this->widget = APP::ModuleManager()->getActionModule();
 
-		$validation_rules = $this->validation_rules;
-
-		$ret = $this->validateInput($validation_rules);
+		$ret = $this->validateInput($this->validation_rules);
 
 		if ($ret) {
 			$this->form = $this->widget->getForm($this->getInput('fields', []),

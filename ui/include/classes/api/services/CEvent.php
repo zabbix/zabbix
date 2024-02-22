@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with events.
+ * Event API implementation.
  */
 class CEvent extends CApiService {
 
@@ -33,102 +33,96 @@ class CEvent extends CApiService {
 	protected $tableAlias = 'e';
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
 
-	/**
-	 * Array of supported objects where keys are object IDs and values are translated object names.
-	 *
-	 * @var array
-	 */
-	protected $objects = [];
+	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns',
+		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata',
+		'suppressed', 'urls'
+	];
 
 	/**
-	 * Array of supported sources where keys are source IDs and values are translated source names.
-	 *
-	 * @var array
-	 */
-	protected $sources = [];
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->sources = eventSource();
-		$this->objects = eventObject();
-	}
-
-	/**
-	 * Get events data.
-	 *
 	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['eventids']
-	 * @param array $options['status']
-	 * @param bool  $options['editable']
-	 * @param array $options['count']
-	 * @param array $options['pattern']
-	 * @param array $options['limit']
-	 * @param array $options['order']
 	 *
-	 * @return array|int item data as array or false if error
+	 * @throws APIException
+	 *
+	 * @return array|string
 	 */
-	public function get($options = []) {
-		$defOptions = [
-			'eventids'					=> null,
-			'groupids'					=> null,
-			'hostids'					=> null,
-			'objectids'					=> null,
-
-			'editable'					=> false,
-			'object'					=> EVENT_OBJECT_TRIGGER,
-			'source'					=> EVENT_SOURCE_TRIGGERS,
-			'severities'				=> null,
-			'nopermissions'				=> null,
-			// filter
-			'value'						=> null,
-			'time_from'					=> null,
-			'time_till'					=> null,
-			'eventid_from'				=> null,
-			'eventid_till'				=> null,
-			'problem_time_from'			=> null,
-			'problem_time_till'			=> null,
-			'acknowledged'				=> null,
-			'suppressed'				=> null,
-			'symptom'					=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
-			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectRelatedObject'		=> null,
-			'select_alerts'				=> null,
-			'select_acknowledges'		=> null,
-			'selectSuppressionData'		=> null,
-			'selectTags'				=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
+	public function get(array $options = []) {
+		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity',
+			'new_severity', 'suppress_until', 'taskid'
 		];
-		$options = zbx_array_merge($defOptions, $options);
+		$alert_output_fields = array_diff(CAlert::OUTPUT_FIELDS, ['eventid']);
 
-		$this->validateGet($options);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'eventids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'groupids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'objectids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'source' =>					['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]), 'default' => EVENT_SOURCE_TRIGGERS],
+			'object' =>					['type' => API_INT32, 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE, EVENT_OBJECT_AUTOREGHOST, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]), 'default' => EVENT_OBJECT_TRIGGER],
+			'value' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'uniq' => true, 'default' => null],
+			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
+			'trigger_severities' =>		['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
+			'eventid_from' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'eventid_till' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'problem_time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'problem_time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'acknowledged' =>			['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => ZBX_PROBLEM_UPDATE_CLOSE.':'.(ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM), 'default' => null],
+			'action_userids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'suppressed' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'symptom' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>					['type' => API_STRING_UTF8]
+			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'cause_eventid']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			'groupBy' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => null],
+			'select_acknowledges' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
+			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
+			'select_alerts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
+			'selectAlerts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $alert_output_fields), 'default' => null],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
+			'selectRelatedObject' =>	['type' => API_MULTIPLE, 'default' => null, 'rules' => [
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_TRIGGER], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CTrigger::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDHost::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DSERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDService::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_AUTOREGHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => ''],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_ITEM], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CItem::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CService::OUTPUT_FIELDS)]
+			]],
+			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
+			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			// sort and limit
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', array_merge($this->sortColumns, ['rowscount'])), 'uniq' => true, 'default' => []],
+			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
+			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>					['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>				['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>				['type' => API_BOOLEAN, 'default' => false]
+		]];
 
-		if ($options['value'] !== null) {
-			zbx_value2array($options['value']);
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
 				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['value'] === null) {
-				$options['value'] = ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null)
+				$options['value'] = $options['problem_time_from'] !== null && $options['problem_time_till'] !== null
 					? [TRIGGER_VALUE_TRUE]
 					: [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE];
 			}
@@ -139,150 +133,143 @@ class CEvent extends CApiService {
 			$recovery = in_array(TRIGGER_VALUE_FALSE, $options['value'])
 				? $this->getEvents(['value' => [TRIGGER_VALUE_FALSE]] + $options)
 				: [];
-			if ($options['countOutput']) {
-				$problems = ($problems === []) ? 0 : $problems;
-				$recovery = ($recovery === []) ? 0 : $recovery;
 
-				if ($options['groupCount']) {
-					$problems = zbx_toHash($problems, 'objectid');
-					$recovery = zbx_toHash($recovery, 'objectid');
+			if ($options['countOutput']) {
+				if ($options['groupBy']) {
+					$problems = array_column($problems, null, 'objectid');
+					$recovery = array_column($recovery, null, 'objectid');
 
 					foreach ($problems as $objectid => &$problem) {
 						if (array_key_exists($objectid, $recovery)) {
-							$problem['rowscount'] += $recovery['rowscount'];
+							$problem['rowscount'] = (string) (
+								$problem['rowscount'] + $recovery[$objectid]['rowscount']
+							);
 							unset($recovery[$objectid]);
 						}
 					}
 					unset($problem);
 
-					$result = array_values($problems + $recovery);
+					$db_events = array_values($problems + $recovery);
 				}
 				else {
-					$result = $problems + $recovery;
+					$db_events = (int) $problems + (int) $recovery;
 				}
 			}
 			else {
-				$result = self::sortResult($problems + $recovery, $options['sortfield'], $options['sortorder']);
+				$db_events = self::sortResult($problems + $recovery, $options['sortfield'], $options['sortorder']);
 
 				if ($options['limit'] !== null) {
-					$result = array_slice($result, 0, $options['limit'], true);
+					$db_events = array_slice($db_events, 0, $options['limit'], true);
 				}
 			}
 		}
 		else {
-			$result = $this->getEvents($options);
+			$db_events = $this->getEvents($options);
 		}
 
-		if ($options['countOutput']) {
-			return is_array($result) ? $result : (string) $result;
+		if ($options['countOutput'] || $options['groupBy']) {
+			return is_array($db_events) ? $db_events : (string) $db_events;
 		}
 
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
+		if ($db_events) {
+			$db_events = $this->addRelatedObjects($options, $db_events);
+			$db_events = $this->unsetExtraFields($db_events, ['eventid', 'object', 'objectid'], $options['output']);
+
+			if (!$options['preservekeys']) {
+				$db_events = array_values($db_events);
+			}
 		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
-		}
-
-		return $result;
+		return $db_events;
 	}
 
 	/**
 	 * Returns the list of events.
 	 *
-	 * @param array     $options
+	 * @param array $options
+	 *
+	 * @return array|string
 	 */
 	private function getEvents(array $options) {
-		$sqlParts = [
-			'select'	=> [$this->fieldId('eventid')],
-			'from'		=> ['e' => 'events e'],
-			'where'		=> [],
-			'order'		=> [],
-			'group'		=> [],
-			'limit'		=> null
-		];
+		$db_events = [];
+
+		$res = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
+
+		while ($event = DBfetch($res)) {
+			if ($options['countOutput']) {
+				if ($options['groupBy']) {
+					$db_events[] = $event;
+				}
+				else {
+					$db_events = $event['rowscount'];
+				}
+			}
+			elseif ($options['groupBy']) {
+				$db_events[] = $event;
+			}
+			else {
+				$db_events[$event['eventid']] = $event;
+			}
+		}
+
+		return $db_events;
+	}
+
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		// source and object
-		$sqlParts['where'][] = 'e.source='.zbx_dbstr($options['source']);
-		$sqlParts['where'][] = 'e.object='.zbx_dbstr($options['object']);
+		$sql_parts['where'][] = dbConditionInt('e.source', [$options['source']]);
+		$sql_parts['where'][] = dbConditionInt('e.object', [$options['object']]);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				$sql_parts['where'][] = '1=0';
+			}
+			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-				// specific triggers
-				if ($options['objectids'] !== null) {
-					$options['objectids'] = array_keys(API::Trigger()->get([
-						'output' => [],
-						'triggerids' => $options['objectids'],
-						'editable' => $options['editable'],
-						'preservekeys' => true
-					]));
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
-				// all triggers
-				else {
-					$sqlParts['where'][] = 'NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f,items i,hosts_groups hgg'.
-							' LEFT JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE e.objectid=f.triggerid'.
-							' AND f.itemid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY i.hostid'.
-						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-							' OR MIN(permission) IS NULL'.
-							' OR MIN(permission)='.PERM_DENY.
-					')';
-				}
+
+				$sql_parts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f1'.
+					' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
+						' AND p1.ugsetid=p.ugsetid'.
+					' WHERE e.objectid=f1.triggerid'.
+						' AND p1.permission IS NULL'.
+				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
-					$sqlParts = self::addTagFilterSqlParts($user_groups, $sqlParts, $options['value'][0]);
+					$sql_parts = self::addTagFilterSqlParts(getUserGroupsByUserId(self::$userData['userid']),
+						$sql_parts, $options['value'][0]
+					);
 				}
 			}
-			// items and LLD rules
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				// specific items or LLD rules
-				if ($options['objectids'] !== null) {
-					if ($options['object'] == EVENT_OBJECT_ITEM) {
-						$items = API::Item()->get([
-							'output' => ['itemid'],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable']
-						]);
-						$options['objectids'] = zbx_objectValues($items, 'itemid');
-					}
-					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-						$items = API::DiscoveryRule()->get([
-							'output' => ['itemid'],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable']
-						]);
-						$options['objectids'] = zbx_objectValues($items, 'itemid');
-					}
-				}
-				// all items and LLD rules
-				else {
-					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-					$sqlParts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM items i,hosts_groups hgg'.
-							' JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE e.objectid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-					')';
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
 			}
 		}
@@ -291,7 +278,7 @@ class CEvent extends CApiService {
 				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null) {
 				if ($options['value'][0] == TRIGGER_VALUE_TRUE) {
-					$sqlParts['where'][] =
+					$sql_parts['where'][] =
 						'e.clock<='.zbx_dbstr($options['problem_time_till']).' AND ('.
 							'NOT EXISTS ('.
 								'SELECT NULL'.
@@ -308,7 +295,7 @@ class CEvent extends CApiService {
 						')';
 				}
 				else {
-					$sqlParts['where'][] =
+					$sql_parts['where'][] =
 						'e.clock>='.zbx_dbstr($options['problem_time_from']).
 						' AND EXISTS ('.
 							'SELECT NULL'.
@@ -322,63 +309,53 @@ class CEvent extends CApiService {
 		}
 
 		// eventids
-		if (!is_null($options['eventids'])) {
-			zbx_value2array($options['eventids']);
-			$sqlParts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
+		if ($options['eventids'] !== null) {
+			$sql_parts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
 		}
 
 		// objectids
 		if ($options['objectids'] !== null && in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM,
 				EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
-			zbx_value2array($options['objectids']);
-			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
-
-			if ($options['groupCount']) {
-				$sqlParts['group']['objectid'] = 'e.objectid';
-			}
+			$sql_parts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 		}
 
 		// groupids
 		if ($options['groupids'] !== null) {
-			zbx_value2array($options['groupids']);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['f'] = 'functions f';
-				$sqlParts['from']['i'] = 'items i';
-				$sqlParts['from']['hg'] = 'hosts_groups hg';
-				$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from']['hg'] = 'hosts_groups hg';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['i'] = 'items i';
-				$sqlParts['from']['hg'] = 'hosts_groups hg';
-				$sqlParts['where']['e-i'] = 'e.objectid=i.itemid';
-				$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
-				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from']['hg'] = 'hosts_groups hg';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
+				$sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 			}
 		}
 
 		// hostids
 		if ($options['hostids'] !== null) {
-			zbx_value2array($options['hostids']);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['f'] = 'functions f';
-				$sqlParts['from']['i'] = 'items i';
-				$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
-				$sqlParts['from']['i'] = 'items i';
-				$sqlParts['where']['e-i'] = 'e.objectid=i.itemid';
-				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			}
 		}
 
@@ -386,21 +363,60 @@ class CEvent extends CApiService {
 		if ($options['severities'] !== null) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
-				zbx_value2array($options['severities']);
-				$sqlParts['where'][] = dbConditionInt('e.severity', $options['severities']);
+				sort($options['severities']);
+
+				if ($options['severities'] != range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
+					$sql_parts['where'][] = dbConditionInt('e.severity', $options['severities']);
+				}
+			}
+			// ignore this filter for items and lld rules
+		}
+
+		// trigger_severities
+		if ($options['trigger_severities'] !== null) {
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				sort($options['trigger_severities']);
+
+				if ($options['trigger_severities']
+						!= range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
+					$sql_parts['from']['t'] = 'triggers t';
+					$sql_parts['where']['e-t'] = 'e.objectid=t.triggerid';
+					$sql_parts['where'][] = dbConditionInt('t.priority', $options['trigger_severities']);
+				}
 			}
 			// ignore this filter for items and lld rules
 		}
 
 		// acknowledged
-		if (!is_null($options['acknowledged'])) {
+		if ($options['acknowledged'] !== null) {
 			$acknowledged = $options['acknowledged'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
-			$sqlParts['where'][] = 'e.acknowledged='.$acknowledged;
+			$sql_parts['where'][] = 'e.acknowledged='.$acknowledged;
+		}
+
+		// Acknowledge action and users that have performed the action.
+		$acknowledge_actions = [];
+
+		if ($options['action'] !== null) {
+			$acknowledge_actions[] = 'ack.action & '.$options['action'].'='.$options['action'];
+		}
+
+		if ($options['action_userids'] !== null) {
+			$acknowledge_actions[] = dbConditionId('ack.userid', $options['action_userids']);
+		}
+
+		if ($acknowledge_actions) {
+			$sql_parts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM acknowledges ack'.
+				' WHERE e.eventid=ack.eventid'.
+					' AND '.implode(' AND ', $acknowledge_actions).
+			')';
 		}
 
 		// suppressed
 		if ($options['suppressed'] !== null) {
-			$sqlParts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
+			$sql_parts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
 				'EXISTS ('.
 					'SELECT NULL'.
 					' FROM event_suppress es'.
@@ -410,7 +426,7 @@ class CEvent extends CApiService {
 
 		// symptom
 		if ($options['symptom'] !== null) {
-			$sqlParts['where'][] = (!$options['symptom'] ? 'NOT ' : '').
+			$sql_parts['where'][] = (!$options['symptom'] ? 'NOT ' : '').
 				'EXISTS ('.
 					'SELECT NULL'.
 					' FROM event_symptom es'.
@@ -419,209 +435,647 @@ class CEvent extends CApiService {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'e',
+		if ($options['tags'] !== null) {
+			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'e',
 				'event_tag', 'eventid'
 			);
 		}
 
 		// time_from
 		if ($options['time_from'] !== null) {
-			$sqlParts['where'][] = 'e.clock>='.zbx_dbstr($options['time_from']);
+			$sql_parts['where'][] = 'e.clock>='.zbx_dbstr($options['time_from']);
 		}
 
 		// time_till
 		if ($options['time_till'] !== null) {
-			$sqlParts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
+			$sql_parts['where'][] = 'e.clock<='.zbx_dbstr($options['time_till']);
 		}
 
 		// eventid_from
 		if ($options['eventid_from'] !== null) {
-			$sqlParts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
+			$sql_parts['where'][] = 'e.eventid>='.zbx_dbstr($options['eventid_from']);
 		}
 
 		// eventid_till
 		if ($options['eventid_till'] !== null) {
-			$sqlParts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
+			$sql_parts['where'][] = 'e.eventid<='.zbx_dbstr($options['eventid_till']);
 		}
 
 		// value
 		if ($options['value'] !== null) {
-			$sqlParts['where'][] = dbConditionInt('e.value', $options['value']);
-		}
-
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('events e', $options, $sqlParts);
+			$sql_parts['where'][] = dbConditionInt('e.value', $options['value']);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->applyFilters($options, $sqlParts);
+			$this->applyFilters($options, $sql_parts);
 		}
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
-		}
+		return $sql_parts;
+	}
+
+	/**
+	 * Returns the list of unique tag filters.
+	 *
+	 * @param array $usrgrpids
+	 *
+	 * @return array
+	 */
+	public static function getTagFilters(array $usrgrpids): array {
+		$tag_filters = uniqTagFilters(DB::select('tag_filter', [
+			'output' => ['groupid', 'tag', 'value'],
+			'filter' => ['usrgrpid' => $usrgrpids]
+		]));
 
 		$result = [];
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($event = DBfetch($res)) {
-			if ($options['countOutput']) {
-				if ($options['groupCount']) {
-					$result[] = $event;
-				}
-				else {
-					$result = $event['rowscount'];
-				}
-			}
-			else {
-				$result[$event['eventid']] = $event;
-			}
+		foreach ($tag_filters as $tag_filter) {
+			$result[$tag_filter['groupid']][] = [
+				'tag' => $tag_filter['tag'],
+				'value' => $tag_filter['value']
+			];
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Validates the input parameters for the get() method.
+	 * Add SQL parts related to tag-based permissions.
 	 *
-	 * @throws APIException     if the input is invalid
+	 * @param array $usrgrpids
+	 * @param array $sql_parts
+	 * @param int   $value
 	 *
-	 * @param array     $options
+	 * @return array
 	 */
-	protected function validateGet(array $options) {
-		$sourceValidator = new CLimitedSetValidator([
-			'values' => array_keys(eventSource())
-		]);
-		if (!$sourceValidator->validate($options['source'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
+	private static function addTagFilterSqlParts(array $usrgrpids, array $sql_parts, int $value): array {
+		$tag_filters = self::getTagFilters($usrgrpids);
+
+		if (!$tag_filters) {
+			return $sql_parts;
 		}
 
-		$objectValidator = new CLimitedSetValidator([
-			'values' => array_keys(eventObject())
-		]);
-		if (!$objectValidator->validate($options['object'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
+		$sql_parts['from']['f'] = 'functions f';
+		$sql_parts['from']['i'] = 'items i';
+		$sql_parts['from']['hg'] = 'hosts_groups hg';
+		$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+		$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+		$sql_parts['where']['i-hg'] = 'i.hostid=hg.hostid';
+
+		$tag_conditions = [];
+		$full_access_groupids = [];
+
+		foreach ($tag_filters as $groupid => $filters) {
+			$tags = [];
+			$tag_values = [];
+
+			foreach ($filters as $filter) {
+				if ($filter['tag'] === '') {
+					$full_access_groupids[] = $groupid;
+
+					continue 2;
+				}
+
+				if ($filter['value'] === '') {
+					$tags[] = $filter['tag'];
+				}
+				else {
+					$tag_values[$filter['tag']][] = $filter['value'];
+				}
+			}
+
+			$conditions = [];
+
+			if ($tags) {
+				$conditions[] = dbConditionString('et.tag', $tags);
+			}
+			$parenthesis = $tags || count($tag_values) > 1;
+
+			foreach ($tag_values as $tag => $values) {
+				$condition = 'et.tag='.zbx_dbstr($tag).' AND '.dbConditionString('et.value', $values);
+				$conditions[] = $parenthesis ? '('.$condition.')' : $condition;
+			}
+
+			$conditions = count($conditions) > 1 ? '('.implode(' OR ', $conditions).')' : $conditions[0];
+
+			$tag_conditions[] = 'hg.groupid='.zbx_dbstr($groupid).' AND '.$conditions;
 		}
 
-		$sourceObjectValidator = new CEventSourceObjectValidator();
-		if (!$sourceObjectValidator->validate(['source' => $options['source'], 'object' => $options['object']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
+		if ($tag_conditions) {
+			if ($value == TRIGGER_VALUE_TRUE) {
+				$sql_parts['from']['et'] = 'event_tag et';
+				$sql_parts['where']['e-et'] = 'e.eventid=et.eventid';
+			}
+			else {
+				$sql_parts['from']['er'] = 'event_recovery er';
+				$sql_parts['from']['et'] = 'event_tag et';
+				$sql_parts['where']['e-er'] = 'e.eventid=er.r_eventid';
+				$sql_parts['where']['er-et'] = 'er.eventid=et.eventid';
+			}
+
+			if ($full_access_groupids || count($tag_conditions) > 1) {
+				foreach ($tag_conditions as &$tag_condition) {
+					$tag_condition = '('.$tag_condition.')';
+				}
+				unset($tag_condition);
+			}
 		}
 
-		$evaltype_validator = new CLimitedSetValidator([
-			'values' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
-		]);
-		if (!$evaltype_validator->validate($options['evaltype'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
+		if ($full_access_groupids) {
+			$tag_conditions[] = dbConditionInt('hg.groupid', $full_access_groupids);
 		}
+
+		$sql_parts['where'][] = count($tag_conditions) > 1
+			? '('.implode(' OR ', $tag_conditions).')'
+			: $tag_conditions[0];
+
+		return $sql_parts;
 	}
 
 	/**
 	 * Apply filter conditions to SQL built query.
 	 *
 	 * @param array $options
+	 *        array $options['filter']['cause_eventids']  Cause event IDs to filter by.
 	 * @param array $sql_parts
-	 *
-	 * $options = [
-	 *     'filter' => [
-	 *         'action' =>          (int)       Acknowledge action(s) that must be performed on filtered events.
-	 *         'action_userid' =>   (int)       User which has performed acknowledge action.
-	 *         'cause_eventid' =>   (array)     Cause eventids to filter by.
-	 *     ]
-	 * ]
-	 *
-	 * @return array
 	 */
-	protected function applyFilters($options, &$sql_parts): void {
-		// Acknowledge action filter properties.
-		$acknowledge_actions = [
-			'ack.eventid=e.eventid'
-		];
-
-		if (array_key_exists('action', $options['filter']) && ctype_xdigit((string) $options['filter']['action'])
-				&& $options['filter']['action'] != ZBX_PROBLEM_UPDATE_NONE) {
-			$acknowledge_actions[] = 'ack.action & '.$options['filter']['action'].'='.$options['filter']['action'];
-		}
-
-		if (array_key_exists('action_userid', $options['filter'])
-				&& zbx_ctype_digit($options['filter']['action_userid'])) {
-			$acknowledge_actions[] = dbConditionId('ack.userid', [$options['filter']['action_userid']]);
-		}
-
-		if (count($acknowledge_actions) > 1) {
-			$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM acknowledges ack'.
-				' WHERE '.implode(' AND ', $acknowledge_actions).
-			')';
+	private function applyFilters(array $options, array &$sql_parts): void {
+		if ($options['countOutput'] || $options['groupBy']) {
+			return;
 		}
 
 		// Filter symptom events for given cause.
 		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
-			zbx_value2array($options['filter']['cause_eventid']);
-
 			$sql_parts['from']['event_symptom'] = 'event_symptom es';
 			$sql_parts['where']['ese'] = 'es.eventid=e.eventid';
 			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
 		}
+	}
 
-		// Apply standard filter properties.
-		$this->dbFilter('events e', $options, $sql_parts);
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if ($options['countOutput'] || $options['groupBy']) {
+			return $sql_parts;
+		}
+
+		// Select fields from event_recovery table using LEFT JOIN.
+		if ($this->outputIsRequested('r_eventid', $options['output'])) {
+			$sql_parts['select']['r_eventid'] = 'er1.r_eventid';
+			$sql_parts['left_join'][] = ['alias' => 'er1', 'table' => 'event_recovery', 'using' => 'eventid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		// Select fields from event_recovery table using LEFT JOIN.
+		$left_join_recovery = false;
+		foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
+			if ($this->outputIsRequested($field, $options['output'])) {
+				$sql_parts['select'][$field] = 'er2.'.$field;
+				$left_join_recovery = true;
+			}
+		}
+
+		if ($left_join_recovery) {
+			$sql_parts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
+			$sql_parts = $this->addQuerySelect('e.object', $sql_parts);
+			$sql_parts = $this->addQuerySelect('e.objectid', $sql_parts);
+		}
+
+		$left_join_symptom = false;
+		if ($this->outputIsRequested('cause_eventid', $options['output'])) {
+			$sql_parts['select']['cause_eventid'] = 'es1.cause_eventid';
+			$left_join_symptom = true;
+		}
+
+		if ($left_join_symptom) {
+			$sql_parts['left_join'][] = ['alias' => 'es1', 'table' => 'event_symptom', 'using' => 'eventid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		return $sql_parts;
+	}
+
+	/**
+	 * Returns sorted array of events.
+	 *
+	 * @param array        $result     Events.
+	 * @param string|array $sortfield
+	 * @param string|array $sortorder
+	 *
+	 * @return array
+	 */
+	private static function sortResult(array $result, $sortfield, $sortorder): array {
+		if ($sortfield === '' || $sortfield === []) {
+			return $result;
+		}
+
+		$fields = [];
+
+		foreach ((array) $sortfield as $i => $field) {
+			if (is_string($sortorder) && $sortorder === ZBX_SORT_DOWN) {
+				$order = ZBX_SORT_DOWN;
+			}
+			elseif (is_array($sortorder) && array_key_exists($i, $sortorder) && $sortorder[$i] === ZBX_SORT_DOWN) {
+				$order = ZBX_SORT_DOWN;
+			}
+			else {
+				$order = ZBX_SORT_UP;
+			}
+
+			$fields[] = ['field' => $field, 'order' => $order];
+		}
+
+		CArrayHelper::sort($result, $fields);
+
+		return $result;
+	}
+
+	protected function addRelatedObjects(array $options, array $result): array {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$this->addRelatedAcknowledges($options, $result);
+		$this->addRelatedAlerts($options, $result);
+		self::addRelatedHosts($options, $result);
+		self::addRelatedObject($options, $result);
+		$this->addRelatedOpdata($options, $result);
+		self::addRelatedSuppressionData($options, $result);
+		$this->addRelatedSuppressed($options, $result);
+		self::addRelatedTags($options, $result);
+		$this->addRelatedUrls($options, $result);
+
+		return $result;
+	}
+
+	private function addRelatedAcknowledges(array $options, array &$result): void {
+		if ($options['selectAcknowledges'] === null) {
+			return;
+		}
+
+		if ($options['selectAcknowledges'] != API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['acknowledges'] = [];
+			}
+			unset($row);
+
+			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
+				? ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+					'suppress_until', 'taskid'
+				]
+				: array_unique(array_merge(['acknowledgeid', 'eventid'], $options['selectAcknowledges']));
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['eventid' => array_keys($result)],
+				'sortfield' => ['clock'],
+				'sortorder' => [ZBX_SORT_DOWN]
+			];
+			$db_acknowledges = DBselect(DB::makeSql('acknowledges', $sql_options));
+
+			while ($db_acknowledge = DBfetch($db_acknowledges)) {
+				$eventid = $db_acknowledge['eventid'];
+
+				if (!in_array('acknowledgeid', $output)) {
+					unset($db_acknowledge['acknowledgeid']);
+				}
+
+				unset($db_acknowledge['eventid']);
+
+				$result[$eventid]['acknowledges'][] = $db_acknowledge;
+			}
+		}
+		else {
+			$db_acknowledges = DBFetchArrayAssoc(DBselect(
+				'SELECT a.eventid,COUNT(a.acknowledgeid) AS rowscount'.
+				' FROM acknowledges a'.
+				' WHERE '.dbConditionInt('a.eventid', array_keys($result)).
+				' GROUP BY a.eventid'
+			), 'eventid');
+
+			foreach ($result as $eventid => $event) {
+				$result[$eventid]['acknowledges'] = array_key_exists($eventid, $db_acknowledges)
+					? $db_acknowledges[$eventid]['rowscount']
+					: '0';
+			}
+		}
+	}
+
+	private function addRelatedAlerts(array $options, array &$result): void {
+		if ($options['selectAlerts'] === null) {
+			return;
+		}
+
+		$alerts = [];
+		$relation_map = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
+		$related_ids = $relation_map->getRelatedIds();
+
+		if ($related_ids) {
+			$alerts = API::Alert()->get([
+				'output' => $options['selectAlerts'] === API_OUTPUT_EXTEND
+					? array_diff(CAlert::OUTPUT_FIELDS, ['eventid'])
+					: $options['selectAlerts'],
+				'alertids' => $related_ids,
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN,
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relation_map->mapMany($result, $alerts, 'alerts');
+	}
+
+	private static function addRelatedHosts(array $options, array &$result): void {
+		if ($options['selectHosts'] === null) {
+			return;
+		}
+
+		$hosts = [];
+		$relation_map = new CRelationMap();
+
+		// trigger events
+		if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+			$query = DBselect(
+				'SELECT e.eventid,i.hostid'.
+				' FROM events e,functions f,items i'.
+				' WHERE '.dbConditionInt('e.eventid', array_keys($result)).
+					' AND e.objectid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND e.object='.zbx_dbstr($options['object']).
+					' AND e.source='.zbx_dbstr($options['source'])
+			);
+		}
+		// item and LLD rule events
+		elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+			$query = DBselect(
+				'SELECT e.eventid,i.hostid'.
+				' FROM events e,items i'.
+				' WHERE '.dbConditionInt('e.eventid', array_keys($result)).
+					' AND e.objectid=i.itemid'.
+					' AND e.object='.zbx_dbstr($options['object']).
+					' AND e.source='.zbx_dbstr($options['source'])
+			);
+		}
+
+		while ($relation = DBfetch($query)) {
+			$relation_map->addRelation($relation['eventid'], $relation['hostid']);
+		}
+
+		$related_ids = $relation_map->getRelatedIds();
+
+		if ($related_ids) {
+			$hosts = API::Host()->get([
+				'output' => $options['selectHosts'],
+				'hostids' => $related_ids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+		}
+
+		$result = $relation_map->mapMany($result, $hosts, 'hosts');
+	}
+
+	private static function addRelatedObject(array $options, array &$result): void {
+		if ($options['selectRelatedObject'] === null || $options['object'] == EVENT_OBJECT_AUTOREGHOST) {
+			return;
+		}
+
+		$relation_map = new CRelationMap();
+
+		foreach ($result as $event) {
+			$relation_map->addRelation($event['eventid'], $event['objectid']);
+		}
+
+		switch ($options['object']) {
+			case EVENT_OBJECT_TRIGGER:
+				$api = API::Trigger();
+				break;
+			case EVENT_OBJECT_DHOST:
+				$api = API::DHost();
+				break;
+			case EVENT_OBJECT_DSERVICE:
+				$api = API::DService();
+				break;
+			case EVENT_OBJECT_ITEM:
+				$api = API::Item();
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				$api = API::DiscoveryRule();
+				break;
+			case EVENT_OBJECT_SERVICE:
+				$api = API::Service();
+				break;
+		}
+
+		$objects = $api->get([
+			'output' => $options['selectRelatedObject'],
+			$api->pkOption() => $relation_map->getRelatedIds(),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $objects, 'relatedObject');
+	}
+
+	private function addRelatedOpdata(array $options, array &$result): void {
+		if (!$this->outputIsRequested('opdata', $options['output'])) {
+			return;
+		}
+
+		$events = DBFetchArrayAssoc(DBselect(
+			'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
+			' FROM events e'.
+				' JOIN triggers t'.
+					' ON t.triggerid=e.objectid'.
+			' WHERE '.dbConditionInt('e.eventid', array_keys($result))
+		), 'eventid');
+
+		foreach ($result as $eventid => $event) {
+			$result[$eventid]['opdata'] = array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== ''
+				? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
+				: '';
+		}
+	}
+
+	private static function addRelatedSuppressionData(array $options, array &$result): void {
+		if ($options['selectSuppressionData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['suppression_data'] = [];
+		}
+		unset($row);
+
+		$output = $options['selectSuppressionData'] === API_OUTPUT_EXTEND
+			? ['event_suppressid', 'eventid', 'maintenanceid', 'suppress_until', 'userid']
+			: array_unique(array_merge(['event_suppressid', 'eventid'], $options['selectSuppressionData']));
+
+		$sql_options = [
+			'output' => $output,
+			'filter' => ['eventid' => array_keys($result)]
+		];
+		$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
+
+		while ($db_suppression_data = DBfetch($db_event_suppress)) {
+			$eventid = $db_suppression_data['eventid'];
+
+			unset($db_suppression_data['event_suppressid'], $db_suppression_data['eventid']);
+
+			$result[$eventid]['suppression_data'][] = $db_suppression_data;
+		}
+	}
+
+	private function addRelatedSuppressed(array $options, array &$result): void {
+		if (!$this->outputIsRequested('suppressed', $options['output'])) {
+			return;
+		}
+
+		if ($options['selectSuppressionData'] !== null) {
+			foreach ($result as &$row) {
+				$row['suppressed'] = $row['suppression_data']
+					? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
+					: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
+			}
+			unset($row);
+		}
+		else {
+			foreach ($result as &$row) {
+				$row['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
+			}
+			unset($row);
+
+			$sql_options = [
+				'output' => ['eventid'],
+				'filter' => ['eventid' => array_keys($result)]
+			];
+			$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
+
+			while ($db_suppression_data = DBfetch($db_event_suppress)) {
+				$result[$db_suppression_data['eventid']]['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_TRUE;
+			}
+		}
+	}
+
+	private static function addRelatedTags(array $options, array &$result): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['tags'] = [];
+		}
+		unset($row);
+
+		$output = $options['selectTags'] === API_OUTPUT_EXTEND
+			? ['eventtagid', 'eventid', 'tag', 'value']
+			: array_unique(array_merge(['eventtagid', 'eventid'], $options['selectTags']));
+
+		$sql_options = [
+			'output' => $output,
+			'filter' => ['eventid' => array_keys($result)]
+		];
+		$db_tags = DBselect(DB::makeSql('event_tag', $sql_options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$eventid = $db_tag['eventid'];
+
+			unset($db_tag['eventtagid'], $db_tag['eventid']);
+
+			$result[$eventid]['tags'][] = $db_tag;
+		}
+	}
+
+	private function addRelatedUrls(array $options, array &$result): void {
+		if (!$this->outputIsRequested('urls', $options['output'])) {
+			return;
+		}
+
+		$sql_options = [
+			'output' => ['eventid', 'tag', 'value'],
+			'filter' => ['eventid' => array_keys($result)]
+		];
+		$db_tags = DBselect(DB::makeSql('event_tag', $sql_options));
+
+		$events = [];
+
+		foreach ($result as $event) {
+			$events[$event['eventid']]['tags'] = [];
+		}
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$events[$db_tag['eventid']]['tags'][] = [
+				'tag' => $db_tag['tag'],
+				'value' => $db_tag['value']
+			];
+		}
+
+		$urls = DB::select('media_type', [
+			'output' => ['event_menu_url', 'event_menu_name'],
+			'filter' => [
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'show_event_menu' => ZBX_EVENT_MENU_SHOW
+			]
+		]);
+
+		$events = CMacrosResolverHelper::resolveMediaTypeUrls($events, $urls);
+
+		foreach ($events as $eventid => $event) {
+			$result[$eventid]['urls'] = $event['urls'];
+		}
 	}
 
 	/**
 	 * Acknowledges the given events and closes them if necessary.
 	 *
-	 * @param array  $data                  	And array of operation data.
-	 * @param mixed  $data['eventids']      	An event ID or an array of event IDs.
-	 * @param string $data['cause_eventid']     Cause event ID. Used if $data['action'] yields 0x100.
-	 * @param string $data['message']      		Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param string $data['severity']      	New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param string $data['suppress_until']	Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
-	 * @param int    $data['action']        	Flags of performed operations combined:
-	 *                                       	 - 0x01  - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                       	 - 0x02  - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                       	 - 0x04  - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                       	 - 0x08  - ZBX_PROBLEM_UPDATE_SEVERITY
-	 *                                       	 - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
-	 *                                       	 - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
-	 *                                       	 - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
-	 *                                           - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
-	 *                                           - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
+	 * @param array        $data                    An array of operation data.
+	 *        array|string $data['eventids']        An event ID or an array of event IDs.
+	 *        string       $data['cause_eventid']   Cause event ID. Used if $data['action'] yields 0x100.
+	 *        string       $data['message']         Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 *        string       $data['severity']        New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 *        string       $data['suppress_until']  Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
+	 *        int          $data['action']          Flags of performed operations combined:
+	 *                                                - 0x01  - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                                - 0x02  - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                                - 0x04  - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                                - 0x08  - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                                - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 *                                                - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                                - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                                - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+	 *                                                - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function acknowledge(array $data) {
+	public function acknowledge(array $data): array {
 		$time = time();
 		$this->validateAcknowledge($data, $time);
 
 		$data['eventids'] = zbx_toArray($data['eventids']);
 		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
-		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
-		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
-		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
+		$has_close_action = ($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE;
+		$has_suppress_action = ($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS;
+		$has_unsuppress_action = ($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 		$has_change_rank_to_symptom_action =
-			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
+			($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 
 		// Validation of event permissions has already been done in validateAcknowledge().
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid', 'cause_eventid'],
 			// "acknowledges" used in CEvent::isEventClosed().
-			'select_acknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
+			'selectAcknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
 				? ['action']
 				: null,
 			// "suppression_data" used in CEvent::isEventSuppressed().
 			'selectSuppressionData' => $has_unsuppress_action ? ['maintenanceid'] : null,
 			'eventids' => $data['eventids'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -780,7 +1234,7 @@ class CEvent extends CApiService {
 			foreach ($acknowledgeids as $k => $id) {
 				$acknowledgement = $acknowledges[$k];
 
-				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE){
+				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 					$tasks[$k] = [
 						'type' => ZBX_TM_TASK_CLOSE_PROBLEM,
 						'status' => ZBX_TM_STATUS_NEW,
@@ -992,33 +1446,33 @@ class CEvent extends CApiService {
 	/**
 	 * Validates the input parameters for the acknowledge() method.
 	 *
-	 * @param array         $data                    And array of operation data.
-	 * @param string|array  $data['eventids']        An event ID or an array of event IDs.
-	 * @param string        $data['cause_eventid']   Cause event ID. Used if $data['action'] yields 0x100.
-	 * @param string        $data['message']         Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param string        $data['severity']        New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param int           $data['suppress_until']  Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
-	 * @param int           $data['action']          Flags of performed operations combined:
-	 *                                                - 0x01  - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                                - 0x02  - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                                - 0x04  - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                                - 0x08  - ZBX_PROBLEM_UPDATE_SEVERITY
-	 *                                                - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
-	 *                                                - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
-	 *                                                - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
-	 *                                                - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
-	 *                                                - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
+	 * @param array        $data                    And array of operation data.
+	 *        string|array $data['eventids']        An event ID or an array of event IDs.
+	 *        string       $data['cause_eventid']   Cause event ID. Used if $data['action'] yields 0x100.
+	 *        string       $data['message']         Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 *        int          $data['severity']        New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 *        int          $data['suppress_until']  Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
+	 *        int          $data['action']          Flags of performed operations combined:
+	 *                                               - 0x01  - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                               - 0x02  - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                               - 0x04  - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                               - 0x08  - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                               - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 *                                               - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                               - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                               - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+	 *                                               - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 	 *
-	 * @throws APIException                          If the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateAcknowledge(array $data, int $time) {
+	protected function validateAcknowledge(array $data, int $time): void {
 		$fields =  [
 			'eventids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NORMALIZE],
 			'action' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
 			'message' =>		['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'message'), 'length' => DB::getFieldLength('acknowledges', 'message')],
 			'severity' =>		['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'new_severity')],
 			'suppress_until' =>	['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'cause_eventid' => ['type' => API_MULTIPLE, 'rules' => [
+			'cause_eventid' =>	['type' => API_MULTIPLE, 'rules' => [
 				// "cause_eventid" should only be accessible if a cause event is converted to symptom event.
 				['if' => static function ($data) { return ($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) != 0; }, 'type' => API_ID, 'flags' => API_REQUIRED],
 				['else' => true, 'type' => API_UNEXPECTED]
@@ -1030,9 +1484,8 @@ class CEvent extends CApiService {
 		}
 
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
-				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
-				| ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
-				| ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
+			| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
+			| ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 
 		// Check that at least one valid flag is set.
 		if (($data['action'] & $action_mask) != $data['action']) {
@@ -1041,17 +1494,17 @@ class CEvent extends CApiService {
 			));
 		}
 
-		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
-		$has_ack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
-		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
-		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
-		$has_unack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
-		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
-		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
+		$has_close_action = ($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE;
+		$has_ack_action = ($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
+		$has_message_action = ($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE;
+		$has_severity_action = ($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY;
+		$has_unack_action = ($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE;
+		$has_suppress_action = ($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS;
+		$has_unsuppress_action = ($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 		$has_rank_change_to_cause_action =
-			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE);
+			($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE;
 		$has_change_rank_to_symptom_action =
-			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
+			($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 
 		// Check access rules.
 		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
@@ -1150,7 +1603,7 @@ class CEvent extends CApiService {
 		 *   - eventid for OK event
 		 *   - eventid with source, that is not trigger
 		 *   - no read rights for related trigger
-		 *   - unexisting eventid
+		 *   - nonexistent eventid
 		 */
 		if (count($eventids) != count($events)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -1179,7 +1632,7 @@ class CEvent extends CApiService {
 		}
 
 		if ($has_suppress_action) {
-			$this->CheckIfValidTime($data, $time);
+			$this->checkIfValidTime($data, $time);
 		}
 	}
 
@@ -1194,7 +1647,7 @@ class CEvent extends CApiService {
 	 *                                        - If any of given event can be closed manually according the triggers
 	 *                                          configuration.
 	 */
-	protected function checkCanBeManuallyClosed(array $events, $editable_events_count) {
+	protected function checkCanBeManuallyClosed(array $events, $editable_events_count): void {
 		if (count($events) != $editable_events_count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -1219,7 +1672,7 @@ class CEvent extends CApiService {
 	 *                                        - If unknown severity is given;
 	 *                                        - If at least one event is not editable.
 	 */
-	protected function checkCanChangeSeverity(array $events, $editable_events_count, $severity) {
+	protected function checkCanChangeSeverity(array $events, $editable_events_count, $severity): void {
 		if (count($events) != $editable_events_count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -1241,10 +1694,12 @@ class CEvent extends CApiService {
 	 * Checks if time is valid future time.
 	 *
 	 * @param array $data                    Input data.
-	 * @param array $data['suppress_until']  Suppress until unix time. O for Indefinite time.
-	 * @param int   $time                    Current unix time.
+	 *        int   $data['suppress_until']  Suppress until Unix time. O for indefinite time.
+	 * @param int   $time                    Current Unix time.
+	 *
+	 * @throws APIException
 	 */
-	protected function CheckIfValidTime(array $data, $time) {
+	protected function checkIfValidTime(array $data, int $time): void {
 		if ($data['suppress_until'] <= $time && $data['suppress_until'] != 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'suppress_until',
@@ -1257,15 +1712,15 @@ class CEvent extends CApiService {
 	/**
 	 * Checks if unsuppress action can be executed for given event.
 	 *
-	 * @param array $event                                         Event object.
-	 * @param array $event['suppression_data']                     List of problem suppression data.
-	 * @param array $event['suppression_data'][]['maintenanceid']  Problem maintenanceid.
+	 * @param array  $event                                         Event object.
+	 *        array  $event['suppression_data']                     List of problem suppression data.
+	 *        string $event['suppression_data'][]['maintenanceid']  Problem maintenanceid.
 	 *
 	 * @return bool
 	 */
-	protected function isEventSuppressed(array $event) {
+	protected function isEventSuppressed(array $event): bool {
 		foreach ($event['suppression_data'] as $suppression) {
-			if($suppression['maintenanceid'] == 0) {
+			if ($suppression['maintenanceid'] == 0) {
 				return true;
 			}
 		}
@@ -1277,527 +1732,24 @@ class CEvent extends CApiService {
 	 * Checks if event is closed.
 	 *
 	 * @param array  $event                              Event object.
-	 * @param string $event['r_eventid']                 OK event id. 0 if not resolved.
-	 * @param array  $event['acknowledges']              List of problem updates.
-	 * @param int    $event['acknowledges'][]['action']  Action performed in update.
+	 *        string $event['r_eventid']                 OK event id. 0 if not resolved.
+	 *        array  $event['acknowledges']              List of problem updates.
+	 *        int    $event['acknowledges'][]['action']  Action performed in update.
 	 *
 	 * @return bool
 	 */
-	protected function isEventClosed(array $event) {
+	protected function isEventClosed(array $event): bool {
 		if (bccomp($event['r_eventid'], '0') == 1) {
 			return true;
 		}
-		else {
-			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					// If at least one manual close update was found, event is closing.
-					return true;
-				}
+
+		foreach ($event['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+				// If at least one manual close update was found, event is closing.
+				return true;
 			}
 		}
 
 		return false;
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if (!$options['countOutput']) {
-			// Select fields from event_recovery table using LEFT JOIN.
-			if ($this->outputIsRequested('r_eventid', $options['output'])) {
-				$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
-				$sqlParts['left_join'][] = ['alias' => 'er1', 'table' => 'event_recovery', 'using' => 'eventid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-			}
-
-			// Select fields from event_recovery table using LEFT JOIN.
-			$left_join_recovery = false;
-			foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
-				if ($this->outputIsRequested($field, $options['output'])) {
-					$sqlParts['select'][$field] = 'er2.'.$field;
-					$left_join_recovery = true;
-				}
-			}
-
-			if ($left_join_recovery) {
-				$sqlParts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-			}
-
-			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
-				$sqlParts = $this->addQuerySelect('e.object', $sqlParts);
-				$sqlParts = $this->addQuerySelect('e.objectid', $sqlParts);
-			}
-
-			$left_join_symptom = false;
-			if ($this->outputIsRequested('cause_eventid', $options['output'])) {
-				$sqlParts['select']['cause_eventid'] = 'es1.cause_eventid';
-				$left_join_symptom = true;
-			}
-
-			if ($left_join_symptom) {
-				$sqlParts['left_join'][] = ['alias' => 'es1', 'table' => 'event_symptom', 'using' => 'eventid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-			}
-		}
-
-		return $sqlParts;
-	}
-
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$eventids = array_keys($result);
-
-		// Adding operational data.
-		if ($this->outputIsRequested('opdata', $options['output'])) {
-			$events = DBFetchArrayAssoc(DBselect(
-				'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
-				' FROM events e'.
-				' JOIN triggers t ON t.triggerid=e.objectid'.
-				' WHERE '.dbConditionInt('e.eventid', $eventids)
-			), 'eventid');
-
-			foreach ($result as $eventid => $event) {
-				$result[$eventid]['opdata'] =
-					(array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== '')
-						? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
-						: '';
-			}
-		}
-
-		// adding hosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$hosts = [];
-			$relationMap = new CRelationMap();
-
-			// trigger events
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$query = DBselect(
-					'SELECT e.eventid,i.hostid'.
-						' FROM events e,functions f,items i'.
-						' WHERE '.dbConditionInt('e.eventid', $eventids).
-						' AND e.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND e.object='.zbx_dbstr($options['object']).
-						' AND e.source='.zbx_dbstr($options['source'])
-				);
-			}
-			// item and LLD rule events
-			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				$query = DBselect(
-					'SELECT e.eventid,i.hostid'.
-						' FROM events e,items i'.
-						' WHERE '.dbConditionInt('e.eventid', $eventids).
-						' AND e.objectid=i.itemid'.
-						' AND e.object='.zbx_dbstr($options['object']).
-						' AND e.source='.zbx_dbstr($options['source'])
-				);
-			}
-
-			while ($relation = DBfetch($query)) {
-				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
-			}
-
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $related_ids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// adding the related object
-		if ($options['selectRelatedObject'] !== null && $options['selectRelatedObject'] != API_OUTPUT_COUNT
-				&& $options['object'] != EVENT_OBJECT_AUTOREGHOST) {
-
-			$relationMap = new CRelationMap();
-			foreach ($result as $event) {
-				$relationMap->addRelation($event['eventid'], $event['objectid']);
-			}
-
-			switch ($options['object']) {
-				case EVENT_OBJECT_TRIGGER:
-					$api = API::Trigger();
-					break;
-				case EVENT_OBJECT_DHOST:
-					$api = API::DHost();
-					break;
-				case EVENT_OBJECT_DSERVICE:
-					$api = API::DService();
-					break;
-				case EVENT_OBJECT_ITEM:
-					$api = API::Item();
-					break;
-				case EVENT_OBJECT_LLDRULE:
-					$api = API::DiscoveryRule();
-					break;
-				case EVENT_OBJECT_SERVICE:
-					$api = API::Service();
-					break;
-			}
-
-			$objects = $api->get([
-				'output' => $options['selectRelatedObject'],
-				$api->pkOption() => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $objects, 'relatedObject');
-		}
-
-		// adding alerts
-		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
-			$alerts = [];
-			$relationMap = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$alerts = API::Alert()->get([
-					'output' => $options['select_alerts'],
-					'selectMediatypes' => API_OUTPUT_EXTEND,
-					'alertids' => $related_ids,
-					'nopermissions' => true,
-					'preservekeys' => true,
-					'sortfield' => 'clock',
-					'sortorder' => ZBX_SORT_DOWN
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $alerts, 'alerts');
-		}
-
-		// adding acknowledges
-		if ($options['select_acknowledges'] !== null) {
-			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
-				// create the base query
-				$sqlParts = API::getApiService()->createSelectQueryParts('acknowledges', 'a', [
-					'output' => $this->outputExtend($options['select_acknowledges'],
-						['acknowledgeid', 'eventid', 'clock', 'userid']
-					),
-					'filter' => ['eventid' => $eventids]
-				]);
-				$sqlParts['order'][] = 'a.clock DESC';
-
-				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
-
-				// if the user data is requested via extended output or specified fields, join the users table
-				$userFields = ['username', 'name', 'surname'];
-				$requestUserData = [];
-				foreach ($userFields as $userField) {
-					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {
-						$requestUserData[] = $userField;
-					}
-				}
-
-				if ($requestUserData) {
-					$users = API::User()->get([
-						'output' => $requestUserData,
-						'userids' => zbx_objectValues($acknowledges, 'userid'),
-						'preservekeys' => true
-					]);
-
-					foreach ($acknowledges as &$acknowledge) {
-						if (array_key_exists($acknowledge['userid'], $users)) {
-							$acknowledge = array_merge($acknowledge, $users[$acknowledge['userid']]);
-						}
-					}
-					unset($acknowledge);
-				}
-
-				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
-				$acknowledges = $this->unsetExtraFields($acknowledges, ['eventid', 'acknowledgeid', 'clock', 'userid'],
-					$options['select_acknowledges']
-				);
-				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
-			}
-			else {
-				$acknowledges = DBFetchArrayAssoc(DBselect(
-					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
-						' FROM acknowledges a'.
-						' WHERE '.dbConditionInt('a.eventid', $eventids).
-						' GROUP BY a.eventid'
-				), 'eventid');
-
-				foreach ($result as $eventid => $event) {
-					$result[$eventid]['acknowledges'] = array_key_exists($eventid, $acknowledges)
-						? $acknowledges[$eventid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		// Adding suppression data.
-		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT) {
-			$suppression_data = API::getApiService()->select('event_suppress', [
-				'output' => $this->outputExtend($options['selectSuppressionData'], ['eventid', 'maintenanceid']),
-				'filter' => ['eventid' => $eventids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($suppression_data, 'eventid', 'event_suppressid');
-			$suppression_data = $this->unsetExtraFields($suppression_data, ['event_suppressid', 'eventid'], []);
-			$result = $relation_map->mapMany($result, $suppression_data, 'suppression_data');
-		}
-
-		// Adding suppressed value.
-		if ($this->outputIsRequested('suppressed', $options['output'])) {
-			$suppressed_eventids = [];
-			foreach ($result as &$event) {
-				if (array_key_exists('suppression_data', $event)) {
-					$event['suppressed'] = $event['suppression_data']
-						? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-						: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-				}
-				else {
-					$suppressed_eventids[] = $event['eventid'];
-				}
-			}
-			unset($event);
-
-			if ($suppressed_eventids) {
-				$suppressed_events = API::getApiService()->select('event_suppress', [
-					'output' => ['eventid'],
-					'filter' => ['eventid' => $suppressed_eventids]
-				]);
-				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
-				foreach ($result as &$event) {
-					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_eventids)
-						? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-						: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-				}
-				unset($event);
-			}
-		}
-
-		// Remove "maintenanceid" field if it's not requested.
-		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT
-				&& !$this->outputIsRequested('maintenanceid', $options['selectSuppressionData'])) {
-			foreach ($result as &$row) {
-				$row['suppression_data'] = $this->unsetExtraFields($row['suppression_data'], ['maintenanceid'], []);
-			}
-			unset($row);
-		}
-
-		// Resolve webhook urls.
-		if ($this->outputIsRequested('urls', $options['output'])) {
-			$tags_options = [
-				'output' => ['eventid', 'tag', 'value'],
-				'filter' => ['eventid' => $eventids]
-			];
-			$tags = DBselect(DB::makeSql('event_tag', $tags_options));
-
-			$events = [];
-
-			foreach ($result as $event) {
-				$events[$event['eventid']]['tags'] = [];
-			}
-
-			while ($tag = DBfetch($tags)) {
-				$events[$tag['eventid']]['tags'][] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
-
-			$urls = DB::select('media_type', [
-				'output' => ['event_menu_url', 'event_menu_name'],
-				'filter' => [
-					'type' => MEDIA_TYPE_WEBHOOK,
-					'status' => MEDIA_TYPE_STATUS_ACTIVE,
-					'show_event_menu' => ZBX_EVENT_MENU_SHOW
-				]
-			]);
-
-			$events = CMacrosResolverHelper::resolveMediaTypeUrls($events, $urls);
-
-			foreach ($events as $eventid => $event) {
-				$result[$eventid]['urls'] = $event['urls'];
-			}
-		}
-
-		// Adding event tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$options['selectTags'] = ['tag', 'value'];
-			}
-
-			$tags_options = [
-				'output' => $this->outputExtend($options['selectTags'], ['eventid']),
-				'filter' => ['eventid' => $eventids]
-			];
-			$tags = DBselect(DB::makeSql('event_tag', $tags_options));
-
-			foreach ($result as &$event) {
-				$event['tags'] = [];
-			}
-			unset($event);
-
-			while ($tag = DBfetch($tags)) {
-				$event = &$result[$tag['eventid']];
-
-				unset($tag['eventtagid'], $tag['eventid']);
-				$event['tags'][] = $tag;
-			}
-			unset($event);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Returns the list of unique tag filters.
-	 *
-	 * @param array $usrgrpids
-	 *
-	 * @return array
-	 */
-	public static function getTagFilters(array $usrgrpids) {
-		$tag_filters = uniqTagFilters(DB::select('tag_filter', [
-			'output' => ['groupid', 'tag', 'value'],
-			'filter' => ['usrgrpid' => $usrgrpids]
-		]));
-
-		$result = [];
-
-		foreach ($tag_filters as $tag_filter) {
-			$result[$tag_filter['groupid']][] = [
-				'tag' => $tag_filter['tag'],
-				'value' => $tag_filter['value']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Add sql parts related to tag-based permissions.
-	 *
-	 * @param array $usrgrpids
-	 * @param array $sqlParts
-	 * @param int   $value
-	 *
-	 * @return array
-	 */
-	protected static function addTagFilterSqlParts(array $usrgrpids, array $sqlParts, $value) {
-		$tag_filters = self::getTagFilters($usrgrpids);
-
-		if (!$tag_filters) {
-			return $sqlParts;
-		}
-
-		$sqlParts['from']['f'] = 'functions f';
-		$sqlParts['from']['i'] = 'items i';
-		$sqlParts['from']['hg'] = 'hosts_groups hg';
-		$sqlParts['where']['e-f'] = 'e.objectid=f.triggerid';
-		$sqlParts['where']['f-i'] = 'f.itemid=i.itemid';
-		$sqlParts['where']['i-hg'] = 'i.hostid=hg.hostid';
-
-		$tag_conditions = [];
-		$full_access_groupids = [];
-
-		foreach ($tag_filters as $groupid => $filters) {
-			$tags = [];
-			$tag_values = [];
-
-			foreach ($filters as $filter) {
-				if ($filter['tag'] === '') {
-					$full_access_groupids[] = $groupid;
-					continue 2;
-				}
-				elseif ($filter['value'] === '') {
-					$tags[] = $filter['tag'];
-				}
-				else {
-					$tag_values[$filter['tag']][] = $filter['value'];
-				}
-			}
-
-			$conditions = [];
-
-			if ($tags) {
-				$conditions[] = dbConditionString('et.tag', $tags);
-			}
-			$parenthesis = $tags || count($tag_values) > 1;
-
-			foreach ($tag_values as $tag => $values) {
-				$condition = 'et.tag='.zbx_dbstr($tag).' AND '.dbConditionString('et.value', $values);
-				$conditions[] = $parenthesis ? '('.$condition.')' : $condition;
-			}
-
-			$conditions = (count($conditions) > 1) ? '('.implode(' OR ', $conditions).')' : $conditions[0];
-
-			$tag_conditions[] = 'hg.groupid='.zbx_dbstr($groupid).' AND '.$conditions;
-		}
-
-		if ($tag_conditions) {
-			if ($value == TRIGGER_VALUE_TRUE) {
-				$sqlParts['from']['et'] = 'event_tag et';
-				$sqlParts['where']['e-et'] = 'e.eventid=et.eventid';
-			}
-			else {
-				$sqlParts['from']['er'] = 'event_recovery er';
-				$sqlParts['from']['et'] = 'event_tag et';
-				$sqlParts['where']['e-er'] = 'e.eventid=er.r_eventid';
-				$sqlParts['where']['er-et'] = 'er.eventid=et.eventid';
-			}
-
-			if ($full_access_groupids || count($tag_conditions) > 1) {
-				foreach ($tag_conditions as &$tag_condition) {
-					$tag_condition = '('.$tag_condition.')';
-				}
-				unset($tag_condition);
-			}
-		}
-
-		if ($full_access_groupids) {
-			$tag_conditions[] = dbConditionInt('hg.groupid', $full_access_groupids);
-		}
-
-		$sqlParts['where'][] = (count($tag_conditions) > 1)
-			? '('.implode(' OR ', $tag_conditions).')'
-			: $tag_conditions[0];
-
-		return $sqlParts;
-	}
-
-	/**
-	 * Returns sorted array of events.
-	 *
-	 * @param array        $events
-	 * @param string|array $sortfield
-	 * @param string|array $sortorder
-	 *
-	 * @return array
-	 */
-	private static function sortResult(array $result, $sortfield, $sortorder) {
-		if ($sortfield === '' || $sortfield === []) {
-			return $result;
-		}
-
-		$fields = [];
-
-		foreach ((array) $sortfield as $i => $field) {
-			if (is_string($sortorder) && $sortorder === ZBX_SORT_DOWN) {
-				$order = ZBX_SORT_DOWN;
-			}
-			elseif (is_array($sortorder) && array_key_exists($i, $sortorder) && $sortorder[$i] === ZBX_SORT_DOWN) {
-				$order = ZBX_SORT_DOWN;
-			}
-			else {
-				$order = ZBX_SORT_UP;
-			}
-
-			$fields[] = ['field' => $field, 'order' => $order];
-		}
-
-		CArrayHelper::sort($result, $fields);
-
-		return $result;
 	}
 }

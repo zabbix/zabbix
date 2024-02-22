@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+use Widgets\SvgGraph\Includes\CWidgetFieldDataSet;
 
 ?>
 
@@ -31,8 +31,8 @@ window.widget_svggraph_form = new class {
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
 		this._form = document.getElementById('widget-dialogue-form');
 		this._templateid = templateid;
-
 		this._dataset_wrapper = document.getElementById('data_sets');
+		this._any_ds_aggregation_function_enabled = false;
 
 		this._$overlay_body.on('scroll', () => {
 			const $preview = jQuery('.<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>', this._$overlay_body);
@@ -59,7 +59,6 @@ window.widget_svggraph_form = new class {
 			.on('change', 'input, z-select, .multiselect', (e) => this.onGraphConfigChange(e));
 
 		this._datasetTabInit();
-		this._timePeriodTabInit();
 		this._legendTabInit();
 		this._problemsTabInit();
 
@@ -130,7 +129,7 @@ window.widget_svggraph_form = new class {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
+				if (dataset.dataset.type == '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -142,7 +141,7 @@ window.widget_svggraph_form = new class {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
+				if (dataset.dataset.type == '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -158,9 +157,7 @@ window.widget_svggraph_form = new class {
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this._dataset_wrapper)).rangeControl();
 
 		// Initialize pattern fields.
-		jQuery('.multiselect', jQuery(this._dataset_wrapper)).each(function() {
-			jQuery(this).multiSelect(jQuery(this).data('params'));
-		});
+		jQuery('.multiselect', jQuery(this._dataset_wrapper)).multiSelect();
 
 		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({
@@ -190,7 +187,7 @@ window.widget_svggraph_form = new class {
 		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => {
-				this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+				this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 			});
 
 		document
@@ -219,16 +216,6 @@ window.widget_svggraph_form = new class {
 		this._initSingleItemSortable(this._getOpenedDataset());
 	}
 
-	_timePeriodTabInit() {
-		document.getElementById('graph_time')
-			.addEventListener('click', (e) => {
-				document.getElementById('time_from').disabled = !e.target.checked;
-				document.getElementById('time_to').disabled = !e.target.checked;
-				document.getElementById('time_from_calendar').disabled = !e.target.checked;
-				document.getElementById('time_to_calendar').disabled = !e.target.checked;
-			});
-	}
-
 	_legendTabInit() {
 		document.getElementById('legend')
 			.addEventListener('click', (e) => {
@@ -242,6 +229,9 @@ window.widget_svggraph_form = new class {
 					jQuery('#legend_columns').rangeControl('enable');
 				}
 				document.getElementById('legend_statistic').disabled = !e.target.checked;
+				document.getElementById('legend_aggregation').disabled = (!e.target.checked
+					|| !this._any_ds_aggregation_function_enabled
+				);
 			});
 
 		document.getElementById('legend_statistic')
@@ -290,13 +280,13 @@ window.widget_svggraph_form = new class {
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
 						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+							this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
 						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
+							this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
 						}
 					}
 				]
@@ -327,7 +317,7 @@ window.widget_svggraph_form = new class {
 	_addDataset(type) {
 		jQuery(this._dataset_wrapper).zbx_vertical_accordion('collapseAll');
 
-		const template = type == <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>
+		const template = type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
@@ -341,7 +331,7 @@ window.widget_svggraph_form = new class {
 
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length,
-			color: type == <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>
+			color: type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 				? ''
 				: colorPalette.getNextColor(used_colors)
 		}));
@@ -353,7 +343,7 @@ window.widget_svggraph_form = new class {
 		}
 
 		for (const multiselect of dataset.querySelectorAll('.multiselect')) {
-			jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
+			jQuery(multiselect).multiSelect();
 		}
 
 		for (const range_control of dataset.querySelectorAll('.<?= CRangeControl::ZBX_STYLE_CLASS ?>')) {
@@ -375,7 +365,7 @@ window.widget_svggraph_form = new class {
 
 		const cloned_dataset = this._getOpenedDataset();
 
-		if (dataset.dataset.type == <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
+		if (dataset.dataset.type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
 			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
 				this._addSingleItem(
 					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][itemids]`).value,
@@ -482,7 +472,8 @@ window.widget_svggraph_form = new class {
 				writeonly: 1,
 				multiselect: 1,
 				with_webitems: 1,
-				real_hosts: 1
+				real_hosts: 1,
+				resolve_macros: 1
 			});
 		}
 		else {
@@ -615,6 +606,7 @@ window.widget_svggraph_form = new class {
 							writeonly: 1,
 							with_webitems: 1,
 							real_hosts: 1,
+							resolve_macros: 1,
 							dialogue_class: 'modal-popup-generic',
 							excludeids: ids
 						});
@@ -762,6 +754,22 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
+		const all_datasets = this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
+
+		this._any_ds_aggregation_function_enabled = false;
+
+		for (const ds of all_datasets) {
+			const ds_index = ds.getAttribute('data-set');
+			const aggregate_function_select = ds.querySelector(`[name="ds[${ds_index}][aggregate_function]"]`);
+
+			if (aggregate_function_select.value != <?= AGGREGATE_NONE ?>) {
+				this._any_ds_aggregation_function_enabled = true;
+				break;
+			}
+		}
+
+		document.getElementById('legend_aggregation').disabled = !this._any_ds_aggregation_function_enabled;
+
 		// Displaying options tab.
 		const percentile_left_checkbox = document.getElementById('percentile_left');
 		percentile_left_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>];
@@ -812,77 +820,157 @@ window.widget_svggraph_form = new class {
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
 	}
 
+	#update_preview_abort_controller = null;
+	#update_preview_loading_timeout = null;
+
 	_updatePreview() {
-		// Update graph preview.
-		const $preview = jQuery('#svg-graph-preview');
-		const $preview_container = $preview.parent();
-		const preview_data = $preview_container.data();
-		const $form = jQuery(this._form);
-		const url = new Curl('zabbix.php');
+		if (this.#update_preview_abort_controller !== null) {
+			this.#update_preview_abort_controller.abort();
+		}
+
+		if (this.#update_preview_loading_timeout !== null) {
+			clearTimeout(this.#update_preview_loading_timeout);
+		}
+
+		const preview = document.getElementById('svg-graph-preview');
+		const preview_container = preview.parentElement;
+		const preview_computed_style = getComputedStyle(preview);
+		const contents_width = Math.floor(parseFloat(preview_computed_style.width));
+		const contents_height = Math.floor(parseFloat(preview_computed_style.height)) - 10;
+
+		const fields = getFormFields(this._form);
+
+		fields.override_hostid = this.#resolveOverrideHostId();
+		fields.time_period = this.#resolveTimePeriod(fields.time_period);
+
 		const data = {
-			uniqueid: 0,
+			templateid: this._templateid ?? undefined,
+			fields,
 			preview: 1,
-			contents_width: Math.floor($preview.width()),
-			contents_height: Math.floor($preview.height()) - 10
+			contents_width,
+			contents_height
 		};
 
-		url.setArgument('action', 'widget.svggraph.view');
+		const curl = new Curl('zabbix.php');
 
-		const form_fields = $form.serializeJSON();
+		curl.setArgument('action', 'widget.svggraph.view');
 
-		if ('ds' in form_fields) {
-			for (const i in form_fields.ds) {
-				form_fields.ds[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.ds[i]);
-			}
-		}
-		if ('or' in form_fields) {
-			for (const i in form_fields.or) {
-				form_fields.or[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.or[i]);
-			}
-		}
-		data.fields = form_fields;
-
-		if (this._templateid !== null) {
-			data.templateid = this._templateid
-		}
-
-		if (preview_data.xhr) {
-			preview_data.xhr.abort();
-		}
-
-		if (preview_data.timeoutid) {
-			clearTimeout(preview_data.timeoutid);
-		}
-
-		preview_data.timeoutid = setTimeout(function() {
-			$preview_container.addClass('is-loading');
+		this.#update_preview_loading_timeout = setTimeout(() => {
+			this.#update_preview_loading_timeout = null;
+			preview_container.classList.add('is-loading');
 		}, 1000);
 
-		preview_data.xhr = jQuery.ajax({
-			url: url.getUrl(),
+		const abort_controller = new AbortController();
+
+		this.#update_preview_abort_controller = abort_controller;
+
+		fetch(curl.getUrl(), {
 			method: 'POST',
-			contentType: 'application/json',
-			data: JSON.stringify(data),
-			dataType: 'json',
-			success: function(r) {
-				if (preview_data.timeoutid) {
-					clearTimeout(preview_data.timeoutid);
-				}
-				$preview_container.removeClass('is-loading');
-
-				$form.prev('.msg-bad').remove();
-
-				if ('error' in r) {
-					const message_box = makeMessageBox('bad', r.error.messages, r.error.title);
-					message_box.insertBefore($form);
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				if (typeof r.body !== 'undefined') {
-					$preview.html(jQuery(r.body)).attr('unselectable', 'on').css('user-select', 'none');
+				for (const element of this._form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
 				}
-			}
+
+				if (this.#update_preview_loading_timeout !== null) {
+					clearTimeout(this.#update_preview_loading_timeout);
+					this.#update_preview_loading_timeout = null;
+				}
+
+				preview_container.classList.remove('is-loading');
+
+				if ('body' in response) {
+					preview.innerHTML = response.body;
+					preview.setAttribute('unselectable', 'on');
+					preview.style.userSelect = 'none';
+				}
+			})
+			.catch((exception) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
+				for (const element of this._form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				if (this.#update_preview_loading_timeout !== null) {
+					clearTimeout(this.#update_preview_loading_timeout);
+					this.#update_preview_loading_timeout = null;
+				}
+
+				preview_container.classList.remove('is-loading');
+
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this._form.parentNode.insertBefore(message_box, this._form);
+			});
+	}
+
+	#resolveTimePeriod(time_period_field) {
+		if ('from' in time_period_field && 'to' in time_period_field) {
+			return time_period_field;
+		}
+
+		let time_period;
+
+		if (CWidgetBase.FOREIGN_REFERENCE_KEY in time_period_field) {
+			const {reference} = CWidgetBase.parseTypedReference(
+				time_period_field[CWidgetBase.FOREIGN_REFERENCE_KEY]
+			);
+
+			time_period = ZABBIX.EventHub.getData({
+				context: 'dashboard',
+				event_type: 'broadcast',
+				reference,
+				type: '_timeperiod'
+			});
+		}
+
+		if (time_period === undefined) {
+			time_period = ZABBIX.EventHub.getData({
+				context: 'dashboard',
+				event_type: 'broadcast',
+				reference: CDashboard.REFERENCE_DASHBOARD,
+				type: '_timeperiod'
+			});
+		}
+
+		return {
+			from: time_period.from,
+			to: time_period.to
+		};
+	}
+
+	#resolveOverrideHostId() {
+		return ZABBIX.EventHub.getData({
+			context: 'dashboard',
+			event_type: 'broadcast',
+			reference: CDashboard.REFERENCE_DASHBOARD,
+			type: '_hostid'
 		});
-
-		$preview_container.data(preview_data);
 	}
 };

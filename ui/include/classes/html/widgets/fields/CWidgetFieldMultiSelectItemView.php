@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectItem;
 
 class CWidgetFieldMultiSelectItemView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectItem $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectItem $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
 		return 'items';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Item'), 'objects' => _('Items')];
 	}
 
 	protected function getPopupParameters(): array {
@@ -43,7 +47,8 @@ class CWidgetFieldMultiSelectItemView extends CWidgetFieldMultiSelectView {
 				'hide_host_filter' => true
 			]
 			: [
-				'real_hosts' => true
+				'real_hosts' => true,
+				'resolve_macros' => true
 			]
 		);
 	}

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2023 Zabbix SIA
+# Copyright (C) 2001-2024 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -51,7 +51,7 @@ my %c = (
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -594,9 +594,68 @@ sub process_row($)
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
+sub timescaledb_get_version($)
+{
+	my $constant_name = shift;
+
+	my $version_file = dirname($0) . "/../../include/zbx_dbversion_constants.h";
+
+	if (! -r $version_file)
+	{
+		print "Expected file \"$version_file\" not found\n";
+		exit;
+	}
+
+	my $ver = `grep $constant_name $version_file`;
+	chomp($ver);
+	(undef, undef, $ver) = split(' ', $ver);
+	$ver =~ m/"([^\.]+)\.([^\.]+)[\."]/;
+
+	return ($1, $2);
+}
+
 sub timescaledb()
 {
+	my ($minimum_postgres_version_major, $minimum_postgres_version_minor) =
+		timescaledb_get_version("ZBX_POSTGRESQL_MIN_VERSION_STR");
+	my ($minimum_timescaledb_version_major, $minimum_timescaledb_version_minor) =
+		timescaledb_get_version("ZBX_TIMESCALE_MIN_VERSION_STR");
+
 	print<<EOF
+DROP FUNCTION IF EXISTS base36_decode(character varying);
+CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
+RETURNS bigint AS \$\$
+DECLARE
+	a char[];
+	ret bigint;
+	i int;
+	val int;
+	chars varchar;
+BEGIN
+	chars := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	FOR i IN REVERSE char_length(base36)..1 LOOP
+		a := a || substring(upper(base36) FROM i FOR 1)::char;
+	END LOOP;
+	i := 0;
+	ret := 0;
+	WHILE i < (array_length(a, 1)) LOOP
+		val := position(a[i + 1] IN chars) - 1;
+		ret := ret + (val * (36 ^ i));
+		i := i + 1;
+	END LOOP;
+
+	RETURN ret;
+END;
+\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+DROP FUNCTION IF EXISTS cuid_timestamp(cuid varchar(25));
+CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS integer AS \$\$
+BEGIN
+	RETURN CAST(base36_decode(substring(cuid FROM 2 FOR 8))/1000 AS integer);
+END;
+\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+
 DO \$\$
 DECLARE
 	minimum_postgres_version_major		INTEGER;
@@ -610,11 +669,13 @@ DECLARE
 	current_timescaledb_version_major	INTEGER;
 	current_timescaledb_version_minor	INTEGER;
 	current_timescaledb_version_full	VARCHAR;
+
+	current_db_extension			VARCHAR;
 BEGIN
-	SELECT 10 INTO minimum_postgres_version_major;
-	SELECT 2 INTO minimum_postgres_version_minor;
-	SELECT 1 INTO minimum_timescaledb_version_major;
-	SELECT 5 INTO minimum_timescaledb_version_minor;
+	SELECT $minimum_postgres_version_major INTO minimum_postgres_version_major;
+	SELECT $minimum_postgres_version_minor INTO minimum_postgres_version_minor;
+	SELECT $minimum_timescaledb_version_major INTO minimum_timescaledb_version_major;
+	SELECT $minimum_timescaledb_version_minor INTO minimum_timescaledb_version_minor;
 
 	SHOW server_version INTO current_postgres_version_full;
 
@@ -628,9 +689,9 @@ BEGIN
 	IF (current_postgres_version_major < minimum_postgres_version_major OR
 			(current_postgres_version_major = minimum_postgres_version_major AND
 			current_postgres_version_minor < minimum_postgres_version_minor)) THEN
-			RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
-					current_postgres_version_full, minimum_postgres_version_major,
-					minimum_postgres_version_minor;
+		RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
+				current_postgres_version_full, minimum_postgres_version_major,
+				minimum_postgres_version_minor;
 	ELSE
 		RAISE NOTICE 'PostgreSQL version % is valid', current_postgres_version_full;
 	END IF;
@@ -655,27 +716,45 @@ BEGIN
 	ELSE
 		RAISE NOTICE 'TimescaleDB version % is valid', current_timescaledb_version_full;
 	END IF;
+
+	SELECT db_extension FROM config INTO current_db_extension;
+
 EOF
 	;
+
+	my $flags = "migrate_data => true, if_not_exists => true";
 
 	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);
 EOF
 	;
 	}
 
+		print<<EOF
+	PERFORM create_hypertable('auditlog', 'auditid', chunk_time_interval => 604800,
+			time_partitioning_func => 'cuid_timestamp', $flags);
+EOF
+	;
+
 	for ("trends", "trends_uint")
 	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, $flags);
 EOF
 	;
 	}
+
 	print<<EOF
-	UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
-	UPDATE config SET compression_status=1,compress_older='7d';
+
+	IF (current_db_extension = 'timescaledb') THEN
+		RAISE NOTICE 'TimescaleDB extension is already installed; not changing configuration';
+	ELSE
+		UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
+		UPDATE config SET compression_status=1,compress_older='7d';
+	END IF;
+
 	RAISE NOTICE 'TimescaleDB is configured successfully';
 END \$\$;
 EOF

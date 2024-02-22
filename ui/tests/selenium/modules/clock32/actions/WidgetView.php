@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,13 +33,6 @@ use API,
 use Modules\Clock2\Widget;
 
 class WidgetView extends CControllerDashboardWidgetView {
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
 
 	protected function doAction(): void {
 		$config_defaults = [
@@ -170,7 +163,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$clock = ['is_enabled' => true];
 
 		if ($this->hasInput('templateid')) {
-			if ($this->hasInput('dynamic_hostid')) {
+			if ($this->fields_values['override_hostid']) {
 				$template_items = API::Item()->get([
 					'output' => ['key_'],
 					'itemids' => $this->fields_values['itemid'],
@@ -181,7 +174,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$items = API::Item()->get([
 						'output' => ['itemid', 'value_type'],
 						'selectHosts' => ['name'],
-						'hostids' => [$this->getInput('dynamic_hostid')],
+						'hostids' => $this->fields_values['override_hostid'],
 						'filter' => [
 							'key_' => $template_items[0]['key_']
 						],

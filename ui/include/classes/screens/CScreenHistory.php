@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,14 +127,14 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = [];
 
-		$items = API::Item()->get([
-			'output' => ['itemid', 'name', 'key_', 'value_type'],
+		$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+			'output' => ['itemid', 'name_resolved', 'key_', 'value_type'],
 			'selectHosts' => ['name'],
 			'selectValueMap' => ['mappings'],
 			'itemids' => $this->itemids,
 			'webitems' => true,
 			'preservekeys' => true
-		]);
+		]), ['name_resolved' => 'name']);
 
 		if (!$items) {
 			show_error_message(_('No permissions to referred object or it does not exist!'));
@@ -305,40 +305,40 @@ class CScreenHistory extends CScreenBase {
 				);
 
 				foreach ($history_data as $data) {
-					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-						$data['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
-					}
-					else {
-						$data['value'] = rtrim($data['value'], " \t\r\n");
-						$data['value'] = zbx_nl2br($data['value']);
-					}
-
 					$item = $items[$data['itemid']];
 					$host = reset($item['hosts']);
 					$color = null;
 
-					if ($this->filter !== '' && $value_type != ITEM_VALUE_TYPE_BINARY) {
-						$haystack = mb_strtolower($data['value']);
-						$needle = mb_strtolower($this->filter);
-						$pos = mb_strpos($haystack, $needle);
+					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+						$value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+					}
+					else {
+						$data['value'] = rtrim($data['value'], " \t\r\n");
+						$value = zbx_nl2br($data['value']);
 
-						if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
-							$color = $this->markColor;
-						}
-						elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
-							$color = $this->markColor;
-						}
+						if ($this->filter !== '') {
+							$haystack = mb_strtolower($data['value']);
+							$needle = mb_strtolower($this->filter);
+							$pos = mb_strpos($haystack, $needle);
 
-						switch ($color) {
-							case MARK_COLOR_RED:
-								$color = ZBX_STYLE_RED;
-								break;
-							case MARK_COLOR_GREEN:
-								$color = ZBX_STYLE_GREEN;
-								break;
-							case MARK_COLOR_BLUE:
-								$color = ZBX_STYLE_BLUE;
-								break;
+							if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
+								$color = $this->markColor;
+							}
+							elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
+								$color = $this->markColor;
+							}
+
+							switch ($color) {
+								case MARK_COLOR_RED:
+									$color = ZBX_STYLE_RED;
+									break;
+								case MARK_COLOR_GREEN:
+									$color = ZBX_STYLE_GREEN;
+									break;
+								case MARK_COLOR_BLUE:
+									$color = ZBX_STYLE_BLUE;
+									break;
+							}
 						}
 					}
 
@@ -380,7 +380,7 @@ class CScreenHistory extends CScreenBase {
 						}
 					}
 
-					$row[] = (new CCol(new CPre($data['value'])))->addClass($color);
+					$row[] = (new CCol(new CPre($value)))->addClass($color);
 
 					$history_table->addRow($row);
 				}
@@ -393,7 +393,6 @@ class CScreenHistory extends CScreenBase {
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
-					->makeVerticalRotation()
 					->setHeader([(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Value')]);
 
 				$items_by_type = [];
@@ -462,8 +461,8 @@ class CScreenHistory extends CScreenBase {
 						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 					]);
 
-					$table_header[] = (new CColHeader($item['name']))
-						->addClass('vertical_rotation')
+					$table_header[] = (new CSpan($item['name']))
+						->addClass(ZBX_STYLE_TEXT_VERTICAL)
 						->setTitle($item['name']);
 					$history_data_index = 0;
 
@@ -499,7 +498,7 @@ class CScreenHistory extends CScreenBase {
 					new CUrl($this->page_file)
 				);
 
-				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
+				$history_table = (new CTableInfo())->setHeader($table_header);
 
 				foreach ($history_data as $history_data_row) {
 					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_data_row['clock'])))
@@ -603,6 +602,7 @@ class CScreenHistory extends CScreenBase {
 			->setArgument('to', $this->timeline['to'])
 			->setArgument('itemids', $itemIds)
 			->setArgument('type', $this->graphType)
+			->setArgument('resolve_macros', 1)
 			->setArgument('profileIdx', $this->profileIdx)
 			->setArgument('profileIdx2', $this->profileIdx2);
 

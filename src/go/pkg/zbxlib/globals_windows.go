@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/ip.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/iprange.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxhash.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
@@ -66,6 +67,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_ip_reverse.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_vfs_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_alias.o
@@ -79,15 +81,7 @@ package zbxlib
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 
-int CONFIG_MAX_LINES_PER_SECOND = 20;
-int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
-
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
-const char	*progname = NULL;
-const char	title_message[] = "agent";
-const char	*usage_message[] = {};
-const char	*help_message[] = {};
 
 zbx_metric_t	parameters_common[] = {NULL};
 zbx_metric_t	*get_parameters_common(void)

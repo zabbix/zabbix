@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 
 #include "dbconfig.h"
 
+#include "zbxalgo.h"
+#include "zbxdb.h"
+
 /* no changes */
 #define ZBX_DBSYNC_ROW_NONE	0
 /*  a new object must be added to configuration cache */
@@ -39,12 +42,6 @@
 #define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0020)
 #define ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS	__UINT64_C(0x0040)
 #define ZBX_DBSYNC_UPDATE_MACROS		__UINT64_C(0x0080)
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#	define ZBX_HOST_TLS_OFFSET	4
-#else
-#	define ZBX_HOST_TLS_OFFSET	0
-#endif
 
 #define ZBX_DBSYNC_TRIGGER_ERROR	0x80
 
@@ -164,5 +161,7 @@ void	zbx_dbsync_clear_user_macros(void);
 
 int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

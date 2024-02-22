@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,12 +43,11 @@ class testFormFilterProblems extends testFormFilter {
 	protected static $triggerids;
 
 	/**
-	 * Time when events were created.
+	 * Current time.
 	 *
 	 * @var int
 	 */
-	protected static $two_yeasr_ago_1;
-	protected static $two_years_ago_2;
+	protected static $time;
 
 	public $url = 'zabbix.php?action=problem.view&show_timeline=0';
 	public $table_selector = 'class:list-table';
@@ -99,37 +98,22 @@ class testFormFilterProblems extends testFormFilter {
 		$this->assertArrayHasKey('triggerids', $triggers);
 		self::$triggerids = CDataHelper::getIds('description');
 
-		// Make timestamp a little less 1 year ago.
-		self::$two_yeasr_ago_1 = time()-62985600;
+		// Create events and problems.
+		self::$time = time();
+		$trigger_data = [
+			[
+				'name' => 'Filter problems trigger 0',
+				'time' => self::$time - 62985600 // now - 729 days.
+			],
+			[
+				'name' => 'Filter problems trigger 1',
+				'time' => self::$time - 62983800 // now - 728 days 23 hours and 30 minutes.
+			]
+		];
 
-		// Make timestamp a little less than 2 years ago.
-		self::$two_years_ago_2 = time()-62983800;
-
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005500, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 0']).', '.self::$two_yeasr_ago_1.', 0, 1, '.
-				zbx_dbstr('Filter problems trigger 0').', 0)'
-		);
-
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005501, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 1']).', '.self::$two_years_ago_2.', 0, 1, '.
-		zbx_dbstr('Filter problems trigger 1').', 1)'
-		);
-
-		// Create problems.
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005500, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 0']).', '.self::$two_yeasr_ago_1.', 0, '.
-				zbx_dbstr('Filter problems trigger 0').', 0)'
-		);
-
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005501, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 1']).', '.self::$two_years_ago_2.', 0, '.
-				zbx_dbstr('Filter problems trigger 1').', 1)'
-		);
-
-		// Change triggers' state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Filter problems trigger 0').', '.
-				zbx_dbstr('Filter problems trigger 1').')'
-		);
+		foreach ($trigger_data as $params) {
+			CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
+		}
 	}
 
 	public static function getCheckCreatedFilterData() {
@@ -172,8 +156,7 @@ class testFormFilterProblems extends testFormFilter {
 					],
 					'filter' => [
 						'Show number of records' => true
-					],
-					'tab_id' => '1'
+					]
 				]
 			],
 			[
@@ -184,8 +167,7 @@ class testFormFilterProblems extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'simple_name'
-					],
-					'tab_id' => '2'
+					]
 				]
 			],
 			// Dataprovider with symbols instead of name.
@@ -198,8 +180,7 @@ class testFormFilterProblems extends testFormFilter {
 					'filter' => [
 						'Name' => '*;%№:?(',
 						'Show number of records' => true
-					],
-					'tab_id' => '3'
+					]
 				]
 			],
 			// Dataprovider with name as cyrillic.
@@ -211,8 +192,7 @@ class testFormFilterProblems extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'кириллица'
-					],
-					'tab_id' => '4'
+					]
 				]
 			],
 			// Two dataproviders with same name and options.
@@ -221,8 +201,7 @@ class testFormFilterProblems extends testFormFilter {
 					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
-					],
-					'tab_id' => '5'
+					]
 				]
 			],
 			[
@@ -230,9 +209,10 @@ class testFormFilterProblems extends testFormFilter {
 					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
-					],
-					'tab_id' => '6'
-				]
+					]
+				],
+				// Should be added previous 5 filter tabs from data provider.
+				'tab' => '6'
 			]
 		];
 	}
@@ -251,9 +231,9 @@ class testFormFilterProblems extends testFormFilter {
 		return [
 			[
 				[
-					'Hosts' => ['Host for tag permissions'],
-					'Not classified' => true,
-					'Show tags' => '2'
+					'Hosts' => ['Host for triggers filtering'],
+					'Average' => true,
+					'Show tags' => '1'
 				]
 			],
 			[
@@ -333,9 +313,8 @@ class testFormFilterProblems extends testFormFilter {
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {
 		$this->createFilter($data, 'Admin', 'zabbix');
-		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
-		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->waitUntilVisible()->one()->getAttribute('data-target');
-		$form = $this->query('id:'.$formid)->asForm()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
+		$form = $filter->getForm();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking result amount before changing time period.
@@ -343,9 +322,9 @@ class testFormFilterProblems extends testFormFilter {
 
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
-			$filter_container->editProperties();
+			$filter->editProperties();
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-			$dialog->fill(['Set custom time period' => true, 'From' => 'now-2y']);
+			$dialog->fill(['Override time period selector' => true, 'From' => 'now-2y']);
 			$dialog->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();
@@ -354,12 +333,12 @@ class testFormFilterProblems extends testFormFilter {
 		else {
 			// Changing time period from timeselector tab.
 			$form->fill(['Show' => 'History']);
-			$this->query('xpath://li[@data-target="tabfilter_timeselector"]/a['.
-					CXPathHelper::fromClass('tabfilter-item-link').']')->waitUntilClickable()->one()->click();
+			$filter->setContext(CFilterElement::CONTEXT_RIGHT);
+			$filter->selectTab('Last 1 hour');
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
-			$this->query('id:apply')->one()->click();
-			$filter_container->selectTab($data['filter']['Name']);
-			$this->query('button:Update')->one()->click();
+			$filter->query('id:apply')->one()->click();
+			$filter->setContext(CFilterElement::CONTEXT_LEFT)->selectTab($data['filter']['Name']);
+			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();
 		}

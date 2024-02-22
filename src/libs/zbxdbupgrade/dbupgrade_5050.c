@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,9 +143,10 @@ static int	DBpatch_5050009(void)
 			"on t.triggerid=s.triggerid order by t.triggerid");
 
 	zbx_db_insert_prepare(&ins_service_problem_tag, "service_problem_tag", "service_problem_tagid", "serviceid",
-			"tag", "operator", "value", NULL);
-	zbx_db_insert_prepare(&ins_trigger_tag, "trigger_tag", "triggertagid", "triggerid", "tag", "value", NULL);
-	zbx_db_insert_prepare(&ins_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
+			"tag", "operator", "value", (char *)NULL);
+	zbx_db_insert_prepare(&ins_trigger_tag, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
+			(char *)NULL);
+	zbx_db_insert_prepare(&ins_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -683,7 +684,8 @@ static int	DBpatch_5050068(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int",
+			(char *)NULL);
 
 	result = zbx_db_select("select roleid,type from role");
 
@@ -1457,18 +1459,18 @@ static int	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_
 	int			ret = FAIL;
 
 	zbx_db_insert_prepare(&db_insert_sla, "sla", "slaid", "name", "status", "slo", "effective_date", "period",
-			"timezone", NULL);
+			"timezone", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_sla_service_tag, "sla_service_tag", "sla_service_tagid", "slaid", "tag",
-			"value", NULL);
+			"value", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_service_tag, "service_tag", "servicetagid", "serviceid", "tag", "value",
-			NULL);
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_sla_schedule, "sla_schedule", "sla_scheduleid", "slaid", "period_from",
-			"period_to", NULL);
+			"period_to", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_sla_excluded_downtime, "sla_excluded_downtime", "sla_excluded_downtimeid",
-			"slaid", "period_from", "period_to", "name", NULL);
+			"slaid", "period_from", "period_to", "name", (char *)NULL);
 
 	for (i = 0, slaid = 0; i < uniq_slas->values_num; i++)
 	{

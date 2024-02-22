@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@
 **/
 
 
+use Widgets\TrigOver\Includes\ViewHelper;
+
 /**
  * @var CPartial $this
- * @var array $data
+ * @var array    $data
  */
 
-$table = (new CTableInfo())
-	->makeVerticalRotation()
-	->setHeadingColumn(0);
+$table = (new CTableInfo())->setHeadingColumn(0);
 
 $header[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
 
 foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
-	$header[] = (new CColHeader($trigname))
-		->addClass('vertical_rotation')
+	$header[] = (new CSpan($trigname))
+		->addClass(ZBX_STYLE_TEXT_VERTICAL)
 		->setTitle($trigname);
 }
 
@@ -50,7 +50,7 @@ foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 		}
 
 		if ($trigger) {
-			$row[] = getTriggerOverviewCell($trigger, $data['dependencies']);
+			$row[] = ViewHelper::getTriggerOverviewCell($trigger, $data['dependencies']);
 		}
 		else {
 			$row[] = new CCol();

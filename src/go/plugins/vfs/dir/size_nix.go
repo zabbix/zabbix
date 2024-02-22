@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ package dir
 import (
 	"fmt"
 	"io/fs"
-	"os"
 	"syscall"
 )
 
@@ -59,16 +58,31 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	i, err := d.Info()
 	if err != nil {
 		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+
 		return true
 	}
 
-	for _, f := range cp.files {
-		if os.SameFile(f, i) {
-			return true
-		}
+	iStat, ok := i.Sys().(*syscall.Stat_t)
+	if !ok {
+		impl.Logger.Errf("failed to get file info for path %s", path)
+
+		return true
 	}
 
-	cp.files = append(cp.files, i)
+	if !i.Mode().IsRegular() || iStat.Nlink <= 1 {
+		return false
+	}
+
+	iData := inodeData{
+		iStat.Dev, iStat.Ino,
+	}
+
+	_, ok = cp.files[iData]
+	if ok {
+		return true
+	}
+
+	cp.files[iData] = true
 
 	return false
 }

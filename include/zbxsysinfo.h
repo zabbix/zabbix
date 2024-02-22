@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ int	zbx_check_key_access_rules(const char *metric);
 int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);
 
 void	zbx_set_user_parameter_dir(const char *path);
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
@@ -154,5 +154,28 @@ ZBX_THREAD_ENTRY(collector_thread, args);
 
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
+
+#if defined(_WINDOWS)
+/* perfstat */
+#include "zbxwin32.h"
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error);
+void			zbx_remove_perf_counter(zbx_perf_counter_data_t *counter);
+
+typedef enum
+{
+	ZBX_SINGLE_THREADED,
+	ZBX_MULTI_THREADED
+}
+zbx_threadedness_t;
+
+int	zbx_init_perf_collector(zbx_threadedness_t threadedness, char **error);
+void	zbx_free_perf_collector(void);
+#endif
+
+#define ZBX_CHECK_TIMEOUT_UNDEFINED	0
+int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len);
+
+int	sysinfo_get_config_timeout(void);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

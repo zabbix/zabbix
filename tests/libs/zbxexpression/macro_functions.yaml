@@ -1,0 +1,81 @@
+---
+test case: Expand '{{HOST.HOST}.regsub([0-9]+, \0)}'
+in:
+  macro_value: 'abc123'
+  expression: '{{HOST.HOST}.regsub([0-9]+, \0)}'
+out:
+  expression: '123'
+  return: SUCCEED
+---
+test case: Expand 'ABC{{HOST.HOST}.regsub([0-9]+, \0)}'
+in:
+  macro_value: 'abcdef'
+  expression: 'ABC{{HOST.HOST}.regsub([0-9]+, \0)}'
+out:
+  expression: 'ABC'
+  return: SUCCEED
+---
+test case: Expand '{{HOST.HOST}.iregsub([a-z]+, \0)}'
+in:
+  macro_value: 'ABC123'
+  expression: '{{HOST.HOST}.iregsub([a-z]+, \0)}'
+out:
+  expression: 'ABC'
+  return: SUCCEED
+---
+test case: Expand '{{HOST.HOST}.fmtnum(2)}'
+in:
+  macro_value: '123.456'
+  expression: '{{HOST.HOST}.fmtnum(2)}'
+out:
+  expression: '123.46'
+  return: SUCCEED
+---
+test case: Expand '{{$USERMACRO}.regsub([0-9]+, \0)}'
+in:
+  macro_value: 'abc123'
+  expression: '{{$USERMACRO}.regsub([0-9]+, \0)}'
+out:
+  expression: '123'
+  return: SUCCEED
+---
+test case: Expand '{{$USERMACRO}.iregsub([a-z]+, \0)}'
+in:
+  macro_value: 'ABC123'
+  expression: '{{$USERMACRO}.iregsub([a-z]+, \0)}'
+out:
+  expression: 'ABC'
+  return: SUCCEED
+---
+test case: Expand '{{$USERMACRO}.fmtnum(2)}'
+in:
+  macro_value: '123.456'
+  expression: '{{$USERMACRO}.fmtnum(2)}'
+out:
+  expression: '123.46'
+  return: SUCCEED
+---
+test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)} 1'
+in:
+  macro_value: '1697177104'
+  expression: '{{$USERMACRO}.fmttime(%H:%M:%S)}'
+out:
+  expression: '09:05:04'
+  return: SUCCEED
+---
+test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)} 2'
+in:
+  macro_value: '2023-10-13T09:05:04'
+  expression: '{{$USERMACRO}.fmttime(%H:%M:%S)}'
+out:
+  expression: '09:05:04'
+  return: SUCCEED
+---
+test case: Expand '{{$USERMACRO}.fmttime(%H:%M:%S)} 3'
+in:
+  macro_value: '2023-10-13T09:05:04+0200'
+  expression: '{{$USERMACRO}.fmttime(%H:%M:%S)}'
+out:
+  expression: '09:05:04'
+  return: SUCCEED
+...

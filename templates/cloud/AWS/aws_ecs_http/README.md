@@ -39,11 +39,10 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:Describe*",
-              "cloudwatch:Get*",
-              "cloudwatch:List*",
-              "ecs:Describe*",
-              "ecs:List*"
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "ecs:ListServices",
+                "esc:ListTasks"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -52,7 +51,36 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
-Set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.ECS.CLUSTER.NAME}"
+If you are using role-based authorization, set the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "ecs:ListServices",
+                "esc:ListTasks",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+Set the following macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.ECS.CLUSTER.NAME}"
+
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -69,6 +97,7 @@ Additional information about the metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -83,9 +112,9 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS ECS Cluster: Get cluster metrics|<p>Get cluster metrics.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ECS Cluster: Get cluster services|<p>Get cluster services.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_cluster_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ECS Cluster: Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ecs.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ECS Cluster: Get cluster metrics|<p>Get cluster metrics.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ECS Cluster: Get cluster services|<p>Get cluster services.</p><p>Full metrics list related to ECS: https://docs.aws.amazon.com/AmazonECS/latest/userguide/metrics-dimensions.html</p>|Script|aws.ecs.get_cluster_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ECS Cluster: Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.ecs.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ECS Cluster: Get metrics check|<p>Data collection check.</p>|Dependent item|aws.ecs.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS ECS Cluster: Get alarms check|<p>Data collection check.</p>|Dependent item|aws.ecs.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS ECS Cluster: Container Instance Count|<p>'The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.'</p>|Dependent item|aws.ecs.container_instance_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -124,7 +153,7 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS ECS Cluster Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS ECS Cluster Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS ECS Cluster Alarms: "{#ALARM_NAME}" has 'Insufficient data' state||`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Cluster Services discovery
@@ -145,10 +174,10 @@ Additional information about the metrics and used API methods:
 |AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization|<p>"A number of CPU units used by tasks in the resource that is specified by the dimension set that you're using.</p><p> This metric is only collected for tasks that have a defined CPU reservation in their task definition."</p>|Dependent item|aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory utilized|<p>'The memory being used by tasks in the resource that is specified by the dimension set that you're using.</p><p>This metric is only collected for tasks that have a defined memory reservation in their task definition.'</p>|Dependent item|aws.ecs.services.memory_utilized["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
 |AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory utilization|<p>'The memory being used by tasks in the resource that is specified by the dimension set that you're using.</p><p>This metric is only collected for tasks that have a defined memory reservation in their task definition.'</p>|Dependent item|aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory reserved|<p>'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using. </p><p>This metric is only collected for tasks that have a defined memory reservation in their task definition.'</p>|Dependent item|aws.ecs.services.memory_reserved["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory reserved|<p>'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.</p><p>This metric is only collected for tasks that have a defined memory reservation in their task definition.'</p>|Dependent item|aws.ecs.services.memory_reserved["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
 |AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network rx bytes|<p>'The number of bytes received by the resource that is specified by the dimensions that you're using.</p><p>This metric is only available for containers in tasks using the awsvpc or bridge network modes.'</p>|Dependent item|aws.ecs.services.network.rx["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network tx bytes|<p>'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.</p><p>This metric is only available for containers in tasks using the awsvpc or bridge network modes.'</p>|Dependent item|aws.ecs.services.network.tx["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Get metrics|<p>Get metrics of ESC services.</p><p>Full metrics list related to ECS : https://docs.aws.amazon.com/ecs/index.html</p>|Script|aws.ecs.services.get_metrics["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Get metrics|<p>Get metrics of ESC services.</p><p>Full metrics list related to ECS : https://docs.aws.amazon.com/ecs/index.html</p>|Script|aws.ecs.services.get_metrics["{#AWS.ECS.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Trigger prototypes for Cluster Services discovery
 

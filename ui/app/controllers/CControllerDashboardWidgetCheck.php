@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,6 +86,9 @@ class CControllerDashboardWidgetCheck extends CController {
 			}
 
 			$output['error']['messages'] = array_column(get_and_clear_messages(), 'message');
+		}
+		else {
+			$output['fields'] = $form->getFieldsValues();
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

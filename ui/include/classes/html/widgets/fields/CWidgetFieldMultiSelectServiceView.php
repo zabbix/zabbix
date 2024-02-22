@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,13 +23,17 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectService;
 
 class CWidgetFieldMultiSelectServiceView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectService $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectService $field) {
+		parent::__construct($field);
 
 		$this->custom_select = true;
 	}
 
 	protected function getObjectName(): string {
 		return 'services';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Service'), 'objects' => _('Services')];
 	}
 }

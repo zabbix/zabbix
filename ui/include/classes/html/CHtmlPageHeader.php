@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,7 +133,11 @@ class CHtmlPageHeader {
 				<meta name="viewport" content="width=device-width, initial-scale=1">
 				<meta name="Author" content="Zabbix SIA" />
 		HTML;
-		echo (new CTag('title', true))->addItem($this->title);
+
+		if ($this->title !== '') {
+			echo (new CTag('title', true))->addItem($this->title);
+		}
+
 		echo <<<HTML
 				<link rel="icon" href="favicon.ico">
 				<link rel="apple-touch-icon-precomposed" sizes="76x76" href="assets/img/apple-touch-icon-76x76-precomposed.png">

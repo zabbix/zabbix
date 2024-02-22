@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,14 +20,16 @@
 #include "vfs_file.h"
 #include "../sysinfo.h"
 
+#include "dir.h"
+
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
-#include "dir.h"
 #include "zbxalgo.h"
 #include "zbxfile.h"
+#include "zbxjson.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
@@ -37,7 +39,6 @@
 #include <sddl.h> /* ConvertSidToStringSid */
 #endif
 
-#define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
 int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -66,9 +67,7 @@ int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		char		cbuf[MAX_BUFFER_LEN];
 		zbx_uint64_t	lines_num = 0;
 		int		f;
-		double		ts;
-
-		ts = zbx_time();
+		double		ts = zbx_time();
 
 		if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		{
@@ -355,14 +354,13 @@ int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#define ZBX_MAX_VFS_FILE_SIZE	16 * ZBX_MEBIBYTE	/* file contents larger than 64 KB will be truncated in the database */
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
 	size_t		contents_alloc = 0, contents_offset = 0;
 	int		nbytes, flen, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_stat_t	stat_buf;
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
 
 	if (2 < request->nparam)
 	{
@@ -402,7 +400,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
+	if (ZBX_MAX_VFS_FILE_SIZE < stat_buf.st_size)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 		goto err;
@@ -425,7 +423,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		if (ZBX_MAX_DB_FILE_SIZE < (flen += nbytes))
+		if (ZBX_MAX_VFS_FILE_SIZE < (flen += nbytes))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 			zbx_free(contents);
@@ -444,7 +442,15 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != contents)
 	{
-		utf8 = zbx_convert_to_utf8(contents, contents_offset, encoding);
+		char	*err_msg;
+
+		if (NULL == (utf8 = zbx_convert_to_utf8(contents, contents_offset, encoding, &err_msg)))
+		{
+			zbx_free(contents);
+			SET_MSG_RESULT(result, err_msg);
+			goto err;
+		}
+
 		zbx_free(contents);
 		zbx_rtrim_utf8(utf8, "\r\n");
 
@@ -459,17 +465,18 @@ err:
 		close(f);
 
 	return ret;
+#undef ZBX_MAX_VFS_FILE_SIZE
 }
 
 int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
-	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str, buf[MAX_BUFFER_LEN],
+			*utf8, *tmp, *ptr = NULL, *line;
+	int		f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
+	ssize_t		nbytes;
+	void		*saveptr = NULL;
 
 	if (6 < request->nparam)
 	{
@@ -535,8 +542,10 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
+	while (0 < (nbytes = zbx_buf_readln(f, buf, sizeof(buf), encoding, &line, &saveptr)))
 	{
+		char	*err_msg;
+
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
@@ -546,7 +555,12 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
+		if (NULL == (utf8 = zbx_convert_to_utf8(line, nbytes, encoding, &err_msg)))
+		{
+			SET_MSG_RESULT(result, err_msg);
+			goto err;
+		}
+
 		zbx_rtrim(utf8, "\r\n");
 		zbx_regexp_sub(utf8, regexp, output, &ptr);
 		zbx_free(utf8);
@@ -581,6 +595,8 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(saveptr);
+
 	if (-1 != f)
 		close(f);
 
@@ -589,13 +605,13 @@ err:
 
 int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, *tmp, encoding[32];
-	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
-	int		nbytes, res, f = -1, ret = SYSINFO_RET_FAIL;
+	char		*filename, *regexp, *tmp, encoding[32], *line, buf[MAX_BUFFER_LEN], *utf8, *start_line_str,
+			*end_line_str;
+	int		res, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
+	ssize_t		nbytes;
+	void		*saveptr = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -662,8 +678,10 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	res = 0;
 
-	while (0 == res && 0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
+	while (0 == res && 0 < (nbytes = zbx_buf_readln(f, buf, sizeof(buf), encoding, &line, &saveptr)))
 	{
+		char	*err_msg;
+
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
@@ -673,7 +691,11 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
+		if (NULL == (utf8 = zbx_convert_to_utf8(line, nbytes, encoding, &err_msg)))
+		{
+			SET_MSG_RESULT(result, err_msg);
+			goto err;
+		}
 
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))
@@ -699,6 +721,8 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(saveptr);
+
 	if (-1 != f)
 		close(f);
 
@@ -707,15 +731,13 @@ err:
 
 static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 {
-	int		i, nbytes, f, ret = SYSINFO_RET_FAIL;
+	int		nbytes, f, ret = SYSINFO_RET_FAIL;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
 	size_t		sz;
 	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
@@ -755,7 +777,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 	sz = ZBX_MD5_DIGEST_SIZE * 2 + 1;
 	hash_text = (char *)zbx_malloc(hash_text, sz);
 
-	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
+	for (int i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 		zbx_snprintf(&hash_text[i << 1], sz - (i << 1), "%02x", hash[i]);
 
 	SET_STR_RESULT(result, hash_text);
@@ -907,9 +929,17 @@ err:
 
 static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 {
+	/* On HP-UX zbx_sha256_finish() requires buffer specified in 2nd argument to */
+	/* be uint32_t-aligned to avoid crash (ZBX-23471). */
+	typedef union	{
+		zbx_uint32_t	ui[ZBX_SHA256_DIGEST_SIZE / sizeof(zbx_uint32_t)];
+		char		ch[ZBX_SHA256_DIGEST_SIZE];
+	} aligned_buf_t;
+
 	int		i, f, ret = SYSINFO_RET_FAIL;
 	char		buf[16 * ZBX_KIBIBYTE];
-	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	aligned_buf_t	hash_res;
+	char		hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	double		ts;
 	ssize_t		nr;
 	sha256_ctx	ctx;
@@ -947,13 +977,13 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_sha256_finish(&ctx, hash_res);
+	zbx_sha256_finish(&ctx, hash_res.ch);
 
 	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
 	{
 		char z[3];
 
-		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res[i]);
+		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res.ch[i]);
 		hash_res_stringhexes[i * 2] = z[0];
 		hash_res_stringhexes[i * 2 + 1] = z[1];
 	}
@@ -1284,7 +1314,7 @@ static char	*get_print_time(time_t st_raw)
 
 static char	*canonicalize_path(const char *fullname)
 {
-	int			i, up_level = 0;
+	int			up_level = 0;
 	char			*name;
 	const char		*p_start = &fullname[1], *p_to_delimiter;
 	size_t			name_alloc = 0, name_offset = 0;
@@ -1308,9 +1338,9 @@ static char	*canonicalize_path(const char *fullname)
 
 	name = NULL;
 
-	for (i = names.values_num - 1; 0 <= i; i--)
+	for (int i = names.values_num - 1; 0 <= i; i--)
 	{
-		char *ptr = names.values[i];
+		char	*ptr = names.values[i];
 
 		if (0 == strcmp(ptr, ".") || 0 == strlen(ptr))
 		{
@@ -1333,7 +1363,7 @@ static char	*canonicalize_path(const char *fullname)
 
 	if (0 < names.values_num)
 	{
-		for (i = 0; i < names.values_num; i++)
+		for (int i = 0; i < names.values_num; i++)
 			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/%s", names.values[i]);
 	}
 	else

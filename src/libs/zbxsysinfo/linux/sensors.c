@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
@@ -78,14 +77,14 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 #ifndef KERNEL_2_4
 /*********************************************************************************
  *                                                                               *
- * Purpose: locate and read the name attribute of a sensor from sysfs            *
+ * Purpose: locates and reads name attribute of sensor from sysfs                *
  *                                                                               *
- * Parameters:  device        - [IN] the path to sensor data in sysfs            *
- *              attribute     - [OUT] the sensor name                            *
+ * Parameters:  device        - [IN] path to sensor data in sysfs                *
+ *              attribute     - [OUT] sensor name                                *
  *                                                                               *
- * Return value: Subfolder where the sensor name file was found or NULL          *
+ * Return value: Subfolder where the sensor name file was found or NULL.         *
  *                                                                               *
- * Comments: attribute string must be freed by caller after it's been used.      *
+ * Comments: Attribute string must be freed by caller after it's been used.      *
  *                                                                               *
  *********************************************************************************/
 static const char	*sysfs_read_attr(const char *device, char **attribute)

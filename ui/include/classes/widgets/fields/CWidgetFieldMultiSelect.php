@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,32 +25,19 @@ use Zabbix\Widgets\CWidgetField;
 
 abstract class CWidgetFieldMultiSelect extends CWidgetField {
 
+	public const DEFAULT_VALUE = [];
+
 	// Is selecting multiple objects or a single one?
 	private bool $is_multiple = true;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setDefault([]);
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
 	public function setValue($value): self {
 		$this->value = (array) $value;
-
-		return $this;
-	}
-
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
-
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
-		}
 
 		return $this;
 	}
@@ -69,5 +56,55 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		$this->is_multiple = $is_multiple;
 
 		return $this;
+	}
+
+	public function preventDefault($default_prevented = true): self {
+		if ($default_prevented) {
+			$this->setMultiple(false);
+		}
+
+		return parent::preventDefault($default_prevented);
+	}
+
+	public function toApi(array &$widget_fields = []): void {
+		$value = $this->getValue();
+
+		if ($value === $this->getDefault()) {
+			return;
+		}
+
+		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+				'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,
+				'value' => $value[self::FOREIGN_REFERENCE_KEY]
+			];
+		}
+		else {
+			parent::toApi($widget_fields);
+		}
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$value = $this->getValue();
+
+		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
+			$validation_rules = ['type' => API_OBJECT, 'fields' => [
+				self::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
+			]];
+
+			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($validation_rules['fields'][self::FOREIGN_REFERENCE_KEY], API_NOT_EMPTY);
+			}
+		}
+		else {
+			$validation_rules = parent::getValidationRules($strict);
+
+			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+			}
+		}
+
+		return $validation_rules;
 	}
 }

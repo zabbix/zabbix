@@ -45,8 +45,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PD: Get instance metrics|<p>Get TiDB PD instance metrics.</p>|HTTP agent|pd.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
-|PD: Get instance status|<p>Get TiDB PD instance status info.</p>|HTTP agent|pd.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"status": "0"}`</p></li></ul>|
+|PD: Get instance metrics|<p>Get TiDB PD instance metrics.</p>|HTTP agent|pd.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
+|PD: Get instance status|<p>Get TiDB PD instance status info.</p>|HTTP agent|pd.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"status": "0"}`</p></li></ul>|
 |PD: Status|<p>Status of PD instance.</p>|Dependent item|pd.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |PD: gRPC Commands total, rate|<p>The rate at which gRPC commands are completed.</p>|Dependent item|pd.grpc_command.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |PD: Version|<p>Version of the PD instance.</p>|Dependent item|pd.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|

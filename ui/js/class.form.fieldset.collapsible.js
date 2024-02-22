@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 
 class CFormFieldsetCollapsible {
 
-	static ZBX_STYLE_COLLAPSIBLE = 'collapsible';
-	static ZBX_STYLE_COLLAPSED = 'collapsed';
 	static ZBX_STYLE_TOGGLE = 'toggle';
 
 	constructor(target) {
@@ -34,9 +32,9 @@ class CFormFieldsetCollapsible {
 
 	_init() {
 		this._toggle.addEventListener('click', () => {
-			const is_collapsed = this._target.classList.contains(CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSED);
+			const is_collapsed = this._target.classList.contains(ZBX_STYLE_COLLAPSED);
 
-			this._target.classList.toggle(CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSED, !is_collapsed);
+			this._target.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
 
 			this._toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
 			this._toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
@@ -44,7 +42,10 @@ class CFormFieldsetCollapsible {
 		});
 
 		for (const element of this._observed_fields) {
-			new ResizeObserver(() => this._update()).observe(element);
+			new ResizeObserver(() => {
+				// Use of setTimeout() to prevent ResizeObserver observation error in Safari.
+				setTimeout(() => this._update());
+			}).observe(element);
 		}
 	}
 

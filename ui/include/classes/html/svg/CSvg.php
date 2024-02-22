@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class CSvg extends CSvgTag {
 	 * @param int $width
 	 * @param int $height
 	 *
-	 * @return CSvg
+	 * @return $this
 	 */
 	public function setSize(int $width, int $height): self {
 		$this->setAttribute('width', $width.'px');

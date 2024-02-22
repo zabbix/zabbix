@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,7 +104,8 @@
 		switch (+form_data['type']) {
 			case <?= ITEM_TYPE_ZABBIX ?>:
 				properties = {
-					key: form_data['key'].trim()
+					key: form_data['key'].trim(),
+					timeout: form_data['timeout']
 				};
 				break;
 
@@ -112,21 +113,29 @@
 				properties = {
 					key: form_data['key'].trim(),
 					username: form_data['username'],
-					password: form_data['password']
+					password: form_data['password'],
+					timeout: form_data['timeout']
 				};
 				break;
 
 			case <?= ITEM_TYPE_SNMP ?>:
 				properties = {
 					snmp_oid: form_data['snmp_oid'],
+					timeout: form_data['timeout'],
 					flags: form_data['flags']
 				};
 				break;
 
 			case <?= ITEM_TYPE_INTERNAL ?>:
-			case <?= ITEM_TYPE_EXTERNAL ?>:
 				properties = {
 					key: form_data['key'].trim()
+				};
+				break;
+
+			case <?= ITEM_TYPE_EXTERNAL ?>:
+				properties = {
+					key: form_data['key'].trim(),
+					timeout: form_data['timeout']
 				};
 				break;
 
@@ -135,7 +144,8 @@
 					key: form_data['key'].trim(),
 					params_ap: form_data['params_ap'],
 					username: form_data['username'],
-					password: form_data['password']
+					password: form_data['password'],
+					timeout: form_data['timeout']
 				};
 				break;
 
@@ -183,7 +193,8 @@
 					authtype: form_data['authtype'],
 					params_es: form_data['params_es'],
 					username: form_data['username'],
-					password: form_data['password']
+					password: form_data['password'],
+					timeout: form_data['timeout']
 				};
 
 				if (properties.authtype == <?= ITEM_AUTHTYPE_PUBLICKEY ?>) {
@@ -199,7 +210,8 @@
 					key: form_data['key'].trim(),
 					params_es: form_data['params_es'],
 					username: form_data['username'],
-					password: form_data['password']
+					password: form_data['password'],
+					timeout: form_data['timeout']
 				};
 				break;
 
@@ -216,14 +228,6 @@
 				properties = {
 					key: form_data['key'].trim(),
 					params_f: form_data['params_f'],
-				};
-				break;
-
-			case <?= ITEM_TYPE_SIMPLE ?>:
-				properties = {
-					key: form_data['key'].trim(),
-					username: form_data['username'],
-					password: form_data['password'],
 				};
 				break;
 
@@ -267,7 +271,8 @@
 	 *                                     - 'test' button to test single preprocessing step (step index).
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_element, step_obj_nr) {
-		var $row = jQuery(trigger_element).closest('.preprocessing-list-item, .preprocessing-list-foot, .tfoot-buttons'),
+		var $row = jQuery(trigger_element)
+					.closest('.preprocessing-list-item, .preprocessing-list-foot, .overlay-dialogue-footer'),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 
@@ -286,6 +291,6 @@
 			show_final_result: show_final_result ? 1 : 0,
 			get_value: get_value ? 1 : 0,
 			data: cached_values
-		}), {dialogueid: 'item-test', trigger_element});
+		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
 	}
 </script>

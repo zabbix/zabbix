@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package file
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"os"
 	"regexp"
@@ -31,7 +32,7 @@ import (
 	"zabbix.com/pkg/zbxregexp"
 )
 
-func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
+func (p *Plugin) exportRegexp(params []string, timeout int) (result interface{}, err error) {
 	var startline, endline, curline uint64
 
 	start := time.Now()
@@ -93,7 +94,7 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 	for 0 < undecodedBufNumBytes || initial {
 		elapsed := time.Since(start)
 
-		if elapsed.Seconds() > float64(p.options.Timeout) {
+		if elapsed.Seconds() > float64(timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 
@@ -103,7 +104,10 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		if err != nil {
 			return nil, err
 		}
-		utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
+		utf8_buf, utf8_bufNumBytes, err := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to convert from encoding to utf8: %w", err)
+		}
 
 		utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 		utf8_bufStr = strings.TrimRight(utf8_bufStr, "\r\n")

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,16 @@
 **/
 
 #include "zbxhttp.h"
+#include "zbxtypes.h"
+#include <stddef.h>
+#include "zbxalgo.h"
 
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_LIBCURL
-
-extern char	*CONFIG_SSL_CA_LOCATION;
-extern char	*CONFIG_SSL_CERT_LOCATION;
-extern char	*CONFIG_SSL_KEY_LOCATION;
 
 size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -92,7 +92,8 @@ int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zb
 
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
-		const char *config_source_ip, char **error)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	CURLcode	err;
 
@@ -120,9 +121,9 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		}
 	}
 
-	if (0 != verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
+	if (0 != verify_peer && NULL != config_ssl_ca_location)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, config_ssl_ca_location)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot specify directory holding CA certificates: %s",
 					curl_easy_strerror(err));
@@ -132,9 +133,8 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 
 	if (NULL != ssl_cert_file && '\0' != *ssl_cert_file)
 	{
-		char	*file_name;
+		char	*file_name = zbx_dsprintf(NULL, "%s/%s", config_ssl_cert_location, ssl_cert_file);
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_CERT_LOCATION, ssl_cert_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);
@@ -156,9 +156,8 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 
 	if (NULL != ssl_key_file && '\0' != *ssl_key_file)
 	{
-		char	*file_name;
+		char	*file_name = zbx_dsprintf(NULL, "%s/%s", config_ssl_key_location, ssl_key_file);
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", CONFIG_SSL_KEY_LOCATION, ssl_key_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL private key file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLKEY, file_name);
@@ -311,7 +310,9 @@ char	*zbx_http_parse_header(char **headers)
 }
 
 int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, char **out, long *response_code, char **error)
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **out,
+		long *response_code, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -336,8 +337,11 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, config_source_ip, error))
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, error))
+	{
 		goto clean;
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)))
 	{
@@ -575,9 +579,12 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	zbx_json_free(&json);
 }
 
-CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context)
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
+		int check_response_code)
 {
 	CURLcode	err;
+	char	status_codes[] = "200,400,401,403,404,405,415,422";
+	long	response_code;
 
 	/* try to retrieve page several times depending on number of retries */
 	do
@@ -586,6 +593,22 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 
 		if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 		{
+			if (1 == check_response_code)
+			{
+				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE,
+						&response_code)))
+				{
+					zabbix_log(LOG_LEVEL_INFORMATION, "cannot get the response code: %s",
+							curl_easy_strerror(err));
+
+					goto next_attempt;
+				}
+				else if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
+					goto next_attempt;
+
+				return err;
+			}
+
 			return err;
 		}
 		else
@@ -597,8 +620,12 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 			}
 		}
 
+next_attempt:
 		context->header.offset = 0;
 		context->body.offset = 0;
+
+		if (0 != attempt_interval && 1 < context->max_attempts)
+			zbx_sleep((unsigned int)attempt_interval);
 	}
 	while (0 < --context->max_attempts);
 
@@ -638,11 +665,14 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 	switch (context->retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
-			if (NULL != context->body.data && FAIL == zbx_is_utf8(context->body.data))
+			if (NULL == context->body.data)
 			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_strdup(NULL, "Server returned empty content");
 				return FAIL;
 			}
+
+			zbx_http_convert_to_utf8(easyhandle, &context->body.data, &context->body.offset,
+					&context->body.allocated);
 
 			if (HTTP_STORE_JSON == context->output_format)
 			{
@@ -660,11 +690,7 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
-			if (FAIL == zbx_is_utf8(context->header.data))
-			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
-				return FAIL;
-			}
+			zbx_replace_invalid_utf8(context->header.data);
 
 			if (HTTP_STORE_JSON == context->output_format)
 			{
@@ -688,12 +714,16 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
-			if (FAIL == zbx_is_utf8(context->header.data) || (NULL != context->body.data &&
-					FAIL == zbx_is_utf8(context->body.data)))
+			if (NULL == context->body.data)
 			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_dsprintf(NULL, "Server returned empty content");
 				return FAIL;
 			}
+
+			zbx_replace_invalid_utf8(context->header.data);
+
+			zbx_http_convert_to_utf8(easyhandle, &context->body.data, &context->body.offset,
+					&context->body.allocated);
 
 			if (HTTP_STORE_JSON == context->output_format)
 			{
@@ -757,15 +787,16 @@ void	zbx_http_context_destroy(zbx_http_context_t *context)
 int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url,
 		const char *query_fields, char *headers, const char *posts, unsigned char retrieve_mode,
 		const char *http_proxy, unsigned char follow_redirects,
-		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
+		int timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
-		char **error)
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	CURLcode		err;
 	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], *headers_ptr, *line;
-	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
+	int			ret = NOTSUPPORTED, found = FAIL;
 	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_ndjson[] = {"Content-Type: application/x-ndjson"};
@@ -828,20 +859,15 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		goto clean;
 	}
 
-	if (FAIL == zbx_is_time_suffix(timeout, &timeout_seconds, (int)strlen(timeout)))
-	{
-		*error = zbx_dsprintf(NULL, "Invalid timeout: %s", timeout);
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_TIMEOUT, (long)timeout_seconds)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_TIMEOUT, (long)timeout)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (SUCCEED != zbx_http_prepare_ssl(context->easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password,
-			verify_peer, verify_host, config_source_ip, error))
+			verify_peer, verify_host, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, error))
 	{
 		goto clean;
 	}
@@ -920,6 +946,63 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_t *allocated)
+{
+	char			*charset, *content_type = NULL;
+#ifdef CURLH_HEADER
+	struct curl_header	*type;
+	CURLHcode		h;
+
+	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "name '%s' value '%s' amount:%lu index:%lu"
+				" origin:%u", type->name, type->value, type->amount,
+				type->index, type->origin);
+
+		content_type = type->value;
+	}
+#else
+	CURLcode	err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_TYPE, &content_type);
+
+	if (CURLE_OK != err || NULL == content_type)
+		zabbix_log(LOG_LEVEL_DEBUG,  "cannot get content type: %s", curl_easy_strerror(err));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "content_type '%s'", content_type);
+#endif
+
+	charset = zbx_determine_charset(content_type, *body, *size);
+
+	if (0 != strcmp(charset, "UTF-8"))
+	{
+		char	*converted, *error = NULL;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
+
+		if (NULL == (converted = zbx_convert_to_utf8(*body, *size, charset, &error)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert from charset '%s': %s", charset, error);
+			zbx_free(error);
+		}
+		else
+		{
+			zbx_free(*body);
+
+			*body = converted;
+			*size = strlen(converted);
+			*allocated = *size;
+		}
+	}
+
+	zbx_free(charset);
+
+	zbx_replace_invalid_utf8(*body);
 }
 
 #endif

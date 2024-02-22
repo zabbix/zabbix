@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'object' => EVENT_OBJECT_TRIGGER
 		]);
 
-		return ($events == count($this->getInput('eventids')));
+		return $events == count($this->getInput('eventids'));
 	}
 
 	protected function doAction() {
@@ -105,7 +105,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		// Select events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid', 'cause_eventid'],
-			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
 			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)

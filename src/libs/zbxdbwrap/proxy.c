@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
-#include "zbxpreproc.h"
 #include "zbxautoreg.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
@@ -94,10 +93,16 @@ typedef struct
 zbx_host_rights_t;
 
 static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
+static zbx_preprocess_item_value_func_t		preprocess_item_value_cb = NULL;
+static zbx_preprocessor_flush_func_t		preprocessor_flush_cb = NULL;
 
-void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func)
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
+	zbx_preprocess_item_value_func_t preprocess_item_value_func,
+	zbx_preprocessor_flush_func_t preprocessor_flush_func)
 {
 	lld_process_agent_result_cb = lld_process_agent_result_func;
+	preprocess_item_value_cb = preprocess_item_value_func;
+	preprocessor_flush_cb = preprocessor_flush_func;
 }
 
 /******************************************************************************
@@ -120,7 +125,7 @@ int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
 #endif
-	if ('\0' != *proxy->proxy_address && FAIL == zbx_tcp_check_allowed_peers(sock, proxy->proxy_address))
+	if ('\0' != *proxy->allowed_addresses && FAIL == zbx_tcp_check_allowed_peers(sock, proxy->allowed_addresses))
 	{
 		*error = zbx_strdup(*error, "connection is not allowed");
 		return FAIL;
@@ -157,7 +162,7 @@ int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t 
 	if (0 == ((unsigned int)proxy->tls_accept & sock->connection_type))
 	{
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
-				zbx_tcp_connection_type_name(sock->connection_type), proxy->host);
+				zbx_tcp_connection_type_name(sock->connection_type), proxy->name);
 		return FAIL;
 	}
 
@@ -167,14 +172,14 @@ int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t 
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *proxy->tls_issuer && 0 != strcmp(proxy->tls_issuer, attr.issuer))
 		{
-			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", proxy->host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", proxy->name);
 			return FAIL;
 		}
 
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *proxy->tls_subject && 0 != strcmp(proxy->tls_subject, attr.subject))
 		{
-			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", proxy->host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", proxy->name);
 			return FAIL;
 		}
 	}
@@ -184,7 +189,7 @@ int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t 
 		if (strlen(proxy->tls_psk_identity) != attr.psk_identity_len ||
 				0 != memcmp(proxy->tls_psk_identity, attr.psk_identity, attr.psk_identity_len))
 		{
-			*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", proxy->host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", proxy->name);
 			return FAIL;
 		}
 	}
@@ -602,9 +607,9 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
 static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT *result, zbx_timespec_t *ts,
 		int *h_num, char *error)
 {
-	if (0 == item->host.proxy_hostid)
+	if (0 == item->host.proxyid)
 	{
-		zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
+		preprocess_item_value_cb(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
 				item->state, error);
 		*h_num = 0;
 	}
@@ -711,11 +716,8 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 		if (0 != value->meta)
 			zbx_set_agent_result_meta(&result, value->lastlogsize, value->mtime);
 
-		if (0 != ZBX_ISSET_VALUE(&result) || 0 != ZBX_ISSET_META(&result))
-		{
-			item->state = ITEM_STATE_NORMAL;
-			process_item_value(item, &result, &value->ts, h_num, NULL);
-		}
+		item->state = ITEM_STATE_NORMAL;
+		process_item_value(item, &result, &value->ts, h_num, NULL);
 
 		zbx_free_agent_result(&result);
 	}
@@ -761,7 +763,7 @@ int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *
 			continue;
 		}
 
-		if (0 != items[i].host.proxy_hostid && NULL != nodata_win &&
+		if (0 != items[i].host.proxyid && NULL != nodata_win &&
 				0 != (nodata_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) && 0 < history_num)
 		{
 			if (values[i].ts.sec <= nodata_win->period_end)
@@ -784,7 +786,7 @@ int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *
 	if (0 < processed_num)
 		zbx_dc_items_update_nextcheck(items, values, errcodes, values_num);
 
-	zbx_preprocessor_flush();
+	preprocessor_flush_cb();
 	zbx_dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
@@ -1182,7 +1184,7 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
 	ZBX_UNUSED(error);
 
 	/* don't process item if its host was assigned to another proxy */
-	if (item->host.proxy_hostid != *proxyid)
+	if (item->host.proxyid != *proxyid)
 		return FAIL;
 
 	/* don't process aggregate/calculated items coming from proxy */
@@ -1325,7 +1327,7 @@ static int	agent_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
 {
 	zbx_host_rights_t	*rights = (zbx_host_rights_t *)args;
 
-	if (0 != item->host.proxy_hostid)
+	if (0 != item->host.proxyid)
 		return FAIL;
 
 	if (ITEM_TYPE_ZABBIX_ACTIVE != item->type)
@@ -1358,7 +1360,7 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 	zbx_host_rights_t	*rights;
 	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-	if (0 != item->host.proxy_hostid)
+	if (0 != item->host.proxyid)
 		return FAIL;
 
 	switch(item->type)
@@ -1634,6 +1636,12 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;
 
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		*info = zbx_strdup(*info, "data collection has been paused");
+		return FAIL;
+	}
+
 	um_handle = zbx_dc_open_user_macros();
 
 	ret = process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
@@ -1707,7 +1715,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
-				"status", "dcheckid", "dns", NULL);
+				"status", "dcheckid", "dns", (char *)NULL);
 
 		for (i = *processed_num; i < services->values_num; i++)
 		{
@@ -2032,7 +2040,7 @@ json_parse_return:
  * Purpose: parse autoregistration data contents and process it               *
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with autoregistration data         *
- *             proxy_hostid    - [IN] proxy identifier from database          *
+ *             proxyid         - [IN] proxy identifier from database          *
  *             events_cbs      - [IN]                                         *
  *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
@@ -2041,7 +2049,7 @@ json_parse_return:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
+static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxyid,
 		const zbx_events_funcs_t *events_cbs, char **error)
 {
 	struct zbx_json_parse	jp_row;
@@ -2169,7 +2177,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	if (0 != autoreg_hosts.values_num)
 	{
 		zbx_db_begin();
-		zbx_autoreg_flush_hosts(&autoreg_hosts, proxy_hostid, events_cbs);
+		zbx_autoreg_flush_hosts(&autoreg_hosts, proxyid, events_cbs);
 		zbx_db_commit();
 		zbx_dc_config_delete_autoreg_host(&autoreg_hosts);
 	}
@@ -2247,9 +2255,9 @@ static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_sta
 
 	delay = ts->sec - diff->lastaccess;
 
-	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
+	if ((PROXY_OPERATING_MODE_PASSIVE == proxy_status &&
 			(2 * proxydata_frequency) < delay && NET_DELAY_MAX < delay) ||
-			(HOST_STATUS_PROXY_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
+			(PROXY_OPERATING_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
 	{
 		diff->nodata_win.values_num = 0;
 		diff->nodata_win.period_end = ts->sec;
@@ -2280,8 +2288,8 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
 
 	delay_empty = ts->sec - diff->nodata_win.period_end;
 
-	if (HOST_STATUS_PROXY_PASSIVE == proxy_status ||
-			(HOST_STATUS_PROXY_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
+	if (PROXY_OPERATING_MODE_PASSIVE == proxy_status ||
+			(PROXY_OPERATING_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
 	{
 		diff->nodata_win.period_end = 0;
 		diff->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
@@ -2312,7 +2320,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 		char **error)
 {
 	struct zbx_json_parse	jp_data;
-	int			ret = SUCCEED, flags_old;
+	int			ret = SUCCEED, flags_old, lastaccess;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
 	zbx_proxy_diff_t	proxy_diff;
@@ -2320,15 +2328,17 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	proxy_diff.flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
-	proxy_diff.hostid = proxy->hostid;
+	proxy_diff.hostid = proxy->proxyid;
 
 	if (SUCCEED != (ret = zbx_dc_get_proxy_nodata_win(proxy_diff.hostid, &proxy_diff.nodata_win,
-			&proxy_diff.lastaccess)))
+			&lastaccess)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy communication delay");
 		ret = FAIL;
 		goto out;
 	}
+
+	proxy_diff.lastaccess = lastaccess;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
 		proxy_diff.more_data = atoi(value);
@@ -2348,11 +2358,11 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 	/* first packet can be empty for active proxy */
 	check_proxy_nodata(ts, proxy_status, proxydata_frequency, &proxy_diff);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:%d"
-			" timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.nodata_win.flags,
-			flags_old, (int)proxy_diff.flags, proxy_status, proxy_diff.nodata_win.period_end,
-			ts->sec - proxy_diff.lastaccess, ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay,
-			proxy_diff.more_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:" ZBX_FS_TIME_T
+			" timestamp:%d lastaccess:" ZBX_FS_TIME_T " proxy_delay:%d more:%d", __func__,
+			proxy_diff.nodata_win.flags, flags_old, (int)proxy_diff.flags, proxy_status,
+			proxy_diff.nodata_win.period_end, (zbx_fs_time_t)(ts->sec - proxy_diff.lastaccess), ts->sec,
+			(zbx_fs_time_t)proxy_diff.lastaccess, proxy_diff.proxy_delay, proxy_diff.more_data);
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
 		zbx_dc_update_proxy(&proxy_diff);
@@ -2380,11 +2390,11 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 				goto out;
 			}
 
-			session = zbx_dc_get_or_create_session(proxy->hostid, value, ZBX_SESSION_TYPE_DATA);
+			session = zbx_dc_get_or_create_session(proxy->proxyid, value, ZBX_SESSION_TYPE_DATA);
 		}
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
-				(void *)&proxy->hostid, &jp_data, session, &proxy_diff.nodata_win, &error_step,
+				(void *)&proxy->proxyid, &jp_data, session, &proxy_diff.nodata_win, &error_step,
 				ZBX_ITEM_GET_PROCESS)))
 		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
@@ -2414,7 +2424,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
 	{
-		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->hostid, events_cbs,
+		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->proxyid, events_cbs,
 				&error_step)))
 		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
@@ -2483,14 +2493,14 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 			for (i = 0; i < host_avails.values_num; i++)
 			{
-				if (SUCCEED == errcodes[i] && hosts[i].proxy_hostid == proxy->hostid)
+				if (SUCCEED == errcodes[i] && hosts[i].proxyid == proxy->proxyid)
 					zbx_vector_proxy_hostdata_ptr_append(&proxy_host_avails, host_avails.values[i]);
 			}
 
 			zbx_free(errcodes);
 			zbx_free(hosts);
 
-			data_len = zbx_availability_serialize_proxy_hostdata(&data, &proxy_host_avails, proxy->hostid);
+			data_len = zbx_availability_serialize_proxy_hostdata(&data, &proxy_host_avails, proxy->proxyid);
 			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
 			zbx_vector_proxy_hostdata_ptr_destroy(&proxy_host_avails);
@@ -2537,9 +2547,9 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 		{
 			zbx_uint64_pair_t	*pair = &lastaccess.values[i];
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_rtdata"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update proxy_rtdata"
 					" set lastaccess=%d"
-					" where hostid=" ZBX_FS_UI64 ";\n",
+					" where proxyid=" ZBX_FS_UI64 ";\n",
 					(int)pair->second, pair->first);
 
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -2573,7 +2583,7 @@ static void	db_update_proxy_version(zbx_dc_proxy_t *proxy, zbx_proxy_diff_t *dif
 		if (0 != proxy->version_int)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %u.%u to %u.%u",
-					proxy->host,
+					proxy->name,
 					ZBX_COMPONENT_VERSION_MAJOR(proxy->version_int),
 					ZBX_COMPONENT_VERSION_MINOR(proxy->version_int),
 					ZBX_COMPONENT_VERSION_MAJOR(diff->version_int),
@@ -2581,14 +2591,14 @@ static void	db_update_proxy_version(zbx_dc_proxy_t *proxy, zbx_proxy_diff_t *dif
 		}
 
 		if (ZBX_DB_OK > zbx_db_execute(
-				"update host_rtdata"
+				"update proxy_rtdata"
 				" set version=%u,compatibility=%u"
-				" where hostid=" ZBX_FS_UI64,
+				" where proxyid=" ZBX_FS_UI64,
 				ZBX_COMPONENT_VERSION_TO_DEC_FORMAT(diff->version_int), diff->compatibility,
 						diff->hostid))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to update proxy version and compatibility with server for"
-					" proxy '%s'.", proxy->host);
+					" proxy '%s'.", proxy->name);
 		}
 	}
 }
@@ -2643,7 +2653,7 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
  * Comments: The proxy parameter properties are also updated.                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, int lastaccess, int compress,
+void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
 		zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t		diff;
@@ -2651,13 +2661,12 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 
 	compatibility = zbx_get_proxy_compatibility(version_int);
 
-	diff.hostid = proxy->hostid;
+	diff.hostid = proxy->proxyid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
 	diff.version_str = version_str;
 	diff.version_int = version_int;
 	diff.compatibility = compatibility;
 	diff.lastaccess = lastaccess;
-	diff.compress = compress;
 
 	zbx_dc_update_proxy(&diff);
 
@@ -2666,11 +2675,7 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 	zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
 	proxy->version_int = version_int;
 	proxy->compatibility = compatibility;
-	proxy->auto_compress = compress;
 	proxy->lastaccess = lastaccess;
-
-	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
-		zbx_db_execute("update hosts set auto_compress=%d where hostid=" ZBX_FS_UI64, diff.compress, diff.hostid);
 
 	zbx_db_flush_proxy_lastaccess();
 }
@@ -2684,7 +2689,7 @@ static void	zbx_update_proxy_lasterror(zbx_dc_proxy_t *proxy)
 {
 	zbx_proxy_diff_t	diff;
 
-	diff.hostid = proxy->hostid;
+	diff.hostid = proxy->proxyid;
 	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR;
 	diff.lastaccess = time(NULL);
 	diff.last_version_error_time = proxy->last_version_error_time;
@@ -2713,7 +2718,8 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 	/* warn if another proxy version is used and proceed with compatibility rules*/
 	if (ZBX_PROXY_VERSION_CURRENT != compatibility)
 	{
-		int	now = zbx_time(), print_log = 0;
+		time_t	now = time(NULL);
+		int	print_log = 0;
 
 		if (proxy->last_version_error_time <= now)
 		{
@@ -2727,7 +2733,7 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 			if (1 == print_log)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %u.%u.%u is not supported by server"
-						" version %d.%d.%d.", proxy->host,
+						" version %d.%d.%d.", proxy->name,
 						ZBX_COMPONENT_VERSION_MAJOR(version),
 						ZBX_COMPONENT_VERSION_MINOR(version),
 						ZBX_COMPONENT_VERSION_PATCH(version), ZABBIX_VERSION_MAJOR,
@@ -2738,7 +2744,7 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 		else if (ZBX_PROXY_VERSION_OUTDATED == compatibility && 1 == print_log)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" version %u.%u.%u is outdated, only data collection"
-					" and remote execution is available with server version %d.%d.%d.", proxy->host,
+					" and remote execution is available with server version %d.%d.%d.", proxy->name,
 					ZBX_COMPONENT_VERSION_MAJOR(version), ZBX_COMPONENT_VERSION_MINOR(version),
 					ZBX_COMPONENT_VERSION_PATCH(version), ZABBIX_VERSION_MAJOR,
 					ZABBIX_VERSION_MINOR, ZABBIX_VERSION_PATCH);
@@ -2749,4 +2755,3 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 
 	return SUCCEED;
 }
-

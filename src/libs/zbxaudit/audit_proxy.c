@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,13 +22,13 @@
 #include "audit/zbxaudit_proxy.h"
 #include "audit/zbxaudit.h"
 
-void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name)
+void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid, const char *name)
 {
 	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	local_audit_entry.id = proxy_hostid;
+	local_audit_entry.id = proxyid;
 	local_audit_entry.cuid = NULL;
 	local_audit_entry.id_table = AUDIT_HOST_ID; /* proxies are stored in host table */
 
@@ -36,7 +36,7 @@ void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name)
 	{
 		zbx_audit_entry_t	*new_entry;
 
-		new_entry = zbx_audit_entry_init(proxy_hostid, AUDIT_HOST_ID, name, AUDIT_ACTION_CONFIG_REFRESH,
+		new_entry = zbx_audit_entry_init(proxyid, AUDIT_HOST_ID, name, AUDIT_ACTION_CONFIG_REFRESH,
 				AUDIT_RESOURCE_PROXY);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}

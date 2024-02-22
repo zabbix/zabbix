@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,11 +110,11 @@ class CControllerHintboxEventlist extends CController {
 
 		$options = [
 			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged', 'cause_eventid'],
-			'select_acknowledges' => ['action', 'taskid'],
+			'selectAcknowledges' => ['action', 'taskid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
-			'eventid_till' => $this->getInput('eventid_till'),
 			'objectids' => $trigger['triggerid'],
+			'eventid_till' => $this->getInput('eventid_till'),
 			'value' => TRIGGER_VALUE_TRUE,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,

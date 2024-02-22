@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ type Manager struct {
 }
 
 // Update updates monitored items for the specified client based on new requests.
-func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests []*plugin.Request) {
+func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, items []*plugin.Item) {
 	var client *Client
 	var ok bool
 
@@ -106,7 +106,7 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 	failedEventSources := make(map[EventSource]error)
 
 	now := time.Now()
-	for _, r := range requests {
+	for _, r := range items {
 		var sub map[Subscriber]*eventWriter
 		subscriber := Subscriber{Clientid: client.ID, Itemid: r.Itemid}
 		if item, ok := client.Items[r.Itemid]; ok {

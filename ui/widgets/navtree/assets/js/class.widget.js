@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,357 +20,216 @@
 
 class CWidgetNavTree extends CWidget {
 
-	static EVENT_MARK = 'widget-navtree.mark';
-	static EVENT_SELECT = 'widget-navtree.select';
+	/**
+	 * @type {boolean}
+	 */
+	#has_content = false;
 
-	static WIDGET_MAP_EVENT_SUBMAP_SELECT = 'widget-map.submap-select';
+	/**
+	 * @type {Array}
+	 */
+	#navtree = [];
 
-	static hasReferenceField() {
-		return true;
-	}
+	/**
+	 * @type {number|null}
+	 */
+	#navtree_item_selected = null;
 
-	onInitialize() {
-		this._severity_levels = null;
-		this._navtree = [];
-		this._maps = [];
-		this._navtree_items_opened = [];
-		this._navtree_item_selected = null;
-		this._maps_accessible = null;
-		this._show_unavailable = false;
-		this._problems = null;
-		this._max_depth = null;
-		this._last_id = null;
+	/**
+	 * @type {Array}
+	 */
+	#navtree_items_opened = [];
 
-		this._has_contents = false;
+	/**
+	 * @type {Object|null}
+	 */
+	#problems = null;
 
-		this._registerContentsEvents();
+	/**
+	 * @type {Object|null}
+	 */
+	#severity_levels = null;
+
+	/**
+	 * @type {Array}
+	 */
+	#maps_accessible = [];
+
+	/**
+	 * @type {boolean}
+	 */
+	#show_unavailable = false;
+
+	/**
+	 * @type {number}
+	 */
+	#max_depth = 10;
+
+	/**
+	 * @type {Object}
+	 */
+	#event_handlers;
+
+	/**
+	 * @type {number}
+	 */
+	#last_id = 0;
+
+	onStart() {
+		this.#registerEvents();
 	}
 
 	onActivate() {
-		if (this._has_contents) {
-			if (this._target.querySelector('.root') === null) {
-				this._makeTree();
-				this._activateTree();
-			}
-
-			this._activateContentsEvents();
-		}
+		this.#activateContentEvents();
 	}
 
 	onDeactivate() {
-		this._deactivateContentsEvents();
-	}
-
-	announceWidgets(widgets) {
-		super.announceWidgets(widgets);
-		this._deactivateContentsEvents();
-
-		this._maps = [];
-
-		for (const widget of widgets) {
-			if (this._fields.reference === widget._fields.filter_widget_reference) {
-				this._maps.push(widget);
-			}
-		}
-
-		if (this._has_contents) {
-			this._activateContentsEvents();
-		}
+		this.#deactivateContentEvents();
 	}
 
 	getDataCopy({is_single_copy}) {
-		this._deactivateContentsEvents();
-		this._setTreeHandlers();
-		this._updateWidgetFields();
-		this._activateContentsEvents();
+		this.#deactivateContentEvents();
+
+		this.#setTreeHandlers();
+		this.#updateWidgetFields();
+
+		this.#activateContentEvents();
 
 		return super.getDataCopy({is_single_copy});
 	}
 
 	onEdit() {
-		if (this._has_contents) {
-			this._deactivateContentsEvents();
-			this._removeTree();
+		if (this.#has_content) {
+			this.#deactivateContentEvents();
+			this.#removeTree();
 		}
 
-		if (this._has_contents && this._state === WIDGET_STATE_ACTIVE) {
-			this._makeTree();
-			this._activateTree();
-			this._activateContentsEvents();
+		if (this.getState() === WIDGET_STATE_ACTIVE) {
+			this.#makeTree();
+			this.#activateContentEvents();
 		}
 	}
 
-	processUpdateResponse(response) {
-		if (this._has_contents) {
-			this._deactivateContentsEvents();
-			this._removeTree();
+	onFeedback({type, value, descriptor}) {
+		const item_selected = this.#navtree[this.#navtree_item_selected];
 
-			this._has_contents = false;
+		let new_item_id = 0;
+
+		for (const [id, item] of Object.entries(this.#navtree)) {
+			if (item.sysmapid == value && item.parent == this.#navtree_item_selected) {
+				new_item_id = id;
+				break;
+			}
+		}
+
+		if (new_item_id == 0) {
+			for (const [id, item] of Object.entries(this.#navtree)) {
+				if (item.sysmapid == value && item_selected.parent == id) {
+					new_item_id = id;
+					break;
+				}
+			}
+		}
+
+		if (new_item_id != 0 && this.#markTreeItemSelected(new_item_id)) {
+			this.#openBranch(this.#navtree_item_selected);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	processUpdateResponse(response) {
+		if (this.#has_content) {
+			this.#deactivateContentEvents();
+			this.#removeTree();
+
+			this.#has_content = false;
 		}
 
 		super.processUpdateResponse(response);
 
 		if (response.navtree_data !== undefined) {
-			this._has_contents = true;
+			this.#has_content = true;
 
-			this._severity_levels = response.navtree_data.severity_levels;
-			this._navtree = response.navtree_data.navtree;
-			this._navtree_items_opened = response.navtree_data.navtree_items_opened;
-			this._navtree_item_selected = response.navtree_data.navtree_item_selected;
-			this._maps_accessible = response.navtree_data.maps_accessible;
-			this._show_unavailable = response.navtree_data.show_unavailable;
-			this._problems = response.navtree_data.problems;
-			this._max_depth = response.navtree_data.max_depth;
+			this.#navtree = response.navtree_data.navtree;
+			this.#navtree_item_selected = response.navtree_data.navtree_item_selected;
+			this.#navtree_items_opened = response.navtree_data.navtree_items_opened;
 
-			this._makeTree();
+			this.#problems = response.navtree_data.problems;
+			this.#severity_levels = response.navtree_data.severity_levels;
 
-			this._activateTree();
-			this._activateContentsEvents();
+			this.#maps_accessible = response.navtree_data.maps_accessible;
+			this.#show_unavailable = response.navtree_data.show_unavailable;
+
+			this.#max_depth = response.navtree_data.max_depth;
+
+			this.#makeTree();
+			this.#activateContentEvents();
 		}
 	}
 
-	_registerContentsEvents() {
-		this._events = {
-			...this._events,
+	#makeTree() {
+		if (!this.#has_content) {
+			return;
+		}
 
-			addChild: (e) => {
-				const button = e.target;
-				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
-				const parent = button.getAttribute('data-id');
+		const tree = this.#buildTree();
 
-				this._itemEditDialog(0, parent, depth + 1, button);
-			},
+		let root = this.#makeTreeBranch();
+		root.classList.add('root');
 
-			addMaps: (e) => {
-				const button = e.target;
-				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
-				const id = button.getAttribute('data-id');
+		this._target.querySelector('.tree').appendChild(root);
 
-				if (typeof window.addPopupValues === 'function') {
-					window.old_addPopupValues = window.addPopupValues;
-				}
+		if (this.isEditMode()) {
+			const root_item = this.#makeTreeItem({name: t('root'), id: 0}, 0, false);
 
-				window.addPopupValues = (data) => {
-					this._deactivateContentsEvents();
+			root.appendChild(root_item);
 
-					const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
-
-					if (root !== null) {
-						for (const item of data.values) {
-							root.appendChild(this._makeTreeItem({
-								id: this._getNextId(),
-								name: item.name,
-								sysmapid: item.id,
-								parent: id
-							}, depth + 1));
-						}
-
-						const tree_item = root.closest('.tree-item');
-
-						tree_item.classList.remove('closed');
-						tree_item.classList.add('opened');
-					}
-
-					this._setTreeHandlers();
-					this._updateWidgetFields();
-
-					if (typeof old_addPopupValues === 'function') {
-						window.addPopupValues = old_addPopupValues;
-						delete window.old_addPopupValues;
-					}
-
-					this._activateContentsEvents();
-				};
-
-				return PopUp('popup.generic', {
-					srctbl: 'sysmaps',
-					srcfld1: 'sysmapid',
-					srcfld2: 'name',
-					multiselect: '1'
-				}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
-			},
-
-			editItem: (e) => {
-				const button = e.target;
-
-				const id = button.getAttribute('data-id');
-				const parent = this._target.querySelector(`input[name="navtree.parent.${id}"]`).value;
-				const depth = parseInt(button.closest('[data-depth]').getAttribute('data-depth'));
-
-				this._itemEditDialog(id, parent, depth, button);
-			},
-
-			removeItem: (e) => {
-				const button = e.target;
-
-				this._deactivateContentsEvents();
-
-				this._target.querySelector(`[data-id="${button.getAttribute('data-id')}"]`).remove();
-				this._setTreeHandlers();
-
-				this._updateWidgetFields();
-
-				this._activateContentsEvents();
-			},
-
-			select: (e) => {
-				const link = e.target;
-
-				const itemid = link.closest('.tree-item').getAttribute('data-id');
-
-				if (this._markTreeItemSelected(itemid)) {
-					this._openBranch(this._navtree_item_selected);
-
-					updateUserProfile('web.dashboard.widget.navtree.item.selected', this._navtree_item_selected,
-						[this._widgetid]
-					);
-
-					this.fire(CWidgetNavTree.EVENT_SELECT, {
-						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
-						itemid: this._navtree_item_selected
-					});
-				}
-
-				e.preventDefault();
-			},
-
-			selectSubmap: (e) => {
-				if (e.detail.back) {
-					if (e.detail.parent_itemid !== null) {
-						this._markTreeItemSelected(e.detail.parent_itemid);
-					}
-				}
-				else {
-					for (let [itemid, item] of Object.entries(this._navtree)) {
-						if (item.sysmapid != e.detail.sysmapid || item.parent != e.detail.parent_itemid) {
-							continue;
-						}
-
-						if (this._markTreeItemSelected(itemid)) {
-							this._openBranch(this._navtree_item_selected);
-						}
-					}
+			if (tree.length > 0) {
+				if (root_item.classList.contains('closed')) {
+					root_item.classList.add('opened');
+					root_item.classList.remove('closed');
 				}
 			}
+
+			root = document.getElementById(`${this.getUniqueId()}_children-of-0`);
 		}
+
+		for (const item of tree) {
+			root.appendChild(this.#makeTreeItem(item));
+		}
+
+		this.#setTreeHandlers();
+		this.#activateTree();
 	}
 
-	_activateTree() {
-		if (this._is_edit_mode) {
-			this._makeSortable();
-		}
-		else {
-			this._parseProblems();
-
-			if (this._navtree_item_selected === null
-					|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')) {
-				this._navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
-					.not('[data-sysmapid="0"]')
-					.first()
-					.data('id');
-			}
-
-			let sysmapid = 0;
-
-			if (this._markTreeItemSelected(this._navtree_item_selected)) {
-				sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
-			}
-
-			this.fire(CWidgetNavTree.EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
-		}
-	}
-
-	_activateContentsEvents() {
-		if (this._state === WIDGET_STATE_ACTIVE && this._has_contents) {
-			if (this._is_edit_mode) {
-				for (const button of this._target.querySelectorAll('.js-add-child')) {
-					button.addEventListener('click', this._events.addChild);
-				}
-
-				for (const button of this._target.querySelectorAll('.js-add-maps')) {
-					button.addEventListener('click', this._events.addMaps);
-				}
-
-				for (const button of this._target.querySelectorAll('.js-edit')) {
-					button.addEventListener('click', this._events.editItem);
-				}
-
-				for (const button of this._target.querySelectorAll('.js-remove')) {
-					button.addEventListener('click', this._events.removeItem);
-				}
-			}
-			else {
-				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
-					link.addEventListener('click', this._events.select);
-				}
-			}
-		}
-
-		if (!this._is_edit_mode) {
-			for (const widget of this._maps) {
-				widget.on(CWidgetNavTree.WIDGET_MAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
-			}
-		}
-	}
-
-	_deactivateContentsEvents() {
-		if (this._has_contents) {
-			if (this._is_edit_mode) {
-				for (const button of this._target.querySelectorAll('.js-add-child')) {
-					button.removeEventListener('click', this._events.addChild);
-				}
-
-				for (const button of this._target.querySelectorAll('.js-add-maps')) {
-					button.removeEventListener('click', this._events.addMaps);
-				}
-
-				for (const button of this._target.querySelectorAll('.js-edit')) {
-					button.removeEventListener('click', this._events.editItem);
-				}
-
-				for (const button of this._target.querySelectorAll('.js-remove')) {
-					button.removeEventListener('click', this._events.removeItem);
-				}
-			}
-			else {
-				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
-					link.removeEventListener('click', this._events.select);
-				}
-			}
-		}
-
-		if (!this._is_edit_mode) {
-			for (const widget of this._maps) {
-				widget.off(CWidgetNavTree.WIDGET_MAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
-			}
-		}
-	}
-
-	_buildTree(parent_id = 0) {
+	#buildTree(parent_id = 0) {
 		const tree = [];
 
-		for (const i in this._navtree) {
+		for (const i in this.#navtree) {
 			const tree_item = {
 				id: i,
-				name: this._navtree[i].name,
-				order: this._navtree[i].order,
-				parent: this._navtree[i].parent,
-				sysmapid: this._navtree[i].sysmapid
+				name: this.#navtree[i].name,
+				order: this.#navtree[i].order,
+				parent: this.#navtree[i].parent,
+				sysmapid: this.#navtree[i].sysmapid
 			};
 
-			if (tree_item.id > this._last_id) {
-				this._last_id = tree_item.id;
+			if (tree_item.id > this.#last_id) {
+				this.#last_id = tree_item.id;
 			}
 
 			if (tree_item.parent == parent_id) {
-				const children = this._buildTree(tree_item.id);
+				const children = this.#buildTree(tree_item.id);
 
 				if (children.length > 0) {
 					tree_item.children = children;
 				}
 
-				tree_item.item_active = (tree_item.sysmapid == 0 || this._maps_accessible.includes(tree_item.sysmapid));
-				tree_item.item_visible = (this._show_unavailable || tree_item.item_active);
+				tree_item.item_active = (tree_item.sysmapid == 0 || this.#maps_accessible.includes(tree_item.sysmapid));
+				tree_item.item_visible = (this.#show_unavailable || tree_item.item_active);
 
 				tree.push(tree_item);
 			}
@@ -383,54 +242,12 @@ class CWidgetNavTree extends CWidget {
 		return tree;
 	}
 
-	_makeTree() {
-		const tree = this._buildTree();
-
-		let root = this._makeTreeBranch();
-		root.classList.add('root');
-
-		this._target.querySelector('.tree').appendChild(root);
-
-		if (this._is_edit_mode) {
-			const root_item = this._makeTreeItem({name: t('root'), id: 0}, 0, false);
-
-			root.appendChild(root_item);
-
-			if (tree.length > 0) {
-				if (root_item.classList.contains('closed')) {
-					root_item.classList.add('opened');
-					root_item.classList.remove('closed');
-				}
-			}
-
-			root = document.getElementById(`${this._unique_id}_children-of-0`);
-		}
-
-		for (const item of tree) {
-			root.appendChild(this._makeTreeItem(item));
-		}
-
-		this._setTreeHandlers();
-	}
-
-	_makeTreeBranch(parent_id = null) {
-		const ul = document.createElement('ul');
-
-		if (parent_id !== null) {
-			ul.id = `${this._unique_id}_children-of-${parent_id}`;
-		}
-
-		ul.classList.add('tree-list');
-
-		return ul;
-	}
-
-	_makeTreeItem(item, depth = 1, editable = true) {
+	#makeTreeItem(item, depth = 1, editable = true) {
 		const li_item = document.createElement('li');
 
 		li_item.classList.add('tree-item');
 
-		if (!editable || this._navtree_items_opened.includes(item.id)) {
+		if (!editable || this.#navtree_items_opened.includes(item.id)) {
 			li_item.classList.add('opened');
 		}
 		else {
@@ -441,13 +258,13 @@ class CWidgetNavTree extends CWidget {
 			li_item.classList.add('root-item');
 		}
 
-		if (this._is_edit_mode && item.sysmapid == 0) {
+		if (this.isEditMode() && item.sysmapid == 0) {
 			li_item.classList.add('no-map');
 		}
 
-		const ul = this._makeTreeBranch(item.id);
+		const ul = this.#makeTreeBranch(item.id);
 
-		if (item.children !== undefined && this._max_depth > depth) {
+		if (item.children !== undefined && this.#max_depth > depth) {
 			let child_items_visible = 0;
 
 			for (const child of item.children) {
@@ -455,10 +272,10 @@ class CWidgetNavTree extends CWidget {
 					continue;
 				}
 
-				ul.appendChild(this._makeTreeItem(child, depth + 1));
+				ul.appendChild(this.#makeTreeItem(child, depth + 1));
 
-				if (child.id > this._last_id) {
-					this._last_id = child.id;
+				if (child.id > this.#last_id) {
+					this.#last_id = child.id;
 				}
 
 				if (child.item_visible === true) {
@@ -471,13 +288,13 @@ class CWidgetNavTree extends CWidget {
 			}
 		}
 
-		if (!this._is_edit_mode && item.sysmapid != 0 && !item.item_active) {
+		if (!this.isEditMode() && item.sysmapid != 0 && !item.item_active) {
 			li_item.classList.add('inaccessible');
 		}
 
 		let link;
 
-		if (!this._is_edit_mode && item.sysmapid != 0 && item.item_active) {
+		if (!this.isEditMode() && item.sysmapid != 0 && item.item_active) {
 			link = document.createElement('a');
 
 			link.href = '#';
@@ -491,7 +308,7 @@ class CWidgetNavTree extends CWidget {
 		link.innerText = item.name;
 		link.classList.add('item-name');
 
-		li_item.id = `${this._unique_id}_tree-item-${item.id}`;
+		li_item.id = `${this.getUniqueId()}_tree-item-${item.id}`;
 		li_item.setAttribute('data-id', item.id);
 
 		if (item.sysmapid != 0) {
@@ -514,7 +331,7 @@ class CWidgetNavTree extends CWidget {
 		margin_lvl.classList.add('margin-lvl');
 		content.appendChild(margin_lvl);
 
-		if (this._is_edit_mode) {
+		if (this.isEditMode()) {
 			const tools = document.createElement('div');
 			tools.classList.add('tools');
 			tree_row.appendChild(tools);
@@ -594,23 +411,23 @@ class CWidgetNavTree extends CWidget {
 					closed_state = '0';
 				}
 
-				if (this._widgetid !== null) {
+				if (this.getWidgetId() !== null) {
 					updateUserProfile(`web.dashboard.widget.navtree.item-${branch.getAttribute('data-id')}.toggle`,
-						closed_state, [this._widgetid]
+						closed_state, [this.getWidgetId()]
 					);
 
-					const index = this._navtree_items_opened.indexOf(branch.getAttribute('data-id'));
+					const index = this.#navtree_items_opened.indexOf(branch.getAttribute('data-id'));
 
 					if (index > -1) {
 						if (closed_state === '1') {
-							this._navtree_items_opened.splice(index, 1);
+							this.#navtree_items_opened.splice(index, 1);
 						}
 						else {
-							this._navtree_items_opened.push(branch.getAttribute('data-id'));
+							this.#navtree_items_opened.push(branch.getAttribute('data-id'));
 						}
 					}
 					else if (index === -1 && closed_state === '0') {
-						this._navtree_items_opened.push(branch.getAttribute('data-id'));
+						this.#navtree_items_opened.push(branch.getAttribute('data-id'));
 					}
 				}
 			});
@@ -619,25 +436,25 @@ class CWidgetNavTree extends CWidget {
 		content.appendChild(link);
 		li_item.appendChild(ul);
 
-		if (this._is_edit_mode && editable) {
+		if (this.isEditMode() && editable) {
 			const name_fld = document.createElement('input');
-			name_fld.id = `${this._unique_id}_navtree.name.${item.id}`;
+			name_fld.id = `${this.getUniqueId()}_navtree.${item.id}.name`;
 			name_fld.type = 'hidden';
-			name_fld.name = `navtree.name.${item.id}`;
+			name_fld.name = `navtree[${item.id}][name]`;
 			name_fld.value = item.name;
 			li_item.appendChild(name_fld);
 
 			const parent_fld = document.createElement('input');
-			parent_fld.id = `${this._unique_id}_navtree.parent.${item.id}`;
+			parent_fld.id = `${this.getUniqueId()}_navtree.${item.id}.parent`;
 			parent_fld.type = 'hidden';
-			parent_fld.name = `navtree.parent.${item.id}`;
+			parent_fld.name = `navtree[${item.id}][parent]`;
 			parent_fld.value = item.parent || 0;
 			li_item.appendChild(parent_fld);
 
 			const mapid_fld = document.createElement('input');
-			mapid_fld.id = `${this._unique_id}_navtree.sysmapid.${item.id}`;
+			mapid_fld.id = `${this.getUniqueId()}_navtree.${item.id}.sysmapid`;
 			mapid_fld.type = 'hidden';
-			mapid_fld.name = `navtree.sysmapid.${item.id}`;
+			mapid_fld.name = `navtree[${item.id}][sysmapid]`;
 			mapid_fld.value = item.sysmapid;
 			li_item.appendChild(mapid_fld);
 		}
@@ -645,7 +462,42 @@ class CWidgetNavTree extends CWidget {
 		return li_item;
 	}
 
-	_removeTree() {
+	#makeTreeBranch(parent_id = null) {
+		const ul = document.createElement('ul');
+
+		if (parent_id !== null) {
+			ul.id = `${this.getUniqueId()}_children-of-${parent_id}`;
+		}
+
+		ul.classList.add('tree-list');
+
+		return ul;
+	}
+
+	#activateTree() {
+		if (this.isEditMode()) {
+			this.#makeSortable();
+		}
+		else {
+			this.#parseProblems();
+
+			if (this.#navtree_item_selected === null
+				|| !jQuery(`.tree-item[data-id=${this.#navtree_item_selected}]`).is(':visible')) {
+				this.#navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
+					.not('[data-sysmapid="0"]')
+					.first()
+					.data('id');
+			}
+
+			this.broadcast({
+				_mapid: this.#markTreeItemSelected(this.#navtree_item_selected)
+					? this.#navtree[this.#navtree_item_selected].sysmapid
+					: null
+			});
+		}
+	}
+
+	#removeTree() {
 		const root = this._target.querySelector('.root');
 
 		if (root !== null) {
@@ -653,7 +505,7 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	_setTreeHandlers() {
+	#setTreeHandlers() {
 		// Add .is-parent class for branches with sub-items.
 		jQuery('.tree-list', jQuery(this._target)).not('.ui-sortable, .root').each(function() {
 			if (jQuery('>li', jQuery(this)).not('.inaccessible').length) {
@@ -683,20 +535,20 @@ class CWidgetNavTree extends CWidget {
 
 		for (const tree_element of document.querySelectorAll('.tree-list')) {
 			for (const button of tree_element.querySelectorAll('.js-add-child, .js-add-maps')) {
-				button.disabled = tree_element.dataset.depth >= this._max_depth;
+				button.disabled = tree_element.dataset.depth >= this.#max_depth;
 			}
 		}
 	}
 
-	_markTreeItemSelected(itemid) {
-		const selected_item = document.getElementById(`${this._unique_id}_tree-item-${itemid}`);
-		const item = this._navtree[itemid];
+	#markTreeItemSelected(itemid) {
+		const selected_item = document.getElementById(`${this.getUniqueId()}_tree-item-${itemid}`);
+		const item = this.#navtree[itemid];
 
-		if (item === undefined || selected_item === null || item === this._navtree_item_selected) {
+		if (item === undefined || selected_item === null || item === this.#navtree_item_selected) {
 			return false;
 		}
 
-		this._navtree_item_selected = itemid;
+		this.#navtree_item_selected = itemid;
 
 		let step_in_path = selected_item.closest('.tree-item');
 
@@ -709,68 +561,68 @@ class CWidgetNavTree extends CWidget {
 			step_in_path = step_in_path.parentNode.closest('.tree-item');
 		}
 
-		updateUserProfile('web.dashboard.widget.navtree.item.selected', this._navtree_item_selected, [this._widgetid]);
-
-		this.fire(CWidgetNavTree.EVENT_MARK, {itemid: this._navtree_item_selected});
+		updateUserProfile('web.dashboard.widget.navtree.item.selected',
+			this.#navtree_item_selected, [this.getWidgetId()]
+		);
 
 		return true;
 	}
 
-	_openBranch(itemid) {
+	#openBranch(itemid) {
 		if (!jQuery(`.tree-item[data-id=${itemid}]`).is(':visible')) {
 			const selector = '> .tree-row > .content > .arrow > .treeview > span';
 
-			let branch_to_open = jQuery(`.tree-item[data-id=${itemid}]`).closest('.tree-list').not('.root');
+			let $branch_to_open = jQuery(`.tree-item[data-id=${itemid}]`).closest('.tree-list').not('.root');
 
-			while (branch_to_open.length) {
-				branch_to_open.closest('.tree-item.is-parent')
+			while ($branch_to_open.length) {
+				$branch_to_open.closest('.tree-item.is-parent')
 					.removeClass('closed')
 					.addClass('opened');
 
-				jQuery(selector, branch_to_open.closest('.tree-item.is-parent'))
+				jQuery(selector, $branch_to_open.closest('.tree-item.is-parent'))
 					.removeClass('arrow-right')
 					.addClass('arrow-down');
 
-				branch_to_open = branch_to_open.closest('.tree-item.is-parent')
+				$branch_to_open = $branch_to_open.closest('.tree-item.is-parent')
 					.closest('.tree-list').not('.root');
 			}
 		}
 	}
 
-	_getNextId() {
-		this._last_id++;
+	#getNextId() {
+		this.#last_id++;
 
-		while (jQuery(`[name="navtree.name.${this._last_id}"]`).length) {
-			this._last_id++;
+		while (jQuery(`[name="navtree[${this.#last_id}][name]"]`).length) {
+			this.#last_id++;
 		}
 
-		return this._last_id;
+		return this.#last_id;
 	}
 
-	_makeSortable() {
+	#makeSortable() {
 		jQuery('.root-item > .tree-list', jQuery(this._target))
 			.sortable_tree({
-				max_depth: this._max_depth,
+				max_depth: this.#max_depth,
 				stop: () => {
-					this._setTreeHandlers();
-					this._updateWidgetFields();
+					this.#setTreeHandlers();
+					this.#updateWidgetFields();
 				}
 			})
 			.disableSelection();
 	}
 
-	_parseProblems() {
-		if (this._severity_levels === null) {
+	#parseProblems() {
+		if (this.#severity_levels === null) {
 			return false;
 		}
 
 		const empty_template = {};
 
-		for (const [severity, _] in Object.entries(this._severity_levels)) {
+		for (const [severity, _] in Object.entries(this.#severity_levels)) {
 			empty_template[severity] = 0;
 		}
 
-		for (const [itemid, problems] of Object.entries(this._problems)) {
+		for (const [itemid, problems] of Object.entries(this.#problems)) {
 			for (const [severity, value] of Object.entries(problems || empty_template)) {
 				if (value) {
 					this._target.querySelectorAll(`.tree-item[data-id="${itemid}"]`).forEach((item) => {
@@ -780,7 +632,7 @@ class CWidgetNavTree extends CWidget {
 			}
 		}
 
-		for (const [severity, value] of Object.entries(this._severity_levels)) {
+		for (const [severity, value] of Object.entries(this.#severity_levels)) {
 			for (const problem of this._target.querySelectorAll(`[data-problems${severity}]`)) {
 				const indicator = document.createElement('span');
 
@@ -788,13 +640,55 @@ class CWidgetNavTree extends CWidget {
 				indicator.classList.add('problem-icon-list-item', value.style_class);
 				indicator.innerText = problem.getAttribute(`data-problems${severity}`);
 
-				problem.querySelector('.tree-row > .problem-icon-list')
-					.appendChild(indicator)
+				problem.querySelector('.tree-row > .problem-icon-list').appendChild(indicator)
 			}
 		}
 	}
 
-	_itemEditDialog(id, parent, depth, trigger_elmnt) {
+	#updateWidgetFields() {
+		if (!this.isEditMode()) {
+			return;
+		}
+
+		const prefix = `${this.getUniqueId()}_`;
+
+		this._fields.navtree = {};
+
+		jQuery('input[name$="[name]"]', jQuery(this._body)).each((index, field) => {
+			const matches = field.getAttribute('name').match(/^navtree\[(\d+)\]/);
+			const id = matches[1];
+
+			const parent = document.getElementById(`${prefix}navtree.${id}.parent`).value;
+			const sysmapid = document.getElementById(`${prefix}navtree.${id}.sysmapid`).value;
+			const element = document.getElementById(`${prefix}children-of-${parent}`);
+
+			let order = 0;
+
+			if (element !== null) {
+				const sibling = element.childNodes;
+
+				while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
+					order++;
+				}
+			}
+
+			this._fields.navtree[id] = {name: field.value};
+
+			if (parent != 0) {
+				this._fields.navtree[id].parent = parent;
+			}
+
+			if (order != 0) {
+				this._fields.navtree[id].order = order + 1;
+			}
+
+			if (sysmapid != 0) {
+				this._fields.navtree[id].sysmapid = sysmapid;
+			}
+		});
+	}
+
+	#itemEditDialog(id, parent, depth, trigger_element) {
 		const url = new Curl('zabbix.php');
 		const item_edit = id != 0;
 
@@ -804,20 +698,20 @@ class CWidgetNavTree extends CWidget {
 			url: url.getUrl(),
 			method: 'POST',
 			data: {
-				name: item_edit ? this._target.querySelector(`[name="navtree.name.${id}"]`).value : '',
-				sysmapid: item_edit ? this._target.querySelector(`[name="navtree.sysmapid.${id}"]`).value : 0,
+				name: item_edit ? this._target.querySelector(`[name="navtree[${id}][name]"]`).value : '',
+				sysmapid: item_edit ? this._target.querySelector(`[name="navtree[${id}][sysmapid]"]`).value : 0,
 				depth: depth
 			},
 			dataType: 'json',
-			success: (resp) => {
-				if (resp.debug !== undefined) {
-					resp.body += resp.debug;
+			success: (response) => {
+				if (response.debug !== undefined) {
+					response.body += response.debug;
 				}
 
 				overlayDialogue({
 					'title': t('Edit tree element'),
 					'class': 'modal-popup',
-					'content': resp.body,
+					'content': response.body,
 					'buttons': [
 						{
 							'title': item_edit ? t('Apply') : t('Add'),
@@ -840,21 +734,21 @@ class CWidgetNavTree extends CWidget {
 											? form_inputs.sysmapid.value
 											: '0',
 										add_submaps: form_inputs.add_submaps !== undefined
-											&& form_inputs.add_submaps.checked ? 1 : 0,
+										&& form_inputs.add_submaps.checked ? 1 : 0,
 										depth: depth
 									},
 									dataType: 'json',
 									complete: () => {
 										overlay.unsetLoading();
 									},
-									success: (resp) => {
+									success: (response) => {
 										form.querySelectorAll('.msg-bad').forEach((msg) => {
 											msg.remove();
 										})
 
-										if ('error' in resp) {
-											const message_box = makeMessageBox('bad', resp.error.messages,
-												resp.error.title
+										if ('error' in response) {
+											const message_box = makeMessageBox('bad', response.error.messages,
+												response.error.title
 											)[0];
 
 											form.insertAdjacentElement('afterbegin', message_box);
@@ -862,31 +756,31 @@ class CWidgetNavTree extends CWidget {
 											return false;
 										}
 										else {
-											this._deactivateContentsEvents();
+											this.#deactivateContentEvents();
 
 											if (item_edit) {
 												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
-												jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
-												jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
-													.val(resp['sysmapid']);
+												jQuery(`[name="navtree[${id}][name]"]`, $row).val(response.name);
+												jQuery(`[name="navtree[${id}][sysmapid]"]`, $row)
+													.val(response['sysmapid']);
 												jQuery('> .tree-row > .content > .item-name', $row)
 													.empty()
-													.attr('title', resp['name'])
-													.append(jQuery('<span>').text(resp.name));
-												$row.toggleClass('no-map', resp.sysmapid == 0);
+													.attr('title', response['name'])
+													.append(jQuery('<span>').text(response.name));
+												$row.toggleClass('no-map', response.sysmapid == 0);
 											}
 											else {
 												const root = this._target
 													.querySelector(`.tree-item[data-id="${parent}"]>ul.tree-list`);
 
-												id = this._getNextId();
+												id = this.#getNextId();
 
 												if (root !== null) {
-													root.append(this._makeTreeItem({
+													root.append(this.#makeTreeItem({
 														id: id,
-														name: resp['name'],
-														sysmapid: resp['sysmapid'],
+														name: response['name'],
+														sysmapid: response['sysmapid'],
 														parent: parent
 													}, depth + 1));
 
@@ -896,20 +790,20 @@ class CWidgetNavTree extends CWidget {
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
-												if (resp.hierarchy[sysmapid] !== undefined
-														&& depth <= this._max_depth) {
+												if (response.hierarchy[sysmapid] !== undefined
+													&& depth <= this.#max_depth) {
 													const root = this._target
 														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
 
-													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
-														if (resp.submaps[submapid] === undefined) {
+													$.each(response.hierarchy[sysmapid], (i, submapid) => {
+														if (response.submaps[submapid] === undefined) {
 															return;
 														}
 
-														const submap_item = resp.submaps[submapid];
-														const submap_itemid = this._getNextId();
+														const submap_item = response.submaps[submapid];
+														const submap_itemid = this.#getNextId();
 
-														root.append(this._makeTreeItem({
+														root.append(this.#makeTreeItem({
 															id: submap_itemid,
 															name: submap_item['name'],
 															sysmapid: submap_item['sysmapid'],
@@ -923,12 +817,12 @@ class CWidgetNavTree extends CWidget {
 												}
 											};
 
-											add_child_level(resp['sysmapid'], id, depth + 1);
+											add_child_level(response['sysmapid'], id, depth + 1);
 
 											overlayDialogueDestroy(overlay.dialogueid);
-											this._updateWidgetFields();
-											this._setTreeHandlers();
-											this._activateContentsEvents();
+											this.#updateWidgetFields();
+											this.#setTreeHandlers();
+											this.#activateContentEvents();
 										}
 									}
 								});
@@ -944,57 +838,165 @@ class CWidgetNavTree extends CWidget {
 						}
 					],
 					'dialogueid': 'navtreeitem',
-					'script_inline': resp.script_inline
-				}, trigger_elmnt);
+					'script_inline': response.script_inline
+				}, trigger_element);
 			}
 		});
 	}
 
-	_updateWidgetFields() {
-		const prefix = `${this.getUniqueId()}_`;
+	#activateContentEvents() {
+		if (this.#has_content && this.getState() === WIDGET_STATE_ACTIVE) {
+			if (this.isEditMode()) {
+				for (const button of this._target.querySelectorAll('.js-add-child')) {
+					button.addEventListener('click', this.#event_handlers.addChild);
+				}
 
-		if (!this._is_edit_mode) {
-			return false;
-		}
+				for (const button of this._target.querySelectorAll('.js-add-maps')) {
+					button.addEventListener('click', this.#event_handlers.addMaps);
+				}
 
-		for (const name in this._fields) {
-			if (/^navtree\.(name|order|parent|sysmapid)\.\d+$/.test(name)) {
-				delete this._fields[name]
+				for (const button of this._target.querySelectorAll('.js-edit')) {
+					button.addEventListener('click', this.#event_handlers.editItem);
+				}
+
+				for (const button of this._target.querySelectorAll('.js-remove')) {
+					button.addEventListener('click', this.#event_handlers.removeItem);
+				}
+			}
+			else {
+				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
+					link.addEventListener('click', this.#event_handlers.select);
+				}
 			}
 		}
+	}
 
-		jQuery('input[name^="navtree.name."]', jQuery(this._body)).each((index, field) => {
-			const id = field.getAttribute('name').substr(13);
+	#deactivateContentEvents() {
+		if (this.#has_content) {
+			if (this.isEditMode()) {
+				for (const button of this._target.querySelectorAll('.js-add-child')) {
+					button.removeEventListener('click', this.#event_handlers.addChild);
+				}
 
-			if (id) {
-				const parent = document.getElementById(`${prefix}navtree.parent.${id}`).value;
-				const sysmapid = document.getElementById(`${prefix}navtree.sysmapid.${id}`).value;
-				const element = document.getElementById(`${prefix}children-of-${parent}`);
+				for (const button of this._target.querySelectorAll('.js-add-maps')) {
+					button.removeEventListener('click', this.#event_handlers.addMaps);
+				}
 
-				let order = 0;
+				for (const button of this._target.querySelectorAll('.js-edit')) {
+					button.removeEventListener('click', this.#event_handlers.editItem);
+				}
 
-				if (element !== null) {
-					const sibling = element.childNodes;
+				for (const button of this._target.querySelectorAll('.js-remove')) {
+					button.removeEventListener('click', this.#event_handlers.removeItem);
+				}
+			}
+			else {
+				for (const link of this._target.querySelectorAll('a[data-sysmapid]')) {
+					link.removeEventListener('click', this.#event_handlers.select);
+				}
+			}
+		}
+	}
 
-					while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
-						order++;
+	#registerEvents() {
+		this.#event_handlers = {
+			addChild: (e) => {
+				const button = e.target;
+				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
+				const parent = button.getAttribute('data-id');
+
+				this.#itemEditDialog(0, parent, depth + 1, button);
+			},
+
+			addMaps: (e) => {
+				const button = e.target;
+				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
+				const id = button.getAttribute('data-id');
+
+				if (typeof window.addPopupValues === 'function') {
+					window.old_addPopupValues = window.addPopupValues;
+				}
+
+				window.addPopupValues = (data) => {
+					this.#deactivateContentEvents();
+
+					const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
+
+					if (root !== null) {
+						for (const item of data.values) {
+							root.appendChild(this.#makeTreeItem({
+								id: this.#getNextId(),
+								name: item.name,
+								sysmapid: item.id,
+								parent: id
+							}, depth + 1));
+						}
+
+						const tree_item = root.closest('.tree-item');
+
+						tree_item.classList.remove('closed');
+						tree_item.classList.add('opened');
 					}
+
+					this.#setTreeHandlers();
+					this.#updateWidgetFields();
+
+					if (typeof old_addPopupValues === 'function') {
+						window.addPopupValues = old_addPopupValues;
+						delete window.old_addPopupValues;
+					}
+
+					this.#activateContentEvents();
+				};
+
+				return PopUp('popup.generic', {
+					srctbl: 'sysmaps',
+					srcfld1: 'sysmapid',
+					srcfld2: 'name',
+					multiselect: '1'
+				}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
+			},
+
+			editItem: (e) => {
+				const button = e.target;
+
+				const id = button.getAttribute('data-id');
+				const parent = this._target.querySelector(`input[name="navtree[${id}][parent]"]`).value;
+				const depth = parseInt(button.closest('[data-depth]').getAttribute('data-depth'));
+
+				this.#itemEditDialog(id, parent, depth, button);
+			},
+
+			removeItem: (e) => {
+				const button = e.target;
+
+				this.#deactivateContentEvents();
+
+				this._target.querySelector(`[data-id="${button.getAttribute('data-id')}"]`).remove();
+				this.#setTreeHandlers();
+
+				this.#updateWidgetFields();
+
+				this.#activateContentEvents();
+			},
+
+			select: (e) => {
+				const link = e.target;
+
+				const itemid = link.closest('.tree-item').getAttribute('data-id');
+
+				if (this.#markTreeItemSelected(itemid)) {
+					this.#openBranch(this.#navtree_item_selected);
+
+					updateUserProfile('web.dashboard.widget.navtree.item.selected', this.#navtree_item_selected,
+						[this.getWidgetId()]
+					);
+
+					this.broadcast({_mapid: this.#navtree[this.#navtree_item_selected].sysmapid});
 				}
 
-				this._fields[`navtree.name.${id}`] = field.value;
-
-				if (parent != 0) {
-					this._fields[`navtree.parent.${id}`] = parent;
-				}
-
-				if (order != 0) {
-					this._fields[`navtree.order.${id}`] = order + 1;
-				}
-
-				if (sysmapid != 0) {
-					this._fields[`navtree.sysmapid.${id}`] = sysmapid;
-				}
+				e.preventDefault();
 			}
-		});
+		};
 	}
 }

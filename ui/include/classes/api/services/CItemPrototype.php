@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN,
 		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE,
 		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
+		ZBX_PREPROC_SNMP_WALK_TO_JSON, ZBX_PREPROC_SNMP_GET_VALUE
 	];
 
 	/**
@@ -121,20 +121,19 @@ class CItemPrototype extends CItemGeneral {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// templateids
@@ -293,23 +292,11 @@ class CItemPrototype extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
+			self::prepareItemsForApi($result, false);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
-			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
-
-		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		foreach ($result as &$item) {
-			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
-				$item['query_fields'] = json_last_error() ? [] : $query_fields;
-			}
-
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = self::headersStringToArray($item['headers']);
-			}
-		}
-		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
@@ -419,6 +406,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
@@ -429,7 +417,9 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $items
 	 */
 	public static function createForce(array &$items): void {
+		self::prepareItemsForDb($items);
 		$itemids = DB::insert('items', $items);
+		self::prepareItemsForApi($items);
 
 		$ins_items_discovery = [];
 		$host_statuses = [];
@@ -509,10 +499,6 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
-		 * fields as they stored in database.
-		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
 				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
@@ -564,6 +550,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
@@ -673,6 +660,8 @@ class CItemPrototype extends CItemGeneral {
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
 
+		self::prepareItemsForDb($items);
+
 		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
@@ -710,6 +699,9 @@ class CItemPrototype extends CItemGeneral {
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
+
+		self::prepareItemsForApi($items);
+		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
@@ -823,6 +815,7 @@ class CItemPrototype extends CItemGeneral {
 			return;
 		}
 
+		self::prepareItemsForApi($db_items);
 		self::addInternalFields($db_items);
 
 		$items = [];
@@ -880,8 +873,7 @@ class CItemPrototype extends CItemGeneral {
 			$item_indexes = array_flip(array_column($items, 'itemid'));
 
 			foreach ($items as $i => $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT
-						&& array_key_exists($item['master_itemid'], $item_indexes)) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists($item['master_itemid'], $item_indexes)) {
 					$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
 
 					unset($items[$i]);
@@ -1181,9 +1173,11 @@ class CItemPrototype extends CItemGeneral {
 			] + $item;
 
 			$upd_item += [
+				'headers' => [],
 				'tags' => [],
 				'preprocessing' => [],
-				'parameters' => []
+				'parameters' => [],
+				'query_fields' => []
 			];
 
 			$upd_items[] = $upd_item;
@@ -1272,7 +1266,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,h.status AS host_status'.
+			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,i.flags,'.
+				'h.status AS host_status'.
 			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
 				' AND i.hostid=h.hostid'.
@@ -1284,6 +1279,7 @@ class CItemPrototype extends CItemGeneral {
 		$db_items = [];
 		$i = 0;
 		$tpl_itemids = [];
+		$internal_fields = array_flip(['type', 'key_', 'hostid', 'flags']);
 
 		while ($row = DBfetch($result)) {
 			$item = [
@@ -1302,11 +1298,11 @@ class CItemPrototype extends CItemGeneral {
 
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row, array_flip(['type', 'key_', 'hostid']));
+					$item += array_intersect_key($row, $internal_fields);
 				}
 			}
 
-			if ($row['host_status'] != HOST_STATUS_TEMPLATE) {
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
 				unset($row['type']);
 			}
 
@@ -1358,12 +1354,6 @@ class CItemPrototype extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
 
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {

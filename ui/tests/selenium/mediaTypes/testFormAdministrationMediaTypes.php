@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,17 +24,19 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
+ *
+ * @onBefore prepareData
  */
 class testFormAdministrationMediaTypes extends CWebTest {
 
-	private static $mediatype_sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
+	protected static $mediatype_sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 
-	private static $update_mediatypes = [
+	protected static $update_mediatypes = [
 		'Email' => 'Email',
 		'SMS' => 'SMS',
 		'Script' => 'Test script'
 	];
-	private static $delete_mediatype = 'Email (HTML)';
+	protected static $delete_mediatype = 'Email (HTML)';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -43,6 +45,77 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
+	}
+
+	public function prepareData() {
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Switch webhook to script with no params',
+				'script' => 'test.sh',
+				'parameters' => [
+					[
+						'name' => 'HTTPProxy'
+					],
+					[
+						'name' => 'Message',
+						'value' => '{ALERT.MESSAGE}'
+					],
+					[
+						'name' => 'Subject',
+						'value' => '{ALERT.SUBJECT}'
+					],
+					[
+						'name' => 'To',
+						'value' => '{ALERT.SENDTO}'
+					],
+					[
+						'name' => 'URL'
+					]
+				]
+			],
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Switch webhook to script with custom params',
+				'script' => 'empty.sh',
+				'parameters' => [
+					[
+						'name' => 'Custom'
+					],
+					[
+						'name' => 'Message',
+						'value' => '{ALERT.MESSAGE}'
+					]
+				]
+			],
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Switch script to webhook with default params',
+				'exec_path' => 'script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => 'custom parameter'
+					]
+				]
+			],
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Switch script to webhook with no params',
+				'exec_path' => 'script2.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => 'custom parameter'
+					]
+				]
+			],
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Switch script to webhook with custom params',
+				'exec_path' => 'script3.sh'
+			]
+		]);
 	}
 
 	public function testFormAdministrationMediaTypes_GeneralLayout() {
@@ -103,7 +176,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		foreach ($session_settings as $setting => $visible) {
 			$concurrent_sessions->fill($setting);
-			$maxsessions = $concurrent_sessions->query('xpath:./../../input[@id="maxsessions"]')->one();
+			$maxsessions = $form->getFieldContainer('Concurrent sessions')->query('id:maxsessions')->one();
 			$this->assertTrue($maxsessions->isVisible($visible));
 
 			if ($visible) {
@@ -381,7 +454,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * @param CFormElement	$form			form that contains the fields to be checked
 	 * @param array			$parameters		field names, their attributes and attribute values
 	 */
-	private function checkTabFields($form, $parameters) {
+	protected function checkTabFields($form, $parameters) {
 		if (CTestArrayHelper::get($parameters, 'tab name', 'Media type') !== $form->getSelectedTab()) {
 			$form->selectTab($parameters['tab name']);
 		}
@@ -1110,7 +1183,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 *
 	 * @param string	$action		type of action to be checked
 	 */
-	private function checkActionCancellation($action = 'create') {
+	protected function checkActionCancellation($action = 'create') {
 		$new_values = [
 			'Media type' => [
 				'Name' => 'Email for action cancellation check',
@@ -1287,5 +1360,142 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 
 		$dialog->close();
+	}
+
+	public function getSavedParametersData() {
+		return [
+			[
+				[
+					'object' => 'Switch script to webhook with default params',
+					'mediatype_tab' => [
+						'Name' => 'Webhook for default parameters check',
+						'Type' => 'Webhook',
+						'Script' => 'test default'
+					],
+					'expected_parameters' => [
+						[
+							'Name' => 'HTTPProxy',
+							'Value' => ''
+						],
+						[
+							'Name' => 'Message',
+							'Value' => '{ALERT.MESSAGE}'
+						],
+						[
+							'Name' => 'Subject',
+							'Value' => '{ALERT.SUBJECT}'
+						],
+						[
+							'Name' => 'To',
+							'Value' => '{ALERT.SENDTO}'
+						],
+						[
+							'Name' => 'URL',
+							'Value' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'object' => 'Switch webhook to script with no params',
+					'mediatype_tab' => [
+						'Name' => 'Script media type with minimal set of values',
+						'Type' => 'Script',
+						'Script name' => '良い一日を過ごしてください',
+						'Script parameters' => []
+					]
+				]
+			],
+			[
+				[
+					'object' => 'Switch webhook to script with custom params',
+					'mediatype_tab' => [
+						'Name' => 'Script media type with several parameters',
+						'Type' => 'Script',
+						'Script name' => '좋은 하루 되세요',
+						'Script parameters' => [
+							[
+								'Value' => 'first parameter'
+							],
+							[
+								'Value' => '良い一日を過ごしてください'
+							],
+							[
+								'Value' => '!@#$%^&*()_+='
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'object' => 'Switch script to webhook with no params',
+					'mediatype_tab' => [
+						'Name' => 'Webhook with minimal set of values',
+						'Type' => 'Webhook',
+						'Script' => 'test no params'
+					],
+					'remove_parameters' => true
+				]
+			],
+			[
+				[
+					'object' => 'Switch script to webhook with custom params',
+					'mediatype_tab' => [
+						'Name' => 'Webhook with custom parameters',
+						'Type' => 'Webhook',
+						'Script' => 'test custom'
+					],
+					'custom_parameters' => [
+						[
+							'Name' => 'From',
+							'Value' => 'zabbix.com'
+						],
+						[
+							'Name' => 'HTTPS',
+							'Value' => 'true'
+						]
+					],
+					'remove_parameters' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check that parameters are saved correctly when switching type from Webhook to Script and vice versa.
+	 *
+	 * @dataProvider getSavedParametersData
+	 */
+	public function testFormAdministrationMediaTypes_SavedParameters($data) {
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link', $data['object'])->waitUntilClickable()->one()->click();
+
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form->fill($data['mediatype_tab']);
+
+		if (array_key_exists('remove_parameters', $data)) {
+			$form->getField('Parameters')->asMultifieldTable()->clear();
+		}
+
+		if (array_key_exists('custom_parameters', $data)) {
+			$form->getField('Parameters')->asMultifieldTable()->fill($data['custom_parameters']);
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Media type updated');
+
+		$this->page->query('link', $data['mediatype_tab']['Name'])->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		$form->checkValue($data['mediatype_tab']);
+
+		if (array_key_exists('custom_parameters', $data)) {
+			$form->getField('Parameters')->asMultifieldTable()->checkValue($data['custom_parameters']);
+		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 }

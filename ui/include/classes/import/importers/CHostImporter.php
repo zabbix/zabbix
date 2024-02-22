@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class CHostImporter extends CImporter {
 				if ($this->options['templateLinkage']['createMissing']
 						&& array_key_exists($host['host'], $template_linkage)) {
 					API::Host()->massAdd([
-						'hosts' => $host,
+						'hosts' => ['hostid' => $host['hostid']],
 						'templates' => $template_linkage[$host['host']]
 					]);
 				}
@@ -291,31 +291,6 @@ class CHostImporter extends CImporter {
 	 * @throws Exception
 	 */
 	protected function resolveHostReferences(array $host): array {
-		foreach ($host['groups'] as $index => $group) {
-			$groupid = $this->referencer->findHostGroupidByName($group['name']);
-
-			if ($groupid === null) {
-				throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
-			}
-
-			$host['groups'][$index] = ['groupid' => $groupid];
-		}
-
-		if (array_key_exists('proxy', $host)) {
-			if (!$host['proxy']) {
-				$proxyid = 0;
-			}
-			else {
-				$proxyid = $this->referencer->findProxyidByHost($host['proxy']['name']);
-
-				if ($proxyid === null) {
-					throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
-				}
-			}
-
-			$host['proxy_hostid'] = $proxyid;
-		}
-
 		$hostid = $this->referencer->findHostidByHost($host['host']);
 
 		if ($hostid !== null) {
@@ -331,6 +306,35 @@ class CHostImporter extends CImporter {
 				}
 				unset($macro);
 			}
+		}
+
+		if (!$this->options['hosts']['createMissing'] && !$this->options['hosts']['updateExisting']) {
+			return $host;
+		}
+
+		foreach ($host['groups'] as $index => $group) {
+			$groupid = $this->referencer->findHostGroupidByName($group['name']);
+
+			if ($groupid === null) {
+				throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
+			}
+
+			$host['groups'][$index] = ['groupid' => $groupid];
+		}
+
+		if (array_key_exists('proxy', $host)) {
+			if (!$host['proxy']) {
+				$proxyid = 0;
+			}
+			else {
+				$proxyid = $this->referencer->findProxyidByName($host['proxy']['name']);
+
+				if ($proxyid === null) {
+					throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
+				}
+			}
+
+			$host['proxyid'] = $proxyid;
 		}
 
 		return $host;

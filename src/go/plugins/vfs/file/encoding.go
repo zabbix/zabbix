@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ package file
 import "C"
 
 import (
+	"fmt"
 	"git.zabbix.com/ap/plugin-support/log"
 	"syscall"
 	"unsafe"
@@ -49,12 +50,12 @@ func findEncodingFromBOM(encoding string, inbuf []byte, bytecount int) string {
 	return encoding
 }
 
-func decodeToUTF8(encoding string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int) {
+func decodeToUTF8(encoding string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int, err error) {
 	if bytecount == 0 {
-		return inbuf, 0
+		return inbuf, 0, nil
 	}
 	if encoding == "" {
-		return inbuf, bytecount
+		return inbuf, bytecount, nil
 	}
 	tocode := C.CString("UTF-8")
 	log.Tracef("Calling C function \"free()\"")
@@ -67,7 +68,7 @@ func decodeToUTF8(encoding string, inbuf []byte, bytecount int) (outbuf []byte, 
 	cd, err := C.iconv_open(tocode, fromcode)
 
 	if err != nil {
-		return inbuf, bytecount
+		return nil, 0, err
 	}
 
 	outbuf = make([]byte, bytecount)
@@ -93,10 +94,14 @@ func decodeToUTF8(encoding string, inbuf []byte, bytecount int) (outbuf []byte, 
 	outbuf = outbuf[:len(outbuf)-int(outbytes)]
 
 	log.Tracef("Calling C function \"iconv_close()\"")
-	C.iconv_close(cd)
+
+	if 0 != C.iconv_close(cd) {
+		return nil, 0, fmt.Errorf("Failed to convert from encoding %s to utf8. ", encoding)
+	}
+
 	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]
 	}
 
-	return outbuf, len(outbuf)
+	return outbuf, len(outbuf), nil
 }

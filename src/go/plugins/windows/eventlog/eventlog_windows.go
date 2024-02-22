@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,16 +22,20 @@ package eventlog
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 	"unsafe"
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxlib"
 )
+
+var impl Plugin
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -51,6 +55,19 @@ type metadata struct {
 	lastcheck time.Time
 }
 
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsEventlog",
+		"eventlog", "Windows event log file monitoring.",
+		"eventlog.count", "Windows event log file monitoring.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+
+	impl.SetHandleTimeout(true)
+}
+
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
@@ -68,6 +85,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
 	}
 	meta := ctx.Meta()
+	isCountItem := false
+
 	var data *metadata
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
@@ -89,6 +108,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	}
 
+	if strings.HasSuffix(key, ".count") {
+		isCountItem = true
+	}
+
 	if ctx.Output().PersistSlotsAvailable() == 0 {
 		p.Warningf("buffer is full, cannot store persistent value")
 		return nil, nil
@@ -97,39 +120,38 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
-	var refresh int
-	if data.lastcheck.IsZero() {
-		refresh = 1
-	} else {
-		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
-	}
-
+	refresh := zbxlib.GetCheckIntervalSeconds(ctx.ItemID(), ctx.Delay(), now, data.lastcheck)
 	logitem := zbxlib.EventLogItem{Results: make([]*zbxlib.EventLogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
-	zbxlib.ProcessEventLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
+	zbxlib.ProcessEventLogCheck(data.blob, &logitem, refresh, grxp.Cblob, isCountItem)
 	data.lastcheck = now
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))
 		for i, r := range logitem.Results {
-			results[i].Itemid = ctx.ItemID()
-			results[i].Value = r.Value
-			results[i].EventSource = r.EventSource
-			results[i].EventID = r.EventID
-			results[i].EventSeverity = r.EventSeverity
-			results[i].EventTimestamp = r.EventTimestamp
-			results[i].Error = r.Error
-			results[i].Ts = r.Ts
-			results[i].LastLogsize = &r.LastLogsize
-			results[i].Persistent = true
+			if !isCountItem {
+				results[i].Itemid = ctx.ItemID()
+				results[i].Value = r.Value
+				results[i].EventSource = r.EventSource
+				results[i].EventID = r.EventID
+				results[i].EventSeverity = r.EventSeverity
+				results[i].EventTimestamp = r.EventTimestamp
+				results[i].Error = r.Error
+				results[i].Ts = r.Ts
+				results[i].LastLogsize = &r.LastLogsize
+				results[i].Persistent = true
+			} else {
+				results[i].Itemid = ctx.ItemID()
+				results[i].Value = r.Value
+				results[i].Ts = r.Ts
+				results[i].Error = r.Error
+				results[i].LastLogsize = &r.LastLogsize
+			}
 		}
-		return results, nil
+		result = results
+
+		return result, nil
 	}
+
 	return nil, nil
-}
-
-var impl Plugin
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog", "Windows event log file monitoring.")
 }

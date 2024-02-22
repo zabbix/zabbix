@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ class testAlertingForServices extends CIntegrationTest {
 				'evaltype' => 0,
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_SERVICE,
+						'conditiontype' => ZBX_CONDITION_TYPE_SERVICE,
 						'operator' => 0,
 						'value' => self::$serviceid
 					]
@@ -213,7 +213,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
 		], 25, 2);
@@ -241,7 +241,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
 		], 25, 2);
@@ -266,7 +266,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'sortfield' => 'alertid'
@@ -339,7 +339,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
 		], 25, 2);
@@ -367,7 +367,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
 		], 25, 2);
@@ -392,7 +392,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'sortfield' => 'alertid'
@@ -457,7 +457,7 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
 		]);
@@ -527,13 +527,12 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
 		$response = $this->call('alert.get', [
-				'output' => 'extend',
-				'actionsids' => self::$actionid,
-				'eventsource' => EVENT_SOURCE_SERVICE,
-				'eventobject' => EVENT_OBJECT_SERVICE,
-				'sortfield' => 'alertid'
-			]
-		);
+			'output' => 'extend',
+			'actionids' => self::$actionid,
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'eventobject' => EVENT_OBJECT_SERVICE,
+			'sortfield' => 'alertid'
+		]);
 		$this->assertCount(2, $response['result']);
 		$this->assertEquals(1, $response['result'][0]['esc_step']);
 		$this->assertEquals(2, $response['result'][1]['esc_step']);

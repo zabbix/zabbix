@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ $csrf_token = CCsrfTokenHelper::get('discovery');
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('discoveryForm')
-	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addStyle('display: none;');
 
 if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
@@ -49,13 +50,13 @@ $form_grid = (new CFormGrid())
 	]);
 
 // Append proxy to form list.
-$proxy_select = (new CSelect('proxy_hostid'))
-	->setValue($this->data['drule']['proxy_hostid'])
+$proxy_select = (new CSelect('proxyid'))
+	->setValue($this->data['drule']['proxyid'])
 	->setFocusableElementId('label-proxy')
 	->addOption(new CSelectOption(0, _('No proxy')));
 
 foreach ($this->data['proxies'] as $proxy) {
-	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
+	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['name']));
 }
 
 $form_grid
@@ -110,7 +111,7 @@ $form_grid->addItem([
 							(new CButtonLink(_('Add')))->addClass('js-check-add')
 						))->setColSpan(2)
 					)
-			)->setId('dcheckListFooter')
+			)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

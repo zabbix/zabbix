@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,15 +21,25 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * Base class for Host form tests.
  */
 class testFormHost extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * All objects created in dataSource DiscoveredHosts.
@@ -40,15 +50,6 @@ class testFormHost extends CWebTest {
 		'Test of discovered host 2 template for clear',
 		'Test of discovered host Template'
 	];
-
-	/**
-	 * Attach Behaviors to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * Link to page for opening host form.
@@ -178,7 +179,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20000,
+				'proxyid' => 20000,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -186,7 +187,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20000,
+				'proxyid' => 20000,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -297,7 +298,7 @@ class testFormHost extends CWebTest {
 			);
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
-				$field_lenghts = [
+				$field_lengths = [
 					'Max repetition count' =>  20,
 					'Context name' => 255,
 					'Security name' => 64,
@@ -305,7 +306,7 @@ class testFormHost extends CWebTest {
 					'Privacy passphrase' => 64
 				];
 
-				foreach ($field_lenghts as $label => $length) {
+				foreach ($field_lengths as $label => $length) {
 					$this->assertEquals($length, $snmp_form->getField($label)->getAttribute('maxlength'));
 				}
 			}
@@ -386,7 +387,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Existen visible name',
+						'Host name' => 'Existed visible name',
 						'Host groups' => 'Zabbix servers',
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
@@ -2031,7 +2032,7 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
@@ -2094,8 +2095,8 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Group created from host prototype 1', 'Group for discovered host test'],
-								'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group created from host prototype 1',
+								'Group for discovered host test'], 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',

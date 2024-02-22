@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,6 +87,9 @@ class CApiInputValidator {
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
+			case API_ESCAPED_STRING_UTF8:
+				return self::validateEscapedStringUtf8($rule, $data, $path, $error);
+
 			case API_STRINGS_UTF8:
 				return self::validateStringsUtf8($rule, $data, $path, $error);
 
@@ -111,8 +114,8 @@ class CApiInputValidator {
 			case API_FILTER_VALUES:
 				return self::validateFilterValues($rule, $data, $path, $error);
 
-			case API_FILTER_VALUE:
-				return self::validateFilterValue($rule, $data, $path, $error);
+			case API_VALUE:
+				return self::validateValue($rule, $data, $path, $error);
 
 			case API_FLOAT:
 				return self::validateFloat($rule, $data, $path, $error);
@@ -194,6 +197,9 @@ class CApiInputValidator {
 
 			case API_DNS:
 				return self::validateDns($rule, $data, $path, $error);
+
+			case API_HOST_ADDRESS:
+				return self::validateHostAddress($rule, $data, $path, $error);
 
 			case API_PORT:
 				return self::validatePort($rule, $data, $path, $error);
@@ -292,13 +298,14 @@ class CApiInputValidator {
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
+			case API_ESCAPED_STRING_UTF8:
 			case API_INT32:
 			case API_INT32_RANGES:
 			case API_UINT64:
 			case API_UINTS64:
 			case API_FILTER:
 			case API_FILTER_VALUES:
-			case API_FILTER_VALUE:
+			case API_VALUE:
 			case API_FLOAT:
 			case API_FLOATS:
 			case API_ID:
@@ -322,6 +329,7 @@ class CApiInputValidator {
 			case API_IP:
 			case API_IP_RANGES:
 			case API_DNS:
+			case API_HOST_ADDRESS:
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
 			case API_EVENT_NAME:
@@ -682,6 +690,36 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Escaped string validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']       (optional) API_NOT_EMPTY
+	 * @param string $rule['characters']  (optional) 'characters' option for CEscapedStringParser.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEscapedStringUtf8($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$escaped_string_parser = new CEscapedStringParser(array_intersect_key($rule, array_flip(['characters'])));
+
+		if ($escaped_string_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $escaped_string_parser->getError());
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Array of strings validator.
 	 *
 	 * @param array  $rule
@@ -902,7 +940,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (($flags & API_NORMALIZE) && self::validateFilterValue([], $data, '', $e)) {
+		if (($flags & API_NORMALIZE) && self::validateValue([], $data, '', $e)) {
 			$data = [$data];
 		}
 		unset($e);
@@ -913,7 +951,7 @@ class CApiInputValidator {
 		}
 
 		$data = array_values($data);
-		$rules = ['type' => API_FILTER_VALUE];
+		$rules = ['type' => API_VALUE];
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
@@ -927,7 +965,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Filter value validator.
+	 * Value validator.
 	 *
 	 * @param array  $rule
 	 * @param mixed  $data
@@ -936,8 +974,8 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFilterValue($rule, &$data, $path, &$error) {
-		if (!is_string($data) && !is_double($data) && !is_int($data)) {
+	private static function validateValue($rule, &$data, $path, &$error) {
+		if (!is_string($data) && !is_int($data) && !is_float($data) ) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('a character string, integer or floating point value is expected')
 			);
@@ -981,19 +1019,20 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
+				$macro_parsers = [];
 				if ($flags & API_ALLOW_USER_MACRO) {
-					$user_macro_parser = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroFunctionParser();
 				}
-
 				if ($flags & API_ALLOW_LLD_MACRO) {
-					$lld_macro_parser = new CLLDMacroParser();
-					$lld_macro_function_parser = new CLLDMacroFunctionParser();
+					$macro_parsers[] = new CLLDMacroParser();
+					$macro_parsers[] = new CLLDMacroFunctionParser();
 				}
 
-				if (($flags & API_ALLOW_USER_MACRO && $user_macro_parser->parse($data) == CParser::PARSE_SUCCESS)
-						|| ($flags & API_ALLOW_LLD_MACRO && ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS
-							|| $lld_macro_function_parser->parse($data) == CParser::PARSE_SUCCESS))) {
-					return true;
+				foreach ($macro_parsers as $macro_parser) {
+					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+						return true;
+					}
 				}
 
 				$value = NAN;
@@ -2297,9 +2336,18 @@ class CApiInputValidator {
 
 						$object_values[] = $object[$field_name];
 
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
+						switch ($rule['fields'][$field_name]['type']) {
+							case API_SCRIPT_MENU_PATH:
+								$object_value = trim(trimPath($object[$field_name]), '/');
+								break;
+
+							case API_USER_MACRO:
+								$object_value = self::trimMacro($object[$field_name]);
+								break;
+
+							default:
+								$object_value = $object[$field_name];
+						}
 
 						if ($level < count($field_names)) {
 							if (!array_key_exists($object_value, $_uniq)) {
@@ -2343,9 +2391,23 @@ class CApiInputValidator {
 
 						$object_values[] = $object[$field_name];
 
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
+						switch ($rule['fields'][$field_name]['type']) {
+							case API_SCRIPT_MENU_PATH:
+								$object_value = trim(trimPath($object[$field_name]), '/');
+
+								// First or only slash from beginning is trimmed.
+								if (isset($object_value[0]) && $object_value[0] === '/') {
+									$object_value = substr($object_value, 1);
+								}
+								break;
+
+							case API_USER_MACRO:
+								$object_value = self::trimMacro($object[$field_name]);
+								break;
+
+							default:
+								$object_value = $object[$field_name];
+						}
 
 						if (!in_array($object_value, $values)) {
 							$_uniqs = [&$uniq];
@@ -2557,6 +2619,7 @@ class CApiInputValidator {
 
 		$options = [
 			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'allow_manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
 			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
@@ -2597,6 +2660,20 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return self::checkIp($flags, $data, $path, $error);
+	}
+
+	/**
+	 * Check IP syntax.
+	 *
+	 * @param int    $flags  API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkIp($flags, &$data, $path, &$error) {
 		$ip_parser = new CIPParser([
 			'v6' => ZBX_HAVE_IPV6,
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
@@ -2688,6 +2765,20 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return self::checkDns($flags, $data, $path, $error);
+	}
+
+	/**
+	 * Check DNS syntax.
+	 *
+	 * @param int    $flags  API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkDns($flags, &$data, $path, &$error) {
 		$dns_parser = new CDnsParser([
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
@@ -2700,6 +2791,47 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Proxy host address validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+
+	private static function validateHostAddress($rule, &$data, $path, &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$e = '';
+
+		if (self::checkIp($flags, $data, $path, $e) || self::checkDns($flags, $data, $path, $e)) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP or DNS is expected'));
+
+		return false;
 	}
 
 	/**
@@ -2737,18 +2869,18 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$macro_parsers = [];
 		if ($flags & API_ALLOW_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
-
-			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
 		}
 
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				return true;
 			}
 		}
@@ -3860,7 +3992,7 @@ class CApiInputValidator {
 		}
 
 		if ($types) {
-			$matches = (new CMacrosResolverGeneral())->getMacroPositions($json, $types);
+			$matches = CMacrosResolverGeneral::getMacroPositions($json, $types);
 			$shift = 0;
 
 			foreach ($matches as $pos => $substr) {
@@ -4075,8 +4207,18 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'characters' => 'nrts'],
+					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '', 'characters' => 'nrts']
+				]];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX]), 'flags' => API_REQUIRED],
+					'2' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => '1', 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+								['else' => true, 'type' => API_UNEXPECTED]
+					]]
 				]];
 				break;
 
@@ -4099,6 +4241,12 @@ class CApiInputValidator {
 						$index =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
 					];
 				}
+				break;
+
+			case ZBX_PREPROC_SNMP_GET_VALUE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+				]];
 				break;
 		}
 

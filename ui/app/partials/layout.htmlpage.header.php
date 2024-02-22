@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ $scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
 
 if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
-	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
+	$page_title = $page_title !== '' ? $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title : $ZBX_SERVER_NAME;
 }
 
 $page_header = new CHtmlPageHeader($page_title, CWebUser::getLang());
@@ -70,7 +70,7 @@ foreach ($modules_assets as $module_id => $assets) {
 $page_header
 	->addJavaScript('
 		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
-		const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+		const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
@@ -111,5 +111,3 @@ if ($scripts) {
 }
 
 $page_header->show();
-
-echo '<body>';

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,23 +20,21 @@
 /* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 #include "software.h"
 
 #include "zbxalgo.h"
 #include "zbxexec.h"
-#include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
-#       include <sys/utsname.h>
+#	include <sys/utsname.h>
 #endif
 
 #define SW_OS_FULL			"/proc/version"
-#define SW_OS_SHORT 			"/proc/version_signature"
+#define SW_OS_SHORT			"/proc/version_signature"
 #define SW_OS_NAME			"/etc/issue.net"
 #define SW_OS_NAME_RELEASE		"/etc/os-release"
 #define SW_OS_OPTION_PRETTY_NAME	"PRETTY_NAME"
@@ -284,8 +282,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 {
 	static char	fmt[64] = "";
 
-	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF],
-			installtime_value[DETAIL_BUF];
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			buildtime_value[DETAIL_BUF], installtime_value[DETAIL_BUF];
 	zbx_uint64_t	size;
 	time_t		buildtime_timestamp, installtime_timestamp;
 	int		rv;
@@ -624,30 +622,30 @@ out:
 	zbx_free(l);
 }
 
-static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
+static void	print_packages(char **buffer, size_t *alloc_len, size_t *offset, zbx_vector_str_t *packages,
+		const char *manager)
 {
-	size_t	offset = 0;
 	int	i;
 
 	if (NULL != manager)
-		offset += zbx_snprintf(buffer + offset, size - offset, "[%s]", manager);
+		zbx_snprintf_alloc(buffer, alloc_len, offset, "[%s]", manager);
+
 
 	if (0 < packages->values_num)
 	{
 		if (NULL != manager)
-			offset += zbx_snprintf(buffer + offset, size - offset, " ");
+			zbx_chrcpy_alloc(buffer, alloc_len, offset, ' ');
 
 		zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		for (i = 0; i < packages->values_num; i++)
-			offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
+			zbx_snprintf_alloc(buffer, alloc_len, offset, "%s, ", packages->values[i]);
 
-		offset -= 2;
+		*offset -= 2;
 	}
 
-	buffer[offset] = '\0';
-
-	return offset;
+	if (NULL != *buffer)
+		(*buffer)[*offset] = '\0';
 }
 
 /**
@@ -705,9 +703,9 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	size_t			offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
-	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
+	size_t			output_alloc = 0, output_offset = 0;
+	int			ret = SYSINFO_RET_FAIL, show_pm, check_regex, check_manager;
+	char			*output = NULL, *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
 				*package, *saveptr;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
@@ -735,10 +733,9 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	*buffer = '\0';
 	zbx_vector_str_create(&packages);
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
 		saveptr = NULL;
@@ -746,11 +743,11 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
@@ -780,9 +777,8 @@ next:
 
 			if (1 == show_pm)
 			{
-				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages,
-						mng->name);
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+				print_packages(&output, &output_alloc, &output_offset, &packages, mng->name);
+				zbx_chrcpy_alloc(&output, &output_alloc, &output_offset, '\n');
 
 				zbx_vector_str_clear_ext(&packages, zbx_str_free);
 			}
@@ -793,19 +789,29 @@ next:
 
 	if (0 == show_pm)
 	{
-		print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
+		print_packages(&output, &output_alloc, &output_offset, &packages, NULL);
 
 		zbx_vector_str_clear_ext(&packages, zbx_str_free);
 	}
-	else if (0 != offset)
-		buffer[--offset] = '\0';
+	else if (0 != output_offset)
+	{
+		output[--output_offset] = '\0';
+	}
 
 	zbx_vector_str_destroy(&packages);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+	{
+		if (NULL == output)
+			output = zbx_strdup(NULL, "");
+
+		SET_TEXT_RESULT(result, output);
+	}
 	else
+	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+		zbx_free(output);
+	}
 
 	return ret;
 }
@@ -912,10 +918,11 @@ out:
 
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
+	int			ret = SYSINFO_RET_FAIL, check_regex, check_manager;
 	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
+	int			timeout;
 
 	if (2 < request->nparam)
 	{
@@ -930,24 +937,34 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
 
 	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
+	timeout = request->timeout;
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
+		time_t	tm_start;
 		mng = &package_managers[i];
 		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
+		tm_start = time(NULL);
+
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
+			timeout = timeout - (int)(time(NULL) - tm_start);
+
+			tm_start = time(NULL);
+
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), timeout,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
 			}
+
+			timeout = timeout - (int)(time(NULL) - tm_start);
 
 			ret = SYSINFO_RET_OK;
 

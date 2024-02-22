@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,20 +21,19 @@
 #include "zbxsysinfo.h"
 
 #include "../sysinfo.h"
-#include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check whether JSON response is "success" or "failed"              *
+ * Purpose: checks whether JSON response is "success" or "failed"             *
  *                                                                            *
- * Parameters: response - [IN] the request                                    *
- *             result   - [OUT] check result                                  *
+ * Parameters: response - [IN]                                                *
+ *             result   - [OUT]                                               *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 static int	check_response(const char *response, AGENT_RESULT *result)
@@ -69,20 +68,21 @@ static int	check_response(const char *response, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send Zabbix stats request and receive the result data             *
+ * Purpose: sends Zabbix stats request and receives result data               *
  *                                                                            *
- * Parameters: json   - [IN] the request                                      *
- *             ip     - [IN] external Zabbix instance hostname                *
- *             port   - [IN] external Zabbix instance port                    *
- *             result - [OUT] check result                                    *
+ * Parameters: json    - [IN] the request                                     *
+ *             ip      - [IN] external Zabbix instance hostname               *
+ *             port    - [IN] external Zabbix instance port                   *
+ *             timeout - [IN] timeout value for comms                         *
+ *             result  - [OUT] check result                                   *
  *                                                                            *
  ******************************************************************************/
-static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip, unsigned short port,
+static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip, unsigned short port, int timeout,
 		AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 
-	if (SUCCEED == zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), ip, port, sysinfo_get_config_timeout(),
+	if (SUCCEED == zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), ip, port, timeout,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		if (SUCCEED == zbx_tcp_send(&s, json->buffer))
@@ -120,24 +120,25 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create Zabbix stats request                                       *
+ * Purpose: creates Zabbix stats request                                      *
  *                                                                            *
- * Parameters: ip     - [IN] external Zabbix instance hostname                *
- *             port   - [IN] external Zabbix instance port                    *
- *             result - [OUT] check result                                    *
+ * Parameters: ip      - [IN] external Zabbix instance hostname               *
+ *             port    - [IN] external Zabbix instance port                   *
+ *             timeout - [IN] timeout value for comms                         *
+ *             result  - [OUT] check result                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result)
+int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout, AGENT_RESULT *result)
 {
 	struct zbx_json	json;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ZABBIX_STATS, ZBX_JSON_TYPE_STRING);
 
-	get_remote_zabbix_stats(&json, ip, port, result);
+	get_remote_zabbix_stats(&json, ip, port, timeout, result);
 
 	zbx_json_free(&json);
 
@@ -146,20 +147,21 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESUL
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create Zabbix stats queue request                                 *
+ * Purpose: creates Zabbix stats queue request                                *
  *                                                                            *
- * Parameters: ip     - [IN] external Zabbix instance hostname                *
- *             port   - [IN] external Zabbix instance port                    *
- *             from   - [IN] lower limit for delay                            *
- *             to     - [IN] upper limit for delay                            *
- *             result - [OUT] check result                                    *
+ * Parameters: ip      - [IN] external Zabbix instance hostname               *
+ *             port    - [IN] external Zabbix instance port                   *
+ *             from    - [IN] lower limit for delay                           *
+ *             to      - [IN] upper limit for delay                           *
+ *             timeout - [IN] timeout value for comms                         *
+ *             result  - [OUT] check result                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
-		AGENT_RESULT *result)
+		int timeout, AGENT_RESULT *result)
 {
 	struct zbx_json	json;
 
@@ -176,7 +178,7 @@ int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const
 
 	zbx_json_close(&json);
 
-	get_remote_zabbix_stats(&json, ip, port, result);
+	get_remote_zabbix_stats(&json, ip, port, timeout, result);
 
 	zbx_json_free(&json);
 
@@ -211,13 +213,13 @@ int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (3 > request->nparam)
 	{
-		if (SUCCEED != zbx_get_remote_zabbix_stats(ip_str, port_number, result))
+		if (SUCCEED != zbx_get_remote_zabbix_stats(ip_str, port_number, request->timeout, result))
 			return SYSINFO_RET_FAIL;
 	}
 	else if (NULL != queue_str && 0 == strcmp(queue_str, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 	{
 		if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip_str, port_number, get_rparam(request, 3),
-				get_rparam(request, 4), result))
+				get_rparam(request, 4), request->timeout, result))
 		{
 			return SYSINFO_RET_FAIL;
 		}

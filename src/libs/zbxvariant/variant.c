@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,7 +260,14 @@ static int	variant_to_ui64(zbx_variant_t *value)
 	zbx_del_zeros(buffer);
 
 	if (SUCCEED != zbx_is_uint64(buffer, &value_ui64))
-		return FAIL;
+	{
+		double	dbl;
+
+		if (SUCCEED != zbx_is_double(buffer, &dbl) || 0 > dbl || dbl >= (double)ZBX_MAX_UINT64)
+			return FAIL;
+
+		value_ui64 = (zbx_uint64_t)dbl;
+	}
 
 	zbx_variant_clear(value);
 	zbx_variant_set_ui64(value, value_ui64);

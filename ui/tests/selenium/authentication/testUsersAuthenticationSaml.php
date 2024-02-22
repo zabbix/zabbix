@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -667,9 +667,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			[
 				[
 					'username' => 'admin-zabbix',
-					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
-					'regular_login' => true,
-					'header' => '100 busiest triggers'
+					'header' => 'Top 100 triggers'
 				]
 			],
 			// #4 Login as zabbix admin with pre-defined login url (has higher priority then the configured url after login).
@@ -677,8 +675,6 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				[
 					'username' => 'admin-zabbix',
 					'url' => 'zabbix.php?action=service.list',
-					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
-					'regular_login' => true,
 					'header' => 'Services'
 				]
 			],

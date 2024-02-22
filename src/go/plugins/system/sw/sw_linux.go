@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -234,9 +234,21 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 
 		var size uint64
 
-		size, err = strconv.ParseUint(split[4], 10, 64)
-		if err != nil {
-			return
+		// According to the Debian project's Policy Manual on Binary package
+		// control files[1], the Installed-Size field[2] is not mandatory in
+		// the stanza. The query for such packages would return an empty value,
+		// which strconv obviously fails to parse into an Uint.
+		//
+		// When that is the case, we simply report the size as 0.
+		//
+		// [1]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#binary-package-control-files-debian-control
+		// [2]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-installed-size
+
+		if split[4] != "" {
+			size, err = strconv.ParseUint(split[4], 10, 64)
+			if err != nil {
+				return "", err
+			}
 		}
 
 		// the reported size is in kB, we want bytes
@@ -537,14 +549,14 @@ func portageParseSizeInfo(in string) (out uint64, err error) {
 func portageDetails(manager string, in []string, regex string) (out string, err error) {
 	const num_fields, pkginfo_num_fields, sizeinfo_num_fields = 2, 5, 3
 
-	rgx, err := regexp.Compile(regex);
+	rgx, err := regexp.Compile(regex)
 	if err != nil {
 		log.Debugf("internal error: cannot compile regex \"%s\"", regex)
 
 		return
 	}
 
-	pd := []PackageDetails{};
+	pd := []PackageDetails{}
 
 	for _, s := range in {
 		var size uint64
@@ -622,7 +634,7 @@ func getParams(params []string, maxparams int) (regex string, manager string, sh
 	return
 }
 
-func (p *Plugin) systemSwPackages(params []string) (result string, err error) {
+func (p *Plugin) systemSwPackages(params []string, timeout int) (result string, err error) {
 	var regex, manager string
 	var short bool
 
@@ -639,12 +651,12 @@ func (p *Plugin) systemSwPackages(params []string) (result string, err error) {
 			continue
 		}
 
-		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(p.options.Timeout), "")
+		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(timeout), "")
 		if err != nil || test == "" {
 			continue
 		}
 
-		tmp, err := zbxcmd.Execute(m.listCmd, time.Second*time.Duration(p.options.Timeout), "")
+		tmp, err := zbxcmd.Execute(m.listCmd, time.Second*time.Duration(timeout), "")
 		if err != nil {
 			p.Errf("Failed to execute command '%s', err: %s", m.listCmd, err.Error())
 
@@ -691,7 +703,7 @@ func (p *Plugin) systemSwPackages(params []string) (result string, err error) {
 	return
 }
 
-func (p *Plugin) systemSwPackagesGet(params []string) (result string, err error) {
+func (p *Plugin) systemSwPackagesGet(params []string, timeout int) (result string, err error) {
 	var regex, manager string
 
 	regex, manager, _, err = getParams(params, 2)
@@ -707,12 +719,12 @@ func (p *Plugin) systemSwPackagesGet(params []string) (result string, err error)
 			continue
 		}
 
-		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(p.options.Timeout), "")
+		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(timeout), "")
 		if err != nil || test == "" {
 			continue
 		}
 
-		tmp, err := zbxcmd.Execute(m.detailsCmd, time.Second*time.Duration(p.options.Timeout), "")
+		tmp, err := zbxcmd.Execute(m.detailsCmd, time.Second*time.Duration(timeout), "")
 		if err != nil {
 			p.Errf("Failed to execute command '%s', err: %s", m.listCmd, err.Error())
 

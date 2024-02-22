@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use CTimezoneHelper;
 
 class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTimeZoneView::class;
 	public const DEFAULT_VALUE = '';
 
 	public function __construct(string $name, string $label = null, array $values = null) {
@@ -41,11 +42,5 @@ class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-	}
-
-	public function setValue($value): self {
-		$this->value = $value;
-
-		return $this;
 	}
 }

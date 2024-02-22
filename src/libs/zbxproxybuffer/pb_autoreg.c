@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ static void	pb_autoreg_write_host_db(zbx_uint64_t id, const char *host, const ch
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns", "listen_port",
-			"tls_accepted", "host_metadata", "flags", "clock", NULL);
+			"tls_accepted", "host_metadata", "flags", "clock", (char *)NULL);
 
 	zbx_db_insert_add_values(&db_insert, id, host, ip, dns, (int)port, (int)connection_type, host_metadata,
 			flags, clock);
@@ -299,7 +299,7 @@ void	pb_autoreg_flush(zbx_pb_t *pb)
 		zbx_list_iterator_t	li;
 
 		zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns",
-				"listen_port", "tls_accepted", "host_metadata", "flags", "clock", NULL);
+				"listen_port", "tls_accepted", "host_metadata", "flags", "clock", (char *)NULL);
 
 		zbx_list_iterator_init(&pb->autoreg, &li);
 

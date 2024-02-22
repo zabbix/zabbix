@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ func (p *Plugin) Validate(privateOptions interface{}) error {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	resp, err := p.broker.export(key, params)
+	resp, err := p.broker.export(key, params, ctx.Timeout())
 	if err != nil {
 		return nil, err
 	}

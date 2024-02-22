@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #include "item_preproc.h"
 #include "preproc_snmp.h"
+#include "pp_manager.h"
+
 #include "zbxjson.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
@@ -27,6 +29,10 @@
 ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
 ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 ZBX_PTR_VECTOR_IMPL(snmp_value_pair, zbx_snmp_value_pair_t *)
+
+#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
+#define ZBX_PREPROC_SNMP_MAC_FROM_HEX	2
+#define ZBX_PREPROC_SNMP_UINT_FROM_BITS	3
 
 #ifdef HAVE_NETSNMP
 static char	zbx_snmp_init_done;
@@ -187,6 +193,7 @@ static int	preproc_snmp_walk_to_json_params(const char *params,
 			parsed_param.field_name = zbx_strdup(NULL, field_name);
 			parsed_param.format_flag = format_flag;
 			parsed_param.oid_prefix = oid_prefix;
+			oid_prefix = NULL;
 
 			zbx_vector_snmp_walk_to_json_param_append(parsed_params, parsed_param);
 		}
@@ -209,13 +216,10 @@ static int	preproc_snmp_walk_to_json_params(const char *params,
 	}
 
 	zbx_free(params2);
+	zbx_free(oid_prefix);
 
 	if (0 != idx % 3)
-	{
-		zbx_free(oid_prefix);
-
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
@@ -278,6 +282,12 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 				while ('.' != *(ptr + 1) && '\0' != *(ptr + 1))
 					ptr++;
 			}
+			else if (ZBX_SNMP_TYPE_STRING == p->type)
+			{
+				while ('\0' != *(ptr + 1) &&
+						('\n' != *ptr || '.' != *(ptr + 1) || 0 == isdigit(*(ptr + 2))))
+					ptr++;
+			}
 
 			len = (size_t)(ptr - start);
 		}
@@ -285,25 +295,37 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 		p->value = zbx_malloc(NULL, len + 1);
 		memcpy(p->value, start, len);
 		(p->value)[len] = '\0';
-		zbx_remove_chars(p->value, "\n");
-		zbx_rtrim(p->value, " ");
+
+		if (ZBX_SNMP_TYPE_HEX == p->type || ZBX_SNMP_TYPE_BITS == p->type)
+		{
+			zbx_remove_chars(p->value, "\n");
+			zbx_rtrim(p->value, " ");
+		}
 
 		return len;
 	}
 	else
 	{
 		char	*out;
+		int	escape = 0;
 
 		ptr++;
-		while ('"' != *ptr)
+
+		while ('"' != *ptr || 0 != escape)
 		{
 			if ('\0' == *ptr)
 				return 0;
-			if ('\\' == *ptr)
+
+			if (0 == escape)
 			{
-				if ('\0' == *(++ptr))
-					return 0;
+				if ('\\' == *ptr)
+					escape = 1;
 			}
+			else
+			{
+				escape = 0;
+			}
+
 			ptr++;
 		}
 
@@ -316,11 +338,11 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 			if ('\\' == *ptr)
 			{
 				ptr++;
-				continue;
 			}
 			*out++ = *ptr++;
 		}
 		*out = '\0';
+
 		return len;
 	}
 }
@@ -372,6 +394,13 @@ reparse_type:
 				goto eol;
 			}
 
+			if (0 == strcmp(type, "NULL") && ('\n' == *data || '\0' == *data))
+			{
+				p->type = ZBX_SNMP_TYPE_UNDEFINED;
+
+				goto eol;
+			}
+
 			*error = strdup("invalid value type format");
 			goto out;
 		}
@@ -396,6 +425,10 @@ reparse_type:
 		else if (0 == strcmp(type, "BITS"))
 		{
 			p->type = ZBX_SNMP_TYPE_BITS;
+		}
+		else if (0 == strcmp(type, "STRING"))
+		{
+			p->type = ZBX_SNMP_TYPE_STRING;
 		}
 		else
 			p->type = ZBX_SNMP_TYPE_UNDEFINED;
@@ -486,10 +519,6 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 	return SUCCEED;
 }
 
-#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
-#define ZBX_PREPROC_SNMP_MAC_FROM_HEX	2
-#define ZBX_PREPROC_SNMP_UINT_FROM_BITS	3
-
 static int	preproc_snmp_convert_bits_value(char **value, int format, char **error)
 {
 #define SNMP_UINT_FROM_BITS_MAX_BYTES	(8 * 2)
@@ -572,10 +601,6 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 
 	return SUCCEED;
 }
-
-#undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
-#undef ZBX_PREPROC_SNMP_MAC_FROM_HEX
-#undef ZBX_PREPROC_SNMP_UINT_FROM_BITS
 
 /******************************************************************************
  *                                                                            *
@@ -799,7 +824,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 		return FAIL;
 	}
 
-	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_TO_VALUE != cache->type)
+	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_VALUE != cache->type)
 	{
 		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 			return FAIL;
@@ -845,6 +870,41 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, value_out);
+
+	return SUCCEED;
+}
+
+int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*err = NULL;
+	int	ret = FAIL, format;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	zbx_remove_chars(value->data.str, "\r\n");
+	zbx_rtrim(value->data.str, " ");
+
+	switch ((format = atoi(params)))
+	{
+		case ZBX_PREPROC_SNMP_UTF8_FROM_HEX:
+		case ZBX_PREPROC_SNMP_MAC_FROM_HEX:
+			ret = preproc_snmp_convert_hex_value(&value->data.str, format, &err);
+			break;
+		case ZBX_PREPROC_SNMP_UINT_FROM_BITS:
+			ret = preproc_snmp_convert_bits_value(&value->data.str, format, &err);
+			break;
+		default:
+			*errmsg = zbx_dsprintf(*errmsg, "unknown parameter '%s'", params);
+			return FAIL;
+	}
+
+	if (FAIL == ret)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "cannot extract value: %s", err);
+		zbx_free(err);
+		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -924,7 +984,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 					sizeof(zbx_snmp_value_pair_t));
 
 			output_value->oid = zbx_strdup(NULL, param_field.field_name);
-			output_value->value = zbx_strdup(NULL, p.value);
+			output_value->value = NULL == p.value ? NULL : zbx_strdup(NULL, p.value);
 
 			if (NULL == (oobj_cached = zbx_hashset_search(&grouped_prefixes, &oobj_local)))
 			{
@@ -957,7 +1017,10 @@ skip:
 	}
 
 	if (NULL != *errmsg)
+	{
 		ret = FAIL;
+		goto out;
+	}
 
 	if (0 < grouped_prefixes.num_data)
 	{
@@ -998,7 +1061,11 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	init_snmp(progname);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_LOAD, 1);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_SAVE, 1);
+
+	init_snmp(preproc_get_progname_cb()());
+
 	netsnmp_init_mib();
 	zbx_snmp_init_done = 1;
 
@@ -1010,7 +1077,6 @@ void	preproc_init_snmp(void)
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 }
 
 void	preproc_shutdown_snmp(void)
@@ -1024,7 +1090,7 @@ void	preproc_shutdown_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	snmp_shutdown(progname);
+	snmp_shutdown(preproc_get_progname_cb()());
 	zbx_snmp_init_done = 0;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($previous_maps) {
 				$previous_map = API::Map()->get([
-					'sysmapids' => [array_pop($previous_maps)],
-					'output' => ['sysmapid', 'name']
+					'output' => ['sysmapid', 'name'],
+					'sysmapids' => [array_pop($previous_maps)]
 				]);
 
 				$previous_map = reset($previous_map);
@@ -65,7 +65,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$sysmapid = $this->fields_values['sysmapid'][0];
 		}
 
-		$sysmap_data = CMapHelper::get($sysmapid == null ? [] : [$sysmapid],
+		$sysmap_data = CMapHelper::get($sysmapid === null ? [] : [$sysmapid],
 			['unique_id' => $this->getInput('unique_id')]
 		);
 
@@ -86,10 +86,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sysmap_data' => $sysmap_data ?: [],
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
-				'filter_widget_reference' => array_key_exists('filter_widget_reference', $this->fields_values)
-					? $this->fields_values['filter_widget_reference']
-					: null,
-				'source_type' => $this->fields_values['source_type'],
 				'previous_map' => $previous_map,
 				'initial_load' => $this->getInput('initial_load', 1),
 				'error' => $error

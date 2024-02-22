@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -325,10 +325,19 @@ int	zbx_wis_uint(const wchar_t *wide_string)
  ******************************************************************************/
 const char	*zbx_print_double(char *buffer, size_t size, double val)
 {
-	zbx_snprintf(buffer, size, "%.15G", val);
+	double	ipart;
 
-	if (atof(buffer) != val)
+	if (0.0 == modf(val, &ipart))
+	{
 		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
+	}
+	else
+	{
+		zbx_snprintf(buffer, size, "%.15G", val);
+
+		if (atof(buffer) != val)
+			zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
+	}
 
 	return buffer;
 }

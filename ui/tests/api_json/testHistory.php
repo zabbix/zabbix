@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -313,6 +313,169 @@ class testHistory extends CAPITest {
 			$this->assertEquals(0, CDBHelper::getCount(
 				'SELECT 1 FROM history_bin WHERE '.dbConditionId('itemid', $api_request), 1
 			));
+		}
+	}
+
+	/**
+	 * Data provider for history.push.
+	 *
+	 * @return array
+	 */
+	public static function getHistoryPushData(): array {
+		return [
+			// Check an empty request.
+			'Test history.push: empty request' => [
+				'request' => [],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/": cannot be empty.'
+			],
+
+			// Check unexpected params.
+			'Test history.push: unexpected parameter' => [
+				'request' => [
+					'abc' => 'abc'
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "abc".'
+			],
+
+			// Check "itemid" field.
+			'Test history.push: invalid "itemid" (boolean)' => [
+				'request' => [
+					'itemid' => true
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/itemid": a number is expected.'
+			],
+			'Test history.push: invalid "itemid" (string)' => [
+				'request' => [
+					'itemid' => 'abc'
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/itemid": a number is expected.'
+			],
+
+			// Check "host" field.
+			'Test history.push: invalid "host" (boolean)' => [
+				'request' => [
+					'host' => true
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/host": a character string is expected.'
+			],
+
+			// Check "key" field.
+			'Test history.push: invalid "key" (boolean)' => [
+				'request' => [
+					'key' => true
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/key": a character string is expected.'
+			],
+
+			// Check "value" field.
+			'Test history.push: missing "value"' => [
+				'request' => [
+					[]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1": the parameter "value" is missing.'
+			],
+			'Test history.push: invalid "value" (boolean)' => [
+				'request' => [
+					'value' => true
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			'Test history.push: invalid "value" (array)' => [
+				'request' => [
+					'value' => []
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+
+			// Check "clock" field.
+			'Test history.push: invalid "clock" (boolean)' => [
+				'request' => [
+					'value' => '25',
+					'clock' => true
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/clock": an unsigned integer is expected.'
+			],
+			'Test history.push: invalid "clock" (string)' => [
+				'request' => [
+					'value' => '25',
+					'clock' => 'abc'
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/clock": an unsigned integer is expected.'
+			],
+			'Test history.push: invalid "clock" (negative integer)' => [
+				'request' => [
+					'value' => '25',
+					'clock' => -1
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/clock": an unsigned integer is expected.'
+			],
+			'Test history.push: invalid "clock" (too large)' => [
+				'request' => [
+					'value' => '25',
+					'clock' => ZBX_MAX_DATE + 1
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/clock": a timestamp is too large.'
+			],
+
+			// Check "ns" field.
+			'Test history.push: invalid "ns" (boolean)' => [
+				'request' => [
+					'value' => '25',
+					'ns' => true
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/ns": an integer is expected.'
+			],
+			'Test history.push: invalid "ns" (string)' => [
+				'request' => [
+					'value' => '25',
+					'ns' => 'abc'
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/ns": an integer is expected.'
+			],
+			'Test history.push: invalid "ns" (too small)' => [
+				'request' => [
+					'value' => '25',
+					'ns' => -1
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/ns": value must be one of 0-999999999.'
+			],
+			'Test history.push: invalid "ns" (too large)' => [
+				'request' => [
+					'value' => '25',
+					'ns' => 1000000000
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/ns": value must be one of 0-999999999.'
+			]
+		];
+	}
+
+	/**
+	 * Test history.push.
+	 *
+	 * @dataProvider getHistoryPushData
+	 */
+	public function testHistory_Push(array $request, array $expected_result, ?string $expected_error): void {
+		$result = $this->call('history.push', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertSame($expected_result, $result['result']);
 		}
 	}
 }

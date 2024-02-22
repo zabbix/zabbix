@@ -18,6 +18,7 @@ noinst_PROGRAMS = $(SERVER_tests)
 
 if SERVER
 VALUECACHE_LIBS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
@@ -48,6 +49,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 CACHE_LIBS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
@@ -133,7 +135,7 @@ COMMON_WRAP_FUNCS = \
 zbx_vc_get_values_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_get_values.c \
-	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
+	valuecache_test.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -154,7 +156,7 @@ zbx_vc_get_values_CFLAGS = \
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_add_values.c \
-	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
+	valuecache_test.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -175,7 +177,7 @@ zbx_vc_add_values_CFLAGS = \
 zbx_vc_get_value_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_get_value.c \
-	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
+	valuecache_test.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 

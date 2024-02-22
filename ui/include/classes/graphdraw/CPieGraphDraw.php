@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,12 +48,18 @@ class CPieGraphDraw extends CGraphDraw {
 	/********************************************************************************************************/
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
-	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
+	public function addItem($itemid, bool $resolve_macros, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history', 'trends'],
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'key_', 'units', 'value_type',
+				'valuemapid', 'history', 'trends'
+			],
 			'itemids' => [$itemid],
 			'webitems' => true
 		]);
+
+		if ($resolve_macros) {
+			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+		}
 
 		if (!$items) {
 			$items = API::ItemPrototype()->get([

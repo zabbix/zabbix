@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -683,6 +683,35 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
+			'jsonpath' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('jsonpath() - Returns JSONPath result'),
+				'params' => [
+					'last' => [
+						'C' => _('Last of').' (T)',
+						'T' => T_ZBX_INT,
+						'M' => [PARAM_TYPE_COUNTS => _('Count')],
+						'A' => false
+					],
+					'shift' => [
+						'C' => _('Time shift'),
+						'T' => T_ZBX_INT,
+						'A' => false
+					],
+					'path' => [
+						'C' => _('JSONPath'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'replace' => [
+						'C' => _('Default'),
+						'T' => T_ZBX_STR,
+						'A' => false
+					]
+				],
+				'allowed_types' => $this->allowedTypesStr,
+				'operators' => $this->operators
+			],
 			'kurtosis' => [
 				'types' => [ZBX_FUNCTION_TYPE_AGGREGATE],
 				'description' => _('kurtosis() - Measures the "tailedness" of the probability distribution'),
@@ -1172,6 +1201,35 @@ class CControllerPopupTriggerExpr extends CController {
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
+			],
+			'xmlxpath' => [
+				'types' => [ZBX_FUNCTION_TYPE_STRING],
+				'description' => _('xmlxpath() - Returns XML XPath result'),
+				'params' => [
+					'last' => [
+						'C' => _('Last of').' (T)',
+						'T' => T_ZBX_INT,
+						'M' => [PARAM_TYPE_COUNTS => _('Count')],
+						'A' => false
+					],
+					'shift' => [
+						'C' => _('Time shift'),
+						'T' => T_ZBX_INT,
+						'A' => false
+					],
+					'path' => [
+						'C' => _('XPath'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'replace' => [
+						'C' => _('Default'),
+						'T' => T_ZBX_STR,
+						'A' => false
+					]
+				],
+				'allowed_types' => $this->allowedTypesStr,
+				'operators' => $this->operators
 			]
 		];
 
@@ -1491,6 +1549,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'mode',
 						'o',
 						'pattern',
+						'path',
 						'replace',
 						'season_unit',
 						'string',
@@ -1526,9 +1585,9 @@ class CControllerPopupTriggerExpr extends CController {
 					$last_functions = [
 						'abs', 'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift',
 						'bitnot', 'bitor', 'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'cos',
-						'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'left', 'length', 'log', 'log10',
-						'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace', 'right', 'round', 'signum',
-						'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate'
+						'cosh', 'cot', 'degrees', 'exp', 'expm1', 'floor', 'in', 'insert', 'jsonpath', 'left', 'length',
+						'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians', 'repeat', 'replace', 'right', 'round',
+						'signum', 'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate', 'xmlxpath'
 					];
 
 					if (in_array($function, $last_functions)) {

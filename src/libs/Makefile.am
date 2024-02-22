@@ -2,12 +2,14 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -39,6 +41,7 @@ DIST_SUBDIRS = \
 	zbxicmpping \
 	zbxip \
 	zbxipcservice \
+	zbxipmi \
 	zbxjson \
 	zbxkvs \
 	zbxlog \
@@ -49,16 +52,20 @@ DIST_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
+	zbxagentget \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
@@ -71,6 +78,7 @@ DIST_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxprof \
 	zbxxml
 
@@ -81,6 +89,7 @@ SERVER_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
+	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
 	zbxcacheconfig \
@@ -106,15 +115,18 @@ SERVER_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
 	zbxservice \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -125,7 +137,11 @@ SERVER_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
+if HAVE_IPMI
+SERVER_SUBDIRS += zbxipmi
+endif
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -156,6 +172,7 @@ PROXY_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
@@ -163,7 +180,9 @@ PROXY_SUBDIRS = \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
+	zbxscripts \
 	zbxshmem \
+	zbxsnmptrapper \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -174,12 +193,17 @@ PROXY_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
+if HAVE_IPMI
+PROXY_SUBDIRS += zbxipmi
+endif
 endif
 endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxcommon \
@@ -208,13 +232,16 @@ SUBDIRS = \
 	zbxodbc \
 	zbxparam \
 	zbxregexp \
+	zbxscripts \
 	zbxsysinfo \
 	zbxstr \
 	zbxthreads \
 	zbxtime \
 	zbxvariant \
 	zbxversion \
+	zbxvmware \
 	zbxxml \
+	zbxagentget \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

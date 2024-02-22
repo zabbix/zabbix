@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -393,6 +393,9 @@ int	zbx_day_in_month(int year, int mon)
  *                                                                            *
  * Return value: duration in milliseconds since time stamp till current time  *
  *                                                                            *
+ * Comments:                                                                  *
+ *     Timestamp value 'ts' must be before or equal to current time.          *
+ *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 {
@@ -400,7 +403,7 @@ zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 
 	zbx_timespec(&now);
 
-	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
+	return (zbx_uint64_t)((now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6);
 }
 
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
@@ -1067,13 +1070,18 @@ static int zbx_iso8601_timezone(const char *zone, long int *offset)
 
 	ptr++;
 
-	if (ZBX_CONST_STRLEN("00:00") > strlen(ptr) || ':' != ptr[2])
+	if (ZBX_CONST_STRLEN("0000") > strlen(ptr))
 		return FAIL;
 
-	if (0 == isdigit(*ptr) || 23 < (h = atoi(ptr)))
+	if (SUCCEED != zbx_is_uint_n_range(ptr, 2, &h, sizeof(h), 0, 23))
 		return FAIL;
 
-	if (0 == isdigit(ptr[3]) || 59 < (m = atoi(&ptr[3])))
+	ptr += 2;
+
+	if (':' == *ptr)
+		ptr++;
+
+	if (0 == isdigit(*ptr) || 59 < (m = atoi(ptr)))
 		return FAIL;
 
 	*offset = sign * (m + h * 60) * 60;

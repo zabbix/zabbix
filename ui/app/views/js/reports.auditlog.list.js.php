@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,8 @@
 				CAudit::ACTION_LOGIN_SUCCESS => [CAudit::RESOURCE_USER],
 				CAudit::ACTION_LOGIN_FAILED => [CAudit::RESOURCE_USER],
 				CAudit::ACTION_HISTORY_CLEAR => [CAudit::RESOURCE_ITEM],
-				CAudit::ACTION_CONFIG_REFRESH => [CAudit::RESOURCE_PROXY]
+				CAudit::ACTION_CONFIG_REFRESH => [CAudit::RESOURCE_PROXY],
+				CAudit::ACTION_PUSH => [CAudit::RESOURCE_HISTORY]
 			]); ?>
 
 			const actions = [];

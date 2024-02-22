@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ class CSeverity extends CRadioButtonList {
 
 		$this->setModern(true);
 		$this->setEnabled($enabled);
+		$this->addClass(ZBX_STYLE_SEVERITY);
 	}
 
 	/**

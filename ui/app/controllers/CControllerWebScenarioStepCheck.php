@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,8 +124,8 @@ class CControllerWebScenarioStepCheck extends CController {
 					$ret = false;
 				}
 
-				if ($field === 'variables') {
-					if ($pair['name'] !== '' && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
+				if ($field === 'variables' && $pair['name'] !== '') {
+					if (preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
 						error(_s('Incorrect value for field "%1$s": %2$s.', $field.'/'.($i + 1).'/name',
 							_('is not enclosed in {} or is malformed')
 						));

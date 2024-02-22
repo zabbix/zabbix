@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -27,6 +28,16 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  * @backup graphs
  */
 class testInheritanceGraph extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
@@ -111,15 +122,14 @@ class testInheritanceGraph extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($item['itemName']);
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
-
-		$this->zbxTestDoubleClickBeforeMessage('add', 'action_buttons');
+		$this->query('id:add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'Graph added');
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
 				$this->zbxTestTextNotPresent('Cannot add graph');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added');
 				$filter = $this->query('name:zbx_filter')->asForm()->one();
 				$filter->getField('Templates')->clear()->fill($this->template);
 				$filter->submit();
@@ -127,10 +137,10 @@ class testInheritanceGraph extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, $data['error_msg']);
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
 				$this->zbxTestTextNotPresent('Graph added');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

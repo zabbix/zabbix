@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldColor extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldColorView::class;
 	public const DEFAULT_VALUE = '';
 
 	private bool $allow_inherited = false;
@@ -34,7 +35,6 @@ class CWidgetFieldColor extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_COLOR, 'flags' => API_ALLOW_NULL]);
 	}
 
@@ -50,6 +50,4 @@ class CWidgetFieldColor extends CWidgetField {
 
 		return $this;
 	}
-
-
 }

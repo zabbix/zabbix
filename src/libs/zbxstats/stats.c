@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -225,10 +225,10 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 		zbx_pb_state_info_t	state;
 		char			*error = NULL;
 
-		zbx_json_addobject(json, "proxy buffer");
-
 		if (SUCCEED == zbx_pb_get_mem_info(&mem, &error))
 		{
+			zbx_json_addobject(json, "proxy buffer");
+
 			zbx_json_addobject(json, "memory");
 			zbx_json_addfloat(json, "pfree", 100 * (double)(mem.mem_total - mem.mem_used) /
 					(double)mem.mem_total);
@@ -237,15 +237,15 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 			zbx_json_adduint64(json, "used", mem.mem_used);
 			zbx_json_addfloat(json, "pused", 100 * (double)mem.mem_used / (double)mem.mem_total);
 			zbx_json_close(json);
+
+			zbx_pb_get_state_info(&state);
+			zbx_json_addint64(json, "state", state.state);
+			zbx_json_adduint64(json, "state change", state.changes_num);
+
+			zbx_json_close(json);
 		}
 		else
 			zbx_free(error);
-
-		zbx_pb_get_state_info(&state);
-		zbx_json_addint64(json, "state", state.state);
-		zbx_json_adduint64(json, "state change", state.changes_num);
-
-		zbx_json_close(json);
 	}
 
 	zbx_json_close(json);

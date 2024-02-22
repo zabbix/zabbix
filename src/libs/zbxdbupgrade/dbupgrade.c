@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -606,6 +606,35 @@ static int	DBdrop_serial_trigger(const char *table_name)
 
 #endif
 
+
+#if defined(HAVE_POSTGRESQL)
+int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field)
+{
+	zbx_db_result_t	result;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc, sql_offset;
+
+	DBfield_type_string(&sql, &sql_alloc, &sql_offset, field);
+
+	result = zbx_db_select(
+			"select 1"
+			" from information_schema.columns"
+			" where table_name='%s'"
+				" and column_name='%s'"
+				" and data_type='%s'"
+				" and table_schema='%s'",
+			table_name, field->name, sql, zbx_db_get_schema_esc());
+
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+	zbx_db_free_result(result);
+
+	zbx_free(sql);
+
+	return ret;
+}
+#endif
+
 int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field)
 {
 	char	*sql = NULL;
@@ -874,6 +903,7 @@ static int	DBset_version(int version, unsigned char mandatory)
 #endif	/* not HAVE_SQLITE3 */
 
 zbx_get_program_type_f	DBget_program_type_cb;
+zbx_get_config_int_f	DBget_config_timeout_cb;
 
 DBPATCHES_ARRAY_DECL(2010);
 DBPATCHES_ARRAY_DECL(2020);
@@ -967,9 +997,16 @@ unsigned char	DBget_program_type(void)
 	return DBget_program_type_cb();
 }
 
-void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
+int	DBget_config_timeout(void)
+{
+	return DBget_config_timeout_cb();
+}
+
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb,
+		zbx_get_config_int_f get_config_timeout_cb)
 {
 	DBget_program_type_cb = get_program_type_cb;
+	DBget_config_timeout_cb = get_config_timeout_cb;
 }
 #ifndef HAVE_SQLITE3
 static int	DBcheck_nodes(void)
@@ -1031,13 +1068,16 @@ static int	DBcheck_nodes(void)
 int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 {
 #define ZBX_DB_WAIT_UPGRADE	10
-	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
+	const char		*dbversion_table_name = "dbversion";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_dbpatch_t		**dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
+	const char		*ha_node_table_name = "ha_node";
 	int			total = 0, current = 0, completed, last_completed = -1, mandatory_num = 0;
+#else
+	ZBX_UNUSED(ha_mode);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1531,4 +1571,60 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 	return ret;
 }
 
+static int	dbupgrade_drop_trigger_on_statement(const char *table_name,
+		const char *indexed_column_name, const char *statement)
+{
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_DB_OK > zbx_db_execute("drop trigger %s_%s_%s on %s", table_name, indexed_column_name, statement,
+			table_name))
+	{
+		return FAIL;
+	}
+#else
+	if (ZBX_DB_OK > zbx_db_execute("drop trigger %s_%s_%s", table_name, indexed_column_name, statement))
+	{
+		return FAIL;
+	}
+#endif
+	return SUCCEED;
+}
+
+int	zbx_dbupgrade_drop_trigger_on_insert(const char *table_name,
+		const char *indexed_column_name)
+{
+	return dbupgrade_drop_trigger_on_statement(table_name, indexed_column_name, "insert");
+}
+
+int	zbx_dbupgrade_drop_trigger_on_update(const char *table_name,
+		const char *indexed_column_name)
+{
+	return dbupgrade_drop_trigger_on_statement(table_name, indexed_column_name, "update");
+}
+
+static int	dbupgrade_drop_trigger_function(const char *table_name, const char *indexed_column_name,
+		const char *function)
+{
+#ifdef HAVE_POSTGRESQL
+	/* same function can depend on multiple triggers */
+	if (ZBX_DB_OK > zbx_db_execute("drop function if exists %s_%s_%s", table_name, indexed_column_name, function))
+		return FAIL;
+#else
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(indexed_column_name);
+	ZBX_UNUSED(function);
+#endif
+	return SUCCEED;
+}
+
+int	zbx_dbupgrade_drop_trigger_function_on_insert(const char *table_name, const char *indexed_column_name,
+		const char *function)
+{
+	return dbupgrade_drop_trigger_function(table_name, indexed_column_name, function);
+}
+
+int	zbx_dbupgrade_drop_trigger_function_on_update(const char *table_name, const char *indexed_column_name,
+		const char *function)
+{
+	return dbupgrade_drop_trigger_function(table_name, indexed_column_name, function);
+}
 #endif

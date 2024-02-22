@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 		$this->field = $field;
 	}
 
-	public function getView(): CCheckBoxList {
+	public function getView(): array {
 		$options = [];
 
 		foreach ($this->field->getValues() as $key => $label) {
@@ -42,15 +42,25 @@ class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 			];
 		}
 
-		return (new CCheckBoxList())
-			->setOptions($options)
-			->setEnabled(!$this->isDisabled())
-			->setColumns($this->columns);
+		return [
+			(new CVar($this->field->getName(), CWidgetFieldCheckBoxList::EMPTY_VALUE))->removeId(),
+			(new CCheckBoxList())
+				->setOptions($options)
+				->setEnabled(!$this->isDisabled())
+				->setColumns($this->columns)
+		];
 	}
 
 	public function setColumns(int $columns): self {
 		$this->columns = $columns;
 
 		return $this;
+	}
+
+	public function getJavaScript(): string {
+		return '
+			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
+				new CWidgetFieldCheckboxList('.json_encode($this->field->getName()).');
+		';
 	}
 }

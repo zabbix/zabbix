@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @dataSource ScheduledReports
@@ -30,15 +30,16 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageScheduledReport extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -150,12 +151,7 @@ class testPageScheduledReport extends CWebTest {
 		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['', 'Name', 'Owner', 'Repeats', 'Period', 'Last sent', 'Status', 'Info'], $table->getHeadersText());
-		foreach ($table->getHeaders() as $header) {
-			if ($header->getText() !== 'Name') {
-				// Only 'Name' column is clickable and contains tags 'a'.
-				$this->assertFalse($header->query('tag:a')->one(false)->isValid());
-			}
-		}
+		$this->assertEquals(['Name'], $table->getSortableHeaders()->asText());
 
 		// Check all columns and info icon for one report.
 		$row = $table->findRow('Name', $expired_report['Name']);

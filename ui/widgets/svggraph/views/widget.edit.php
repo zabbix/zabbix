@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,13 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+use Widgets\SvgGraph\Includes\{
+	CWidgetFieldDataSet,
+	CWidgetFieldDataSetView,
+	CWidgetFieldOverrideView
+};
 
-$form = (new CWidgetFormView($data));
+$form = new CWidgetFormView($data);
 
 $preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
@@ -42,7 +46,7 @@ $form_tabs = (new CTabView())
 		TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS
 	)
 	->addTab('time_period', _('Time period'), getTimePeriodTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_TIME
+		TAB_INDICATOR_GRAPH_TIME_PERIOD
 	)
 	->addTab('axes', _('Axes'), getAxesTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_AXES
@@ -65,13 +69,13 @@ $form
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_svggraph_form.init('.json_encode([
 		'form_tabs_id' => $form_tabs->getId(),
-		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE,
+		'color_palette' => CWidgetFieldDataSet::DEFAULT_COLOR_PALETTE,
 		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
 function getDatasetTab(CWidgetFormView $form, array $fields): array {
-	$dataset = $form->registerField(new CWidgetFieldGraphDataSetView($fields['ds']));
+	$dataset = $form->registerField(new CWidgetFieldDataSetView($fields['ds']));
 
 	return [
 		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
@@ -134,31 +138,23 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 }
 
 function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$graph_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
-	$time_from = $form->registerField(
-		(new CWidgetFieldDatePickerView($fields['time_from']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	);
-	$time_to = $form->registerField(
-		(new CWidgetFieldDatePickerView($fields['time_to']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	);
+	$time_period_field = (new CWidgetFieldTimePeriodView($fields['time_period']))
+		->setDateFormat(ZBX_FULL_DATE_TIME)
+		->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+		->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'));
 
-	return (new CFormGrid())
-		->addItem([
-			$graph_time->getLabel(),
-			new CFormField($graph_time->getView())
-		])
-		->addItem([
-			$time_from->getLabel(),
-			new CFormField($time_from->getView())
-		])
-		->addItem([
-			$time_to->getLabel(),
-			new CFormField($time_to->getView())
+	$form->registerField($time_period_field);
+
+	$form_grid = new CFormGrid();
+
+	foreach ($time_period_field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+		$form_grid->addItem([
+			$label,
+			(new CFormField($view))->addClass($class)
 		]);
+	}
+
+	return $form_grid;
 }
 
 function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
@@ -248,6 +244,7 @@ function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 	$legend = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
 	$legend_statistic = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_statistic']));
+	$legend_aggregation = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_aggregation']));
 	$legend_lines = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
 	$legend_columns = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
@@ -263,6 +260,10 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 				->addItem([
 					$legend_statistic->getLabel(),
 					new CFormField($legend_statistic->getView())
+				])
+				->addItem([
+					$legend_aggregation->getLabel(),
+					new CFormField($legend_aggregation->getView())
 				])
 		)
 		->addItem(
@@ -327,7 +328,7 @@ function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 }
 
 function getOverridesTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$overrides = $form->registerField(new CWidgetFieldGraphOverrideView($fields['or']));
+	$overrides = $form->registerField(new CWidgetFieldOverrideView($fields['or']));
 
 	return (new CFormGrid())->addItem([
 		$overrides->getLabel(),

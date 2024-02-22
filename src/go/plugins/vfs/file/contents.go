@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import (
 )
 
 func (p *Plugin) exportContents(params []string) (result interface{}, err error) {
+	const maxFileLen = 16 * 1024 * 1024
 
 	if len(params) != 1 && len(params) != 2 {
 		return nil, errors.New("Wrong number of parameters")
@@ -44,8 +45,7 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 	}
 	filelen := f.Size()
 
-	bnum := 64 * 1024
-	if filelen > int64(bnum) {
+	if filelen > int64(maxFileLen) {
 		return nil, errors.New("File is too large for this check")
 	}
 
@@ -60,7 +60,11 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
 	encoding = findEncodingFromBOM(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
-	utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	utf8_buf, utf8_bufNumBytes, err := decodeToUTF8(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to convert from encoding to utf8: %w", err)
+	}
+
 	utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 
 	return strings.TrimRight(utf8_bufStr, "\n\r"), nil

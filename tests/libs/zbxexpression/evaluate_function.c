@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ void	zbx_mock_test_entry(void **state)
 
 	evaluate_item.itemid = item.itemid;
 	evaluate_item.value_type = item.value_type;
-	evaluate_item.proxy_hostid = item.host.proxy_hostid;
+	evaluate_item.proxyid = item.host.proxyid;
 	evaluate_item.host = item.host.host;
 	evaluate_item.key_orig = item.key_orig;
 

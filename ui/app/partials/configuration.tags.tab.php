@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,132 +24,27 @@
  * @var array    $data
  */
 
+$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
+$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
+$field_label = array_key_exists('field_label', $data) ? $data['field_label'] : null;
+$data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
+
 if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
-$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
-
 // form list
 $form_grid = (new CFormGrid())->setId('tagsFormList');
-
-$table = (new CTable())
-	->addClass('tags-table')
-	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([
-		_('Name'),
-		_('Value'),
-		'',
-		$show_inherited_tags ? _('Parent templates') : null
-	]);
-
-$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-
-// fields
-foreach ($data['tags'] as $i => $tag) {
-	$tag += ['type' => ZBX_PROPERTY_OWN];
-
-	if ($with_automatic) {
-		$tag += ['automatic' => ZBX_TAG_MANUAL];
-	}
-
-	$readonly = $data['readonly']
-		|| ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
-		|| ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC);
-
-	$tag_input = (new CTextAreaFlexible('tags['.$i.'][tag]', $tag['tag'], ['readonly' => $readonly]))
-		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-		->setAttribute('placeholder', _('tag'));
-
-	$tag_cell = [$tag_input];
-
-	if ($show_inherited_tags) {
-		$tag_cell[] = new CVar('tags['.$i.'][type]', $tag['type']);
-	}
-
-	if ($with_automatic) {
-		$tag_cell[] = new CVar('tags['.$i.'][automatic]', $tag['automatic']);
-	}
-
-	$value_input = (new CTextAreaFlexible('tags['.$i.'][value]', $tag['value'], ['readonly' => $readonly]))
-		->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
-
-	$actions = [];
-
-	if ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
-		switch ($data['source']) {
-			case 'host':
-				$actions[] = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
-				break;
-		}
-	}
-	elseif ($show_inherited_tags && ($tag['type'] & ZBX_PROPERTY_INHERITED) != 0) {
-		$actions[] = (new CButton('tags['.$i.'][disable]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-disable')
-			->setEnabled(!$readonly);
-	}
-	else {
-		$actions[] = (new CButton('tags['.$i.'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-			->setEnabled(!$readonly);
-	}
-
-	$row = [
-		(new CCol($tag_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($actions))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass(ZBX_STYLE_TOP)
-	];
-
-	if ($show_inherited_tags) {
-		$template_list = [];
-
-		if (array_key_exists('parent_templates', $tag)) {
-			CArrayHelper::sort($tag['parent_templates'], ['name']);
-
-			foreach ($tag['parent_templates'] as $templateid => $template) {
-				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
-					$template_list[] = (new CLink($template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $templateid)
-					))->setTarget('_blank');
-				}
-				else {
-					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
-				}
-
-				$template_list[] = ', ';
-			}
-
-			array_pop($template_list);
-		}
-
-		$row[] = $template_list;
-	}
-
-	$table->addRow($row, 'form_row');
-}
-
-// buttons
-$table->setFooter(new CCol(
-	(new CButton('tag_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-		->setEnabled(!$data['readonly'])
-));
+$table = new CPartial('tags.list.html', $data);
 
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
+	$label = null;
+
 	switch ($data['source']) {
 		case 'trigger':
 		case 'trigger_prototype':
 			$btn_labels = [_('Trigger tags'), _('Inherited and trigger tags')];
-			$on_change = 'this.form.submit()';
+			$on_change = '';
 			break;
 
 		case 'httptest':
@@ -158,8 +53,10 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 
 		case 'item':
+			$label = new CLabel(_('Tags'));
+			$table = (new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
-			$on_change = 'this.form.submit()';
+			$on_change = null;
 			break;
 	}
 
@@ -171,10 +68,17 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 				->setModern()
 		)
 	);
+	$form_grid->addItem($label);
 }
 
-$form_grid->addItem(
-	new CFormField($table)
-);
+if ($field_label) {
+	$form_grid->addItem([
+		new CLabel($field_label),
+		new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+	]);
+}
+else {
+	$form_grid->addItem(new CFormField($table));
+}
 
 $form_grid->show();

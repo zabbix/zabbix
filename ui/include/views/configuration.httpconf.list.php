@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ $filter_column_left = (new CFormList())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -68,7 +68,7 @@ $filter_column_left = (new CFormList())
 	)
 	->addRow(_('Status'),
 		(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 			->setModern(true)
@@ -234,9 +234,9 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'name' => _('Clear history'),
-			'confirm_singular' => _('Delete history of selected web scenario?'),
-			'confirm_plural' => _('Delete history of selected web scenarios?'),
+			'name' => _('Clear history and trends'),
+			'confirm_singular' => _('Clear history and trends of selected web scenario?'),
+			'confirm_plural' => _('Clear history and trends of selected web scenarios?'),
 			'csrf_token' => $csrf_token
 		]
 	];
@@ -260,6 +260,10 @@ $html_page
 	->addItem($httpForm)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['hostid']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

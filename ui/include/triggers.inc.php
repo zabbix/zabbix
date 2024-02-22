@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -297,7 +297,9 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from'],
-			'tags' => array_key_exists('tags', $problem_options) ? $problem_options['tags'] : null,
+			'tags' => array_key_exists('tags', $problem_options) && $problem_options['tags']
+				? $problem_options['tags']
+				: null,
 			'evaltype' => array_key_exists('evaltype', $problem_options)
 				? $problem_options['evaltype']
 				: TAG_EVAL_TYPE_AND_OR
@@ -362,51 +364,6 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	}
 
 	return $triggers;
-}
-
-/**
- * Creates and returns a trigger status cell for the trigger overview table.
- *
- * @param array  $trigger
- * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
- *
- * @return CCol
- */
-function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
-	$column = (new CCol([
-		array_key_exists($trigger['triggerid'], $dependencies)
-			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
-			: [],
-		$trigger['problem']['acknowledged'] == 1
-			? (new CSpan())->addClass(ZBX_ICON_CHECK)
-			: null
-	]))
-		->addClass(CSeverityHelper::getStyle((int) $trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE))
-		->addClass(ZBX_STYLE_CURSOR_POINTER);
-
-	$eventid = 0;
-	$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
-	$duration = time() - $trigger['lastchange'];
-
-	if ($blink_period > 0 && $duration < $blink_period) {
-		$column->addClass('js-blink');
-		$column->setAttribute('data-time-to-blink', $blink_period - $duration);
-		$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
-	}
-
-	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-		$eventid = $trigger['problem']['eventid'];
-		$update_problem = true;
-	}
-	else {
-		$update_problem = false;
-	}
-
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
-		['update_problem' => $update_problem]
-	));
-
-	return $column;
 }
 
 /**
@@ -616,9 +573,15 @@ function make_trigger_details($trigger, $eventid) {
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
 				->addClass(ZBX_STYLE_WORDWRAP)
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
-					['show_rank_change_cause' => true]
-				))
+				->setMenuPopup(CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('tr_events.php'))
+						->setArgument('triggerid', $trigger['triggerid'])
+						->setArgument('eventid', $eventid)
+						->getUrl(),
+					'eventid' => $eventid,
+					'show_rank_change_cause' => true
+				]))
 			)
 		])
 		->addRow([
@@ -765,8 +728,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					}
 
 					$url = (new CLinkAction($element['expression']))
-						->setId($expressionId)
-						->onClick('copy_expression(this.id, '.$type.');');
+						->setId($expressionId);
 				}
 
 				$expr = expressionLevelDraw($next, $level);
@@ -1379,6 +1341,7 @@ function get_item_function_info(string $expr) {
 		'floor' => ['any' => $rule_int],
 		'in' => ['any' => $rule_0or1],
 		'insert' => ['any' => $rule_str],
+		'jsonpath' => ['any' => $rule_str],
 		'left' => ['any' => $rule_str],
 		'length' => ['any' => $rule_int],
 		'log' => ['any' => $rule_float],
@@ -1408,7 +1371,8 @@ function get_item_function_info(string $expr) {
 			'any' => ['value_type' => 'HHMMSS', 'values' => null]
 		],
 		'trim' => ['any' => $rule_str],
-		'truncate' => ['any' => $rule_float]
+		'truncate' => ['any' => $rule_float],
+		'xmlxpath' => ['any' => $rule_str]
 	];
 
 	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
@@ -1844,15 +1808,18 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 	foreach ($templates as $template) {
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('trigger_prototypes.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
 					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('triggers.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1)
+					->setArgument('uncheck', 1)
 					->setArgument('context', 'template');
 			}
 
@@ -1903,22 +1870,23 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 		foreach ($templates as $template) {
 			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('trigger_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-						->setArgument('context', 'template');
+					$attribute_name = 'data-parent_discoveryid';
+					$attribute_value = $parent_templates['links'][$triggerid]['lld_ruleid'];
+					$prototype = '1';
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
-					$url = (new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('hostid', $template['hostid'])
-						->setArgument('context', 'template');
+					$attribute_name = 'data-hostid';
+					$attribute_value = $template['hostid'];
+					$prototype = '0';
 				}
 
-				$name = new CLink($template['name'], $url);
+				$name = (new CLink($template['name']))
+					->addClass('js-related-trigger-edit')
+					->setAttribute('data-prototype', $prototype)
+					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+					->setAttribute('data-context', 'template')
+					->setAttribute($attribute_name, $attribute_value);
 			}
 			else {
 				$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -2028,14 +1996,14 @@ function getTriggerDependencies(array $triggers) {
 /**
  * Returns icons with tooltips for triggers with dependencies.
  *
- * @param array  $dependencies
- * @param array  $dependencies['up']    (optional) The list of "Dependent" triggers.
- * @param array  $dependencies['down']  (optional) The list of "Depeneds on" triggers.
- * @param bool   $freeze_on_click
+ * @param array $dependencies
+ *        array $dependencies['up']    (optional) The list of "Dependent" triggers.
+ *        array $dependencies['down']  (optional) The list of "Depends on" triggers.
+ * @param bool  $freeze_on_click
  *
  * @return array
  */
-function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
+function makeTriggerDependencies(array $dependencies, bool $freeze_on_click = true): array {
 	$result = [];
 
 	foreach (['down', 'up'] as $type) {

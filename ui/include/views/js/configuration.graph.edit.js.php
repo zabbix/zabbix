@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -319,11 +319,15 @@
 	const view = {
 		form_name: null,
 		graphs: null,
+		context: null,
+		parent_discoveryid: null,
 
-		init({form_name, theme_colors, graphs, items}) {
+		init({form_name, theme_colors, graphs, items, context, parent_discoveryid}) {
 			this.form_name = form_name;
 			colorPalette.setThemeColors(theme_colors);
 			this.graphs = graphs;
+			this.context = context;
+			this.is_discovery = parent_discoveryid !== null;
 
 			items.forEach((item, i) => {
 				item.number = i;
@@ -350,6 +354,7 @@
 					src.setArgument('height', $('#height').val());
 					src.setArgument('graphtype', $('#graphtype').val());
 					src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
+					src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 					if (this.graphs.graphtype == <?= GRAPH_TYPE_PIE ?>
 							|| this.graphs.graphtype == <?= GRAPH_TYPE_EXPLODED ?>) {
@@ -391,7 +396,7 @@
 
 						$(node).find('*[name]').each((_, input) => {
 							if (!$.isEmptyObject(input) && input.name != null) {
-								const regex = /items\[[\d+]\]\[([a-zA-Z0-9\-\_\.]+)\]/;
+								const regex = /items\[\d+\]\[([a-zA-Z0-9\-\_\.]+)\]/;
 								const name = input.name.match(regex);
 
 								short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
@@ -576,7 +581,7 @@
 
 				$('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
 					'$.extend(' + JSON.stringify(parameters) + ', view.getOnlyHostParam()),' +
-					'{dialogue_class: "modal-popup-generic", trigger_element: this});'
+					'{dialogue_class: "modal-popup-generic", trigger_element: this.parentNode});'
 				);
 			}
 		},
@@ -699,12 +704,31 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
+			);
 		},
 
 		refresh() {
@@ -716,8 +740,9 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, discovery, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -725,26 +750,19 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				view.refresh();
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
+						curl.setArgument('context', context);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
+				if (curl == null) {
+					view.refresh();
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			}
 		}
 	};

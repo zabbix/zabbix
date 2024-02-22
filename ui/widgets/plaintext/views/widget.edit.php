@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['items']['itemids']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,
@@ -46,8 +46,8 @@
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_as_html'])
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->show();

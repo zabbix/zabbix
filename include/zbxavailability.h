@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,9 +126,9 @@ zbx_uint32_t	zbx_availability_serialize_active_status_response(unsigned char **d
 void	zbx_availability_deserialize_active_status_response(const unsigned char *data, int *status);
 
 zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_proxy_hostdata_ptr_t *hosts,
-		zbx_uint64_t proxy_hostid);
+		zbx_uint64_t proxyid);
 void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
-		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxy_hostid);
+		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxyid);
 
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
 void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids);

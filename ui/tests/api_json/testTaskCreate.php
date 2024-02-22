@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -791,7 +791,7 @@ class testTaskCreate extends CAPITest {
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.(implode(', ', [
-					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_TASK_CHECK_NOW
+					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXYIDS, ZBX_TM_TASK_CHECK_NOW
 				])).'.'
 			],
 
@@ -916,7 +916,7 @@ class testTaskCreate extends CAPITest {
 								]
 							]
 						],
-						'proxy_hostid' => '01'
+						'proxyid' => '01'
 					]
 				],
 				'expected_results' => [],
@@ -1001,7 +1001,7 @@ class testTaskCreate extends CAPITest {
 					]
 				],
 				'expected_results' => [],
-				'expected_error' => 'Cannot send request: item "6 Item-T (0/1/1)" on host "API test task.create template" is not monitored.'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			'Test LLD rule (not monitored)' => [
 				'task' => [
@@ -1041,7 +1041,7 @@ class testTaskCreate extends CAPITest {
 					]
 				],
 				'expected_results' => [],
-				'expected_error' => 'Cannot send request: discovery rule "5 LLD-T (0/1/1)" on host "API test task.create template" is not monitored.'
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 
 			// Test dependent items and LLD rules.
@@ -1306,7 +1306,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			],
@@ -1330,7 +1330,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			]

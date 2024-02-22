@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup sessions
@@ -29,19 +29,17 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testFormSetup extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
-
 
 	/**
 	 * @backup config
@@ -54,10 +52,11 @@ class testFormSetup extends CWebTest {
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
-		$this->assertEquals('English (en_US)', $language_field->getValue());
+		$this->assertEquals('English (en_GB)', $language_field->getValue());
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
-		$this->assertEquals($hint_text, $this->query('class:hint-box')->one()->getText());
+		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
+				->getAttribute('data-hintbox-contents'));
 		$this->checkButtons('first section');
 
 		$this->assertScreenshot($form, 'Welcome_En');
@@ -276,9 +275,11 @@ class testFormSetup extends CWebTest {
 
 		// Check timezone field.
 		$timezones_field = $form->getField('Default time zone');
-
 		$timezones = $timezones_field->getOptions()->asText();
-		$this->assertEquals(427, count($timezones));
+
+		// Note that count of available timezones may differ based on the local environment configuration.
+		$this->assertEquals(420, count($timezones));
+
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
 			$this->assertContains($timezone, $timezones);
@@ -577,7 +578,7 @@ class testFormSetup extends CWebTest {
 		// MySQL database error depends on php version.
 		$mapping = [
 			'Error connecting to database. Empty cipher.' => [
-				'8.1.0' => '(trying to connect via (null))'
+				'8.1.0' => 'Cannot connect to MySQL using SSL'
 			],
 			'php_network_getaddresses: getaddrinfo failed: Name or service not known' => [
 				'8.1.0' => 'php_network_getaddresses: getaddrinfo for incorrect_DB_host failed: Name or service not known'

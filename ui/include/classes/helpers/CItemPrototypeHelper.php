@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,65 @@
 
 
 class CItemPrototypeHelper extends CItemGeneralHelper {
+
+	/**
+	 * Get item prototype fields default values.
+	 */
+	public static function getDefaults(): array {
+		$general_fields = parent::getDefaults();
+
+		return [
+			'discover'	=> ZBX_PROTOTYPE_DISCOVER,
+			'flags'		=> ZBX_FLAG_DISCOVERY_PROTOTYPE
+		] + $general_fields;
+	}
+
+	/**
+	 * Convert API data to be ready to use for edit or create form.
+	 *
+	 * @param array $item  Array of API fields data.
+	 */
+	public static function convertApiInputForForm(array $item): array {
+		$item = parent::convertApiInputForForm($item);
+		$item['parent_items'] = makeItemTemplatesHtml(
+			$item['itemid'],
+			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => true
+		]);
+
+		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
+		}
+		else {
+			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			$item['delay_flex'] = [];
+		}
+
+		if ($item['master_itemid']) {
+			$master_item = API::ItemPrototype()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid']
+			]);
+
+			if (!$master_item) {
+				$master_item = API::Item()->get([
+					'output' => ['itemid', 'name'],
+					'itemids' => $item['master_itemid'],
+					'webitems' => true
+				]);
+			}
+
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
+		return $item;
+	}
 
 	/**
 	 * @param array $src_options

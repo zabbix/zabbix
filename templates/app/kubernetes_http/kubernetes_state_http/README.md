@@ -3,12 +3,12 @@
 
 ## Overview
 
-The template to monitor Kubernetes state that work without any external scripts. 
+The template to monitor Kubernetes state. 
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
 Template `Kubernetes cluster state by HTTP` - collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.
 
-Don't forget change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
+Don't forget to change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
@@ -31,7 +31,7 @@ This template has been tested on:
 Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.0) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
 
-Template needs to use Authorization via API token.
+Template needs to use authorization via API token.
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
@@ -39,7 +39,7 @@ Get the generated service account token using the command:
 
 `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
-Then set it to the macro `{$KUBE.API.TOKEN}`.  
+Then set it to the macro `{$KUBE.API.TOKEN}`.
 Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
 
 *NOTE.* If you wish to monitor Controller Manager and Scheduler components, you might need to set the `--binding-address` option for them to the address where Zabbix proxy can reach them.
@@ -69,18 +69,18 @@ Set up macros to filter node metrics by nodename:
 - {$KUBE.LLD.FILTER.NODE.MATCHES}
 - {$KUBE.LLD.FILTER.NODE.NOT_MATCHES}
 
-**Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
+**Note**: If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
 
-You can use the `{$KUBE.KUBELET.FILTER.LABELS}` and `{$KUBE.KUBELET.FILTER.ANNOTATIONS}` macros for advanced filtering of Kubelets by node labels and annotations.
+You can use the `{$KUBE.KUBELET.FILTER.LABELS}` and `{$KUBE.KUBELET.FILTER.ANNOTATIONS}` macros for advanced filtering of kubelets by node labels and annotations.
 
 Notes about labels and annotations filters:
 
 - Macro values should be specified separated by commas and must have the key/value form with support for regular expressions in the value (`key1: value, key2: regexp`).
 - ECMAScript syntax is used for regular expressions.
-- Filters are applied if such a label key exists for the entity that is being filtered (it means that if you specify a key in a filter, entities which do not have this key will not be affected by the filter and will still be discovered, and only entities containing that key will be filtered by the value).
+- Filters are applied if such label key exists for the entity that is being filtered (it means that if you specify a key in the filter, entities that do not have this key will not be affected by the filter and will still be discovered, and only entities containing that key will be filtered by the value).
 - You can also use the exclamation point symbol (`!`) to invert the filter (`!key: value`).
 
-For example: `kubernetes.io/hostname: kubernetes-node[5-25], !node-role.kubernetes.io/ingress: .*`. As a result, the Kubelets on nodes 5-25 without the "ingress" role will be discovered.
+For example: `kubernetes.io/hostname: kubernetes-node[5-25], !node-role.kubernetes.io/ingress: .*`. As a result, the kubelets on nodes 5-25 without the "ingress" role will be discovered.
 
 
 See the Kubernetes documentation for details about labels and annotations:
@@ -102,7 +102,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 `{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:regex:".*:default:.*"} = 15m`
 
-**Note**, that different context macros with regular expressions matching the same string can be applied in an undefined order and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/7.0/manual/config/macros/user_macros_context) for details.
+**Note** that different context macros with regular expressions matching the same string can be applied in an undefined order, and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/7.0/manual/config/macros/user_macros_context) for details.
 
 ### Macros used
 
@@ -115,6 +115,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
+|{$OPENSHIFT.STATE.ENDPOINT.NAME}|<p>OpenShift state endpoint name.</p>|`openshift-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
 |{$KUBE.CONTROL_PLANE.TAINT}|<p>Taint that applies to control plane nodes. Change if needed. Used in ControlPlane LLD.</p>|`node-role.kubernetes.io/control-plane`|
@@ -143,7 +144,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Kubernetes: Get state metrics|<p>Collecting Kubernetes metrics from kube-state-metrics.</p>|Script|kube.state.metrics|
 |Kubernetes: Control plane LLD|<p>Generation of data for Control plane discovery rules.</p>|Script|kube.control_plane.lld<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Kubernetes: Node LLD|<p>Generation of data for Kubelet discovery rules.</p>|Script|kube.node.lld<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Kubernetes: Get component statuses||HTTP agent|kube.componentstatuses<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Get component statuses||HTTP agent|kube.componentstatuses<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Get readyz||HTTP agent|kube.readyz<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Kubernetes: Get livez||HTTP agent|kube.livez<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Kubernetes: Namespace count|<p>The number of namespaces.</p>|Dependent item|kube.namespace.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_namespace_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -190,9 +191,9 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Ready|<p>The number of nodes that should be running the daemon pod and have one or more running and ready.</p>|Dependent item|kube.daemonset.ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Scheduled|<p>The number of nodes running at least one daemon pod and are supposed to.</p>|Dependent item|kube.daemonset.scheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Scheduled|<p>The number of nodes that run at least one daemon pod and are supposed to.</p>|Dependent item|kube.daemonset.scheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Desired|<p>The number of nodes that should be running the daemon pod.</p>|Dependent item|kube.daemonset.desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Misscheduled|<p>The number of nodes running a daemon pod but are not supposed to.</p>|Dependent item|kube.daemonset.misscheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Misscheduled|<p>The number of nodes that run a daemon pod but are not supposed to.</p>|Dependent item|kube.daemonset.misscheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Updated number scheduled|<p>The total number of nodes that are running updated daemon pod.</p>|Dependent item|kube.daemonset.updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule PVC discovery
@@ -258,7 +259,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas available|<p>The number of available replicas per deployment.</p>|Dependent item|kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas unavailable|<p>The number of unavailable replicas per deployment.</p>|Dependent item|kube.deployment.replicas_unavailable[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas updated|<p>The number of updated replicas per deployment.</p>|Dependent item|kube.deployment.replicas_updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas mismatched|<p>The number of available replicas that mismatch the desired number of replicas.</p>|Dependent item|kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas mismatched|<p>The number of available replicas not matching the desired number of replicas.</p>|Dependent item|kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Deployment discovery
 
@@ -291,13 +292,13 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Kubernetes: Node [{#NAME}]: CPU allocatable|<p>The CPU resources of a node that are available for scheduling.</p>|Dependent item|kube.node.cpu_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Node [{#NAME}]: Memory allocatable|<p>The Memory resources of a node that are available for scheduling.</p>|Dependent item|kube.node.memory_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Node [{#NAME}]: Pods allocatable|<p>The Pods resources of a node that are available for scheduling.</p>|Dependent item|kube.node.pods_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Node [{#NAME}]: Ephemeral storage allocatable|<p>The allocatable ephemeral-storage of a node that is available for scheduling.</p>|Dependent item|kube.node.ephemeral_storage_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Node [{#NAME}]: Memory allocatable|<p>The memory resources of a node that are available for scheduling.</p>|Dependent item|kube.node.memory_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Node [{#NAME}]: Pods allocatable|<p>The pods resources of a node that are available for scheduling.</p>|Dependent item|kube.node.pods_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Node [{#NAME}]: Ephemeral storage allocatable|<p>The allocatable ephemeral storage of a node that is available for scheduling.</p>|Dependent item|kube.node.ephemeral_storage_allocatable[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Node [{#NAME}]: CPU capacity|<p>The capacity for CPU resources of a node.</p>|Dependent item|kube.node.cpu_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Node [{#NAME}]: Memory capacity|<p>The capacity for Memory resources of a node.</p>|Dependent item|kube.node.memory_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Node [{#NAME}]: Ephemeral storage capacity|<p>The ephemeral-storage capacity of a node.</p>|Dependent item|kube.node.ephemeral_storage_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Node [{#NAME}]: Pods capacity|<p>The capacity for Pods resources of a node.</p>|Dependent item|kube.node.pods_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Node [{#NAME}]: Memory capacity|<p>The capacity for memory resources of a node.</p>|Dependent item|kube.node.memory_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Node [{#NAME}]: Ephemeral storage capacity|<p>The ephemeral storage capacity of a node.</p>|Dependent item|kube.node.ephemeral_storage_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Node [{#NAME}]: Pods capacity|<p>The capacity for pods resources of a node.</p>|Dependent item|kube.node.pods_capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule Pod discovery
 
@@ -324,7 +325,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Unschedulable|<p>Describes the unschedulable status for the pod.</p>|Dependent item|kube.pod.unschedulable[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(kube_pod_status_unschedulable{pod="{#NAME}"})`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU limits|<p>The limit on CPU cores to be used by a container.</p>|Dependent item|kube.pod.containers.limits.cpu[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers memory limits|<p>The limit on memory to be used by a container.</p>|Dependent item|kube.pod.containers.limits.memory[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU requests|<p>The number of requested cpu cores by a container.</p>|Dependent item|kube.pod.containers.requests.cpu[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU requests|<p>The number of requested CPU cores by a container.</p>|Dependent item|kube.pod.containers.requests.cpu[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers memory requests|<p>The number of requested memory bytes by a container.</p>|Dependent item|kube.pod.containers.requests.memory[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Trigger prototypes for Pod discovery
@@ -348,7 +349,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Desired replicas|<p>Number of desired pods for a ReplicaSet.</p>|Dependent item|kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Fully labeled replicas|<p>The number of fully labeled replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.fully_labeled_replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Ready|<p>The number of ready replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas mismatched|<p>The number of ready replicas that mismatch the desired number of replicas.</p>|Dependent item|kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas mismatched|<p>The number of ready replicas not matching the desired number of replicas.</p>|Dependent item|kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for ReplicaSet discovery
 
@@ -371,7 +372,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Current replicas|<p>The number of current replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Ready replicas|<p>The number of ready replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Updated replicas|<p>The number of updated replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas mismatched|<p>The number of ready replicas that mismatch the number of replicas.</p>|Dependent item|kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas mismatched|<p>The number of ready replicas not matching the number of replicas.</p>|Dependent item|kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for StatefulSet discovery
 
@@ -407,12 +408,12 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |----|-----------|----|-----------------------|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Suspend|<p>Suspend flag tells the controller to suspend subsequent executions.</p>|Dependent item|kube.cronjob.spec_suspend[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Active|<p>Active holds pointers to currently running jobs.</p>|Dependent item|kube.cronjob.status_active[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Last schedule|<p>LastScheduleTime keeps information of when was the last time the job was successfully scheduled.</p>|Dependent item|kube.cronjob.last_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return new Date(value * 1000).toString().slice(0,19);`</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Next schedule|<p>Next time the cronjob should be scheduled. The time after lastScheduleTime, or after the cron job's creation time if it's never been scheduled. Use this to determine if the job is delayed.</p>|Dependent item|kube.cronjob.next_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return new Date(value * 1000).toString().slice(0,19);`</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Failed|<p>The number of pods which reached Phase Failed and the reason for failure.</p>|Dependent item|kube.cronjob.status_failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Succeeded|<p>The number of pods which reached Phase Succeeded.</p>|Dependent item|kube.cronjob.status_succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion succeeded|<p>Number of job has completed its execution.</p>|Dependent item|kube.cronjob.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion failed|<p>Number of job has failed its execution.</p>|Dependent item|kube.cronjob.completion.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Last schedule|<p>LastScheduleTime keeps information of when was the last time the job was successfully scheduled.</p>|Dependent item|kube.cronjob.last_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Next schedule|<p>Next time the cronjob should be scheduled. The time after lastScheduleTime or after the cron job's creation time if it's never been scheduled. Use this to determine if the job is delayed.</p>|Dependent item|kube.cronjob.next_schedule_time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Failed|<p>The number of pods which reached the Failed phase and the reason for failure.</p>|Dependent item|kube.cronjob.status_failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Succeeded|<p>The number of pods which reached the Succeeded phase.</p>|Dependent item|kube.cronjob.status_succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion succeeded|<p>Number of jobs the execution of which has been completed.</p>|Dependent item|kube.cronjob.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion failed|<p>Number of jobs the execution of which has failed.</p>|Dependent item|kube.cronjob.completion.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule Job discovery
 
@@ -424,10 +425,10 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Failed|<p>The number of pods which reached Phase Failed and the reason for failure.</p>|Dependent item|kube.job.status_failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Succeeded|<p>The number of pods which reached Phase Succeeded.</p>|Dependent item|kube.job.status_succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion succeeded|<p>Number of job has completed its execution.</p>|Dependent item|kube.job.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion failed|<p>Number of job has failed its execution.</p>|Dependent item|kube.job.completion.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Failed|<p>The number of pods which reached the Failed phase and the reason for failure.</p>|Dependent item|kube.job.status_failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Succeeded|<p>The number of pods which reached the Succeeded phase.</p>|Dependent item|kube.job.status_succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion succeeded|<p>Number of jobs the execution of which has been completed.</p>|Dependent item|kube.job.completion.succeeded[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion failed|<p>Number of jobs the execution of which has failed.</p>|Dependent item|kube.job.completion.failed[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule Component statuses discovery
 
@@ -482,6 +483,71 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Kubernetes: Livez [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0`|Warning||
+
+### LLD rule OpenShift BuildConfig discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift BuildConfig discovery||Dependent item|openshift.buildconfig.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_buildconfig_created`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift BuildConfig discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Created|<p>OpenShift BuildConfig Unix creation timestamp.</p>|Dependent item|openshift.buildconfig.created.time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Generation|<p>Sequence number representing a specific generation of the desired state.</p>|Dependent item|openshift.buildconfig.generation[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] BuildConfig [{#NAME}]: Latest version|<p>The latest version of BuildConfig.</p>|Dependent item|openshift.buildconfig.status[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### LLD rule OpenShift Build discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift Build discovery||Dependent item|openshift.build.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_build_created`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift Build discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Created|<p>OpenShift Build Unix creation timestamp.</p>|Dependent item|openshift.build.created.time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Generation|<p>Sequence number representing a specific generation of the desired state.</p>|Dependent item|openshift.build.sequence.number[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] Build [{#NAME}]: Status phase|<p>The Build phase.</p>|Dependent item|openshift.build.status_phase[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for OpenShift Build discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OpenShift: Build [{#NAME}]: Build has failed||`count(/Kubernetes cluster state by HTTP/openshift.build.status_phase[{#NAMESPACE}/{#NAME}],2m,"ge",6)>=2`|Warning||
+
+### LLD rule OpenShift ClusterResourceQuota discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift ClusterResourceQuota discovery||Dependent item|openshift.cluster.resource.quota.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_clusterresourcequota_usage`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift ClusterResourceQuota discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Quota [{#NAME}] Resource [{#RESOURCE}]: Type [{#TYPE}]]|<p>Usage about resource quota.</p>|Dependent item|openshift.cluster.resource.quota[{#RESOURCE}/{#NAME}/{#TYPE}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule OpenShift Route discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift Route discovery||Dependent item|openshift.route.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `openshift_route_info`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OpenShift Route discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OpenShift: Namespace [{#NAMESPACE}] Route [{#NAME}]: Created|<p>OpenShift Route Unix creation timestamp.</p>|Dependent item|openshift.route.created.time[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|OpenShift: Namespace [{#NAMESPACE}] Route [{#NAME}]: Status|<p>Information about route status.</p>|Dependent item|openshift.route.status[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `openshift_route_status{route="{#NAME}"} == 1` label `status`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li></ul>|
+
+### Trigger prototypes for OpenShift Route discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|OpenShift: Route [{#NAME}] with issue: Status is false||`count(/Kubernetes cluster state by HTTP/openshift.route.status[{#NAMESPACE}/{#NAME}],2m,,0)>=2`|Warning||
 
 ## Feedback
 

@@ -1,0 +1,124 @@
+---
+test case: "Add tags to host with no tags"
+in:
+  host_tags: []
+  add_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  host_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+---
+test case: "Add tags to host having some tags"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+  add_tags:
+    - tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag4
+      value: value4
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 0
+      tag: tag3
+      value: value3
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 0
+      tag: tag4
+      value: value4
+      automatic: ZBX_DB_TAG_NORMAL
+---
+test case: "No changes are expected, if tags having the same name and values
+  are added"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+  add_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+---
+test case: "Tags having the same tags and different values are different tags"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+  add_tags:
+    - tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tagid: 0
+      tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 0
+      tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_NORMAL
+...

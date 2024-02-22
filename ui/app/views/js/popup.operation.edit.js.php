@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ window.operation_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.actionid = actionid;
 		this.row_index = data.row_index;
+		this.data = data;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -38,8 +39,8 @@ window.operation_popup = new class {
 		this._loadViews();
 		this._processTypeOfCalculation();
 
-		if (data.opconditions.length > 0) {
-			data.opconditions.map((row, index) => {
+		if (this.data.opconditions.length > 0) {
+			this.data.opconditions.map((row, index) => {
 				this._createOperationConditionsRow(row, index);
 			})
 		}
@@ -47,6 +48,7 @@ window.operation_popup = new class {
 
 	_loadViews() {
 		this._customMessageFields();
+		this.#loadHostTags(this.data.optag);
 		this._removeAllFields();
 		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
 		this._changeView(operation_type);
@@ -63,13 +65,60 @@ window.operation_popup = new class {
 			if (e.target.classList.contains('operation-condition-list-footer')) {
 				this._openConditionsPopup(e.target);
 			}
-			else if (e.target.classList.contains('element-table-remove')) {
-				this._processTypeOfCalculation();
-			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 				this._processTypeOfCalculation();
 			}
+			else if (e.target.classList.contains('element-table-add')) {
+				const tags_table = this.form.querySelector('#tags-table');
+				const form_rows = tags_table.querySelectorAll('.form_row')
+				let row_index = 0;
+
+				if (form_rows.length !== 0) {
+					const last_row = form_rows[form_rows.length - 1];
+
+					row_index = parseInt(last_row.getAttribute('data-id')) + 1;
+				}
+
+				this.#addHostTags([{tag: '', value:'', row_index: row_index}]);
+			}
+			else if (e.target.classList.contains('element-table-remove')) {
+				e.target.closest('tr').remove();
+			}
+		});
+	}
+
+	/**
+	 * Adds empty row if no host tags are initially present and adds a row index for each host tag.
+	 *
+	 * @param {array} optags  Operation host tags.
+	 */
+	#loadHostTags(optags) {
+		if (optags.length === 0) {
+			optags.push({tag: '', value:'', row_index: 0});
+		}
+		else {
+			optags.map((optag, index) => {
+				optag.row_index = index;
+			});
+		}
+
+		this.#addHostTags(optags);
+	}
+
+	/**
+	 * Adds rows for "Add host tags" and "Remove host tags" options based on row template.
+	 *
+	 * @param {array} optags  Operation host tags.
+	 */
+	#addHostTags(optags) {
+		const tags_table = this.form.querySelector('#tags-table');
+		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
+
+		optags.forEach((optag) => {
+			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(optag));
+
+			$(`#operation_optag_${optag.row_index}_tag, #operation_optag_${optag.row_index}_value`).textareaFlexible();
 		});
 	}
 
@@ -111,6 +160,11 @@ window.operation_popup = new class {
 			case <?= OPERATION_TYPE_HOST_REMOVE ?>:
 			case <?= OPERATION_TYPE_HOST_ENABLE ?>:
 			case <?= OPERATION_TYPE_HOST_DISABLE ?>:
+				break;
+
+			case <?= OPERATION_TYPE_HOST_TAGS_ADD ?>:
+			case <?= OPERATION_TYPE_HOST_TAGS_REMOVE ?>:
+				this.#hostTagsFields();
 				break;
 
 			case <?= OPERATION_TYPE_UPDATE_MESSAGE ?>:
@@ -164,6 +218,14 @@ window.operation_popup = new class {
 		this.hostgroup_ms.multiSelect('setDisabledEntries',
 			[... this.form.querySelectorAll('[name^="operation[opgroup]["]')].map((input) => input.value)
 		);
+	}
+
+	/**
+	 * Shows or hides the host tags fields.
+	 */
+	#hostTagsFields() {
+		this.form.querySelector('#operation-host-tags').style.display = '';
+		this._enableFormFields(['operation-host-tags']);
 	}
 
 	_templateFields() {
@@ -446,7 +508,7 @@ window.operation_popup = new class {
 			return;
 		}
 		else {
-			if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
+			if (input.conditiontype == <?= ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 				if (input.value == 1) {
 					input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' ';
 				}

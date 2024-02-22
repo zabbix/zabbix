@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,8 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'initial_load' => 'in 0,1',
 			'widgetid' => 'db widget.widgetid',
-			'unique_id' => 'required|string',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'unique_id' => 'required|string'
 		]);
 	}
 
@@ -83,11 +82,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private function getHosts(): array {
 		if ($this->isTemplateDashboard()) {
-			if ($this->hasInput('dynamic_hostid')) {
+			if ($this->fields_values['override_hostid']) {
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'selectInventory' => ['location_lat', 'location_lon'],
-					'hostids' => [$this->getInput('dynamic_hostid')],
+					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
 						'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 					],
@@ -140,9 +139,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Get problems.
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
-			'symptom' => false,
-			'selectHosts' => ['hostid'],
-			'objectids' => array_keys($triggers)
+			'objectids' => array_keys($triggers),
+			'symptom' => false
 		]);
 
 		// Group problems by hosts.

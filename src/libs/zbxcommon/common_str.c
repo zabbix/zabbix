@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,19 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 	str[written_len] = '\0';	/* always write '\0', even if buffer size is 0 or vsnprintf() error */
 
 	return (size_t)written_len;
+}
+
+int	zbx_vsnprintf_check_len(const char *fmt, va_list args)
+{
+	int	rv;
+
+	if (0 > (rv = vsnprintf(NULL, 0, fmt, args)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return rv;
 }
 
 /******************************************************************************
@@ -160,6 +173,64 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 	return written_len;
 }
 
+#if defined(__hpux)
+#include "zbxlog.h"
+	/* On HP-UX 11.23 vsnprintf(NULL, 0, fmt, args) cannot be used to     */
+	/* determine the required buffer size - the result is program crash   */
+	/* (ZBX-23404). Also, it returns -1 if buffer is too small.           */
+	/* On HP-UX 11.31 vsnprintf() works as expected.                      */
+	/* Agent can be compiled on HP-UX 11.23 but can be running on         */
+	/* HP-UX 11.31 - it needs to adapt to vsnprintf() at runtime.         */
+
+static int	vsnprintf_small_buf_test(const char *fmt, ...)
+{
+	char	buf[4];	/* large enough to store "ABC"+'\0' without corrupting stack */
+	int	res;
+	va_list	args;
+
+	va_start(args, fmt);
+	/* vsnprintf() with too small buffer, only "A"+'\0' can fit */
+	res = vsnprintf(buf, sizeof(buf) - 2, fmt, args);
+	va_end(args);
+
+	return res;
+}
+
+#define VSNPRINTF_UNKNOWN	-1
+#define VSNPRINTF_NOT_C99	0
+#define VSNPRINTF_IS_C99	1
+
+static int	test_vsnprintf(void)
+{
+	int	res = vsnprintf_small_buf_test("%s", "ABC");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "vsnprintf() returned %d", res);
+
+	if (0 < res)
+		return VSNPRINTF_IS_C99;
+	else if (-1 == res)
+		return VSNPRINTF_NOT_C99;
+
+	zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", res);
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+int	zbx_hpux_vsnprintf_is_c99(void)
+{
+	static int	is_c99_vsnprintf = VSNPRINTF_UNKNOWN;
+
+	if (VSNPRINTF_UNKNOWN == is_c99_vsnprintf)
+		is_c99_vsnprintf = test_vsnprintf();
+
+	return (VSNPRINTF_IS_C99 == is_c99_vsnprintf) ? SUCCEED : FAIL;
+}
+#undef VSNPRINTF_UNKNOWN
+#undef VSNPRINTF_NOT_C99
+#undef VSNPRINTF_IS_C99
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Secure version of snprintf function.                              *
@@ -176,13 +247,59 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 {
 	va_list	args;
 	size_t	avail_len, written_len;
+
+#if defined(__hpux)
+	if (SUCCEED != zbx_hpux_vsnprintf_is_c99())
+	{
+#define INITIAL_ALLOC_LEN	128
+		int	bytes_written = 0;
+
+		if (NULL == *str)
+		{
+			*alloc_len = INITIAL_ALLOC_LEN;
+			*str = (char *)zbx_malloc(NULL, *alloc_len);
+			*offset = 0;
+		}
+
+		while (1)
+		{
+			avail_len = *alloc_len - *offset;
+			va_start(args, fmt);
+			bytes_written = vsnprintf(*str + *offset, avail_len, fmt, args);
+			va_end(args);
+
+			if (0 <= bytes_written)
+				break;
+
+			if (-1 == bytes_written)
+			{
+				*alloc_len *= 2;
+				*str = (char *)zbx_realloc(*str, *alloc_len);
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", bytes_written);
+
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		*offset += bytes_written;
+
+		return;
+#undef INITIAL_ALLOC_LEN
+	}
+	/* HP-UX vsnprintf() looks C99-compliant, proceed with common implementation */
+#endif
 retry:
 	if (NULL == *str)
 	{
-		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
-		/* so we have to use the standard function                                   */
 		va_start(args, fmt);
-		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
+
+		/* zbx_vsnprintf_check_len() cannot return negative result. */
+		/* '\0' + one byte to prevent operation retry. */
+		*alloc_len = (size_t)zbx_vsnprintf_check_len(fmt, args) + 2;
+
 		va_end(args);
 		*offset = 0;
 		*str = (char *)zbx_malloc(*str, *alloc_len);

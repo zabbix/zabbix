@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -338,7 +338,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 
 			if ($this->getInput('ldap_jit_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-				$fields['jit_provision_interval'] = '1h';
+				$fields['jit_provision_interval'] = DB::getDefault('config', 'jit_provision_interval');
 			}
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,8 +57,8 @@ class CConfigurationExport {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $options               IDs of elements that should be exported.
-	 * @param array $templateids_to_unlink Template IDs with parent template ids that should be unlinked.
+	 * @param array $options                IDs of elements that should be exported.
+	 * @param array $unlink_templates_data  Template IDs with parent template ids that should be unlinked.
 	 */
 	public function __construct(array $options, array $unlink_templates_data = []) {
 		$this->options = array_merge([
@@ -207,7 +207,7 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			// Parameter in CImportValidatorFactory is irrelavant here, since export does not validate data.
+			// Parameter in CImportValidatorFactory is irrelevant here, since export does not validate data.
 			$schema = (new CImportValidatorFactory(CExportWriterFactory::YAML))
 				->getObject(ZABBIX_EXPORT_VERSION)
 				->getSchema();
@@ -434,7 +434,7 @@ class CConfigurationExport {
 	protected function gatherHosts(array $hostIds) {
 		$hosts = API::Host()->get([
 			'output' => [
-				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+				'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 				'name', 'description', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -629,27 +629,26 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function gatherProxies(array $hosts) {
-		$proxy_hostids = [];
-		$db_proxies = [];
+		$proxyids = [];
 
 		foreach ($hosts as $host) {
-			if ($host['proxy_hostid'] != 0) {
-				$proxy_hostids[$host['proxy_hostid']] = true;
+			if ($host['proxyid'] != 0) {
+				$proxyids[$host['proxyid']] = true;
 			}
 		}
 
-		if ($proxy_hostids) {
-			$db_proxies = DBfetchArray(DBselect(
-				'SELECT h.hostid,h.host'.
-				' FROM hosts h'.
-				' WHERE '.dbConditionInt('h.hostid', array_keys($proxy_hostids))
-			));
-			$db_proxies = zbx_toHash($db_proxies, 'hostid');
-		}
+		$db_proxies = $proxyids
+			? DBfetchArray(DBselect(
+				'SELECT p.proxyid,p.name'.
+				' FROM proxy p'.
+				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids))
+			))
+			: [];
+		$db_proxies = array_column($db_proxies, null, 'proxyid');
 
 		foreach ($hosts as &$host) {
-			$host['proxy'] = ($host['proxy_hostid'] != 0 && array_key_exists($host['proxy_hostid'], $db_proxies))
-				? ['name' => $db_proxies[$host['proxy_hostid']]['host']]
+			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
+				? ['name' => $db_proxies[$host['proxyid']]['name']]
 				: [];
 		}
 		unset($host);
@@ -880,13 +879,6 @@ class CConfigurationExport {
 			// Unset unnecessary filter field and prepare the operations.
 			if ($item['overrides']) {
 				foreach ($item['overrides'] as &$override) {
-					if (array_key_exists('filter', $override)) {
-						if (!$override['filter']['conditions']) {
-							unset($override['filter']);
-						}
-						unset($override['filter']['eval_formula']);
-					}
-
 					foreach ($override['operations'] as &$operation) {
 						if (array_key_exists('opstatus', $operation)) {
 							$operation['status'] = $operation['opstatus']['status'];
@@ -1708,8 +1700,8 @@ class CConfigurationExport {
 			$host = reset($graph['hosts']);
 
 			$ids[$id] = [
-				'name' => $graph['name'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'name' => $graph['name']
 			];
 		}
 
@@ -1744,8 +1736,8 @@ class CConfigurationExport {
 			$host = reset($item['hosts']);
 
 			$ids[$id] = [
-				'key' => $item['key_'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'key' => $item['key_']
 			];
 		}
 

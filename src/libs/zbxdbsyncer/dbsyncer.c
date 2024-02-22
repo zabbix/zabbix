@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ static void	zbx_db_flush_timer_queue(void)
 	if (0 != persistent_timers.values_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns",
-				NULL);
+				(char *)NULL);
 
 		for (int i = 0; i < persistent_timers.values_num; i++)
 		{

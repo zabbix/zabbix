@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
@@ -28,18 +28,19 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  */
 abstract class testFormMacros extends CLegacyWebTest {
 
-	use MacrosTrait;
-
-	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
-
 	/**
 	 * Attach Behaviors to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
+
+	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
@@ -510,13 +511,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$column->query('link', $name)->asPopupButton()->one()->select('Host');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
+			else if ($host_type === 'template') {
+				$this->page->login()
+						->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+				$this->query('link', $name)->one()->click();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+			}
 			else {
 				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 				$this->page->login()->open(
 					$is_prototype
 						? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-						: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+						: 'host_prototypes.php?form=update&host_prototypeid='.$id.'&groupid=0'
 				);
 				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
@@ -527,11 +534,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			}
+			else if ($host_type === 'template') {
+				$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
+				$this->query('button:Create template')->one()->click();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+			}
 			else {
 				$this->page->login()->open(
 					$is_prototype
 						? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
-						: $host_type.'s.php?form=create'
+						: 'host_prototypes.php?form=create'
 				);
 				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
@@ -545,7 +557,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					$group_field => $group_name
 			];
 
-			if ($is_prototype || $host_type === 'template') {
+			if ($is_prototype) {
 				$form->asForm(['normalized' => true])->fill($general_data);
 			}
 			else {
@@ -570,7 +582,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$object = $is_prototype ? 'host prototype' : $host_type;
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				if ($host_type === 'host') {
+				if ($host_type === 'host' || $host_type === 'template') {
 					COverlayDialogElement::ensureNotPresent();
 				}
 
@@ -587,7 +599,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
 
-				if ($host_type === 'host') {
+				if ($host_type === 'host' || $host_type === 'template') {
 					COverlayDialogElement::find()->one()->close();
 					COverlayDialogElement::ensureNotPresent();
 				}
@@ -612,13 +624,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
+		else if ($host_type === 'template') {
+			$this->page->login()
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		}
 		else {
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 			$this->page->login()->open(
 				$is_prototype
 					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+					: 'host_prototypes.php?form=update&host_prototypeid='.$id.'&groupid=0'
 			);
 
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
@@ -628,7 +646,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->removeAllMacros();
 		$form->submit();
 
-		if ($host_type === 'host') {
+		if ($host_type === 'host' || $host_type === 'template') {
 			COverlayDialogElement::ensureNotPresent();
 		}
 
@@ -669,12 +687,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'index' => 0,
 							'macro' => '{$SNMP_COMMUNITY}',
 							'value' => 'new redefined value 1',
-							'description' => 'new redifined description 1'
+							'description' => 'new redefined description 1'
 						],
 						[
 							'macro' => '{$_}',
-							'value' => 'new redifined value 2',
-							'description' => 'new redifined description 2'
+							'value' => 'new redefined value 2',
+							'description' => 'new redefined description 2'
 						]
 					]
 				]
@@ -723,15 +741,20 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
+			else if ($host_type === 'template') {
+				$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
+				$this->query('button:Create template')->one()->click();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+			}
 			else {
-				$this->page->login()->open($host_type.'s.php?form=create');
+				$this->page->login()->open('host_prototypes.php?form=create');
 				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
 
 			$name = $host_type.' with edited global macro '.time();
 
 			if ($host_type === 'template') {
-				$form->asForm(['normalized' => true])->fill([
+				$form->asGridForm(['normalized' => true])->fill([
 					'Template name' => $name,
 					'Template groups' => 'Templates'
 				]);
@@ -745,7 +768,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$form->selectTab('Macros');
-		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
+		$radio_switcher = $this->query('id:show_inherited'.($host_type === 'template' ? '_template' : '').'_macros')
+				->asSegmentedRadio()->waitUntilPresent()->one();
 
 		switch ($data['case']) {
 			case 'Add new macro':
@@ -871,7 +895,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$form->submit();
 
-		if ($host_type === 'host') {
+		if ($host_type === 'host' || $host_type === 'template') {
 			COverlayDialogElement::ensureNotPresent();
 		}
 
@@ -887,11 +911,17 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
+		else if ($host_type === 'template') {
+			$this->page->login()
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		}
 		else {
 			$this->page->open(
 				$is_prototype
 					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+					: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 			);
 			$form->invalidate();
 		}
@@ -954,7 +984,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				break;
 		}
 
-		if ($host_type === 'host') {
+		if ($host_type === 'host' || $host_type === 'template') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -1022,10 +1052,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
+		else if ($host_type === 'template') {
+			$this->page->login()
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		}
 		else {
 			$link = $is_prototype
 				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
+				: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
 
 			$this->page->login()->open($link);
 
@@ -1034,7 +1070,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$form->selectTab('Macros');
-		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
+		$radio_switcher = $this->query('id:show_inherited'.($host_type === 'template' ? '_template' : '').'_macros')
+				->asSegmentedRadio()->waitUntilPresent()->one();
 
 		switch ($data['case']) {
 			case 'Remove macro from Host':
@@ -1177,6 +1214,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 					->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 		}
+		else if ($host_type === 'template') {
+			$this->page->login()
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		}
 		else {
 			$this->page->open($link);
 		}
@@ -1210,7 +1253,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->checkInheritedGlobalMacros($expected_hostmacros);
 				break;
 		}
-		if ($host_type === 'host') {
+		if ($host_type === 'host' || $host_type === 'template') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -1236,11 +1279,17 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
+		else if ($host_type === 'template') {
+			$this->page->login()
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		}
 		else {
 			$this->page->open(
 				$is_prototype
 					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+					: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 			);
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		}
@@ -1264,14 +1313,15 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
-		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+		$this->query('xpath://label[@for="show_inherited'.($host_type === 'template' ? '_template' : '').'_macros_1"]')
+				->waitUntilPresent()->one()->click();
 
 		// Get all macros defined for this host.
 		$hostmacros = CDBHelper::getAll('SELECT macro, value, description, type FROM hostmacro where hostid ='.$id);
 
 		$this->checkInheritedGlobalMacros($hostmacros);
 
-		if ($host_type === 'host') {
+		if ($host_type === 'host' || $host_type === 'template') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -1338,7 +1388,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				[
 					'macro' => '{$SECRET_HOST_MACRO}',
 					'type' => 'Secret text',
-					'chenge_type' => true
+					'change_type' => true
 				]
 			],
 			[
@@ -1428,7 +1478,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				$value_field->invalidate();
 
-				$this->assertFalse($change_button->isEnabled());
+				$this->assertFalse($value_field->getNewValueButton()->isEnabled());
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {
@@ -1524,7 +1574,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 
 		// Switch to tab with inherited and instance macros and verify that the value is secret but is still accessible.
-		$this->checkInheritedTab($data['macro_fields'], true);
+		$this->checkInheritedTab($data['macro_fields'], true, $source);
 
 		// Check that macro value is hidden but is still accessible after switching back to instance macros list.
 		$data_value_field = $this->getValueField($data['macro_fields']['macro']);
@@ -1552,13 +1602,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertEquals($data['macro_fields']['value']['text'], $guest_value_field->getValue());
 
 			// Switch to tab with inherited and instance macros and verify that the value is plain text.
-			$this->checkInheritedTab($data['macro_fields'], false);
+			$this->checkInheritedTab($data['macro_fields'], false, $source);
 		}
 		else {
 			$this->assertEquals('******', $guest_value_field->getValue());
 
 			// Switch to tab with inherited and instance macros and verify that the value is secret and is not accessible.
-			$this->checkInheritedTab($data['macro_fields'], true, false);
+			$this->checkInheritedTab($data['macro_fields'], true, $source, false);
 		}
 
 		// Check macro value, type and description in DB.
@@ -1568,7 +1618,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				array_values(CDBHelper::getRow($sql))
 		);
 
-		if ($source === 'hosts') {
+		if ($source === 'hosts' || $source == 'templates') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -1603,7 +1653,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		// Check that new values are correct in Inherited and host prototype macros tab before saving the values.
 		$secret = (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) ===
 				CInputGroupElement::TYPE_SECRET) ? true : false;
-		$this->checkInheritedTab($data, $secret);
+		$this->checkInheritedTab($data, $secret, $source);
 
 		$form->invalidate();
 		$form->submit();
@@ -1619,19 +1669,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
 			$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 			$this->assertEquals('******', $value_field->getValue());
-			$this->checkInheritedTab($data, true, false);
+			$this->checkInheritedTab($data, true, $source, false);
 		}
 		else {
 			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
 			$this->assertEquals($data['value']['text'], $value_field->getValue());
-			$this->checkInheritedTab($data, false);
+			$this->checkInheritedTab($data, false, $source);
 		}
 
 		// Check in DB that values of the updated macros are correct.
 		$sql = 'SELECT value FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']).' ORDER BY hostmacroid DESC';
 		$this->assertEquals($data['value']['text'], CDBHelper::getValue($sql));
 
-		if ($source === 'hosts') {
+		if ($source === 'hosts' || $source === 'templates') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -1716,7 +1766,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));
 
-		if ($source === 'hosts') {
+		if ($source === 'hosts' || $source === 'templates') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -1728,11 +1778,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 *
 	 * @param type $data		given data provider
 	 * @param type $secret		flag that indicates if the value should have type "Secret text".
+	 * @param string $source	type of entity that is being checked (host, hostPrototype, template)
 	 * @param type $available	flag that indicates if the value should be available.
 	 */
-	public function checkInheritedTab($data, $secret, $available = true) {
+	public function checkInheritedTab($data, $secret, $source, $available = true) {
 		// Switch to the list of inherited and instance macros.
-		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+		$this->query('xpath://label[@for="show_inherited'.($source === 'templates' ? '_template' : '').'_macros_1"]')
+				->waitUntilPresent()->one()->click();
 		$this->query('class:is-loading')->waitUntilNotPresent();
 		$value_field = $this->getValueField($data['macro']);
 
@@ -1747,7 +1799,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		// Switch back to the list of instance macros.
-		$this->query('xpath://label[@for="show_inherited_macros_0"]')->waitUntilPresent()->one()->click();
+		$this->query('xpath://label[@for="show_inherited'.($source === 'templates' ? '_template' : '').'_macros_0"]')
+				->waitUntilPresent()->one()->click();
 		$this->query('class:is-loading')->waitUntilNotPresent();
 	}
 
@@ -1770,6 +1823,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
 					->findRow('Name', $name, true)->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
+		}
+		else if ($source === 'templates') {
+			$this->page->login()
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
 		else {
@@ -2154,7 +2213,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
 
-		if ($source === 'hosts') {
+		if ($source === 'hosts' || $source === 'templates') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -2293,7 +2352,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']).' ORDER BY hostmacroid DESC';
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 
-		if ($source === 'hosts') {
+		if ($source === 'hosts' || $source === 'templates') {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
@@ -2373,7 +2432,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $vault_values['error']);
 
 			// Hosts in edit view opens in overlay and need to be closed manually.
-			if ($source === 'hosts') {
+			if ($source === 'hosts' || $source === 'templates') {
 				COverlayDialogElement::find()->one()->close();
 				COverlayDialogElement::ensureNotPresent();
 			}
@@ -2424,7 +2483,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Hosts items page. Macro is not resolved in any field.
 			[
 				[
-					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D='.$this->macro_resolve_hostid.'&context=host',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$this->macro_resolve_hostid.'&context=host',
 					'name' => 'Macro value: '.$this->macro_resolve,
 					'key' => 'trap['.$this->macro_resolve.']',
 					'key_secret' => 'trap['.$this->macro_resolve.']'
@@ -2470,8 +2529,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 */
 	private function checkItemFields($url, $name, $key) {
 		$this->page->login()->open($url)->waitUntilReady();
-		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"] | '.
-				'//table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+		$table = $this->query('xpath://form[@name="item_list"]/table[@class="list-table"] | '.
+				'//table[contains(@class, "list-table fixed")]')->asTable()->waitUntilPresent()->one();
 
 		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
 		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());

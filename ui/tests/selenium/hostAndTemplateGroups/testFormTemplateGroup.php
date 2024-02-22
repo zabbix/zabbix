@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  * @backup hosts
  *
  * @onBefore prepareGroupData
+ *
+ * @dataSource HostTemplateGroups
  */
 class testFormTemplateGroup extends testFormGroups {
 
@@ -139,8 +141,8 @@ class testFormTemplateGroup extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'One group for Delete',
-					'error' => 'Template "Template for group testing" cannot be without template group.'
+					'name' => self::DELETE_ONE_GROUP,
+					'error' => 'Template "Template for template group testing" cannot be without template group.'
 				]
 			]
 		];

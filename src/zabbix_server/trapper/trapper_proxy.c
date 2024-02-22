@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,25 @@
 
 #include "trapper_request.h"
 
+#include "trapper.h"
+
 #include "zbxcommshigh.h"
+#include "../taskmanager/taskmanager_server.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
+
+#include "zbxcommshigh.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxdbwrap.h"
 #include "zbxproxybuffer.h"
-#include "../taskmanager/taskmanager.h"
 #include "zbxcompress.h"
-
-extern unsigned char	program_type;
 
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)
 
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 
-int	init_proxy_history_lock(char **error)
+int	init_proxy_history_lock(unsigned char program_type, char **error)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
@@ -43,7 +45,7 @@ int	init_proxy_history_lock(char **error)
 	return SUCCEED;
 }
 
-void	free_proxy_history_lock(void)
+void	free_proxy_history_lock(unsigned char program_type)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		zbx_mutex_destroy(&proxy_lock);
@@ -315,19 +317,23 @@ out:
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
-		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs)
+		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
+		zbx_get_config_forks_f get_config_forks)
 {
 	ZBX_UNUSED(jp);
 	ZBX_UNUSED(ts);
 	ZBX_UNUSED(proxydata_frequency);
 	ZBX_UNUSED(events_cbs);
+	ZBX_UNUSED(get_config_forks);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
 		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		{
 			zbx_recv_proxyconfig(sock, config_comms->config_tls, config_vault, config_comms->config_timeout,
-					config_comms->config_source_ip, config_comms->server);
+					config_comms->config_trapper_timeout, config_comms->config_source_ip,
+					config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
+					config_comms->config_ssl_key_location, config_comms->server);
 			return SUCCEED;
 		}
 		else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))

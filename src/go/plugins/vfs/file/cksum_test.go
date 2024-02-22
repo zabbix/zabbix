@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,17 +26,18 @@ import (
 	"testing"
 
 	"git.zabbix.com/ap/plugin-support/std"
+	"zabbix.com/pkg/zbxtest"
 )
 
 var CrcFile = "1234"
 
 func TestFileCksumDefault(t *testing.T) {
+	var ctx zbxtest.MockEmptyCtx
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
-
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
-	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, nil); err != nil {
+
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, ctx); err != nil {
 		t.Errorf("vfs.file.cksum returned error %s", err.Error())
 	} else {
 		if crc, ok := result.(uint32); !ok {
@@ -50,12 +51,11 @@ func TestFileCksumDefault(t *testing.T) {
 }
 
 func TestFileCksumCrc32(t *testing.T) {
+	var ctx zbxtest.MockEmptyCtx
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
-
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
-	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "crc32"}, nil); err != nil {
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "crc32"}, ctx); err != nil {
 		t.Errorf("vfs.file.cksum[text.txt,crc32] returned error %s", err.Error())
 	} else {
 		if crc, ok := result.(uint32); !ok {
@@ -69,12 +69,11 @@ func TestFileCksumCrc32(t *testing.T) {
 }
 
 func TestFileCksumMd5(t *testing.T) {
+	var ctx zbxtest.MockEmptyCtx
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
-
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
-	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "md5"}, nil); err != nil {
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "md5"}, ctx); err != nil {
 		t.Errorf("vfs.file.cksum[text.txt,md5] returned error %s", err.Error())
 	} else {
 		if md5sum, ok := result.(string); !ok {
@@ -88,12 +87,11 @@ func TestFileCksumMd5(t *testing.T) {
 }
 
 func TestFileCksumSha256sum(t *testing.T) {
+	var ctx zbxtest.MockEmptyCtx
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
-
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
-	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "sha256"}, nil); err != nil {
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt", "sha256"}, ctx); err != nil {
 		t.Errorf("vfs.file.cksum[text.txt,sha256] returned error %s", err.Error())
 	} else {
 		if sha256, ok := result.(string); !ok {

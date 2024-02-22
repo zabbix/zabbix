@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,6 +172,12 @@ static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_get_history_compression_age(void);
 
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
+{
+	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
+		zbx_free(opt->source);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves all internal metrics of the database cache              *
@@ -336,6 +342,24 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 	return (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
 }
 
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids)
+{
+	int	i, hour, now = time(NULL);
+
+	hour = now - now % SEC_PER_HOUR;
+
+	LOCK_TRENDS;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		ZBX_DC_TREND	trend = {.itemid = itemids->values[i], .disable_from = hour};
+
+		(void)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
+	}
+
+	UNLOCK_TRENDS;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: apply disable_from changes to cache                               *
@@ -375,7 +399,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
-			"value_max", NULL);
+			"value_max", (char *)NULL);
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -440,7 +464,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct itemid"
+				"select itemid"
 				" from %s"
 				" where clock>=%d and",
 				table_name, clocks[j]);
@@ -865,7 +889,7 @@ static void	DCmass_update_trends(const zbx_dc_history_t *history, int history_nu
 				continue;
 
 			/* discard trend items that are older than compression age */
-			if (0 != compression_age && trend->clock < compression_age)
+			if (0 != compression_age && trend->clock < compression_age && 0 != trend->clock)
 			{
 				if (SEC_PER_HOUR < (ts.sec - last_trend_discard)) /* log once per hour */
 				{
@@ -874,14 +898,20 @@ static void	DCmass_update_trends(const zbx_dc_history_t *history, int history_nu
 					last_trend_discard = ts.sec;
 				}
 
-				zbx_hashset_iter_remove(&iter);
+				trend->clock = 0;
+				trend->num = 0;
+				memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
+				memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
+				memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
 			}
 			else
 			{
 				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
-				zbx_vector_uint64_append(&del_itemids, trend->itemid);
+				/* trend is missing an hour, check if it should be cleared from cache */
+				if (0 != trend->disable_from && trend->disable_from < hour - SEC_PER_HOUR)
+					zbx_vector_uint64_append(&del_itemids, trend->itemid);
 			}
 		}
 
@@ -1257,6 +1287,14 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
+static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
+{
+	if (0 != (mask & (1 << item->value_type)))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: export history                                                    *
@@ -1315,7 +1353,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
-				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
+				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].item_value_type,
+						item) && SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
 						&connector_filters->values[k].connector_tags, &item_info->item_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
@@ -1329,7 +1368,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 		zbx_json_clean(&json);
 
-		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
@@ -2566,6 +2605,8 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
+	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
+
 	zbx_vector_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2675,12 +2716,15 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		DCinventory_value_add(inventory_values, item, h);
 
-		if (0 != item->host.proxy_hostid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
+		if (0 != item->host.proxyid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
 		{
-			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
+			zbx_uint64_pair_t	p = {item->host.proxyid, h->ts.sec};
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
+
+		if (0 != item->has_trigger)
+			h->flags |= ZBX_DC_FLAG_HASTRIGGER;
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -3068,8 +3112,20 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				{
 					zbx_db_begin();
 
-					DBmass_update_items(&item_diff, &inventory_values);
 					DBmass_update_trends(trends, trends_num, &trends_diff);
+
+					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
+						DCupdate_trends(&trends_diff);
+
+					zbx_vector_uint64_pair_clear(&trends_diff);
+				}
+				while (ZBX_DB_DOWN == txn_error);
+
+				do
+				{
+					zbx_db_begin();
+
+					DBmass_update_items(&item_diff, &inventory_values);
 
 					if (NULL != events_cbs->process_events_cb)
 					{
@@ -3077,16 +3133,11 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 						events_cbs->process_events_cb(NULL, NULL);
 					}
 
-					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
-					{
-						DCupdate_trends(&trends_diff);
-					}
-					else
+					if (ZBX_DB_OK != (txn_error = zbx_db_commit()))
 					{
 						if (NULL != events_cbs->reset_event_recovery_cb)
 							events_cbs->reset_event_recovery_cb();
 					}
-					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
@@ -3763,13 +3814,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	if (NULL == result)
 		return;
 
-	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
-	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) &&
-			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		return;
-	}
-
 	value_flags = 0;
 
 	if (!ZBX_ISSET_VALUE(result))
@@ -3779,7 +3823,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		value_flags |= ZBX_DC_FLAG_META;
 
 	/* Add data to the local history cache if:                                           */
-	/*   1) the NOVALUE flag is set (data contains either meta information or timestamp) */
+	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
@@ -3924,7 +3968,22 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	{
 		zbx_log_t	log;
 
-		zbx_variant_convert(value, ZBX_VARIANT_STR);
+		if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_STR))
+		{
+			char	*error;
+
+			zabbix_log(LOG_LEVEL_CRIT, "cannot convert value from %s to %s",
+					zbx_variant_type_desc(value), zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			error = zbx_dsprintf(NULL, "Cannot convert value from %s to %s.",
+					zbx_variant_type_desc(value), zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime,
+					value_flags);
+			zbx_free(error);
+
+			return;
+		}
 
 		log.logeventid = value_opt->logeventid;
 		log.severity = value_opt->severity;
@@ -3980,6 +4039,8 @@ void	zbx_dc_flush_history(void)
 	cache->history_num += item_values_num;
 
 	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
 	item_values_num = 0;
 	string_values_offset = 0;
@@ -4339,17 +4400,19 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		/* a record with metadata and no value can be dropped if  */
 		/* the metadata update is copied to the last queued value */
-		if (NULL != (item = hc_get_item(item_value->itemid)) &&
-				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
-				0 != (item_value->flags & ZBX_DC_FLAG_META))
+		if (NULL != (item = hc_get_item(item_value->itemid)) && 0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 		{
 			/* skip metadata updates when only one value is queued, */
 			/* because the item might be already being processed    */
 			if (item->head != item->tail)
 			{
-				item->head->lastlogsize = item_value->lastlogsize;
-				item->head->mtime = item_value->mtime;
-				item->head->flags |= ZBX_DC_FLAG_META;
+				if (0 != (item_value->flags & ZBX_DC_FLAG_META))
+				{
+					item->head->lastlogsize = item_value->lastlogsize;
+					item->head->mtime = item_value->mtime;
+					item->head->flags |= ZBX_DC_FLAG_META;
+				}
+
 				continue;
 			}
 		}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	int		lastaccess;
+	time_t		lastaccess;
 }
 zbx_active_avail_proxy_t;
 
@@ -260,7 +260,7 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		if (ZBX_DB_OK > zbx_db_execute("update host_rtdata hr set active_available=%i where exists "
-				"(select null from hosts h where h.hostid=hr.hostid and proxy_hostid is null)",
+				"(select null from hosts h where h.hostid=hr.hostid and proxyid is null)",
 				ZBX_INTERFACE_AVAILABLE_UNKNOWN))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to reset availability status for active checks");
@@ -289,7 +289,7 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 }
 static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
-	zbx_uint64_t			proxy_hostid;
+	zbx_uint64_t			proxyid;
 	zbx_vector_proxy_hostdata_ptr_t	hosts;
 	zbx_proxy_hostdata_t		*host;
 	zbx_vector_uint64_t		status_unknown, status_available, status_unavailable;
@@ -297,7 +297,7 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 
 	zbx_vector_proxy_hostdata_ptr_create(&hosts);
 
-	zbx_availability_deserialize_proxy_hostdata(message->data, &hosts, &proxy_hostid);
+	zbx_availability_deserialize_proxy_hostdata(message->data, &hosts, &proxyid);
 
 	zbx_vector_uint64_create(&status_unknown);
 	zbx_vector_uint64_create(&status_available);
@@ -328,17 +328,17 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	if (ZBX_DB_OK == zbx_db_commit())
 		zbx_hashset_clear(&cache->queue);
 
-	if (NULL == (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
+	if (NULL == (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxyid)))
 	{
 		zbx_active_avail_proxy_t	proxy_avail_local;
 
-		proxy_avail_local.hostid = proxy_hostid;
-		proxy_avail_local.lastaccess = (int)time(NULL);
+		proxy_avail_local.hostid = proxyid;
+		proxy_avail_local.lastaccess = time(NULL);
 
 		zbx_hashset_insert(&cache->proxy_avail, &proxy_avail_local, sizeof(zbx_active_avail_proxy_t));
 	}
 	else
-		proxy_avail->lastaccess = (int)time(NULL);
+		proxy_avail->lastaccess = time(NULL);
 
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
@@ -370,7 +370,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 {
 	zbx_hashset_iter_t		iter;
 	zbx_active_avail_proxy_t	*proxy_avail;
-	int				now;
+	time_t				now;
 
 	if (0 == cache->proxy_avail.num_data)
 		return;
@@ -383,7 +383,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 		if (proxy_avail->lastaccess + AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC <= now)
 		{
 			if (ZBX_DB_OK > zbx_db_execute("update host_rtdata set active_available=%i "
-					"where hostid in (select hostid from hosts where proxy_hostid=" ZBX_FS_UI64 ")",
+					"where hostid in (select hostid from hosts where proxyid=" ZBX_FS_UI64 ")",
 					ZBX_INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
 			{
 				continue;
@@ -396,12 +396,12 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
 	zbx_active_avail_proxy_t	*proxy_avail;
-	zbx_uint64_t			proxy_hostid;
+	zbx_uint64_t			proxyid;
 
-	zbx_availability_deserialize_active_proxy_hb_update(message->data, &proxy_hostid);
+	zbx_availability_deserialize_active_proxy_hb_update(message->data, &proxyid);
 
-	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
-		proxy_avail->lastaccess = (int)time(NULL);
+	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxyid)))
+		proxy_avail->lastaccess = time(NULL);
 }
 
 

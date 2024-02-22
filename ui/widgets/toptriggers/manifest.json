@@ -1,0 +1,28 @@
+{
+	"manifest_version": 2.0,
+	"id": "toptriggers",
+	"type": "widget",
+	"name": "Top triggers",
+	"namespace": "TopTriggers",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays top N triggers that have the most problems within the period of evaluation, sorted by the number of problems.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/top_triggers",
+	"widget": {
+		"js_class": "CWidgetTopTriggers",
+		"refresh_rate": 0,
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		}
+	},
+	"actions": {
+		"widget.toptriggers.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

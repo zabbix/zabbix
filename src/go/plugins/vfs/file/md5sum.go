@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ func md5sum(file std.File, start time.Time, timeout int) (result interface{}, er
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
-func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
+func (p *Plugin) exportMd5sum(params []string, timeout int) (result interface{}, err error) {
 	if len(params) > 1 {
 		return nil, errors.New("Too many parameters.")
 	}
@@ -63,5 +63,5 @@ func (p *Plugin) exportMd5sum(params []string) (result interface{}, err error) {
 	}
 	defer file.Close()
 
-	return md5sum(file, start, p.options.Timeout)
+	return md5sum(file, start, timeout)
 }

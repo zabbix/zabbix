@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,12 +42,11 @@ zbx_wmpoint_t;
 
 static wchar_t	*zbx_wcsdup2(const char *filename, int line, wchar_t *old, const wchar_t *str)
 {
-	int	retry;
 	wchar_t	*ptr = NULL;
 
 	zbx_free(old);
 
-	for (retry = 10; 0 < retry && NULL == ptr; ptr = wcsdup(str), retry--)
+	for (int retry = 10; 0 < retry && NULL == ptr; ptr = wcsdup(str), retry--)
 		;
 
 	if (NULL != ptr)
@@ -97,10 +96,9 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *n
 
 static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
-	char		*path, *mode;
-	char		*error;
+	char		*path, *mode, *error;
 	zbx_uint64_t	total, used, free;
-	double		pused,pfree;
+	double		pused, pfree;
 
 	/* 'timeout_event' argument is here to make the vfs_fs_size() prototype as required by */
 	/* zbx_execute_threaded_metric() on MS Windows */
@@ -221,7 +219,7 @@ static int	add_fs_to_vector(zbx_vector_ptr_t *mntpoints, wchar_t *path, char **e
 	zbx_wmpoint_t	*mntpoint;
 	zbx_uint64_t	total, not_used, used;
 	double		pfree, pused;
-	char 		*fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
+	char		*fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
 
 	get_fs_data(path, &fsname, &fstype, &fslabel, &fsdrivetype);
 
@@ -337,7 +335,7 @@ out:
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json		j;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vector_ptr_t	mount_paths;
 	char			*error = NULL, *fsname, *fstype, *fslabel, *fsdrivetype;
 
@@ -350,7 +348,7 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	for (i = 0; i < mount_paths.values_num; i++)
+	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		get_fs_data(mount_paths.values[i], &fsname, &fstype, &fslabel, &fsdrivetype);
 
@@ -385,7 +383,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	struct zbx_json		j;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_wmpoint_t		*mpoint;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	char			*error = NULL;
 	zbx_vector_ptr_t	mount_paths;
 
@@ -403,7 +401,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	ZBX_UNUSED(timeout_event);
 	zbx_vector_ptr_create(&mntpoints);
 
-	for (i = 0; i < mount_paths.values_num; i++)
+	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		if (FAIL == add_fs_to_vector(&mntpoints, mount_paths.values[i], &error))
 		{
@@ -420,7 +418,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 		goto out;
 	}
 
-	for (i = 0; i < mount_paths.values_num; i++)
+	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		zbx_wmpoint_t	mpoint_local;
 		int		idx;

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@
 
 namespace Widgets\Gauge\Includes;
 
+use API,
+	CNumberParser;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -28,9 +31,11 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
+	CWidgetFieldCheckBoxList,
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
@@ -38,9 +43,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldNumericBox,
 	CWidgetFieldThresholds
 };
-
-use API,
-	CNumberParser;
 
 use Widgets\Gauge\Widget;
 
@@ -59,10 +61,9 @@ class WidgetForm extends CWidgetForm {
 	// Scale defaults.
 	private const DEFAULT_MIN = 0;
 	private const DEFAULT_MAX = 100;
-	private const DEFAULT_SCALE_SHOW = 1;
 	private const DEFAULT_SCALE_DECIMAL_PLACES = 0;
 	private const DEFAULT_SCALE_SHOW_UNITS = 1;
-	private const DEFAULT_SCALE_SIZE_PERCENT = 10;
+	private const DEFAULT_SCALE_SIZE_PERCENT = 15;
 
 	// Description defaults.
 	private const DEFAULT_DESCRIPTION_SIZE_PERCENT = 15;
@@ -75,7 +76,6 @@ class WidgetForm extends CWidgetForm {
 
 	// Value defaults.
 	private const DEFAULT_VALUE_SIZE_PERCENT = 25;
-	private const DEFAULT_VALUE_ARC_SHOW = 1;
 	private const DEFAULT_VALUE_BOLD = 0;
 
 	// Value arc defaults.
@@ -86,13 +86,10 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_UNITS_SIZE_PERCENT = 25;
 	private const DEFAULT_UNITS_BOLD = 0;
 
-	// Needle defaults.
-	private const DEFAULT_NEEDLE_SHOW = 0;
-
 	// Threshold defaults.
 	private const DEFAULT_TH_SHOW_LABELS = 0;
 	private const DEFAULT_TH_SHOW_ARC = 0;
-	private const DEFAULT_TH_ARC_SIZE_PERCENT = 10;
+	private const DEFAULT_TH_ARC_SIZE_PERCENT = 5;
 
 	private bool $is_binary_units = false;
 
@@ -134,6 +131,10 @@ class WidgetForm extends CWidgetForm {
 
 		if ($min >= $max) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _s('value must be greater than "%1$s"', $min));
+		}
+
+		if (!$this->getFieldValue('show')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
 		}
 
 		$min_threshold = null;
@@ -186,6 +187,19 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
+				(new CWidgetFieldCheckBoxList('show', _('Show'), [
+					Widget::SHOW_DESCRIPTION => _('Description'),
+					Widget::SHOW_VALUE => _('Value'),
+					Widget::SHOW_VALUE_ARC => _('Value arc'),
+					Widget::SHOW_NEEDLE => _('Needle'),
+					Widget::SHOW_SCALE => _('Scale')
+				]))
+					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_SCALE,
+						Widget::SHOW_VALUE_ARC
+					])
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
@@ -218,9 +232,6 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))->setDefault(self::DEFAULT_VALUE_BOLD)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('value_arc', _('Arc')))->setDefault(self::DEFAULT_VALUE_ARC_SHOW)
-			)
-			->addField(
 				(new CWidgetFieldIntegerBox('value_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
 					->setFullName(_('Value size'))
 					->setDefault(self::DEFAULT_VALUE_SIZE_PERCENT)
@@ -229,7 +240,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('value_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('value_arc_size', _('Arc size'),
+				(new CWidgetFieldIntegerBox('value_arc_size', _('Size'),
 					self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_VALUE_ARC_SIZE_PERCENT)
 			)
@@ -268,13 +279,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('units_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('needle_show', _('Needle')))->setDefault(self::DEFAULT_NEEDLE_SHOW)
-			)
-			->addField(
 				new CWidgetFieldColor('needle_color', _('Color'))
-			)
-			->addField(
-				(new CWidgetFieldCheckBox('scale_show', _('Scale')))->setDefault(self::DEFAULT_SCALE_SHOW)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('scale_decimal_places', _('Decimal places'),
@@ -306,9 +311,8 @@ class WidgetForm extends CWidgetForm {
 					self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_TH_ARC_SIZE_PERCENT)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

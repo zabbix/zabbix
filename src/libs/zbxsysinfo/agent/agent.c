@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,8 +77,8 @@ static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (NULL != sysinfo_get_config_host_metadata_item())
 	{
 		if (SUCCEED != zbx_execute_agent_check(sysinfo_get_config_host_metadata_item(),
-				ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, result) ||
-				NULL == ZBX_GET_STR_RESULT(result))
+				ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, result,
+				ZBX_CHECK_TIMEOUT_UNDEFINED) || NULL == ZBX_GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
 					sysinfo_get_config_host_metadata_item()));

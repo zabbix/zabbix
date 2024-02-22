@@ -47,6 +47,11 @@ zabbix_proxy \- Zabbix proxy daemon
 .B \-R
 .I runtime\-option
 .br
+.B zabbix_proxy
+.RB [ \-c
+.IR config\-file ]
+.B \-T
+.br
 .B zabbix_proxy \-h
 .br
 .B zabbix_proxy \-V
@@ -115,7 +120,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (availability\ manager, configuration\ syncer, data\ sender, discovery\ manager, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, preprocessing\ manager, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (availability\ manager, configuration\ syncer, data\ sender, discovery\ manager, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4
@@ -134,7 +139,7 @@ Profiling control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (configuration\ syncer, data\ sender, discovery manager, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, agent\ poller, http\ agent\ poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
+All processes of specified type (configuration\ syncer, data\ sender, discovery manager, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
 .RE
 .RS 4
 .TP 4
@@ -152,6 +157,8 @@ Process identifier
 (rwlock, mutex, processing) can be used with process-type (e.g., history syncer,1,processing)
 .RE
 .RE
+.IP "\fB\-T\fR, \fB\-\-test-config\fR"
+Validate configuration file and exit.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,15 +28,15 @@ define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
  * Date and time formats.
  * Date formats must be compatible with the CDate class (class.cdate.js).
  */
-define('DATE_TIME_FORMAT_SECONDS', _('Y-m-d H:i:s'));
-define('DATE_TIME_FORMAT', _('Y-m-d H:i'));
-define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
+define('DATE_TIME_FORMAT_SECONDS', _('Y-m-d h:i:s A'));
+define('DATE_TIME_FORMAT', _('Y-m-d h:i A'));
+define('DATE_TIME_FORMAT_SHORT', _('m-d h:i A'));
 define('DATE_FORMAT', _('Y-m-d'));
 define('DATE_FORMAT_SHORT', _('m-d'));
-define('TIME_FORMAT_SECONDS', _('H:i:s'));
-define('TIME_FORMAT', _('H:i'));
+define('TIME_FORMAT_SECONDS', _('h:i:s A'));
+define('TIME_FORMAT', _('h:i A'));
 
-define('SVG_GRAPH_DATE_TIME_FORMAT_SHORT', _('n-d H:i'));
+define('SVG_GRAPH_DATE_TIME_FORMAT_SHORT', _('n-d h:i A'));
 define('SVG_GRAPH_DATE_FORMAT', _('Y-n-d'));
 define('SVG_GRAPH_DATE_FORMAT_SHORT', _('n-d'));
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -393,6 +393,10 @@ switch ($data['popup_type']) {
 					'status' => $trigger['status'],
 					'host' => $trigger['hostname']
 				];
+
+				if ($data['popup_type'] === 'trigger_prototypes') {
+					$trigger['prototype'] = '1';
+				}
 			}
 		}
 		unset($trigger);
@@ -423,7 +427,7 @@ switch ($data['popup_type']) {
 						.getElementById(this.dataset.dstfld1)
 						.dispatchEvent(new CustomEvent("help_items.paste"));
 
-					updateItemFormElements();
+					window.updateItemFormElements && updateItemFormElements();
 
 					if (this.dataset.dstfld2 in values) {
 						popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld2]: values[this.dataset.dstfld2]});

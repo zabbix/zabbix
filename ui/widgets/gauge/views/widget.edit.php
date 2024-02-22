@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 	)
 	->addField(
@@ -41,6 +41,9 @@ $form
 	)
 	->addFieldsGroup(
 		getColorsFieldsGroupView($data['fields'])->addRowClass('fields-group-colors')
+	)
+	->addField(
+		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(3)
 	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
@@ -54,6 +57,9 @@ $form
 				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
 			)
 			->addFieldsGroup(
+				getValueArcFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value-arc')
+			)
+			->addFieldsGroup(
 				getNeedleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-needle')
 			)
 			->addFieldsGroup(
@@ -63,8 +69,8 @@ $form
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-thresholds')
 			)
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
@@ -94,6 +100,7 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Description')))
+		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 		->setFieldHint(
 			makeHelpIcon([
 				_('Supported macros:'),
@@ -127,7 +134,6 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 
 function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
-	$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_arc_size']));
 	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
 	$units_field = $form->registerField(
 		(new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
@@ -148,13 +154,6 @@ function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetF
 		->addField(
 			(new CWidgetFieldColorView($fields['value_color']))->addLabelClass('offset-3')
 		)
-		->addField(
-			new CWidgetFieldCheckBoxView($fields['value_arc'])
-		)
-		->addItem([
-			$value_arc_size_field->getLabel(),
-			(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
-		])
 		->addItem(
 			new CTag('hr')
 		)
@@ -179,25 +178,30 @@ function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetF
 		);
 }
 
-function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$needle_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['needle_show']));
-	$needle_color_field = $form->registerField(new CWidgetFieldColorView($fields['needle_color']));
+function getValueArcFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_arc_size']));
 
-	return (new CWidgetFieldsGroupView(_('Needle')))
+	return (new CWidgetFieldsGroupView(_('Value arc')))
 		->addItem([
-			(new CDiv([$needle_show_field->getView(), $needle_color_field->getLabel()]))->addClass('needle-show'),
-			new CFormField($needle_color_field->getView())
+			$value_arc_size_field->getLabel(),
+			(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
 		]);
 }
 
+function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	return (new CWidgetFieldsGroupView(_('Needle')))
+		->addField(
+			new CWidgetFieldColorView($fields['needle_color'])
+		);
+}
+
 function getScaleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$scale_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show']));
 	$scale_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['scale_size']));
 	$scale_show_units_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show_units']));
 
 	return (new CWidgetFieldsGroupView(_('Scale')))
 		->addItem([
-			(new CDiv([$scale_show_field->getView(), $scale_show_units_field->getLabel()]))->addClass('scale-show'),
+			(new CDiv([$scale_show_units_field->getLabel()]))->addClass('scale-show'),
 			(new CFormField($scale_show_units_field->getView()))
 		])
 		->addItem([

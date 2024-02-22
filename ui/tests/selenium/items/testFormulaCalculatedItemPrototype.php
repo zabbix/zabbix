@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testCalculatedFormula.php';
  */
 class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 
-	public $url = 'disc_prototypes.php?form=create&parent_discoveryid=10080&context=host';
+	public $url = 'zabbix.php?action=item.prototype.list&parent_discoveryid=10080&context=host';
 
 	public function getItemPrototypeValidationData() {
 		return [
@@ -151,6 +151,16 @@ class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(last(/host/key,{#LLD}:now-24h),123)',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+				]
+			],
+			[
+				[
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#10:{#LLD}),"$.[0].last_name","LastName")'
+				]
+			],
+			[
+				[
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#4:{#LLD}),"/zabbix_export/version/text()",5.0)'
 				]
 			]
 		];

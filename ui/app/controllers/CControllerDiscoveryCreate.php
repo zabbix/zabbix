@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class CControllerDiscoveryCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>					'required|db drules.name|not_empty',
-			'proxy_hostid' =>			'db drules.proxy_hostid',
+			'proxyid' =>				'db drules.proxyid',
 			'iprange' =>				'required|db drules.iprange|not_empty|flags '.P_CRLF,
 			'delay' =>					'required|db drules.delay|not_empty',
 			'status' =>					'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
@@ -60,7 +60,7 @@ class CControllerDiscoveryCreate extends CController {
 
 	protected function doAction(): void {
 		$drule = [];
-		$this->getInputs($drule, ['name', 'proxy_hostid', 'iprange', 'delay', 'dchecks']);
+		$this->getInputs($drule, ['name', 'proxyid', 'iprange', 'delay', 'dchecks']);
 		$uniq = $this->getInput('uniqueness_criteria', 0);
 
 		$drule['status'] = $this->getInput('status', DRULE_STATUS_DISABLED);

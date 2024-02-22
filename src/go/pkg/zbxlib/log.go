@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ package zbxlib
 
 int	zbx_agent_pid;
 
+ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
+
 void handleZabbixLog(int level, const char *message);
 
 void zbx_log_go_impl(int level, const char *fmt, va_list args)
@@ -34,13 +36,17 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 	if (zbx_agent_pid == getpid() && -1 != level)
 	{
 		va_list	tmp;
+		size_t	size;
 
 		va_copy(tmp, args);
-		size_t	size = vsnprintf(NULL, 0, fmt, tmp) + 2;
+
+		// zbx_vsnprintf_check_len() cannot return negative result
+		size = (size_t)zbx_vsnprintf_check_len(fmt, tmp) + 2;
+
 		va_end(tmp);
 
 		char	*message = (char *)zbx_malloc(NULL, size);
-		vsnprintf(message, size, fmt, args);
+		zbx_vsnprintf(message, size, fmt, args);
 
 		handleZabbixLog(level, message);
 		zbx_free(message);
@@ -60,7 +66,7 @@ int	zbx_redirect_stdio(const char *filename)
 
 void	log_init(void)
 {
-	zbx_init_library_common(zbx_log_go_impl);
+	zbx_init_library_common(zbx_log_go_impl, get_zbx_progname);
 }
 
 */

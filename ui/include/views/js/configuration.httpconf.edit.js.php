@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,16 +45,29 @@
 		/** @type {boolean} */
 		#variables_headers_initialized = false;
 
+		/** @type {string} */
+		#context;
+
 		constructor() {
 			this.#registerEvents();
 		}
 
-		init({is_templated, variables, headers, steps}) {
+		init({is_templated, variables, headers, steps, context}) {
 			this.#form = document.getElementById('webscenario-form');
 			this.#is_templated = is_templated;
 			this.#step_list = document.getElementById('steps');
+			this.#context = context;
 
 			this.#initTemplates();
+
+			this.#form.addEventListener('click', e => {
+				const target = e.target;
+
+				if (target.matches('.js-edit-template')) {
+					e.preventDefault();
+					this.#openTemplatePopup(target.dataset);
+				}
+			});
 
 			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
@@ -85,7 +98,7 @@
 		#initVariables(variables) {
 			const $variables = jQuery('#variables');
 
-			jQuery('#variables').dynamicRows({
+			$variables.dynamicRows({
 				template: '#variable-row-tmpl',
 				rows: variables
 			});
@@ -288,12 +301,31 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.#events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.#events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.#events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.#events.elementSuccess.bind(this, this.#context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		}
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.#openTemplatePopup(template_data);
+		}
+
+		#openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.#events.elementSuccess.bind(this, this.#context), {once: true}
+			);
 		}
 
 		refresh() {
@@ -305,8 +337,9 @@
 
 		#registerEvents() {
 			this.#events = {
-				hostSuccess(e) {
+				elementSuccess(context, e) {
 					const data = e.detail;
+					let curl = null;
 
 					if ('success' in data) {
 						postMessageOk(data.success.title);
@@ -314,26 +347,19 @@
 						if ('messages' in data.success) {
 							postMessageDetails('success', data.success.messages);
 						}
-					}
 
-					view.refresh();
-				},
-
-				hostDelete(e) {
-					const data = e.detail;
-
-					if ('success' in data) {
-						postMessageOk(data.success.title);
-
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
+						if ('action' in data.success && data.success.action === 'delete') {
+							curl = new Curl('httpconf.php');
+							curl.setArgument('context', context);
 						}
 					}
 
-					const curl = new Curl('zabbix.php');
-					curl.setArgument('action', 'host.list');
-
-					location.href = curl.getUrl();
+					if (curl == null) {
+						view.refresh();
+					}
+					else {
+						location.href = curl.getUrl();
+					}
 				}
 			};
 		}

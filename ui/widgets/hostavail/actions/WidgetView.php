@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,67 +27,98 @@ use API,
 	CItemGeneral;
 
 class WidgetView extends CControllerDashboardWidgetView {
-	protected function init(): void {
-		parent::init();
 
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
+	private const INTERFACE_STATUSES = [
+		INTERFACE_AVAILABLE_UNKNOWN,
+		INTERFACE_AVAILABLE_TRUE,
+		INTERFACE_AVAILABLE_FALSE,
+		INTERFACE_AVAILABLE_MIXED
+	];
 
 	protected function doAction(): void {
-		$interface_types = CItemGeneral::INTERFACE_TYPES_BY_PRIORITY;
+		$interface_types = array_merge([INTERFACE_TYPE_AGENT_ACTIVE], CItemGeneral::INTERFACE_TYPES_BY_PRIORITY);
 
 		// Sanitize non-existing interface types.
 		$this->fields_values['interface_type'] = array_values(
 			array_intersect($interface_types, $this->fields_values['interface_type'])
 		);
 
-		$hosts_types = $this->fields_values['interface_type'] ?: $interface_types;
+		$interface_types = $this->fields_values['interface_type'] ?: $interface_types;
 
-		$hosts_total = array_fill_keys($interface_types, 0);
-		$hosts_count = array_fill_keys($interface_types, [
-			INTERFACE_AVAILABLE_UNKNOWN => 0,
-			INTERFACE_AVAILABLE_TRUE => 0,
-			INTERFACE_AVAILABLE_FALSE => 0
-		]);
+		$interface_totals = array_fill_keys($interface_types, 0);
+		$interface_type_count = array_fill_keys($interface_types, array_fill_keys(self::INTERFACE_STATUSES, 0));
+		$total_hosts = array_fill_keys(self::INTERFACE_STATUSES, 0);
 
-		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid') || !$this->isTemplateDashboard()) {
+		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->fields_values['override_hostid'])) {
 			$options = [
-				'output' => [],
+				'output' => in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types) ? ['active_available'] : [],
 				'selectInterfaces' => ['type', 'available'],
-				'filter' => $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
-					? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
-					: ['status' => HOST_STATUS_MONITORED]
+				'monitored_hosts' => true,
+				'preservekeys' => true
 			];
 
-			if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
-				$options['hostids'] = [$this->getInput('dynamic_hostid')];
+			if (!$this->isTemplateDashboard() && $this->fields_values['groupids']) {
+				$options['groupids'] = getSubGroups($this->fields_values['groupids']);
 			}
-			else {
-				$options['groupids'] = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-					? getSubGroups($this->fields_values['groupids'])
-					: null;
+
+			if ($this->isTemplateDashboard()) {
+				$options['hostids'] = $this->fields_values['override_hostid'];
+			}
+
+			if ($this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF) {
+				$options['filter'] = ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF];
 			}
 
 			$db_hosts = API::Host()->get($options);
 
-			$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
+			$db_items_active_count = in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types)
+				? API::Item()->get([
+					'groupCount' => true,
+					'countOutput' => true,
+					'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
+					'hostids' => array_keys($db_hosts)
+				])
+				: [];
 
-			foreach ($db_hosts as $host) {
+			$db_items_active_count = array_filter(array_column($db_items_active_count, 'rowscount', 'hostid'));
+
+			foreach ($db_hosts as $hostid => $host) {
 				$host_interfaces = array_fill_keys($interface_types, []);
 
 				foreach ($host['interfaces'] as $interface) {
-					$host_interfaces[$interface['type']][] = $interface['available'];
+					if (in_array($interface['type'], $interface_types)) {
+						$host_interfaces[$interface['type']][] = $interface;
+					}
+				}
+
+				if (array_key_exists('active_available', $host)) {
+					$host_interfaces[INTERFACE_TYPE_AGENT_ACTIVE][] = $host['active_available'];
 				}
 
 				$host_interfaces = array_filter($host_interfaces);
+				$host_interfaces_status = array_fill_keys(array_keys($host_interfaces), []);
 
 				foreach ($host_interfaces as $type => $interfaces) {
-					$interfaces_availability = array_intersect($availability_priority, $interfaces);
-					$available = reset($interfaces_availability);
-					$hosts_count[$type][$available]++;
-					$hosts_total[$type]++;
+					if ($type == INTERFACE_TYPE_AGENT_ACTIVE) {
+						if (array_key_exists($hostid, $db_items_active_count)) {
+							$status = $interfaces[0];
+						}
+						else {
+							continue;
+						}
+					} else {
+						$status = getInterfaceAvailabilityStatus($interfaces);
+					}
+
+					$interface_type_count[$type][$status]++;
+					$interface_totals[$type]++;
+					$host_interfaces_status[$type] = ['available' => $status];
+				}
+
+				$host_interfaces_status = array_filter($host_interfaces_status);
+
+				if ($host_interfaces_status) {
+					$total_hosts[getInterfaceAvailabilityStatus($host_interfaces_status)]++;
 				}
 			}
 		}
@@ -95,9 +126,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'layout' => $this->fields_values['layout'],
-			'hosts_types' => $hosts_types,
-			'hosts_count' => $hosts_count,
-			'hosts_total' => $hosts_total,
+			'only_totals' => $this->fields_values['only_totals'],
+			'interface_types' => $interface_types,
+			'interface_type_count' => $interface_type_count,
+			'interface_totals' => $interface_totals,
+			'total_hosts' => $total_hosts,
+			'total_hosts_sum' => array_sum($total_hosts),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

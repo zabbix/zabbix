@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,28 +24,299 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="groupPrototypeRow">
-	<tr class="form_row">
-		<td>
-			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}" style="width: 448px"
-				placeholder="{#MACRO}" maxlength="255" />
-		</td>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove">
-				<?= _('Remove') ?>
-			</button>
-		</td>
-	</tr>
-</script>
-
-<script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
-	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
-</script>
-
 <script>
-	const view = {
+	const view = new class {
+
+		init({form_name, readonly, parent_hostid, group_prototypes, prototype_templateid, prototype_interfaces,
+				parent_host_interfaces, parent_host_status}) {
+			this.form = document.getElementById('host-prototype-form');
+			this.form_name = form_name;
+			this.readonly = readonly;
+			this.parent_hostid = parent_hostid;
+			this.group_prototypes = group_prototypes;
+			this.prototype_templateid = prototype_templateid;
+			this.prototype_interfaces = prototype_interfaces;
+			this.parent_host_interfaces = parent_host_interfaces;
+			this.parent_host_status = parent_host_status;
+			this.macros_templateids = null;
+
+			this.initHostTab();
+			this.initMacrosTab();
+			this.initInventoryTab();
+			this.initEncryptionTab();
+
+			this.form.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-linked-template')) {
+					this.openTemplatePopup({templateid: e.target.dataset.templateid});
+				}
+			});
+		}
+
+		initHostTab() {
+			jQuery('#host')
+				.on('input keydown paste', function () {
+					$('#name').attr('placeholder', $(this).val());
+				})
+				.trigger('input');
+
+			const $groups_ms = $('#groups_, #group_links_');
+			const $template_ms = $('#add_templates_');
+
+			$template_ms.on('change', () => {
+				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
+			});
+
+			$groups_ms.on('change', () => {
+				$groups_ms.multiSelect('setDisabledEntries',
+					[...document.querySelectorAll('[name^="groups["], [name^="group_links["]')]
+						.map((input) => input.value)
+				)
+			});
+
+			new InterfaceSourceSwitcher(
+				document.getElementById('interfaces-table'),
+				document.getElementById('custom_interfaces'),
+				document.getElementById('interface-add'),
+				{
+					parent_is_template: this.parent_host_status == <?= HOST_STATUS_TEMPLATE ?>,
+					is_templated: this.prototype_templateid != 0,
+					inherited_interfaces: this.parent_host_interfaces,
+					custom_interfaces: this.prototype_interfaces
+				}
+			);
+
+			jQuery('#group_prototype_add')
+				.data('group-prototype-count', jQuery('#tbl_group_prototypes').find('.group-prototype-remove').length)
+				.click(() => {
+					this.addGroupPrototypeRow({})
+				});
+
+			jQuery('#tbl_group_prototypes').on('click', '.group-prototype-remove', function() {
+				jQuery(this).closest('.form_row').remove();
+			});
+
+			if (this.group_prototypes.length === 0) {
+				this.addGroupPrototypeRow({});
+			}
+
+			this.group_prototypes.forEach((group_prototype) => {
+				this.addGroupPrototypeRow(group_prototype);
+			});
+
+			if (this.prototype_templateid != 0) {
+				jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
+				jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
+			}
+		}
+
+		initMacrosTab() {
+			this.macros_manager = new HostMacrosManager({
+				'container':$('#macros_container .table-forms-td-right'),
+				'readonly': this.readonly,
+				'parent_hostid': this.parent_hostid
+			});
+			let macros_initialized = false;
+
+			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
+				let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+				const show_inherited_macros = this.form
+					.querySelector('input[name=show_inherited_macros]:checked').value == 1;
+
+				if (panel.attr('id') === 'macro-tab') {
+
+					// Please note that macro initialization must take place once and only when the tab is visible.
+					if (event.type === 'tabsactivate') {
+						const templateids = this.getAllTemplates();
+
+						// First time always load inherited macros.
+						if (this.macros_templateids === null) {
+							this.macros_templateids = templateids;
+
+							if (show_inherited_macros) {
+								this.macros_manager.load(show_inherited_macros, templateids);
+								macros_initialized = true;
+							}
+						}
+						// Other times load inherited macros only if templates changed.
+						else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
+							this.macros_templateids = templateids;
+							this.macros_manager.load(show_inherited_macros, templateids);
+						}
+					}
+
+					if (macros_initialized) {
+						return;
+					}
+
+					// Initialize macros.
+					if (this.readonly) {
+						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
+					}
+					else {
+						this.macros_manager.initMacroTable(show_inherited_macros);
+					}
+
+					macros_initialized = true;
+				}
+			});
+
+			this.form.querySelector('#show_inherited_macros').onchange = (e) => {
+				this.macros_manager.load(e.target.value == 1, this.getAllTemplates());
+			}
+		}
+
+		initInventoryTab() {
+			jQuery('input[name=inventory_mode]').click(function() {
+				// Action depending on which button was clicked.
+				const $inventory_fields = jQuery('#inventorylist :input:gt(2)');
+
+				switch (this.value) {
+					case '<?= HOST_INVENTORY_DISABLED ?>':
+						$inventory_fields.prop('disabled', true);
+						jQuery('.populating_item').hide();
+						break;
+					case '<?= HOST_INVENTORY_MANUAL ?>':
+						$inventory_fields.prop('disabled', false);
+						jQuery('.populating_item').hide();
+						break;
+					case '<?= HOST_INVENTORY_AUTOMATIC ?>':
+						$inventory_fields.prop('disabled', false);
+						$inventory_fields.filter('.linked_to_item').prop('disabled', true);
+						jQuery('.populating_item').show();
+						break;
+				}
+			});
+		}
+
+		initEncryptionTab() {
+			jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+				jQuery('#tls_issuer, #tls_subject').closest('li').toggle(jQuery('#tls_in_cert').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
+
+				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').toggle(jQuery('#tls_in_psk').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>);
+			});
+
+			// Refresh field visibility on document load.
+			let tls_accept = jQuery('#tls_accept').val();
+
+			if ((tls_accept & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+				jQuery('#tls_in_none').prop('checked', true);
+			}
+			if ((tls_accept & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+				jQuery('#tls_in_psk').prop('checked', true);
+			}
+			if ((tls_accept & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+				jQuery('#tls_in_cert').prop('checked', true);
+			}
+
+			jQuery('input[name=tls_connect]').trigger('change');
+		}
+
+		addGroupPrototypeRow(groupPrototype) {
+			const addButton = jQuery('#group_prototype_add');
+
+			const rowTemplate = new Template(jQuery('#groupPrototypeRow').html());
+			groupPrototype.i = addButton.data('group-prototype-count');
+			jQuery('#row_new_group_prototype').before(rowTemplate.evaluate(groupPrototype));
+
+			addButton.data('group-prototype-count', addButton.data('group-prototype-count') + 1);
+		}
+
+		/**
+		 * Collects ids of currently active (linked + new) templates.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getAllTemplates() {
+			return this.getLinkedTemplates().concat(this.getNewTemplates());
+		}
+
+		/**
+		 * Helper to get linked template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getLinkedTemplates() {
+			const linked_templateids = [];
+
+			this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+				linked_templateids.push(input.value);
+			});
+
+			return linked_templateids;
+		}
+
+		/**
+		 * Helper to get added template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getNewTemplates() {
+			const $template_multiselect = $('#add_templates_');
+			const templateids = [];
+
+			// Readonly forms don't have multiselect.
+			if ($template_multiselect.length) {
+				$template_multiselect.multiSelect('getData').forEach(template => {
+					templateids.push(template.id);
+				});
+			}
+
+			return templateids;
+		}
+
 		editHost(e, hostid) {
 			return;
+		}
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		}
+
+		openTemplatePopup(template_data) {
+			const overlay = PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.templateSubmit(e));
+		}
+
+		refresh() {
+			const url = new Curl('');
+			const form = document.getElementsByName(this.form_name)[0];
+			const fields = getFormFields(form);
+
+			post(url.getUrl(), fields);
+		}
+
+		templateSubmit(e) {
+			let curl = null;
+
+			if ('success' in e.detail) {
+				postMessageOk(e.detail.success.title);
+
+				if ('messages' in e.detail.success) {
+					postMessageDetails('success', e.detail.success.messages);
+				}
+
+				if ('action' in e.detail.success && e.detail.success.action === 'delete') {
+					curl = new Curl('host_discovery.php');
+					curl.setArgument('context', 'template');
+				}
+			}
+
+			if (curl) {
+				location.href = curl.getUrl();
+			}
+			else {
+				view.refresh();
+			}
 		}
 	}
 </script>
@@ -162,102 +433,4 @@
 			this._target = obj_custom;
 		}
 	}
-
-	function addGroupPrototypeRow(groupPrototype) {
-		var addButton = jQuery('#group_prototype_add');
-
-		var rowTemplate = new Template(jQuery('#groupPrototypeRow').html());
-		groupPrototype.i = addButton.data('group-prototype-count');
-		jQuery('#row_new_group_prototype').before(rowTemplate.evaluate(groupPrototype));
-
-		addButton.data('group-prototype-count', addButton.data('group-prototype-count') + 1);
-	}
-
-	jQuery(function() {
-		'use strict';
-
-		const interface_source_switcher = new InterfaceSourceSwitcher(
-			document.getElementById('interfaces-table'),
-			document.getElementById('custom_interfaces'),
-			document.getElementById('interface-add'),
-			<?= json_encode([
-				'parent_is_template' => $data['parent_host']['status'] == HOST_STATUS_TEMPLATE,
-				'is_templated' => $data['host_prototype']['templateid'] != 0,
-				'inherited_interfaces' => array_values($data['parent_host']['interfaces']),
-				'custom_interfaces' => array_values($data['host_prototype']['interfaces'])
-			]) ?>
-		);
-
-		jQuery('#group_prototype_add')
-			.data('group-prototype-count', jQuery('#tbl_group_prototypes').find('.group-prototype-remove').length)
-			.click(function() {
-				addGroupPrototypeRow({})
-			});
-
-		jQuery('#tbl_group_prototypes').on('click', '.group-prototype-remove', function() {
-			jQuery(this).closest('.form_row').remove();
-		});
-
-		<?php if (!$data['host_prototype']['groupPrototypes']): ?>
-			addGroupPrototypeRow({'name': ''});
-		<?php endif ?>
-		<?php foreach ($data['host_prototype']['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?= json_encode(['name' => $groupPrototype['name']]) ?>);
-		<?php endforeach ?>
-
-		<?php if ($data['host_prototype']['templateid']): ?>
-			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
-			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
-		<?php endif ?>
-
-		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			jQuery('#tls_issuer, #tls_subject').closest('li').toggle(jQuery('#tls_in_cert').is(':checked')
-					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
-
-			jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').toggle(jQuery('#tls_in_psk').is(':checked')
-					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>);
-		});
-
-		jQuery('input[name=inventory_mode]').click(function() {
-			// Action depending on which button was clicked.
-			const $inventory_fields = jQuery('#inventorylist :input:gt(2)');
-
-			switch (this.value) {
-				case '<?= HOST_INVENTORY_DISABLED ?>':
-					$inventory_fields.prop('disabled', true);
-					jQuery('.populating_item').hide();
-					break;
-				case '<?= HOST_INVENTORY_MANUAL ?>':
-					$inventory_fields.prop('disabled', false);
-					jQuery('.populating_item').hide();
-					break;
-				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
-					$inventory_fields.prop('disabled', false);
-					$inventory_fields.filter('.linked_to_item').prop('disabled', true);
-					jQuery('.populating_item').show();
-					break;
-			}
-		});
-
-		// Refresh field visibility on document load.
-		let tls_accept = jQuery('#tls_accept').val();
-
-		if ((tls_accept & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
-			jQuery('#tls_in_none').prop('checked', true);
-		}
-		if ((tls_accept & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
-			jQuery('#tls_in_psk').prop('checked', true);
-		}
-		if ((tls_accept & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
-			jQuery('#tls_in_cert').prop('checked', true);
-		}
-
-		jQuery('input[name=tls_connect]').trigger('change');
-
-		jQuery('#host')
-			.on('input keydown paste', function () {
-				$('#name').attr('placeholder', $(this).val());
-			})
-			.trigger('input');
-	});
 </script>

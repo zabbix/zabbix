@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ if (array_key_exists('error', $data)) {
 	return;
 }
 
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -42,7 +43,12 @@ $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.widget-field.checkbox-list.js');
+$this->addJsFile('class.widget-field.multiselect.js');
+$this->addJsFile('class.widget-field.time-period.js');
+$this->addJsFile('class.widget-select.popup.js');
 $this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
@@ -53,37 +59,38 @@ $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $main_filter_form = null;
 
-if ($data['dynamic']['has_dynamic_widgets']) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])) {
 	$main_filter_form = (new CForm('get'))
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))
 		->addVar('action', 'dashboard.view')
 		->addItem([
-			(new CLabel(_('Host'), 'dynamic_hostid_ms'))->addStyle('margin-right: 5px;'),
+			(new CLabel(_('Host'), 'dashboard_hostid_ms'))->addStyle('margin-right: 5px;'),
 			(new CMultiSelect([
-				'name' => 'dynamic_hostid',
+				'name' => 'dashboard_hostid',
 				'object_name' => 'hosts',
-				'data' => $data['dynamic']['host'] ? [$data['dynamic']['host']] : [],
+				'data' => $data['dashboard_host'] ? [$data['dashboard_host']] : [],
 				'multiple' => false,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
 						'dstfrm' => 'dashboard_filter',
-						'dstfld1' => 'dynamic_hostid',
+						'dstfld1' => 'dashboard_hostid',
 						'monitored_hosts' => true,
 						'with_items' => true
 					]
@@ -113,14 +120,12 @@ $html_page = (new CHtmlPage())
 							->addClass(ZBX_ICON_MENU)
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
-							->setEnabled($data['dashboard']['can_edit_dashboards']
-								|| $data['dashboard']['can_view_reports']
-							)
+							->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
-								$data['dashboard']['editable'], $data['dashboard']['has_related_reports'],
-								$data['dashboard']['can_edit_dashboards'], $data['dashboard']['can_view_reports'],
-								$data['dashboard']['can_create_reports']
+								$data['dashboard']['editable'], $data['has_related_reports'],
+								$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
+								$data['can_create_reports']
 							))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
@@ -196,12 +201,12 @@ $html_page = (new CHtmlPage())
 			->addClass(ZBX_STYLE_SELECTED)
 	])));
 
-if ($data['has_time_selector']) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requirements'])) {
 	$html_page->addItem(
 		(new CFilter())
-			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
+			->setProfile($data['dashboard_time_period']['profileIdx'], $data['dashboard_time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],
+			->addTimeSelector($data['dashboard_time_period']['from'], $data['dashboard_time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 	);
@@ -260,9 +265,9 @@ $html_page
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
 		'configuration_hash' => $data['configuration_hash'],
-		'has_time_selector' => $data['has_time_selector'],
-		'time_period' => $data['time_period'],
-		'dynamic' => $data['dynamic'],
+		'broadcast_requirements' => $data['broadcast_requirements'],
+		'dashboard_host' => $data['dashboard_host'],
+		'dashboard_time_period' => $data['dashboard_time_period'],
 		'web_layout_mode' => $web_layout_mode,
 		'clone' => $data['clone']
 	]).');

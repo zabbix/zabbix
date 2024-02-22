@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectAction;
 
 class CWidgetFieldMultiSelectActionView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectAction $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectAction $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
 		return 'actions';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Action'), 'objects' => _('Actions')];
 	}
 
 	protected function getPopupParameters(): array {

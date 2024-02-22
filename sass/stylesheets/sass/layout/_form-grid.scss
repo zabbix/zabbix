@@ -81,6 +81,7 @@
 						box-shadow: none;
 
 						span {
+							margin-bottom: -1px;
 							border-bottom-width: 2px;
 							border-bottom-style: solid;
 						}
@@ -181,6 +182,34 @@
 		}
 	}
 
+	&.form-grid-1-1 {
+		grid-template-columns: repeat(2, minmax(15%, max-content) auto);
+
+		&.label-width-true {
+			grid-template-columns: repeat(2, max-content auto);
+		}
+	}
+
+	&.form-grid-3-1 {
+		grid-template-columns: minmax(15%, max-content) 3fr max-content auto;
+
+		&.label-width-true {
+			grid-template-columns: max-content auto 3fr max-content auto;
+		}
+	}
+
+	&.form-grid-1-1,
+	&.form-grid-3-1 {
+		.form-field:not(.field-fluid) {
+			grid-column-start: initial;
+			grid-column-end: span 1;
+		}
+	}
+
+	.form-subfield {
+		margin-top: 5px;
+	}
+
 	table {
 		width: 100%;
 
@@ -225,44 +254,6 @@
 		padding: 0 5px 5px 0;
 	}
 
-	.btn-icon,
-	.btn-link {
-		&:not(:first-child) {
-			margin-left: 5px;
-		}
-	}
-
-	.btn-icon {
-		&.btn-small {
-			top: 1px;
-			vertical-align: text-bottom;
-		}
-	}
-
-	&.form-grid-1-1 {
-		grid-template-columns: repeat(2, minmax(15%, max-content) auto);
-
-		&.label-width-true {
-			grid-template-columns: repeat(2, max-content auto);
-		}
-	}
-
-	&.form-grid-3-1 {
-		grid-template-columns: minmax(15%, max-content) 3fr max-content auto;
-
-		&.label-width-true {
-			grid-template-columns: max-content auto 3fr max-content auto;
-		}
-	}
-
-	&.form-grid-1-1,
-	&.form-grid-3-1 {
-		.form-field:not(.field-fluid) {
-			grid-column-start: initial;
-			grid-column-end: span 1;
-		}
-	}
-
 	.table-forms,
 	.table-forms-separator {
 		line-height: $body-line-height;
@@ -278,5 +269,29 @@
 
 	.table-forms-separator {
 		display: inline-flex;
+	}
+
+	.btn-split {
+		button {
+			&[aria-expanded="true"] {
+				background-color: $ui-bg-selected-color;
+				border-color: $ui-bg-selected-color;
+			}
+		}
+	}
+
+	a,
+	.btn-icon,
+	.btn-link {
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
+	}
+
+	.btn-icon {
+		&.btn-small {
+			top: 1px;
+			vertical-align: text-bottom;
+		}
 	}
 }

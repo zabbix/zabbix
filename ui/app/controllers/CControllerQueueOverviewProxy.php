@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,13 +54,13 @@ class CControllerQueueOverviewProxy extends CController {
 		}
 		else {
 			$queue_data = array_column($queue_data, null, 'proxyid');
-			$proxies = API::proxy()->get([
-				'output' => ['host'],
+			$proxies = API::Proxy()->get([
+				'output' => ['name'],
 				'preservekeys' => true
 			]);
-			$proxies[0] = ['host' => _('Server')];
+			$proxies[0] = ['name' => _('Server')];
 
-			CArrayHelper::sort($proxies, ['host']);
+			CArrayHelper::sort($proxies, ['name']);
 		}
 
 		$response = new CControllerResponseData([

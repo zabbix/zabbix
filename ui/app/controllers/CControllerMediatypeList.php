@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,38 +89,15 @@ class CControllerMediatypeList extends CController {
 			'filter' => [
 				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
+			'selectActions' => ['actionid', 'name', 'eventsource'],
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
 
 		if ($data['mediatypes']) {
-			// Get media types used in actions.
-			$actions = API::Action()->get([
-				'output' => ['actionid', 'name', 'eventsource'],
-				'selectOperations' => ['operationtype', 'opmessage'],
-				'mediatypeids' => array_keys($data['mediatypes'])
-			]);
-
 			foreach ($data['mediatypes'] as &$media_type) {
 				$media_type['typeid'] = $media_type['type'];
 				$media_type['type'] = CMediatypeHelper::getMediaTypes($media_type['type']);
-				$media_type['list_of_actions'] = [];
-
-				foreach ($actions as $action) {
-					foreach ($action['operations'] as $operation) {
-						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								&& $operation['opmessage']['mediatypeid'] == $media_type['mediatypeid']) {
-
-							$media_type['list_of_actions'][$action['actionid']] = [
-								'actionid' => $action['actionid'],
-								'name' => $action['name'],
-								'eventsource' => $action['eventsource']
-							];
-						}
-					}
-				}
-
-				CArrayHelper::sort($media_type['list_of_actions'], ['name']);
 			}
 			unset($media_type);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,9 @@ class CFilter extends CDiv {
 	// Profile data associated with filter object.
 	protected $idx = null;
 	protected $idx2 = 0;
+
+	// Time period Div element.
+	private $time_period;
 
 	/**
 	 * List of predefined time ranges.
@@ -237,14 +240,16 @@ class CFilter extends CDiv {
 	 * - time selector range change buttons: back, zoom out, forward.
 	 * - time selector range change form with predefined ranges.
 	 *
-	 * @param string $from    Start date. (can be in relative time format, example: now-1w)
-	 * @param string $to      End date. (can be in relative time format, example: now-1w)
-	 * @param bool   $visible Either to make time selector visible or hidden.
-	 * @param string $format  Date and time format used in CDateSelector.
+	 * @param string $from        Start date. (can be in relative time format, example: now-1w)
+	 * @param string $to          End date. (can be in relative time format, example: now-1w)
+	 * @param bool   $visible     Either to make time selector visible or hidden.
+	 * @param string $profileidx  Profile key.
+	 * @param string $format      Date and time format used in CDateSelector.
 	 *
 	 * @return CFilter
 	 */
-	public function addTimeSelector($from, $to, $visible = true, $format = ZBX_FULL_DATE_TIME) {
+	public function addTimeSelector(string $from, string $to, bool $visible = true, string $profileidx = '',
+			string $format = ZBX_FULL_DATE_TIME): CFilter {
 		$header = relativeDateToText($from, $to);
 
 		if ($visible) {
@@ -281,34 +286,43 @@ class CFilter extends CDiv {
 					->addClass(ZBX_STYLE_BTN)
 					->addClass(ZBX_ICON_CLOCK)
 					->addClass(ZBX_STYLE_BTN_TIME),
-				(new CDiv([
-					(new CDiv([
-						new CList([
-							new CLabel(_('From'), 'from'),
-							(new CDateSelector('from', $from))->setDateFormat($format)
-						]),
-						(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
-							->setAttribute('data-error-for', 'from')
-							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
-							->addStyle('display: none'),
-						new CList([
-							new CLabel(_('To'), 'to'),
-							(new CDateSelector('to', $to))->setDateFormat($format)
-						]),
-						(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
-							->setAttribute('data-error-for', 'to')
-							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
-							->addStyle('display: none'),
-						new CList([
-							new CButton('apply', _('Apply'))
-						])
-					]))->addClass(ZBX_STYLE_TIME_INPUT),
-					(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
-				]))
-					->addClass(ZBX_STYLE_FILTER_CONTAINER)
-					->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
-					->setId($anchor)
+				new CDiv()
 			);
+
+			$this->time_period = (new CDiv([
+				(new CDiv([
+					new CList([
+						new CLabel(_('From'), 'from'),
+						(new CDateSelector('from', $from))->setDateFormat($format)
+					]),
+					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+						->setAttribute('data-error-for', 'from')
+						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+						->addStyle('display: none'),
+					new CList([
+						new CLabel(_('To'), 'to'),
+						(new CDateSelector('to', $to))->setDateFormat($format)
+					]),
+					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+						->setAttribute('data-error-for', 'to')
+						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+						->addStyle('display: none'),
+					new CList([
+						new CButton('apply', _('Apply'))
+					])
+				]))->addClass(ZBX_STYLE_TIME_INPUT),
+				(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
+			]))
+				->addClass(ZBX_STYLE_FILTER_CONTAINER)
+				->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
+				->setId($anchor);
+
+			if ($profileidx !== '') {
+				$this->form->addItem((new CVar('from',
+					CProfile::get($profileidx.'.from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT))
+				))->removeId());
+				$this->form->addItem((new CVar('to', CProfile::get($profileidx.'.to', 'now')))->removeId());
+			}
 		}
 		else {
 			$this
@@ -400,6 +414,7 @@ class CFilter extends CDiv {
 		}
 
 		$this->addItem($this->form);
+		$this->addItem($this->time_period);
 
 		return parent::toString($destroy).($headers_cnt ? get_js($this->getJS()) : '');
 	}

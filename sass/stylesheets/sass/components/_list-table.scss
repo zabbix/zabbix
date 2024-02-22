@@ -4,6 +4,10 @@
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	&.fixed {
+		table-layout: fixed;
+	}
+
 	thead {
 		th {
 			height: 100%;
@@ -14,8 +18,12 @@
 			white-space: nowrap;
 			vertical-align: bottom;
 
-			.vertical {
+			.text-vertical {
+				max-height: 150px;
+				overflow: hidden;
+				text-overflow: ellipsis;
 				writing-mode: vertical-lr;
+				line-height: 22px;
 				transform: rotate(180deg);
 			}
 
@@ -163,11 +171,6 @@
 		}
 	}
 
-	.vertical_rotation_inner {
-		transform: rotate(270deg);
-		white-space: nowrap;
-	}
-
 	.nothing-to-show {
 		td {
 			color: $font-alt-color;
@@ -225,6 +228,8 @@
 	.btn-icon,
 	.icon,
 	.link-action {
+		vertical-align: top;
+
 		&:not(.no-indent):not(:first-child) {
 			margin-left: 5px;
 		}

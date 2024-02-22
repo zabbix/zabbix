@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,16 @@
 
 class CControllerAuditLogList extends CController {
 
+	/**
+	 * @var string  Time from.
+	 */
+	private $from;
+
+	/**
+	 * @var string  Time till.
+	 */
+	private $to;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -39,7 +49,7 @@ class CControllerAuditLogList extends CController {
 			'to' =>						'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -53,21 +63,17 @@ class CControllerAuditLogList extends CController {
 	}
 
 	protected function doAction(): void {
+		$this->from = $this->getInput('from', CProfile::get('web.auditlog.filter.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
+		));
+		$this->to = $this->getInput('to', CProfile::get('web.auditlog.filter.to', 'now'));
+
 		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
 		}
-
-		$timeselector_options = [
-			'profileIdx' => 'web.auditlog.filter',
-			'profileIdx2' => 0,
-			'from' => null,
-			'to' => null
-		];
-		$this->getInputs($timeselector_options, ['from', 'to']);
-		updateTimeSelectorPeriod($timeselector_options);
 
 		$data = [
 			'page' => $this->getInput('page', 1),
@@ -79,7 +85,12 @@ class CControllerAuditLogList extends CController {
 			'action' => $this->getAction(),
 			'actions' => self::getActionsList(),
 			'resources' => self::getResourcesList(),
-			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'timeline' => getTimeSelectorPeriod([
+				'profileIdx' => 'web.auditlog.filter',
+				'profileIdx2' => 0,
+				'from' => $this->from,
+				'to' => $this->to
+			]),
 			'auditlogs' => [],
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
@@ -195,7 +206,8 @@ class CControllerAuditLogList extends CController {
 			CAudit::ACTION_DELETE => _('Delete'),
 			CAudit::ACTION_EXECUTE => _('Execute'),
 			CAudit::ACTION_HISTORY_CLEAR => _('History clear'),
-			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh')
+			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh'),
+			CAudit::ACTION_PUSH => _('Push')
 		];
 	}
 
@@ -217,6 +229,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_GRAPH => _('Graph'),
 			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
 			CAudit::RESOURCE_HA_NODE => _('High availability node'),
+			CAudit::RESOURCE_HISTORY => _('History'),
 			CAudit::RESOURCE_HOST => _('Host'),
 			CAudit::RESOURCE_HOST_GROUP => _('Host group'),
 			CAudit::RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
@@ -262,6 +275,8 @@ class CControllerAuditLogList extends CController {
 		CProfile::update('web.auditlog.filter.recordsetid', $this->getInput('filter_recordsetid', ''),
 			PROFILE_TYPE_STR
 		);
+		CProfile::update('web.auditlog.filter.from', $this->from, PROFILE_TYPE_STR);
+		CProfile::update('web.auditlog.filter.to', $this->to, PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {
@@ -291,7 +306,8 @@ class CControllerAuditLogList extends CController {
 				$auditlog['short_details'] .= _('Description').': '.$auditlog['resourcename'];
 			}
 
-			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE])) {
+			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE,
+					CAudit::ACTION_PUSH])) {
 				continue;
 			}
 
@@ -308,7 +324,7 @@ class CControllerAuditLogList extends CController {
 			}
 
 			$details = $this->formatDetails($details);
-			$short_details =  array_slice($details, 0, 2);
+			$short_details = array_slice($details, 0, 2);
 
 			// We cut string and show "Details" button if audit detail string more than 255 symbols.
 			foreach ($short_details as &$detail) {

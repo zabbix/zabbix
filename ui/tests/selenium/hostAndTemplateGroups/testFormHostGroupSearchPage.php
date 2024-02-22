@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  *
  * @onBefore prepareGroupData
  *
- * @dataSource DiscoveredHosts
+ * @dataSource DiscoveredHosts, HostTemplateGroups
  */
 class testFormHostGroupSearchPage extends testFormGroups {
 
@@ -143,7 +143,7 @@ class testFormHostGroupSearchPage extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'One group for Delete',
+					'name' => self::DELETE_ONE_GROUP,
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],
@@ -191,24 +191,99 @@ class testFormHostGroupSearchPage extends testFormGroups {
 		return [
 			[
 				[
-					'apply_permissions' => 'Europe',
-					// Permission inheritance doesn't apply when changing the name of existing group.
+					'apply_permissions' => 'Europe/Test',
+					// Permission inheritance doesn't apply from first level group e.x. 'Streets'
+					// when changing the name of existing group to new subgroup name.
 					'open_form' => 'Europe group for test on search page',
 					'create' => 'Streets/Dzelzavas',
 					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe (including subgroups)' => 'Deny',
-						'Streets' => 'Deny',
-						'Streets/Dzelzavas' => 'None'
+						[
+							'groups' => ['Europe/Test', 'Europe/Test/Zabbix'],
+							'Permissions' => 'Read-write'
+						],
+						[
+							'groups' => ['Cities/Cesis', 'Europe/Latvia'],
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Streets'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Streets', 'Tags' => 'street']
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Europe/Test/Zabbix',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						]
+					]
+				]
+			],
+			[
+				[
+					'apply_permissions' => 'Europe',
+					// After renaming a subgroup, all permissions remain the same.
+					'open_form' => 'Europe/Test',
+					'create' => 'Streets/Terbatas',
+					'groups_after' => [
+						[
+							'groups' => 'Streets/Terbatas',
+							'Permissions' => 'Read-write'
+						],
+						[
+							'groups' => 'Cities/Cesis',
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Europe/Latvia', 'Europe/Test/Zabbix', 'Europe/Latvia/Riga/Zabbix',
+								'Streets'],
+							'Permissions' => 'Deny'
+						]
+					],
+					'tags_after' => [
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Latvia',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Latvia/Riga/Zabbix',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test/Zabbix',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						],
+						[
+							'Host groups' => 'Streets/Terbatas',
+							'Tags' => 'country: test'
+						]
 					]
 				]
 			]

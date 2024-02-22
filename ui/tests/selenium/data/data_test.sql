@@ -19,234 +19,14 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (1
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90278, 10053, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10030,10084,1,4,1,'127.0.0.1','jmxagent.zabbix.com','10051');
 
--- Add regular expressions
-INSERT INTO regexps (regexpid, name, test_string) VALUES (20,'1_regexp_1','first test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (21,'1_regexp_2','first test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (22,'2_regexp_1','second test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (23,'2_regexp_2','second test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (24,'3_regexp_1','test');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (25,'3_regexp_2','test');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (26,'4_regexp_1','abcd');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (27,'4_regexp_2','abcd');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (28,'5_regexp_1','abcd');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (29,'5_regexp_2','abcd');
-
--- Add expressions for regexps
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (20,20,'first test string',0,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (21,21,'first test string2',0,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (22,22,'second test string',1,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (23,23,'second string',1,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (24,24,'abcd test',2,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (25,25,'test',2,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (26,26,'abcd',3,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (27,27,'asdf',3,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (28,28,'abcd',4,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (29,29,'asdf',4,',',1);
-
--- trigger actions
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (10,'Simple action',0,0,0,'60s');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (11,'Trigger action 1',0,0,0,'1h');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (12,'Trigger action 2',0,0,0,'60s');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (13,'Trigger action 3',0,0,0,'60s');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (14,'Trigger action 4',0,0,1,'60s');
-
--- autoregistration actions
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (9,'Autoregistration action 1',2,0,0,'1h');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (15,'Autoregistration action 2',2,0,1,'1h');
-
-INSERT INTO hosts (hostid, host, status, description) VALUES (20000, 'Proxy for Discovery rule', 5, '');
-INSERT INTO hosts (hostid, host, status, description) VALUES (20001, 'Proxy for Actions', 5, '');
-
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (502, 9, 20, 1, '20001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (503, 9, 20, 0, '20000');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (504, 10, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (505, 11, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (507, 12, 26, 3, 'PostgreSQL', 'Database');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (508, 12, 26, 2, 'MYSQL', 'Database');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value2) VALUES (509, 12, 26, 0, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (510, 12, 16, 10, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (511, 12, 13, 1, '10081');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (512, 12, 13, 0, '10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (513, 12, 6, 7, '6-7,08:00-18:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (514, 12, 6, 4, '1-7,00:00-24:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (517, 12, 4, 6, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (518, 12, 4, 5, '3');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (519, 12, 4, 1, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (520, 12, 4, 0, '5');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (521, 12, 4, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (522, 12, 3, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (523, 12, 3, 2, 'Oracle');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (524, 12, 2, 1, '13485');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (525, 12, 2, 0, '99252');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (526, 12, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 1, 0, '99134');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (528, 12, 0, 1, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (529, 12, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (530, 13, 26, 3, 'PostgreSQL', 'Database');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (531, 13, 26, 2, 'MYSQL', 'Database');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value2) VALUES (532, 13, 26, 0, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (533, 13, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (535, 13, 13, 1, '10081');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (536, 13, 13, 0, '10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (537, 13, 6, 7, '6-7,08:00-18:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (538, 13, 6, 4, '1-7,00:00-24:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (541, 13, 4, 6, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (542, 13, 4, 5, '3');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (543, 13, 4, 1, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (544, 13, 4, 0, '5');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (545, 13, 4, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (546, 13, 3, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (547, 13, 3, 2, 'Oracle');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (548, 13, 2, 1, '13485');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (549, 13, 2, 0, '99252');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (550, 13, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 1, 0, '99134');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (552, 13, 0, 1, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (553, 13, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (554, 14, 26, 3, 'PostgreSQL', 'Database');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (555, 14, 26, 2, 'MYSQL', 'Database');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value2) VALUES (556, 14, 26, 0, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (557, 14, 16, 11, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (559, 14, 13, 1, '10081');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (560, 14, 13, 0, '10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (561, 14, 6, 7, '6-7,08:00-18:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (562, 14, 6, 4, '1-7,00:00-24:00');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (565, 14, 4, 6, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (566, 14, 4, 5, '3');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (567, 14, 4, 1, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (568, 14, 4, 0, '5');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (569, 14, 4, 0, '1');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (570, 14, 3, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (571, 14, 3, 2, 'Oracle');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (572, 14, 2, 1, '13485');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (573, 14, 2, 0, '99252');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (574, 14, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (575, 14, 1, 0, '99134');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (576, 14, 0, 1, '4');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (577, 14, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (578, 15, 22, 3, 'DB2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (579, 15, 22, 2, 'MySQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (580, 15, 20, 1, '20001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (581, 15, 20, 0, '20000');
-
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (11, 10, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (12, 11, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (13, 12, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (14, 13, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (15, 13, 0, 3600, 2, 2, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (16, 13, 0, 0, 5, 6, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (17, 14, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (18, 14, 0, 3600, 2, 2, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (19, 14, 0, 0, 5, 6, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (20, 14, 1, 0, 20, 0, 0);
-
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (11, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (12, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (13, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (14, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (15, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (16, 0, 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (17, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (18, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (19, 0, 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
-
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 11, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 12, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (12, 13, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (13, 14, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (14, 15, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (15, 17, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (16, 18, 7);
-
-INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 16, 1);
-INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 19, 1);
-
-INSERT INTO opcommand (operationid, scriptid) VALUES (20, 4);
-
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (1, 20, NULL);
-
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (1,15,14,0,'0');
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (2,15,14,0,'1');
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (3,16,14,0,'0');
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (4,18,14,0,'0');
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (5,18,14,0,'1');
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (6,19,14,0,'0');
-INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, value) VALUES (7,20,14,0,'0');
-
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (21, 9, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (22, 9, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (23, 9, 1, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (24, 9, 2, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (25, 9, 9, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (26, 9, 4, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (27, 9, 6, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (28, 15, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (29, 15, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (30, 15, 1, 0, 1, 1, 0);
-
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (21, 0, 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (22, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (28, 0, 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (29, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
-
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (17, 21, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (18, 22, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (19, 28, 7);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (20, 29, 7);
-
--- Autoregistration action scripts
-INSERT INTO opcommand (operationid, scriptid) VALUES (23, 4);
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 23, NULL);
-INSERT INTO opcommand (operationid, scriptid) VALUES (30, 4);
-INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (5, 30, NULL);
-
-INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 26, 5);
-
-INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 27, 10001);
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
 
 -- Add test graph
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (800000,'Test graph 1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
 
 -- Add graph items
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (800000, 800000, 42213, 1, 1, 'FF5555', 0, 2, 0);
-
--- Add maintenance periods
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680,0);
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (2,'Maintenance period 2 (no data collection)',1,'Test description 1',1294760280,1294846680,0);
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (3,'Maintenance for update (data collection)',0,'Test description',1534885200,1534971600,2);
-
-INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,1,4);
-INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,2,4);
-INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3,3,4);
-
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760340);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,1,1365,0,15,37500,183840,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (5,4,1,2730,85,0,84600,1800,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (6,0,1,0,0,1,43200,184200,1294760340);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (7,2,2,0,0,1,43200,93780,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,1,1365,0,15,37500,183840,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (11,0,1,0,0,1,43200,90000,1534950000);
-
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,1,2);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3,1,3);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4,1,4);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5,1,5);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (6,2,6);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (7,2,7);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (8,2,8);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (9,2,9);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (10,2,10);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (11,3,11);
-
-INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (1,3,'Tag1',2,'A');
-INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (2,3,'Tag2',0,'B');
 
 -- Add maps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (3, 'Test map 1', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
@@ -275,45 +55,18 @@ INSERT INTO sysmap_shape (sysmap_shapeid, sysmapid, type, x, y, width, height, t
 INSERT INTO sysmap_shape (sysmap_shapeid, sysmapid, type, x, y, width, height, text, font, font_size, font_color, text_halign, text_valign, border_type, border_width, border_color, background_color, zindex) VALUES (101,3,0,113,82,124,86,'',9,11,'000000',0,0,3,5,'009900','',1);
 INSERT INTO sysmap_shape (sysmap_shapeid, sysmapid, type, x, y, width, height, text, font, font_size, font_color, text_halign, text_valign, border_type, border_width, border_color, background_color, zindex) VALUES (102,3,0,408,0,233,50,'Map name: {MAP.NAME}',10,14,'BB0000',1,2,0,2,'000000','',2);
 
-
 -- Host inventories
 INSERT INTO host_inventory (type,type_full,name,alias,os,os_full,os_short,serialno_a,serialno_b,tag,asset_tag,macaddress_a,macaddress_b,hardware,hardware_full,software,software_full,software_app_a,software_app_b,software_app_c,software_app_d,software_app_e,contact,location,location_lat,location_lon,notes,chassis,model,hw_arch,vendor,contract_number,installer_name,deployment_status,url_a,url_b,url_c,host_networks,host_netmask,host_router,oob_ip,oob_netmask,oob_router,date_hw_purchase,date_hw_install,date_hw_expiry,date_hw_decomm,site_address_a,site_address_b,site_address_c,site_city,site_state,site_country,site_zip,site_rack,site_notes,poc_1_name,poc_1_email,poc_1_phone_a,poc_1_phone_b,poc_1_cell,poc_1_screen,poc_1_notes,poc_2_name,poc_2_email,poc_2_phone_a,poc_2_phone_b,poc_2_cell,poc_2_screen,poc_2_notes,hostid) VALUES ('Type','Type (Full details)','Name','Alias','OS','OS (Full details)','OS (Short)','Serial number A','Serial number B','Tag','Asset tag','MAC address A','MAC address B','Hardware','Hardware (Full details)','Software','Software (Full details)','Software application A','Software application B','Software application C','Software application D','Software application E','Contact','Location','Location latitud','Location longitu','Notes','Chassis','Model','HW architecture','Vendor','Contract number','Installer name','Deployment status','URL A','URL B','URL C','Host networks','Host subnet mask','Host router','OOB IP address','OOB subnet mask','OOB router','Date HW purchased','Date HW installed','Date HW maintenance expires','Date hw decommissioned','Site address A','Site address B','Site address C','Site city','Site state / province','Site country','Site ZIP / postal','Site rack location','Site notes','Primary POC name','Primary POC email','Primary POC phone A','Primary POC phone B','Primary POC cell','Primary POC screen name','Primary POC notes','Secondary POC name','Secondary POC email','Secondary POC phone A','Secondary POC phone B','Secondary POC cell','Secondary POC screen name','Secondary POC notes',10053);
 
 -- delete Discovery Rule
-INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, posts, headers) VALUES (22188, 'delete Discovery Rule', 0, 10053, 'rule', 'key', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 1, 10021, '', '');
+INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags,query_fields, interfaceid, posts, headers) VALUES (22188, 'delete Discovery Rule', 0, 10053, 'rule', 'key', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 1,'', 10021, '', '');
 
 -- add some test items
 -- first, one that references a non-existent user macro in the key and then references that key parameter in the item name using a positional reference
-INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, posts, headers) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 0, 10053, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021, '', '');
-INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, inventory_link, posts, headers) VALUES (23101, 'Item_populating_filed_Type', 0, 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021, 1, '', '');
-
--- test discovery rule
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (3, NULL, 'External network', '192.168.3.1-255', 600, 0);
-
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (6, 3, 9, 'system.uname', '', '10050', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (7, 3, 3, '', '', '21,1021', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (8, 3, 4, '', '', '80,8080', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (9, 3, 14, '', '', '443', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (10, 3, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (11, 3, 7, '', '', '143-145', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (12, 3, 1, '', '', '389', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (13, 3, 6, '', '', '119', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (14, 3, 5, '', '', '110', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (15, 3, 2, '', '', '25', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (16, 3, 10, 'ifIndex0', 'public', '161', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (17, 3, 11, 'ifInOut0', 'private1', '162', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (18, 3, 13, 'ifIn0', '', '161', 'private2', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (19, 3, 0, '', '', '22', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (20, 3, 8, '', '', '10000-20000', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (21, 3, 15, '', '', '23', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (22, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
-
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (4, 20000, 'Discovery rule for update', '192.14.3.1-255', 600, 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (23, 4, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (5, 20000, 'Disabled discovery rule for update', '192.15.3.1-255', 600, 1);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (24, 5, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (6, 20000, 'Discovery rule to check delete', '192.16.3.1-255', 600, 1);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0);
+INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags,query_fields, interfaceid, posts, headers) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 0, 10053, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0,'', 10021, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 'ITEM_REFERENCING_A_NON-EXISTENT_USER_MACRO');
+INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid,query_fields, inventory_link, posts, headers) VALUES (23101, 'Item_populating_filed_Type', 0, 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021,'', 1, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (23101, 'Item_populating_filed_Type', 'ITEM_POPULATING_FILED_TYPE');
 
 -- Global macros
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (6,'{$DEFAULT_DELAY}','30','');
@@ -331,25 +84,12 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES 
 INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (18,'{$Y_SECRET_MACRO_2_TEXT_REVERT}','Change value and type and revert','' , 1);
 INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (19,'{$Z_GLOBAL_MACRO_2_RESOLVE}','Value 2 B resolved','' , 0);
 
--- adding test data to the 'alerts' table for testing Audit->Actions report
-INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES (1, 0, 0, 13545, 1329724790, 1, 0, 0);
-
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (1, 12, 1, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 5', 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (2, 12, 1, 1, 1329724810, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 6', 'Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: PROBLEM', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (3, 12, 1, 1, 1329724820, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 7', 'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7: PROBLEM', 1, 0, '', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (4, 12, 1, 1, 1329724830, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 10', 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM', 2, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (5, 12, 1, 1, 1329724840, 1, 'igor.danoshaites@zabbix.com', 'PROBLEM: Value of item key1 > 20', 'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM', 0, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused', 1, 0, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (6, 12, 1, NULL, 1329724850, NULL, '', '', 'Command: H1:ls -la', 1, 0, '', 1, 1, '');
-INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (7, 12, 1, NULL, 1329724860, NULL, '', '', 'Command: H1:ls -la', 1, 0, '', 1, 1, '');
-
--- deleting auditid from the ids table
--- delete from ids where table_name='auditlog' and field_name='auditid'
-
 -- host, item, trigger  for testing macro resolving in trigger description
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (20006, 'Host for trigger description macros', 'Host for trigger description macros', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90279, 20006, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 20006, 10025);
-INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description, posts, headers) VALUES (24338, 'item1', 'key1', 20006, 10025, '30s', 3, '', '', '', '');
+INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params,query_fields, description, posts, headers) VALUES (24338, 'item1', 'key1', 20006, 10025, '30s', 3, '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (24338, 'item1', 'ITEM1');
 INSERT INTO triggers (triggerid, description, value, state, lastchange, comments) VALUES (100029, 'trigger host.host:{HOST.HOST} | host.host2:{HOST.HOST2} | host.name:{HOST.NAME} | item.value:{ITEM.VALUE} | item.value1:{ITEM.VALUE1} | item.lastvalue:{ITEM.LASTVALUE} | host.ip:{HOST.IP} | host.dns:{HOST.DNS} | host.conn:{HOST.CONN}', 0, 1, '1339761311', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99946, 24338, 100029, 'last', '$,#1');
 
@@ -378,22 +118,29 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15001, 
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15003, 15001, 15015);
 
 -- testFormItem.LayoutCheck testInheritanceItem.SimpleUpdate
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers) VALUES (15000, 15000, 0, 'itemInheritance'     , 'key-item-inheritance-test', '30s', 3, 1, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers) VALUES (15001, 15000, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , '30s', 3, 1, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers) VALUES (15002, 15000, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , '30s', 3, 1, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers) VALUES (15003, 15000, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , '30s', 3, 1, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers) VALUES (15004, 15000, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , '30s', 3, 1, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, posts, headers) VALUES (15093, 15000, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing'   , '30s', 3, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15005, 15001, 0, 'itemInheritance'     , 'key-item-inheritance-test', '30s', 3, '', '', 15000, 15000, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15006, 15001, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , '30s', 3, '', '', 15000, 15001, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15007, 15001, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , '30s', 3, '', '', 15000, 15002, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15008, 15001, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , '30s', 3, '', '', 15000, 15003, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15009, 15001, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , '30s', 3, '', '', 15000, 15004, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15094, 15001, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing', '30s', 3, '', '', 15000, 15093, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, posts, headers)             VALUES (15010, 15001, 0, 'itemInheritanceTest' , 'key-test-inheritance'     , '30s', 3, '', '', 15000, '', '');
-
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, posts, headers) VALUES (15079, 15002, 0, 'testInheritance'     , 'key-item-inheritance'     , '30s', 3, '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid, templateid, posts, headers) VALUES (15080, 15001, 0, 'testInheritance'     , 'key-item-inheritance'     , '30s', 3, '', '', 15000, 15079, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params,query_fields, description, posts, headers) VALUES (15000, 15000, 0, 'itemInheritance'     , 'key-item-inheritance-test', '30s', 3, 1, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params,query_fields, description, posts, headers) VALUES (15001, 15000, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , '30s', 3, 1, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params,query_fields, description, posts, headers) VALUES (15002, 15000, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , '30s', 3, 1, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params,query_fields, description, posts, headers) VALUES (15003, 15000, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , '30s', 3, 1, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params,query_fields, description, posts, headers) VALUES (15004, 15000, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , '30s', 3, 1, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params,query_fields, description, posts, headers) VALUES (15093, 15000, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing'   , '30s', 3, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15005, 15001, 0, 'itemInheritance'     , 'key-item-inheritance-test', '30s', 3, '', '', 15000,'', 15000, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15005, 'itemInheritance', 'ITEMINHERITANCE');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15006, 15001, 0, 'testInheritanceItem1', 'test-inheritance-item1'   , '30s', 3, '', '', 15000,'', 15001, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15006, 'testInheritanceItem1', 'TESTINHERITANCEITEM1');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15007, 15001, 0, 'testInheritanceItem2', 'test-inheritance-item2'   , '30s', 3, '', '', 15000,'', 15002, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15007, 'testInheritanceItem2', 'TESTINHERITANCEITEM2');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15008, 15001, 0, 'testInheritanceItem3', 'test-inheritance-item3'   , '30s', 3, '', '', 15000,'', 15003, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15008, 'testInheritanceItem3', 'TESTINHERITANCEITEM3');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15009, 15001, 0, 'testInheritanceItem4', 'test-inheritance-item4'   , '30s', 3, '', '', 15000,'', 15004, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15009, 'testInheritanceItem4', 'TESTINHERITANCEITEM4');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15094, 15001, 0, 'testInheritanceItemPreprocessing', 'test-inheritance-item-preprocessing', '30s', 3, '', '', 15000,'', 15093, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15094, 'testInheritanceItemPreprocessing', 'TESTINHERITANCEITEMPREPROCESSING');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description,query_fields, interfaceid, posts, headers)             VALUES (15010, 15001, 0, 'itemInheritanceTest' , 'key-test-inheritance'     , '30s', 3, '', '','', 15000, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15010, 'itemInheritanceTest', 'ITEMINHERITANCETEST');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params,query_fields, description, posts, headers) VALUES (15079, 15002, 0, 'testInheritance'     , 'key-item-inheritance'     , '30s', 3, '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, interfaceid,query_fields, templateid, posts, headers) VALUES (15080, 15001, 0, 'testInheritance'     , 'key-item-inheritance'     , '30s', 3, '', '', 15000,'', 15079, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15080, 'testInheritance', 'TESTINHERITANCE');
 
 -- testFormItem.Preprocessing Inheritance test template->testInheritanceItemPreprocessing
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (125,15093,1,1,'123');
@@ -494,33 +241,33 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color) 
 
 -- testInheritanceDiscoveryRule.LayoutCheck and testInheritanceDiscoveryRule.SimpleUpdate
 -- testFormItemPrototype, testInheritanceItemPrototype etc. for all prototype testing
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, posts, headers)                          VALUES (15011, 15000, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 0, 4, '', '', 1, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, posts, headers)                          VALUES (15012, 15000, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 0, 4, '', '', 1, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, posts, headers)                          VALUES (15013, 15000, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 0, 4, '', '', 1, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, posts, headers)                          VALUES (15014, 15000, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 0, 4, '', '', 1, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, posts, headers)                          VALUES (15015, 15000, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 0, 4, '', '', 1, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15016, 15001, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 0, 4, '', '', 1, 15000, 15011, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15017, 15001, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 0, 4, '', '', 1, 15000, 15012, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15018, 15001, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 0, 4, '', '', 1, 15000, 15013, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15019, 15001, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 0, 4, '', '', 1, 15000, 15014, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15020, 15001, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 0, 4, '', '', 1, 15000, 15015, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15011, 15000, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 0, 4, '', '','', 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15012, 15000, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 0, 4, '', '','', 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15013, 15000, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 0, 4, '', '','', 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15014, 15000, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 0, 4, '', '','', 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15015, 15000, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 0, 4, '', '','', 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15016, 15001, 0, 'testInheritanceDiscoveryRule' , 'inheritance-discovery-rule' , 3600, 0, 4, '', '', 1, 15000,'', 15011, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15017, 15001, 0, 'testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 3600, 0, 4, '', '', 1, 15000,'', 15012, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15018, 15001, 0, 'testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 3600, 0, 4, '', '', 1, 15000,'', 15013, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15019, 15001, 0, 'testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 3600, 0, 4, '', '', 1, 15000,'', 15014, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, trends, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15020, 15001, 0, 'testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 3600, 0, 4, '', '', 1, 15000,'', 15015, '', '');
 
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, posts, headers)                          VALUES (15081, 15002, 0, 'testInheritanceDiscoveryRule5', 'discovery-rule-inheritance5', 3600, 4, '', '', 1, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15082, 15001, 0, 'testInheritanceDiscoveryRule5', 'discovery-rule-inheritance5', 3600, 4, '', '', 1, 15000, 15081, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15081, 15002, 0, 'testInheritanceDiscoveryRule5', 'discovery-rule-inheritance5', 3600, 4, '', '','', 1, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15082, 15001, 0, 'testInheritanceDiscoveryRule5', 'discovery-rule-inheritance5', 3600, 4, '', '', 1, 15000,'', 15081, '', '');
 
 -- testInheritanceItemPrototype.SimpleUpdate and testInheritanceItemPrototype.SimpleCreate
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags, posts, headers)                          VALUES (15021, 15000, 0, 'itemDiscovery'                , 'item-discovery-prototype[{#KEY}]', '30s', 3, 1, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags, posts, headers)                          VALUES (15022, 15000, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1[{#KEY}]'    , '30s', 3, 1, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags, posts, headers)                          VALUES (15023, 15000, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2[{#KEY}]'    , '30s', 3, 1, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags, posts, headers)                          VALUES (15024, 15000, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3[{#KEY}]'    , '30s', 3, 1, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, flags, posts, headers)                          VALUES (15025, 15000, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4[{#KEY}]'    , '30s', 3, 1, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, posts, headers)                          VALUES (15095, 15000, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing[{#KEY}]'    , 30, 3,'', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15026, 15001, 0, 'itemDiscovery'                , 'item-discovery-prototype[{#KEY}]', '30s', 3, '', '', 2, 15000, 15021, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15027, 15001, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1[{#KEY}]'    , '30s', 3, '', '', 2, 15000, 15022, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15028, 15001, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2[{#KEY}]'    , '30s', 3, '', '', 2, 15000, 15023, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15029, 15001, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3[{#KEY}]'    , '30s', 3, '', '', 2, 15000, 15024, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15030, 15001, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4[{#KEY}]'    , '30s', 3, '', '', 2, 15000, 15025, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15096, 15001, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing[{#KEY}]', '30s', 3, '', '', 2, 15000, 15095, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description,query_fields, flags, posts, headers)                          VALUES (15021, 15000, 0, 'itemDiscovery'                , 'item-discovery-prototype[{#KEY}]', '30s', 3, 1, '', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description,query_fields, flags, posts, headers)                          VALUES (15022, 15000, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1[{#KEY}]'    , '30s', 3, 1, '', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description,query_fields, flags, posts, headers)                          VALUES (15023, 15000, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2[{#KEY}]'    , '30s', 3, 1, '', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description,query_fields, flags, posts, headers)                          VALUES (15024, 15000, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3[{#KEY}]'    , '30s', 3, 1, '', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description,query_fields, flags, posts, headers)                          VALUES (15025, 15000, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4[{#KEY}]'    , '30s', 3, 1, '', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15095, 15000, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing[{#KEY}]'    , 30, 3,'', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15026, 15001, 0, 'itemDiscovery'                , 'item-discovery-prototype[{#KEY}]', '30s', 3, '', '', 2, 15000,'', 15021, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15027, 15001, 0, 'testInheritanceItemPrototype1', 'item-prototype-test1[{#KEY}]'    , '30s', 3, '', '', 2, 15000,'', 15022, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15028, 15001, 0, 'testInheritanceItemPrototype2', 'item-prototype-test2[{#KEY}]'    , '30s', 3, '', '', 2, 15000,'', 15023, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15029, 15001, 0, 'testInheritanceItemPrototype3', 'item-prototype-test3[{#KEY}]'    , '30s', 3, '', '', 2, 15000,'', 15024, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15030, 15001, 0, 'testInheritanceItemPrototype4', 'item-prototype-test4[{#KEY}]'    , '30s', 3, '', '', 2, 15000,'', 15025, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15096, 15001, 0, 'testInheritanceItemPrototypePreprocessing', 'item-prototype-preprocessing[{#KEY}]', '30s', 3, '', '', 2, 15000,'', 15095, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15021, 15021, 15011);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15022, 15022, 15011);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15023, 15023, 15011);
@@ -534,8 +281,8 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (1503
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15031, 15095, 15011);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15032, 15096, 15016);
 
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, posts, headers)                          VALUES (15083, 15002, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15084, 15001, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '', 2, 15000, 15083, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description,query_fields, flags, posts, headers)                          VALUES (15083, 15002, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '','', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid,query_fields, templateid, posts, headers) VALUES (15084, 15001, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '', 2, 15000,'', 15083, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15083, 15083, 15081);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15084, 15084, 15082);
 
@@ -629,54 +376,79 @@ INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VAL
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15006, 15006, 'testInheritanceWeb3', 1, 'testInheritanceWeb3', 15, '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts) VALUES (15007, 15007, 'testInheritanceWeb4', 1, 'testInheritanceWeb4', 15, '');
 
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15031, 15000, 9, 'Download speed for scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,,bps]'                      , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15032, 15000, 9, 'Failed step of scenario "testInheritanceWeb1".', 'web.test.fail[testInheritanceWeb1]'                         , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15033, 15000, 9, 'Last error message of scenario "testInheritanceWeb1".', 'web.test.error[testInheritanceWeb1]'                        , 60, 1, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15034, 15000, 9, 'Download speed for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,testInheritanceWeb1,bps]'   , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15035, 15000, 9, 'Response time for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.time[testInheritanceWeb1,testInheritanceWeb1,resp]', 60, 0, 's'  , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15036, 15000, 9, 'Response code for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.rspcode[testInheritanceWeb1,testInheritanceWeb1]'  , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15037, 15000, 9, 'Download speed for scenario "testInheritanceWeb2".', 'web.test.in[testInheritanceWeb2,,bps]'                      , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15038, 15000, 9, 'Failed step of scenario "testInheritanceWeb2".', 'web.test.fail[testInheritanceWeb2]'                         , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15039, 15000, 9, 'Last error message of scenario "testInheritanceWeb2".', 'web.test.error[testInheritanceWeb2]'                        , 60, 1, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15040, 15000, 9, 'Download speed for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.in[testInheritanceWeb2,testInheritanceWeb2,bps]'   , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15041, 15000, 9, 'Response time for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.time[testInheritanceWeb2,testInheritanceWeb2,resp]', 60, 0, 's'  , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15042, 15000, 9, 'Response code for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.rspcode[testInheritanceWeb2,testInheritanceWeb2]'  , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15043, 15000, 9, 'Download speed for scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,,bps]'                      , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15044, 15000, 9, 'Failed step of scenario "testInheritanceWeb3".', 'web.test.fail[testInheritanceWeb3]'                         , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15045, 15000, 9, 'Last error message of scenario "testInheritanceWeb3".', 'web.test.error[testInheritanceWeb3]'                        , 60, 1, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15046, 15000, 9, 'Download speed for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,testInheritanceWeb3,bps]'   , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15047, 15000, 9, 'Response time for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.time[testInheritanceWeb3,testInheritanceWeb3,resp]', 60, 0, 's'  , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15048, 15000, 9, 'Response code for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.rspcode[testInheritanceWeb3,testInheritanceWeb3]'  , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15049, 15000, 9, 'Download speed for scenario "testInheritanceWeb4".', 'web.test.in[testInheritanceWeb4,,bps]'                      , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15050, 15000, 9, 'Failed step of scenario "testInheritanceWeb4".', 'web.test.fail[testInheritanceWeb4]'                         , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15051, 15000, 9, 'Last error message of scenario "testInheritanceWeb4".', 'web.test.error[testInheritanceWeb4]'                        , 60, 1, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15052, 15000, 9, 'Download speed for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.in[testInheritanceWeb4,testInheritanceWeb4,bps]'   , 60, 0, 'Bps', '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15053, 15000, 9, 'Response time for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.time[testInheritanceWeb4,testInheritanceWeb4,resp]', 60, 0, 's'  , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, posts, headers)             VALUES (15054, 15000, 9, 'Response code for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.rspcode[testInheritanceWeb4,testInheritanceWeb4]'  , 60, 3, ''   , '', '', '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15055, 15001, 9, 'Download speed for scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,,bps]'                      , 60, 0, 'Bps', '', '', 15031, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15056, 15001, 9, 'Failed step of scenario "testInheritanceWeb1".', 'web.test.fail[testInheritanceWeb1]'                         , 60, 3, ''   , '', '', 15032, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15057, 15001, 9, 'Last error message of scenario "testInheritanceWeb1".', 'web.test.error[testInheritanceWeb1]'                        , 60, 1, ''   , '', '', 15033, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15058, 15001, 9, 'Download speed for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,testInheritanceWeb1,bps]'   , 60, 0, 'Bps', '', '', 15034, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15059, 15001, 9, 'Response time for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.time[testInheritanceWeb1,testInheritanceWeb1,resp]', 60, 0, 's'  , '', '', 15035, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15060, 15001, 9, 'Response code for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.rspcode[testInheritanceWeb1,testInheritanceWeb1]'  , 60, 3, ''   , '', '', 15036, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15061, 15001, 9, 'Download speed for scenario "testInheritanceWeb2".' , 'web.test.in[testInheritanceWeb2,,bps]'                      , 60, 0, 'Bps', '', '', 15037, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15062, 15001, 9, 'Failed step of scenario "testInheritanceWeb2".', 'web.test.fail[testInheritanceWeb2]'                         , 60, 3, ''   , '', '', 15038, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15063, 15001, 9, 'Last error message of scenario "testInheritanceWeb2".', 'web.test.error[testInheritanceWeb2]'                        , 60, 1, ''   , '', '', 15039, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15064, 15001, 9, 'Download speed for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.in[testInheritanceWeb2,testInheritanceWeb2,bps]'   , 60, 0, 'Bps', '', '', 15040, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15065, 15001, 9, 'Response time for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.time[testInheritanceWeb2,testInheritanceWeb2,resp]', 60, 0, 's'  , '', '', 15041, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15066, 15001, 9, 'Response code for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.rspcode[testInheritanceWeb2,testInheritanceWeb2]'  , 60, 3, ''   , '', '', 15042, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15067, 15001, 9, 'Download speed for scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,,bps]'                      , 60, 0, 'Bps', '', '', 15043, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15068, 15001, 9, 'Failed step of scenario "testInheritanceWeb3".', 'web.test.fail[testInheritanceWeb3]'                         , 60, 3, ''   , '', '', 15044, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15069, 15001, 9, 'Last error message of scenario "testInheritanceWeb3".', 'web.test.error[testInheritanceWeb3]'                        , 60, 1, ''   , '', '', 15045, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15070, 15001, 9, 'Download speed for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,testInheritanceWeb3,bps]'   , 60, 0, 'Bps', '', '', 15046, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15071, 15001, 9, 'Response time for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.time[testInheritanceWeb3,testInheritanceWeb3,resp]', 60, 0, 's'  , '', '', 15047, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15072, 15001, 9, 'Response code for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.rspcode[testInheritanceWeb3,testInheritanceWeb3]'  , 60, 3, ''   , '', '', 15048, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15073, 15001, 9, 'Download speed for scenario "testInheritanceWeb4".' , 'web.test.in[testInheritanceWeb4,,bps]'                      , 60, 0, 'Bps', '', '', 15049, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15074, 15001, 9, 'Failed step of scenario "testInheritanceWeb4".', 'web.test.fail[testInheritanceWeb4]'                         , 60, 3, ''   , '', '', 15050, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15075, 15001, 9, 'Last error message of scenario "testInheritanceWeb4".', 'web.test.error[testInheritanceWeb4]'                        , 60, 1, ''   , '', '', 15051, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15076, 15001, 9, 'Download speed for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.in[testInheritanceWeb4,testInheritanceWeb4,bps]'   , 60, 0, 'Bps', '', '', 15052, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15077, 15001, 9, 'Response time for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.time[testInheritanceWeb4,testInheritanceWeb4,resp]', 60, 0, 's'  , '', '', 15053, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description, templateid, posts, headers) VALUES (15078, 15001, 9, 'Response code for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.rspcode[testInheritanceWeb4,testInheritanceWeb4]'  , 60, 3, ''   , '', '', 15054, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15031, 15000, 9, 'Download speed for scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,,bps]'                      , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15032, 15000, 9, 'Failed step of scenario "testInheritanceWeb1".', 'web.test.fail[testInheritanceWeb1]'                         , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15033, 15000, 9, 'Last error message of scenario "testInheritanceWeb1".', 'web.test.error[testInheritanceWeb1]'                        , 60, 1, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15034, 15000, 9, 'Download speed for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,testInheritanceWeb1,bps]'   , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15035, 15000, 9, 'Response time for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.time[testInheritanceWeb1,testInheritanceWeb1,resp]', 60, 0, 's'  , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15036, 15000, 9, 'Response code for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.rspcode[testInheritanceWeb1,testInheritanceWeb1]'  , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15037, 15000, 9, 'Download speed for scenario "testInheritanceWeb2".', 'web.test.in[testInheritanceWeb2,,bps]'                      , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15038, 15000, 9, 'Failed step of scenario "testInheritanceWeb2".', 'web.test.fail[testInheritanceWeb2]'                         , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15039, 15000, 9, 'Last error message of scenario "testInheritanceWeb2".', 'web.test.error[testInheritanceWeb2]'                        , 60, 1, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15040, 15000, 9, 'Download speed for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.in[testInheritanceWeb2,testInheritanceWeb2,bps]'   , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15041, 15000, 9, 'Response time for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.time[testInheritanceWeb2,testInheritanceWeb2,resp]', 60, 0, 's'  , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15042, 15000, 9, 'Response code for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.rspcode[testInheritanceWeb2,testInheritanceWeb2]'  , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15043, 15000, 9, 'Download speed for scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,,bps]'                      , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15044, 15000, 9, 'Failed step of scenario "testInheritanceWeb3".', 'web.test.fail[testInheritanceWeb3]'                         , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15045, 15000, 9, 'Last error message of scenario "testInheritanceWeb3".', 'web.test.error[testInheritanceWeb3]'                        , 60, 1, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15046, 15000, 9, 'Download speed for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,testInheritanceWeb3,bps]'   , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15047, 15000, 9, 'Response time for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.time[testInheritanceWeb3,testInheritanceWeb3,resp]', 60, 0, 's'  , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15048, 15000, 9, 'Response code for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.rspcode[testInheritanceWeb3,testInheritanceWeb3]'  , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15049, 15000, 9, 'Download speed for scenario "testInheritanceWeb4".', 'web.test.in[testInheritanceWeb4,,bps]'                      , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15050, 15000, 9, 'Failed step of scenario "testInheritanceWeb4".', 'web.test.fail[testInheritanceWeb4]'                         , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15051, 15000, 9, 'Last error message of scenario "testInheritanceWeb4".', 'web.test.error[testInheritanceWeb4]'                        , 60, 1, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15052, 15000, 9, 'Download speed for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.in[testInheritanceWeb4,testInheritanceWeb4,bps]'   , 60, 0, 'Bps', '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15053, 15000, 9, 'Response time for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.time[testInheritanceWeb4,testInheritanceWeb4,resp]', 60, 0, 's'  , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params,query_fields, description, posts, headers)             VALUES (15054, 15000, 9, 'Response code for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.rspcode[testInheritanceWeb4,testInheritanceWeb4]'  , 60, 3, ''   , '','', '', '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15055, 15001, 9, 'Download speed for scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,,bps]'                      , 60, 0, 'Bps', '', '','', 15031, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15056, 15001, 9, 'Failed step of scenario "testInheritanceWeb1".', 'web.test.fail[testInheritanceWeb1]'                         , 60, 3, ''   , '', '','', 15032, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15057, 15001, 9, 'Last error message of scenario "testInheritanceWeb1".', 'web.test.error[testInheritanceWeb1]'                        , 60, 1, ''   , '', '','', 15033, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15058, 15001, 9, 'Download speed for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.in[testInheritanceWeb1,testInheritanceWeb1,bps]'   , 60, 0, 'Bps', '', '','', 15034, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15059, 15001, 9, 'Response time for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.time[testInheritanceWeb1,testInheritanceWeb1,resp]', 60, 0, 's'  , '', '','', 15035, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15060, 15001, 9, 'Response code for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'web.test.rspcode[testInheritanceWeb1,testInheritanceWeb1]'  , 60, 3, ''   , '', '','', 15036, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15061, 15001, 9, 'Download speed for scenario "testInheritanceWeb2".' , 'web.test.in[testInheritanceWeb2,,bps]'                      , 60, 0, 'Bps', '', '','', 15037, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15062, 15001, 9, 'Failed step of scenario "testInheritanceWeb2".', 'web.test.fail[testInheritanceWeb2]'                         , 60, 3, ''   , '', '','', 15038, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15063, 15001, 9, 'Last error message of scenario "testInheritanceWeb2".', 'web.test.error[testInheritanceWeb2]'                        , 60, 1, ''   , '', '','', 15039, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15064, 15001, 9, 'Download speed for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.in[testInheritanceWeb2,testInheritanceWeb2,bps]'   , 60, 0, 'Bps', '', '','', 15040, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15065, 15001, 9, 'Response time for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.time[testInheritanceWeb2,testInheritanceWeb2,resp]', 60, 0, 's'  , '', '','', 15041, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15066, 15001, 9, 'Response code for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'web.test.rspcode[testInheritanceWeb2,testInheritanceWeb2]'  , 60, 3, ''   , '', '','', 15042, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15067, 15001, 9, 'Download speed for scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,,bps]'                      , 60, 0, 'Bps', '', '','', 15043, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15068, 15001, 9, 'Failed step of scenario "testInheritanceWeb3".', 'web.test.fail[testInheritanceWeb3]'                         , 60, 3, ''   , '', '','', 15044, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15069, 15001, 9, 'Last error message of scenario "testInheritanceWeb3".', 'web.test.error[testInheritanceWeb3]'                        , 60, 1, ''   , '', '','', 15045, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15070, 15001, 9, 'Download speed for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.in[testInheritanceWeb3,testInheritanceWeb3,bps]'   , 60, 0, 'Bps', '', '','', 15046, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15071, 15001, 9, 'Response time for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.time[testInheritanceWeb3,testInheritanceWeb3,resp]', 60, 0, 's'  , '', '','', 15047, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15072, 15001, 9, 'Response code for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'web.test.rspcode[testInheritanceWeb3,testInheritanceWeb3]'  , 60, 3, ''   , '', '','', 15048, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15073, 15001, 9, 'Download speed for scenario "testInheritanceWeb4".' , 'web.test.in[testInheritanceWeb4,,bps]'                      , 60, 0, 'Bps', '', '','', 15049, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15074, 15001, 9, 'Failed step of scenario "testInheritanceWeb4".', 'web.test.fail[testInheritanceWeb4]'                         , 60, 3, ''   , '', '','', 15050, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15075, 15001, 9, 'Last error message of scenario "testInheritanceWeb4".', 'web.test.error[testInheritanceWeb4]'                        , 60, 1, ''   , '', '','', 15051, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15076, 15001, 9, 'Download speed for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.in[testInheritanceWeb4,testInheritanceWeb4,bps]'   , 60, 0, 'Bps', '', '','', 15052, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15077, 15001, 9, 'Response time for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.time[testInheritanceWeb4,testInheritanceWeb4,resp]', 60, 0, 's'  , '', '','', 15053, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, units, params, description,query_fields, templateid, posts, headers) VALUES (15078, 15001, 9, 'Response code for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'web.test.rspcode[testInheritanceWeb4,testInheritanceWeb4]'  , 60, 3, ''   , '', '','', 15054, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15055, 'Download speed for scenario "testInheritanceWeb1".', 'DOWNLOAD SPEED FOR SCENARIO "TESTINHERITANCEWEB1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15056, 'Failed step of scenario "testInheritanceWeb1".', 'FAILED STEP OF SCENARIO "TESTINHERITANCEWEB1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15057, 'Last error message of scenario "testInheritanceWeb1".', 'LAST ERROR MESSAGE OF SCENARIO "TESTINHERITANCEWEB1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15058, 'Download speed for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'DOWNLOAD SPEED FOR STEP "TESTINHERITANCEWEB1" OF SCENARIO "TESTINHERITANCEWEB1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15059, 'Response time for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'RESPONSE TIME FOR STEP "TESTINHERITANCEWEB1" OF SCENARIO "TESTINHERITANCEWEB1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15060, 'Response code for step "testInheritanceWeb1" of scenario "testInheritanceWeb1".', 'RESPONSE CODE FOR STEP "TESTINHERITANCEWEB1" OF SCENARIO "TESTINHERITANCEWEB1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15061, 'Download speed for scenario "testInheritanceWeb2".', 'DOWNLOAD SPEED FOR SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15062, 'Failed step of scenario "testInheritanceWeb2".', 'FAILED STEP OF SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15063, 'Last error message of scenario "testInheritanceWeb2".', 'LAST ERROR MESSAGE OF SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15064, 'Download speed for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'DOWNLOAD SPEED FOR STEP "TESTINHERITANCEWEB2" OF SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15065, 'Response time for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'RESPONSE TIME FOR STEP "TESTINHERITANCEWEB2" OF SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15066, 'Response code for step "testInheritanceWeb2" of scenario "testInheritanceWeb2".', 'RESPONSE CODE FOR STEP "TESTINHERITANCEWEB2" OF SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15067, 'Last error message of scenario "testInheritanceWeb2".', 'LAST ERROR MESSAGE OF SCENARIO "TESTINHERITANCEWEB2".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15068, 'Failed step of scenario "testInheritanceWeb3".', 'FAILED STEP OF SCENARIO "TESTINHERITANCEWEB3".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15069, 'Last error message of scenario "testInheritanceWeb3".', 'LAST ERROR MESSAGE OF SCENARIO "TESTINHERITANCEWEB3".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15070, 'Download speed for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'DOWNLOAD SPEED FOR STEP "TESTINHERITANCEWEB3" OF SCENARIO "TESTINHERITANCEWEB3".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15071, 'Response time for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'RESPONSE TIME FOR STEP "TESTINHERITANCEWEB3" OF SCENARIO "TESTINHERITANCEWEB3".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15072, 'Response code for step "testInheritanceWeb3" of scenario "testInheritanceWeb3".', 'RESPONSE CODE FOR STEP "TESTINHERITANCEWEB3" OF SCENARIO "TESTINHERITANCEWEB3".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15073, 'Download speed for scenario "testInheritanceWeb4".', 'DOWNLOAD SPEED FOR SCENARIO "TESTINHERITANCEWEB4".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15074, 'Failed step of scenario "testInheritanceWeb4".', 'FAILED STEP OF SCENARIO "TESTINHERITANCEWEB4".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15075, 'Last error message of scenario "testInheritanceWeb4".', 'LAST ERROR MESSAGE OF SCENARIO "TESTINHERITANCEWEB4".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15076, 'Download speed for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'DOWNLOAD SPEED FOR STEP "TESTINHERITANCEWEB4" OF SCENARIO "TESTINHERITANCEWEB4".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15077, 'Response time for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'RESPONSE TIME FOR STEP "TESTINHERITANCEWEB4" OF SCENARIO "TESTINHERITANCEWEB4".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15078, 'Response code for step "testInheritanceWeb4" of scenario "testInheritanceWeb4".', 'RESPONSE CODE FOR STEP "TESTINHERITANCEWEB4" OF SCENARIO "TESTINHERITANCEWEB4".');
+
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (15000, 15000, 15031, 2);
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (15001, 15000, 15032, 3);
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (15002, 15000, 15033, 4);
@@ -752,13 +524,18 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
 
 -- testFormItem.LayoutCheck testFormItem.SimpleUpdate
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99098, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '', 1, '', '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99099, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '', 1, '', '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99100, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '', 1, '', '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99101, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '', 1, '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params,query_fields, formula, posts, headers) VALUES (99098, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '','', 1, '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params,query_fields, formula, posts, headers) VALUES (99099, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '','', 1, '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params,query_fields, formula, posts, headers) VALUES (99100, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '','', 1, '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params,query_fields, formula, posts, headers) VALUES (99101, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '','', 1, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99098, 'testFormItem1', 'TESTFORMITEM1');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99099, 'testFormItem2', 'TESTFORMITEM2');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99100, 'testFormItem3', 'TESTFORMITEM3');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99101, 'testFormItem4', 'TESTFORMITEM4');
 
 -- testFormTrigger.SimpleCreate
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, posts, headers) VALUES (99102, 0, 40001, 'testFormItem', 'testFormItems', 'test-item-reuse', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 40011, '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags,query_fields, interfaceid, posts, headers) VALUES (99102, 0, 40001, 'testFormItem', 'testFormItems', 'test-item-reuse', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0,'', 40011, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99102, 'testFormItem', 'TESTFORMITEM');
 
 -- testFormTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14000, '{14000}=0', 'testFormTrigger1', '');
@@ -786,26 +563,26 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300003, 300003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 
 -- testFormDiscoveryRule.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 10080, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 10081, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 10082, 1,  50, '', '', 40011, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 10083, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 10080, 1,  50, '', '','', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 10081, 1,  50, '', '','', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 10082, 1,  50, '', '','', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 10083, 1,  50, '', '','', 40011, '', '');
 
 -- testFormItemPrototype.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 133800, 1,  50, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 133800, 1,  50, '', '','', 40011, '', '');
 
 -- testFormItemPrototype.SimpleUpdate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype1', 'item-prototype-form1[{#KEY}]', 40001, 3, 23800, 2, 5, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype1', 'item-prototype-form1[{#KEY}]', 40001, 3, 23800, 2, 5, '', '','', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (501, 23800, 133800);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype2', 'item-prototype-form2[{#KEY}]', 40001, 3, 23801, 2, 5, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype2', 'item-prototype-form2[{#KEY}]', 40001, 3, 23801, 2, 5, '', '','', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (502, 23801, 133800);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype3', 'item-prototype-form3[{#KEY}]', 40001, 3, 23802, 2, 5, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype3', 'item-prototype-form3[{#KEY}]', 40001, 3, 23802, 2, 5, '', '','', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (503, 23802, 133800);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemPrototype4', 'item-prototype-form4[{#KEY}]', 40001, 3, 23803, 2, 5, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemPrototype4', 'item-prototype-form4[{#KEY}]', 40001, 3, 23803, 2, 5, '', '','', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504, 23803, 133800);
 
 -- testFormTriggerPrototype.SimpleCreate
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid, posts, headers) VALUES ('testFormItemReuse', 'item-prototype-reuse[{#KEY}]', 40001, 3, 23804, 2, 5, '', '', 40011, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormItemReuse', 'item-prototype-reuse[{#KEY}]', 40001, 3, 23804, 2, 5, '', '','', 40011, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 133800);
 
 -- testFormTriggerPrototype.SimpleUpdate
@@ -834,64 +611,6 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600006, 600003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600007, 600003, 23804, 1, 1, 'FF5555', 0, 2, 0);
 
--- testFormWeb.SimpleUpdate
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (94, 40001, 'testFormWeb1', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (95, 40001, 'testFormWeb2', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (96, 40001, 'testFormWeb3', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (97, 40001, 'testFormWeb4', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (94, 94, 'testFormWeb1', 1, 'testFormWeb1', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (95, 95, 'testFormWeb2', 1, 'testFormWeb2', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (96, 96, 'testFormWeb3', 1, 'testFormWeb3', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (97, 97, 'testFormWeb4', 1, 'testFormWeb4', 15, '', '', '');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23420,9,40001,'Download speed for scenario "testFormWeb1".','web.test.in[testFormWeb1,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23421,9,40001,'Failed step of scenario "testFormWeb1".','web.test.fail[testFormWeb1]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23422,9,40001,'Last error message of scenario "testFormWeb1".','web.test.error[testFormWeb1]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23423,9,40001,'Download speed for step "testFormWeb1" of scenario "testFormWeb1".','web.test.in[testFormWeb1,testFormWeb1,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23424,9,40001,'Response time for step "testFormWeb1" of scenario "testFormWeb1".','web.test.time[testFormWeb1,testFormWeb1,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23425,9,40001,'Response code for step "testFormWeb1" of scenario "testFormWeb1".','web.test.rspcode[testFormWeb1,testFormWeb1]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23426,9,40001,'Download speed for scenario "testFormWeb2".','web.test.in[testFormWeb2,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23427,9,40001,'Failed step of scenario "testFormWeb2".','web.test.fail[testFormWeb2]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23428,9,40001,'Last error message of scenario "testFormWeb2".','web.test.error[testFormWeb2]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23429,9,40001,'Download speed for step "testFormWeb2" of scenario "testFormWeb2".','web.test.in[testFormWeb2,testFormWeb2,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23430,9,40001,'Response time for step "testFormWeb2" of scenario "testFormWeb2".','web.test.time[testFormWeb2,testFormWeb2,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23431,9,40001,'Response code for step "testFormWeb2" of scenario "testFormWeb2".','web.test.rspcode[testFormWeb2,testFormWeb2]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23432,9,40001,'Download speed for scenario "testFormWeb3".','web.test.in[testFormWeb3,,bps]','60s',30,'90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23433,9,40001,'Failed step of scenario "testFormWeb3".','web.test.fail[testFormWeb3]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23434,9,40001,'Last error message of scenario "testFormWeb3".','web.test.error[testFormWeb3]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23435,9,40001,'Download speed for step "testFormWeb3" of scenario "testFormWeb3".','web.test.in[testFormWeb3,testFormWeb3,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23436,9,40001,'Response time for step "testFormWeb3" of scenario "testFormWeb3".','web.test.time[testFormWeb3,testFormWeb3,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23437,9,40001,'Response code for step "testFormWeb3" of scenario "testFormWeb3".','web.test.rspcode[testFormWeb3,testFormWeb3]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23438,9,40001,'Download speed for scenario "testFormWeb4".','web.test.in[testFormWeb4,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23439,9,40001,'Failed step of scenario "testFormWeb4".','web.test.fail[testFormWeb4]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23440,9,40001,'Last error message of scenario "testFormWeb4".','web.test.error[testFormWeb4]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23441,9,40001,'Download speed for step "testFormWeb4" of scenario "testFormWeb4".','web.test.in[testFormWeb4,testFormWeb4,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23442,9,40001,'Response time for step "testFormWeb4" of scenario "testFormWeb4".','web.test.time[testFormWeb4,testFormWeb4,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23443,9,40001,'Response code for step "testFormWeb4" of scenario "testFormWeb4".','web.test.rspcode[testFormWeb4,testFormWeb4]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (910,94,23420,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (911,94,23421,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (912,94,23422,4);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (913,95,23426,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (914,95,23427,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (915,95,23428,4);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (916,96,23432,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (917,96,23433,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (918,96,23434,4);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (919,97,23438,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (920,97,23439,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (921,97,23440,4);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (910,94,23423,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (911,94,23424,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (912,94,23425,0);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (913,95,23429,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (914,95,23430,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (915,95,23431,0);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (916,96,23435,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (917,96,23436,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (918,96,23437,0);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (919,97,23441,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (920,97,23442,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (921,97,23443,0);
-
 -- testZBX6663.MassSelect
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50000, 'Template ZBX6663 First', 'Template ZBX6663 First', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50000, 50000, 1);
@@ -902,51 +621,66 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50002, 50001, 4)
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50000, 50001, 50002);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50002, 50000, 50002);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50001, 50015);
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400080,9,50000,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 First,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400090,9,50000,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 First]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400100,9,50000,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 First]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400110,9,50000,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 First,Web ZBX6663 First Step,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400120,9,50000,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 First,Web ZBX6663 First Step,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400130,9,50000,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 First,Web ZBX6663 First Step]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400140,9,50002,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 Second,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400150,9,50002,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 Second]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400160,9,50002,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 Second]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400170,9,50002,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 Second,Web ZBX6663 Second Step,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400180,9,50002,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 Second,Web ZBX6663 Second Step,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400190,9,50002,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 Second,Web ZBX6663 Second Step]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400200,9,50001,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 Second,,bps]','60s','30d','90d',0,0,'','Bps','',400140,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400210,9,50001,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 Second]','60s','30d','90d',0,3,'','','',400150,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400220,9,50001,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 Second]','60s','30d','90d',0,1,'','','',400160,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400230,9,50001,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 Second,Web ZBX6663 Second Step,bps]','60s','30d','90d',0,0,'','Bps','',400170,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400240,9,50001,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 Second,Web ZBX6663 Second Step,resp]','60s','30d','90d',0,0,'','s','',400180,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400250,9,50001,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 Second,Web ZBX6663 Second Step]','60s','30d','90d',0,3,'','','',400190,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400260,9,50000,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 Second,,bps]','60s','30d','90d',0,0,'','Bps','',400140,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400270,9,50000,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 Second]','60s','30d','90d',0,3,'','','',0400150,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400280,9,50000,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 Second]','60s','30d','90d',0,1,'','','',400160,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400290,9,50000,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 Second,Web ZBX6663 Second Step,bps]','60s','30d','90d',0,0,'','Bps','',400170,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400300,9,50000,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 Second,Web ZBX6663 Second Step,resp]','60s','30d','90d',0,0,'','s','',400180,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400310,9,50000,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 Second,Web ZBX6663 Second Step]','60s','30d','90d',0,3,'','','',400190,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400320,9,50001,'Download speed for scenario "$1".','web.test.in[Web ZBX6663,,bps]','60s','30s','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400330,9,50001,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400340,9,50001,'Last error message of scenario "$1".','web.test.error[Web ZBX6663]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400350,9,50001,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663,Web ZBX6663 Step,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400360,9,50001,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663,Web ZBX6663 Step,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400370,9,50001,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663,Web ZBX6663 Step]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400380,0,50002,'Item ZBX6663 Second','item-ZBX6663-second','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400390,0,50001,'Item ZBX6663 Second','item-ZBX6663-second','30s','90d','365d',0,3,'','','',400380,NULL,'','',0,'','','','',0,50015,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400400,0,50000,'Item ZBX6663 Second','item-ZBX6663-second','30s','90d','365d',0,3,'','','',400380,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400410,0,50000,'Item ZBX6663 First','item-ZBX6663-first','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400420,0,50001,'Item ZBX6663','item-ZBX6663','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50015,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400430,0,50001,'DiscoveryRule ZBX6663','drule-zbx6663','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,50015,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400450,0,50002,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400460,0,50001,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second','30s','90d','365d',0,4,'','','',400450,NULL,'','',0,'','','','',1,50015,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400470,0,50000,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second','30s','90d','365d',0,4,'','','',400450,NULL,'','',0,'','','','',1,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400480,0,50002,'ItemProto ZBX6663 Second','item-proto-zbx6663-second[{#KEY}]','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400490,0,50001,'ItemProto ZBX6663 Second','item-proto-zbx6663-second[{#KEY}]','30s','90d','365d',0,3,'','','',400480,NULL,'','',0,'','','','',2,50015,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400500,0,50000,'ItemProto ZBX6663 Second','item-proto-zbx6663-second[{#KEY}]','30s','90d','365d',0,3,'','','',400480,NULL,'','',0,'','','','',2,NULL,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400510,0,50000,'DiscoveryRule ZBX6663 First','drule-zbx6663-first','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'3600','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400520,0,50001,'ItemProto ZBX6663 HSecond','item-proto-zbx6663-hsecond[{#KEY}]','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',2,50015,'',0,'30d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400540,0,50000,'ItemProto ZBX6663 TSecond','item-proto-zbx6663-tsecond[{#KEY}]','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400080,9,50000,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 First,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400090,9,50000,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 First]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400100,9,50000,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 First]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400110,9,50000,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 First,Web ZBX6663 First Step,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400120,9,50000,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 First,Web ZBX6663 First Step,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400130,9,50000,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 First,Web ZBX6663 First Step]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400140,9,50002,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 Second,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400150,9,50002,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 Second]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400160,9,50002,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 Second]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400170,9,50002,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 Second,Web ZBX6663 Second Step,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400180,9,50002,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 Second,Web ZBX6663 Second Step,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400190,9,50002,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 Second,Web ZBX6663 Second Step]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400200,9,50001,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 Second,,bps]','60s','30d','90d',0,0,'','Bps','',400140,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400210,9,50001,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 Second]','60s','30d','90d',0,3,'','','',400150,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400220,9,50001,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 Second]','60s','30d','90d',0,1,'','','',400160,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400230,9,50001,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 Second,Web ZBX6663 Second Step,bps]','60s','30d','90d',0,0,'','Bps','',400170,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400240,9,50001,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 Second,Web ZBX6663 Second Step,resp]','60s','30d','90d',0,0,'','s','',400180,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400250,9,50001,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 Second,Web ZBX6663 Second Step]','60s','30d','90d',0,3,'','','',400190,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400260,9,50000,'Download speed for scenario "$1".','web.test.in[Web ZBX6663 Second,,bps]','60s','30d','90d',0,0,'','Bps','',400140,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400270,9,50000,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663 Second]','60s','30d','90d',0,3,'','','',0400150,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400280,9,50000,'Last error message of scenario "$1".','web.test.error[Web ZBX6663 Second]','60s','30d','90d',0,1,'','','',400160,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400290,9,50000,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663 Second,Web ZBX6663 Second Step,bps]','60s','30d','90d',0,0,'','Bps','',400170,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400300,9,50000,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663 Second,Web ZBX6663 Second Step,resp]','60s','30d','90d',0,0,'','s','',400180,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400310,9,50000,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663 Second,Web ZBX6663 Second Step]','60s','30d','90d',0,3,'','','',400190,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400320,9,50001,'Download speed for scenario "$1".','web.test.in[Web ZBX6663,,bps]','60s','30s','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400330,9,50001,'Failed step of scenario "$1".','web.test.fail[Web ZBX6663]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400340,9,50001,'Last error message of scenario "$1".','web.test.error[Web ZBX6663]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400350,9,50001,'Download speed for step "$2" of scenario "$1".','web.test.in[Web ZBX6663,Web ZBX6663 Step,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400360,9,50001,'Response time for step "$2" of scenario "$1".','web.test.time[Web ZBX6663,Web ZBX6663 Step,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400370,9,50001,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Web ZBX6663,Web ZBX6663 Step]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400380,0,50002,'Item ZBX6663 Second','item-ZBX6663-second','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400390,0,50001,'Item ZBX6663 Second','item-ZBX6663-second','30s','90d','365d',0,3,'','','',400380,NULL,'','',0,'','','','',0,50015,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400400,0,50000,'Item ZBX6663 Second','item-ZBX6663-second','30s','90d','365d',0,3,'','','',400380,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400410,0,50000,'Item ZBX6663 First','item-ZBX6663-first','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400420,0,50001,'Item ZBX6663','item-ZBX6663','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50015,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400430,0,50001,'DiscoveryRule ZBX6663','drule-zbx6663','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,50015,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400450,0,50002,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400460,0,50001,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second','30s','90d','365d',0,4,'','','',400450,NULL,'','',0,'','','','',1,50015,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400470,0,50000,'DiscoveryRule ZBX6663 Second','drule-ZBX6663-second','30s','90d','365d',0,4,'','','',400450,NULL,'','',0,'','','','',1,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400480,0,50002,'ItemProto ZBX6663 Second','item-proto-zbx6663-second[{#KEY}]','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400490,0,50001,'ItemProto ZBX6663 Second','item-proto-zbx6663-second[{#KEY}]','30s','90d','365d',0,3,'','','',400480,NULL,'','',0,'','','','',2,50015,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400500,0,50000,'ItemProto ZBX6663 Second','item-proto-zbx6663-second[{#KEY}]','30s','90d','365d',0,3,'','','',400480,NULL,'','',0,'','','','',2,NULL,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400510,0,50000,'DiscoveryRule ZBX6663 First','drule-zbx6663-first','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'','3600','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400520,0,50001,'ItemProto ZBX6663 HSecond','item-proto-zbx6663-hsecond[{#KEY}]','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',2,50015,'',0,'','30d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400540,0,50000,'ItemProto ZBX6663 TSecond','item-proto-zbx6663-tsecond[{#KEY}]','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'','30d','','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400200, 'Download speed for scenario "$1".', 'DOWNLOAD SPEED FOR SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400210, 'Failed step of scenario "$1".', 'FAILED STEP OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400220, 'Last error message of scenario "$1".', 'LAST ERROR MESSAGE OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400230, 'Download speed for step "$2" of scenario "$1".', 'DOWNLOAD SPEED FOR STEP "$2" OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400240, 'Response time for step "$2" of scenario "$1".', 'RESPONSE TIME FOR STEP "$2" OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400250, 'Response code for step "$2" of scenario "$1".', 'RESPONSE CODE FOR STEP "$2" OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400320, 'Download speed for scenario "$1".', 'DOWNLOAD SPEED FOR SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400330, 'Failed step of scenario "$1".', 'FAILED STEP OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400340, 'Last error message of scenario "$1".', 'LAST ERROR MESSAGE OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400350, 'Download speed for step "$2" of scenario "$1".', 'DOWNLOAD SPEED FOR STEP "$2" OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400360, 'Response time for step "$2" of scenario "$1".', 'RESPONSE TIME FOR STEP "$2" OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400370, 'Response code for step "$2" of scenario "$1".', 'RESPONSE CODE FOR STEP "$2" OF SCENARIO "$1".');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400390, 'Item ZBX6663 Second', 'ITEM ZBX6663 SECOND');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400420, 'Item ZBX6663', 'ITEM ZBX6663');
+
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (507,400480,400450,'',0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (508,400490,400460,'',0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (509,400500,400470,'',0,0);
@@ -1048,9 +782,12 @@ INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50005,50005,50003)
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50016,50003,1,1,1,'127.0.7.1','','10071');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50017,50004,1,1,1,'127.0.7.1','','10071');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50018,50005,1,1,1,'127.0.7.1','','10071');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400550,0,50003,'zbx6648 item disabled','zbx6648-item-disabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50016,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400560,0,50004,'zbx6648 item enabled','zbx6648-item-enabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50017,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400570,0,50005,'zbx6648 item all','zbx6648-item-all','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50018,'',0,'30','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400550,0,50003,'zbx6648 item disabled','zbx6648-item-disabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50016,'',0,'','30','','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400550, 'zbx6648 item disabled', 'ZBX6648 ITEM DISABLED');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400560,0,50004,'zbx6648 item enabled','zbx6648-item-enabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50017,'',0,'','30','','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400560, 'zbx6648 item enabled', 'ZBX6648 ITEM ENABLED');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400570,0,50005,'zbx6648 item all','zbx6648-item-all','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50018,'',0,'','30','','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400570, 'zbx6648 item all', 'ZBX6648 ITEM ALL');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100018,'{100018}=0','zbx6648 trigger disabled','',1,0,0,0,'','',NULL,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100019,'{100019}=0','zbx6648 trigger enabled','',0,0,0,0,'','',NULL,0,0,0);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100020,'{100020}=0','zbx6648 trigger all enabled','',0,0,0,0,'','',NULL,0,0,0);
@@ -1067,14 +804,15 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (50007, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50007, 50007, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50007, 50019);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50006, 50020);
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400580,0,50006,'Discovery-rule-layout-test-001','drule-layout-test001','30s','90d','365d',1,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'50d','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400590,0,50007,'Discovery-rule-layout-test-002','drule-layout-test002','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30','','');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,posts,headers) VALUES ('Item-proto-layout-test-001', 'item-proto-layout-test001', 50006, 3, 400600, 2, 5, '', '','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400580,0,50006,'Discovery-rule-layout-test-001','drule-layout-test001','30s','90d','365d',1,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'','50d','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400590,0,50007,'Discovery-rule-layout-test-002','drule-layout-test002','30s','90d','365d',0,4,'','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'','30','','');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,query_fields, description,posts,headers) VALUES ('Item-proto-layout-test-001', 'item-proto-layout-test001', 50006, 3, 400600, 2, 5, '','', '','','');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (513, 400600, 400580);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,posts,headers) VALUES ('Item-proto-layout-test-002', 'item-proto-layout-test002', 50007, 3, 400610, 2, 5, '', '','','');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,query_fields, description,posts,headers) VALUES ('Item-proto-layout-test-002', 'item-proto-layout-test002', 50007, 3, 400610, 2, 5, '','', '','','');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (514, 400610, 400590);
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400620,0,50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50020,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400630,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'{{$A}}',0,'30','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400620,0,50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50020,'',0,'','30','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400630,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'{{$A}}',0,'','30','','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400630, 'Item-layout-test-002', 'ITEM-LAYOUT-TEST-002');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100022,'{100022}=0','Trigger-proto-layout-test-001','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100022,400600,100022,'last','$,#1');
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (100023, '{100023}=0', 'Trigger-proto-layout-test-001', '', 2);
@@ -1088,7 +826,8 @@ INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (10002
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50008, 'Host-map-test-zbx6840', 'Host-map-test-zbx6840', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50008, 50008, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50021);
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (400650,0,50008,'Item-layout-test-zbx6840','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50021,'',0,'30','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400650,0,50008,'Item-layout-test-zbx6840','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50021,'',0,'','30','','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400650, 'Item-layout-test-zbx6840', 'ITEM-LAYOUT-TEST-ZBX6840');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100026,'{100026}=0 and {100027}=0','Trigger-map-test-zbx6840','',0,0,0,0,'','',NULL,0,0,0);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100026,400650,100026,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100027,42237,100026,'last','$,#1');
@@ -1103,14 +842,22 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (15003, 'test
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15003, 15003, 4);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15005, 15003, 1, '127.0.0.1', 1, '10050', 1);
 
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags, posts, headers) VALUES (15085, 15003, 15005, 0, 3, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'numeric_unsigned[item_testpagehistory_checklayout]', '30s', '90d', '365d', 0, '', NULL, '', '', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, trends, status, units, valuemapid, params, description, flags, posts, headers) VALUES (15086, 15003, 15005, 0, 0, 'item_testPageHistory_CheckLayout_Numeric_Float'   , 'numeric_float[item_testpagehistory_checklayout]'   , '30s', '90d', '365d', 0, '', NULL, '', '', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15087, 15003, 15005, 0, 1, 'item_testPageHistory_CheckLayout_Character'       , 'character[item_testpagehistory_checklayout]'       , '30s', '90d',      0,           '', 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15088, 15003, 15005, 0, 4, 'item_testPageHistory_CheckLayout_Text'            , 'text[item_testpagehistory_checklayout]'            , '30s', '90d',      0,           '', 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15089, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Log'             , 'log[item_testpagehistory_checklayout]'             , '30s', '90d',      0,           '', '', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15090, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Log_2'           , 'log[item_testpagehistory_checklayout, 2]'          , '30s', '90d',      0,           '', 'Non-clickable description', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15091, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , '30s', '90d',      0,           '', 'https://zabbix.com', 0, '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15092, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , '30s', '90d',      0,           '', 'The following url should be clickable: https://zabbix.com', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, trends, status, units, valuemapid, params, description,query_fields, flags, posts, headers) VALUES (15085, 15003, 15005, 0, 3, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'numeric_unsigned[item_testpagehistory_checklayout]', '30s', '90d', '365d', 0, '', NULL, '', '','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, trends, status, units, valuemapid, params, description,query_fields, flags, posts, headers) VALUES (15086, 15003, 15005, 0, 0, 'item_testPageHistory_CheckLayout_Numeric_Float'   , 'numeric_float[item_testpagehistory_checklayout]'   , '30s', '90d', '365d', 0, '', NULL, '', '','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description,query_fields, flags, posts, headers) VALUES (15087, 15003, 15005, 0, 1, 'item_testPageHistory_CheckLayout_Character'       , 'character[item_testpagehistory_checklayout]'       , '30s', '90d',      0,           '', 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description,query_fields, flags, posts, headers) VALUES (15088, 15003, 15005, 0, 4, 'item_testPageHistory_CheckLayout_Text'            , 'text[item_testpagehistory_checklayout]'            , '30s', '90d',      0,           '', 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description,query_fields, flags, posts, headers) VALUES (15089, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Log'             , 'log[item_testpagehistory_checklayout]'             , '30s', '90d',      0,           '', '','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description,query_fields, flags, posts, headers) VALUES (15090, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Log_2'           , 'log[item_testpagehistory_checklayout, 2]'          , '30s', '90d',      0,           '', 'Non-clickable description','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description,query_fields, flags, posts, headers) VALUES (15091, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , '30s', '90d',      0,           '', 'https://zabbix.com','', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description,query_fields, flags, posts, headers) VALUES (15092, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , '30s', '90d',      0,           '', 'The following url should be clickable: https://zabbix.com','', 0, '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15085, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_NUMERIC_UNSIGNED');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15086, 'item_testPageHistory_CheckLayout_Numeric_Float', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_NUMERIC_FLOAT');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15087, 'item_testPageHistory_CheckLayout_Character', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_CHARACTER');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15088, 'item_testPageHistory_CheckLayout_Text', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_TEXT');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15089, 'item_testPageHistory_CheckLayout_Log', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_LOG');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15090, 'item_testPageHistory_CheckLayout_Log_2', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_LOG_2');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15091, 'item_testPageHistory_CheckLayout_Eventlog', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_EVENTLOG');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (15092, 'item_testPageHistory_CheckLayout_Eventlog_2', 'ITEM_TESTPAGEHISTORY_CHECKLAYOUT_EVENTLOG_2');
 
 -- testFormFilterProblems, testFormFilterHosts
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (92, 'filter-create', '$2y$10$nA7hh4cZ5oHM.GgXPqzZ/e/vaD1LYcOi.3ZfulCjZV/9H4PFtIKnK', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
@@ -1138,7 +885,7 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (92, 'Test timezone');
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (105, 92, 9);
 
 -- testUrlUserPermissions
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page, url) VALUES (40, 'admin-zabbix', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_US', 30, 2, 'default', 0, 0, 50, 'toptriggers.php');
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page, url) VALUES (40, 'admin-zabbix', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_US', 30, 2, 'default', 0, 0, 50, 'zabbix.php?action=toptriggers.list');
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (60, 7, 40);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (50, 'user-zabbix', '$2y$10$MZQTU3/7XsECy1DbQqvn/eaoPoMDgMYJ7Ml1wYon1dC0NfwM9E3zu', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (70, 7, 50);
@@ -1158,6 +905,8 @@ UPDATE config SET alert_usrgrpid = 150 WHERE configid = 1;
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
 -- Super admin rows per page
 UPDATE users SET rows_per_page = 100 WHERE userid = 1;
+-- Set default language to EN_gb to display the date/time in the 24-hour format
+UPDATE config SET default_lang='en_GB' WHERE configid=1;
 
 -- test data for testPageAdministrationGeneralIconMapping and testFormAdministrationGeneralIconMapping
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (100, 'Icon mapping one', 10);
@@ -1200,65 +949,13 @@ INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (93,93,'Service','ab
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (93,0,0,99251,1603466628,128786843,'Test trigger with tag',2);
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
 
--- Tag based permissions
-INSERT INTO usrgrp (usrgrpid, name) VALUES (90, 'Selenium user group for tag permissions AAA');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (91, 'Selenium user group for tag permissions BBB');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (90, 'Tag-user', '$2y$10$UpgaksQrfBNgJVTZ8Zy53eVE6gaRcGhh1WQZojBAw2GGGh3ZXIoSi', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (90, 90, 90);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (91, 91, 90);
--- Tag based permissions: host group, host, item, two triggers
-INSERT INTO hstgrp (groupid, name, type) VALUES (50004, 'Host group for tag permissions', 0);
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'Host for tag permissions', 'Host for tag permissions', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90280, 50009, 50004);
-INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 50009, 50022);
-INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description, posts, headers) VALUES (400660, 'tag.item', 'tag.key', 50009, 50022, '30s', 3, '', '', '', '');
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100027, 'Trigger for tag permissions MySQL', '{100028}=0', 0, 1, '1339761311', '');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100028, 400660, 100027, 'last', '$,#1');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9001, 'Service','MySQL', 100027);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100028, 'Trigger for tag permissions Oracle', '{100029}=0', 0, 1, '1339761311', '');
-INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100029, 400660, 100028, 'last', '$,#1');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9002, 'Service','Oracle', 100028);
--- Tag based permissions: triggers problems events
-INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (94,0,0,100027,1603456528,128786843,1,'Trigger for tag permissions MySQL');
-INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (94,94,'Service','MySQL');
-INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (94,0,0,100027,1603456528,128786843,'Trigger for tag permissions MySQL');
-INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (94,94,'Service','MySQL');
-INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name) VALUES (95,0,0,100028,1603466728,128786843,1,'Trigger for tag permissions Oracle');
-INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
-INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (95,0,0,100028,1603466728,128786843,'Trigger for tag permissions Oracle');
-INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
--- Tag based permissions: Read-write permissions to host group
-INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
-INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
-
--- event correlation
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'delete tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'Event correlation for update', 'Test description update', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001, 99001, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for cancel', 'Test description cancel', 1, 1, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'cancel tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99003, 'Event correlation for clone', 'Test description clone', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
-
 -- host prototypes
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90001, 'Host for host prototype tests', 'Host for host prototype tests', 0, '', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99000, 90001, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50024,90001,1,1,1,'127.0.0.1','','10050');
-INSERT INTO items (name, key_, hostid, value_type, itemid, interfaceid, flags, delay, params, description, posts, headers) VALUES ('Discovery rule 1', 'key1', 90001, 4, 90001, 50024, 1, '30s', '', '', '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, interfaceid, flags, delay, params, description, posts, headers) VALUES ('Discovery rule 2', 'key2', 90001, 4, 90002, 50024, 1, '30s', '', '', '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, interfaceid, flags, delay, params, description, posts, headers) VALUES ('Discovery rule 3', 'key3', 90001, 4, 90003, 50024, 1, '30s', '', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, interfaceid, flags, delay, params,query_fields, description, posts, headers) VALUES ('Discovery rule 1', 'key1', 90001, 4, 90001, 50024, 1, '30s', '','', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, interfaceid, flags, delay, params,query_fields, description, posts, headers) VALUES ('Discovery rule 2', 'key2', 90001, 4, 90002, 50024, 1, '30s', '','', '', '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, interfaceid, flags, delay, params,query_fields, description, posts, headers) VALUES ('Discovery rule 3', 'key3', 90001, 4, 90003, 50024, 1, '30s', '','', '', '', '');
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90002, 'Host prototype {#1}', 'Host prototype {#1}', 0, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90003, 'Host prototype {#2}', 'Host prototype {#2}', 1, '', 2);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90004, 'Host prototype {#3}', 'Host prototype {#3}', 0, '', 2);
@@ -1310,7 +1007,7 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 50019, 1010);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99006, 'Inheritance test template with host prototype', 'Inheritance test template with host prototype', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99006, 99006, 50023);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers,query_fields, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '','', 1);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99007, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1012, 99007, '', 50019, NULL);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
@@ -1321,7 +1018,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99004, 'Host
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10026,99004,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99004, 99004, 50019);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15004, 99004, 99006);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, templateid, flags) VALUES (99084, 99004, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 99083, 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, templateid,query_fields, flags) VALUES (99084, 99004, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 99083,'', 1);
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99008, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 99007, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1014, 99008, '', 50019, 1002);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
@@ -1344,8 +1041,11 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90281, 50010, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50023,50010,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '{$_} {$NONEXISTING}', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99004, 'Http agent item form', 'HTTP AGENT ITEM FORM');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '{$LOCALIP} {$A}', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '{$A} and IP number {$LOCALIP}', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99005, 'Http agent item for update', 'HTTP AGENT ITEM FOR UPDATE');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula,query_fields, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '{$A} and IP number {$LOCALIP}', 'http-item-delete', 30, 50023, '', '','', 'zabbix.com', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99006, 'Http agent item for delete', 'HTTP AGENT ITEM FOR DELETE');
 INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5501, 50010, 'Service state');
 INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue, sortorder) VALUES (55001, 5501, 0, 'Down', 0);
 INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue, sortorder) VALUES (55002, 5501, 1, 'Up', 1);
@@ -1425,6 +1125,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99011, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 50013);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50025,99011,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99087, 2, 99011, 'Trapper_for_suppression', '', 'trapper_sup', 30, NULL, '', '', '', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99087, 'Trapper_for_suppression', 'TRAPPER_FOR_SUPPRESSION');
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger_for_suppression', '{100031}>0', 1, 3, 0, '1535012391', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100031, 99087, 100031, 'last', '$,#1');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9004, 'SupTag','A', 100031);
@@ -1447,6 +1148,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99012, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99008, 99012, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50026,99012,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99007, 2, 99012, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99007, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700018,'Check graph 1',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700019,'Check graph 2',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700026, 700018, 99007, 0, 0, '1A7C11', 0, 2, 0);
@@ -1455,6 +1157,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99013, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99009, 99013, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50027,99013,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99008, 2, 99013, 'Item to delete graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99008, 'Item to delete graph', 'ITEM TO DELETE GRAPH');
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700020,'Delete graph 1',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700021,'Delete graph 2',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700022,'Delete graph 3',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
@@ -1481,23 +1184,28 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99017, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99013, 99017, 50007);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50029,99017,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99010, 2, 99017, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99010, 'Item', 'ITEM');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99018, 'Host with item and without graph 2', 'Host with item and without graph 2', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99014, 99018, 50007);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50030,99018,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99011, 2, 99018, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99011, 'Item', 'ITEM');
 INSERT INTO hstgrp (groupid,name,type) VALUES (50008,'Group to copy all graph',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99019, 'Host with item to copy all graphs 1', 'Host with item to copy all graphs 1', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99015, 99019, 50008);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50031,99019,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99012, 2, 99019, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99012, 'Item', 'ITEM');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99020, 'Host with item to copy all graphs 2', 'Host with item to copy all graphs 2', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99016, 99020, 50008);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50032,99020,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99013, 2, 99020, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99013, 'Item', 'ITEM');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99021, 'Host to check graph 2', 'Host to check graph 2', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99017, 99021, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50033,99021,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99014, 2, 99021, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99014, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99022, 'Template with item graph', 'Template with item graph', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99018, 99022, 1);
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99015, 2, 99022, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
@@ -1514,30 +1222,36 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99024, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99022, 99024, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50034,99024,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99017, 2, 99024, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99017, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99025, 'Host to check graph 4', 'Host to check graph 4', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99023, 99025, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50035,99025,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99018, 2, 99025, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99018, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99026, 'Host to check graph 5', 'Host to check graph 5', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99024, 99026, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50036,99026,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99019, 2, 99026, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99019, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 INSERT INTO hstgrp (groupid,name,type) VALUES (50009,'Copy graph to several groups 1',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99027, 'Host 1 from first group', 'Host 1 from first group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99025, 99027, 50009);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50037,99027,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '{$A}', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99020, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 INSERT INTO hstgrp (groupid,name,type) VALUES (50010,'Copy graph to several groups 2',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Host 1 from second group', 'Host 1 from second group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99026, 99028, 50010);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50038,99028,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99021, 2, 99028, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99021, 'Item to check graph', 'ITEM TO CHECK GRAPH');
 
 -- testPageTriggers tags filtering test
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99050, 'Host for trigger tags filtering', 'Host for trigger tags filtering', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99910, 99050, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (55030,99050,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99090, 2, 99050, 'Trapper', '', 'trap', 30, NULL, '', '', '', '', '','');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99090, 'Trapper', 'TRAPPER');
 
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100060, 'First trigger for tag filtering', '{100060}>0', 0, 1, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100060, 99090, 100060, 'last', '$');
@@ -1583,13 +1297,17 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90284, 50013, 50
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50039,50011,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50040,50012,1,1,1,'127.0.0.1','','10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50041,50013,1,1,1,'127.0.0.1','','10050');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description,query_fields, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '','', 0, '', '');
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99000, 99086, 'DataBase', 'mysql');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description,query_fields, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '','', 0, '', '');
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99001, 99091, 'DataBase', 'PostgreSQL');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '', 0, '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description,query_fields, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '','', 0, '', '');
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99002, 99088, 'DataBase', 'Oracle');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers, units) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '', 'UNIT');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers,query_fields, units) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '','', 'UNIT');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99086, '1_item', '1_ITEM');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99091, '2_item', '2_ITEM');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99088, '3_item', '3_ITEM');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99089, '4_item', '4_ITEM');
 INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99003, 99089, 'DataBase', 'Oracle DB');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', 'Macro should be resolved, host IP should be visible here: {HOST.CONN}', 0, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', 'The following url should be clickable: https://zabbix.com', 2);
@@ -1631,8 +1349,8 @@ INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severit
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES ( 9007, 0, 0, 100040, 1533555726, 726692808, '4_trigger_Average', 3, 1);
 INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message, action, old_severity, new_severity) VALUES (1, 1, 9005, 1533629135, '1 acknowledged', 2, 0, 0);
 INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message, action, old_severity, new_severity) VALUES (2, 1, 9006, 1533629135, '2 acknowledged', 2, 0, 0);
-INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (1, 4, 1, 1533631968, 0, NULL);
-INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (2, 4, 1, 1533631968, 0, NULL);
+INSERT INTO task (taskid, type, status, clock, ttl, proxyid) VALUES (1, 4, 1, 1533631968, 0, NULL);
+INSERT INTO task (taskid, type, status, clock, ttl, proxyid) VALUES (2, 4, 1, 1533631968, 0, NULL);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (1, 1);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (2, 2);
 
@@ -1646,9 +1364,12 @@ INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUE
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50014, 1, 1, 1, '127.0.0.1', '10051');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50014, 4);
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (400670, 2, 50014, 'Item A', 'A', '', '', '', '');
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (400680, 2, 50014, 'Item B', 'B', '', '', '', '');
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (400690, 2, 50014, 'Item C', 'C', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (400670, 2, 50014, 'Item A', 'A', '','', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (400680, 2, 50014, 'Item B', 'B', '','', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (400690, 2, 50014, 'Item C', 'C', '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400670, 'Item A', 'ITEM A');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400680, 'Item B', 'ITEM B');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400690, 'Item C', 'ITEM C');
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100001, '{16028}=0', 'A trigger', '');
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100002, '{16029}=0', 'B trigger', '');
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100003, '{16030}=0', 'C trigger', '');
@@ -1659,7 +1380,7 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 -- testPageTriggers triggers filtering
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99061, 'Inheritance template for triggers filtering', 'Inheritance template for triggers filtering', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99913, 99061, 1);
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, params, posts, headers) VALUES (99092, 2, 99061, 'Inheritance item for triggers filtering', '', 'trap', NULL, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid,query_fields, params, posts, headers) VALUES (99092, 2, 99061, 'Inheritance item for triggers filtering', '', 'trap', NULL,'', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, priority, state, comments) VALUES (100065, 'Inheritance trigger with tags', '{100065}>0',3, 1, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100065, 99092, 100065, 'last', '$');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9046, 'server','selenium', 100065);
@@ -1671,8 +1392,10 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99914, 99062, 50
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50004, 99062, 99061);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (55033, 99062, 1, 1, 1, '127.0.0.1', '', '10050');
 
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, params, posts, templateid, headers) VALUES (99093, 2, 99062, 'Inheritance item for triggers filtering', '', 'trap', NULL, '', '', 99092,'');
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, params, posts, headers) VALUES (99094, 2, 99062, 'Item for triggers filtering', '', 'trap1', NULL, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, params, posts,query_fields, templateid, headers) VALUES (99093, 2, 99062, 'Inheritance item for triggers filtering', '', 'trap', NULL, '', '','', 99092,'');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid,query_fields, params, posts, headers) VALUES (99094, 2, 99062, 'Item for triggers filtering', '', 'trap1', NULL,'', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99093, 'Inheritance item for triggers filtering', 'INHERITANCE ITEM FOR TRIGGERS FILTERING');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99094, 'Item for triggers filtering', 'ITEM FOR TRIGGERS FILTERING');
 
 INSERT INTO triggers (triggerid, description, expression, value, comments, templateid, state, error) VALUES (100066, 'Inheritance trigger with tags', '{100067}=0', 1,'', 100065, 1, 'selenium trigger cannot be evaluated for some reason');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (100067, 100066, 99093, 'last', '$');
@@ -1693,10 +1416,11 @@ INSERT INTO triggers (triggerid, description, expression, status, value, priorit
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100071, 99094, 100070, 'last', '$');
 INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) VALUES (99001, 100070, 100067);
 
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99095, 2, 99062, 'Discovery rule for triggers filtering', '', 'lld', NULL, 1,'','','');
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99096, 2, 99062, 'Discovered item {#TEST}', '', 'lld[{#TEST}]', NULL, 2, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99095, 2, 99062, 'Discovery rule for triggers filtering', '', 'lld', NULL, 1,'','','','');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99096, 2, 99062, 'Discovered item {#TEST}', '', 'lld[{#TEST}]', NULL, 2,'', '', '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, lastcheck, ts_delete) VALUES (15085, 99096, 99095, 0, 0);
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99097, 2, 99062, 'Discovered item one', '', 'lld[one]', NULL, 4, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99097, 2, 99062, 'Discovered item one', '', 'lld[one]', NULL, 4,'', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99097, 'Discovered item one', 'DISCOVERED ITEM ONE');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) values (15086, 99097, 99096, 'lld[one]');
 INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags) VALUES (100068, 'Discovered trigger {#TEST}', '{100069}>0', 0, 0, 5, '', 0, 2);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100069, 99096, 100068, 'last', '$');
@@ -1805,35 +1529,34 @@ INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (15680, 1030);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100004, 15680, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100005, 15680, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
 -- widget "Test cases for simple update and deletion"
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 100005, 1, 'ds.color.0', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 100005, 1, 'ds.0.color', 0, 'FF465C');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90007, 100005, 0, 'righty', 0, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 100005, 1, 'ds.hosts.0.0', 0, 'Host*');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 100005, 1, 'ds.items.0.0', 0, 'Available memory');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 100005, 1, 'ds.0.hosts.0', 0, 'Host*');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 100005, 1, 'ds.0.items.0', 0, 'Available memory');
 -- widget "Test cases for update"
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90010, 100004, 0, 'ds.axisy.0', 1, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 1, 'ds.color.0', 0, 'FF465C');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 0, 'ds.pointsize.0', 4, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.transparency.0', 6, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 100004, 0, 'ds.type.0', 1, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90015, 100004, 0, 'graph_time', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90010, 100004, 0, 'ds.0.axisy', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 1, 'ds.0.color', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 0, 'ds.0.pointsize', 4, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.0.transparency', 6, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 100004, 0, 'ds.0.type', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90016, 100004, 0, 'lefty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90017, 100004, 0, 'legend_lines', 2, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90018, 100004, 0, 'or.pointsize.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90018, 100004, 0, 'or.0.pointsize', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90019, 100004, 0, 'righty_units', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90020, 100004, 0, 'severities', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90021, 100004, 0, 'show_problems', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90022, 100004, 0, 'source', 2, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90024, 100004, 1, 'ds.hosts.0.0', 0, 'update host');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90025, 100004, 1, 'ds.items.0.0', 0, 'update item');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90026, 100004, 1, 'ds.timeshift.0', 0, '1m');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90027, 100004, 1, 'or.hosts.0.0', 0, 'override host');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90028, 100004, 1, 'or.items.0.0', 0, 'override item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90024, 100004, 1, 'ds.0.hosts.0', 0, 'update host');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90025, 100004, 1, 'ds.0.items.0', 0, 'update item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90026, 100004, 1, 'ds.0.timeshift', 0, '1m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90027, 100004, 1, 'or.0.hosts.0', 0, 'override host');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90028, 100004, 1, 'or.0.items.0', 0, 'override item');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90029, 100004, 1, 'problemhosts.0', 0, 'ЗАББИКС Сервер');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90030, 100004, 1, 'righty_max', 0, '5');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90031, 100004, 1, 'righty_min', 0, '-2');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90032, 100004, 1, 'righty_static_units', 0, 'KB');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90033, 100004, 1, 'time_from', 0, 'now-10m');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90034, 100004, 1, 'time_to', 0, 'now-5m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90033, 100004, 1, 'time_period.from', 0, 'now-10m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90034, 100004, 1, 'time_period.to', 0, 'now-5m');
 
 -- testProblemsBySeverityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1040, 'Dashboard for Problems by severity', 1, 1);
@@ -1861,14 +1584,15 @@ INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname,
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55072, 99136, 3, '127.0.0.3', 'Test3', '1', '623', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55073, 99136, 4, '127.0.0.4', 'Test4', '1', '12345', '1');
 
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99142, 0, 99136, 'Master item', '', 'master', 55070, 0, '', '', '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99294, 0, 99136, 'Test discovery rule', '', 'test', 55070, 1, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99142, 0, 99136, 'Master item', '', 'master', 55070, 0,'', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99294, 0, 99136, 'Test discovery rule', '', 'test', 55070, 1,'', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99142, 'Master item', 'MASTER ITEM');
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99137, 'Test Item Template', 'Test Item Template', 3,'Template for testing items');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99982, 99137, 1);
 
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99183, 2, 99137, 'Master item', '', 'master', NULL, 0, '', '', '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99349, 0, 99137, 'Test discovery rule', '', 'test', NULL, 1, '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99183, 2, 99137, 'Master item', '', 'master', NULL, 0,'', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers) VALUES (99349, 0, 99137, 'Test discovery rule', '', 'test', NULL, 1,'', '', '', '');
 
 -- testFormHostPrototypeMacros
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99200, 'Host prototype for macros {#UPDATE}', 'Host prototype for macros {#UPDATE}', 0, '', 2);
@@ -1925,9 +1649,11 @@ INSERT INTO hosts (hostid, host, name, description) VALUES (99202, 'Dynamic widg
 INSERT INTO hstgrp (groupid, name, type) VALUES (50017, 'Dynamic widgets HG1 (H1 and H2)', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99983, 99202, 50017);
 INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55074, 99202, 1, 1);
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99103, 2, 99202, 'Dynamic widgets H1I1', 'dynamic[1]', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (99103, 2, 99202, 'Dynamic widgets H1I1', 'dynamic[1]', '','', '', '', '');
 INSERT INTO history (itemid, clock, value, ns) VALUES (99103, 1589983553, '11', 726692808);
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99104, 2, 99202, 'Dynamic widgets H1I2', 'dynamic[2]', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (99104, 2, 99202, 'Dynamic widgets H1I2', 'dynamic[2]', '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99103, 'Dynamic widgets H1I1', 'DYNAMIC WIDGETS H1I1');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99104, 'Dynamic widgets H1I2', 'DYNAMIC WIDGETS H1I2');
 INSERT INTO history (itemid, clock, value, ns) VALUES (99104, 1589897100, '12', 726692808);
 INSERT INTO graphs (graphid, name) VALUES (700026, 'Dynamic widgets H1 G1 (I1)');
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700034, 700026, 99103, 0);
@@ -1938,9 +1664,9 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700036, 7
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700037, 700028, 99104, 1);
 INSERT INTO graphs (graphid, name) VALUES (700031,'Dynamic widgets H1 G4 (H1I1 and H3I1)');
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700041, 700031, 99104, 0);
-INSERT INTO items (itemid, type, hostid, name, key_, flags, params, description, posts, headers) VALUES (99107, 2, 99202, 'Dynamic widgets H1D1', 'dynamic.lld[1]', 1, '', '', '', '');
-INSERT INTO items (itemid, type, hostid, name, key_, flags, params, description, posts, headers) VALUES (99108, 2, 99202, 'Dynamic widgets H1IP1', 'dynamic.ip[1]', 2, '', '', '', '');
-INSERT INTO items (itemid, type, hostid, name, key_, flags, params, description, posts, headers) VALUES (99109, 2, 99202, 'Dynamic widgets H1IP2', 'dynamic.ip[2]', 2, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, flags, params,query_fields, description, posts, headers) VALUES (99107, 2, 99202, 'Dynamic widgets H1D1', 'dynamic.lld[1]', 1, '','', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, flags, params,query_fields, description, posts, headers) VALUES (99108, 2, 99202, 'Dynamic widgets H1IP1', 'dynamic.ip[1]', 2, '','', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, flags, params,query_fields, description, posts, headers) VALUES (99109, 2, 99202, 'Dynamic widgets H1IP2', 'dynamic.ip[2]', 2, '','', '', '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15087, 99108, 99107);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15088, 99109, 99107);
 INSERT INTO graphs (graphid, name, flags) VALUES (700032, 'Dynamic widgets GP1 (IP1)', 2);
@@ -1957,12 +1683,13 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700047, 7
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99203, 'Dynamic widgets H2', 'Dynamic widgets H2', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99984, 99203, 50017);
 INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55075, 99203, 1, 1);
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99105, 2, 99203, 'Dynamic widgets H2I1', 'dynamic[1]', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (99105, 2, 99203, 'Dynamic widgets H2I1', 'dynamic[1]', '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99105, 'Dynamic widgets H2I1', 'DYNAMIC WIDGETS H2I1');
 INSERT INTO history (itemid, clock, value, ns) VALUES (99105, 1589810700, '21', 726692808);
 INSERT INTO graphs (graphid, name) VALUES (700029, 'Dynamic widgets H2 G1 (I1)');
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700038, 700029, 99105, 0);
-INSERT INTO items (itemid, type, hostid, name, key_, flags, params, description, posts, headers) VALUES (99110, 2, 99203, 'Dynamic widgets H2D1', 'dynamic.lld[1]', 1, '', '', '', '');
-INSERT INTO items (itemid, type, hostid, name, key_, flags, params, description, posts, headers) VALUES (99111, 2, 99203, 'Dynamic widgets H2IP1', 'dynamic.ip[1]', 2, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, flags, params,query_fields, description, posts, headers) VALUES (99110, 2, 99203, 'Dynamic widgets H2D1', 'dynamic.lld[1]', 1, '','', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, flags, params,query_fields, description, posts, headers) VALUES (99111, 2, 99203, 'Dynamic widgets H2IP1', 'dynamic.ip[1]', 2, '','', '', '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15089, 99111, 99110);
 INSERT INTO graphs (graphid, name, flags) VALUES (700036, 'Dynamic widgets GP1 (IP1)', 2);
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700048, 700036, 99111, 0);
@@ -1977,7 +1704,8 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99204, 'Dyna
 INSERT INTO hstgrp (groupid, name, type) VALUES (50018, 'Dynamic widgets HG2 (H3)', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99985, 99204, 50018);
 INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55076, 99204, 1, 1);
-INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99106, 2, 99204, 'Dynamic widgets H3I1', 'dynamic[1]', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params,query_fields, description, posts, headers) VALUES (99106, 2, 99204, 'Dynamic widgets H3I1', 'dynamic[1]', '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99106, 'Dynamic widgets H3I1', 'DYNAMIC WIDGETS H3I1');
 INSERT INTO history (itemid, clock, value, ns) VALUES (99106, 1589724300, '31', 726692808);
 INSERT INTO graphs (graphid, name) VALUES (700030, 'Dynamic widgets H3 G1 (I1)');
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700039, 700030, 99106, 0);
@@ -1992,10 +1720,10 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90036, 100010, 4, 'itemid', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90037, 100011, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90038, 100011, 4, 'itemid', 0, 99103);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90039, 100011, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90039, 100011, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90040, 100012, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90041, 100012, 4, 'itemid', 0, 99104);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90042, 100012, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90042, 100012, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100013, 15700, 'graph', '', 0, 3, 8, 3);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100014, 15700, 'graph', '', 8, 3, 8, 3);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100015, 15700, 'graph', '', 16, 3, 8, 3);
@@ -2003,27 +1731,27 @@ INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height)
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100017, 15700, 'graph', '', 10, 6, 10, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90043, 100013, 6, 'graphid', 0, 700027);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90044, 100014, 6, 'graphid', 0, 700026);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90045, 100014, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90045, 100014, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90046, 100015, 6, 'graphid', 0, 700027);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90047, 100015, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90047, 100015, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90048, 100016, 6, 'graphid', 0, 700028);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90049, 100016, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90049, 100016, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90050, 100017, 6, 'graphid', 0, 700031);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90051, 100017, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90051, 100017, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100018, 15700, 'plaintext', '', 0, 9, 8, 2);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100019, 15700, 'plaintext', '', 8, 9, 8, 2);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100020, 15700, 'plaintext', '', 16, 9, 8, 2);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100021, 15700, 'plaintext', '', 0, 11, 8, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90052, 100018, 4, 'itemids', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90053, 100019, 4, 'itemids', 0, 99103);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90054, 100019, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90054, 100019, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90055, 100020, 4, 'itemids', 0, 99104);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90056, 100020, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90056, 100020, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90057, 100021, 4, 'itemids', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90058, 100021, 4, 'itemids', 0, 99104);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 100021, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90059, 100021, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100022, 15700, 'url', 'Dynamic URL', 0, 13, 11, 4);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 100022, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90060, 100022, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 100022, 1, 'url', 'iframe.php?name={HOST.NAME}');
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100023, 15700, 'graphprototype', '', 0, 17, 9, 2);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100024, 15700, 'graphprototype', '', 9, 17, 8, 2);
@@ -2035,21 +1763,29 @@ INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height)
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100030, 15700, 'graphprototype', '', 11, 21, 11, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90062, 100023, 0, 'source_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90063, 100023, 5, 'itemid', 0, 99109);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90064, 100024, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90064, 100024, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90065, 100024, 0, 'source_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90066, 100024, 5, 'itemid', 0, 99108);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90067, 100025, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90067, 100025, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90068, 100025, 0, 'source_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90069, 100025, 5, 'itemid', 0, 99109);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90070, 100026, 7, 'graphid', 0, 700032);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90071, 100027, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90071, 100027, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90072, 100027, 7, 'graphid', 0, 700032);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90073, 100028, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90073, 100028, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90074, 100028, 7, 'graphid', 0, 700033);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90075, 100029, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90075, 100029, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90076, 100029, 7, 'graphid', 0, 700034);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90077, 100030, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90077, 100030, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90078, 100030, 7, 'graphid', 0, 700035);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100031, 15700, 'gauge', '', 11, 11, 6, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90079, 100031, 4, 'itemid', 0, 99104);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90080, 100031, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100032, 15700, 'gauge', '', 17, 11, 6, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90081, 100032, 4, 'itemid', 0, 99103);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90082, 100032, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 
 -- testFormUserMedia
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,10,'test@jabber.com',0,16,'1-7,00:00-24:00');
@@ -2059,10 +1795,10 @@ INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, perio
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9004, 1400);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100099, 9004, 'graphprototype', 'Graph prototype widget for update', 0, 0, 16, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 100099, 7, 'graphid', 600003);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 100099, 7, 'graphid.0', 600003);
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (120000, 9004, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 16, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905055, 120000, 7, 'graphid', 600002);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905055, 120000, 7, 'graphid.0', 600002);
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9005, 1410);
@@ -2113,7 +1849,8 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VAL
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99514, 99135, '{$X_SECRET_HOST_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Host macro to be resolved', 0);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99515, 99011, '{$SECRET_HOST_MACRO}', 'some secret value', '', 1);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99516, 99011, '{$TEXT_HOST_MACRO}', 'some text value', '', 0);
-INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99112, 2, 99135, 'Macro value: {$X_SECRET_HOST_MACRO_2_RESOLVE}', 'trap[{$X_SECRET_HOST_MACRO_2_RESOLVE}]', NULL, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params,query_fields, description, posts, headers) VALUES (99112, 2, 99135, 'Macro value: {$X_SECRET_HOST_MACRO_2_RESOLVE}', 'trap[{$X_SECRET_HOST_MACRO_2_RESOLVE}]', NULL, '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99112, 'Macro value: {$X_SECRET_HOST_MACRO_2_RESOLVE}', 'MACRO VALUE: {$X_SECRET_HOST_MACRO_2_RESOLVE}');
 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99525, 99011, '{$VAULT_HOST_MACRO3}', 'secret/path:key', 'Change name, value, description', 2);
 
@@ -2124,12 +1861,13 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VAL
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99520, 99137, '{$TEXT_TEMPLATE_MACRO_2_SECRET}', 'Text template macro value', 'Text template macro that is going to become secret', 0);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99521, 99137, '{$SECRET_TEMPLATE_MACRO_UPDATE}', 'Secret template macro value', 'Secret template macro that is going to stay secret', 1);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99522, 99137, '{$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Template macro to be resolved', 0);
-INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99113, 2, 99137, 'Macro value: {$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params,query_fields, description, posts, headers) VALUES (99113, 2, 99137, 'Macro value: {$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'trap', NULL, '','', '', '', '');
 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99526, 99014, '{$VAULT_HOST_MACRO}', 'secret/path:key', 'Change name, value, description', 2);
 
 -- testFormAdministrationGeneralMacros
-INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap[{$Z_GLOBAL_MACRO_2_RESOLVE}]', NULL, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params,query_fields, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap[{$Z_GLOBAL_MACRO_2_RESOLVE}]', NULL, '','', '', '', '');
+INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99114, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'MACRO VALUE: {$Z_GLOBAL_MACRO_2_RESOLVE}');
 
 -- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
@@ -34,7 +35,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
@@ -75,21 +76,21 @@ class testPageItems extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history', 'Delete');
+		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history and trends', 'Delete');
 	}
 
 	/**
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
-			$this->assertFalse($this->query('button:Clear history')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Clear history and trends')->one()->isEnabled());
 		}
 		else {
 			$this->zbxTestClickButtonText('Execute now');
@@ -186,7 +187,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider getHostAndGroupData
 	 */
 	public function testPageItems_FilterHostAndGroupsFilter($data) {
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D=99062&context=host');
+		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]=99062');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Item create button enabled and breadcrumbs exist.
@@ -200,14 +201,13 @@ class testPageItems extends CLegacyWebTest {
 		$form->fill($data['filter_options']);
 		$form->submit();
 		$this->page->waitUntilReady();
-
 		// Item create button disabled and breadcrumbs not exist.
 		$this->assertFalse($this->query('button:Create item (select host first)')->one()->isEnabled());
 		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
 		// Check results in table.
-		$table = $this->query('name:items')->one()->query('class:list-table')->asTable()->one();
+		$table = $this->query('name:item_list')->one()->query('class:list-table')->asTable()->one();
 		foreach ($table->getRows() as $i => $row) {
-			$get_host = $row->getColumn('Name')->query('xpath:./a[not(@class)]')->one()->getText();
+			$get_host = $row->getColumn('Name')->query('class:js-update-item')->one()->getText();
 			$get_group = $row->getColumn('Host')->getText();
 			foreach ($data['result'][$i] as $group => $host) {
 				$this->assertEquals($host, $get_host);

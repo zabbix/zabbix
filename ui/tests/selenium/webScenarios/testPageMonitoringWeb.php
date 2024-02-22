@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,31 +20,35 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup hosts, httptest
  *
- * @dataSource DiscoveredHosts, EntitiesTags, ExecuteNowAction
+ * @dataSource WebScenarios, DiscoveredHosts, EntitiesTags, ExecuteNowAction
  *
- * @onBefore prepareHostWebData
+ * @onBefore getContextData
  */
 class testPageMonitoringWeb extends CWebTest {
 
-	use TagTrait;
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
 	}
+
+	const HOST = 'Simple form test host';
+	const SCENARIO = 'Scenario for Delete';
 
 	/**
 	 * Host id created for web service.
@@ -60,113 +64,12 @@ class testPageMonitoringWeb extends CWebTest {
 	 */
 	private static $httptestid;
 
-	public function prepareHostWebData() {
-		CDataHelper::call('hostgroup.create', [
-			[
-				'name' => 'WebData HostGroup'
-			]
-		]);
-		$hostgrpid = CDataHelper::getIds('name');
-
-		CDataHelper::call('host.create', [
-			'host' => 'WebData Host',
-			'groups' => [
-				[
-					'groupid' => $hostgrpid['WebData HostGroup']
-				]
-			],
-			'interfaces' => [
-				'type'=> 1,
-				'main' => 1,
-				'useip' => 1,
-				'ip' => '192.168.3.217',
-				'dns' => '',
-				'port' => '10050'
-			]
-		]);
-		self::$hostid = CDataHelper::getIds('host');
-
-		CDataHelper::call('httptest.create', [
-			[
-				'name' => 'Web scenario 1 step',
-				'hostid' => self::$hostid['WebData Host'],
-				'steps' => [
-					[
-						'name' => 'Homepage',
-						'url' => 'http://zabbix.com',
-						'no' => 1
-					]
-				],
-				'tags' => [
-					[
-						'tag' => 'FirstTag',
-						'value' => 'value 1'
-					]
-				]
-			],
-			[
-				'name' => 'Web scenario 2 step',
-				'hostid' => self::$hostid['WebData Host'],
-				'steps' => [
-					[
-						'name' => 'Homepage1',
-						'url' => 'http://example.com',
-						'no' => 1
-					],
-					[
-						'name' => 'Homepage2',
-						'url' => 'http://example.com',
-						'no' => 2
-					]
-				],
-				'tags' => [
-					[
-						'tag' => 'SecondTag',
-						'value' => 'value 2'
-					],
-					[
-						'tag' => 'ThirdTag',
-						'value' => 'value 3'
-					]
-				]
-			],
-			[
-				'name' => 'Web scenario 3 step',
-				'hostid' => self::$hostid['WebData Host'],
-				'steps' => [
-					[
-						'name' => 'Homepage1',
-						'url' => 'http://example.com',
-						'no' => 1
-					],
-					[
-						'name' => 'Homepage2',
-						'url' => 'http://example.com',
-						'no' => 2
-					],
-					[
-						'name' => 'Homepage3',
-						'url' => 'http://example.com',
-						'no' => 3
-					]
-				],
-				'tags' => [
-					[
-						'tag' => 'FourthTag',
-						'value' => 'value 4'
-					],
-					[
-						'tag' => 'FifthTag',
-						'value' => 'value 5'
-					],
-					[
-						'tag' => 'SixthTag',
-						'value' => 'value 6'
-					]
-				]
-			]
-		]);
-		self::$httptestid = CDataHelper::getIds('name');
+	/**
+	 * Get the necessary properties of entities used within this test.
+	 */
+	public static function getContextData() {
+		self::$hostid = CDataHelper::get('WebScenarios.hostid');
+		self::$httptestid = CDataHelper::get('WebScenarios.httptestids.'.self::SCENARIO);
 	}
 
 	/**
@@ -237,13 +140,13 @@ class testPageMonitoringWeb extends CWebTest {
 		$start_contents = $this->getTableColumnData('Name');
 
 		// Filter hosts.
-		$form->fill(['Hosts' => 'Simple form test host']);
+		$form->fill(['Hosts' => self::HOST]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
-		$this->assertEquals(4, $table->getRows()->count());
-		$this->assertTableStats(4);
+		$this->assertEquals(3, $table->getRows()->count());
+		$this->assertTableStats(3);
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$this->query('button:Reset')->one()->click();
@@ -263,9 +166,9 @@ class testPageMonitoringWeb extends CWebTest {
 			'Discovery', 'Web', 'Detect operating system', 'Ping', 'Traceroute'
 		];
 
-		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Graphs');
-		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Dashboards');
-		$this->checkHostContextMenu($popupitems, 'Simple form test host', 'Dashboards');
+		$this->checkHostContextMenu($popupitems, 'Host for tags testing', 'Graphs');
+		$this->checkHostContextMenu($popupitems, self::HOST, 'Dashboards');
+		$this->checkHostContextMenu($popupitems, 'Template inheritance test host', 'Dashboards');
 	}
 
 	/**
@@ -288,30 +191,6 @@ class testPageMonitoringWeb extends CWebTest {
 		$popup->close();
 	}
 
-	/**
-	 * Function which checks if disabled web services aren't displayed.
-	 */
-	public function testPageMonitoringWeb_CheckDisabledWebServices() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$values = $this->getTableColumnData('Name');
-
-		// Turn off/on web services and check table results.
-		foreach (['Disable', 'Enable'] as $status) {
-			$this->page->open('httpconf.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'])->waitUntilReady();
-			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
-			$this->query('button', $status)->one()->click();
-			$this->page->acceptAlert();
-
-			$this->assertMessage(TEST_GOOD, ($status === 'Disable' ? 'Web scenarios disabled' :'Web scenarios enabled'));
-
-			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-			$changed = ($status === 'Disable')
-				? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step', 'Web scenario 3 step'])
-				: $values;
-			$this->assertTableDataColumn($changed);
-		}
-	}
-
 	public static function getFilterData() {
 		return [
 			// #0.
@@ -324,7 +203,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web scenario 1 step'
+						'Scenario for Update'
 					]
 				]
 			],
@@ -340,9 +219,9 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web scenario 3 step'
+						'Scenario for Delete',
+						'Scenario for Update',
+						'Template_Web_scenario'
 					]
 				]
 			],
@@ -356,7 +235,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web scenario 1 step'
+						'Scenario for Update'
 					]
 				]
 			],
@@ -370,7 +249,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web scenario 1 step'
+						'Scenario for Update'
 					]
 				]
 			],
@@ -385,7 +264,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web scenario 2 step'
+						'Scenario for Delete'
 					]
 				]
 			],
@@ -393,7 +272,7 @@ class testPageMonitoringWeb extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'WebData Host'
+						'Host groups' => 'Zabbix servers'
 					],
 					'tag_options' => [
 						'type' => 'Or',
@@ -403,8 +282,8 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web scenario 2 step',
-						'Web scenario 3 step'
+						'Scenario for Delete',
+						'Template_Web_scenario'
 					]
 				]
 			],
@@ -418,20 +297,16 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Scenario for Delete',
+						'Scenario for Update',
 						'Template web scenario',
 						'Template web scenario 1',
 						'Template web scenario 2',
 						'Template web scenario with tags for cloning',
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -451,20 +326,16 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Scenario for Delete',
+						'Scenario for Update',
 						'Template web scenario',
 						'Template web scenario 1',
 						'Template web scenario 2',
 						'Template web scenario with tags for cloning',
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -485,20 +356,16 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Scenario for Delete',
+						'Scenario for Update',
 						'Template web scenario',
 						'Template web scenario 1',
 						'Template web scenario 2',
 						'Template web scenario with tags for cloning',
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -519,20 +386,16 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Scenario for Delete',
+						'Scenario for Update',
 						'Template web scenario',
 						'Template web scenario 1',
 						'Template web scenario 2',
 						'Template web scenario with tags for cloning',
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -552,20 +415,16 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Scenario for Delete',
 						'Template web scenario',
 						'Template web scenario 1',
 						'Template web scenario 2',
 						'Template web scenario with tags for cloning',
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
+						'Template_Web_scenario',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 2 step',
-						'Web scenario 3 step',
 						'Web scenario for execute now',
 						'Web scenario for removing tags',
 						'Web scenario with tags for cloning',
@@ -579,18 +438,19 @@ class testPageMonitoringWeb extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'WebData HostGroup'
+						'Host groups' => 'Zabbix servers'
 					],
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
 							['name' => 'FirstTag', 'value' => 'value 6', 'operator' => 'Does not contain'],
-							['name' => 'FirstTag', 'value' => '1', 'operator' => 'Does not contain']
+							['name' => 'FirstTag', 'value' => '1', 'operator' => 'Does not contain'],
+							['name' => 'FirstTag', 'operator' => 'Exists'],
+							['name' => 'FirstTag', 'operator' => 'Exists']
 						]
 					],
 					'expected' => [
-						'Web scenario 2 step',
-						'Web scenario 3 step'
+						'Scenario for Update'
 					]
 				]
 			],
@@ -601,10 +461,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'Host groups' => 'Zabbix servers'
 					],
 					'expected' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
+						'Scenario for Delete',
+						'Scenario for Update',
+						'Template_Web_scenario',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
@@ -621,10 +480,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'Hosts' => 'Simple form test host'
 					],
 					'expected' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4'
+						'Scenario for Delete',
+						'Scenario for Update',
+						'Template_Web_scenario'
 					]
 				]
 			],
@@ -653,10 +511,9 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
+						'Scenario for Delete',
+						'Scenario for Update',
+						'Template_Web_scenario',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
@@ -673,10 +530,9 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
+						'Scenario for Delete',
+						'Scenario for Update',
+						'Template_Web_scenario',
 						'testInheritanceWeb1',
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
@@ -690,13 +546,20 @@ class testPageMonitoringWeb extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'WebData HostGroup',
-						'Hosts' => ['WebData Host']
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => [
+							'Simple form test host'
+						]
+					],
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FifthTag', 'operator' => 'Does not exist'],
+							['name' => 'SecondTag', 'operator' => 'Does not exist']
+						]
 					],
 					'expected' => [
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web scenario 3 step'
+						'Scenario for Update'
 					]
 				]
 			],
@@ -704,53 +567,16 @@ class testPageMonitoringWeb extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Host groups' => [
+							'HostTags'
+						],
 						'Hosts' => [
-							'Host ZBX6663',
-							'Simple form test host',
-							'Template inheritance test host',
-							'WebData Host'
+							'Host ZBX6663'
 						]
-					],
-					'expected' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web scenario 3 step',
-						'Web ZBX6663',
-						'Web ZBX6663 Second'
 					]
 				]
 			],
 			// #19.
-			[
-				[
-					'filter' => [
-						'Host groups' => [
-							'WebData HostGroup',
-							'Zabbix servers'
-						],
-						'Hosts' => [
-							'Host ZBX6663',
-							'WebData Host'
-						]
-					],
-					'expected' => [
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web scenario 3 step',
-						'Web ZBX6663',
-						'Web ZBX6663 Second'
-					]
-				]
-			],
-			// #20.
 			[
 				[
 					'filter' => [
@@ -761,19 +587,18 @@ class testPageMonitoringWeb extends CWebTest {
 						'tags' => [
 							['name' => 'FirstTag', 'value' => 'value 6', 'operator' => 'Contains']
 						]
-					],
-					'expected' => []
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * Function which checks if Web service tags are properly displayed.
+	 * Function which checks filtering of Web scenarios.
 	 *
 	 * @dataProvider getFilterData
 	 */
-	public function testPageMonitoringWeb_TagsFilter($data) {
+	public function testPageMonitoringWeb_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('class:list-table')->waitUntilPresent()->one();
@@ -789,7 +614,13 @@ class testPageMonitoringWeb extends CWebTest {
 
 		$form->submit();
 		$table->waitUntilReloaded();
-		$this->assertTableDataColumn($data['expected']);
+
+		if (array_key_exists('expected', $data)) {
+			$this->assertTableDataColumn($data['expected']);
+		}
+		else {
+			$this->assertTableData();
+		}
 	}
 
 	/**
@@ -797,17 +628,18 @@ class testPageMonitoringWeb extends CWebTest {
 	 */
 	public function testPageMonitoringWeb_CheckWebServiceNumberOfSteps() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
-		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::SCENARIO);
+		$this->assertEquals('2', $row->getColumn('Number of steps')->getText());
 
 		// Directly open API created Web scenario and add one more step.
-		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
-				self::$httptestid['Web scenario 3 step'])->waitUntilReady();
-		$this->query('id:webscenario-form')->asForm()->one()->selectTab('Steps');
-		$this->query('xpath://button[@class="btn-link js-add-step"]')->one()->click();
+		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid.'&httptestid='.self::$httptestid)
+				->waitUntilReady();
+		$scenario_form = $this->query('id:webscenario-form')->asForm()->one();
+		$scenario_form->selectTab('Steps');
+		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:webscenario-step-form')->asForm()->one();
-		$form->fill(['Name' => 'Step number 4', 'id:url' => 'test.com']);
+		$form->fill(['Name' => 'Step number 3', 'id:url' => 'test.com']);
 		$form->submit();
 		$this->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
@@ -815,7 +647,7 @@ class testPageMonitoringWeb extends CWebTest {
 
 		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
 		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$this->assertEquals('4', $row->getColumn('Number of steps')->getText());
+		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
 	}
 
 	/**
@@ -860,5 +692,29 @@ class testPageMonitoringWeb extends CWebTest {
 		}
 
 		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
+	}
+
+	/**
+	 * Function which checks if disabled web services aren't displayed.
+	 */
+	public function testPageMonitoringWeb_CheckDisabledWebServices() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$values = $this->getTableColumnData('Name');
+
+		// Turn off/on web services and check table results.
+		foreach (['Disable', 'Enable'] as $status) {
+			$this->page->open('httpconf.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
+			$this->query('button', $status)->one()->click();
+			$this->page->acceptAlert();
+
+			$this->assertMessage(TEST_GOOD, ($status === 'Disable' ? 'Web scenarios disabled' : 'Web scenarios enabled'));
+
+			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+			$changed = ($status === 'Disable')
+				? array_diff($values, ['Template_Web_scenario', 'Scenario for Update', 'Scenario for Delete'])
+				: array_merge($values, ['Scenario for Clone']);
+			$this->assertTableDataColumn($changed);
+		}
 	}
 }

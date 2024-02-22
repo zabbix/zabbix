@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
+/* strptime() on newer and older GNU/Linux systems */
+#define _GNU_SOURCE
 #include "macrofunc.h"
 
 #include "zbxregexp.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbx_expression_constants.h"
 
 typedef struct
 {
@@ -31,17 +31,6 @@ typedef struct
 	const char	*functions;
 }
 zbx_macro_functions_t;
-
-/* macros that can be modified using macro functions */
-static zbx_macro_functions_t	mod_macros[] =
-{
-	{MVAR_ITEM_VALUE, "regsub,iregsub,fmtnum"},
-	{MVAR_ITEM_LASTVALUE, "regsub,iregsub,fmtnum"},
-	{MVAR_TIME, "fmttime"},
-	{"{?}", "fmtnum"},
-	{NULL, NULL}
-};
-
 
 /******************************************************************************
  *                                                                            *
@@ -128,6 +117,16 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 	time_new = time(&time_new);
 	localtime_r(&time_new, &local_time);
+
+	if (NULL == strptime(*out, "%H:%M:%S", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S", &local_time) &&
+			NULL == strptime(*out, "%Y-%m-%dT%H:%M:%S%z", &local_time))
+	{
+		if (0 == (time_new = atoi(*out)))
+			return FAIL;
+
+		localtime_r(&time_new, &local_time);
+	}
 
 	if (2 == nparam)
 	{
@@ -223,7 +222,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	if (FAIL == zbx_is_uint32(params[0], &precision))
+	if (FAIL == zbx_is_uint_range(params[0], &precision, 0, 20))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid parameter \"%s\"", params[0]);
 		return FAIL;
@@ -236,48 +235,40 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if a macro function one in the list for the macro.          *
+ * Purpose: gets macro from the macro function                                *
  *                                                                            *
  * Parameters: str          - [IN] string containing potential macro          *
  *             fm           - [IN] function macro to check                    *
  *             N_functionid - [OUT] index of the macro in string (if valid)   *
  *                                                                            *
- * Return value: unindexed macro from the allowed list or NULL.               *
+ * Return value: unindexed macro  or NULL.                                    *
+ * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
 {
-	int	i;
+	const char	*ptr_l = str + fm->macro.l, *ptr_r;
+	char		*ptr = NULL;
 
-	for (i = 0; NULL != mod_macros[i].macro; i++)
+	if (NULL != (ptr_r = strchr(ptr_l, '}')))
 	{
-		size_t	len, fm_len;
+		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;
 
-		len = strlen(mod_macros[i].macro);
-		fm_len = fm->macro.r - fm->macro.l + 1;
+		ptr = zbx_strdup(ptr, ptr_l);
 
-		if (len > fm_len || 0 != strncmp(mod_macros[i].macro, str + fm->macro.l, len - 1))
-			continue;
-
-		if ('?' != mod_macros[i].macro[1] && len != fm_len)
+		if ('?' != ptr_l[1] && len != fm_len)
 		{
-			if (SUCCEED != zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+			if (SUCCEED == zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
 					sizeof(*N_functionid), 1, 9))
 			{
-				continue;
+				len--;
+				ptr[len] = '}';
 			}
 		}
-		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
-			continue;
-
-		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l,
-				fm->func_param.l - fm->func.l, ','))
-		{
-			return mod_macros[i].macro;
-		}
+		ptr[len + 1] = '\0';
 	}
 
-	return NULL;
+	return ptr;
 }
 
 /******************************************************************************
@@ -331,7 +322,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		}
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-		params[nparam++] = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+		params[nparam++] = zbx_function_param_unquote_dyn_compat(ptr + param_pos, param_len, &quoted);
 	}
 
 	ret = macrofunc(params, nparam, out);

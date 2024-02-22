@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldLatLng extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldLatLngView::class;
 	public const DEFAULT_VALUE = '';
 
 	/**
@@ -35,7 +36,6 @@ class CWidgetFieldLatLng extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_LAT_LNG_ZOOM])
 			->setMaxLength(255);
 	}

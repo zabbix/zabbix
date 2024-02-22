@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,23 +51,27 @@
 </script>
 <script>
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
-				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
-			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
-		}
-		else {
-			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		if (document.getElementById('type').value == <?= ITEM_TYPE_SSH ?>) {
+			document.getElementById('js-item-password-label').innerText =
+					document.getElementById('authtype').value == <?= ITEM_AUTHTYPE_PUBLICKEY ?>
+				? <?= json_encode(_('Key passphrase')) ?>
+				: <?= json_encode(_('Password')) ?>;
 		}
 	}
 
 	const item_form = {
 		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types,
-				discovered_item}) {
+				discovered_item, inherited_timeouts}) {
 			this.interfaces = interfaces;
 			this.testable_item_types = testable_item_types;
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
 			this.discovered_item = discovered_item === undefined ? false : discovered_item;
+			this.type = document.getElementById('type');
+			this.timeout = document.getElementById('timeout');
+			this.custom_timeout = document.getElementById('custom_timeout');
+			this.custom_timeout_value = this.timeout.value;
+			this.inherited_timeouts = inherited_timeouts;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
 				item_type_lookup.init(value_type_by_keys, keys_by_item_type, this.discovered_item);
@@ -84,15 +88,27 @@
 					array_keys(itemTypeInterface(), INTERFACE_TYPE_OPT)
 				) ?>.indexOf(type) != -1;
 
-		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
+		if (type == <?= ITEM_TYPE_SIMPLE ?>
+				&& (key.substring(0, 7) === 'vmware.' || key.substring(0, 8) === 'icmpping')) {
 			jQuery('#test_item').prop('disabled', true);
 		}
 		else {
 			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
 		}
 
-		// delay field
-		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+		if (type == <?= ITEM_TYPE_SIMPLE ?>) {
+			const toggle_fields = [
+				'js-item-timeout-label',
+				'js-item-timeout-field'
+			];
+			const set_hidden = key.substring(0, 8) === 'icmpping' || key.substring(0, 7) === 'vmware.';
+			const object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
+		else if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
 			const toggle_fields = [
 				'delay',
 				'js-item-delay-label',
@@ -100,13 +116,39 @@
 				'js-item-flex-intervals-label',
 				'js-item-flex-intervals-field'
 			];
-			const set_hidden = (key.substr(0, 8) === 'mqtt.get'),
-				object_switcher = globalAllObjForViewSwitcher['type'];
+			const set_hidden = key.substring(0, 8) === 'mqtt.get';
+			const object_switcher = globalAllObjForViewSwitcher['type'];
 
 			toggle_fields.forEach((element_id) =>
 				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
 			);
 		}
+		else if (type == <?= ITEM_TYPE_SNMP ?>) {
+			const toggle_fields = [
+				'js-item-timeout-label',
+				'js-item-timeout-field'
+			];
+			const snmp_oid = document.getElementById('snmp_oid').value;
+			const set_hidden = snmp_oid.substring(0, 4) !== 'get[' && snmp_oid.substring(0, 5) !== 'walk[';
+			const object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
+
+		if (type in item_form.inherited_timeouts) {
+			item_form.timeout.disabled = false;
+
+			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+				item_form.timeout.value = item_form.inherited_timeouts[type];
+			}
+		}
+		else {
+			item_form.timeout.disabled = true;
+		}
+
+		item_form.custom_timeout_value = item_form.timeout.value;
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
 		$('input[name=interfaceid]').prop('aria-required', !interface_optional);
@@ -144,7 +186,7 @@
 			new CViewSwitcher('allow_traps', 'change', item_form.field_switches.for_traps);
 		}
 
-		$("#key").on('keyup change', updateItemFormElements);
+		$("#key, #snmp_oid").on('keyup change', updateItemFormElements);
 
 		$('#parameters_table').dynamicRows({template: '#parameters_table_row', allow_empty: true});
 
@@ -189,6 +231,18 @@
 				}
 			})
 			.trigger('change');
+
+		item_form.custom_timeout.addEventListener('change', () => {
+			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+				item_form.custom_timeout_value = item_form.timeout.value;
+				item_form.timeout.value = item_form.inherited_timeouts[item_form.type.value] || '';
+				item_form.timeout.readOnly = true;
+			}
+			else {
+				item_form.timeout.value = item_form.custom_timeout_value;
+				item_form.timeout.readOnly = false;
+			}
+		});
 
 		$('#test_item').on('click', function() {
 			var step_nums = [];
@@ -289,7 +343,7 @@
 
 				this.updateHintDisplay();
 
-				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
+				// 'Do not store' trends for Calculated with string-types of information is forced on Item save.
 				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.discovered_item) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {

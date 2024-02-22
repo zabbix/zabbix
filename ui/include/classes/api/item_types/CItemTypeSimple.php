@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class CItemTypeSimple extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	const FIELD_NAMES = ['interfaceid', 'username', 'password', 'delay'];
+	const FIELD_NAMES = ['interfaceid', 'username', 'password', 'timeout', 'delay'];
 
 	/**
 	 * @inheritDoc
@@ -38,6 +38,7 @@ class CItemTypeSimple extends CItemType {
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
 			'username' =>		self::getCreateFieldRule('username', $item),
 			'password' =>		self::getCreateFieldRule('password', $item),
+			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -50,6 +51,7 @@ class CItemTypeSimple extends CItemType {
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
 			'username' =>		self::getUpdateFieldRule('username', $db_item),
 			'password' =>		self::getUpdateFieldRule('password', $db_item),
+			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -62,6 +64,7 @@ class CItemTypeSimple extends CItemType {
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'username' =>		self::getUpdateFieldRuleInherited('username', $db_item),
 			'password' =>		self::getUpdateFieldRuleInherited('password', $db_item),
+			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -74,6 +77,7 @@ class CItemTypeSimple extends CItemType {
 			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
 			'username' =>		self::getUpdateFieldRuleDiscovered('username'),
 			'password' =>		self::getUpdateFieldRuleDiscovered('password'),
+			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
 			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}

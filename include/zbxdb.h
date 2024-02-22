@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,8 @@ typedef enum
 	ERR_Z3005,
 	ERR_Z3006,
 	ERR_Z3007,
-	ERR_Z3008
+	ERR_Z3008,
+	ERR_Z3009
 }
 zbx_err_codes_t;
 
@@ -108,7 +109,6 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
-#define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
 #ifdef HAVE_ORACLE
@@ -198,8 +198,8 @@ typedef enum
 {	/* db extension error codes shared with FRONTEND */
 	ZBX_EXT_ERR_UNDEFINED = 0,
 	ZBX_EXT_SUCCEED = 1,
-	ZBX_TIMESCALEDB_POSTGRES_TOO_OLD,
-	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE,
+	/* ZBX_TIMESCALEDB_POSTGRES_TOO_OLD, obsoleted since Zabbix 7.0 */
+	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE = 3,
 	ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM,
 	ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED,
 	ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM,
@@ -243,7 +243,6 @@ struct zbx_db_version_info_t
 
 	zbx_db_version_status_t	ext_flag;
 
-	char			*ext_lic;
 	zbx_db_ext_err_code_t	ext_err_code;
 
 	int			history_compressed_chunks;

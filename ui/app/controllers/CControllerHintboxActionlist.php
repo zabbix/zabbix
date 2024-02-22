@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class CControllerHintboxActionlist extends CController {
 		if ($ret) {
 			$events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock'],
-				'select_acknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity', 'old_severity',
+				'selectAcknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity', 'old_severity',
 					'suppress_until'
 				],
 				'eventids' => (array) $this->getInput('eventid')

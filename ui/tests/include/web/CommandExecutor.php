@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ use Facebook\WebDriver\Exception\Internal\WebDriverCurlException;
 use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Exception\UnknownErrorException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * Helper class that allows custom command execution.
@@ -61,7 +62,7 @@ class CommandExecutor extends HttpCommandExecutor {
 		catch (WebDriverCurlException $exception) {
 			// Code is not missing here
 		}
-		catch (UnknownErrorException $exception) {
+		catch (UnknownErrorException|NoSuchElementException $exception) {
 			if (strpos($exception->getMessage(), 'ode with given id') !== false) {
 				throw new StaleElementReferenceException($exception->getMessage());
 			}

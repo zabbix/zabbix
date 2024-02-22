@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
@@ -60,6 +61,7 @@ type ResultCache interface {
 	Upload(u Uploader)
 	// TODO: will be used once the runtime configuration reload is implemented
 	UpdateOptions(options *agent.AgentOptions)
+	EnableUpload(bool)
 }
 
 type AgentData struct {
@@ -94,7 +96,7 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	Write(data []byte, timeout time.Duration) (err []error)
+	Write(data []byte, timeout time.Duration) (upload bool, err []error)
 	Addr() (s string)
 	Hostname() (s string)
 	CanRetry() (enabled bool)
@@ -123,6 +125,8 @@ type cacheData struct {
 	lastErrors    []error
 	retry         *time.Timer
 	timeout       int
+	historyUpload bool
+	mu            sync.Mutex
 }
 
 func (c *cacheData) Stop() {
@@ -143,6 +147,10 @@ func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
 }
 
 func (c *cacheData) Upload(u Uploader) {
+	if !c.isUploadEnabled() {
+		return
+	}
+
 	if u == nil {
 		u = c.uploader
 	}
@@ -155,6 +163,20 @@ func (c *cacheData) Flush() {
 	c.Upload(nil)
 }
 
+func (c *cacheData) EnableUpload(enabled bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.historyUpload = enabled
+}
+
+func (c *cacheData) isUploadEnabled() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.historyUpload
+}
+
 func tableName(prefix string, index int) string {
 	return fmt.Sprintf("%s_%d", prefix, index)
 }
@@ -165,8 +187,10 @@ func fetchRowAndClose(rows *sql.Rows, args ...interface{}) (ok bool, err error) 
 	if rows.Next() {
 		err = rows.Scan(args...)
 		rows.Close()
+
 		return err == nil, err
 	}
+
 	return false, rows.Err()
 }
 
@@ -180,15 +204,19 @@ func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCa
 
 	if options.EnablePersistentBuffer == 0 {
 		c := &MemoryCache{
-			cacheData: data,
+			cacheData:     data,
+			historyUpload: true,
 		}
 		c.init(options)
+
 		return c
 	} else {
 		c := &DiskCache{
-			cacheData: data,
+			cacheData:     data,
+			historyUpload: true,
 		}
 		c.init(options)
+
 		return c
 	}
 }

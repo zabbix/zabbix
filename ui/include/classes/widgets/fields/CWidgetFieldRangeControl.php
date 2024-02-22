@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldRangeControl extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldRangeControlView::class;
+
 	private int $min;
 	private int $max;
 	private int $step;
@@ -41,9 +43,7 @@ class CWidgetFieldRangeControl extends CWidgetField {
 		$this->max = $max;
 		$this->step = $step;
 
-		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => $this->min.':'.$this->max]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function setValue($value): self {
@@ -62,5 +62,10 @@ class CWidgetFieldRangeControl extends CWidgetField {
 
 	public function getStep(): int {
 		return $this->step;
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => $this->min.':'.$this->max];
 	}
 }

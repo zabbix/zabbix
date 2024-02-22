@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ const char	*dservice_type_string(zbx_dservice_type_t service);
 const char	*trigger_value_string(unsigned char value);
 const char	*zbx_type_string(zbx_value_type_t type);
 
-int	expr_db_get_host_value(zbx_uint64_t hostid, char **replace_to, const char *field_name);
+int	expr_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name);
 int	expr_db_get_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *templateid);
 int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to);
 int	expr_db_get_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to);

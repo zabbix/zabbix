@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,20 +60,7 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
-		// Autocomplete url.
-		$url = (new CUrl('jsrpc.php'))
-			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
-			->setArgument('method', static::SEARCH_METHOD)
-			->setArgument('object_name', $options['object_name']);
-
-		if (array_key_exists('objectOptions', $options)) {
-			foreach ($options['objectOptions'] as $option_name => $option_value) {
-				$url->setArgument($option_name, $option_value);
-			}
-		}
-
-		$params = [
-			'url' => $url->getUrl(),
+		$this->params = [
 			'name' => $options['name'],
 			'labels' => [
 				'No matches found' => _('No matches found'),
@@ -84,31 +71,51 @@ class CMultiSelect extends CTag {
 			]
 		];
 
+		if (array_key_exists('object_name', $options)) {
+			// Autocomplete url.
+			$url = (new CUrl('jsrpc.php'))
+				->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
+				->setArgument('method', static::SEARCH_METHOD)
+				->setArgument('object_name', $options['object_name']);
+
+			if (array_key_exists('objectOptions', $options)) {
+				foreach ($options['objectOptions'] as $option_name => $option_value) {
+					$url->setArgument($option_name, $option_value);
+				}
+			}
+
+			$this->params['url'] = $url->getUrl();
+		}
+
+		if (array_key_exists('multiselect_id', $options)) {
+			$this->params['multiselect_id'] = $options['multiselect_id'];
+		}
+
 		if (array_key_exists('data', $options)) {
-			$params['data'] = zbx_cleanHashes($options['data']);
+			$this->params['data'] = zbx_cleanHashes($options['data']);
 		}
 
 		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden'] as $option) {
 			if (array_key_exists($option, $options)) {
-				$params[$option] = $options[$option];
+				$this->params[$option] = $options[$option];
 			}
 		}
 
 		if (array_key_exists('autosuggest', $options)
 				&& array_key_exists('filter_preselect', $options['autosuggest'])) {
-			$params['autosuggest']['filter_preselect'] = $options['autosuggest']['filter_preselect'];
+			$this->params['autosuggest']['filter_preselect'] = $options['autosuggest']['filter_preselect'];
 		}
 
 		if (array_key_exists('custom_select', $options)) {
-			$params['custom_select'] = $options['custom_select'];
+			$this->params['custom_select'] = $options['custom_select'];
 		}
 		elseif (array_key_exists('popup', $options)) {
 			if (array_key_exists('filter_preselect', $options['popup'])) {
-				$params['popup']['filter_preselect'] = $options['popup']['filter_preselect'];
+				$this->params['popup']['filter_preselect'] = $options['popup']['filter_preselect'];
 			}
 
 			if (array_key_exists('parameters', $options['popup'])) {
-				$params['popup']['parameters'] = $options['popup']['parameters'];
+				$this->params['popup']['parameters'] = $options['popup']['parameters'];
 
 				$excludeids = array_key_exists('excludeids', $options['popup']['parameters'])
 					? $options['popup']['parameters']['excludeids']
@@ -119,12 +126,12 @@ class CMultiSelect extends CTag {
 					: []);
 
 				if ($excludeids) {
-					$params['excludeids'] = $excludeids;
+					$this->params['excludeids'] = $excludeids;
 				}
 			}
 		}
 
-		$this->params = $params;
+		$this->setAttribute('data-params', $this->params);
 
 		if (!array_key_exists('add_post_js', $options) || $options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
@@ -136,8 +143,12 @@ class CMultiSelect extends CTag {
 		return $this;
 	}
 
+	public function getParams(): array {
+		return $this->params;
+	}
+
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect('.json_encode($this->params).');';
+		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect();';
 	}
 
 	/**
@@ -148,8 +159,8 @@ class CMultiSelect extends CTag {
 	 * @return array
 	 */
 	protected function mapOptions(array $options) {
-		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
+		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
+			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
 		];
 
 		foreach ($options as $field => $value) {
@@ -162,6 +173,7 @@ class CMultiSelect extends CTag {
 		$mappings = [
 			'name' => 'name',
 			'object_name' => 'object_name',
+			'multiselect_id' => 'multiselect_id',
 			'disabled' => 'disabled',
 			'hidden' => 'hidden',
 			'default_value' => 'defaultValue',
@@ -243,7 +255,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status', 'hide_host_filter'
+					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -411,6 +423,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('group_status', $parameters)) {
 					$popup_parameters['group_status'] = $parameters['group_status'];
 					$autocomplete_parameters['group_status'] = $parameters['group_status'];
+				}
+
+				if (array_key_exists('resolve_macros', $parameters) && $parameters['resolve_macros']) {
+					$popup_parameters['resolve_macros'] = '1';
+					$autocomplete_parameters['resolve_macros'] = true;
 				}
 			}
 

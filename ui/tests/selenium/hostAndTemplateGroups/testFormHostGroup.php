@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  *
  * @onBefore prepareGroupData
  *
- * @dataSource DiscoveredHosts
+ * @dataSource DiscoveredHosts, HostTemplateGroups
  */
 class testFormHostGroup extends testFormGroups {
 
@@ -177,7 +177,7 @@ class testFormHostGroup extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'One group for Delete',
+					'name' => self::DELETE_ONE_GROUP,
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],
@@ -234,5 +234,65 @@ class testFormHostGroup extends testFormGroups {
 	 */
 	public function testFormHostGroup_ApplyPermissionsToSubgroups($data) {
 		$this->checkSubgroupsPermissions($data);
+	}
+
+	public static function getLLDLinksData() {
+		return [
+			[
+				[
+					'name' => 'Single prototype group KEY',
+					'links' => ['17th LLD']
+				]
+			],
+			[
+				[
+					'name' => 'グループプロトタイプ番号 1 KEY',
+					'links' => ['1st LLD', '2nd LLD', '3rd LLD', 'fifth LLD', 'forth LLD'],
+					'ellipsis' => true
+				]
+			],
+			[
+				[
+					'name' => '5 prototype group KEY',
+					'links' => ['12th LLD', 'Eleventh LLD', 'Mūsu desmitais LLD', 'Trīspadsmitais LLD', 'Četrpadsmitais LLD']
+				]
+			],
+			[
+				[
+					'name' => 'Trešais grupu prototips KEY',
+					'links' => ['LLD number 8', 'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快', 'sevenths LLD']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLLDLinksData
+	 */
+	public function testFormHostGroup_CheckLLDLinks($data) {
+		$link_ids = CDataHelper::get('HostTemplateGroups.lld_host_prototype_ids');
+
+		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$discovered_by = $dialog->asForm()->getField('Discovered by');
+
+		foreach ($data['links'] as $lld_name) {
+			$link = $discovered_by->query('link', $lld_name)->one();
+			$this->assertTrue($link->isClickable());
+
+			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].'&hostid='.
+					$link_ids[$lld_name]['host_prototype_id'].'&context=host';
+			$this->assertEquals($link_url, $link->getAttribute('href'));
+		}
+
+		// Check that three dots are added after the 5th LLD name, if there are more than 5 parent LLDs.
+		if (CTestArrayHelper::get($data, 'ellipsis')) {
+			array_push($data['links'], '...');
+		}
+
+		$this->assertEquals($data['links'], explode(', ', $discovered_by->getText()));
+		$dialog->close();
 	}
 }

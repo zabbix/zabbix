@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,8 +104,8 @@ class testFormHostFromStandalone extends testFormHost {
 	public function testFormHostFromStandalone_DiscoveredHostLinkedTemplates() {
 		$filtered_results = [
 			[
-				'type' => 'items',
-				'form' => 'items',
+				'type' => 'zabbix.php?action=item.list&',
+				'form' => 'item_list',
 				'objects' => [
 					'before_unlink' => [
 						'Test of discovered host 1 template for unlink: Template1 item1',
@@ -126,8 +126,8 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'triggers',
-				'form' => 'triggersForm',
+				'type' => 'zabbix.php?action=trigger.list&',
+				'form' => 'trigger_form',
 				'objects' => [
 					'before_unlink' => [
 						'Test of discovered host 1 template for unlink: Template1 trigger',
@@ -143,7 +143,7 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'graphs',
+				'type' => 'graphs.php?',
 				'form' => 'graphForm',
 				'objects' => [
 					'before_unlink' => [
@@ -160,7 +160,7 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'host_discovery',
+				'type' => 'host_discovery.php?',
 				'form' => 'discovery',
 				'objects' => [
 					'before_unlink' => [
@@ -177,7 +177,7 @@ class testFormHostFromStandalone extends testFormHost {
 				]
 			],
 			[
-				'type' => 'httpconf',
+				'type' => 'httpconf.php?',
 				'form' => 'scenarios',
 				'objects' => [
 					'before_unlink' => [
@@ -199,7 +199,7 @@ class testFormHostFromStandalone extends testFormHost {
 		$this->page->login();
 
 		foreach ($filtered_results as $result) {
-			$this->page->open($result['type'].'.php?filter_set=1&filter_hostids%5B0%5D='.
+			$this->page->open($result['type'].'filter_set=1&filter_hostids%5B0%5D='.
 					$discovered_hostid.'&context=host')->waitUntilReady();
 
 			// Check objects on Discovered host before unlinking templates.
@@ -224,18 +224,11 @@ class testFormHostFromStandalone extends testFormHost {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-
-		// TODO: Update the message details after ZBX-21366 is merged.
-		$message_details = [
-			'Templates "Test of discovered host 2 template for clear" unlinked from hosts "Discovered host from prototype 1".',
-			'Templates "Test of discovered host 1 template for unlink" unlinked from hosts "Discovered host from prototype 1".'
-		];
-
-		$this->assertMessage(TEST_GOOD, 'Host updated', $message_details);
+		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		foreach ($filtered_results as $result) {
 			// Open hosts objects and check objects on Discovered host after unlinking some templates.
-			$this->page->open($result['type'].'.php?filter_set=1&filter_hostids%5B0%5D='.
+			$this->page->open($result['type'].'filter_set=1&filter_hostids%5B0%5D='.
 					$discovered_hostid.'&context=host')->waitUntilReady();
 			$this->assertTableDataColumn($result['objects']['after_unlink'], 'Name', 'xpath://form[@name='.
 					CXPathHelper::escapeQuotes($result['form']).']/table'

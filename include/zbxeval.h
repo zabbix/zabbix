@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbxexpr.h"
+#include "zbxregexp.h"
 
 /*
  * Token type flags (32 bits):
@@ -96,6 +97,7 @@
 #define ZBX_EVAL_PARSE_FUNCTION_NAME	__UINT64_C(0x00008000)
 #define ZBX_EVAL_PARSE_PROP_TAG		__UINT64_C(0x00010000)	/* 'tag' keyword in item query filter */
 #define ZBX_EVAL_PARSE_PROP_GROUP	__UINT64_C(0x00020000)	/* 'group' keyword in item query filter */
+#define ZBX_EVAL_PARSE_STR_V64_COMPAT	__UINT64_C(0x00040000)	/* no backslash escaping for history functions */
 
 #define ZBX_EVAL_PARSE_FUNCTION		(ZBX_EVAL_PARSE_FUNCTION_NAME | ZBX_EVAL_PARSE_FUNCTION_ARGS	|\
 					ZBX_EVAL_PARSE_GROUP)
@@ -212,6 +214,9 @@ zbx_eval_context_t;
 
 typedef int	(*zbx_macro_expand_func_t)(void *data, char **str, const zbx_uint64_t *hostids, int hostids_num, \
 		char **error);
+typedef void	(*zbx_get_expressions_by_name_f)(zbx_vector_expression_t *expressions, const char *name);
+
+void	zbx_init_library_eval(zbx_get_expressions_by_name_f get_expressions_by_name_func);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
 void	zbx_eval_init(zbx_eval_context_t *ctx);
@@ -253,6 +258,7 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 		const char *parameter, const char *error);
 
 void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs);
+int	zbx_eval_compare_tokens_by_loc(const void *d1, const void *d2);
 
 typedef struct
 {
@@ -287,4 +293,35 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error);
 
 int	zbx_eval_var_vector_to_dbl(zbx_vector_var_t *input_vector, zbx_vector_dbl_t *output_vector, char **error);
+
+#define OP_UNKNOWN	-1
+#define OP_EQ		0
+#define OP_NE		1
+#define OP_GT		2
+#define OP_GE		3
+#define OP_LT		4
+#define OP_LE		5
+#define OP_LIKE		6
+#define OP_REGEXP	7
+#define OP_IREGEXP	8
+#define OP_BITAND	9
+#define OP_ANY		10
+
+typedef struct
+{
+	int			op;
+	int			numeric_search;
+	char			*pattern2;
+	zbx_uint64_t		pattern_ui64;
+	zbx_uint64_t		pattern2_ui64;
+	double			pattern_dbl;
+	zbx_vector_expression_t	regexps;
+}
+zbx_eval_count_pattern_data_t;
+
+int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error);
+int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int limit, int *count, char **error);
+void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
 #endif

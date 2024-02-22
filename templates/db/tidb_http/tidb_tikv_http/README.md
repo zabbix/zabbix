@@ -36,7 +36,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|-------|
 |{$TIKV.PORT}|<p>The port of TiKV server metrics web endpoint</p>|`20180`|
 |{$TIKV.URL}|<p>TiKV server URL</p>|`localhost`|
-|{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}|<p>Maximum number of coprocessor request errors</p>|`1`|
+|{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}|<p>Maximum number of coprocessor request errors</p>|`1`|
 |{$TIKV.STORE.ERRORS.MAX.WARN}|<p>Maximum number of failure messages</p>|`1`|
 |{$TIKV.PENDING_COMMANDS.MAX.WARN}|<p>Maximum number of pending commands</p>|`1`|
 |{$TIKV.PENDING_TASKS.MAX.WARN}|<p>Maximum number of tasks currently running by the worker or pending</p>|`1`|
@@ -45,7 +45,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiKV: Get instance metrics|<p>Get TiKV instance metrics.</p>|HTTP agent|tikv.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
+|TiKV: Get instance metrics|<p>Get TiKV instance metrics.</p>|HTTP agent|tikv.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
 |TiKV: Store size|<p>The storage size of TiKV instance.</p>|Dependent item|tikv.engine_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tikv_engine_size_bytes")].value.sum()`</p></li></ul>|
 |TiKV: Get store size metrics|<p>Get capacity metrics of TiKV instance.</p>|Dependent item|tikv.store_size.metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tikv_store_size_bytes")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |TiKV: Available size|<p>The available capacity of TiKV instance.</p>|Dependent item|tikv.store_size.available<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "available")].value.first()`</p></li></ul>|
@@ -85,7 +85,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|TiKV: Too many coprocessor request error||`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}`|Warning||
+|TiKV: Too many coprocessor request error||`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}`|Warning||
 |TiKV: Too many pending commands||`min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}`|Average||
 |TiKV: Too many pending tasks||`min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}`|Average||
 |TiKV: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB TiKV by HTTP/tikv.uptime)<10m`|Info|**Manual close**: Yes|

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ use Zabbix\Core\{
 	CWidget
 };
 
+use Zabbix\Widgets\CWidgetField;
+
 class CDashboardHelper {
 
 	/**
@@ -40,8 +42,6 @@ class CDashboardHelper {
 
 	/**
 	 * Update editable flag.
-	 *
-	 * @static
 	 *
 	 * @param array $dashboards  An associative array of the dashboards.
 	 */
@@ -60,22 +60,24 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Prepare widget pages for dashboard grid.
+	 * Prepare dashboard pages and widgets for the presentation.
+	 *
+	 * @param array       $pages         Dashboard pages with widgets as returned by the dashboard API.
+	 * @param string|null $templateid    Template ID, if used.
+	 * @param bool        $with_rf_rate  Supply refresh rates for widgets, for the current user.
+	 *
+	 * @return array
 	 */
-	public static function preparePagesForGrid(array $pages, ?string $templateid, bool $with_rf_rate): array {
-		if (!$pages) {
-			return [];
-		}
-
-		$grid_pages = [];
+	public static function preparePages(array $pages, ?string $templateid, bool $with_rf_rate): array {
+		$prepared_pages = [];
 
 		foreach ($pages as $page) {
-			$grid_page_widgets = [];
+			$prepared_widgets = [];
 
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
-				$grid_page_widget = [
+				$prepared_widget = [
 					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
 					'name' => $widget_data['name'],
@@ -87,57 +89,105 @@ class CDashboardHelper {
 						'height' => (int) $widget_data['height']
 					],
 					'rf_rate' => 0,
-					'fields' => []
+					'fields' => [],
+					'messages' => []
 				];
 
 				/** @var CWidget $widget */
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
-					$grid_page_widget['fields'] = self::convertWidgetFields($widget_data['fields']);
+					$form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
+
+					$prepared_widget['messages'] = $form->validate();
+					$prepared_widget['fields'] = $form->getFieldsValues();
 
 					if ($with_rf_rate) {
 						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
 
 						if ($rf_rate == -1) {
-							// Transforms corrupted data to default values.
-							$widget_form = $widget->getForm($grid_page_widget['fields'], $templateid);
-							$widget_form->validate();
-							$values = $widget_form->getFieldsValues();
-
-							$rf_rate = $values['rf_rate'] == -1
+							$rf_rate = $prepared_widget['fields']['rf_rate'] == -1
 								? $widget->getDefaultRefreshRate()
-								: $values['rf_rate'];
+								: $prepared_widget['fields']['rf_rate'];
 						}
 
-						$grid_page_widget['rf_rate'] = $rf_rate;
+						$prepared_widget['rf_rate'] = $rf_rate;
 					}
 				}
 
-				$grid_page_widgets[] = $grid_page_widget;
+				$prepared_widgets[] = $prepared_widget;
 			}
 
-			$grid_pages[] = [
+			$prepared_pages[] = [
 				'dashboard_pageid' => $page['dashboard_pageid'],
 				'name' => $page['name'],
 				'display_period' => $page['display_period'],
-				'widgets' => $grid_page_widgets
+				'widgets' => $prepared_widgets
 			];
 		}
 
-		return $grid_pages;
+		return $prepared_pages;
 	}
 
 	/**
-	 * Get widget pages with inaccessible fields unset.
+	 * Get dashboard data source requirements.
 	 *
-	 * @static
+	 * @param array $prepared_pages  Dashboard pages, prepared and validated using preparePages method.
 	 *
-	 * @param array $pages
-	 * @param array $pages[]['widgets']
-	 * @param array $pages[]['widgets'][]['fields']
-	 * @param array $pages[]['widgets'][]['fields'][]['type']
-	 * @param array $pages[]['widgets'][]['fields'][]['value']
+	 * @return array
+	 */
+	public static function getBroadcastRequirements(array $prepared_pages): array {
+		$requirements = [];
+
+		foreach ($prepared_pages as $prepared_page) {
+			foreach ($prepared_page['widgets'] as $widget_data) {
+				foreach ($widget_data['fields'] as $field) {
+					if (!is_array($field)) {
+						continue;
+					}
+
+					$objects = [$field];
+
+					while ($objects) {
+						$objects_next = [];
+
+						foreach ($objects as $object) {
+							if (array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $object)) {
+								[
+									'reference' => $reference,
+									'type' => $type
+								] = CWidgetField::parseTypedReference($object[CWidgetField::FOREIGN_REFERENCE_KEY]);
+
+								if ($reference === CWidgetField::REFERENCE_DASHBOARD) {
+									$requirements[$type] = true;
+								}
+							}
+							else {
+								foreach ($object as $object_next) {
+									if (is_array($object_next)) {
+										$objects_next[] = $object_next;
+									}
+								}
+							}
+
+							$objects = $objects_next;
+						}
+					}
+				}
+			}
+		}
+
+		return $requirements;
+	}
+
+	/**
+	 * Unset widget fields referring to inaccessible objects.
+	 *
+	 * @param array $pages  Dashboard pages with widgets, as returned by the dashboard API.
+	 *        array $pages[]['widgets']
+	 *        array $pages[]['widgets'][]['fields']
+	 *        array $pages[]['widgets'][]['fields'][]['type']
+	 *        array $pages[]['widgets'][]['fields'][]['value']
 	 *
 	 * @return array
 	 */
@@ -346,58 +396,93 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Converts fields, received from API to key/value format.
+	 * Construct widget fields from widget field data returned by the dashboards API.
 	 *
-	 * @static
-	 *
-	 * @param array $fields  fields as received from API
+	 * @param array $fields
 	 *
 	 * @return array
 	 */
-	public static function convertWidgetFields(array $fields): array {
-		$ret = [];
+	public static function constructWidgetFields(array $fields): array {
+		$fields_new = [];
 
 		foreach ($fields as $field) {
-			if (array_key_exists($field['name'], $ret)) {
-				$ret[$field['name']] = (array) $ret[$field['name']];
-				$ret[$field['name']][] = $field['value'];
+			if (array_key_exists($field['name'], $fields_new)) {
+				$fields_new[$field['name']] = (array) $fields_new[$field['name']];
+				$fields_new[$field['name']][] = $field['value'];
 			}
 			else {
-				$ret[$field['name']] = $field['value'];
+				$fields_new[$field['name']] = $field['value'];
 			}
 		}
 
-		return $ret;
+		return self::constructWidgetFieldsIntoObjects($fields_new);
 	}
 
 	/**
-	 * Checks, if any of widgets needs time selector.
+	 * Construct widget fields from destructured objects back into objects.
 	 *
-	 * @static
+	 * Example:
+	 *     In: [
+	 *         'a.0'       => 'value_1',
+	 *         'a.1'       => 'value_2',
+	 *         'b.0.c.0.d' => 'value_3'
+	 *     ]
 	 *
-	 * @param array $pages
+	 *     Out: [
+	 *         'a' => ['value_1', 'value_2'],
+	 *         'b' => [0 => ['c' => [0 => ['d' => 'value_3']]]]
+	 *     ]
 	 *
-	 * @return bool
+	 * @param array $fields
+	 *
+	 * @return array
 	 */
-	public static function hasTimeSelector(array $pages): bool {
-		foreach ($pages as $page) {
-			foreach ($page['widgets'] as $widget_data) {
-				$widget = App::ModuleManager()->getModule($widget_data['type']);
+	private static function constructWidgetFieldsIntoObjects(array $fields): array {
+		$fields_new = [];
 
-				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET
-						&& $widget->usesTimeSelector($widget_data['fields'])) {
-					return true;
+		uksort($fields,
+			static fn(string $key_1, string $key_2): int => strnatcmp($key_1, $key_2)
+		);
+
+		foreach ($fields as $key => $value) {
+			if (preg_match('/^([a-z_]+)((\\.([a-z_]+|[0-9]+))+)$/', $key, $matches) === 0) {
+				$fields_new[$key] = $value;
+
+				continue;
+			}
+
+			$field_name = $matches[1];
+			$field_path = $matches[2];
+
+			preg_match_all('/\\.([a-z_]+|[0-9]+)/', $field_path, $matches);
+
+			$field_path_keys = array_merge([$field_name], $matches[1]);
+
+			$field_ptr = &$fields_new;
+
+			for ($i = 0, $count = count($field_path_keys); $i < $count; $i++) {
+				$field_path_key = $field_path_keys[$i];
+
+				if ($i < $count - 1) {
+					if (!array_key_exists($field_path_key, $field_ptr)) {
+						$field_ptr[$field_path_key] = [];
+					}
+
+					$field_ptr = &$field_ptr[$field_path_key];
+				}
+				else {
+					$field_ptr[$field_path_key] = $value;
 				}
 			}
+
+			unset($field_ptr);
 		}
 
-		return false;
+		return $fields_new;
 	}
 
 	/**
 	 * Validate input parameters of dashboard pages.
-	 *
-	 * @static
 	 *
 	 * @var array  $dashboard_pages
 	 * @var array  $dashboard_pages[]['widgets']
@@ -517,8 +602,6 @@ class CDashboardHelper {
 	/**
 	 * Prepare data for cloning template dashboards.
 	 * Replace item and graph ids to new ids.
-	 *
-	 * @static
 	 *
 	 * @param array  $dashboards  Dashboards array.
 	 * @param string $templateid  New template id.
@@ -642,9 +725,6 @@ class CDashboardHelper {
 		return $widget_last_type;
 	}
 
-	/**
-	 * @throws JsonException
-	 */
 	public static function getConfigurationHash(array $dashboard, array $widget_defaults): string {
 		ksort($widget_defaults);
 

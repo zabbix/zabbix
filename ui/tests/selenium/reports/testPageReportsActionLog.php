@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,42 +20,22 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup alerts
  *
- * @onBefore prepareInsertActionsData
+ * @dataSource LoginUsers, Actions
  */
 class testPageReportsActionLog extends CWebTest {
 
-	use TableTrait;
-
-	public static function prepareInsertActionsData() {
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (130, 13, 1, 1, ".
-				"1329724870, 10, 'test.test@zabbix.com', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
-		);
-
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (131, 13, 1, 9, ".
-				"1329724880, 3, '77777777', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
-		);
-
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (132, 13, 1, 9, ".
-				"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
-		);
-
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (133, 13, 1, 1, ".
-				"1597439400, 3, 'igor.danoshaites@zabbix.com', 'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '');"
-		);
-
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (134, 12, 1, 9, ".
-				"1597440000, 3, 'igor.danoshaites@zabbix.com', 'time_subject_2', 'time_message_', 1, 0, '', 1, 0, '');"
-		);
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
 	}
 
 	public function testPageReportsActionLog_CheckLayout() {
@@ -77,7 +57,8 @@ class testPageReportsActionLog extends CWebTest {
 		);
 
 		// Check data set values in input field.
-		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
+		$this->assertEquals('now-1h', $this->query('id:from')->one()->getValue());
+		$this->assertEquals('now', $this->query('id:to')->one()->getValue());
 
 		// Press to display filter.
 		$this->query('id:ui-id-2')->one()->click();
@@ -683,8 +664,9 @@ class testPageReportsActionLog extends CWebTest {
 				$time_tab->one()->click();
 			}
 
-			$form->fill($data['time']);
-			$form->query('button:Apply')->one()->click();
+			$this->query('id:from')->one()->fill($data['time']['id:from']);
+			$this->query('id:to')->one()->fill($data['time']['id:to']);
+			$this->query('id:apply')->one()->click();
 			$this->page->waitUntilReady();
 		}
 

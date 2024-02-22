@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,18 +37,18 @@ class testFormUpdateProblem extends CWebTest {
 	protected static $hostid;
 
 	/**
-	 * Ids of the triggers for problems.
-	 *
-	 * @var array
-	 */
-	protected static $triggerids;
-
-	/**
 	 * Time when acknowledge was created.
 	 *
 	 * @var string
 	 */
 	protected static $acktime;
+
+	/**
+	 * Eventid for problem suppression.
+	 *
+	 * @var integer
+	 */
+	protected static $eventid_for_icon_test;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -106,77 +106,67 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				'description' => 'Trigger for float',
 				'expression' => 'last(/Host for Problems Update/float)=0',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => 'Trigger for char',
 				'expression' => 'last(/Host for Problems Update/char)=0',
-				'priority' => 1,
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
 				'manual_close' => 1
 			],
 			[
 				'description' => 'Trigger for log',
 				'expression' => 'last(/Host for Problems Update/log)=0',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Trigger for unsigned',
 				'expression' => 'last(/Host for Problems Update/unsigned)=0',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => 'Trigger for text',
 				'expression' => 'last(/Host for Problems Update/text)=0',
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => 'Trigger for icon test',
 				'expression' => 'last(/Host for Problems Update/log)=0',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $triggers);
-		self::$triggerids = CDataHelper::getIds('description');
 
-		// Create events.
+		// Create problems and events.
 		$time = time();
-		$i=0;
-		foreach (self::$triggerids as $name => $id) {
-			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.(100550 + $i).', 0, 0, '.
-					zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
-			);
-			$i++;
+		foreach (CDataHelper::getIds('description') as $name => $id) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
 		}
 
-		// Create problems.
-		$j=0;
-		foreach (self::$triggerids as $name => $id) {
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.(100550 + $j).', 0, 0, '.
-					zbx_dbstr($id).', '.$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
-			);
-			$j++;
+		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.zbx_dbstr('Trigger for char'));
+
+		$eventids = [];
+		foreach (['Trigger for text', 'Trigger for unsigned', 'Trigger for icon test'] as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
 		}
 
-		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for float').', '.
-				zbx_dbstr('Trigger for log').', '.zbx_dbstr('Trigger for unsigned').', '.zbx_dbstr('Trigger for text').', '.
-				zbx_dbstr('Trigger for icon test').')'
-		);
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for char'));
+		self::$eventid_for_icon_test = $eventids['Trigger for icon test'];
 
 		// Suppress the problem: 'Trigger for text'.
-		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, 100554, NULL, 0)');
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, '.
+				$eventids['Trigger for text'].', NULL, 0)'
+		);
 
 		// Acknowledge the problem: 'Trigger for unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
-			'eventids' => 100553,
+			'eventids' => $eventids['Trigger for unsigned'],
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
 
 		$event = CDataHelper::call('event.get', [
-			'eventids' => 100553,
-			'select_acknowledges' => ['clock']
+			'eventids' => $eventids['Trigger for unsigned'],
+			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
@@ -216,7 +206,7 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
-					// If problem is Aknowledged - label is changed to Unacknowledge.
+					// If problem is Acknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
 						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
@@ -355,7 +345,7 @@ class testFormUpdateProblem extends CWebTest {
 			'id:severity' => ['value' => 'Not classified', 'enabled' => false],
 			'id:suppress_problem' => ['value' => false, 'enabled' => true],
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
-			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
+			'id:suppress_until_problem' => ['maxlength' => 255, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
@@ -643,7 +633,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+14y'
+						'id:suppress_until_problem' => 'now+5y'
 					],
 					'db_check' => [
 						[
@@ -814,6 +804,7 @@ class testFormUpdateProblem extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $message);
 
 			// Check db change.
+			// DB values "action" and "new_severity" may depend on previous test cases in data provider.
 			foreach ($data['db_check'] as $event) {
 				$sql = CDBHelper::getRow('SELECT message, action, new_severity, suppress_until'.
 						' FROM acknowledges'.
@@ -898,7 +889,9 @@ class testFormUpdateProblem extends CWebTest {
 		);
 
 		// Suppress the problem in DB: 'Trigger for icon test'.
-		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10051, 100555, NULL, 0)');
+		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)
+				VALUES (10051, '.self::$eventid_for_icon_test.', NULL, 0)'
+		);
 
 		// Assert that eye icon stopped blinking.
 		$this->page->refresh();
@@ -983,7 +976,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	private function checkIconAndHint($row, $class, $text) {
 		// Assert blinking icon in Info column.
-		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink']);
+		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink'])->waitUntilVisible();
 		$this->assertTrue($icon->exists());
 
 		// Check icon hintbox.

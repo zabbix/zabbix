@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,10 +149,4 @@ int	zbx_pp_preproc_has_history(int type)
 void	zbx_pp_item_clear(zbx_pp_item_t *item)
 {
 	zbx_pp_item_preproc_release(item->preproc);
-}
-
-void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
-{
-	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
-		zbx_free(opt->source);
 }

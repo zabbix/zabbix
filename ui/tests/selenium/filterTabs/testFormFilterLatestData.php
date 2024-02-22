@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class testFormFilterLatestData extends testFormFilter {
 	];
 
 	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
 	}
 
 	/**
@@ -145,8 +145,7 @@ class testFormFilterLatestData extends testFormFilter {
 					],
 					'filter' => [
 						'Show number of records' => true
-					],
-					'tab_id' => '1'
+					]
 				]
 			],
 			[
@@ -157,8 +156,7 @@ class testFormFilterLatestData extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'simple_name'
-					],
-					'tab_id' => '2'
+					]
 				]
 			],
 			// Dataprovider with symbols instead of name.
@@ -172,8 +170,7 @@ class testFormFilterLatestData extends testFormFilter {
 					'filter' => [
 						'Name' => '*;%№:?(',
 						'Show number of records' => true
-					],
-					'tab_id' => '3'
+					]
 				]
 			],
 			// Dataprovider with name as cyrillic.
@@ -185,8 +182,7 @@ class testFormFilterLatestData extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'кириллица'
-					],
-					'tab_id' => '4'
+					]
 				]
 			],
 			// Two dataproviders with same name and options.
@@ -195,8 +191,7 @@ class testFormFilterLatestData extends testFormFilter {
 					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
-					],
-					'tab_id' => '5'
+					]
 				]
 			],
 			[
@@ -205,7 +200,8 @@ class testFormFilterLatestData extends testFormFilter {
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
-					'tab_id' => '6'
+					// Should be added previous 5 filter tabs from data provider.
+					'tab' => '6'
 				]
 			]
 		];

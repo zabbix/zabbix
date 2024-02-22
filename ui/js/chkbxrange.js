@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ var chkbxRange = {
 	chkboxes:			{},		// ckbx list
 	prefix:				null,	// prefix for session storage variable name
 	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to session storage
-	footerButtons:		{},		// action buttons at the bottom of page
 	sessionStorageName:	null,
+	event_handlers:     null,
 
 	init: function() {
 		var path = new Curl();
@@ -67,11 +67,15 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		this.footerButtons = jQuery('#action_buttons button:not(.js-no-chkbxrange)');
-		var thisChkbxRange = this;
-		this.footerButtons.each(function() {
-			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);
-		});
+		if (this.event_handlers === null) {
+			this.event_handlers = {
+				action_button_click: (e) => this.submitFooterButton(e)
+			};
+		}
+
+		for (const footer_button of document.querySelectorAll('#action_buttons button:not(.js-no-chkbxrange)')) {
+			footer_button.addEventListener('click', this.event_handlers.action_button_click);
+		}
 	},
 
 	implement: function(obj) {
@@ -375,8 +379,6 @@ var chkbxRange = {
 	},
 
 	submitFooterButton: function(e) {
-		e = e || window.event;
-
 		const checked_count = Object.keys(this.getSelectedIds()).length;
 
 		var footerButton = jQuery(e.target),

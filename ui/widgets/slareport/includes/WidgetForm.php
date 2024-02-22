@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 namespace Widgets\SlaReport\Includes;
 
 use API,
-	CAbsoluteTimeParser,
-	CParser,
 	CTimezoneHelper,
 	DateTimeZone;
 
@@ -33,10 +31,10 @@ use Zabbix\Widgets\{
 };
 
 use Zabbix\Widgets\Fields\{
-	CWidgetFieldDatePicker,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectService,
-	CWidgetFieldMultiSelectSla
+	CWidgetFieldMultiSelectSla,
+	CWidgetFieldTimePeriod
 };
 
 /**
@@ -45,13 +43,14 @@ use Zabbix\Widgets\Fields\{
 class WidgetForm extends CWidgetForm {
 
 	public function validate(bool $strict = false): array {
-		if ($errors = parent::validate($strict)) {
+		/** @var CWidgetFieldMultiSelectSla $slaid_field */
+		$slaid_field = $this->getFields()['slaid'];
+
+		if ($errors = $slaid_field->validate($strict)) {
 			return $errors;
 		}
 
-		$errors = [];
-
-		$slaids = $this->getFieldValue('slaid');
+		$slaids = $slaid_field->getValue();
 
 		$slas = $slaids
 			? API::Sla()->get([
@@ -70,37 +69,12 @@ class WidgetForm extends CWidgetForm {
 			: CTimezoneHelper::getSystemTimezone()
 		);
 
-		$absolute_time_parser = new CAbsoluteTimeParser();
+		/** @var CWidgetFieldTimePeriod $date_period_field */
+		$date_period_field = $this->getFields()['date_period'];
 
-		$period_from = null;
+		$date_period_field->setTimeZone($timezone);
 
-		if ($absolute_time_parser->parse($this->getFieldValue('date_from')) == CParser::PARSE_SUCCESS) {
-			$period_from = $absolute_time_parser->getDateTime(true, $timezone)->getTimestamp();
-
-			if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
-				$period_from = null;
-
-				$errors[] = _s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected'));
-			}
-		}
-
-		$period_to = null;
-
-		if ($absolute_time_parser->parse($this->getFieldValue('date_to')) == CParser::PARSE_SUCCESS) {
-			$period_to = $absolute_time_parser->getDateTime(false, $timezone)->getTimestamp();
-
-			if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
-				$period_to = null;
-
-				$errors[] = _s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected'));
-			}
-		}
-
-		if ($period_from !== null && $period_to !== null && $period_to <= $period_from) {
-			$errors[] = _s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To'));
-		}
-
-		return $errors;
+		return parent::validate($strict);
 	}
 
 	public function addFields(): self {
@@ -118,10 +92,8 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(ZBX_SLA_DEFAULT_REPORTING_PERIODS)
 			)
 			->addField(
-				new CWidgetFieldDatePicker('date_from', _('From'), true)
-			)
-			->addField(
-				new CWidgetFieldDatePicker('date_to', _('To'), true)
+				(new CWidgetFieldTimePeriod('date_period'))
+					->setDateOnly()
 			);
 	}
 }

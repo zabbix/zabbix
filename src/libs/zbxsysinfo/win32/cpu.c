@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "win32_cpu.h"
 
 #include "../common/stats.h"
-#include "perfstat.h"
+#include "perfstat/perfstat.h"
 
 /* shortcut to avoid extra verbosity */
 typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
@@ -33,7 +33,7 @@ static GETLPIEX		get_lpiex;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find number of active logical CPUs                                *
+ * Purpose: finds number of active logical CPUs                               *
  *                                                                            *
  * Return value: number of CPUs or 0 on failure                               *
  *                                                                            *
@@ -80,10 +80,9 @@ int	get_cpu_num_win32(void)
 
 		if (get_lpiex(RelationProcessorCore, buffer, &buffer_length))
 		{
-			unsigned int	i;
 			PSYS_LPI_EX	ptr;
 
-			for (i = 0; i < buffer_length; i += (unsigned int)ptr->Size)
+			for (unsigned int i = 0; i < buffer_length; i += (unsigned int)ptr->Size)
 			{
 				ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 
@@ -126,7 +125,7 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the number of active processor groups                     *
+ * Purpose: returns number of active processor groups                         *
  *                                                                            *
  * Return value: number of groups, 1 if groups are not supported              *
  *                                                                            *
@@ -164,7 +163,7 @@ int	get_cpu_group_num_win32(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the number of NUMA nodes                                  *
+ * Purpose: returns number of NUMA nodes                                      *
  *                                                                            *
  * Return value: number of NUMA nodes, 1 if NUMA not supported                *
  *                                                                            *
@@ -192,9 +191,9 @@ int	get_numa_node_num_win32(void)
 
 		if (get_lpiex(RelationNumaNode, buffer, &buffer_length))
 		{
-			unsigned int	i;
+			numa_node_count = 0;
 
-			for (i = 0, numa_node_count = 0; i < buffer_length; numa_node_count++)
+			for (unsigned int i = 0; i < buffer_length; numa_node_count++)
 			{
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 				i += (unsigned)ptr->Size;
@@ -244,7 +243,7 @@ int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	cpu_num, interval;
 	double	value;
 
-	if (0 == CPU_COLLECTOR_STARTED(collector))
+	if (0 == cpu_collector_started())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
@@ -258,7 +257,7 @@ int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (tmp = get_rparam(request, 0)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = ZBX_CPUNUM_ALL;
-	else if (SUCCEED != zbx_is_uint_range(tmp, &cpu_num, 0, collector->cpus.count - 1))
+	else if (SUCCEED != zbx_is_uint_range(tmp, &cpu_num, 0, (get_collector())->cpus.count - 1))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -307,7 +306,7 @@ int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result)
 	double	value;
 	int	cpu_num, ret = FAIL;
 
-	if (0 == CPU_COLLECTOR_STARTED(collector))
+	if (0 == cpu_collector_started())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
@@ -339,15 +338,15 @@ int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (tmp = get_rparam(request, 1)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 	{
-		ret = get_perf_counter_value(collector->cpus.queue_counter, 1 * SEC_PER_MIN, &value, &error);
+		ret = get_perf_counter_value((get_collector())->cpus.queue_counter, 1 * SEC_PER_MIN, &value, &error);
 	}
 	else if (0 == strcmp(tmp, "avg5"))
 	{
-		ret = get_perf_counter_value(collector->cpus.queue_counter, 5 * SEC_PER_MIN, &value, &error);
+		ret = get_perf_counter_value((get_collector())->cpus.queue_counter, 5 * SEC_PER_MIN, &value, &error);
 	}
 	else if (0 == strcmp(tmp, "avg15"))
 	{
-		ret = get_perf_counter_value(collector->cpus.queue_counter, 15 * SEC_PER_MIN, &value, &error);
+		ret = get_perf_counter_value((get_collector())->cpus.queue_counter, 15 * SEC_PER_MIN, &value, &error);
 	}
 	else
 	{

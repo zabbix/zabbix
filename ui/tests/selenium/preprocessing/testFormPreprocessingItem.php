@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -26,8 +27,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
 
-	public $link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::HOSTID;
-	public $ready_link = 'items.php?form=update&context=host&hostid='.self::HOSTID.'&itemid=';
+	public $link = 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID;
 	public $button = 'Create item';
 	public $success_message = 'Item added';
 	public $fail_message = 'Cannot add item';
@@ -35,10 +35,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const HOSTID					= 40001;	// 'Simple form test host'
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
-	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
-	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
-
-	use PreprocessingTrait;
 
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -121,12 +117,11 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	public function testFormPreprocessingItem_CopyItem() {
 		$item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing
 		$item_name = 'testInheritanceItemPreprocessing';
-		$itemid = 15094;									// testInheritanceItemPreprocessing
 		$original_hostid = 15001;							// "Template inheritance test host"
 		$target_hostname = 'Simple form test host';
 
-		$this->page->login()->open('items.php?filter_set=1&context=host&filter_hostids[0]='.$original_hostid);
-		$table = $this->query('xpath://form[@name="items"]/table')->asTable()->one();
+		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.$original_hostid);
+		$table = $this->query('xpath://form[@name="item_list"]/table')->asTable()->one();
 		$table->findRow('Key', $item_key)->select();
 		$this->query('button:Copy')->one()->click();
 		$mass_update_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
@@ -139,12 +134,13 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->assertMessage(TEST_GOOD, 'Item copied');
 
 		// Open original item form and get steps text.
-		$this->page->open('items.php?form=update&context=host&hostid='.$original_hostid.'&itemid='.$itemid);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.$original_hostid);
+		$this->query('link', $item_name)->one()->click();
+		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
 		// Open copied item form, get steps text and compare to original.
-		$this->page->open('items.php?filter_set=1&context=host&filter_hostids[0]='.self::HOSTID);
+		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID);
 		$this->query('link', $item_name)->one()->click();
 		$form->invalidate();
 		$this->assertEquals($item_name, $form->getField('Name')->getValue());
@@ -176,12 +172,12 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	 * @backup profiles
 	 */
 	public function testFormPreprocessingItem_CloneItem() {
-		$link = 'items.php?form=update&context=host&hostid='.self::HOSTID.'&itemid='.self::CLONE_ITEMID;
+		$link = 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID;
 		$this->checkCloneItem($link, 'Item');
 	}
 
 	public function testFormPreprocessingItem_CloneTemplatedItem() {
-		$link = 'items.php?form=update&context=host&hostid='.self::INHERITANCE_HOSTID.'&itemid='.self::INHERITED_ITEMID;
+		$link = 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_HOSTID;
 		$this->checkCloneItem($link, 'Item', $templated = true);
 	}
 
@@ -196,8 +192,8 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
 	public function testFormPreprocessingItem_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_TEMPLATEID;
-		$host_link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_HOSTID;
+		$this->link = 'zabbix.php?action=item.list&filter_set=1&context=template&filter_hostids[0]='.self::INHERITANCE_TEMPLATEID;
+		$host_link = 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_HOSTID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

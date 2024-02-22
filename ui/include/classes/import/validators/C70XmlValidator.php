@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,13 +53,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
 		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
 		CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH,
 		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
+		CXmlConstantValue::MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
 		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
 		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
 		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
@@ -70,7 +72,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -513,7 +516,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+							'timeout' =>				['type' => XML_STRING, 'default' => ''],
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
@@ -659,7 +662,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'],  'rules' => [
 										'key' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
-									'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+									'timeout' =>				['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
@@ -872,7 +875,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+							'timeout' =>				['type' => XML_STRING, 'default' => ''],
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
@@ -1201,7 +1204,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+							'timeout' =>				['type' => XML_STRING, 'default' => ''],
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
@@ -1348,7 +1351,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'],  'rules' => [
 										'key' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
-									'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+									'timeout' =>				['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
@@ -1564,7 +1567,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+							'timeout' =>				['type' => XML_STRING, 'default' => ''],
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [

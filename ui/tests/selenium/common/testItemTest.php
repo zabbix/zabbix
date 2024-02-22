@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,27 +20,28 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * Base class for "Test item" function tests.
  */
 class testItemTest extends CWebTest {
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Proxy for Discovery rule'
-	const TEMPLATE_ID = 99137;	// 'Test Item Template'
-
-	use PreprocessingTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
 	}
+
+	const HOST_ID = 99136;		// 'Test item host' monitored by 'Proxy for Discovery rule'
+	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	/**
 	 * Test item button state data for item, item prototype and LLD.
@@ -76,7 +77,7 @@ class testItemTest extends CWebTest {
 	/**
 	 * Check test item button state depending on item type.
 	 *
-	 * @param arary		$data			data provider
+	 * @param array		$data			data provider
 	 * @param string	$item_name		item given name
 	 * @param string	$item_type		type of an item: item, prototype or lld rule
 	 * @param string	$success_text	text part of a success message
@@ -86,16 +87,28 @@ class testItemTest extends CWebTest {
 	 * @param string	$items			pointer to form in URL
 	 */
 	public function checkTestButtonState($data, $item_name, $item_type, $success_text, $check_now, $is_host, $id, $items = null) {
-		$create_link = ($items === null)
-			? 'disc_prototypes.php?form=create&context=host&parent_discoveryid='.$id
-			: $items.'.php?form=create&context=host&hostid='.$id;
+		$context = $is_host ? 'host' : 'template';
 
-		$saved_link = ($items === null)
-			? 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.$id.'&itemid='
-			: $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
+		if ($item_type === 'Discovery rule') {
+			$create_link = 'host_discovery.php?form=create&hostid='.$id.'&context='.$context;
+			$saved_link = $items.'.php?form=update&context=host&hostid='.$id.'&itemid=';
+		}
+		else {
+			$create_link = ($items === null)
+				? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
+				: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
+		}
 
 		$this->page->login()->open($create_link);
-		$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
+
+		if ($item_type !== 'Discovery rule') {
+			$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$item_form = $dialog->asForm();
+		}
+		else {
+			$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
+		}
 
 		// Create item.
 		$item_form->fill([
@@ -110,7 +123,14 @@ class testItemTest extends CWebTest {
 
 		// Open created item and change type.
 		foreach ($data as $update) {
-			$this->page->open($saved_link.$itemid);
+			if ($item_type === 'Discovery rule') {
+				$this->page->open($saved_link.$itemid);
+			}
+			else {
+				$this->page->open($create_link);
+				$this->query('link:'.$item_name)->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady();
+			}
 			$item_form->invalidate();
 			$type = $item_form->getField('Type')->getValue();
 
@@ -127,10 +147,16 @@ class testItemTest extends CWebTest {
 				// Check "Execute now" button only in host case item saved form and then change type.
 				if ($i === 0) {
 					if ($check_now) {
-						if ($type === 'Dependent item') {
-							$enabled = true;
+						if ($item_type !== 'Discovery rule') {
+							if ($type === 'Dependent item') {
+								$enabled = true;
+							}
+							$execute_button = $dialog->getFooter()->query('button:Execute now')->waitUntilVisible()->one();
 						}
-						$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
+						else {
+							$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
+						}
+
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
@@ -146,7 +172,7 @@ class testItemTest extends CWebTest {
 				}
 			}
 
-			$this->saveFormAndCheckMessage($item_type.' updated');
+			$this->saveFormAndCheckMessage($item_type.' updated', $item_type == 'Discovery rule' ? true : false);
 		}
 	}
 
@@ -675,23 +701,26 @@ class testItemTest extends CWebTest {
 	/**
 	 * Check test item form.
 	 *
-	 * @param arary		$data			data provider
+	 * @param array		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
 	 * @param string	$id				id of a host, template or LLD rule
 	 * @param string	$items			pointer to form in URL
 	 * @param boolean   $lld            true if lld, false if item or item prototype
 	 */
 	public function checkTestItem($data, $is_host, $id, $items = null, $lld = false) {
+		$context = ($is_host === true) ? 'host' : 'template';
 		$create_link = ($items === null)
-			? 'disc_prototypes.php?form=create&context=host&parent_discoveryid='.$id
-			: $items.'.php?form=create&context=host&hostid='.$id;
+			? 'zabbix.php?action=item.prototype.list&context='.$context.'&parent_discoveryid='.$id
+			: 'zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$id;
 
 		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
 
 		$this->page->login()->open($create_link);
-		$item_form = $this->query('name:itemForm')->asForm()->waitUntilReady()->one();
+		$this->query('button:'.(($items === null) ? 'Create item prototype' : 'Create item'))->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$item_form = $dialog->asForm();
 		$item_form->fill($data['fields']);
 
 		if ($is_host) {
@@ -715,8 +744,8 @@ class testItemTest extends CWebTest {
 		}
 
 		// Open Test item dialog form.
-		$this->query('id:test_item')->waitUntilVisible()->one()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->getFooter()->query('button:Test')->one()->click();
+		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -740,7 +769,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid',
+						'proxy' => 'id:proxyid',
 						'version' => 'id:interface_details_version',
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
@@ -755,7 +784,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid',
+						'proxy' => 'id:proxyid',
 						'version' => 'id:interface_details_version',
 						'community' => 'id:interface_details_community'
 					];
@@ -764,7 +793,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid'
+						'proxy' => 'id:proxyid'
 					];
 				}
 
@@ -772,8 +801,8 @@ class testItemTest extends CWebTest {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
 
-				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
-						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
+				$proxy = CDBHelper::getValue("SELECT name FROM proxy WHERE proxyid IN ".
+						"(SELECT proxyid FROM hosts WHERE host = 'Test item host')");
 
 				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {
@@ -1059,7 +1088,7 @@ class testItemTest extends CWebTest {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['error']);
-				$overlay->close();
+				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				break;
 		}
 	}
@@ -1117,8 +1146,16 @@ class testItemTest extends CWebTest {
 	 * @param int		$i			index number of preprocessing step
 	 */
 	private function checkTestButtonInPreprocessing($item_type, $enabled = true, $i = 0) {
-		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
+
+		if ($item_type == 'Discovery rule') {
+			$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+			$test_button = $this->query('id:test_item')->waitUntilVisible()->one();
+		}
+		else {
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$item_form = $dialog->asForm();
+			$test_button = $dialog->getFooter()->query('button:Test')->one();
+		}
 
 		$this->assertTrue($test_button->isEnabled($enabled));
 		$item_form->selectTab('Preprocessing');
@@ -1129,8 +1166,12 @@ class testItemTest extends CWebTest {
 		$item_form->selectTab($item_type);
 	}
 
-	private function saveFormAndCheckMessage($message) {
-		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+	private function saveFormAndCheckMessage($message, $lld = 'false') {
+
+		$item_form = $lld
+			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
+			: COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+
 		$item_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $message);

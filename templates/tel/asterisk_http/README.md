@@ -99,8 +99,9 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SIP trunk "{#OBJECTNAME}": Status|<p>SIP trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.sip.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active SIP trunk channels.</p>|Dependent item|asterisk.sip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|SIP trunk "{#OBJECTNAME}": Get SIP trunk|<p>Raw data for a SIP trunk.</p>|Dependent item|asterisk.sip.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
+|SIP trunk "{#OBJECTNAME}": Status|<p>SIP trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.sip.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active SIP trunk channels.</p>|Dependent item|asterisk.sip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
 
 ### Trigger prototypes for SIP peers discovery
 
@@ -119,8 +120,9 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IAX trunk "{#OBJECTNAME}": Status|<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|IAX trunk "{#OBJECTNAME}": Active channels|<p>The total number of active IAX trunk channels.</p>|Dependent item|asterisk.iax.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|IAX trunk "{#OBJECTNAME}": Get IAX trunk|<p>Raw data for an IAX trunk.</p>|Dependent item|asterisk.iax.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
+|IAX trunk "{#OBJECTNAME}": Status|<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|IAX trunk "{#OBJECTNAME}": Active channels|<p>The total number of active IAX trunk channels.</p>|Dependent item|asterisk.iax.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
 
 ### Trigger prototypes for IAX peers discovery
 
@@ -139,8 +141,9 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PJSIP trunk "{#OBJECTNAME}": Device state|<p>PJSIP trunk status. Here are the possible states that a device state may have:</p><p>Unavailable</p><p>Not in use</p><p>In use</p>|Dependent item|asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|PJSIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active PJSIP trunk channels.</p>|Dependent item|asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|PJSIP trunk "{#OBJECTNAME}": Get PJSIP trunk|<p>Raw data for a PJSIP trunk.</p>|Dependent item|asterisk.pjsip.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
+|PJSIP trunk "{#OBJECTNAME}": Device state|<p>PJSIP trunk status. Here are the possible states that a device state may have:</p><p>Unavailable</p><p>Not in use</p><p>In use</p>|Dependent item|asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceState`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|PJSIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active PJSIP trunk channels.</p>|Dependent item|asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
 
 ### Trigger prototypes for PJSIP endpoints discovery
 
@@ -159,9 +162,10 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|"{#QUEUE}": Logged in|<p>The number of queue members.</p>|Dependent item|asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()`</p></li></ul>|
-|"{#QUEUE}": Available|<p>The number of available queue members.</p>|Dependent item|asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()`</p></li></ul>|
-|"{#QUEUE}": Callers|<p>The number incoming calls in queue.</p>|Dependent item|asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p></li></ul>|
+|"{#QUEUE}": Get queue|<p>Raw data for a queue.</p>|Dependent item|asterisk.queue.get[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].first()`</p></li></ul>|
+|"{#QUEUE}": Logged in|<p>The number of queue members.</p>|Dependent item|asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LoggedIn`</p></li></ul>|
+|"{#QUEUE}": Available|<p>The number of available queue members.</p>|Dependent item|asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Available`</p></li></ul>|
+|"{#QUEUE}": Callers|<p>The number incoming calls in queue.</p>|Dependent item|asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Callers`</p></li></ul>|
 
 ### Trigger prototypes for Queues discovery
 

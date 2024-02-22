@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,15 @@
 
 #include "zbxregexp.h"
 #include "zbxembed.h"
-#include "zbxprometheus.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
-#include "zbxdbhigh.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
+#	include <libxml/parser.h>
 #endif
 
 #include "zbxnum.h"
@@ -119,7 +118,15 @@ int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zb
 	}
 
 	if (ZBX_VARIANT_NONE != (type_hint = item_preproc_numeric_type_hint(value_type)))
-		zbx_variant_convert(value_num, type_hint);
+	{
+		if (FAIL == zbx_variant_convert(value_num, type_hint))
+		{
+			*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+					zbx_variant_type_desc(value_num), zbx_get_variant_type_desc(type_hint));
+			zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+			return FAIL;
+		}
+	}
 
 	return SUCCEED;
 }
@@ -281,14 +288,54 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 
 		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
 		{
-			zbx_variant_convert(value, ZBX_VARIANT_DBL);
-			zbx_variant_convert(history_value, ZBX_VARIANT_DBL);
+			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_DBL))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
+			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_DBL))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(history_value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
 			ret = item_preproc_delta_float(value, ts, op_type, history_value, history_ts);
 		}
 		else
 		{
-			zbx_variant_convert(value, ZBX_VARIANT_UI64);
-			zbx_variant_convert(history_value, ZBX_VARIANT_UI64);
+			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_UI64))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
+			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_UI64))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(history_value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
 			ret = item_preproc_delta_uint64(value, ts, op_type, history_value, history_ts);
 		}
 
@@ -584,7 +631,7 @@ int	item_preproc_2dec(zbx_variant_t *value, int op_type, char **errmsg)
 int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
 	char		*pattern, *output, *new_value = NULL;
-	const char	*regex_error;
+	char		*regex_error = NULL;
 	zbx_regexp_t	*regex = NULL;
 	int		ret = FAIL;
 
@@ -604,7 +651,7 @@ int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errm
 	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))	/* PCRE_MULTILINE is not used here */
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
-		zbx_regexp_err_msg_free(regex_error);
+		zbx_free(regex_error);
 		goto out;
 	}
 
@@ -724,7 +771,7 @@ int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, 
 	zbx_variant_t	value_str;
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
-	const char	*errptr = NULL;
+	char		*errptr = NULL;
 	char		*errmsg;
 
 	zbx_variant_copy(&value_str, value);
@@ -738,7 +785,7 @@ int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, 
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
 		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
-		zbx_regexp_err_msg_free(errptr);
+		zbx_free(errptr);
 		goto out;
 	}
 
@@ -779,7 +826,7 @@ int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *para
 	zbx_variant_t	value_str;
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
-	const char	*errptr = NULL;
+	char		*errptr = NULL;
 	char		*errmsg;
 
 	zbx_variant_copy(&value_str, value);
@@ -793,7 +840,7 @@ int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *para
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
 		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
-		zbx_regexp_err_msg_free(errptr);
+		zbx_free(errptr);
 		goto out;
 	}
 
@@ -904,7 +951,7 @@ int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *para
 	xmlDoc			*doc = NULL;
 	xmlXPathContext		*xpathCtx = NULL;
 	xmlXPathObject		*xpathObj = NULL;
-	xmlErrorPtr		pErr;
+	const xmlError		*pErr;
 	xmlBufferPtr		xmlBufferLocal;
 
 	zbx_variant_copy(&value_str, value);
@@ -1035,6 +1082,96 @@ out:
 	zbx_variant_clear(&value_str);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks error for pattern matching regular expression              *
+ *                                                                            *
+ * Parameters: value  - [IN] value to process                                 *
+ *             params - [IN] operation parameters                             *
+ *             error  - [IN/OUT]                                              *
+ *                                                                            *
+ * Return value: FAIL - preprocessing step error                              *
+ *               SUCCEED - preprocessing step succeeded, error may contain    *
+ *                         extracted error message                            *
+ *                                                                            *
+ ******************************************************************************/
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error)
+{
+#define ZBX_PP_MATCH_TYPE_MATCHES	0
+#define ZBX_PP_MATCH_TYPE_ANY		-1
+	zbx_variant_t	value_str;
+	int		ret = SUCCEED, match_type = ZBX_PP_MATCH_TYPE_ANY;
+	char		*pattern = NULL, *newline, *out = NULL, *errptr = NULL;
+	zbx_regexp_t	*regex;
+
+	zbx_variant_copy(&value_str, value);
+
+	if (NULL != (newline = strchr(params, '\n')))
+	{
+		newline++;
+		pattern = zbx_strdup(NULL, newline);
+		match_type = atoi(params);
+	}
+
+	if (ZBX_PP_MATCH_TYPE_ANY == match_type)
+		goto out;
+
+	if (ZBX_PP_MATCH_TYPE_MATCHES == match_type)
+	{
+		if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &errptr))
+		{
+			*error = zbx_dsprintf(*error, "invalid regular expression: %s", errptr);
+			zbx_free(errptr);
+			goto out;
+		}
+
+		if (SUCCEED == zbx_mregexp_sub_precompiled(value->data.str, regex, *error, ZBX_MAX_RECV_DATA_SIZE,
+				&out))
+		{
+			if (NULL != out)
+			{
+				zbx_free(*error);
+				*error = out;
+			}
+		}
+		else
+			ret = FAIL;
+	}
+	else
+	{
+		int	res;
+
+		if (FAIL == zbx_regexp_compile(pattern, &regex, &errptr))
+		{
+			*error = zbx_dsprintf(*error, "invalid regular expression: %s", errptr);
+			zbx_free(errptr);
+			ret = FAIL;
+			goto out;
+		}
+
+		if (FAIL != (res = zbx_regexp_match_precompiled2(value_str.data.str, regex, &errptr)))
+		{
+			if (ZBX_REGEXP_MATCH == res)
+				ret = FAIL;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "regular expression execution failed: %s", errptr);
+			zbx_free(errptr);
+			ret = FAIL;
+		}
+	}
+
+	zbx_regexp_free(regex);
+out:
+	zbx_free(pattern);
+	zbx_variant_clear(&value_str);
+
+	return ret;
+#undef ZBX_PP_MATCH_TYPE_MATCHES
+#undef ZBX_PP_MATCH_TYPE_ANY
 }
 
 /******************************************************************************

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,14 @@ type requestBody struct {
 
 func newRequestBody() *requestBody {
 	return &requestBody{"", make(map[string]string), make(map[string]string)}
+}
+
+// httpCookiesGet parses Cookie HTTP request header returns HTTP cookies
+func (b *requestBody) httpCookiesGet() []*http.Cookie {
+	r := http.Request{Header: http.Header{}}
+	r.Header.Add("Cookie", b.Header["Cookie"])
+
+	return r.Cookies()
 }
 
 func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
@@ -157,12 +165,27 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		"making chrome headless request with parameters url: %s, width: %s, height: %s for report request from %s",
 		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
+	var cookieParams []*network.CookieParam
+
+	for _, cookie := range req.httpCookiesGet() {
+		cookieParam := network.CookieParam{
+			Name:     cookie.Name,
+			Value:    cookie.Value,
+			URL:      req.URL,
+			Domain:   u.Hostname(),
+			SameSite: network.CookieSameSiteStrict,
+			HTTPOnly: true,
+		}
+
+		cookieParams = append(cookieParams, &cookieParam)
+	}
+
 	var buf []byte
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
-		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
+		network.SetCookies(cookieParams),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
-		navigateAndWaitFor(u.String(), "networkIdle"),
+		prepareDashboard(u.String()),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
 			defer cancel()
@@ -194,47 +217,35 @@ func pixels2inches(value int64) float64 {
 	return float64(value) * 0.0104166667
 }
 
-func navigateAndWaitFor(url string, eventName string) chromedp.ActionFunc {
+func prepareDashboard(url string) chromedp.ActionFunc {
 	return func(ctx context.Context) error {
 		_, _, _, err := page.Navigate(url).Do(ctx)
 		if err != nil {
 			return err
 		}
 
-		return waitFor(ctx, eventName)
+		return waitForDashboardReady(ctx, url)
 	}
 }
 
-// This comment is taken from the proof of concept example
-//
-// waitFor blocks until eventName is received.
-// Examples of events you can wait for:
-//     init, DOMContentLoaded, firstPaint,
-//     firstContentfulPaint, firstImagePaint,
-//     firstMeaningfulPaintCandidate,
-//     load, networkAlmostIdle, firstMeaningfulPaint, networkIdle
-//
-// This is not super reliable, I've already found incidental cases where
-// networkIdle was sent before load. It's probably smart to see how
-// puppeteer implements this exactly.
-func waitFor(ctx context.Context, eventName string) error {
-	ch := make(chan struct{})
-	cctx, cancel := context.WithCancel(ctx)
-	chromedp.ListenTarget(cctx, func(ev interface{}) {
-		switch e := ev.(type) {
-		case *page.EventLifecycleEvent:
-			if e.Name == eventName {
-				cancel()
-				close(ch)
-			}
-		}
-	})
-	select {
-	case <-ch:
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
+func waitForDashboardReady(ctx context.Context, url string) error {
+	const wrapperIsReady = ".wrapper.is-ready"
+	const timeout = time.Minute
+
+	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
+	var isReady bool
+
+	err := chromedp.Run(ctx, chromedp.Poll(expression, &isReady, chromedp.WithPollingTimeout(timeout)))
+
+	if errors.Is(err, chromedp.ErrPollingTimeout) {
+		log.Warningf("timeout occurred while dashboard was getting ready, url: '%s'", url)
+	} else if err != nil {
+		log.Warningf("error while dashboard was getting ready: %s, url: '%s'", err.Error(), url)
+	} else if !isReady {
+		log.Warningf("should never happen, dashboard failed to get ready with no error, url: '%s'", url)
 	}
+
+	return nil
 }
 
 func parseUrl(u string) (*url.URL, error) {

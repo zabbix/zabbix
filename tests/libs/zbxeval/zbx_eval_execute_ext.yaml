@@ -266,4 +266,63 @@ in:
 out:
   result: SUCCEED
   value: 0
+---
+test case: Expression 'count(last_foreach(/*/key),"eq","\\")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"eq","\\")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ['\', '0', '.']
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'count(last_foreach(/*/key),"eq","a\\b")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"eq","a\\b")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["\\", "a\\b", "aaa"]
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'count(last_foreach(/*/key),"regexp","\\")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"regexp","\\")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["\\", "a\\b", "0"]
+out:
+  result: FAIL
+---
+test case: Expression 'count(last_foreach(/*/key),"regexp","\\\\")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"regexp","\\\\")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["\\", "a\\b", "0"]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'count(last_foreach(/*/key),"regexp",".\\\"b")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"regexp",".\\\"b")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["a\\\"b", "\\\\\"b", "0"]
+out:
+  result: SUCCEED
+  value: 2
 ...

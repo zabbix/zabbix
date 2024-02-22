@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
 void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+char	*zbx_find_buf_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf,
+		size_t szbyte);
 
 #define ZBX_READ_ERR		-1
 #define ZBX_READ_WRONG_ENCODING	-2
@@ -48,5 +50,7 @@ int	__zbx_open(const char *pathname, int flags);
 #	define zbx_open(pathname, flags)	open(pathname, flags)
 #	define ZBX_PATH_SEPARATOR	'/'
 #endif
+
+ssize_t	zbx_buf_readln(int fd, char *buf, size_t bufsz, const char *encoding, char **value, void **saveptr);
 
 #endif /* ZABBIX_ZBXFILE_H */

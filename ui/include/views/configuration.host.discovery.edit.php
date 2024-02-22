@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,19 +106,9 @@ $item_tab
 	]);
 
 // Prepare ITEM_TYPE_HTTPAGENT query fields.
-$query_fields_data = [];
+$query_fields_data = $data['query_fields'];
 
-if (is_array($data['query_fields']) && $data['query_fields']) {
-	$i = 0;
-	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = [
-			'name' => key($pair),
-			'value' => reset($pair),
-			'sortorder' => $i++
-		];
-	}
-}
-elseif (!$data['limited']) {
+if (!$query_fields_data && !$data['limited']) {
 	$query_fields_data[] = [
 		'name' => '',
 		'value' => '',
@@ -149,23 +139,24 @@ $parameters_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 if ($parameters_data) {
-	foreach ($parameters_data as $parameter) {
-		$parameters_table->addRow([
-			(new CTextBox('parameters[name][]', $parameter['name'], $data['limited'],
-				DB::getFieldLength('item_parameter', 'name'))
-			)
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CTextBox('parameters[value][]', $parameter['value'], $data['limited'],
-				DB::getFieldLength('item_parameter', 'value'))
-			)
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CButtonLink(_('Remove')))
-				->addClass('element-table-remove')
-				->setEnabled(!$data['limited'])
-				->onClick('jQuery(this).closest("tr").remove();')
-		]);
+	foreach ($parameters_data as $num => $parameter) {
+		$parameters_table->addItem(
+			(new CRow([
+				(new CTextBox('parameters['.$num.'][name]', $parameter['name'], $data['limited'],
+					DB::getFieldLength('item_parameter', 'name'))
+				)
+					->setAttribute('style', 'width: 100%;')
+					->removeId(),
+				(new CTextBox('parameters['.$num.'][value]', $parameter['value'], $data['limited'],
+					DB::getFieldLength('item_parameter', 'value'))
+				)
+					->setAttribute('style', 'width: 100%;')
+					->removeId(),
+				(new CButtonLink(_('Remove')))
+					->addClass('element-table-remove')
+					->setEnabled(!$data['limited'])
+			]))->addClass('form_row')
+		);
 	}
 }
 
@@ -197,13 +188,13 @@ $item_tab
 					->addItem(new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+							new CVar('query_fields[#{index}][sortorder]', '#{sortorder}')
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
+						(new CTextBox('query_fields[#{index}][name]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
+						(new CTextBox('query_fields[#{index}][value]', '#{value}', $data['limited']))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -219,30 +210,30 @@ $item_tab
 		))->setId('js-item-query-fields-field')
 	])
 	// Append ITEM_TYPE_SCRIPT parameters to form list.
-	->addItem(
-		(new CTag('script', true))
-			->setId('parameters_table_row')
-			->setAttribute('type', 'text/x-jquery-tmpl')
-			->addItem(
-				(new CRow([
-					(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('item_parameter', 'name')))
-						->setAttribute('style', 'width: 100%;')
-						->removeId(),
-					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
-						->setAttribute('style', 'width: 100%;')
-						->removeId(),
-					(new CButtonLink(_('Remove')))
-						->addClass('element-table-remove')
-						->onClick('jQuery(this).closest("tr").remove();')
-				]))
-			)
-	)
 	->addItem([
 		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('js-item-parameters-label'),
-		(new CFormField((new CDiv($parameters_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-parameters-field')
+		(new CFormField([
+			(new CDiv([
+				$parameters_table,
+				(new CTemplateTag('parameters_table_row'))->addItem(
+					(new CRow([
+						(new CTextBox('parameters[#{rowNum}][name]', '', false,
+							DB::getFieldLength('item_parameter', 'name')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CTextBox('parameters[#{rowNum}][value]', '', false,
+							DB::getFieldLength('item_parameter', 'value')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+					]))->addClass('form_row')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		]))->setId('js-item-parameters-field')
 	])
 	->addItem([
 		(new CLabel(_('Script'), 'script'))
@@ -277,16 +268,6 @@ $item_tab
 			->setValue($data['request_method'])
 		))->setId('js-item-request-method-field')
 	])
-	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField((new CTextBox('timeout', $data['timeout'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		))->setId('js-item-timeout-field')
-	])
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
 	->addItem([
 		(new CLabel(_('Request body type'), 'post_type'))->setId('js-item-post-type-label'),
@@ -308,19 +289,9 @@ $item_tab
 	]);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields to form list.
-$headers_data = [];
+$headers_data = $data['headers'];
 
-if (is_array($data['headers']) && $data['headers']) {
-	$i = 0;
-	foreach ($data['headers'] as $pair) {
-		$headers_data[] = [
-			'name' => key($pair),
-			'value' => reset($pair),
-			'sortorder' => $i++
-		];
-	}
-}
-elseif (!$data['limited']) {
+if (!$headers_data && !$data['limited']) {
 	$headers_data[] = [
 		'name' => '',
 		'value' => '',
@@ -350,13 +321,13 @@ $item_tab
 					->addItem(new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							new CVar('headers[#{index}][sortorder]', '#{sortorder}')
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
+						(new CTextBox('headers[#{index}][name]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 2000))
+						(new CTextBox('headers[#{index}][value]', '#{value}', $data['limited'], 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -547,12 +518,29 @@ if ($data['display_interfaces']) {
 
 $item_tab
 	->addItem([
-		(new CLabel(_('SNMP OID'), 'snmp_oid'))
+		(new CLabel([
+			_('SNMP OID'),
+			makeHelpIcon([
+				_('Field requirements:'),
+				(new CList([
+					new CListItem([
+						(new CSpan('walk[OID1,OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('to retrieve a subtree')
+					]),
+					new CListItem([
+						(new CSpan('discovery[{#MACRO1},OID1,{#MACRO2},OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('(legacy) to retrieve a subtree in JSON')
+					])
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		], 'snmp_oid'))
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
 		(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $data['limited'], 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+			->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 			->setAriaRequired()
 		))->setId('js-item-snmp-oid-field')
 	]);
@@ -692,14 +680,53 @@ $delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
 	->addClass('element-table-add')
 ]);
 
+$item_tab->addItem([
+	(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
+	(new CFormField((new CDiv($delayFlexTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	))->setId('js-item-flex-intervals-field')
+]);
+
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$edit_source_timeouts_link = null;
+
+if ($data['can_edit_source_timeouts']
+		&& (!$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)) {
+	$edit_source_timeouts_link = $data['host']['proxyid']
+		? (new CLink(_('Timeouts')))
+			->setAttribute('data-proxyid', $data['host']['proxyid'])
+			->onClick('view.editProxy(event, this.dataset.proxyid);')
+		: (new CLink(_('Timeouts'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+		))->setTarget('_blank');
+}
+
+$item_tab->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CRadioButtonList('custom_timeout', $data['custom_timeout']))
+			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+			->setReadonly($data['limited'])
+			->setModern(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('timeout', $data['timeout'],
+			$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired(),
+		$edit_source_timeouts_link
+	]))->setId('js-item-timeout-field')
+]);
+
 $item_tab
-	->addItem([
-		(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
-		(new CFormField((new CDiv($delayFlexTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-flex-intervals-field')
-	])
 	->addItem([
 		(new CLabel(_('Keep lost resources period'), 'lifetime'))->setAsteriskMark(),
 		new CFormField((new CTextBox('lifetime', $data['lifetime']))
@@ -751,8 +778,7 @@ $condition_tab->addItem([
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
-			(new CSpan(''))
-				->setId('expression'),
+			(new CSpan(''))->setId('expression'),
 			(new CTextBox('formula', $data['formula']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
@@ -769,20 +795,6 @@ $condition_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
-$conditions = $data['conditions'];
-
-if (!$conditions) {
-	$conditions = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -790,8 +802,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-// fields
-foreach ($conditions as $i => $condition) {
+foreach ($data['conditions'] as $i => $condition) {
 	// formula id
 	$formulaid = [
 		new CSpan($condition['formulaid']),
@@ -995,7 +1006,7 @@ if (!empty($data['itemid'])) {
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			)
-			->onClick('view.checkNow(this);');
+			->addClass('js-execute-item');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
@@ -1037,14 +1048,17 @@ $html_page->show();
 		'interfaces' => $data['interfaces'],
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'inherited_timeouts' => $data['inherited_timeouts']['timeouts']
 	]).');
 '))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'counter' => $data['counter']
+		'counter' => $data['counter'],
+		'context' => $data['context'],
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

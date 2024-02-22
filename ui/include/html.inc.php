@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,14 +266,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$db_host = reset($db_host);
 
 	if (!$is_template) {
-		// Get count for item type ITEM_TYPE_ZABBIX_ACTIVE (7).
-		$db_item_active_count = API::Item()->get([
-			'countOutput' => true,
-			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-			'hostids' => [$hostid]
-		]);
-
-		if ($db_item_active_count > 0) {
+		if (getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
 				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
@@ -282,6 +275,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			];
 			unset($db_host['active_available']);
 		}
+
+		$db_host['has_passive_checks'] = (bool) getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, [$hostid]);
 	}
 
 	// get lld-rules
@@ -302,7 +297,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 	if ($is_template) {
 		$template = new CSpan(
-			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
+			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.edit')
+				->setArgument('templateid', $db_host['templateid'])
+			))
+				->setAttribute('data-templateid', $db_host['templateid'])
+				->onClick('view.editTemplate(event, this.dataset.templateid);')
 		);
 
 		if ($current_element === '') {
@@ -310,7 +310,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 
 		$list->addItem(new CBreadcrumbs([
-			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
+			new CSpan(new CLink(_('All templates'), (new CUrl('zabbix.php'))->setArgument('action', 'template.list'))),
 			$template
 		]));
 
@@ -353,7 +353,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete'])];
@@ -374,7 +374,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// items
 		$items = new CSpan([
 			new CLink(_('Items'),
-				(new CUrl('items.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -389,7 +390,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// triggers
 		$triggers = new CSpan([
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
@@ -488,7 +490,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// item prototypes
 		$item_prototypes = new CSpan([
 			new CLink(_('Item prototypes'),
-				(new CUrl('disc_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -502,7 +505,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// trigger prototypes
 		$trigger_prototypes = new CSpan([
 			new CLink(_('Trigger prototypes'),
-				(new CUrl('trigger_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
@@ -620,8 +624,13 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 
 /**
  * Create HTML helper element for host interfaces availability.
+ *
+ * @param array $host_interfaces
+ * @param bool $passive_checks
+ *
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks = true): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -640,7 +649,9 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 		];
 	}
 
-	return (new CHostAvailability())->setInterfaces($interfaces);
+	return (new CHostAvailability())
+		->setInterfaces($interfaces)
+		->enablePassiveChecks($passive_checks);
 }
 
 /**
@@ -858,6 +869,10 @@ function getAdministrationGeneralSubmenu(): array {
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
+	$timeouts_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'timeouts.edit')
+		->getUrl();
+
 	$image_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'image.list')
 		->getUrl();
@@ -895,6 +910,7 @@ function getAdministrationGeneralSubmenu(): array {
 			'items' => array_filter([
 				$gui_url            => _('GUI'),
 				$autoreg_url        => _('Autoregistration'),
+				$timeouts_url       => _('Timeouts'),
 				$image_url          => _('Images'),
 				$iconmap_url        => _('Icon mapping'),
 				$regex_url          => _('Regular expressions'),

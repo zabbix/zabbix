@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ typedef enum {
 }
 zbx_ha_mode_t;
 
-void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb,
+		zbx_get_config_int_f get_config_timeout_cb);
 
 int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode);
 

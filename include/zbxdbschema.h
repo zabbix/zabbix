@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 /* flags */
 #define ZBX_NOTNULL		0x01
 #define ZBX_PROXY		0x02
+#define ZBX_UPPER		0x04
 
 /* FK flags */
 #define ZBX_FK_CASCADE_DELETE	0x01
@@ -40,7 +41,7 @@
 #define ZBX_TYPE_CUID		9
 #define	ZBX_TYPE_SERIAL		10
 
-#define ZBX_MAX_FIELDS		104 /* maximum number of fields in a table plus one for null terminator in dbschema.c */
+#define ZBX_MAX_FIELDS		114 /* maximum number of fields in a table plus one for null terminator in dbschema.c */
 #define ZBX_TABLENAME_LEN	26
 #define ZBX_TABLENAME_LEN_MAX	(ZBX_TABLENAME_LEN + 1)
 #define ZBX_FIELDNAME_LEN	28

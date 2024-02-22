@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,12 +59,13 @@ class TabIndicators {
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
+		const PIE_CHART = document.querySelector('#widget-dialogue-form');
 		const PROXY = document.querySelector('#proxy-form');
 		const SERVICE = document.querySelector('#service-form');
 		const SLA = document.querySelector('#sla-form');
 		const TEMPLATE = document.querySelector('#templates-form');
-		const TRIGGER = document.querySelector('#triggers-form');
-		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
+		const TRIGGER = document.querySelector('#trigger-form');
+		const TRIGGER_PROTOTYPE = document.querySelector('#trigger-prototype-form');
 		const USER = document.querySelector('#user-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
 		const WEB_SCENARIO = document.querySelector('#webscenario-form');
@@ -76,12 +77,16 @@ class TabIndicators {
 				return AUTHENTICATION;
 			case !!GRAPH:
 				return GRAPH;
+			case !!TEMPLATE:
+				return TEMPLATE;
 			case !!HOST:
 				return HOST;
 			case !!HOST_DISCOVERY:
 				return HOST_DISCOVERY;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
+			case !!PROXY:
+				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -90,14 +95,14 @@ class TabIndicators {
 				return MAP;
 			case !!MEDIA_TYPE:
 				return MEDIA_TYPE;
+			case !!PIE_CHART:
+				return PIE_CHART;
 			case !!PROXY:
 				return PROXY;
 			case !!SERVICE:
 				return SERVICE;
 			case !!SLA:
 				return SLA;
-			case !!TEMPLATE:
-				return TEMPLATE;
 			case !!TRIGGER:
 				return TRIGGER;
 			case !!TRIGGER_PROTOTYPE:
@@ -183,8 +188,8 @@ class TabIndicatorFactory {
 				return new EncryptionTabIndicatorItem;
 			case 'Filters':
 				return new FiltersTabIndicatorItem;
-			case 'FrontendMessage':
-				return new FrontendMessageTabIndicatorItem;
+			case 'FrontendNotifications':
+				return new FrontendNotificationsTabIndicatorItem;
 			case 'GraphAxes':
 				return new GraphAxesTabIndicatorItem;
 			case 'GraphDataset':
@@ -197,8 +202,12 @@ class TabIndicatorFactory {
 				return new GraphOverridesTabIndicatorItem;
 			case 'GraphProblems':
 				return new GraphProblemsTabIndicatorItem;
-			case 'GraphTime':
-				return new GraphTimeTabIndicatorItem;
+			case 'GraphTimePeriod':
+				return new GraphTimePeriodTabIndicatorItem;
+			case 'HostMacros':
+				return new HostMacrosTabIndicatorItem;
+			case 'HostPrototypeMacros':
+				return new HostPrototypeMacrosTabIndicatorItem;
 			case 'HttpAuth':
 				return new HttpAuthTabIndicatorItem;
 			case 'Media':
@@ -217,8 +226,6 @@ class TabIndicatorFactory {
 				return new LdapTabIndicatorItem;
 			case 'LldMacros':
 				return new LldMacrosTabIndicatorItem;
-			case 'Macros':
-				return new MacrosTabIndicatorItem;
 			case 'Overrides':
 				return new OverridesTabIndicatorItem;
 			case 'Operations':
@@ -227,10 +234,20 @@ class TabIndicatorFactory {
 				return new TemplatePermissionsTabIndicatorItem;
 			case 'HostPermissions':
 				return new HostPermissionsTabIndicatorItem;
+			case 'PieDataset':
+				return new PieDatasetTabIndicatorItem;
+			case 'PieDisplayOptions':
+				return new PieDisplayOptionsTabIndicatorItem;
+			case 'PieLegend':
+				return new PieLegendTabIndicatorItem;
+			case 'PieTimePeriod':
+				return new PieTimePeriodTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
 				return new ProxyEncryptionTabIndicatorItem;
+			case 'ProxyTimeouts':
+				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
 				return new SamlTabIndicatorItem;
 			case 'Sharing':
@@ -243,10 +260,14 @@ class TabIndicatorFactory {
 				return new TagFilterTabIndicatorItem;
 			case 'Tags':
 				return new TagsTabIndicatorItem;
+			case 'TemplateMacros':
+				return new TemplateMacrosTabIndicatorItem;
 			case 'Time':
 				return new TimeTabIndicatorItem;
 			case 'Valuemaps':
 				return new ValuemapsTabIndicatorItem;
+			case 'TemplateValuemaps':
+				return new TemplateValuemapsTabIndicatorItem;
 		}
 
 		return null;
@@ -331,7 +352,7 @@ class TabIndicatorItem {
 	}
 }
 
-class MacrosTabIndicatorItem extends TabIndicatorItem {
+class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	static ZBX_PROPERTY_INHERITED = 1;
 
@@ -340,13 +361,15 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#tbl_macros .form_row')]
+		let macros = [...document.forms['host-form'].querySelectorAll('#tbl_macros .form_row')];
+
+		return macros
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
-						&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -356,7 +379,95 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.getElementById('macros_container');
+		let target_node = document.getElementById('macros_container');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
+		}
+	}
+}
+
+class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
+
+	static ZBX_PROPERTY_INHERITED = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		let macros = [...document.forms['hostPrototypeForm'].querySelectorAll('#tbl_macros .form_row')];
+
+		return macros
+			.filter((row) => {
+				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
+				const inherited = HostPrototypeMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
+
+				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+					return false;
+				}
+
+				return (macro !== null && macro.value !== '');
+			})
+			.length;
+	}
+
+	initObserver() {
+		let target_node = document.getElementById('macros_container');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
+		}
+	}
+}
+
+class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
+
+	static ZBX_PROPERTY_INHERITED = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		let macros = [...document.forms['templates-form'].querySelectorAll('#tbl_macros .form_row')];
+
+		return macros
+			.filter((row) => {
+				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
+				const inherited = TemplateMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
+
+				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+					return false;
+				}
+
+				return (macro !== null && macro.value !== '');
+			})
+			.length;
+	}
+
+	initObserver() {
+		let target_node = document.getElementById('template_macros_container');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
@@ -658,6 +769,27 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 		for (const _element of document.querySelectorAll(
 				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
 			_element.addEventListener('change', () => this.addAttributes(element));
+		}
+	}
+}
+
+class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const custom_timeouts = document.querySelector('[name="custom_timeouts"]:checked');
+
+		return custom_timeouts !== null && custom_timeouts.value === '1';
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll('[name="custom_timeouts"]')) {
+			input.addEventListener('click', () => {
+				this.addAttributes();
+			});
 		}
 	}
 }
@@ -1117,7 +1249,7 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
+class FrontendNotificationsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1287,17 +1419,17 @@ class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class GraphTimeTabIndicatorItem extends TabIndicatorItem {
+class GraphTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector('#graph_time');
+		const element = document.querySelector('input[name="time_period[data_source]"]');
 
 		if (element !== null) {
-			return element.checked;
+			return !element.checked;
 		}
 
 		return false;
@@ -1329,6 +1461,12 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend_statistic = document.getElementById('legend_statistic');
 
 		if (legend_statistic !== null && legend_statistic.checked) {
+			return true;
+		}
+
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked && !legend_aggregation.disabled) {
 			return true;
 		}
 
@@ -1413,15 +1551,24 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#templategroup-right-table tbody tr')
-			.length > 1;
+		return [...document.querySelectorAll('#templategroup-right-table .form_row')]
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
+			.length;
 	}
 
-	initObserver(element) {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
-		});
+	initObserver() {
+		const target_node = document.getElementById('templategroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1432,15 +1579,24 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#group-right-table tbody tr')
-			.length > 1;
+		return [...document.querySelectorAll('#hostgroup-right-table .form_row')]
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
+			.length;
 	}
 
 	initObserver() {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes();
-		});
+		const target_node = document.getElementById('hostgroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1469,5 +1625,163 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 				subtree: true
 			});
 		}
+	}
+}
+
+class TemplateValuemapsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#template-valuemap-table tbody tr')
+			.length;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#template-valuemap-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+	}
+}
+
+class PieDatasetTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#data_set .list-accordion-item')
+			.length;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#data_set');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+	}
+}
+
+class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
+
+	static PIE_CHART_SPACE_DEFAULT = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const names = ['source', 'draw_type', 'merge'];
+
+		for (const name of names) {
+			const elem = document.querySelector("[name='" + name + "']:checked");
+			if (elem !== null && elem.value > 0) {
+				return true;
+			}
+		}
+
+		const space = document.getElementById('space');
+
+		if (space !== null && space.value != PieDisplayOptionsTabIndicatorItem.PIE_CHART_SPACE_DEFAULT) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class PieTimePeriodTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('input[name="time_period[data_source]"]');
+
+		if (element !== null) {
+			return !element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class PieLegendTabIndicatorItem extends TabIndicatorItem {
+
+	static PIE_CHART_LEGEND_LINES_MIN = 1;
+	static PIE_CHART_LEGEND_COLUMNS_MAX = 4;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const legend = document.getElementById('legend');
+
+		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked) {
+			return true;
+		}
+
+		const legend_lines = document.getElementById('legend_lines');
+
+		if (legend_lines !== null && legend_lines.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MIN) {
+			return true;
+		}
+
+		const legend_columns = document.getElementById('legend_columns');
+
+		if (legend_columns !== null
+			&& legend_columns.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_COLUMNS_MAX) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }

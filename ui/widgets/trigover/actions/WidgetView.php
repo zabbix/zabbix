@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
@@ -44,7 +43,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -76,7 +75,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($this->isTemplateDashboard()) {
 				$groupids = [];
-				$host_options['hostids'] = [$this->getInput('dynamic_hostid')];
+				$host_options['hostids'] = $this->fields_values['override_hostid'];
 			}
 			else {
 				$groupids = $this->fields_values['groupids'];

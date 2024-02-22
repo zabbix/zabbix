@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,31 +18,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup items
  *
- * @dataSource ExecuteNowAction, DiscoveredHosts
+ * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups, AllItemValueTypes
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
-	use TableTrait;
-
-	const HOST_ID = 90001;
-
-	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	const HOST_ID = 90001;
+
+	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
@@ -72,9 +74,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'Type' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 						'SNMP agent', 'Zabbix internal','Zabbix trapper', 'External check',
 						'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent',
-						'TELNET agent', 'JMX agent', 'Dependent item', 'all'],
-				'State' => ['Normal', 'Not supported', 'all'],
-				'Status' => ['all', 'Enabled', 'Disabled']
+						'TELNET agent', 'JMX agent', 'Dependent item', 'All'],
+				'State' => ['Normal', 'Not supported', 'All'],
+				'Status' => ['All', 'Enabled', 'Disabled']
 		];
 		foreach ($dropdowns as $name => $values) {
 			foreach ($values as $value) {
@@ -90,7 +92,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					case 'Normal':
 					case 'Not supported':
 						$this->assertFalse($form->getField('Status')->isEnabled());
-						$this->assertEquals('all', $form->getField('Status')->getText());
+						$this->assertEquals('All', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -295,7 +297,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 86
+					'rows' => 90
 				]
 			],
 			// #1
@@ -435,20 +437,39 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
+						'1st LLD',
+						'2nd LLD',
+						'3rd LLD',
+						'12th LLD',
+						'15th LLD 🙃^天!',
+						'16th LLD',
+						'17th LLD',
 						'Linux by Zabbix agent: Block devices discovery',
 						'DR1-agent',
 						'DR2-trap',
 						'I1-lvl1-agent-num: DR3-I1-dep-agent',
 						'I2-lvl1-trap-num: DR4-I2-dep-trap',
 						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
+						'Eleventh LLD',
+						'fifth LLD',
+						'forth LLD',
 						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
+						'LLD for host group test',
+						'LLD number 8',
+						'LLD rule for item types',
+						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
 						'Linux by Zabbix agent: Linux: Get filesystems: Mounted filesystem discovery',
+						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
+						'sevenths LLD',
+						'sixth LLD',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
 						'Test of discovered host 2 template for clear: Template2 discovery rule',
 						'Test of discovered host Template: Template discovery rule',
-						'Zabbix server health: Zabbix server: Zabbix proxies stats: Zabbix proxy discovery'
+						'Trīspadsmitais LLD',
+						'Zabbix server health: Zabbix server: Zabbix proxies stats: Zabbix proxy discovery',
+						'Četrpadsmitais LLD'
 					]
 				]
 			],
@@ -481,11 +502,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Type' => 'Database monitor',
 						'Update interval' => '1h',
-						'Name'=> 'Non-local database'
+						'Name'=> 'PDB'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Non-local database discovery'
+						'PDB discovery'
 					]
 				]
 			],
@@ -545,7 +566,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Update interval' => '0',
 						'Keep lost resources period' => '30d',
-						'State' => 'all',
+						'State' => 'All',
 						'Status' => 'Enabled'
 					],
 					'expected' => [

@@ -5,6 +5,7 @@ form.dashboard-widget-gauge {
 		&.fields-group-colors,
 		&.fields-group-description,
 		&.fields-group-value,
+		&.fields-group-value-arc,
 		&.fields-group-needle,
 		&.fields-group-scale,
 		&.fields-group-thresholds {
@@ -60,16 +61,6 @@ form.dashboard-widget-gauge {
 				display: flex;
 
 				label[for='units'] {
-					width: 100%;
-				}
-			}
-		}
-
-		&.fields-group-needle {
-			.needle-show {
-				display: flex;
-
-				label[for='lbl_needle_color'] {
 					width: 100%;
 				}
 			}

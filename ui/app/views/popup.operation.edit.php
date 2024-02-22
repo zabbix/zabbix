@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -330,6 +330,47 @@ $form_grid->addItem([
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
 	)->setId('operation-attr-hostgroups')
 ]);
+
+// Operation Add/Remove host tags.
+$form_grid->addItem(
+	(new CFormField([
+		(new CTable())
+			->setId('tags-table')
+			->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
+			->setHeader([_('Name'), _('Value'), ''])
+			->setFooter(new CCol(
+				(new CButton('tag_add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+			)),
+		(new CTemplateTag('operation-host-tags-row-tmpl'))
+			->addItem(
+				(new CRow([
+					(new CCol(
+						(new CTextAreaFlexible('operation[optag][#{row_index}][tag]', '#{tag}',
+							['add_post_js' => false]
+						))
+							->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+							->setAttribute('placeholder', _('tag'))
+					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+					(new CCol(
+						(new CTextAreaFlexible('operation[optag][#{row_index}][value]', '#{value}',
+							['add_post_js' => false]
+						))
+							->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+							->setAttribute('placeholder', _('value'))
+					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+					(new CCol(
+						(new CSimpleButton(_('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+					))->addClass(ZBX_STYLE_NOWRAP)
+				]))
+					->addClass('form_row')
+					->setAttribute('data-id','#{row_index}')
+			)
+	]))->setId('operation-host-tags')
+);
 
 // Link / unlink templates attribute row.
 $form_grid->addItem([

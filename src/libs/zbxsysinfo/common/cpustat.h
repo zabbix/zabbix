@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@ typedef struct
 	int			count;
 }
 ZBX_CPUS_STAT_DATA;
-
-#define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.queue_counter)
 
 int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **error);
 
@@ -84,8 +82,6 @@ typedef struct
 }
 ZBX_CPUS_UTIL_DATA_AIX;
 #endif /* _AIX */
-
-#define CPU_COLLECTOR_STARTED(collector)	(collector)
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,6 +133,40 @@ void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
 	*j->buffer = '\0';
 
 	zbx_json_addarray(j, NULL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize json with data from another json and position cursor   *
+ *          to the closing bracket                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_json_init_with(struct zbx_json *j, const char *src)
+{
+	if (NULL == src)
+	{
+		zbx_json_init(j, ZBX_JSON_STAT_BUF_LEN);
+		return;
+	}
+
+	size_t	len = strlen(src);
+
+	j->buffer = NULL;
+	j->buffer_allocated = 0;
+	__zbx_json_realloc(j, len + 1);
+
+	memcpy(j->buffer, src, len + 1);
+
+	j->buffer_size = len;
+	j->buffer_offset = len - 1;	/* position to the closing bracket */
+	j->level = 1;
+
+	const char	*ptr = j->buffer + j->buffer_offset - 1;
+
+	while (' ' == *ptr && ptr > j->buffer)
+		ptr--;
+
+	j->status = ('{' == *ptr ? ZBX_JSON_EMPTY : ZBX_JSON_COMMA);
 }
 
 static void	zbx_json_setempty(struct zbx_json *j)
@@ -922,7 +956,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
 				return NULL;
 	}
 
@@ -956,7 +990,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
 				return NULL;
 	}
 
@@ -1221,7 +1255,7 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 		object.start = p;
 
 		if (NULL == (object.end = __zbx_json_rbracket(p)))
-			object.end = p + json_parse_value(p, NULL, NULL) - 1;
+			object.end = p + json_parse_value(p, NULL, 0, NULL) - 1;
 	}
 
 	*out = object;

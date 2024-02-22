@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite to check if trigger state is updated properly
  * when item state toggles between normal and unsupported
  *
- * @backup hosts,host_rtdata
+ * @backup hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, config, ha_node, expressions, globalmacro
+ * @backup interface, item_rtdata, items, regexps, task, task_data
  * @hosts test
  */
 class testActiveAvailability extends CIntegrationTest {
@@ -66,7 +67,7 @@ class testActiveAvailability extends CIntegrationTest {
 				'LogFileSize' => 20
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => 0,
+				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'Hostname' => 'active proxy',
@@ -93,7 +94,7 @@ class testActiveAvailability extends CIntegrationTest {
 				'ProxyDataFrequency' => 1
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => 1,
+				'ProxyMode' => PROXY_OPERATING_MODE_PASSIVE,
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'Hostname' => 'passive proxy',
@@ -236,12 +237,12 @@ class testActiveAvailability extends CIntegrationTest {
 	 *
 	 * @required-components server,proxy,agent
 	 * @configurationDataProvider activeProxyConfigurationProvider
-	 * @backup hosts,host_rtdata
+	 * @backup hosts,host_rtdata,proxy,proxy_rtdata
 	 */
 	public function testActiveAvailability_activeProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [
-			'host' => 'active proxy',
-			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'name' => 'active proxy',
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 			'hosts' => [
 				[
 					"hostid" => self::$hostid
@@ -283,23 +284,19 @@ class testActiveAvailability extends CIntegrationTest {
 	 *
 	 * @required-components server,proxy,agent
 	 * @configurationDataProvider passiveProxyConfigurationProvider
-	 * @backup hosts,host_rtdata
+	 * @backup hosts,host_rtdata,proxy,proxy_rtdata
 	 */
 	public function testActiveAvailability_passiveProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [
-			'host' => 'passive proxy',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'name' => 'passive proxy',
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [
 				[
 					"hostid" => self::$hostid
 				]
 			],
-			'interface' => [
-				'ip' => '127.0.0.1',
-				'useip' => 1,
-				'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
-				'dns' => ''
-			]
+			'address' => '127.0.0.1',
+			'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 

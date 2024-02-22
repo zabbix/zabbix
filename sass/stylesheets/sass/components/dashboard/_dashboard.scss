@@ -37,8 +37,8 @@
 
 .dashboard-navigation {
 	display: flex;
-	margin-top: 10px;
-	padding-bottom: 2px;
+	margin-top: 2px;
+	margin-bottom: 6px;
 
 	&.is-scrollable {
 		.dashboard-navigation-controls {
@@ -72,7 +72,7 @@
 
 		& > .sortable-item:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
-			padding: 0 3.5px 0 3.5px;
+			padding: 0 3.5px;
 
 			& > div {
 				padding: 0 8px;
@@ -87,7 +87,7 @@
 		box-sizing: border-box;
 		display: block;
 		// Invisible padding for tab separation.
-		padding: 0 1.5px 0 1.5px;
+		padding: 0 1.5px;
 		margin: 0;
 		list-style-type: none;
 		outline: none;
@@ -181,7 +181,7 @@
 
 .dashboard-grid {
 	position: relative;
-	margin: 0 -4px -4px -4px;
+	margin: -4px;
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
@@ -577,6 +577,19 @@
 	}
 }
 
+.dashboard-grid-iterator-actions {
+	opacity: 0;
+
+	@if $ui-transitions {
+		transition: opacity $ui-controls-transition-duration ease-out;
+	}
+
+	li {
+		margin-top: 2px;
+		margin-right: 2px;
+	}
+}
+
 .dashboard-grid-iterator-contents {
 	// To catch vertical resize events correctly.
 	position: absolute;
@@ -659,6 +672,10 @@
 			// Not inheriting opacity transition here.
 			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
 				box-shadow $ui-transition-duration ease-out;
+		}
+
+		.dashboard-grid-iterator-actions {
+			opacity: 1;
 		}
 
 		&.dashboard-grid-iterator-hidden-header.iterator-double-header {
@@ -1039,7 +1056,6 @@
 	}
 }
 
-.dashboard-grid-widget-contents,
 .dashboard-grid-iterator-contents {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
@@ -1091,8 +1107,18 @@
 }
 
 .wrapper.layout-kioskmode {
-
 	.dashboard-navigation {
 		display: none;
+	}
+}
+
+@page {
+	margin: 10px;
+}
+
+@media print {
+	.dashboard-page {
+		margin: 10px;
+		break-after: page;
 	}
 }

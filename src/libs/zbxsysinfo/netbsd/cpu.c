@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "../common/stats.h"
 #include <uvm/uvm_extern.h>
 
-static int	get_cpu_num()
+static int	get_cpu_num(void)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
 	size_t	len;

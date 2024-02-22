@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,11 +73,11 @@ class CControllerPopupActionConditionEdit extends CController {
 
 	protected function getConditionLastType(): string {
 		$default = [
-			EVENT_SOURCE_TRIGGERS => CONDITION_TYPE_TRIGGER_NAME,
-			EVENT_SOURCE_DISCOVERY => CONDITION_TYPE_DHOST_IP,
-			EVENT_SOURCE_AUTOREGISTRATION => CONDITION_TYPE_HOST_NAME,
-			EVENT_SOURCE_INTERNAL => CONDITION_TYPE_EVENT_TYPE,
-			EVENT_SOURCE_SERVICE => CONDITION_TYPE_SERVICE
+			EVENT_SOURCE_TRIGGERS => ZBX_CONDITION_TYPE_EVENT_NAME,
+			EVENT_SOURCE_DISCOVERY => ZBX_CONDITION_TYPE_DHOST_IP,
+			EVENT_SOURCE_AUTOREGISTRATION => ZBX_CONDITION_TYPE_HOST_NAME,
+			EVENT_SOURCE_INTERNAL => ZBX_CONDITION_TYPE_EVENT_TYPE,
+			EVENT_SOURCE_SERVICE => ZBX_CONDITION_TYPE_SERVICE
 		];
 
 		$last_type = CProfile::get('popup.condition.actions_last_type', $default[$this->getInput('source')],

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,10 +38,3 @@ if (document.cookie.indexOf('browserwarning_ignore') < 0) {
 		window.location.replace('browserwarning.php');
 	}
 }
-
-// This is a hack to to enable Safari specific CSS.
-document.addEventListener('DOMContentLoaded', () => {
-	if (SF) {
-		document.body.classList.add('safari');
-	}
-});

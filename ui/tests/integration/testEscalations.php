@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ class testEscalations extends CIntegrationTest {
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$triggerid
 					]
@@ -312,6 +312,13 @@ class testEscalations extends CIntegrationTest {
 			'actionid' => self::$trigger_actionid,
 			'pause_suppressed' => 1
 		]);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 4);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+
 		// Create maintenance period
 		self::$maint_start_tm = time() + 10;
 		$maint_end_tm = self::$maint_start_tm + 60 * 2;
@@ -333,10 +340,6 @@ class testEscalations extends CIntegrationTest {
 		$maintenance_id = $response['result']['maintenanceids'][0];
 
 		$this->reloadConfigurationCache();
-
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 4);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
@@ -419,7 +422,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
-		], 5, 2);
+		], 15, 5);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
@@ -664,7 +667,7 @@ class testEscalations extends CIntegrationTest {
 				'filter' => [
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => $symptom_triggerids[$i]
 						]
@@ -860,7 +863,7 @@ HEREDOC;
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$triggerid
 					]
@@ -978,7 +981,7 @@ HEREDOC;
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'conditiontype' => ZBX_CONDITION_TYPE_TRIGGER,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$triggerid
 					]

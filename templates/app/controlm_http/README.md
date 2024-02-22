@@ -1,4 +1,94 @@
 
+# Control-M enterprise manager by HTTP
+
+## Overview
+
+The template to monitor Control-M by Zabbix that work without any external scripts.
+
+
+## Requirements
+
+Zabbix version: 7.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Control-M 9.21.0
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template is intended to be used on Control-M Enterprise Manager instances. 
+
+It monitors:
+* active SLA services;
+* discovers Control-M servers using Low Level Discovery;
+* creates host prototypes for discovered servers with the `Control-M server by HTTP` template.
+
+To use this template, you must set macros: **{$API.TOKEN}** and **{$API.URI.ENDPOINT}**. 
+
+To access the API token, use one of the following Control-M interfaces:
+
+> [Control-M WEB user interface](https://documents.bmc.com/supportu/controlm-saas/en-US/Documentation/Creating_an_API_Token.htm);
+
+> [Control-M command line interface tool CTM](https://docs.bmc.com/docs/saas-api/authentication-service-941879068.html).
+
+`{$API.URI.ENDPOINT}` - is the Control-M Automation API endpoint for the API requests, including your server IP, or DNS address, Automation API port and path.
+
+For example, `https://monitored.controlm.instance:8443/automation-api`.
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>|`<set the api uri endpoint here>`|
+|{$API.TOKEN}|<p>A token to use for API connections.</p>|`<set the token here>`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Control-M: Get Control-M servers|<p>Gets a list of servers.</p>|HTTP agent|controlm.servers|
+|Control-M: Get SLA services|<p>Gets all the SLA active services.</p>|HTTP agent|controlm.services|
+
+### LLD rule Server discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Server discovery|<p>Discovers the Control-M servers.</p>|Dependent item|controlm.server.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
+
+### LLD rule SLA services discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|SLA services discovery|<p>Discovers the SLA services in the Control-M environment.</p>|Dependent item|controlm.services.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.activeServices`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for SLA services discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: stats|<p>Gets the service statistics.</p>|Dependent item|service.stats['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.activeServices.[?(@.serviceName == '{#SERVICE.NAME}')]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.[?(@.serviceJob == '{#SERVICE.JOB}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status|<p>Gets the service status.</p>|Dependent item|service.status['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'executed'|<p>Gets the number of jobs in the state - `executed`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',executed]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.executed`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitCondition'|<p>Gets the number of jobs in the state - `waitCondition`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitCondition]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitCondition`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitResource'|<p>Gets the number of jobs in the state - `waitResource`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitResource]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitResource`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitHost'|<p>Gets the number of jobs in the state - `waitHost`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitHost]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitHost`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitWorkload'|<p>Gets the number of jobs in the state - `waitWorkload`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitWorkload]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitWorkload`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'completed'|<p>Gets the number of jobs in the state - `completed`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',completed]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.completed`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'error'|<p>Gets the number of jobs in the state - `error`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',error]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for SLA services discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has encountered an issue.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=0 or last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=10`|Average|**Manual close**: Yes|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has finished its job late.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=3`|Warning|**Manual close**: Yes|
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|<p>There are services present which are in the state - `error`.</p>|`last(/Control-M enterprise manager by HTTP/service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',error],#1)>0`|Average||
+
 # Control-M server by HTTP
 
 ## Overview
@@ -122,96 +212,6 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 |Agent [{#AGENT.NAME}}: status disabled|<p>The agent is disabled.</p>|`last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=2 or last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=3`|Info|**Manual close**: Yes|
 |Agent [{#AGENT.NAME}]: version has changed|<p>The agent version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)<>last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#2)`|Info|**Manual close**: Yes|
 |Agent [{#AGENT.NAME}]: unknown version|<p>The agent version is unknown.</p>|`last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)="Unknown"`|Warning|**Manual close**: Yes|
-
-# Control-M enterprise manager by HTTP
-
-## Overview
-
-The template to monitor Control-M by Zabbix that work without any external scripts.
-
-
-## Requirements
-
-Zabbix version: 7.0 and higher.
-
-## Tested versions
-
-This template has been tested on:
-- Control-M 9.21.0
-
-## Configuration
-
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
-
-## Setup
-
-This template is intended to be used on Control-M Enterprise Manager instances. 
-
-It monitors:
-* active SLA services;
-* discovers Control-M servers using Low Level Discovery;
-* creates host prototypes for discovered servers with the `Control-M server by HTTP` template.
-
-To use this template, you must set macros: **{$API.TOKEN}** and **{$API.URI.ENDPOINT}**. 
-
-To access the API token, use one of the following Control-M interfaces:
-
-> [Control-M WEB user interface](https://documents.bmc.com/supportu/controlm-saas/en-US/Documentation/Creating_an_API_Token.htm);
-
-> [Control-M command line interface tool CTM](https://docs.bmc.com/docs/saas-api/authentication-service-941879068.html).
-
-`{$API.URI.ENDPOINT}` - is the Control-M Automation API endpoint for the API requests, including your server IP, or DNS address, Automation API port and path.
-
-For example, `https://monitored.controlm.instance:8443/automation-api`.
-
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>|`<set the api uri endpoint here>`|
-|{$API.TOKEN}|<p>A token to use for API connections.</p>|`<set the token here>`|
-
-### Items
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Control-M: Get Control-M servers|<p>Gets a list of servers.</p>|HTTP agent|controlm.servers|
-|Control-M: Get SLA services|<p>Gets all the SLA active services.</p>|HTTP agent|controlm.services|
-
-### LLD rule Server discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Server discovery|<p>Discovers the Control-M servers.</p>|Dependent item|controlm.server.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
-
-### LLD rule SLA services discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|SLA services discovery|<p>Discovers the SLA services in the Control-M environment.</p>|Dependent item|controlm.services.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.activeServices`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-
-### Item prototypes for SLA services discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: stats|<p>Gets the service statistics.</p>|Dependent item|service.stats['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.activeServices.[?(@.serviceName == '{#SERVICE.NAME}')]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.[?(@.serviceJob == '{#SERVICE.JOB}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status|<p>Gets the service status.</p>|Dependent item|service.status['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'executed'|<p>Gets the number of jobs in the state - `executed`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',executed]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.executed`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitCondition'|<p>Gets the number of jobs in the state - `waitCondition`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitCondition]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitCondition`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitResource'|<p>Gets the number of jobs in the state - `waitResource`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitResource]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitResource`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitHost'|<p>Gets the number of jobs in the state - `waitHost`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitHost]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitHost`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitWorkload'|<p>Gets the number of jobs in the state - `waitWorkload`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitWorkload]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.waitWorkload`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'completed'|<p>Gets the number of jobs in the state - `completed`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',completed]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.completed`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'error'|<p>Gets the number of jobs in the state - `error`.</p>|Dependent item|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',error]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.statusByJobs.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-
-### Trigger prototypes for SLA services discovery
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has encountered an issue.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=0 or last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=10`|Average|**Manual close**: Yes|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has finished its job late.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=3`|Warning|**Manual close**: Yes|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|<p>There are services present which are in the state - `error`.</p>|`last(/Control-M enterprise manager by HTTP/service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',error],#1)>0`|Average||
 
 ## Feedback
 

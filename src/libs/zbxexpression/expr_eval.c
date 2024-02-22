@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -957,7 +957,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	evaluate_item.itemid = item->itemid;
 	evaluate_item.value_type = item->value_type;
-	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.proxyid = item->host.proxyid;
 	evaluate_item.host = item->host.host;
 	evaluate_item.key_orig = item->key_orig;
 
@@ -979,7 +979,8 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 						args[i].data.dbl);
 				break;
 			case ZBX_VARIANT_STR:
-				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
+				zbx_strquote_alloc_opt(&params, &params_alloc, &params_offset, args[i].data.str,
+						ZBX_STRQUOTE_DEFAULT);
 				break;
 			case ZBX_VARIANT_UI64:
 				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,
@@ -1614,7 +1615,8 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		char **error)
 {
 	zbx_expression_query_many_t	*data;
-	int				ret = FAIL, item_func, count, seconds, i;
+	int				ret = FAIL, item_func, count, i;
+	time_t				seconds;
 	zbx_vector_var_t		*results_var_vector;
 	double				result;
 	char				*operator = NULL, *pattern = NULL;
@@ -1646,11 +1648,15 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (1 == args_num && ZBX_VARIANT_STR == args[0].type)
 			{
-				if (FAIL == zbx_is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				int	tmp;
+
+				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
 				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
+
+				seconds = tmp;
 			}
 			else
 				seconds = 0;
@@ -1675,11 +1681,15 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (ZBX_VARIANT_STR == args[0].type)
 			{
-				if (FAIL == zbx_is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				int	tmp;
+
+				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
 				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
+
+				seconds = tmp;
 			}
 			else
 			{
@@ -1689,7 +1699,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 					goto out;
 				}
 
-				seconds = args[0].data.dbl;
+				seconds = (time_t)args[0].data.dbl;
 			}
 			count = 0;
 

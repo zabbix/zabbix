@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,17 +26,17 @@ import (
 	"testing"
 
 	"git.zabbix.com/ap/plugin-support/std"
+	"zabbix.com/pkg/zbxtest"
 )
 
 var Md5File = "1234"
 
 func TestFileMd5sum(t *testing.T) {
+	var ctx zbxtest.MockEmptyCtx
 	stdOs = std.NewMockOs()
 
-	impl.options.Timeout = 3
-
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(Md5File))
-	if result, err := impl.Export("vfs.file.md5sum", []string{"text.txt"}, nil); err != nil {
+	if result, err := impl.Export("vfs.file.md5sum", []string{"text.txt"}, ctx); err != nil {
 		t.Errorf("vfs.file.md5sum returned error %s", err.Error())
 	} else {
 		if md5sum, ok := result.(string); !ok {

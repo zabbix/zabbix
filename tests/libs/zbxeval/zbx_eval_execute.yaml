@@ -2238,4 +2238,76 @@ in:
 out:
   result: SUCCEED
   value: '0'
+---
+test case: Expression 'jsonpath("{\"val\":\"str\"}", "$.val")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'jsonpath("{\"val\":\"str\"}", "$.val")'
+out:
+  result: SUCCEED
+  value: 'str'
+---
+test case: Expression 'jsonpath("{\"val1\":\"str\"}", "$.val", "default")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'jsonpath("{\"val1\":\"str\"}", "$.val", "default")'
+out:
+  result: SUCCEED
+  value: 'default'
+---
+test case: Expression 'jsonpath("{\"val\":\"\"}", "$.val")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'jsonpath("{\"val\":\"\"}", "$.val")'
+out:
+  result: SUCCEED
+  value: ''
+---
+test case: Expression 'jsonpath("{}", "$.val")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'jsonpath("{}", "$.val")'
+out:
+  result: FAIL
+  value: ''
+---
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()", "unknown status")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()", "unknown status")'
+out:
+  result: SUCCEED
+  value: 'unknown status'
+---
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status", "unknown status")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status", "unknown status")'
+out:
+  result: SUCCEED
+  value: '<status/>'
+---
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status></error></response>", "/response/error/status/text()")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status></error></response>", "/response/error/status/text()")'
+out:
+  result: SUCCEED
+  value: 'abc'
+---
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "string(/response/error/status)", "unknown status")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "string(/response/error/status)", "unknown status")'
+out:
+  result: SUCCEED
+  value: ''
+---
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()")'
+out:
+  result: FAIL
+  value: ''
 ...

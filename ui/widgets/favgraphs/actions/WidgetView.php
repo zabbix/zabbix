@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($itemids) {
 			$db_items = API::Item()->get([
-				'output' => ['itemid', 'name'],
+				'output' => ['itemid', 'name_resolved'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($itemids),
 				'webitems' => true
@@ -49,7 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($db_items as $db_item) {
 				$graphs[] = [
 					'itemid' => $db_item['itemid'],
-					'label' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name']
+					'label' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name_resolved']
 				];
 			}
 		}

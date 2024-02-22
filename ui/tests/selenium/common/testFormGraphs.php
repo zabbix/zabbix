@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 class testFormGraphs extends CWebTest {
@@ -29,6 +30,8 @@ class testFormGraphs extends CWebTest {
 	const HOSTID = 40001;									// Simple form test host.
 	const LLDID = 133800;									// testFormDiscoveryRule on Simple form test host.
 	const SQL = 'SELECT * FROM graphs ORDER BY graphid';
+	const LLD_WITH_ITEMS = 'LLD rule for item types';
+	const HOST_WITH_ITEMS = 'Host for all item value types';
 
 	/**
 	 * Flag for graph prototype.
@@ -74,12 +77,15 @@ class testFormGraphs extends CWebTest {
 	];
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	private function getGraphSuffix() {
@@ -115,7 +121,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Color', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action'],
 						'dropdowns' => [
 							'calc_fnc' => ['all', 'min', 'avg', 'max'],
 							'drawtype' => ['Line', 'Filled region', 'Bold line', 'Dot', 'Dashed line', 'Gradient line'],
@@ -150,7 +156,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Color', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Colour', 'Action'],
 						'dropdowns' => [
 							'calc_fnc' => ['min', 'avg', 'max'],
 							'yaxisside' => ['Left', 'Right']
@@ -185,7 +191,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', 'Action'],
 						'dropdowns' => [
 							'type' => ['Simple', 'Graph sum'],
 							'calc_fnc' => ['min', 'avg', 'max', 'last']
@@ -220,7 +226,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Color', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', 'Action'],
 						'dropdowns' => [
 							'type' => ['Simple', 'Graph sum'],
 							'calc_fnc' => ['min', 'avg', 'max', 'last']
@@ -553,7 +559,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty Y MIN and MAX itmes',
+						'Name' => 'Empty Y MIN and MAX items',
 						'Width' => 200,
 						'Height' => 400,
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
@@ -638,7 +644,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['items'] as $i => $item) {
 				$items_container->query('button', CTestArrayHelper::get($item, 'prototype', false) ? 'Add prototype' : 'Add')
 						->waitUntilClickable()->one()->click();
-				$dialog = COverlayDialogElement::find()->one();
+				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$dialog->query('link', $item['item'])->waitUntilClickable()->one()->click();
 				$dialog->ensureNotPresent();
 
@@ -766,8 +772,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
 					'yaxis_items' => [
-						'min' => 'Failed step of scenario "testFormWeb3".',
-						'max' => 'Download speed for scenario "testFormWeb4".'
+						'min' => 'Failed step of scenario "Scenario for Update".',
+						'max' => 'Download speed for scenario "Scenario for Delete".'
 					],
 					'items' => [
 						[
@@ -1064,5 +1070,62 @@ class testFormGraphs extends CWebTest {
 				self::$items['graph_prototype_trap_float']['itemid'],
 				self::$items['graph_prototype_trap_text']['itemid']
 		]);
+	}
+
+	/**
+	 * Function which checks that only permitted item types are accessible for graph and graph prototype creation.
+	 *
+	 * @param string    $url	url provided which needs to be opened
+	 */
+	public function checkAvailableItems($url) {
+		$this->page->login()->open($url)->waitUntilReady();
+		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
+
+		foreach (['MIN', 'MAX'] as $axis) {
+			$form->fill(['Y axis '.$axis.' value' => 'Item']);
+			$this->checkItemsInDialog($form, 'button:Select', self::HOST_WITH_ITEMS, $axis);
+
+			if ($this->prototype) {
+				$this->checkItemsInDialog($form, 'xpath://button[@id="add_protoitem"]', self::HOST_WITH_ITEMS, $axis);
+			}
+		}
+
+		$this->checkItemsInDialog($form, 'xpath://button[@id="add_item"]', self::HOST_WITH_ITEMS);
+
+		if ($this->prototype) {
+			$this->checkItemsInDialog($form, 'xpath://button[@id="add_protoitem"]', self::HOST_WITH_ITEMS);
+		}
+	}
+
+	/**
+	 * Function checks available item types in dialog form.
+	 *
+	 * @param CFormElement	$form		form element of widget
+	 * @param string		$button		name of a button
+	 * @param string		$host		name of a host
+	 * @param string		$axis		axis which is being tested.
+	 */
+	protected function checkItemsInDialog($form, $button, $host, $axis = null) {
+		if ($axis === null) {
+			$form->query($button)->waitUntilClickable()->one()->click();
+		}
+		else {
+			$form->getFieldContainer('Y axis '.$axis.' value')->query($button)->waitUntilClickable()->one()->click();
+		}
+
+		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$table = $dialog->query('class:list-table')->one()->waitUntilVisible();
+
+		if (!str_contains($button, 'add_protoitem')) {
+			$dialog->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect()->one()->fill($host);
+			$table->waitUntilReloaded();
+			$expected_items =['Float item', 'Unsigned item', 'Unsigned_dependent item'];
+		}
+		else {
+			$expected_items = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
+		}
+
+		$this->assertTableDataColumn($expected_items);
+		$dialog->close();
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_scripts_constants.h"
 
 /*
  * 5.4 development database patches
@@ -773,9 +774,9 @@ static int	DBpatch_5030046(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
+	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
-			"valuemapid", "value", "newvalue", NULL);
+			"valuemapid", "value", "newvalue", (char *)NULL);
 
 	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
@@ -3746,7 +3747,7 @@ static int	DBpatch_5030120(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 	result = zbx_db_select(
 			"select i.itemid,a.name from items i"
 			" join items_applications ip on i.itemid=ip.itemid"
@@ -3779,7 +3780,7 @@ static int	DBpatch_5030121(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 
 	result = zbx_db_select(
 			"select i.itemid,ap.name from items i"
@@ -3814,7 +3815,7 @@ static int	DBpatch_5030122(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", (char *)NULL);
 	result = zbx_db_select(
 			"select h.httptestid,a.name from httptest h"
 			" join applications a on h.applicationid=a.applicationid");
@@ -3846,7 +3847,8 @@ static int	DBpatch_5030123(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value",
+			(char *)NULL);
 	result = zbx_db_select(
 			"select selementid,application from sysmaps_elements"
 			" where elementtype in (0,3) and application<>''");
@@ -4157,7 +4159,7 @@ static int	DBpatch_5030131(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
-			"value_str", NULL);
+			"value_str", (char *)NULL);
 
 	zbx_vector_uint64_create(&widget_fieldids);
 
@@ -4842,7 +4844,7 @@ static int	DBpatch_5030165(void)
 	sql = zbx_malloc(NULL, sql_alloc);
 
 	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
-			"parameter", NULL);
+			"parameter", (char *)NULL);
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select triggerid,recovery_mode,expression,recovery_expression from triggers"
@@ -5176,7 +5178,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 
 			zbx_function_param_parse(ptr + par_l + 1, &param_pos, &param_len, &sep_pos);
 
-			arg0 = zbx_function_param_unquote_dyn(ptr + par_l + 1 + param_pos, param_len, &quoted);
+			arg0 = zbx_function_param_unquote_dyn_compat(ptr + par_l + 1 + param_pos, param_len, &quoted);
 			arg0_len = strlen(arg0);
 			zbx_remove_chars(arg0, "\t\n\r");
 			if (strlen(arg0) != arg0_len)
@@ -5434,13 +5436,13 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
 
-	if (4 == request->nparam)
+	if (4 == request->nparam && 0 != strcmp("last", request->params[2]))
 	{
 		zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
 
 		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
 		{
-			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+			dbpatch_strcpy_alloc_quoted_compat(str, str_alloc, str_offset, request->params[3]);
 		}
 		else
 		{
@@ -5583,7 +5585,8 @@ static int	DBpatch_5030173(void)
 	if (SUCCEED != zbx_db_table_exists("trigger_queue_tmp"))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
+	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns",
+			(char *)NULL);
 
 	result = zbx_db_select("select objectid,type,clock,ns from trigger_queue_tmp");
 
@@ -5931,7 +5934,8 @@ static int	compose_trigger_expression(zbx_db_row_t row, zbx_uint64_t rules, char
 			continue;
 		}
 
-		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules, &error))
+		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules | ZBX_EVAL_PARSE_STR_V64_COMPAT,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 					__func__, row[0], error);

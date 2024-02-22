@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,25 +26,21 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldReference;
+$form = new CWidgetFormView($data);
 
-$form = (new CWidgetFormView($data))
-	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
-
-// Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
 foreach ($data['fields']['navtree']->getValue() as $i => $navtree_item) {
-	$form->addVar($data['fields']['navtree']->getName().'.name.'.$i, $navtree_item['name']);
+	$form->addVar($data['fields']['navtree']->getName().'['.$i.'][name]', $navtree_item['name']);
 
 	if ($navtree_item['order'] != 1) {
-		$form->addVar($data['fields']['navtree']->getName().'.order.'.$i, $navtree_item['order']);
+		$form->addVar($data['fields']['navtree']->getName().'['.$i.'][order]', $navtree_item['order']);
 	}
 
 	if ($navtree_item['parent'] != 0) {
-		$form->addVar($data['fields']['navtree']->getName().'.parent.'.$i, $navtree_item['parent']);
+		$form->addVar($data['fields']['navtree']->getName().'['.$i.'][parent]', $navtree_item['parent']);
 	}
 
 	if (array_key_exists('sysmapid', $navtree_item)) {
-		$form->addVar($data['fields']['navtree']->getName().'.sysmapid.'.$i, $navtree_item['sysmapid']);
+		$form->addVar($data['fields']['navtree']->getName().'['.$i.'][sysmapid]', $navtree_item['sysmapid']);
 	}
 }
 

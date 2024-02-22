@@ -34,24 +34,22 @@ check_service_test_SOURCES = \
 	../../zbxmockdir.c
 
 parse_item_key_LDADD = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
-	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
-	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
+	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
+	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
+	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
-	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/housekeeper/libzbxhousekeeper.a \
 	$(top_srcdir)/src/zabbix_server/timer/libzbxtimer.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
-	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
-	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
-	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
+	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -104,7 +102,12 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
+
+if HAVE_IPMI
+parse_item_key_LDADD += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
+endif
 
 parse_item_key_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 
@@ -154,6 +157,7 @@ endif
 
 if AGENT
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
@@ -171,7 +175,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
@@ -211,8 +214,30 @@ zbx_execute_agent_check_WRAP_FUNCS = \
 	-Wl,--wrap=vfs_file_md5sum \
 	-Wl,--wrap=vfs_file_cksum \
 	-Wl,--wrap=vfs_dir_size \
+	-Wl,--wrap=vfs_dev_discovery \
+	-Wl,--wrap=vfs_dev_read \
+	-Wl,--wrap=vfs_dev_write \
+	-Wl,--wrap=vfs_dir_count \
+	-Wl,--wrap=vfs_dir_get \
+	-Wl,--wrap=vfs_dir_size \
+	-Wl,--wrap=vfs_dir_cksum \
+	-Wl,--wrap=vfs_file_contents \
+	-Wl,--wrap=vfs_file_exists \
+	-Wl,--wrap=vfs_file_get \
+	-Wl,--wrap=vfs_file_md5sum \
+	-Wl,--wrap=vfs_file_owner \
+	-Wl,--wrap=vfs_file_permissions \
+	-Wl,--wrap=vfs_file_regexp \
+	-Wl,--wrap=vfs_file_regmatch \
+	-Wl,--wrap=vfs_file_size \
+	-Wl,--wrap=vfs_file_time \
+	-Wl,--wrap=vfs_fs_discovery \
+	-Wl,--wrap=vfs_fs_get \
+	-Wl,--wrap=vfs_fs_inode \
+	-Wl,--wrap=vfs_fs_size \
 	-Wl,--wrap=net_dns \
 	-Wl,--wrap=net_dns_record \
+	-Wl,--wrap=net_dns_perf \
 	-Wl,--wrap=net_tcp_port \
 	-Wl,--wrap=system_users_num
 

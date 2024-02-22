@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,13 +42,6 @@ class CTag extends CObject {
 	 */
 	private $paired = false;
 
-	/**
-	 * Hint element for the current CTag.
-	 *
-	 * @var CSpan
-	 */
-	protected $hint = null;
-
 	public function __construct(string $tagname, bool $paired = false, $body = null) {
 		parent::__construct();
 
@@ -86,10 +79,6 @@ class CTag extends CObject {
 		$res = $this->startToString();
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
-
-		if ($this->hint !== null) {
-			$res .= $this->hint->toString();
-		}
 
 		if ($destroy) {
 			$this->destroy();
@@ -169,9 +158,7 @@ class CTag extends CObject {
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '', $delay = null) {
-		$this->hint = (new CDiv($text))
-			->addClass('hint-box')
-			->setAttribute('style', 'display: none;');
+		$this->setAttribute('data-hintbox-contents', (new CTag('', false, $text))->bodyToString());
 
 		$this->setAttribute('data-hintbox', '1');
 

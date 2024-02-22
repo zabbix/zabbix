@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ CDate.prototype = {
 
 	/**
 	* Formats date according given format. Uses server timezone.
-	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d', 'H:i:s', 'H:i',
-	*						'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
+	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d h:i:s A',
+	*						'Y-m-d','H:i:s', 'H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
 	*						Format 'd m Y H i' is also accepted but used internally for date input fields.
 	*
 	* @param format PHP style date format limited to supported formats
@@ -52,14 +52,16 @@ CDate.prototype = {
 	* @return string|bool human readable date or false if unsupported format given
 	*/
 	format: function(format) {
-		var shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		const shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-		var dt = this.getDate(),
-			mnth = this.getMonth(),
-			yr = this.getFullYear(),
-			hrs = this.getHours(),
-			mnts = this.getMinutes(),
-			sec = this.getSeconds();
+		const dt = this.getDate();
+		const mnth = this.getMonth();
+		const yr = this.getFullYear();
+		const hrs = this.getHours();
+		const mnts = this.getMinutes();
+		const sec = this.getSeconds();
+		const ampm = (hrs < 12) ? 'AM' : 'PM';
+		const ampmhrs = appendZero((hrs + 11) % 12 + 1);
 
 		/**
 		 * Append date suffix according to English rules e.g., 3 becomes 3rd.
@@ -68,7 +70,7 @@ CDate.prototype = {
 		 *
 		 * @return string
 		 */
-		var appSfx = function(date) {
+		const appSfx = function(date) {
 			if (date % 10 == 1 && date != 11) {
 				return date + 'st';
 			}
@@ -99,9 +101,8 @@ CDate.prototype = {
 			case 'H:i':
 				return  appendZero(hrs) + ':' + appendZero(mnts);
 			case 'M jS, Y h:i A':
-				var ampm = (hrs < 12) ? 'AM' : 'PM';
-				hrs = appendZero((hrs + 11) % 12 + 1);
-				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + hrs + ':' + appendZero(mnts) + ' ' + ampm;
+				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + ampmhrs + ':' + appendZero(mnts) + ' ' +
+					ampm;
 			case 'Y M d H:i':
 				return  yr + ' ' + shortMn[mnth] + ' ' +appendZero(dt) + ' ' + appendZero(hrs) + ':' + appendZero(mnts);
 			case 'd.m.Y H:i':
@@ -114,6 +115,9 @@ CDate.prototype = {
 			case 'd m Y H i':
 				return appendZero(dt) + ' ' + appendZero(mnth + 1) + ' ' + yr + ' ' + appendZero(hrs) + ' ' +
 					appendZero(mnts);
+			case 'Y-m-d h:i:s A':
+				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + ampmhrs + ':' +
+					appendZero(mnts) + ':' + appendZero(sec) + ' ' + ampm;
 			default:
 				// defaults to Y-m-d H:i:s
 				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + appendZero(hrs) + ':' +

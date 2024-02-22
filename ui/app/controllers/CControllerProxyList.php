@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@ class CControllerProxyList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'uncheck' =>		'in 1',
-			'filter_set' =>		'in 1',
-			'filter_rst' =>		'in 1',
-			'filter_name' =>	'string',
-			'sort' =>			'in '.implode(',', ['host', 'status', 'tls_accept', 'version', 'lastaccess']),
-			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'filter_status' =>	'in -1,'.implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]),
-			'filter_version' =>	'in -1,'.implode(',', [ZBX_PROXY_VERSION_ANY_OUTDATED, ZBX_PROXY_VERSION_CURRENT])
+			'uncheck' =>		                 'in 1',
+			'filter_set' =>		                 'in 1',
+			'filter_rst' =>		                 'in 1',
+			'filter_name' =>	                 'string',
+			'sort' =>			                 'in '.implode(',', ['name', 'operating_mode', 'tls_accept', 'version', 'lastaccess']),
+			'sortorder' =>		                 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'filter_operating_mode' => 'in -1,'.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
+			'filter_version' =>	                 'in -1,'.implode(',', [ZBX_PROXY_VERSION_ANY_OUTDATED, ZBX_PROXY_VERSION_CURRENT])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,7 +51,7 @@ class CControllerProxyList extends CController {
 	}
 
 	protected function doAction() {
-		$sortField = $this->getInput('sort', CProfile::get('web.proxies.php.sort', 'host'));
+		$sortField = $this->getInput('sort', CProfile::get('web.proxies.php.sort', 'name'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.proxies.php.sortorder', ZBX_SORT_UP));
 
 		CProfile::update('web.proxies.php.sort', $sortField, PROFILE_TYPE_STR);
@@ -60,18 +60,20 @@ class CControllerProxyList extends CController {
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.proxies.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.proxies.filter_operating_mode',
+				$this->getInput('filter_operating_mode', -1), PROFILE_TYPE_INT
+			);
 			CProfile::update('web.proxies.filter_version', $this->getInput('filter_version', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.proxies.filter_name');
-			CProfile::delete('web.proxies.filter_status');
+			CProfile::delete('web.proxies.filter_operating_mode');
 			CProfile::delete('web.proxies.filter_version');
 		}
 
 		$filter = [
 			'name' => CProfile::get('web.proxies.filter_name', ''),
-			'status' => CProfile::get('web.proxies.filter_status', -1),
+			'operating_mode' => CProfile::get('web.proxies.filter_operating_mode', -1),
 			'version' => CProfile::get('web.proxies.filter_version', -1)
 		];
 
@@ -92,10 +94,10 @@ class CControllerProxyList extends CController {
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', $sortField],
 			'search' => [
-				'host' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'operating_mode' => ($filter['operating_mode'] == -1) ? null : $filter['operating_mode'],
 				'compatibility' => ($filter['version'] == -1) ? null : $filter['version']
 			],
 			'limit' => $limit,
@@ -104,7 +106,7 @@ class CControllerProxyList extends CController {
 		]);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
+			'output' => ['name', 'operating_mode', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
 				'compatibility'
 			],
 			'selectHosts' => ['hostid', 'name', 'status'],
@@ -176,7 +178,9 @@ class CControllerProxyList extends CController {
 				if (array_key_exists('required performance', $server_status)) {
 					foreach ($server_status['required performance'] as $stats) {
 						if (array_key_exists($stats['attributes']['proxyid'], $data['proxies'])) {
-							$data['proxies'][$stats['attributes']['proxyid']]['vps_total'] += round($stats['count'], 2);
+							$data['proxies'][$stats['attributes']['proxyid']]['vps_total'] += round($stats['count'],
+								2
+							);
 						}
 					}
 				}

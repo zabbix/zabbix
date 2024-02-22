@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,7 +114,6 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 int	zbx_fsname_compare(const void *fs1, const void *fs2);
 #endif
 
-int	sysinfo_get_config_timeout(void);
 int	sysinfo_get_config_log_remote_commands(void);
 int	sysinfo_get_config_unsafe_user_parameters(void);
 const char	*sysinfo_get_config_source_ip(void);

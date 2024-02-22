@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,33 +26,33 @@
  * @var array $data
  */
 
-if (array_key_exists('itemid', $data['fields'])) {
-	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid'],
-		$data['captions']['items']['itemid'])
-	)->setPopupParameter('numeric', true);
+$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))->setPopupParameter('numeric', true);
 
-	if (!$data['fields']['itemid']->isTemplateDashboard()) {
-		$field_itemid->setPopupParameter('with_simple_graph_items', true);
-	}
-}
-else {
-	$field_itemid = null;
+if (!$data['fields']['itemid']->isTemplateDashboard()) {
+	$field_itemid->setPopupParameter('with_simple_graph_items', true);
 }
 
 (new CWidgetFormView($data))
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
-	->addField($field_itemid)
-	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'], $data['captions']['graphs']['graphid'])
-		: null
+	->addField($field_itemid->addRowClass('js-row-itemid'))
+	->addField(
+		(new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('js-row-graphid')
+	)
+	->addField(
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_graph_form.init();')
 	->show();

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ char	*zbx_xml_escape_dyn(const char *data);
 void	zbx_xml_escape_xpath(char **data);
 
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg);
 
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
@@ -54,6 +55,7 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num);
 int	zbx_xml_node_read_num(xmlDoc *xdoc, xmlNode *node, const char *xpath, int *num);
 char	*zbx_xml_node_read_value(xmlDoc *xdoc, xmlNode *node, const char *xpath);
+char	*zbx_xml_node_read_prop(xmlNode *node, const char *name);
 char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
 xmlNode	*zbx_xml_node_get(xmlDoc *xdoc, xmlNode *node, const char *xpath);
 xmlNode	*zbx_xml_doc_get(xmlDoc *xdoc, const char *xpath);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -33,9 +32,21 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxflag"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxnet"
 )
+
+const usageMessageFormat = //
+`Usage of Zabbix web service:
+  %[1]s [-c config-file]
+  %[1]s [-c config-file] -T
+  %[1]s -h
+  %[1]s -V
+
+Options:
+%[2]s
+`
 
 var (
 	confDefault     string
@@ -47,26 +58,65 @@ type handler struct {
 }
 
 func main() {
-	var confFlag string
-	var helpFlag bool
-	var versionFlag bool
+	var (
+		confFlag       string
+		helpFlag       bool
+		testConfigFlag bool
+		versionFlag    bool
+	)
 
 	version.Init(applicationName)
 
-	const (
-		confDescription    = "Path to the configuration file"
-		helpDefault        = false
-		helpDescription    = "Display this help message"
-		versionDefault     = false
-		versionDescription = "Print program version and exit"
-	)
+	f := zbxflag.Flags{
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "config",
+				Shorthand: "c",
+				Description: fmt.Sprintf(
+					"Path to the configuration file (default: %q)", confDefault,
+				),
+			},
+			Default: confDefault,
+			Dest:    &confFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test-config",
+				Shorthand:   "T",
+				Description: "Validate configuration file and exit",
+			},
+			Default: false,
+			Dest:    &testConfigFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "help",
+				Shorthand:   "h",
+				Description: "Display this help message",
+			},
+			Default: false,
+			Dest:    &helpFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "version",
+				Shorthand:   "V",
+				Description: "Print program version and exit",
+			},
+			Default: false,
+			Dest:    &versionFlag,
+		},
+	}
 
-	flag.StringVar(&confFlag, "config", confDefault, confDescription)
-	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
-	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
-	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
-	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
+	f.Register(flag.CommandLine)
+
+	flag.Usage = func() {
+		fmt.Printf(
+			usageMessageFormat,
+			os.Args[0],
+			f.Usage(),
+		)
+	}
 
 	flag.Parse()
 
@@ -80,8 +130,22 @@ func main() {
 		os.Exit(0)
 	}
 
+	if testConfigFlag {
+		if confFlag == "" {
+			fmt.Fprintf(os.Stderr, "cannot validate configuration file: %s\n", "it was not specified")
+			os.Exit(1)
+		}
+
+		fmt.Printf("Validating configuration file \"%s\"\n", confFlag)
+	}
+
 	if err := conf.Load(confFlag, &options); err != nil {
 		fatalExit("", err)
+	}
+
+	if testConfigFlag {
+		fmt.Println("Validation successful")
+		os.Exit(0)
 	}
 
 	var logType, logLevel int
@@ -136,11 +200,13 @@ func main() {
 }
 
 func run() error {
-	var h handler
+	var (
+		h   handler
+		err error
+	)
 
-	var err error
-
-	if h.allowedPeers, err = zbxnet.GetAllowedPeers(options.AllowedIP); err != nil {
+	h.allowedPeers, err = zbxnet.GetAllowedPeers(options.AllowedIP)
+	if err != nil {
 		return err
 	}
 
@@ -210,7 +276,7 @@ func validateTLSFiles() error {
 }
 
 func createTLSServer() (*http.Server, error) {
-	caCert, err := ioutil.ReadFile(options.TLSCAFile)
+	caCert, err := os.ReadFile(options.TLSCAFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read CA cert file: %s", err.Error())
 	}
@@ -225,5 +291,9 @@ func createTLSServer() (*http.Server, error) {
 
 	tlsConfig.BuildNameToCertificate()
 
-	return &http.Server{Addr: ":" + options.ListenPort, TLSConfig: tlsConfig, ErrorLog: log.DefaultLogger}, nil
+	return &http.Server{
+		Addr:      ":" + options.ListenPort,
+		TLSConfig: tlsConfig,
+		ErrorLog:  log.DefaultLogger,
+	}, nil
 }

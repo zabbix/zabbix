@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -314,7 +314,7 @@ static int	DBpatch_6010023(void)
 	zbx_db_insert_t	insert;
 	int		ret;
 
-	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", (char *)NULL);
 
 	result = zbx_db_select("select hostid from hosts where flags!=%i and status in (%i,%i)",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
@@ -630,7 +630,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 	if (0 == new_count)
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
+	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", (char *)NULL);
 	groupid = zbx_db_get_maxid_num("hstgrp", new_count);
 
 	for (i = 0; i < hstgrps->values_num; i++)
@@ -647,7 +647,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 		goto out;
 
 	zbx_db_insert_clean(&db_insert);
-	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
+	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", (char *)NULL);
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hstgrps->values_num; i++)

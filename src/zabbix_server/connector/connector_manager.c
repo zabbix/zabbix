@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,6 +85,7 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_free(connector->ssl_key_file_orig);
 	zbx_free(connector->ssl_key_password);
 	zbx_free(connector->ssl_key_password_orig);
+	zbx_free(connector->attempt_interval);
 	zbx_list_destroy(&connector->data_point_link_queue);
 	zbx_hashset_destroy(&connector->data_point_links);
 }

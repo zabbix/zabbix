@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,12 @@
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
+#include "zbxsysinfo.h"
+
 #include "stats.h"
 
 #include "zbxmutexs.h"
-#include "zbxlog.h"
-#include "zbxsysinfo.h"
 #include "zbxstr.h"
-
-extern ZBX_COLLECTOR_DATA	*collector;
 
 static kstat_ctl_t	*kc = NULL;
 static kid_t		kc_id = 0;
@@ -40,9 +38,9 @@ static zbx_mutex_t	kstat_lock = ZBX_MUTEX_NULL;
  *                                                                            *
  * Purpose: refreshes kstat environment                                       *
  *                                                                            *
- * Parameters: error - [OUT] the error message                                *
+ * Parameters: error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the kstat environment was refreshed successfully   *
+ * Return value: SUCCEED - kstat environment was refreshed successfully       *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -78,12 +76,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize kstat environment                                      *
+ * Purpose: initializes kstat environment                                     *
  *                                                                            *
- * Parameters: kstat - [IN] the kstat data storage                            *
- *             error - [OUT] the error message                                *
+ * Parameters: kstat - [IN] kstat data storage                                *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the kstat environment was initialized successfully *
+ * Return value: SUCCEED - kstat environment was initialized successfully     *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -144,7 +142,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect kstat stats                                               *
+ * Purpose: collects kstat stats                                              *
  *                                                                            *
  * Comments: This function is called every second to collect statistics.      *
  *                                                                            *
@@ -188,15 +186,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get free memory size                                              *
+ * Purpose: gets free memory size                                             *
  *                                                                            *
- * Parameters: value - [OUT] the free memory size in bytes                    *
- *             error - [OUT] the error message                                *
+ * Parameters: value - [OUT] free memory size in bytes                        *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the free memory size was stored in value           *
- *               FAIL - either an error occurred (error parameter is set) or  *
+ * Return value: SUCCEED - free memory size was stored in value               *
+ *               FAIL - Either an error occurred (error parameter is set) or  *
  *                      data was not collected yet (error parameter is left   *
- *                      unchanged)                                            *
+ *                      unchanged).                                           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
@@ -204,16 +202,16 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 	int			sysconf_pagesize, last, prev, ret = FAIL;
 	zbx_kstat_vminfo_t	*vminfo;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): collector:%p", __func__, collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): collector:%p", __func__, get_collector());
 
 	zbx_mutex_lock(kstat_lock);
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 		goto out;
 
-	last = collector->kstat.vminfo_index;
+	last = (get_collector())->kstat.vminfo_index;
 	prev = last ^ 1;
-	vminfo = collector->kstat.vminfo;
+	vminfo = (get_collector())->kstat.vminfo;
 
 	if (0 != vminfo[prev].updates && vminfo[prev].updates < vminfo[last].updates)
 	{
@@ -232,7 +230,7 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 out:
 	zbx_mutex_unlock(kstat_lock);
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		*error = zbx_strdup(*error, "Collector is not started.");
 		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started");

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,6 @@ var jqBlink = {
  */
 var hintBox = {
 
-	preload_hint_timer: null,
 	show_hint_timer: null,
 
 	/**
@@ -266,57 +265,23 @@ var hintBox = {
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
-		jQuery(document).on('keydown click mouseenter mouseleave', '[data-hintbox=1]', function (e) {
-			var $target = jQuery(this).hasClass('hint-item')
+		jQuery(document).on('keydown click mouseenter mousemove mouseleave', '[data-hintbox=1]', function (e) {
+			const $target = jQuery(this).hasClass('hint-item')
 				? jQuery(this).siblings('.main-hint')
 				: jQuery(this);
 
 			if (e.type === 'keydown') {
-				if (e.which != 13) {
+				if (e.which !== 13) {
 					return;
 				}
 
-				var offset = $target.offset(),
+				const offset = $target.offset(),
 					w = jQuery(window);
 
 				// Emulate a click on the left middle point of the target.
 				e.clientX = offset.left - w.scrollLeft();
 				e.clientY = offset.top - w.scrollTop() + ($target.height() / 2);
 				e.preventDefault();
-			}
-
-			if ($target.data('hintbox-preload') && $target.next('.hint-box').children().length == 0) {
-				clearTimeout(hintBox.preload_hint_timer);
-
-				// Manually trigger preloaderCloseHandler for the previous preloader.
-				if (jQuery('#hintbox-preloader').length) {
-
-					// Prevent loading restart on repetitive click and keydown events.
-					if (e.type === 'click' || e.type === 'keydown') {
-						return false;
-					}
-
-					jQuery(document).trigger('click');
-				}
-
-				if (e.type === 'mouseleave') {
-					$target.blur();
-
-					return false;
-				}
-
-				var preloadHintHandler = function() {
-					hintBox.preloadHint(e, $target);
-				}
-
-				if (e.type === 'mouseenter') {
-					hintBox.preload_hint_timer = setTimeout(preloadHintHandler, 400);
-				}
-				else {
-					preloadHintHandler();
-				}
-
-				return false;
 			}
 
 			hintBox.displayHint(e, $target, $target.data('hintbox-delay') !== undefined
@@ -333,17 +298,15 @@ var hintBox = {
 
 		switch (e.handleObj.origType) {
 			case 'mouseenter':
-				var showHintHandler = function() {
-					hintBox.showHint(e, $target[0], $target.next('.hint-box').html(), $target.data('hintbox-class'),
-						false, $target.data('hintbox-style')
-					);
-				}
+				hintBox.showHintStart(e, $target, delay);
+				break;
 
-				if (delay > 0) {
-					hintBox.show_hint_timer = setTimeout(showHintHandler, delay);
+			case 'mousemove':
+				if (!$target[0].hintBoxItem) {
+					hintBox.showHintStart(e, $target, delay);
 				}
-				else {
-					showHintHandler();
+				else if ($target.data('hintbox-track-mouse') === 1 && !$target[0].isStatic) {
+					hintBox.positionElement(e, $target, $target[0].hintBoxItem);
 				}
 				break;
 
@@ -354,12 +317,27 @@ var hintBox = {
 
 			case 'keydown':
 			case 'click':
-				if ($target.data('hintbox-static') == 1) {
+				if ($target.data('hintbox-static') === 1) {
 					hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
 						$target.data('hintbox-style')
 					);
 				}
 				break;
+		}
+	},
+
+	showHintStart: function (e, $target, delay) {
+		const showHintHandler = function() {
+			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxContents, $target.data('hintbox-class'),
+				false, $target.data('hintbox-style')
+			);
+		}
+
+		if (delay > 0) {
+			hintBox.show_hint_timer = setTimeout(showHintHandler, delay);
+		}
+		else {
+			showHintHandler();
 		}
 	},
 
@@ -373,77 +351,61 @@ var hintBox = {
 		}
 	},
 
-	preloadHint: function(e, $target) {
-		var url = new Curl('zabbix.php'),
-			data = $target.data('hintbox-preload');
+	preloadHint: function(e, target, box) {
+		const url = new Curl('zabbix.php');
+		const data = jQuery(target).data('hintbox-preload');
 
 		url.setArgument('action', hintBox.getHintboxAction(data.type));
 
-		var xhr = jQuery.ajax({
+		const xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: data.data,
 			dataType: 'json'
 		});
 
-		var $preloader = hintBox.createPreloader();
-
-		var preloader_timer = setTimeout(function() {
-			$preloader.fadeIn(200);
-			hintBox.positionElement(e, $target[0], $preloader);
-		}, 500);
-
-		addToOverlaysStack($preloader.prop('id'), $target[0], 'preloader', xhr);
+		const $preloader = jQuery('<div>', {
+			'id': 'hintbox-preloader',
+			'class': 'is-loading hintbox-preloader'
+		}).appendTo(box);
 
 		xhr.done(function(resp) {
-			clearTimeout(preloader_timer);
-			overlayPreloaderDestroy($preloader.prop('id'));
-
-			var $hint_box = $target.next('.hint-box').empty();
+			let hintbox_contents = '';
 
 			if ('error' in resp) {
-				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true);
+				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true)[0];
 
-				$hint_box.append(message_box);
+				hintbox_contents += message_box.innerHTML;
 			}
 			else {
 				if (resp.messages) {
-					$hint_box.append(resp.messages);
+					hintbox_contents += resp.messages;
 				}
 
 				if (resp.data) {
-					$hint_box.append(resp.data);
+					hintbox_contents += resp.data;
 				}
 			}
 
-			hintBox.displayHint(e, $target);
+			target.dataset.hintboxContents = hintbox_contents;
+
+			$preloader.remove();
+
+			if (target.hintBoxItem !== undefined) {
+				box.append(hintbox_contents);
+
+				// Reset hintbox position.
+				box.css({
+					width: '',
+					height: '',
+					top: '',
+					right: '',
+					left: ''
+				});
+
+				hintBox.positionElement(e, target, target.hintBoxItem);
+			}
 		});
-
-		jQuery(document)
-			.off('click', hintBox.preloaderCloseHandler)
-			.on('click', {id: $preloader.prop('id')}, hintBox.preloaderCloseHandler);
-	},
-
-	/**
-	 * Create preloader elements for the hint box.
-	 */
-	createPreloader: function() {
-		return jQuery('<div>', {
-			'id': 'hintbox-preloader',
-			'class': 'is-loading hintbox-preloader'
-		})
-			.appendTo($('.wrapper'))
-			.on('click', function(e) {
-				e.stopPropagation();
-			})
-			.hide();
-	},
-
-	/**
-	 * Event handler for the preloader elements destroy.
-	 */
-	preloaderCloseHandler: function(event) {
-		overlayPreloaderDestroy(event.data.id);
 	},
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
@@ -492,6 +454,10 @@ var hintBox = {
 			box.prepend(close_link);
 		}
 
+		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
+			hintBox.preloadHint(e, target, box);
+		}
+
 		jQuery(appendTo).append(box);
 
 		target.observer = new MutationObserver(() => {
@@ -513,12 +479,12 @@ var hintBox = {
 	},
 
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
-		var isStatic = target.isStatic;
+		const isStatic = target.isStatic;
 		hintBox.hideHint(target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery(target).next('.hint-box').html();
+				hintText = target.dataset.hintboxContents;
 			}
 
 			target.isStatic = true;
@@ -855,6 +821,8 @@ function getConditionFormula(conditions, evalType) {
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
+	 * - sortable				- enable jQuery UI sortable initialization
+	 * - sortableOptions		- additional options to pass to jQuery UI sortable initialization
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -878,15 +846,82 @@ function getConditionFormula(conditions, evalType) {
 			rows: [],
 			dataCallback: function(data) {
 				return {};
-			}
+			},
+			sortable: false,
+			sortableOptions: {}
 		}, options);
+
+		if (options.sortable) {
+			options.sortableOptions = $.extend({}, {
+				disabled: false,
+				items: options.row,
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'grabbing',
+				handle: '.drag-icon',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					for (let td of ui.find('>td')) {
+						const $td = jQuery(td);
+						$td.attr('width', $td.width());
+					}
+
+					// When dragging element on safari, it jumps out of the table.
+					if (SF) {
+						// Move back draggable element to proper position.
+						ui.css('left', (ui.offset().left - 2) + 'px');
+					}
+
+					return ui;
+				},
+				start: function(e, ui) {
+					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				},
+				stop: function(e, ui) {
+					ui.item.find('>td').removeAttr('style');
+					ui.item.removeAttr('style');
+				}
+			}, options.sortableOptions);
+		}
 
 		return this.each(function() {
 			var table = $(this);
 
 			// If options.remove_next_sibling is true, counter counts each row making the next index twice as large (bug).
 			table.data('dynamicRows', {
-				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
+				counter: (options.counter !== null) ? options.counter : $(options.row, table).length,
+				addRows: (rows) => {
+					const local_options = $.extend({}, options, {
+						dataCallback: (data) => options.dataCallback($.extend(data, rows.shift()))
+					});
+					const beforeRow = (options['beforeRow'] !== null)
+						? $(options['beforeRow'], table)
+						: $(options.add, table).closest('tr');
+
+					table.trigger('beforeadd.dynamicRows', options);
+
+					while (rows.length > 0) {
+						addRow(table, beforeRow, local_options);
+					}
+
+					table.trigger('afteradd.dynamicRows', options);
+					table.trigger('change');
+
+					return table;
+				},
+				removeRows: (filter) => {
+					for (const row of $(options.row, table)) {
+						if (filter === undefined || filter(row)) {
+							removeRow(table, row, options);
+						}
+					}
+
+					table.trigger('afterremove.dynamicRows', options);
+					table.trigger('change');
+
+					return table;
+				}
 			});
 
 			// add buttons
@@ -901,6 +936,10 @@ function getConditionFormula(conditions, evalType) {
 
 				if (!options.allow_empty) {
 					$(options.remove, table).attr('disabled', false);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 
 				table.trigger('afteradd.dynamicRows', options);
@@ -918,6 +957,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', true);
 
 					table.trigger('afteradd.dynamicRows', options);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 			});
 
@@ -938,6 +981,22 @@ function getConditionFormula(conditions, evalType) {
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
 				initRows(table, before_row, options);
+			}
+
+			if (options.sortable) {
+				table
+					.sortable(options.sortableOptions)
+					.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
+						const drag_icons = table[0].querySelectorAll(options.sortableOptions.handle);
+						const disabled = drag_icons.length < 2;
+
+						for (const drag_icon of drag_icons) {
+							drag_icon.classList.toggle('disabled', disabled);
+						}
+
+						table.sortable({disabled});
+					})
+					.trigger('afteradd.dynamicRows');
 			}
 		});
 	};
@@ -1028,83 +1087,23 @@ function getConditionFormula(conditions, evalType) {
 }(jQuery));
 
 jQuery(function ($) {
-	var verticalHeaderTables = {};
-
-	$.fn.makeVerticalRotation = function() {
-		this.each(function(i) {
-			var table = $(this);
-
-			if (table.data('rotated') == 1) {
-				return;
-			}
-			table.data('rotated', 1);
-
-			var cellsToRotate = $('.vertical_rotation', table),
-				betterCells = [];
-
-			// insert spans
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					text = $('<span>', {
-						text: cell.html()
-					}).css({'white-space': 'nowrap'});
-
-				cell.text('').append(text);
-			});
-
-			// rotate cells
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					span = cell.children(),
-					height = cell.height(),
-					width = span.width(),
-					transform = (width / 2) + 'px ' + (width / 2) + 'px';
-
-				var css = {};
-
-				css['transform-origin'] = transform;
-				css['-webkit-transform-origin'] = transform;
-				css['-moz-transform-origin'] = transform;
-				css['-o-transform-origin'] = transform;
-
-				var divInner = $('<div>', {
-					'class': 'vertical_rotation_inner'
-				})
-					.css(css)
-					.append(span.text());
-
-				var div = $('<div>', {
-					height: width,
-					width: height
-				})
-					.append(divInner);
-
-				betterCells.push(div);
-			});
-
-			cellsToRotate.each(function(i) {
-				$(this).html(betterCells[i]);
-			});
-
-			table.on('remove', function() {
-				delete verticalHeaderTables[table.attr('id')];
-			});
-
-			verticalHeaderTables[table.attr('id')] = table;
-		});
-	};
-
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
 		$('.wrapper').scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');
 	}
 });
 
-window.addEventListener('load', e => {
+document.addEventListener('DOMContentLoaded', () => {
 
-	/**
-	 * SideBar initialization.
-	 */
+	// Event hub initialization.
+
+	ZABBIX.EventHub = new CEventHub();
+});
+
+window.addEventListener('load', () => {
+
+	// SideBar initialization.
+
 	const sidebar = document.querySelector('.sidebar');
 
 	if (sidebar !== null) {

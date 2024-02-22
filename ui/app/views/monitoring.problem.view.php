@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ if ($data['action'] === 'problem.view') {
 	$this->addJsFile('class.tabfilter.js');
 	$this->addJsFile('class.tabfilteritem.js');
 	$this->addJsFile('class.tagfilteritem.js');
+	$this->addJsFile('items.js');
+	$this->addJsFile('multilineinput.js');
 
 	$this->enableLayoutModes();
 	$web_layout_mode = $this->getLayoutMode();

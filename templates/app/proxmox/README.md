@@ -25,13 +25,13 @@ This template has been tested on:
 
 Create an API token for the monitoring user. Important note: for security reasons, it is recommended to create a separate user (Datacenter - Permissions).
 
-For the created API token and user, provide the necessary access levels:
+Please provide the necessary access levels for both the User and the Token.
 
 * Check: ["perm","/",["Sys.Audit"]]
 
-* Check: ["perm","/nodes/{node}",["Sys.Audit"]]
+* Check: ["perm","/storage",["Datastore.Audit"]]
 
-* Check: ["perm","/vms/{vmid}",["VM.Audit"]]
+* Check: ["perm","/vms",["VM.Audit"]]
 
 Copy the resulting Token ID and Secret into host macros.
 
@@ -56,8 +56,8 @@ Copy the resulting Token ID and Secret into host macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Proxmox: Get cluster resources|<p>Resources index.</p>|HTTP agent|proxmox.cluster.resources<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
-|Proxmox: Get cluster status|<p>Get cluster status information.</p>|HTTP agent|proxmox.cluster.status<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
+|Proxmox: Get cluster resources|<p>Resources index.</p>|HTTP agent|proxmox.cluster.resources<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
+|Proxmox: Get cluster status|<p>Get cluster status information.</p>|HTTP agent|proxmox.cluster.status<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
 |Proxmox: API service status|<p>Get API service status.</p>|Script|proxmox.api.available<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers

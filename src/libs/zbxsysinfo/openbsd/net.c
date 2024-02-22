@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 
 #include <sys/ioctl.h>
 #include <sys/sockio.h>
@@ -54,8 +53,7 @@ static int	get_ifdata(const char *if_name,
 	struct ifnet		*ifp;
 
 	kvm_t	*kp;
-	int	len = 0;
-	int	ret = SYSINFO_RET_FAIL;
+	int	len = 0, ret = SYSINFO_RET_FAIL;
 
 	if (NULL == if_name || '\0' == *if_name)
 	{
@@ -344,7 +342,6 @@ int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			i;
 	struct zbx_json		j;
 	struct if_nameindex	*interfaces;
 
@@ -356,7 +353,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; 0 != interfaces[i].if_index; i++)
+	for (int i = 0; 0 != interfaces[i].if_index; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", interfaces[i].if_name, ZBX_JSON_TYPE_STRING);

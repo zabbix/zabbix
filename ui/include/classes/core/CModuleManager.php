@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -450,9 +450,10 @@ final class CModuleManager {
 				'name' => '',
 				'form_class' => CWidget::DEFAULT_FORM_CLASS,
 				'js_class' => CWidget::DEFAULT_JS_CLASS,
+				'in' => [],
+				'out' => [],
 				'size' => CWidget::DEFAULT_SIZE,
-				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE,
-				'use_time_selector' => false
+				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE
 			];
 		}
 

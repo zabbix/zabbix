@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ $form = (new CForm())
 
 $tags_form_grid = (new CFormGrid())
 	->addItem([
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		new CFormField(
 			(new CDiv([
 				(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
@@ -49,7 +49,7 @@ $tags_form_grid = (new CFormGrid())
 				(new CTemplateTag('tag-row-tmpl'))
 					->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
 			]))
-				->setId('tags-div')
+				->setId('tags-field')
 				->addClass(ZBX_STYLE_TABLE_FORMS)
 		)
 	]);

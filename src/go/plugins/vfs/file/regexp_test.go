@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,9 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
+
 	"zabbix.com/pkg/zbxregexp"
+	"zabbix.com/pkg/zbxtest"
 )
 
 func TestExecuteRegex(t *testing.T) {
@@ -72,9 +74,7 @@ func TestExecuteRegex(t *testing.T) {
 }
 
 func TestFileRegexpOutput(t *testing.T) {
-
-	impl.options.Timeout = 3
-
+	var ctx zbxtest.MockEmptyCtx
 	filename := "/tmp/zbx_vfs_file_regexp_test.dat"
 
 	type testCase struct {
@@ -204,7 +204,7 @@ func TestFileRegexpOutput(t *testing.T) {
 			targetEncoding: "UTF-32LE", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: "127.0.0.1 локалхост"},
 
-		// wrong encodings, but we cannot detect this and there is no expected target contents
+		// wrong encodings in file, but we cannot detect this and there is no expected target contents
 		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2",
 			lineEnd: "", targetStringGroup: "", targetContents: ""},
 		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2",
@@ -235,7 +235,7 @@ func TestFileRegexpOutput(t *testing.T) {
 		var err error
 
 		if result, err = impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+			c.lineStart, c.lineEnd, c.targetStringGroup}, ctx); err != nil {
 			t.Errorf("vfs.file.regexp (testCase[%d]) returned error %s", i, err.Error())
 
 			return
@@ -264,7 +264,7 @@ func TestFileRegexpOutput(t *testing.T) {
 	fileManyCharsNoNewLine := []byte{
 		0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x65, 0x74, 0x61}
 
-	// wrong encodings, but we can detect this
+	// wrong encodings in file, but we can detect this
 	testsWrongEncodings := []*testCase{
 		{fileContents: fileSingleCharNoNewLine, targetSearch: "a", targetEncoding: "UTF-32BE",
 			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "a"},
@@ -285,13 +285,67 @@ func TestFileRegexpOutput(t *testing.T) {
 		defer os.Remove(filename)
 
 		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+			c.lineStart, c.lineEnd, c.targetStringGroup}, ctx); err != nil {
 			if err.Error() != expectedError {
 				t.Errorf("vfs.file.regexp testcase[%d] failed with unexpected error: %s, expected: %s",
 					i, err.Error(), expectedError)
 			}
 		} else {
 			t.Errorf("vfs.file.regexp testcase[%d] did NOT return error, result: %s", i, result)
+		}
+	}
+
+	// wrong targets encodings
+	testsWrongTargetEncodings := []*testCase{
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "BADGER",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
+
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-66",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
+
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "so-8859-5",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль"},
+
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "выхухоль2\n", targetEncoding: "-8859-5",
+			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "6LE", lineStart: "2",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
+
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "E", lineStart: "1",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль"},
+
+		{fileContents: fileContents_UTF_16LE, targetSearch: "выхухоль2\n", targetEncoding: "-",
+			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BEUTF-32BE",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
+
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "-UTF-32BE", lineStart: "1",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль"}}
+
+	for i, c := range testsWrongTargetEncodings {
+		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
+			t.Errorf("failed to created file: %s", err1.Error())
+
+			return
+		}
+
+		var err error
+		_, err = impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
+			c.lineStart, c.lineEnd, c.targetStringGroup}, ctx)
+
+		if nil == err {
+			t.Errorf("vfs.file.regexp (testCase[%d]) did not return error: ->%s<- when wrong target "+
+				"encoding:->%s<- was used", i, expectedErrorUTF8Convert, c.targetEncoding)
+
+			return
+		} else if err.Error() != expectedErrorUTF8Convert {
+			t.Errorf("vfs.file.regexp (testCase[%d]) expected error: ->%s<-,"+
+				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
+				expectedErrorUTF8Convert, err.Error(), c.targetEncoding)
+
+			return
 		}
 	}
 }

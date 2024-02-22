@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -336,9 +336,14 @@ class WidgetProblems extends CTableInfo {
 
 			$problem_link = [
 				(new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid'],
-						['show_rank_change_cause' => true]
-					))
+					->setMenuPopup(CMenuPopupHelper::getTrigger([
+						'triggerid' => $trigger['triggerid'],
+						'backurl' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->getUrl(),
+						'eventid' => $problem['eventid'],
+						'show_rank_change_cause' => true
+					]))
 					->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 						$problem['name'], CSeverityHelper::getName((int) $problem['severity'])
 					))

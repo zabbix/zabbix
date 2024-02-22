@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,13 +301,14 @@ func (b *pluginBroker) stop() {
 	b.tx <- &r
 }
 
-func (b *pluginBroker) export(key string, params []string) (*comms.ExportResponse, error) {
+func (b *pluginBroker) export(key string, params []string, timeout int) (*comms.ExportResponse, error) {
 	data := comms.ExportRequest{
 		Common: comms.Common{
 			Type: comms.ExportRequestType,
 		},
-		Key:    key,
-		Params: params,
+		Key:     key,
+		Params:  params,
+		Timeout: timeout,
 	}
 
 	r := request{

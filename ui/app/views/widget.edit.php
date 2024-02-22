@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,4 +26,17 @@
  * @var array $data
  */
 
-(new CWidgetFormView($data))->show();
+use Zabbix\Widgets\CWidgetField;
+
+$form = new CWidgetFormView($data);
+
+/** @var CWidgetField $field */
+foreach ($this->data['fields'] as $name => $field) {
+	$field_view = $field::DEFAULT_VIEW;
+
+	if ($field_view !== null) {
+		$form->addField(new $field_view($field));
+	}
+}
+
+$form->show();

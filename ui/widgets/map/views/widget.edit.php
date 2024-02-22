@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,14 +28,6 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
-	)
-	->addField(array_key_exists('sysmapid', $data['fields'])
-		? new CWidgetFieldMultiSelectMapView($data['fields']['sysmapid'], $data['captions']['sysmaps']['sysmapid'])
-		: null
-	)
-	->addField(array_key_exists('filter_widget_reference', $data['fields'])
-		? new CWidgetFieldWidgetSelectView($data['fields']['filter_widget_reference'])
-		: null
+		new CWidgetFieldMultiSelectMapView($data['fields']['sysmapid'])
 	)
 	->show();

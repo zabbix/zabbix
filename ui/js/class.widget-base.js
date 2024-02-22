@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,12 +58,6 @@ const WIDGET_EVENT_ENTER = 'widget-enter';
 // Widget leave event: informs the dashboard page to un-focus the widget.
 const WIDGET_EVENT_LEAVE = 'widget-leave';
 
-// Widget before-update event: thrown by a widget immediately before the update cycle has started.
-const WIDGET_EVENT_BEFORE_UPDATE = 'widget-before-update';
-
-// Widget after-update event: thrown by a widget immediately after the update cycle has finished.
-const WIDGET_EVENT_AFTER_UPDATE = 'widget-after-update';
-
 // Widget copy event: informs the dashboard page to copy the widget to the local storage.
 const WIDGET_EVENT_COPY = 'widget-copy';
 
@@ -78,6 +72,28 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
+	// Widget ready event: informs the dashboard page that the widget has been fully loaded (fired once).
+	static EVENT_READY = 'widget-ready';
+
+	// Require data source event: informs the dashboard page to load the referred foreign data source.
+	static EVENT_REQUIRE_DATA_SOURCE = 'widget-require-data-source';
+
+	static FOREIGN_REFERENCE_KEY = '_reference';
+
+	#fields_references_accessors = null;
+
+	#fields_referred_data = new Map();
+
+	#fields_referred_data_updated = new Set();
+
+	#fields_referred_data_subscriptions = [];
+
+	#broadcast_cache = new Map();
+
+	#feedback_cache = new Map();
+
+	#ready_promise = null;
+
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
@@ -87,11 +103,13 @@ class CWidgetBase {
 	 * @param {Object}      fields              Widget field values (widget configuration data).
 	 *
 	 * @param {Object}      defaults            Widget type defaults.
-	 *        {string}      defaults.name           Default name to display in the header, if no custom name given.
-	 *        {Object}      defaults.size           Default size to use when creating new widgets.
-	 *        {number}      defaults.size.width     Default width.
-	 *        {number}      defaults.size.height    Default height
-	 *        {string}      defaults.js_class       JavaScript class name.
+	 *        {string}      defaults.name         Default name to display in the header, if no custom name given.
+	 *        {Object}      defaults.size         Optional. Default size to use when creating new widgets.
+	 *        {number}      defaults.size.width   Default width.
+	 *        {number}      defaults.size.height  Default height.
+	 *        {string}      defaults.js_class     Optional. JavaScript class name.
+	 *        {Object}      defaults.in           Optional. Fields able to receive data from the event hub.
+	 *        {Array}       defaults.out          Optional. Fields able to broadcast data to the event hub.
 	 *
 	 * @param {string|null} widgetid            Widget ID stored in the database, or null for new widgets.
 	 *
@@ -105,8 +123,8 @@ class CWidgetBase {
 	 * @param {number}      rf_rate             Update cycle rate (refresh rate) in seconds. Supported values: 0 (no
 	 *                                          refresh), 10, 30, 60, 120, 600 or 900 seconds.
 	 * @param {Object}      dashboard           Essential data of the dashboard object.
-	 *        {string|null} dashboard.dashboardid   Dashboard ID.
-	 *        {string|null} dashboard.templateid    Template ID (used for template and host dashboards).
+	 *        {string|null} dashboard.dashboardid  Dashboard ID.
+	 *        {string|null} dashboard.templateid   Template ID (used for template and host dashboards).
 	 *
 	 * @param {Object}      dashboard_page      Essential data of the dashboard page object.
 	 *        {string}      dashboard_page.unique_id  Run-time, unique ID of the dashboard page.
@@ -116,24 +134,12 @@ class CWidgetBase {
 	 * @param {number}      min_rows            Minimum number of dashboard cell rows per single widget.
 	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
 	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
-	 * @param {boolean}     can_edit_dashboards Whether the user has access to creating and editing dashboards.
-	 *
-	 * @param {Object|null} time_period         Selected time period (if widget.use_time_selector in manifest.json is
-	 *                                          set to true in any of the loaded widgets), or null.
-	 *        {string}      time_period.from    Relative time of period start (like "now-1h").
-	 *        {number}      time_period.from_ts Timestamp of period start.
-	 *        {string}      time_period.to      Relative time of period end (like "now").
-	 *        {number}      time_period.to_ts   Timestamp of period end.
-	 *
-	 * @param {string|null}	dynamic_hostid      ID of the dynamically selected host on a dashboard (if any of the
-	 *                                          widgets has the "dynamic" checkbox field configured and checked in the
-	 *                                          widget configuration), or null.
 	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
 	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
 	constructor({
 		type,
-		name = '',
+		name,
 		view_mode,
 		fields,
 		defaults,
@@ -148,9 +154,6 @@ class CWidgetBase {
 		min_rows,
 		is_editable,
 		is_edit_mode,
-		can_edit_dashboards,
-		time_period,
-		dynamic_hostid,
 		csrf_token = null,
 		unique_id
 	}) {
@@ -160,7 +163,15 @@ class CWidgetBase {
 		this._name = name;
 		this._view_mode = view_mode;
 		this._fields = fields;
-		this._defaults = defaults;
+
+		this._defaults = {
+			name: defaults.name,
+			size: defaults.size,
+			js_class: defaults.js_class,
+			in: 'in' in defaults ? {...defaults.in} : {},
+			out: 'out' in defaults ? defaults.out : []
+		};
+
 		this._widgetid = widgetid;
 		this._pos = pos;
 		this._is_new = is_new;
@@ -180,19 +191,16 @@ class CWidgetBase {
 		this._min_rows = min_rows;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
-		this._can_edit_dashboards = can_edit_dashboards;
-		this._time_period = time_period;
-		this._dynamic_hostid = dynamic_hostid;
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
-		this._init();
+		this.#initialize();
 	}
 
 	/**
 	 * Define initial data. Invoked once, upon instantiation.
 	 */
-	_init() {
+	#initialize() {
 		this._css_classes = {
 			actions: 'dashboard-grid-widget-actions',
 			container: 'dashboard-grid-widget-container',
@@ -218,7 +226,6 @@ class CWidgetBase {
 		this._update_retry_sec = 3;
 		this._show_preloader_asap = true;
 		this._resizable_handles = [];
-
 		this._hide_preloader_animation_frame = null;
 
 		this._events = {};
@@ -259,7 +266,9 @@ class CWidgetBase {
 			this.setPos(this._pos);
 		}
 
-		this._registerEvents();
+		this.#registerEvents();
+
+		this.#startDataExchange();
 
 		this.onStart();
 	}
@@ -280,9 +289,10 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_ACTIVE;
 
+		this.#activateEvents();
+
 		this.onActivate();
 
-		this._activateEvents();
 		this._startUpdating();
 	}
 
@@ -302,15 +312,16 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_INACTIVE;
 
-		this.onDeactivate();
-
 		if (this._is_new) {
 			this._is_new = false;
 			this._target.classList.remove('new-widget');
 		}
 
-		this._deactivateEvents();
 		this._stopUpdating();
+
+		this.onDeactivate();
+
+		this.#deactivateEvents();
 	}
 
 	/**
@@ -335,6 +346,8 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_DESTROYED;
 
+		this.#stopDataExchange();
+
 		this.onDestroy();
 	}
 
@@ -342,6 +355,302 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	onDestroy() {
+	}
+
+	// Widget communication methods.
+
+	/**
+	 * Broadcast data to dependent widgets.
+	 *
+	 * @param {Object} data  Object containing key-value pairs, like { _hostid: "123", _itemid: "789" }.
+	 */
+	broadcast(data) {
+		const declared_out_types = new Set();
+
+		for (const {type} of this._defaults.out) {
+			declared_out_types.add(type);
+		}
+
+		for (const type of Object.keys(data)) {
+			if (!declared_out_types.has(type)) {
+				throw new Error('Cannot broadcast data of undeclared type.');
+			}
+		}
+
+		for (const [type, value] of Object.entries(data)) {
+			ZABBIX.EventHub.publish({
+				data: value,
+				descriptor: {
+					context: 'dashboard',
+					sender_unique_id: this._unique_id,
+					sender_type: 'widget',
+					widget_type: this._type,
+					event_type: 'broadcast',
+					event_origin: this._unique_id,
+					reference: this._fields.reference,
+					type
+				}
+			});
+
+			this.#broadcast_cache.set(type, value);
+		}
+	}
+
+	/**
+	 * Check if data of specified type has been already broadcast.
+	 *
+	 * @param {string} type
+	 *
+	 * @returns {boolean}
+	 */
+	hasBroadcast(type) {
+		const descriptor = {
+			context: 'dashboard',
+			sender_unique_id: this._unique_id,
+			sender_type: 'widget',
+			widget_type: this._type,
+			event_type: 'broadcast',
+			event_origin: this._unique_id,
+			reference: this._fields.reference,
+			type
+		};
+
+		return ZABBIX.EventHub.getData(descriptor) !== undefined;
+	}
+
+	/**
+	 * Broadcast default data (nulls) to dependent widgets. Invoked to ensure that all the declared data is broadcast.
+	 */
+	#broadcastDefaults() {
+		for (const {type} of this._defaults.out) {
+			if (!this.hasBroadcast(type)) {
+				this.broadcast({[type]: null});
+			}
+		}
+	}
+
+	/**
+	 * Send feedback data to the referred foreign data sources.
+	 *
+	 * @param {Object} data  An object consisting of {path: value} pairs.
+	 */
+	feedback(data) {
+		const accessors = this.#getFieldsReferencesAccessors();
+
+		for (const [path, value] of Object.entries(data)) {
+			this.#feedback_cache.set(path, value);
+
+			if (!accessors.has(path)) {
+				continue;
+			}
+
+			const {reference, type} = CWidgetBase.parseTypedReference(accessors.get(path).getTypedReference());
+
+			if (reference !== '') {
+				ZABBIX.EventHub.publish({
+					data: value,
+					descriptor: {
+						context: 'dashboard',
+						sender_unique_id: this._unique_id,
+						sender_type: 'widget',
+						widget_type: this._type,
+						event_type: 'feedback',
+						event_origin: this._unique_id,
+						reference,
+						type
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	onFeedback({type, value, descriptor}) {
+		return false;
+	}
+
+	/**
+	 * Require loading the specified foreign data source.
+	 *
+	 * @param {string} reference
+	 * @param {string} type
+	 */
+	requireDataSource(reference, type) {
+		this.fire(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, {reference, type});
+	}
+
+	/**
+	 * Load and connect to the referred foreign data sources.
+	 *
+	 * Invoked before the first activation of the dashboard page, as well as on fields update.
+	 */
+	#startDataExchange() {
+		for (const [path, accessor] of this.#getFieldsReferencesAccessors()) {
+			const {reference, type} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+			if (reference === '') {
+				this.#fields_referred_data.set(path, {value: null, descriptor: null});
+				this.#fields_referred_data_updated.add(path);
+
+				this.#feedback_cache.delete(path);
+
+				continue;
+			}
+
+			this.requireDataSource(reference, type);
+
+			const broadcast_subscription = ZABBIX.EventHub.subscribe({
+				require: {
+					context: 'dashboard',
+					event_type: 'broadcast',
+					reference,
+					type
+				},
+				callback: ({data, descriptor}) => {
+					if (descriptor.event_origin === this._unique_id) {
+						return;
+					}
+
+					this.#fields_referred_data.set(path, {value: data, descriptor});
+					this.#fields_referred_data_updated.add(path);
+
+					this.#feedback_cache.delete(path);
+
+					if (this._state === WIDGET_STATE_ACTIVE) {
+						this._startUpdating();
+					}
+				}
+			});
+
+			this.#fields_referred_data_subscriptions.push(broadcast_subscription);
+		}
+
+		const declared_out_types = new Set();
+
+		for (const {type} of this._defaults.out) {
+			declared_out_types.add(type);
+		}
+
+		const feedback_subscription = ZABBIX.EventHub.subscribe({
+			require: {
+				context: 'dashboard',
+				event_type: 'feedback',
+				reference: this._fields.reference
+			},
+			callback: ({data, descriptor}) => {
+				if (!('type' in descriptor) || !declared_out_types.has(descriptor.type)) {
+					return;
+				}
+
+				if (JSON.stringify(this.#broadcast_cache.get(descriptor.type)) !== JSON.stringify(data)) {
+					this.#broadcast_cache.set(descriptor.type, data);
+
+					if (this.onFeedback({type: descriptor.type, value: data})) {
+						ZABBIX.EventHub.publish({
+							data,
+							descriptor: {
+								context: 'dashboard',
+								sender_unique_id: this._unique_id,
+								sender_type: 'widget',
+								widget_type: this._type,
+								event_type: 'broadcast',
+								event_origin: descriptor.event_origin,
+								reference: this._fields.reference,
+								type: descriptor.type
+							}
+						});
+					}
+				}
+			}
+		});
+
+		this.#fields_referred_data_subscriptions.push(feedback_subscription);
+	}
+
+	/**
+	 * Disconnect from the referred foreign data sources, invalidate broadcast data.
+	 *
+	 * Invoked when the widget or the dashboard page gets deleted, as well as on fields update.
+	 */
+	#stopDataExchange() {
+		ZABBIX.EventHub.invalidateData({
+			context: 'dashboard',
+			sender_unique_id: this._unique_id
+		});
+
+		for (const subscription of this.#fields_referred_data_subscriptions) {
+			ZABBIX.EventHub.unsubscribe(subscription);
+		}
+
+		this.#fields_referred_data.clear();
+		this.#fields_referred_data_updated.clear();
+		this.#fields_referred_data_subscriptions = [];
+
+		this.#feedback_cache.clear();
+
+		this.#resetFieldsReferencesAccessors();
+	}
+
+	/**
+	 * Check if the referred data has been fully received from all foreign data sources.
+	 *
+	 * @returns {boolean}
+	 */
+	isFieldsReferredDataReady() {
+		return this.#fields_referred_data.size === this.#getFieldsReferencesAccessors().size;
+	}
+
+	/**
+	 * Get referred data and event descriptors received from foreign data sources.
+	 *
+	 * @returns {Map}
+	 */
+	getFieldsReferredData() {
+		return this.#fields_referred_data;
+	}
+
+	/**
+	 * Check whether the referred fields data has been updated since the last update cycle.
+	 *
+	 * @returns {boolean}
+	 */
+	isFieldsReferredDataUpdated(path) {
+		return this.#fields_referred_data_updated.has(path);
+	}
+
+	/**
+	 * Get fields data with references replaced with the actual referred data received from foreign data sources.
+	 *
+	 * @returns {Object}
+	 */
+	getFieldsData() {
+		const fields_data = JSON.parse(JSON.stringify(this._fields));
+
+		const fields_data_update = new Map();
+
+		for (const [path, {value}] of this.#fields_referred_data) {
+			fields_data_update.set(path, value);
+		}
+
+		for (const [path, value] of this.#feedback_cache) {
+			fields_data_update.set(path, value);
+		}
+
+		for (const [path, value] of fields_data_update) {
+			let container = {fields_data};
+			let key = 'fields_data';
+
+			for (const step of path.split('/')) {
+				container = container[key];
+				key = step;
+			}
+
+			container[key] = value;
+		}
+
+		return fields_data;
 	}
 
 	// External events management methods.
@@ -374,53 +683,6 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	onEdit() {
-	}
-
-	/**
-	 * Check whether the widget supports dynamic hosts (overriding the host selected in the configuration).
-	 *
-	 * The host selection control will be displayed on the dashboard, if any of the loaded widgets has such support.
-	 *
-	 * @returns {boolean}
-	 */
-	supportsDynamicHosts() {
-		return this._fields.dynamic === '1';
-	}
-
-	/**
-	 * Get the dynamic host currently in use. Invoked if the widget supports dynamic hosts.
-	 *
-	 * @returns {string|null}
-	 */
-	getDynamicHost() {
-		return this._dynamic_hostid;
-	}
-
-	/**
-	 * Set the dynamic host. Invoked if the widget supports dynamic hosts.
-	 *
-	 * @param {string|null} dynamic_hostid
-	 */
-	setDynamicHost(dynamic_hostid) {
-		this._dynamic_hostid = dynamic_hostid;
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
-	}
-
-	/**
-	 * Set the time period selected in the time selector of the dashboard.
-	 *
-	 * @param {Object|null} time_period  Selected time period (if widget.use_time_selector in manifest.json is set to
-	 *                                   true in any of the loaded widgets), or null.
-	 *        {string}      time_period.from     Relative time of period start (like "now-1h").
-	 *        {number}      time_period.from_ts  Timestamp of period start.
-	 *        {string}      time_period.to       Relative time of period end (like "now").
-	 *        {number}      time_period.to_ts    Timestamp of period end.
-	 */
-	setTimePeriod(time_period) {
-		this._time_period = time_period;
 	}
 
 	/**
@@ -568,12 +830,12 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Get widget name to be displayed in the header (either custom, if not empty, or the default one).
+	 * Get widget name displayed in the header.
 	 *
 	 * @returns {string}
 	 */
 	getHeaderName() {
-		return this._name !== '' ? this._name : this._defaults.name;
+		return this._header.querySelector('h4').textContent;
 	}
 
 	/**
@@ -582,9 +844,7 @@ class CWidgetBase {
 	 * @param {string} name
 	 */
 	_setHeaderName(name) {
-		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._header.querySelector('h4').textContent = name;
-		}
+		this._header.querySelector('h4').textContent = name;
 	}
 
 	// Data interface methods.
@@ -631,6 +891,104 @@ class CWidgetBase {
 	}
 
 	/**
+	 * Get accessors to the field objects containing references to the foreign data sources.
+	 *
+	 * @returns {Map}
+	 */
+	#getFieldsReferencesAccessors() {
+		if (this.#fields_references_accessors === null) {
+			this.#fields_references_accessors = CWidgetBase.getFieldsReferencesAccessors(this._fields);
+		}
+
+		return this.#fields_references_accessors;
+	}
+
+	/**
+	 * Reset accessors to the field objects containing references to the foreign data sources.
+	 *
+	 * Invoked when the fields are updated.
+	 */
+	#resetFieldsReferencesAccessors() {
+		this.#fields_references_accessors = null;
+	}
+
+	/**
+	 * Get accessors to the field objects containing references to the foreign data sources.
+	 *
+	 * @param {Object} fields  Widget field values (widget configuration data).
+	 *
+	 * @returns {Object}
+	 */
+	static getFieldsReferencesAccessors(fields) {
+		const accessors = new Map();
+
+		let traverse = [{container: fields, path: []}];
+
+		while (traverse.length > 0) {
+			const traverse_next = [];
+
+			for (const {container, path} of traverse) {
+				for (const key in container) {
+					if (typeof container[key] !== 'object' || container[key] === null) {
+						continue;
+					}
+
+					if ('_reference' in container[key]) {
+						accessors.set([...path, key].join('/'), {
+							setTypedReference: (typed_reference) => container[key]._reference = typed_reference,
+							getTypedReference: () => container[key]._reference
+						});
+
+						continue;
+					}
+
+					traverse_next.push({
+						container: container[key],
+						keys: Object.keys(container[key]),
+						path: [...path, key]
+					});
+				}
+			}
+
+			traverse = traverse_next;
+		}
+
+		return accessors;
+	}
+
+	/**
+	 * Parse typed reference (a reference to a foreign data source).
+	 *
+	 * @param {string} typed_reference
+	 *
+	 * @returns {{reference: string, type: string}}
+	 */
+	static parseTypedReference(typed_reference) {
+		const separator_index = typed_reference.indexOf('.');
+
+		if (separator_index === -1) {
+			return {reference: '', type: ''};
+		}
+
+		return {
+			reference: typed_reference.slice(0, separator_index),
+			type: typed_reference.slice(separator_index + 1)
+		};
+	}
+
+	/**
+	 * Create typed reference (a reference to a foreign data source).
+	 *
+	 * @param {string} reference
+	 * @param {string} type
+	 *
+	 * @returns {string}
+	 */
+	static createTypedReference({reference, type = ''}) {
+		return type !== '' ? `${reference}.${type}` : reference;
+	}
+
+	/**
 	 * Get widget ID.
 	 *
 	 * @returns {string|null}  Widget ID stored in the database, or null for new widgets.
@@ -655,11 +1013,12 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Update widget properties and start updating immediately.
+	 * Update widget properties and start updating immediately, if widget is active.
 	 *
-	 * @param {string|undefined} name       Widget name to display in the header.
-	 * @param {number|undefined} view_mode  One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
-	 * @param {Object|undefined} fields     Widget field values (widget configuration data).
+	 * @param {string|undefined} name               Widget name to display in the header.
+	 * @param {number|undefined} view_mode          One of ZBX_WIDGET_VIEW_MODE_NORMAL,
+	 *                                              ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
+	 * @param {Object|undefined} fields             Widget field values (widget configuration data).
 	 */
 	updateProperties({name, view_mode, fields}) {
 		if (name !== undefined) {
@@ -671,7 +1030,15 @@ class CWidgetBase {
 		}
 
 		if (fields !== undefined) {
+			if (this._state !== WIDGET_STATE_INITIAL) {
+				this.#stopDataExchange();
+			}
+
 			this._setFields(fields);
+
+			if (this._state !== WIDGET_STATE_INITIAL) {
+				this.#startDataExchange();
+			}
 		}
 
 		this._updatePadding();
@@ -718,7 +1085,7 @@ class CWidgetBase {
 					}
 				})
 				.catch((exception) => {
-					console.log('Could not update widget refresh rate:', exception);
+					console.log('Could not update widget refresh rate', exception);
 				});
 		}
 	}
@@ -773,20 +1140,20 @@ class CWidgetBase {
 	/**
 	 * Get context menu to display when actions button is clicked.
 	 *
+	 * @param {boolean} can_copy_widget   Whether a widget is allowed to be copied?
 	 * @param {boolean} can_paste_widget  Whether a copied widget is ready to be pasted over the current one.
 	 *
 	 * @returns {Object[]}
 	 */
-	getActionsContextMenu({can_paste_widget}) {
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
 		let menu = [];
 		let menu_actions = [];
 
-		if (this._can_edit_dashboards && (this._dashboard.templateid === null || this._dynamic_hostid === null)) {
-			menu_actions.push({
-				label: t('Copy'),
-				clickCallback: () => this.fire(WIDGET_EVENT_COPY)
-			});
-		}
+		menu_actions.push({
+			label: t('Copy'),
+			disabled: can_copy_widget === false,
+			clickCallback: () => this.fire(WIDGET_EVENT_COPY)
+		});
 
 		if (this._is_edit_mode) {
 			menu_actions.push({
@@ -824,7 +1191,7 @@ class CWidgetBase {
 				[900, t('15 minutes')]
 			]);
 
-			for (const [rf_rate, label] of rf_rates.entries()) {
+			for (const [rf_rate, label] of rf_rates) {
 				refresh_interval_section.items.push({
 					label: label,
 					selected: rf_rate === this._rf_rate,
@@ -836,7 +1203,7 @@ class CWidgetBase {
 								this._startUpdating();
 							}
 							else {
-								this._stopUpdating();
+								this._stopUpdating({do_abort: false});
 							}
 						}
 					}
@@ -854,31 +1221,48 @@ class CWidgetBase {
 	/**
 	 * Start updating the widget. Invoked on activation of the widget or when the update is required immediately.
 	 *
-	 * @param {number}       delay_sec       Delay seconds before the update.
-	 * @param {boolean|null} do_update_once  Whether the widget is required to update once.
+	 * This method implements asynchronous delay, if delay_sec is set to zero.
+	 *
+	 * @param {number} delay_sec  Delay seconds before the update.
 	 */
-	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
-		if (do_update_once === null) {
-			do_update_once = this._is_edit_mode;
+	_startUpdating({delay_sec = 0} = {}) {
+		if (this._update_timeout_id !== null) {
+			clearTimeout(this._update_timeout_id);
+			this._update_timeout_id = null;
 		}
 
-		this._stopUpdating({do_abort: false});
+		if (this._update_interval_id !== null) {
+			clearInterval(this._update_interval_id);
+			this._update_interval_id = null;
+		}
 
-		if (delay_sec > 0) {
+		if (delay_sec >= 0) {
 			this._update_timeout_id = setTimeout(() => {
 				this._update_timeout_id = null;
-				this._startUpdating(0, {do_update_once});
+				this._startUpdating({delay_sec: -1});
 			}, delay_sec * 1000);
+
+			return;
 		}
-		else {
-			if (!do_update_once && this._rf_rate > 0) {
-				this._update_interval_id = setInterval(() => {
-					this._update(do_update_once);
-				}, this._rf_rate * 1000);
+
+		if (!this.isFieldsReferredDataReady()) {
+			if (this._show_preloader_asap) {
+				this._showPreloader();
+			}
+			else {
+				this._schedulePreloader();
 			}
 
-			this._update(do_update_once);
+			return;
 		}
+
+		if (!this._is_edit_mode && this._rf_rate > 0) {
+			this._update_interval_id = setInterval(() => {
+				this._update();
+			}, this._rf_rate * 1000);
+		}
+
+		this._update();
 	}
 
 	/**
@@ -895,6 +1279,10 @@ class CWidgetBase {
 		if (this._update_interval_id !== null) {
 			clearInterval(this._update_interval_id);
 			this._update_interval_id = null;
+		}
+
+		if (this._update_abort_controller === null) {
+			this._hidePreloader();
 		}
 
 		if (do_abort && this._update_abort_controller !== null) {
@@ -918,46 +1306,56 @@ class CWidgetBase {
 
 	/**
 	 * Organize the update cycle of the widget.
-	 *
-	 * @param {boolean} do_update_once  Whether the widget is required to update once.
 	 */
-	_update(do_update_once) {
+	_update() {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
-			this._startUpdating(1, {do_update_once});
+			this._startUpdating({delay_sec: 1});
 
 			return;
 		}
-
-		this.fire(WIDGET_EVENT_BEFORE_UPDATE);
 
 		this._contents_size = this._getContentsSize();
 
 		this._update_abort_controller = new AbortController();
 
 		if (this._show_preloader_asap) {
-			this._show_preloader_asap = false;
 			this._showPreloader();
 		}
 		else {
 			this._schedulePreloader();
 		}
 
-		new Promise((resolve) => resolve(this.promiseUpdate()))
-			.then(() => this._hidePreloader())
-			.catch((exception) => {
-				console.log('Could not update widget:', exception);
+		Promise.resolve()
+			.then(() => this.promiseUpdate())
+			.then(() => {
+				this._hidePreloader();
+				this._show_preloader_asap = false;
 
+				this.#fields_referred_data_updated.clear();
+
+				this.#broadcastDefaults();
+
+				if (this.#ready_promise === null) {
+					this.#ready_promise = this.promiseReady();
+					this.#ready_promise.then(() => {
+						if (this._state !== WIDGET_STATE_DESTROYED) {
+							this.fire(CWidgetBase.EVENT_READY);
+						}
+					});
+				}
+			})
+			.catch((exception) => {
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
 				}
 				else {
-					this._startUpdating(this._update_retry_sec, {do_update_once});
+					console.log('Could not update widget', exception);
+
+					this._startUpdating({delay_sec: this._update_retry_sec});
 				}
 			})
 			.finally(() => {
 				this._update_abort_controller = null;
-
-				this.fire(WIDGET_EVENT_AFTER_UPDATE);
 			});
 	}
 
@@ -965,6 +1363,12 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	promiseUpdate() {
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	promiseReady() {
 	}
 
 	// Widget view methods.
@@ -1146,15 +1550,9 @@ class CWidgetBase {
 			li_button.type = 'button';
 			li_button.setAttribute('data-hintbox', '1');
 			li_button.setAttribute('data-hintbox-static', '1');
+			li_button.setAttribute('data-hintbox-contents', info[i].hint);
 			li_button.classList.add(ZBX_STYLE_BTN_ICON, info[i].icon);
 			li.appendChild(li_button);
-
-			const li_div = document.createElement('div');
-
-			li_div.innerHTML = info[i].hint;
-			li_div.classList.add('hint-box');
-			li_div.style.display = 'none';
-			li.appendChild(li_div);
 
 			this._actions.prepend(li);
 		}
@@ -1170,7 +1568,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Show data preloader immediately. Invoked before the first update cycle of the widget.
+	 * Show data preloader immediately. Invoked on the first update cycle of the widget.
 	 */
 	_showPreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
@@ -1180,8 +1578,8 @@ class CWidgetBase {
 			this._hide_preloader_animation_frame = null;
 		}
 
-		this._body.classList.add('is-loading');
-		this._body.classList.remove('is-loading-fadein', 'delayed-15s');
+		this._contents.classList.add('is-loading');
+		this._contents.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
 	/**
@@ -1195,13 +1593,13 @@ class CWidgetBase {
 		}
 
 		this._hide_preloader_animation_frame = requestAnimationFrame(() => {
-			this._body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+			this._contents.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
 			this._hide_preloader_animation_frame = null;
 		});
 	}
 
 	/**
-	 * Schedule showing data preloader after 15 seconds. Invoked before regular update cycle of the widget.
+	 * Schedule showing data preloader after 15 seconds. Invoked on a regular update cycle of the widget.
 	 */
 	_schedulePreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
@@ -1211,7 +1609,7 @@ class CWidgetBase {
 			this._hide_preloader_animation_frame = null;
 		}
 
-		this._body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+		this._contents.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
 	/**
@@ -1297,7 +1695,7 @@ class CWidgetBase {
 	/**
 	 * Create event listeners. Invoked once, upon widget initialization.
 	 */
-	_registerEvents() {
+	#registerEvents() {
 		this._events = {
 			actions: (e) => {
 				this.fire(WIDGET_EVENT_ACTIONS, {mouse_event: e});
@@ -1321,16 +1719,14 @@ class CWidgetBase {
 
 			leave: () => {
 				this.fire(WIDGET_EVENT_LEAVE);
-			},
-
-			...this._events
+			}
 		};
 	}
 
 	/**
 	 * Activate event listeners. Invoked on each activation of the dashboard page.
 	 */
-	_activateEvents() {
+	#activateEvents() {
 		this._button_actions.addEventListener('click', this._events.actions);
 
 		if (this._is_editable) {
@@ -1346,7 +1742,7 @@ class CWidgetBase {
 	/**
 	 * Deactivate event listeners. Invoked on each deactivation of the dashboard page.
 	 */
-	_deactivateEvents() {
+	#deactivateEvents() {
 		this._button_actions.removeEventListener('click', this._events.actions);
 
 		if (this._is_editable) {

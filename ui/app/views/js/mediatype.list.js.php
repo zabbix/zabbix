@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,8 +67,8 @@
 		}
 
 		/**
-		 * Opens media type edit popup and and listens to submit and delete actions from edit form. If gets a
-		 * successful response, reloads the page.
+		 * Opens media type edit popup and listens to submit and delete actions from edit form. If gets a successful
+		 * response, reloads the page.
 		 *
 		 * @param {object} parameters  Parameters to pass to the edit form.
 		 */
@@ -81,18 +81,6 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				uncheckTableRows('mediatype');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('mediatype');
-
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
@@ -193,16 +181,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('mediatype');
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {

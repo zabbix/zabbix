@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #include "active.h"
 
+#include "trapper.h"
+
 #include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
@@ -31,9 +33,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxautoreg.h"
-#include "../scripts/scripts.h"
-
-extern unsigned char	program_type;
+#include "zbxscripts.h"
 
 /**********************************************************************************
  *                                                                                *
@@ -196,7 +196,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
-		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != zbx_dc_get_auto_registration_action_count())
+		if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
+				0 != zbx_dc_get_auto_registration_action_count())
 		{
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
@@ -212,12 +213,13 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		goto out;
 	}
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
 		heartbeat = AUTO_REGISTRATION_HEARTBEAT;
 	else
 		heartbeat = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != zbx_dc_get_auto_registration_action_count())
+	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
+			0 != zbx_dc_get_auto_registration_action_count())
 	{
 		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
 				heartbeat))
@@ -384,7 +386,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
 		item_key = ZBX_KEY_LOG;
-	else if (0 == strncmp(key, "eventlog[", 9))
+	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
 		item_key = ZBX_KEY_EVENTLOG;
 	else
 		return;
@@ -556,6 +558,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_dc_item_t		*dc_items;
 		int			*errcodes, delay;
 		zbx_dc_um_handle_t	*um_handle;
+		char			*timeout = NULL;
 
 		dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
@@ -617,11 +620,21 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			/* Removing those would cause older agents to fail. */
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, dc_items[i].mtime);
+
+			timeout = zbx_strdup(NULL, dc_items[i].timeout_orig);
+
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TIMEOUT, timeout, ZBX_JSON_TYPE_STRING);
+
 			zbx_json_close(&json);
 
 			zbx_itemkey_extract_global_regexps(dc_items[i].key, &names);
 
 			zbx_free(dc_items[i].key);
+			zbx_free(timeout);
 		}
 
 		zbx_dc_config_clean_items(dc_items, errcodes, num);
@@ -635,6 +648,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_json_close(&json);
 
 	zbx_remote_commans_prepare_to_send(&json, hostid);
+
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HISTORY_UPLOAD, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED,
+				ZBX_JSON_TYPE_STRING);
+	}
 
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);

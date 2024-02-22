@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -799,7 +799,14 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
-				$('#elementClose').click(function() {
+				jQuery(document).on('keydown', (event) => {
+					if (event.which == KEY_ESCAPE) {
+						that.clearSelection();
+						that.toggleForm();
+					}
+				});
+
+				$('.btn-overlay-close, #elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
@@ -1649,7 +1656,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {object} data
 			 */
@@ -1774,7 +1781,7 @@ ZABBIX.apps.map = (function($) {
 
 		Shape.prototype = {
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {object} data
 			 */
@@ -2062,8 +2069,8 @@ ZABBIX.apps.map = (function($) {
 					shiftY = Math.round(dims.height / 2),
 					newX = x,
 					newY = y,
-					newWidth = dims.width,
-					newHeight = dims.height,
+					newWidth = Math.round(dims.width),
+					newHeight = Math.round(dims.height),
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 				// Lines should not be aligned
@@ -3655,7 +3662,7 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		/**
-		 * Form for editin links.
+		 * Form for editing links.
 		 *
 		 * @param {object} formContainer jQuesry object
 		 * @param {object} sysmap

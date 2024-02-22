@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Read value from a string in /proc file.                           *
+ * Purpose: Reads value from a string in /proc file.                          *
  *                                                                            *
  * Parameters:                                                                *
  *     f     - [IN] file to read from                                         *
@@ -137,9 +137,9 @@ static void	proc_data_free(proc_data_t *proc_data)
  *     num   - [OUT] numeric result                                           *
  *     str   - [OUT] string result                                            *
  *                                                                            *
- * Return value: SUCCEED - successful reading,                                *
- *               NOTSUPPORTED - the search string was not found.              *
- *               FAIL - the search string was found but could not be parsed.  *
+ * Return value: SUCCEED - successful reading                                 *
+ *               NOTSUPPORTED - search string was not found.                  *
+ *               FAIL - search string was found but could not be parsed       *
  *                                                                            *
  ******************************************************************************/
 static int	read_value_from_proc_file(FILE *f, long pos, const char *label, int type, zbx_uint64_t *num, char **str)
@@ -331,22 +331,24 @@ static int	check_user(FILE *f_stat, struct passwd *usrinfo)
 	return FAIL;
 }
 
-static int	check_proccomm(FILE *f_cmd, const char *proccomm)
+static int	check_proccomm(FILE *f_cmd, const zbx_regexp_t *proccomm_rxp)
 {
 	char	*tmp = NULL;
-	size_t	i, l;
+	size_t	l;
 	int	ret = SUCCEED;
 
-	if (NULL == proccomm || '\0' == *proccomm)
+	if (NULL == proccomm_rxp)
 		return SUCCEED;
 
 	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
-		for (i = 0, l -= 2; i < l; i++)
+		l = l - 2;
+
+		for (size_t i = 0; i < l; i++)
 			if ('\0' == tmp[i])
 				tmp[i] = ' ';
 
-		if (NULL != zbx_regexp_match(tmp, proccomm, NULL))
+		if (0 == zbx_regexp_match_precompiled(tmp, proccomm_rxp))
 			goto clean;
 	}
 
@@ -395,7 +397,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Read amount of memory in bytes from a string in /proc file.       *
+ * Purpose: Reads amount of memory in bytes from a string in /proc file.      *
  *          For example, reading "VmSize:   176712 kB" from /proc/1/status    *
  *          will produce a result 176712*1024 = 180953088 bytes               *
  *                                                                            *
@@ -405,11 +407,11 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  *     guard - [IN] label before which to stop, e.g. "VmStk:\t" (optional)    *
  *     bytes - [OUT] result in bytes                                          *
  *                                                                            *
- * Return value: SUCCEED - successful reading,                                *
- *               NOTSUPPORTED - the search string was not found. For example, *
+ * Return value: SUCCEED - successful reading                                 *
+ *               NOTSUPPORTED - The search string was not found. For example, *
  *                              /proc/NNN/status files for kernel threads do  *
  *                              not contain "VmSize:" string.                 *
- *               FAIL - the search string was found but could not be parsed.  *
+ *               FAIL - The search string was found but could not be parsed.  *
  *                                                                            *
  ******************************************************************************/
 int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx_uint64_t *bytes)
@@ -520,18 +522,20 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR		*dir;
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
+	zbx_regexp_t	*proccomm_rxp = NULL;
 	FILE		*f_cmd = NULL, *f_stat = NULL;
 	zbx_uint64_t	mem_size = 0, byte_value = 0, total_memory;
 	double		pct_size = 0.0, pct_value = 0.0;
-	int		do_task, res, proccount = 0, invalid_user = 0, invalid_read = 0;
-	int		mem_type_tried = 0, mem_type_code;
-	char		*mem_type = NULL;
+	int		do_task, res, mem_type_code, mem_type_tried = 0, proccount = 0, invalid_user = 0,
+			invalid_read = 0, ret = SYSINFO_RET_OK;
+	char		*mem_type = NULL, *rxp_error = NULL;
 	const char	*mem_type_search = NULL;
 
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean_re;
 	}
 
 	procname = get_rparam(request, 0);
@@ -547,7 +551,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 							zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto clean_re;
 			}
 
 			invalid_user = 1;
@@ -569,10 +574,25 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean_re;
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (NULL != proccomm && '\0' != *proccomm)
+	{
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			ret = SYSINFO_RET_FAIL;
+			goto clean_re;
+		}
+	}
+
 	mem_type = get_rparam(request, 4);
 
 	/* Comments for process memory types were compiled from: */
@@ -651,7 +671,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean_re;
 	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
@@ -663,20 +684,23 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain amount of total memory: %s",
 					zbx_strerror(errno)));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto clean_re;
 		}
 
 		if (0 == total_memory)	/* this should never happen but anyway - avoid crash due to dividing by 0 */
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Total memory reported is 0."));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto clean_re;
 		}
 	}
 
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean_re;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -703,7 +727,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (FAIL == check_user(f_stat, usrinfo))
 			continue;
 
-		if (FAIL == check_proccomm(f_cmd, proccomm))
+		if (FAIL == check_proccomm(f_cmd, proccomm_rxp))
 			continue;
 
 		rewind(f_stat);
@@ -842,7 +866,8 @@ clean:
 		zbx_rtrim(s, ":\t");
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get amount of \"%s\" memory.", s));
 		zbx_free(s);
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean_re;
 	}
 out:
 	if (ZBX_PMEM != mem_type_code)
@@ -859,8 +884,11 @@ out:
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
+clean_re:
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE
@@ -879,17 +907,19 @@ out:
 
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
+	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *rxp_error = NULL;
 	DIR		*dir;
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
+	zbx_regexp_t	*proccomm_rxp = NULL;
 	FILE		*f_cmd = NULL, *f_stat = NULL;
-	int		proccount = 0, invalid_user = 0, zbx_proc_stat;
+	int		proccount = 0, invalid_user = 0, zbx_proc_stat, ret = SYSINFO_RET_OK;
 
 	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	procname = get_rparam(request, 0);
@@ -905,7 +935,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 							zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto clean;
 			}
 
 			invalid_user = 1;
@@ -931,10 +962,24 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (NULL != proccomm && '\0' != *proccomm)
+	{
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
+	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
 		goto out;
@@ -942,7 +987,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -969,7 +1015,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (FAIL == check_user(f_stat, usrinfo))
 			continue;
 
-		if (FAIL == check_proccomm(f_cmd, proccomm))
+		if (FAIL == check_proccomm(f_cmd, proccomm_rxp))
 			continue;
 
 		if (FAIL == check_procstate(f_stat, zbx_proc_stat))
@@ -982,16 +1028,19 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	closedir(dir);
 out:
 	SET_UI64_RESULT(result, proccount);
+clean:
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: returns process name                                              *
  *                                                                            *
- * Parameters: pid -      [IN] the process identifier                         *
- *             procname - [OUT] the process name                              *
+ * Parameters: pid -      [IN]                                                *
+ *             procname - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
@@ -1033,9 +1082,9 @@ static int	proc_get_process_name(pid_t pid, char **procname)
  *                                                                            *
  * Purpose: returns process command line                                      *
  *                                                                            *
- * Parameters: pid            - [IN] the process identifier                   *
- *             cmdline        - [OUT] the process command line                *
- *             cmdline_nbytes - [OUT] the number of bytes in the command line *
+ * Parameters: pid            - [IN]                                          *
+ *             cmdline        - [OUT] process command line                    *
+ *             cmdline_nbytes - [OUT] number of bytes in command line         *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
@@ -1098,8 +1147,8 @@ static int	proc_get_process_cmdline(pid_t pid, char **cmdline, size_t *cmdline_n
  *                                                                            *
  * Purpose: returns process user identifier                                   *
  *                                                                            *
- * Parameters: pid - [IN] the process identifier                              *
- *             uid - [OUT] the user identifier                                *
+ * Parameters: pid - [IN]                                                     *
+ *             uid - [OUT]                                                    *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
@@ -1122,11 +1171,11 @@ static int	proc_get_process_uid(pid_t pid, uid_t *uid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: read 64 bit unsigned space or zero character terminated integer   *
- *          from a text string                                                *
+ * Purpose: Reads 64 bit unsigned space or zero character terminated integer  *
+ *          from a text string.                                               *
  *                                                                            *
- * Parameters: ptr   - [IN] the text string                                   *
- *             value - [OUT] the parsed value                                 *
+ * Parameters: ptr   - [IN] text string                                       *
+ *             value - [OUT] parsed value                                     *
  *                                                                            *
  * Return value: The length of the parsed text or FAIL if parsing failed.     *
  *                                                                            *
@@ -1149,11 +1198,11 @@ static int	proc_read_value(const char *ptr, zbx_uint64_t *value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads process cpu utilization values from /proc/[pid]/stat file   *
+ * Purpose: Reads process cpu utilization values from /proc/[pid]/stat file.  *
  *                                                                            *
- * Parameters: procutil - [IN/OUT] the process cpu utilization data           *
+ * Parameters: procutil - [IN/OUT] process cpu utilization data               *
  *                                                                            *
- * Return value: SUCCEED - the process cpu utilization data was read          *
+ * Return value: SUCCEED - process cpu utilization data was read              *
  *                         successfully                                       *
  *               <0      - otherwise, -errno code is returned                 *
  *                                                                            *
@@ -1230,7 +1279,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process name matches filter                         *
+ * Purpose: checks if process name matches filter                             *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
@@ -1249,7 +1298,7 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process user matches filter                         *
+ * Purpose: checks if process user matches filter                             *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo)
@@ -1265,7 +1314,7 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process command line matches filter                 *
+ * Purpose: checks if process command line matches filter                     *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdline)
@@ -1281,19 +1330,17 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get process cpu utilization data                                  *
+ * Purpose: gets process cpu utilization data                                 *
  *                                                                            *
- * Parameters: procs     - [IN/OUT] an array of process utilization data      *
- *             procs_num - [IN] the number of items in procs array            *
+ * Parameters: procs     - [IN/OUT] array of process utilization data         *
+ *             procs_num - [IN] number of items in procs array                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __func__, procs_num);
 
-	for (i = 0; i < procs_num; i++)
+	for (int i = 0; i < procs_num; i++)
 		procs[i].error = proc_read_cpu_util(&procs[i]);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
@@ -1301,10 +1348,10 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create process object with the specified properties               *
+ * Purpose: creates process object with specified properties                  *
  *                                                                            *
- * Parameters: pid   - [IN] the process identifier                            *
- *             flags - [IN] the flags specifying properties to set            *
+ * Parameters: pid   - [IN]                                                   *
+ *             flags - [IN] flags specifying properties to set                *
  *                                                                            *
  * Return value: The created process object or NULL if property reading       *
  *               failed.                                                      *
@@ -1373,13 +1420,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get system processes                                              *
+ * Purpose: gets system processes                                             *
  *                                                                            *
- * Parameters: processes - [OUT] the system processes                         *
- *             flags     - [IN] the flags specifying the process properties   *
- *                              that must be returned                         *
+ * Parameters: processes - [OUT] system processes                             *
+ *             flags     - [IN] flags specifying process properties that must *
+ *                              be returned                                   *
  *                                                                            *
- * Return value: SUCCEED - the system processes were retrieved successfully   *
+ * Return value: SUCCEED - system processes were retrieved successfully       *
  *               FAIL    - failed to open /proc directory                     *
  *                                                                            *
  ******************************************************************************/
@@ -1421,7 +1468,7 @@ out:
  *                                                                            *
  * Purpose: frees process vector read by zbx_proc_get_processes function      *
  *                                                                            *
- * Parameters: processes - [IN/OUT] the process vector to free                *
+ * Parameters: processes - [IN/OUT] process vector to free                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
@@ -1431,16 +1478,16 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get pids matching the specified process name, user name and       *
+ * Purpose: gets pids matching specified process name, user name and          *
  *          command line                                                      *
  *                                                                            *
- * Parameters: processes   - [IN] the list of system processes                *
- *             procname    - [IN] the process name, NULL - all                *
- *             username    - [IN] the user name, NULL - all                   *
- *             cmdline     - [IN] the command line, NULL - all                *
- *             pids        - [OUT] the vector of matching pids                *
+ * Parameters: processes   - [IN] list of system processes                    *
+ *             procname    - [IN] NULL - all                                  *
+ *             username    - [IN] ...                                         *
+ *             cmdline     - [IN] ...                                         *
+ *             pids        - [OUT] vector of matching pids                    *
  *                                                                            *
- * Return value: SUCCEED   - the pids were read successfully                  *
+ * Return value: SUCCEED   - pids were read successfully                      *
  *               -errno    - failed to read pids                              *
  *                                                                            *
  ******************************************************************************/
@@ -1448,7 +1495,6 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids)
 {
 	struct passwd		*usrinfo;
-	int			i;
 	zbx_sysinfo_proc_t	*proc;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s flags:" ZBX_FS_UI64, __func__,
@@ -1463,7 +1509,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	else
 		usrinfo = NULL;
 
-	for (i = 0; i < processes->values_num; i++)
+	for (int i = 0; i < processes->values_num; i++)
 	{
 		proc = (zbx_sysinfo_proc_t *)processes->values[i];
 
@@ -1774,13 +1820,14 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	} while(0)
 
 	char				*procname, *proccomm, *param, *prname = NULL, *cmdline = NULL, *user = NULL,
-					*group = NULL;
-	int				invalid_user = 0, zbx_proc_mode, i;
+					*group = NULL, *rxp_error = NULL;
+	int				invalid_user = 0, zbx_proc_mode;
 	DIR				*dir;
 	FILE				*f_cmd = NULL, *f_status = NULL, *f_stat = NULL;
 	struct dirent			*entries;
 	struct passwd			*usrinfo;
 	struct zbx_json			j;
+	zbx_regexp_t			*proccomm_rxp = NULL;
 	zbx_vector_proc_data_ptr_t	proc_data_ctx;
 
 	if (4 < request->nparam)
@@ -1830,6 +1877,16 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != proccomm && '\0' != *proccomm)
+	{
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in third parameter: %s", rxp_error));
+			zbx_free(rxp_error);
+			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	if (1 == invalid_user)
@@ -1918,7 +1975,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != usrinfo && (SUCCEED != ret_uid || usrinfo->pw_uid != uid))
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(cmdline, proccomm, NULL))
+		if (NULL != proccomm && '\0' != *proccomm && 0 != zbx_regexp_match_precompiled(cmdline, proccomm_rxp))
 			continue;
 
 		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
@@ -2033,15 +2090,13 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
-		int	k;
-
-		for (i = 0; i < proc_data_ctx.values_num; i++)
+		for (int i = 0; i < proc_data_ctx.values_num; i++)
 		{
 			proc_data_t	*pdata = proc_data_ctx.values[i];
 
 			pdata->processes = 1;
 
-			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			for (int k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
 				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
@@ -2075,7 +2130,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < proc_data_ctx.values_num; i++)
+	for (int i = 0; i < proc_data_ctx.values_num; i++)
 	{
 		proc_data_t	*pdata;
 
@@ -2163,6 +2218,9 @@ out:
 	zbx_json_close(&j);
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 	zbx_json_free(&j);
+
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
 	return SYSINFO_RET_OK;
 #undef SUM_PROC_VALUE

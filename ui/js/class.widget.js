@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,29 +22,6 @@
  * The base class of all dashboard widgets. Depending on widget needs, it can be instantiated directly or be extended.
  */
 class CWidget extends CWidgetBase {
-
-	/**
-	 * Check if widgets of this type implement communication with other widgets. The reference field represents the
-	 * unique ID of the widget. Its name is "reference". The value is generated and regenerated automatically when
-	 * copying widgets or dashboard pages.
-	 *
-	 * @returns {boolean}
-	 */
-	static hasReferenceField() {
-		return false;
-	}
-
-	/**
-	 * Get field names by which widgets of this type refer and store connections to other widgets. These fields have a
-	 * role of foreign keys, referring to the corresponding "reference" fields of target widgets. The widget is
-	 * responsible for setting field values. The values are regenerated automatically when copying widgets or dashboard
-	 * pages.
-	 *
-	 * @returns {string[]}
-	 */
-	static getForeignReferenceFields() {
-		return [];
-	}
 
 	/**
 	 * Define initial state of the widget.
@@ -121,24 +98,31 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
-	 * Make the acquaintance of other widgets on all dashboard pages so that related widgets can establish connections.
-	 *
-	 * Invoked each time when the configuration of widgets is updated.
-	 *
-	 * Possible widget state: WIDGET_STATE_INITIAL, WIDGET_STATE_ACTIVE, WIDGET_STATE_INACTIVE.
-	 *
-	 * @param {CWidget[]} widgets
-	 */
-	announceWidgets(widgets) {
-	}
-
-	/**
 	 * Whether to display small vertical padding for the widget contents' container.
 	 *
 	 * @returns {boolean}
 	 */
 	hasPadding() {
 		return this._view_mode !== ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
+	}
+
+	/**
+	 * Feedback event callback.
+	 *
+	 * Invoked when the feedback is received from another widget listening to this one for a particular type of data.
+	 * Invoked only if the feedback value is different from the broadcast one.
+	 *
+	 * Must return true to re-broadcast the feedback value or false to ignore the event.
+	 * Feedbacks-aware widgets must generally re-broadcast the value.
+	 *
+	 * @param {string} type        Out data type, as specified in the manifest.json.
+	 * @param {*}      value       Feedback value.
+	 * @param {Object} descriptor  Feedback descriptor.
+	 *
+	 * @returns {boolean}  Whether to rebroadcast the value automatically.
+	 */
+	onFeedback({type, value, descriptor}) {
+		return false;
 	}
 
 	/**
@@ -181,6 +165,40 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
+	 * Resolve as soon as the widget is fully rendered (ready for printing).
+	 *
+	 * The method is called once, immediately after the promiseUpdate is resolved.
+	 * Custom implementation must also resolve the promise provided by the default implementation.
+	 *
+	 * @returns {Promise<any>}
+	 */
+	promiseReady() {
+		return new Promise(resolve => {
+			let incomplete = 0;
+
+			const image_complete = () => {
+				if (--incomplete === 0) {
+					resolve();
+				}
+			};
+
+			for (const img of this._body.querySelectorAll('img')) {
+				if (!img.complete) {
+					img.addEventListener('load', image_complete);
+					img.addEventListener('error', image_complete);
+
+					incomplete++;
+				}
+			}
+
+			if (incomplete === 0) {
+				// Wait until preloader icon is removed on animation frame.
+				requestAnimationFrame(() => resolve());
+			}
+		});
+	}
+
+	/**
 	 * Prepare server request data for updating the widget.
 	 *
 	 * Invoked by the default implementation of the "promiseUpdate" method only.
@@ -190,17 +208,16 @@ class CWidget extends CWidgetBase {
 	 * @returns {Object}
 	 */
 	getUpdateRequestData() {
+		const fields_data = this.getFieldsData();
+
 		return {
 			templateid: this._dashboard.templateid ?? undefined,
 			dashboardid: this._dashboard.dashboardid ?? undefined,
 			widgetid: this._widgetid ?? undefined,
 			name: this._name !== '' ? this._name : undefined,
-			fields: Object.keys(this._fields).length > 0 ? this._fields : undefined,
+			fields: Object.keys(fields_data).length > 0 ? fields_data : undefined,
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
-			dynamic_hostid: this._dashboard.templateid !== null || this.supportsDynamicHosts()
-				? (this._dynamic_hostid ?? undefined)
-				: undefined,
 			contents_width: this._contents_size.width,
 			contents_height: this._contents_size.height
 		};

@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once __DIR__.'/js/configuration.host.prototype.edit.js.php';
-require_once __DIR__.'/js/common.template.edit.js.php';
 
 $host_prototype = $data['host_prototype'];
 $parent_host = $data['parent_host'];
@@ -101,11 +101,9 @@ if ($host_prototype['templateid']) {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
+				$template_link = (new CLink($template['name']))
+					->addClass('js-edit-linked-template')
+					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
 				$template_link = new CSpan($template['name']);
@@ -130,11 +128,9 @@ else {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
+				$template_link = (new CLink($template['name']))
+					->addClass('js-edit-linked-template')
+					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
 				$template_link = new CSpan($template['name']);
@@ -221,6 +217,30 @@ $host_tab->addRow(
 	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
+$group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
+	(new CRow([
+		new CCol([
+			(new CTextBox('group_prototypes[#{i}][name]', '#{name}'))
+				->addStyle('width: 448px')
+				->setAttribute('placeholder', '{#MACRO}'),
+			new CInput('hidden', 'group_prototypes[#{i}][group_prototypeid]', '#{group_prototypeid}')
+		]),
+		(new CCol(
+			(new CButtonLink(_('Remove')))
+				->setAttribute('name', 'remove')
+				->addClass('group-prototype-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))->addClass('form_row')
+);
+
+$host_interface_template = (new CTemplateTag('host-interface-row-tmpl'))->addItem(
+	new CPartial('configuration.host.interface.row')
+);
+
+$host_tab
+	->addItem($group_prototype_template)
+	->addItem($host_interface_template);
+
 $interface_header = renderInterfaceHeaders();
 
 $agent_interfaces = (new CDiv())
@@ -278,8 +298,8 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	$host_tab->addRow(
 		_('Monitored by proxy'),
 		(new CTextBox(
-			'proxy_hostid',
-			($parent_host['proxy_hostid'] != 0) ? $this->data['proxy']['host'] : _('(no proxy)'),
+			'proxyid',
+			($parent_host['proxyid'] != 0) ? $this->data['proxy']['name'] : _('(no proxy)'),
 			true
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -345,29 +365,106 @@ $tabs->addTab('tags-tab', _('Tags'),
 	TAB_INDICATOR_TAGS
 );
 
-$tabs->addTab('macroTab', _('Macros'),
-	(new CFormList('macrosFormList'))
-		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-			->addValue(_('Host prototype macros'), 0)
-			->addValue(_('Inherited and host prototype macros'), 1)
-			->setModern(true)
-		)
-		->addRow(
-			null,
-			new CPartial(
-				$data['show_inherited_macros']
-					? 'hostmacros.inherited.list.html'
-					: 'hostmacros.list.html',
-				[
-					'macros' => $data['macros'],
-					'parent_hostid' => $data['parent_host']['hostid'],
-					'readonly' => $data['templates']
-				]
-			),
-			'macros_container'
+$macro_tab = (new CFormList('macrosFormList'))
+	->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+		->addValue(_('Host prototype macros'), 0)
+		->addValue(_('Inherited and host prototype macros'), 1)
+		->setModern(true)
+	)
+	->addRow(
+		null,
+		new CPartial(
+			$data['show_inherited_macros']
+				? 'hostmacros.inherited.list.html'
+				: 'hostmacros.list.html',
+			[
+				'macros' => $data['macros'],
+				'parent_hostid' => $data['parent_host']['hostid'],
+				'readonly' => $data['templates']
+			]
 		),
-	TAB_INDICATOR_MACROS
-);
+		'macros_container'
+	);
+
+if (!$data['readonly']) {
+	$macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
+		->addItem(
+			(new CRow([
+				(new CCol([
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->addClass('macro')
+						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+						->setAttribute('placeholder', '{$MACRO}')
+						->disableSpellcheck()
+				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+						->setAttribute('placeholder', _('description'))
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))->addClass('form_row')
+		);
+
+	$macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
+		->addItem(
+			(new CRow([
+				(new CCol([
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->addClass('macro')
+						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+						->setAttribute('placeholder', '{$MACRO}')
+						->disableSpellcheck(),
+					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
+				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP),
+				[
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					),
+					new CCol(),
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					)
+				]
+			]))->addClass('form_row')
+		)
+		->addItem(
+			(new CRow([
+				(new CCol(
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('description'))
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
+			]))->addClass('form_row')
+		);
+
+	$macro_tab
+		->addItem($macro_row_tmpl)
+		->addItem($macro_row_inherited_tmpl);
+}
+
+$tabs->addTab('macro-tab', _('Macros'), $macro_tab, TAB_INDICATOR_HOST_PROTOTYPE_MACROS);
 
 $tabs->addTab('inventoryTab', _('Inventory'),
 	(new CFormList('inventorylist'))
@@ -454,4 +551,19 @@ $form->addItem($tabs);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName(),
+		'readonly' => $data['readonly'],
+		'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
+		'group_prototypes' => $host_prototype['groupPrototypes'],
+		'prototype_templateid' => $host_prototype['templateid'],
+		'prototype_interfaces' => array_values($host_prototype['interfaces']),
+		'parent_host_interfaces' => array_values($parent_host['interfaces']),
+		'parent_host_status' => $parent_host['status']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

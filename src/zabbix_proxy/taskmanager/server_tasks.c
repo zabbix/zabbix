@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "taskmanager.h"
+#include "taskmanager_proxy.h"
+
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtasks.h"
@@ -25,26 +27,25 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get tasks scheduled to be executed on the server                  *
+ * Purpose: gets tasks scheduled to be executed on server                     *
  *                                                                            *
  * Parameters: tasks         - [OUT] tasks to execute                         *
- *             proxy_hostid  - [IN] (ignored)                                 *
+ *             proxyid       - [IN] (ignored)                                 *
  *             compatibility - [IN] (ignored)                                 *
  *                                                                            *
  * Comments: This function is used by proxy to get tasks to be sent to the    *
  *           server.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
 		zbx_proxy_compatibility_t compatibility)
 {
-	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	ZBX_UNUSED(proxy_hostid);
+	ZBX_UNUSED(proxyid);
 	ZBX_UNUSED(compatibility);
 
-	result = zbx_db_select(
+	zbx_db_result_t	result = zbx_db_select(
 			"select t.taskid,t.type,t.clock,t.ttl,"
 				"r.status,r.parent_taskid,r.info,"
 				"tr.status,tr.parent_taskid,tr.info,"
@@ -65,10 +66,11 @@ void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hos
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	taskid, parent_taskid;
-		zbx_tm_task_t	*task;
 
 		ZBX_STR2UINT64(taskid, row[0]);
-		task = zbx_tm_task_create(taskid, atoi(row[1]), ZBX_TM_STATUS_NEW, atoi(row[2]), atoi(row[3]), 0);
+
+		zbx_tm_task_t	*task = zbx_tm_task_create(taskid, atoi(row[1]), ZBX_TM_STATUS_NEW, atoi(row[2]),
+				atoi(row[3]), 0);
 
 		switch (task->type)
 		{

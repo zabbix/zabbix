@@ -127,7 +127,7 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>Discovery of file systems of different types.</p>|Dependent item|vfs.fs.dependent.discovery|
+|Mounted filesystem discovery|<p>Discovery of file systems of different types.</p>|Dependent item|vfs.fs.dependent.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Mounted filesystem discovery
 

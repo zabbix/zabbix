@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping')))->removeId())
-	->setId('housekeeping')
+	->setId('housekeeping-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
@@ -176,11 +176,6 @@ $house_keeper_tab = (new CFormList())
 				$timescaledb_error = _('Unable to retrieve TimescaleDB compression support status.');
 				break;
 
-			case ZBX_TIMESCALEDB_POSTGRES_TOO_OLD:
-				$timescaledb_error = _('Compression is not supported.').' '.
-					_('PostgreSQL database server version is too old.');
-				break;
-
 			case ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE:
 				$timescaledb_error = _('Compression is not supported.').' '.
 					_('Unable to retrieve TimescaleDB version.');
@@ -219,7 +214,9 @@ $house_keeper_tab = (new CFormList())
 		$timescaledb_error = $timescaledb_error !== '' ? makeErrorIcon($timescaledb_error) : null;
 
 		$compression_status_checkbox = (new CCheckBox('compression_status'))
-			->setChecked($data['compression_status'] == 1)
+			->setChecked($data['compression_availability'] && $data['compression_status'] == 1
+				|| $data['compression_not_detected']
+			)
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab

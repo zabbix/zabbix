@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include "preproc_snmp.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
-#include "zbxdbhigh.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
@@ -129,15 +128,23 @@ static int	pp_execute_trim(int type, zbx_variant_t *value, const char *params)
 /******************************************************************************
  *                                                                            *
  * Purpose: execute 'check for unsupported' step                              *
+ * *                                                                          *
+ * Parameters: value                - [IN/OUT]                                *
+ *             params               - [IN] preprocessing parameters           *
+ *             error_handler_params - [IN/OUT]                                *
  *                                                                            *
  * Result value: SUCCEED - the input value does not have an error             *
  *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	pp_check_not_error(const zbx_variant_t *value)
+static int	pp_check_not_supported_error(const zbx_variant_t *value, const char *params,
+		char **error_handler_params)
 {
-	if (ZBX_VARIANT_ERR == value->type)
+	if (ZBX_VARIANT_ERR == value->type && SUCCEED == item_preproc_check_error_regex(value, params,
+			error_handler_params))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -998,6 +1005,30 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: execute 'snmp to value' step                                      *
+ *                                                                            *
+ * Parameters:  value  - [IN/OUT] value to process                            *
+ *              params - [IN] step parameters                                 *
+ *                                                                            *
+ * Result value: SUCCEED - the preprocessing step was executed successfully.  *
+ *               FAIL    - otherwise. The error message is stored in value.   *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_execute_snmp_get_to_value(zbx_variant_t *value, const char *params)
+{
+	char	*errmsg = NULL;
+
+	if (SUCCEED == item_preproc_snmp_get_to_value(value, params, &errmsg))
+		return SUCCEED;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_error(value, errmsg);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute preprocessing step                                        *
  *                                                                            *
  * Parameters: ctx              - [IN] worker specific execution context      *
@@ -1007,7 +1038,7 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *             value_type       - [IN] item value type                        *
  *             value            - [IN/OUT] input/output value                 *
  *             ts               - [IN] value timestamp                        *
- *             step             - [IN] step to execute                        *
+ *             step             - [IN/OUT] step to execute                    *
  *             history_value    - [IN/OUT] last value                         *
  *             history_ts       - [IN/OUT] last value timestamp               *
  *             config_source_ip - [IN]                                        *
@@ -1018,7 +1049,7 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  ******************************************************************************/
 int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shared_handle_t *um_handle,
 		zbx_uint64_t hostid, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
-		const zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
+		zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
 		const char *config_source_ip)
 {
 	int	ret;
@@ -1031,10 +1062,11 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 
 	if (NULL != um_handle)
 	{
-		char	*error = NULL;
+		char		*error = NULL;
+		unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE : ZBX_MACRO_ENV_NONSECURE;
 
-		if (SUCCEED != zbx_dc_expand_user_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
-				&error))
+		if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
+				env, &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
 			zbx_free(error);
@@ -1079,7 +1111,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = pp_validate_not_regex(value, params);
 			goto out;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			ret = pp_check_not_error(value);
+			ret = pp_check_not_supported_error(value, params, &step->error_handler_params);
 			goto out;
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
 			ret = pp_error_from_json(value, params);
@@ -1114,11 +1146,14 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = pp_execute_str_replace(value, params);
 			goto out;
-		case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+		case ZBX_PREPROC_SNMP_WALK_VALUE:
 			ret = pp_execute_snmp_to_value(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 			ret = pp_execute_snmp_to_json(value, params);
+			goto out;
+		case ZBX_PREPROC_SNMP_GET_VALUE:
+			ret = pp_execute_snmp_get_to_value(value, params);
 			goto out;
 		default:
 			zbx_variant_clear(value);
@@ -1208,8 +1243,12 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 				ts, preproc->steps + i, &history_value, &history_ts, config_source_ip))
 		{
 			zbx_variant_copy(&value_raw, value_out);
-			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(value_out, preproc->steps + i)))
+
+			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(um_handle, preproc->hostid, value_out,
+					preproc->steps + i)))
+			{
 				zbx_variant_clear(&value_raw);
+			}
 		}
 		else
 		{

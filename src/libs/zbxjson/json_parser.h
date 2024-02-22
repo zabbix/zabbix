@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
 
 zbx_int64_t	zbx_json_validate(const char *start, char **error);
 
-zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, char **error);
+zbx_int64_t	json_parse_value(const char *start, zbx_jsonobj_t *obj, int depth, char **error);
 
 zbx_int64_t	json_error(const char *message, const char *ptr, char **error);
 
-zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, char **error);
-zbx_int64_t	json_parse_array(const char *start, zbx_jsonobj_t *obj, char **error);
+zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, int depth, char **error);
+zbx_int64_t	json_parse_array(const char *start, zbx_jsonobj_t *obj, int depth, char **error);
 
 #endif

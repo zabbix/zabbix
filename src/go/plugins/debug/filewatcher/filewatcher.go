@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,18 +21,20 @@ package filemonitor
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"github.com/fsnotify/fsnotify"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
-
-	"github.com/fsnotify/fsnotify"
 )
+
+var impl Plugin
 
 type watchRequest struct {
 	clientid uint64
-	targets  []*plugin.Request
+	items    []*plugin.Item
 	output   plugin.ResultWriter
 }
 
@@ -50,7 +52,15 @@ type fsNotify interface {
 	removePath(path string)
 }
 
-var impl Plugin
+func init() {
+	impl.eventSources = make(map[string]*fileWatcher)
+	impl.manager = watch.NewManager(&impl)
+
+	err := plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) run() {
 	for {
@@ -59,12 +69,12 @@ func (p *Plugin) run() {
 			if r == nil {
 				return
 			}
-			p.manager.Update(r.clientid, r.output, r.targets)
+			p.manager.Update(r.clientid, r.output, r.items)
 		case event := <-p.watcher.Events:
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				var b []byte
 				var v interface{}
-				if b, v = ioutil.ReadFile(event.Name); v == nil {
+				if b, v = os.ReadFile(event.Name); v == nil {
 					v = b
 				}
 				if es, ok := p.eventSources[event.Name]; ok {
@@ -75,8 +85,8 @@ func (p *Plugin) run() {
 	}
 }
 
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
-	p.input <- &watchRequest{clientid: ctx.ClientID(), targets: requests, output: ctx.Output()}
+func (p *Plugin) Watch(items []*plugin.Item, ctx plugin.ContextProvider) {
+	p.input <- &watchRequest{clientid: ctx.ClientID(), items: items, output: ctx.Output()}
 }
 
 func (p *Plugin) Start() {
@@ -103,8 +113,7 @@ type fileWatcher struct {
 	fsnotify fsNotify
 }
 
-type eventFilter struct {
-}
+type eventFilter struct{}
 
 func (w *eventFilter) Process(v interface{}) (value *string, err error) {
 	if b, ok := v.([]byte); !ok {
@@ -150,11 +159,4 @@ func (p *Plugin) addPath(path string) error {
 func (p *Plugin) removePath(path string) {
 	_ = p.watcher.Remove(path)
 	delete(p.eventSources, path)
-}
-
-func init() {
-	impl.eventSources = make(map[string]*fileWatcher)
-	impl.manager = watch.NewManager(&impl)
-
-	plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
 }

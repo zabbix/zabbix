@@ -80,6 +80,7 @@ OBJS = \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
+	..\..\..\src\libs\zbxhttp\charset.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\agent\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\zbxsysinfo_common.o \
@@ -90,12 +91,14 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\http_metrics.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
+	..\..\..\src\libs\zbxsysinfo\common\ip_reverse.o \
 	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
 	..\..\..\src\libs\zbxsysinfo\common\zabbix_stats.o \
 	..\..\..\src\libs\zbxsysinfo\common\stats.o \
 	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
 	..\..\..\src\libs\zbxsysinfo\simple\simple.o \
+	..\..\..\src\libs\zbxsysinfo\win32\perfstat\perfstat.o \
 	..\..\..\src\libs\zbxsysinfo\win32\cpu.o \
 	..\..\..\src\libs\zbxsysinfo\win32\diskio.o \
 	..\..\..\src\libs\zbxsysinfo\win32\diskspace.o \
@@ -122,12 +125,11 @@ OBJS = \
 	..\..\..\src\zabbix_agent\eventlog\eventlog.o \
 	..\..\..\src\zabbix_agent\eventlog\process_eventslog.o \
 	..\..\..\src\zabbix_agent\eventlog\process_eventslog6.o \
-	..\..\..\src\zabbix_agent\listener.o \
+	..\..\..\src\zabbix_agent\listener\listener.o \
 	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \
 	..\..\..\src\zabbix_agent\logfiles\logfiles.o \
-	..\..\..\src\zabbix_agent\perfstat.o \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \
-	..\..\..\src\zabbix_agent\zbxconf.o \
+	..\..\..\src\zabbix_agent\agent_conf\agent_conf.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o \

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 **/
 
 #include "dir.h"
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
+#include "zbxalgo.h"
+#include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
@@ -33,8 +34,8 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if filename matches the include-regexp and doesn't match   *
- *          the exclude-regexp                                                *
+ * Purpose: Checks if filename matches the include-regexp and doesn't match   *
+ *          the exclude-regexp.                                               *
  *                                                                            *
  * Parameters: fname      - [IN] filename to be checked                       *
  *             regex_incl - [IN] regexp for filenames to include (NULL means  *
@@ -54,8 +55,8 @@ static int	filename_matches(const char *fname, const zbx_regexp_t *regex_incl, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds directory to processing queue after checking if current      *
- *          depth is less than 'max_depth'                                    *
+ * Purpose: Adds directory to processing queue after checking if current      *
+ *          depth is less than 'max_depth'.                                   *
  *                                                                            *
  * Parameters: list      - [IN/OUT] vector used to replace recursion          *
  *                                  with iterative approach                   *
@@ -88,8 +89,8 @@ static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int ma
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares two zbx_file_descriptor_t values to perform search       *
- *          within descriptor vector                                          *
+ * Purpose: Compares two zbx_file_descriptor_t values to perform search       *
+ *          within descriptor vector.                                         *
  *                                                                            *
  * Parameters: file_a - [IN] file descriptor A                                *
  *             file_b - [IN] file descriptor B                                *
@@ -112,8 +113,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		zbx_regexp_t **regex_excl, zbx_regexp_t **regex_excl_dir, int *max_depth, char **dir,
 		zbx_stat_t *status, int depth_param, int excl_dir_param, int param_count)
 {
-	char	*dir_param, *regex_incl_str, *regex_excl_str, *regex_excl_dir_str, *max_depth_str;
-	const char	*error = NULL;
+	char	*dir_param, *regex_incl_str, *regex_excl_str, *regex_excl_dir_str, *max_depth_str, *error = NULL;
 
 	if (param_count < request->nparam)
 	{
@@ -139,7 +139,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
-			zbx_regexp_err_msg_free(error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
@@ -150,7 +150,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
-			zbx_regexp_err_msg_free(error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
@@ -161,7 +161,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in %s parameter: %s",
 					(5 == excl_dir_param ? "sixth" : "eleventh"), error));
-			zbx_regexp_err_msg_free(error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
@@ -208,9 +208,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 
 static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *result, int *mode)
 {
-	char	*mode_str;
-
-	mode_str = get_rparam(request, 3);
+	char	*mode_str = get_rparam(request, 3);
 
 	if (NULL == mode_str || '\0' == *mode_str || 0 == strcmp(mode_str, "apparent"))	/* <mode> default value */
 	{
@@ -247,13 +245,13 @@ static int	etype_to_mask(const char *etype)
 
 int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)
 {
-	int	n, num, ret = 0;
+	int	num, ret = 0;
 
 	if (NULL == etypes || '\0' == *etypes)
 		return 0;
 
 	num = zbx_num_param(etypes);
-	for (n = 1; n <= num; n++)
+	for (int n = 1; n <= num; n++)
 	{
 		char	*etype;
 		int	type;
@@ -416,17 +414,15 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  *          immediately stop whatever it is doing, clean up everything and    *
  *          return SYSINFO_RET_FAIL.                                          *
  *                                                                            *
- * Parameters: timeout_event - [IN] handle of a timeout event that was passed *
- *                                  to the metric function                    *
+ * Parameters: timeout_event - [IN] Handle of a timeout event that was passed *
+ *                                  to the metric function.                   *
  *                                                                            *
  * Return value: TRUE, if timeout or error was detected, FALSE otherwise.     *
  *                                                                            *
  ******************************************************************************/
 static BOOL	has_timed_out(HANDLE timeout_event)
 {
-	DWORD rc;
-
-	rc = WaitForSingleObject(timeout_event, 0);
+	DWORD rc = WaitForSingleObject(timeout_event, 0);
 
 	switch (rc)
 	{
@@ -447,9 +443,7 @@ static BOOL	has_timed_out(HANDLE timeout_event)
 
 static int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_info, char **error)
 {
-	HANDLE	file_handle;
-
-	file_handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+	HANDLE	file_handle = CreateFile(wpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
 			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, NULL);
 
 	if (INVALID_HANDLE_VALUE == file_handle)
@@ -910,9 +904,7 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 		wchar_t			*wpath;
 		HANDLE			handle;
 		WIN32_FIND_DATA		data;
-		zbx_directory_item_t	*item;
-
-		item = list.values[--list.values_num];
+		zbx_directory_item_t	*item = list.values[--list.values_num];
 
 		name = zbx_dsprintf(NULL, "%s\\*", item->path);
 
@@ -1062,8 +1054,7 @@ static int	vfs_dir_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDL
 static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, int count_mode)
 {
 	char			*dir = NULL;
-	int			types, max_depth, ret = SYSINFO_RET_FAIL;
-	int			count = 0;
+	int			types, max_depth, ret = SYSINFO_RET_FAIL, count = 0;
 	zbx_vector_ptr_t	list;
 	zbx_stat_t		status;
 	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
@@ -1095,11 +1086,9 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, int count_
 
 	while (0 < list.values_num)
 	{
-		zbx_directory_item_t	*item;
 		struct dirent		*entry;
 		DIR			*directory;
-
-		item = (zbx_directory_item_t *)list.values[--list.values_num];
+		zbx_directory_item_t	*item = (zbx_directory_item_t *)list.values[--list.values_num];
 
 		if (NULL == (directory = opendir(item->path)))
 		{

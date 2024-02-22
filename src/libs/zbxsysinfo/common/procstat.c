@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,9 +74,6 @@
  * * The system keeps the shared memory segment until the last process detaches from it.
  * * Synchronise both references with procstat_reattach() before using procstat shared memory segment.
  */
-
-/* the main collector data */
-extern ZBX_COLLECTOR_DATA	*collector;
 
 /* local reference to the procstat shared memory */
 static zbx_dshm_ref_t	procstat_ref;
@@ -190,19 +187,19 @@ static int			procstat_snapshot_num;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the procstat shared memory segment has at least          *
- *          the specified amount of free bytes in the segment                 *
+ * Purpose: Checks if the procstat shared memory segment has at least         *
+ *          the specified amount of free bytes in the segment.                *
  *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
+ * Parameters: base - [IN] procstat shared memory segment                     *
  *             size - [IN] number of free bytes needed                        *
  *                                                                            *
  * Return value: SUCCEED - sufficient amount of bytes are available           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	procstat_dshm_has_enough_space(void *base, size_t size)
+static int	procstat_dshm_has_enough_space(const void *base, size_t size)
 {
-	zbx_procstat_header_t	*header = (zbx_procstat_header_t *)base;
+	const zbx_procstat_header_t	*header = (const zbx_procstat_header_t *)base;
 
 	if (header->size >= size + header->size_allocated)
 		return SUCCEED;
@@ -212,9 +209,9 @@ static int	procstat_dshm_has_enough_space(void *base, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate the actual shared memory size used by procstat          *
+ * Purpose: calculates actual shared memory size used by procstat             *
  *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
+ * Parameters: base - [IN] procstat shared memory segment                     *
  *                                                                            *
  * Return value: The number of bytes required to store current procstat data. *
  *                                                                            *
@@ -248,9 +245,9 @@ static size_t	procstat_dshm_used_size(void *base)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate the number of active queries                            *
+ * Purpose: calculates number of active queries                               *
  *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
+ * Parameters: base - [IN] procstat shared memory segment                     *
  *                                                                            *
  * Return value: The number of active queries.                                *
  *                                                                            *
@@ -273,11 +270,11 @@ static int	procstat_queries_num(void *base)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates memory in the shared memory segment,                    *
- *          calls exit() if segment is too small                              *
+ * Purpose: Allocates memory in the shared memory segment and                 *
+ *          calls exit() if segment is too small.                             *
  *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
- *             size - [IN] the number of bytes to allocate                    *
+ * Parameters: base - [IN] procstat shared memory segment                     *
+ *             size - [IN] number of bytes to allocate                        *
  *                                                                            *
  * Return value: The offset of allocated data from the beginning of segment   *
  *               (positive value).                                            *
@@ -304,11 +301,11 @@ static int	procstat_alloc(void *base, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates required memory in procstat memory segment and copies   *
- *          the specified string (calls exit() if segment is too small)       *
+ * Purpose: Allocates required memory in procstat memory segment and copies   *
+ *          the specified string (calls exit() if segment is too small).      *
  *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
- *             str  - [IN] the string to copy                                 *
+ * Parameters: base - [IN] procstat shared memory segment                     *
+ *             str  - [IN] string to copy                                     *
  *                                                                            *
  * Return value: The offset to allocated data counting from the beginning     *
  *               of data segment.                                             *
@@ -333,7 +330,7 @@ static size_t	procstat_strdup(void *base, const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reattaches the procstat_ref to the shared memory segment if it    *
+ * Purpose: Reattaches the procstat_ref to the shared memory segment if it    *
  *          was 'resized' (a new segment created and the old data copied) by  *
  *          other process.                                                    *
  *                                                                            *
@@ -345,7 +342,7 @@ static void	procstat_reattach(void)
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_dshm_validate_ref(&collector->procstat, &procstat_ref, &errmsg))
+	if (FAIL == zbx_dshm_validate_ref(&(get_collector())->procstat, &procstat_ref, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot validate process data collector reference: %s", errmsg);
 		zbx_free(errmsg);
@@ -355,11 +352,11 @@ static void	procstat_reattach(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies procstat data to a new shared memory segment               *
+ * Purpose: copies procstat data to new shared memory segment                 *
  *                                                                            *
- * Parameters: dst      - [OUT] the destination segment                       *
- *             size_dst - [IN] the size of destination segment                *
- *             src      - [IN] the source segment                             *
+ * Parameters: dst      - [OUT] destination segment                           *
+ *             size_dst - [IN] size of destination segment                    *
+ *             src      - [IN] source segment                                 *
  *                                                                            *
  ******************************************************************************/
 static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
@@ -402,13 +399,13 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if processor statistics collector is running (at least one *
+ * Purpose: Checks if processor statistics collector is running (at least one *
  *          one process statistics query has been made).                      *
  *                                                                            *
  ******************************************************************************/
 static int	procstat_running(void)
 {
-	if (ZBX_NONEXISTENT_SHMID == collector->procstat.shmid)
+	if (ZBX_NONEXISTENT_SHMID == (get_collector())->procstat.shmid)
 		return FAIL;
 
 	return SUCCEED;
@@ -416,13 +413,13 @@ static int	procstat_running(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get process statistics query based on process name, user name     *
- *          and command line                                                  *
+ * Purpose: Gets process statistics query based on process name, user name    *
+ *          and command line.                                                 *
  *                                                                            *
- * Parameters: base     - [IN] the procstat shared memory segment             *
- *             procname - [IN] the process name                               *
- *             username - [IN] the user name                                  *
- *             cmdline  - [IN] the command line                               *
+ * Parameters: base     - [IN] procstat shared memory segment                 *
+ *             procname - [IN]                                                *
+ *             username - [IN]                                                *
+ *             cmdline  - [IN]                                                *
  *             flags    - [IN] platform specific flags                        *
  *                                                                            *
  * Return value: The process statistics query for the specified parameters or *
@@ -454,11 +451,11 @@ static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds a new query to process statistics collector                  *
+ * Purpose: adds new query to process statistics collector                    *
  *                                                                            *
- * Parameters: procname - [IN] the process name                               *
- *             username - [IN] the user name                                  *
- *             cmdline  - [IN] the command line                               *
+ * Parameters: procname - [IN]                                                *
+ *             username - [IN]                                                *
+ *             cmdline  - [IN]                                                *
  *             flags    - [IN] platform specific flags                        *
  *                                                                            *
  * Return value:                                                              *
@@ -476,7 +473,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* when allocating a new collection reserve space for procstat header */
-	if (0 == collector->procstat.size)
+	if (0 == (get_collector())->procstat.size)
 		size += PROCSTAT_ALIGNED_HEADER_SIZE;
 
 	/* reserve space for process attributes */
@@ -500,11 +497,11 @@ static void	procstat_add(const char *procname, const char *username, const char 
 		/* recalculate the space required to store existing data + new query */
 		size += procstat_dshm_used_size(procstat_ref.addr);
 
-		if (FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
+		if (FAIL == zbx_dshm_realloc(&(get_collector())->procstat, size, &errmsg))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot reallocate memory in process data collector: %s", errmsg);
 			zbx_free(errmsg);
-			zbx_dshm_unlock(&collector->procstat);
+			zbx_dshm_unlock(&(get_collector())->procstat);
 
 			exit(EXIT_FAILURE);
 		}
@@ -535,7 +532,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees the query data structure used to store queries locally      *
+ * Purpose: frees query data structure used to store queries locally          *
  *                                                                            *
  ******************************************************************************/
 static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
@@ -546,10 +543,10 @@ static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: try to compress (remove inactive queries) the procstat shared     *
- *          memory segment once per day                                       *
+ * Purpose: Tries to compress (remove inactive queries) the procstat shared   *
+ *          memory segment once per day.                                      *
  *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
+ * Parameters: base - [IN] procstat shared memory segment                     *
  *                                                                            *
  ******************************************************************************/
 static void	procstat_try_compress(void *base)
@@ -563,16 +560,14 @@ static void	procstat_try_compress(void *base)
 	if (0 == (++collector_iteration % PROCSTAT_COMPRESS_PERIOD))
 	{
 		zbx_procstat_header_t	*header = (zbx_procstat_header_t *)procstat_ref.addr;
-		size_t			size;
+		size_t			size = procstat_dshm_used_size(base);
 		char			*errmsg = NULL;
 
-		size = procstat_dshm_used_size(base);
-
-		if (size < header->size && FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
+		if (size < header->size && FAIL == zbx_dshm_realloc(&(get_collector())->procstat, size, &errmsg))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot reallocate memory in process data collector: %s", errmsg);
 			zbx_free(errmsg);
-			zbx_dshm_unlock(&collector->procstat);
+			zbx_dshm_unlock(&(get_collector())->procstat);
 
 			exit(EXIT_FAILURE);
 		}
@@ -581,12 +576,12 @@ static void	procstat_try_compress(void *base)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: builds a local copy of the process cpu utilization queries and    *
- *          removes expired (not used during last 24 hours) queries           *
+ * Purpose: Builds a local copy of the process cpu utilization queries and    *
+ *          removes expired (not used during last 24 hours) queries.          *
  *                                                                            *
  * Parameters: queries_ptr - [OUT] local copy of queries copied from queries  *
  *                                 in shared memory segment                   *
- *             runid       - [IN] marker for queries to be processed in the   *
+ *             runid       - [IN] marker for queries to be processed in       *
  *                                current collector iteration                 *
  *                                                                            *
  * Return value: The flags defining the process properties to be retrieved.   *
@@ -603,7 +598,7 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 	zbx_procstat_query_data_t	*qdata;
 	int				flags = ZBX_SYSINFO_PROC_NONE, *pnext_query;
 
-	zbx_dshm_lock(&collector->procstat);
+	zbx_dshm_lock(&(get_collector())->procstat);
 
 	procstat_reattach();
 
@@ -662,29 +657,29 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 out:
 	procstat_try_compress(procstat_ref.addr);
 
-	zbx_dshm_unlock(&collector->procstat);
+	zbx_dshm_unlock(&(get_collector())->procstat);
 
 	return flags;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: for every query gets the pids of processes matching query         *
- *          attributes                                                        *
+ * Purpose: For every query gets the pids of processes matching query         *
+ *          attributes.                                                       *
  *                                                                            *
- * Parameters: queries - [IN/OUT] fills pids and error for each query         *
+ * Parameters: queries   - [IN/OUT] fills pids and error for each query       *
+ *             processes - [IN]                                               *
  *                                                                            *
  * Return value: total number of pids saved in all queries                    *
  *                                                                            *
  ******************************************************************************/
 static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_ptr_t *processes)
 {
-	zbx_procstat_query_data_t	*qdata;
-	int				i, pids_num = 0;
+	int	pids_num = 0;
 
-	for (i = 0; i < queries->values_num; i++)
+	for (int i = 0; i < queries->values_num; i++)
 	{
-		qdata = (zbx_procstat_query_data_t *)queries->values[i];
+		zbx_procstat_query_data_t	*qdata = (zbx_procstat_query_data_t *)queries->values[i];
 
 		zbx_proc_get_matching_pids(processes, qdata->procname, qdata->username, qdata->cmdline, qdata->flags,
 				&qdata->pids);
@@ -697,25 +692,22 @@ static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates a list of unique pids that are monitored by current data  *
- *          gathering cycle                                                   *
+ * Purpose: Creates a list of unique pids that are monitored by current data  *
+ *          gathering cycle.                                                  *
  *                                                                            *
- * Parameters: pids     - [OUT] a sorted vector of unique pids                *
+ * Parameters: pids     - [OUT] sorted vector of unique pids                  *
  *             queries  - [IN] local, working copy of queries                 *
- *             pids_num - [IN] the total number of pids monitored by queries  *
+ *             pids_num - [IN] total number of pids monitored by queries      *
  *                             (might contain duplicated pids)                *
  *                                                                            *
  ******************************************************************************/
 static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vector_ptr_t *queries, int pids_num)
 {
-	zbx_procstat_query_data_t	*qdata;
-	int				i;
-
 	zbx_vector_uint64_reserve(pids, pids_num);
 
-	for (i = 0; i < queries->values_num; i++)
+	for (int i = 0; i < queries->values_num; i++)
 	{
-		qdata = (zbx_procstat_query_data_t *)queries->values[i];
+		zbx_procstat_query_data_t	*qdata = (zbx_procstat_query_data_t *)queries->values[i];
 
 		if (SUCCEED != qdata->error)
 			continue;
@@ -731,23 +723,22 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets cpu utilization data snapshot for the monitored processes    *
+ * Purpose: gets cpu utilization data snapshot for monitored processes        *
  *                                                                            *
- * Parameters: stats - [OUT] current reading of the per-pid cpu usage         *
- *                               statistics (array, items correspond to pids) *
+ * Parameters: stats - [OUT] current reading of per-pid cpu usage statistics  *
+*                            (array, items correspond to pids)                *
  *             pids  - [IN]  pids (unique) for which to collect data in this  *
- *                               iteration                                    *
+ *                           iteration                                        *
  *                                                                            *
- * Return value: timestamp of the snapshot                                    *
+ * Return value: timestamp of snapshot                                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t *stats,
-				zbx_vector_uint64_t *pids)
+		const zbx_vector_uint64_t *pids)
 {
 	zbx_timespec_t	snapshot_timestamp;
-	int		i;
 
-	for (i = 0; i < pids->values_num; i++)
+	for (int i = 0; i < pids->values_num; i++)
 		stats[i].pid = pids->values[i];
 
 	zbx_proc_get_process_stats(stats, pids->values_num);
@@ -759,7 +750,7 @@ static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare process utilization data by their pids                    *
+ * Purpose: compares process utilization data by their pids                   *
  *                                                                            *
  ******************************************************************************/
 static int	procstat_util_compare(const void *d1, const void *d2)
@@ -774,8 +765,7 @@ static int	procstat_util_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates the cpu utilization for queries since the previous     *
- *          snapshot                                                          *
+ * Purpose: calculates cpu utilization for queries since previous snapshot    *
  *                                                                            *
  * Parameters: queries - [IN/OUT] local, working copy of queries, saving      *
  *                                utime, stime and error                      *
@@ -786,19 +776,15 @@ static int	procstat_util_compare(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
-			zbx_vector_uint64_t *pids, const zbx_procstat_util_t *stats)
+			const zbx_vector_uint64_t *pids, const zbx_procstat_util_t *stats)
 {
-	zbx_procstat_query_data_t	*qdata;
-	zbx_procstat_util_t		*putil;
-	int				j, i;
-
-	for (j = 0; j < queries->values_num; j++)
+	for (int j = 0; j < queries->values_num; j++)
 	{
-		qdata = (zbx_procstat_query_data_t *)queries->values[j];
+		zbx_procstat_query_data_t	*qdata = (zbx_procstat_query_data_t *)queries->values[j];
 
 		/* sum the cpu utilization for processes that are present in current */
 		/* and last process cpu utilization snapshot                         */
-		for (i = 0; i < qdata->pids.values_num; i++)
+		for (int i = 0; i < qdata->pids.values_num; i++)
 		{
 			zbx_uint64_t		starttime, utime, stime;
 			zbx_procstat_util_t	util_local;
@@ -806,8 +792,8 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 			util_local.pid = qdata->pids.values[i];
 
 			/* find the process utilization data in current snapshot */
-			putil = (zbx_procstat_util_t *)zbx_bsearch(&util_local, stats, pids->values_num,
-					sizeof(zbx_procstat_util_t), procstat_util_compare);
+			zbx_procstat_util_t	*putil = (zbx_procstat_util_t *)zbx_bsearch(&util_local, stats,
+					pids->values_num, sizeof(zbx_procstat_util_t), procstat_util_compare);
 
 			if (NULL == putil || SUCCEED != putil->error)
 				continue;
@@ -830,35 +816,32 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: updates cpu utilization and saves the new snapshot for queries in *
- *          shared memory segment                                             *
- *                                                                            *
- * Parameters: queries - [IN] local, working copy of queries (utime, stime    *
- *                            and error must be set)                          *
- *             runid   - [IN] marker for queries to be processed in the       *
- *                            current collector iteration                     *
- *             snapshot_timestamp - [IN] timestamp of the current snapshot    *
- *                                                                            *
- * Comments: updates header (pids_num) and queries (h_data, h_count, h_first) *
- *           in shared memory segment, writes stats at the end of the shared  *
- *           memory segment                                                   *
- *                                                                            *
- ******************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: Updates cpu utilization and saves the new snapshot for queries in shared  *
+ *          memory segment.                                                           *
+ *                                                                                    *
+ * Parameters: queries            - [IN] local, working copy of queries (utime, stime *
+ *                                       and error must be set)                       *
+ *             runid              - [IN] marker for queries to be processed in        *
+ *                                       current collector iteration                  *
+ *             snapshot_timestamp - [IN] timestamp of current snapshot                *
+ *                                                                                    *
+ * Comments: Updates header (pids_num) and queries (h_data, h_count, h_first)         *
+ *           in shared memory segment, writes stats at the end of the shared          *
+ *           memory segment.                                                          *
+ *                                                                                    *
+ **************************************************************************************/
 static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runid,
 		const zbx_timespec_t *snapshot_timestamp)
 {
-	zbx_procstat_query_t		*query;
-	zbx_procstat_query_data_t	*qdata;
-	int				index;
-	int				i;
+	int				index, i = 0;
 
-	zbx_dshm_lock(&collector->procstat);
+	zbx_dshm_lock(&(get_collector())->procstat);
 
 	procstat_reattach();
 
-	for (query = PROCSTAT_QUERY_FIRST(procstat_ref.addr), i = 0; NULL != query;
+	for (zbx_procstat_query_t *query = PROCSTAT_QUERY_FIRST(procstat_ref.addr); NULL != query;
 			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
 	{
 		if (runid != query->runid)
@@ -870,7 +853,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 			break;
 		}
 
-		qdata = (zbx_procstat_query_data_t *)queries->values[i++];
+		zbx_procstat_query_data_t	*qdata = (zbx_procstat_query_data_t *)queries->values[i++];
 
 		if (SUCCEED != (query->error = qdata->error))
 			continue;
@@ -903,7 +886,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 		query->h_data[index].timestamp = *snapshot_timestamp;
 	}
 
-	zbx_dshm_unlock(&collector->procstat);
+	zbx_dshm_unlock(&(get_collector())->procstat);
 }
 
 /*
@@ -912,13 +895,13 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if processor statistics collector is enabled (the main     *
- *          collector has been initialized)                                   *
+ * Purpose: Checks if processor statistics collector is enabled (the main     *
+ *          collector has been initialized).                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_procstat_collector_started(void)
 {
-	if (NULL == collector)
+	if (NULL == get_collector())
 		return FAIL;
 
 	return SUCCEED;
@@ -935,7 +918,7 @@ void	zbx_procstat_init(void)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED != zbx_dshm_create(&collector->procstat, 0, ZBX_MUTEX_PROCSTAT,
+	if (SUCCEED != zbx_dshm_create(&(get_collector())->procstat, 0, ZBX_MUTEX_PROCSTAT,
 			procstat_copy_data, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize process data collector: %s", errmsg);
@@ -956,7 +939,7 @@ void	zbx_procstat_destroy(void)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED != zbx_dshm_destroy(&collector->procstat, &errmsg))
+	if (SUCCEED != zbx_dshm_destroy(&(get_collector())->procstat, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot free resources allocated by process data collector: %s", errmsg);
 		zbx_free(errmsg);
@@ -970,20 +953,19 @@ void	zbx_procstat_destroy(void)
  *                                                                            *
  * Purpose: gets process cpu utilization                                      *
  *                                                                            *
- * Parameters: procname       - [IN] the process name, NULL - all             *
- *             username       - [IN] the user name, NULL - all                *
- *             cmdline        - [IN] the command line, NULL - all             *
- *             collector_func - [IN] the callback function to use for process *
- *                              statistics gathering                          *
- *             period         - [IN] the time period                          *
- *             type           - [IN] the cpu utilization type, see            *
- *                              ZBX_PROCSTAT_CPU_* defines                    *
- *             value          - [OUT] the utilization in %                    *
- *             errmsg         - [OUT] the error message                       *
+ * Parameters: procname - [IN] NULL - all                                     *
+ *             username - [IN] ...                                            *
+ *             cmdline  - [IN] ...                                            *
+ *             flags    - [IN]                                                *
+ *             period   - [IN] time period                                    *
+ *             type     - [IN] cpu utilization type, see                      *
+ *                             ZBX_PROCSTAT_CPU_* defines                     *
+ *             value    - [OUT] utilization in %                              *
+ *             errmsg   - [OUT]                                               *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - the utime value was retrieved successfully                   *
- *     FAIL    - either collector does not have at least two data samples     *
+ *     SUCCEED - utime value was retrieved successfully                       *
+ *     FAIL    - Either collector does not have at least two data samples     *
  *               required to calculate the statistics, or an error occurred   *
  *               during the collection process. In the second case the errmsg *
  *               will contain an error message.                               *
@@ -997,7 +979,7 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 	zbx_procstat_query_t	*query;
 	zbx_uint64_t		ticks_diff = 0, time_diff;
 
-	zbx_dshm_lock(&collector->procstat);
+	zbx_dshm_lock(&(get_collector())->procstat);
 
 	procstat_reattach();
 
@@ -1050,7 +1032,7 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 
 	ret = SUCCEED;
 out:
-	zbx_dshm_unlock(&collector->procstat);
+	zbx_dshm_unlock(&(get_collector())->procstat);
 
 	return ret;
 }

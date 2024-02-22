@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxnum.h"
 #include "zbxtypes.h"
-#include "zbxlog.h"
-
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
 /* unresolved symbols needed for linking */
 
 static unsigned char	program_type	= 0;
@@ -75,6 +75,8 @@ static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 };
 
 int	get_config_forks(unsigned char process_type)
@@ -86,15 +88,6 @@ void	set_config_forks(unsigned char process_type, int forks)
 {
 	CONFIG_FORKS[process_type] = forks;
 }
-
-int	CONFIG_LISTEN_PORT		= 0;
-char	*CONFIG_LISTEN_IP		= NULL;
-int	CONFIG_TRAPPER_TIMEOUT		= 300;
-
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
-int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
-int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 
@@ -110,21 +103,7 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
-char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-
-char	*CONFIG_SNMPTRAP_FILE		= NULL;
-
-char	*CONFIG_JAVA_GATEWAY		= NULL;
-int	CONFIG_JAVA_GATEWAY_PORT	= 0;
-
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
-int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
-
-/* web monitoring */
-char	*CONFIG_SSL_CA_LOCATION		= NULL;
-char	*CONFIG_SSL_CERT_LOCATION	= NULL;
-char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
@@ -133,28 +112,9 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 /* not used in tests, defined for linking with comms.c */
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-const char	title_message[] = "mock_title_message";
-const char	*usage_message[] = {"mock_usage_message", NULL};
-const char	*help_message[] = {"mock_help_message", NULL};
-const char	*progname = "mock_progname";
-const char	syslog_app_name[] = "mock_syslog_app_name";
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "mock_progname")
 
-char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
-
-int	CONFIG_BUFFER_SIZE		= 100;
-int	CONFIG_BUFFER_SEND		= 5;
-
-int	CONFIG_MAX_LINES_PER_SECOND	= 20;
-
-char	**CONFIG_ALIASES		= NULL;
-char	**CONFIG_USER_PARAMETERS	= NULL;
-#if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS		= NULL;
-char	**CONFIG_PERF_COUNTERS_EN	= NULL;
-#endif
 
 static ZBX_THREAD_LOCAL int	zbx_config_timeout = 3;
 int	get_zbx_config_timeout(void)
@@ -184,7 +144,9 @@ int	main (void)
 	};
 
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
-	zbx_init_library_common(zbx_mock_log_impl);
-
+	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname);
+#ifndef _WINDOWS
+	zbx_init_library_nix(get_zbx_progname);
+#endif
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

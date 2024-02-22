@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'] ?: 0)
-	->addVar('eventsource', $data['eventsource']);
+	->addVar('eventsource', $data['eventsource'])
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -138,9 +139,7 @@ $action_tab->addItem([
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		]))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
-			(new CSpan(''))
-				->addStyle('white-space: normal;')
-				->setId('expression'),
+			(new CSpan(''))->setId('expression'),
 			$formula
 		]))
 			->addClass(ZBX_STYLE_CELL)

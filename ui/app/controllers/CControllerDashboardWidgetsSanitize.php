@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 use Zabbix\Core\CModule;
 
 /**
- * Controller for sanitizing fields of widgets before pasting previously copied widget.
+ * Controller for sanitizing fields of widgets before pasting previously copied widgets or dashboard pages.
  */
 class CControllerDashboardWidgetsSanitize extends CController {
 
@@ -69,10 +69,8 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				}
 
 				$this->widgets_data[] = [
-					'type' => $widget_input['type'],
-					'form' => $widget->getForm($widget_input['fields'],
-						$this->hasInput('templateid') ? $this->getInput('templateid') : null
-					)
+					'widget' => $widget,
+					'fields' => $widget_input['fields']
 				];
 			}
 		}
@@ -91,21 +89,42 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
 	protected function doAction(): void {
-		$widgets = [];
-
-		foreach ($this->widgets_data as $index => $widget_data) {
-			if ($widget_data !== null) {
-				$widgets[$index] = ['fields' => $widget_data['form']->fieldsToApi()];
-			}
-		}
+		$widgets_fields = [];
 
 		if (!$this->hasInput('templateid')) {
-			$widgets = CDashboardHelper::unsetInaccessibleFields([['widgets' => $widgets]]);
-			$widgets = $widgets[0]['widgets'];
+			$widgets_api = [];
+
+			foreach ($this->widgets_data as $index => $widget_data) {
+				if ($widget_data !== null) {
+					$form = $widget_data['widget']->getForm($widget_data['fields'],
+						$this->hasInput('templateid') ? $this->getInput('templateid') : null
+					);
+
+					$form->validate();
+
+					$widgets_api[$index] = ['fields' => $form->fieldsToApi()];
+				}
+			}
+
+			$widgets_api = CDashboardHelper::unsetInaccessibleFields([['widgets' => $widgets_api]]);
+			$widgets_api = $widgets_api[0]['widgets'];
+
+			foreach ($this->widgets_data as $index => $widget_data) {
+				if ($widget_data !== null) {
+					$widgets_fields[$index] = CDashboardHelper::constructWidgetFields($widgets_api[$index]['fields']);
+				}
+			}
+		}
+		else {
+			foreach ($this->widgets_data as $index => $widget_data) {
+				if ($widget_data !== null) {
+					$widgets_fields[$index] = $widget_data['fields'];
+				}
+			}
 		}
 
 		$output = [
@@ -119,22 +138,14 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				continue;
 			}
 
-			$output_fields = [];
+			$form = $widget_data['widget']->getForm($widgets_fields[$index],
+				$this->hasInput('templateid') ? $this->getInput('templateid') : null
+			);
+			$form->validate();
 
-			foreach ($widgets[$index]['fields'] as $field) {
-				if (array_key_exists($field['name'], $output_fields)) {
-					if (!is_array($output_fields[$field['name']])) {
-						$output_fields[$field['name']] = [$output_fields[$field['name']]];
-					}
-
-					$output_fields[$field['name']][] = $field['value'];
-				}
-				else {
-					$output_fields[$field['name']] = $field['value'];
-				}
-			}
-
-			$output['widgets'][$index]['fields'] = $output_fields;
+			$output['widgets'][$index] = [
+				'fields' => $form->getFieldsValues()
+			];
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));

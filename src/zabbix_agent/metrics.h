@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,8 @@ typedef struct
 	zbx_uint64_t		processed_bytes;	/* number of processed bytes for log[], log.count[], logrt[], */
 							/* logrt.count[] items */
 	char			*persistent_file_name;	/* not used on Microsoft Windows */
+
+	int			timeout;
 }
 ZBX_ACTIVE_METRIC;
 

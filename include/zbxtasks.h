@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@
 /* task data type */
 #define ZBX_TM_DATA_TYPE_TEST_ITEM			0
 #define ZBX_TM_DATA_TYPE_DIAGINFO			1
-#define ZBX_TM_DATA_TYPE_PROXY_HOSTIDS			2
-#define ZBX_TM_DATA_TYPE_PROXY_HOSTNAME			3
+#define ZBX_TM_DATA_TYPE_PROXYIDS			2
+#define ZBX_TM_DATA_TYPE_PROXYNAME			3
 #define ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD	4
 #define ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION		5
 #define ZBX_TM_DATA_TYPE_RANK_EVENT			6
@@ -112,7 +112,7 @@ typedef struct
 	/* the task identifier */
 	zbx_uint64_t	taskid;
 	/* the target proxy hostid or 0 if the task must be on server, ignored by proxy */
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	/* the task type (ZBX_TM_TASK_* defines) */
 	unsigned char	type;
 	/* the task status (ZBX_TM_STATUS_* defines) */
@@ -142,7 +142,7 @@ zbx_tm_data_t		*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, 
 zbx_tm_data_result_t	*zbx_tm_data_result_create(zbx_uint64_t parent_taskid, int status, const char *info);
 
 zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsigned char status, int clock, int ttl,
-		zbx_uint64_t proxy_hostid);
+		zbx_uint64_t proxyid);
 
 void	zbx_tm_save_tasks(zbx_vector_tm_task_t *tasks);
 int	zbx_tm_save_task(zbx_tm_task_t *task);
@@ -151,6 +151,6 @@ void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status);
 void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_tm_task_t *tasks);
 void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_tm_task_t *tasks);
 
-int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid, char **info);
+int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxyid, char **info);
 
 #endif

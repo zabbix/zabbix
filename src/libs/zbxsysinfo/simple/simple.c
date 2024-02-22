@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -352,14 +352,14 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_SSH_PORT;
-			ret = check_ssh(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ssh(ip, port, request->timeout, &value_int);
 		}
 		else if (0 == strcmp(service, "ldap"))
 		{
 #ifdef HAVE_LDAP
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_LDAP_PORT;
-			ret = check_ldap(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ldap(ip, port, request->timeout, &value_int);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
 #endif
@@ -368,41 +368,41 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_SMTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_smtp, "QUIT\r\n",
+			ret = tcp_expect(ip, port, request->timeout, NULL, validate_smtp, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "ftp"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_FTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_ftp, "QUIT\r\n",
+			ret = tcp_expect(ip, port, request->timeout, NULL, validate_ftp, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "http"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_HTTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int);
+			ret = tcp_expect(ip, port, request->timeout, NULL, NULL, NULL, &value_int);
 		}
 		else if (0 == strcmp(service, "pop"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_POP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_pop, "QUIT\r\n",
+			ret = tcp_expect(ip, port, request->timeout, NULL, validate_pop, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "nntp"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NNTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_nntp, "QUIT\r\n",
+			ret = tcp_expect(ip, port, request->timeout, NULL, validate_nntp, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "imap"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_IMAP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_imap, "a1 LOGOUT\r\n",
+			ret = tcp_expect(ip, port, request->timeout, NULL, validate_imap, "a1 LOGOUT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "tcp"))
@@ -412,14 +412,14 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 				return SYSINFO_RET_FAIL;
 			}
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int);
+			ret = tcp_expect(ip, port, request->timeout, NULL, NULL, NULL, &value_int);
 		}
 		else if (0 == strcmp(service, "https"))
 		{
 #ifdef HAVE_LIBCURL
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_HTTPS_PORT;
-			ret = check_https(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_https(ip, port, request->timeout, &value_int);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTPS check was not compiled in."));
 #endif
@@ -428,7 +428,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_TELNET_PORT;
-			ret = check_telnet(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_telnet(ip, port, request->timeout, &value_int);
 		}
 		else
 		{
@@ -442,7 +442,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NTP_PORT;
-			ret = check_ntp(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ntp(ip, port, request->timeout, &value_int);
 		}
 		else
 		{

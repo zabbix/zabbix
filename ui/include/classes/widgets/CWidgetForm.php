@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,68 +113,6 @@ class CWidgetForm {
 	}
 
 	protected function normalizeValues(array $values): array {
-		return self::convertDottedKeys($values);
-	}
-
-	/**
-	 * Convert all dot-delimited keys to arrays of objects.
-	 * Example:
-	 *   source:                             result:
-	 *   [                                   [
-	 *       'tags.tag.0' => 'tag1',             'tags' => [
-	 *       'tags.value.0' => 'value1',             ['tag' => 'tag1', 'value' => 'value1'],
-	 *       'tags.tag.1' => 'tag2',                 ['tag' => 'tag2', 'value' => 'value2']
-	 *       'tags.value.1' => 'value2',         ],
-	 *       'ds.hosts.0.0' => 'host1',          'ds' => [
-	 *       'ds.hosts.1.0' => 'host2',              [
-	 *       'ds.hosts.1.1' => 'host3',                  'hosts' => ['host1'],
-	 *       'ds.color.0' => 'AB43C5',                   'color' => 'AB43C5'
-	 *       'ds.color.1' => 'CCCCCC',               ],
-	 *       'ds.hosts.1.1' => 'host3',              [
-	 *       'problemhosts.0' => 'ph1',                  'hosts => ['host2', 'host3'],
-	 *       'problemhosts.1' => 'ph2'                   'color' => 'CCCCCC'
-	 *   ]                                           ],
-	 *                                           ],
-	 *                                           'problemhosts' => ['ph1', 'ph2']
-	 *                                       ]
-	 *
-	 * @static
-	 *
-	 * @param array $data  An array of key => value pairs.
-	 *
-	 * @return array
-	 */
-	protected static function convertDottedKeys(array $data): array {
-		// API doesn't guarantee fields to be retrieved in same order as stored. Sorting by key...
-		uksort($data, static function ($key1, $key2) {
-			foreach (['key1', 'key2'] as $var) {
-				if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $$var, $matches) === 1) {
-					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2].'.'.$matches[4];
-				}
-				elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $$var, $matches) === 1) {
-					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2];
-				}
-			}
-
-			return strnatcmp((string) $key1, (string) $key2);
-		});
-
-		// Converting dot-delimited keys to the arrays.
-		foreach ($data as $key => $value) {
-			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $key, $matches) === 1) {
-				$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
-				unset($data[$key]);
-			}
-			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $key, $matches) === 1) {
-				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
-				unset($data[$key]);
-			}
-			elseif (preg_match('/^([a-z]+)\.(\d+)$/', (string) $key, $matches) === 1) {
-				$data[$matches[1]][$matches[2]] = $value;
-				unset($data[$key]);
-			}
-		}
-
-		return $data;
+		return $values;
 	}
 }

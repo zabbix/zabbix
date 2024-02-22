@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -355,6 +355,168 @@ class CConditionHelperTest extends TestCase {
 			],
 			[
 				['ZZZX', 'ZZZY', 'ZZZZ'], 'AAAAA'
+			]
+		];
+	}
+
+	/**
+	 * Test if conditions are correctly sorted based on given formula.
+	 *
+	 * @dataProvider dataProviderSortConditionsByFormula
+	 *
+	 * @param array $filter
+	 * @param array $expected_conditions
+	 */
+	public function testSortConditionsByFormula(array $filter, array $expected_conditions): void {
+		$sorted_conditions = CConditionHelper::sortConditionsByFormula($filter);
+
+		$this->assertSame($expected_conditions, $sorted_conditions);
+	}
+
+	/**
+	 * Data provider to test condition sorting.
+	 *
+	 * @return array
+	 */
+	public function dataProviderSortConditionsByFormula(): array {
+		return [
+			[
+				[
+					'formula' => 'B or A',
+					'conditions' => [
+						['formulaid' => 'A'],
+						['formulaid' => 'B']
+					]
+				],
+				[
+					['formulaid' => 'B'],
+					['formulaid' => 'A']
+				]
+			],
+			[
+				[
+					'formula' => 'A and B and C',
+					'conditions' => [
+						['formulaid' => 'A'],
+						['formulaid' => 'B'],
+						['formulaid' => 'C']
+					]
+				],
+				[
+					['formulaid' => 'A'],
+					['formulaid' => 'B'],
+					['formulaid' => 'C']
+				]
+			],
+			[
+				[
+					'formula' => 'C and B and A',
+					'conditions' => [
+						['formulaid' => 'A'],
+						['formulaid' => 'B'],
+						['formulaid' => 'C']
+					]
+				],
+				[
+					['formulaid' => 'C'],
+					['formulaid' => 'B'],
+					['formulaid' => 'A']
+				]
+			],
+			[
+				[
+					'formula' => '(D or E or F) and (C or A or B) and (G and H)',
+					'conditions' => [
+						['formulaid' => 'A'],
+						['formulaid' => 'B'],
+						['formulaid' => 'C'],
+						['formulaid' => 'D'],
+						['formulaid' => 'E'],
+						['formulaid' => 'F'],
+						['formulaid' => 'G'],
+						['formulaid' => 'H']
+					]
+				],
+				[
+					['formulaid' => 'D'],
+					['formulaid' => 'E'],
+					['formulaid' => 'F'],
+					['formulaid' => 'C'],
+					['formulaid' => 'A'],
+					['formulaid' => 'B'],
+					['formulaid' => 'G'],
+					['formulaid' => 'H']
+				]
+			],
+			[
+				[
+					'formula' => '(G or D or B or E or C or H or A or F or I or J or O) and (AA or T or W or Z or Q or'.
+						' M or Y or X or K or U or V or S or AC or P or R or L or N) or (AB and AD)',
+					'conditions' => [
+						['formulaid' => 'A'],
+						['formulaid' => 'B'],
+						['formulaid' => 'C'],
+						['formulaid' => 'D'],
+						['formulaid' => 'E'],
+						['formulaid' => 'F'],
+						['formulaid' => 'G'],
+						['formulaid' => 'H'],
+						['formulaid' => 'I'],
+						['formulaid' => 'J'],
+						['formulaid' => 'K'],
+						['formulaid' => 'L'],
+						['formulaid' => 'M'],
+						['formulaid' => 'N'],
+						['formulaid' => 'O'],
+						['formulaid' => 'P'],
+						['formulaid' => 'Q'],
+						['formulaid' => 'R'],
+						['formulaid' => 'S'],
+						['formulaid' => 'T'],
+						['formulaid' => 'U'],
+						['formulaid' => 'V'],
+						['formulaid' => 'W'],
+						['formulaid' => 'X'],
+						['formulaid' => 'Y'],
+						['formulaid' => 'Z'],
+						['formulaid' => 'AA'],
+						['formulaid' => 'AB'],
+						['formulaid' => 'AC'],
+						['formulaid' => 'AD']
+					]
+				],
+				[
+					['formulaid' => 'G'],
+					['formulaid' => 'D'],
+					['formulaid' => 'B'],
+					['formulaid' => 'E'],
+					['formulaid' => 'C'],
+					['formulaid' => 'H'],
+					['formulaid' => 'A'],
+					['formulaid' => 'F'],
+					['formulaid' => 'I'],
+					['formulaid' => 'J'],
+					['formulaid' => 'O'],
+					['formulaid' => 'AA'],
+					['formulaid' => 'T'],
+					['formulaid' => 'W'],
+					['formulaid' => 'Z'],
+					['formulaid' => 'Q'],
+					['formulaid' => 'M'],
+					['formulaid' => 'Y'],
+					['formulaid' => 'X'],
+					['formulaid' => 'K'],
+					['formulaid' => 'U'],
+					['formulaid' => 'V'],
+					['formulaid' => 'S'],
+					['formulaid' => 'AC'],
+					['formulaid' => 'P'],
+					['formulaid' => 'R'],
+					['formulaid' => 'L'],
+					['formulaid' => 'N'],
+					['formulaid' => 'AB'],
+					['formulaid' => 'AD']
+				]
 			]
 		];
 	}

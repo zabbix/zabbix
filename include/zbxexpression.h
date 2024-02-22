@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 #define ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define ZBX_MACRO_TYPE_TRIGGER_COMMENTS		0x00000020	/* description */
 #define ZBX_MACRO_TYPE_ITEM_KEY			0x00000040
-#define ZBX_MACRO_TYPE_INTERFACE_ADDR		0x00000080
 #define ZBX_MACRO_TYPE_COMMON			0x00000100
 #define ZBX_MACRO_TYPE_PARAMS_FIELD		0x00000200
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400
@@ -61,7 +60,7 @@
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
-#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
+#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO | ZBX_TOKEN_USER_FUNC_MACRO)
 
 /* group - hostids cache */
 typedef struct
@@ -126,18 +125,6 @@ typedef struct
 }
 zbx_expression_eval_t;
 
-typedef struct
-{
-	int			op;
-	int			numeric_search;
-	char			*pattern2;
-	zbx_uint64_t		pattern_ui64;
-	zbx_uint64_t		pattern2_ui64;
-	double			pattern_dbl;
-	zbx_vector_expression_t	regexps;
-}
-zbx_eval_count_pattern_data_t;
-
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event,
 		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
@@ -198,11 +185,4 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
-
-int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
-		int limit, int *count, char **error);
-
-int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
-		zbx_eval_count_pattern_data_t *pdata, char **error);
-void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
 #endif

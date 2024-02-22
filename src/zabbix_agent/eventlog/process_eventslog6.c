@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,6 +184,8 @@ BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DW
 #define	VAR_EVENT_DATA_STRING_ARRAY(p, i)	(p[7].StringArr[i])
 #define	VAR_EVENT_DATA_TYPE(p)			(p[7].Type)
 #define	VAR_EVENT_DATA_COUNT(p)			(p[7].Count)
+
+ZBX_VECTOR_IMPL(prov_meta, provider_meta_t)
 
 /* gets handles of Event Log */
 static int	zbx_get_handle_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *query,
@@ -441,56 +443,123 @@ out:
 	return ret;
 }
 
+static EVT_HANDLE	open_publisher_metadata(const wchar_t *pname, const char* utf8_name)
+{
+	EVT_HANDLE handle;
+
+	if (NULL == (handle = EvtOpenPublisherMetadata(NULL, pname, NULL, 0, 0)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s", utf8_name,
+				zbx_strerror_from_system(GetLastError()));
+	}
+
+	return handle;
+}
+
+static int	get_publisher_metadata(zbx_vector_prov_meta_t *prov_meta, const wchar_t *pname, int force_fetch,
+		EVT_HANDLE *dest)
+{
+	char		*tmp_pname = zbx_unicode_to_utf8(pname);
+	int		index, ret = FAIL;
+	provider_meta_t	p_meta;
+
+	p_meta.name = tmp_pname;
+
+	if (FAIL == (index = zbx_vector_prov_meta_bsearch((const zbx_vector_prov_meta_t *)prov_meta,
+			p_meta, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	{
+		if (NULL == (*dest = open_publisher_metadata(pname, tmp_pname)))
+			goto out;
+
+		p_meta.name = zbx_strdup(NULL, tmp_pname);
+		p_meta.handle = *dest;
+
+		index = zbx_vector_prov_meta_nearestindex(prov_meta, p_meta, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_prov_meta_insert(prov_meta, p_meta, index);
+
+		ret = SUCCEED;
+	}
+	else {
+		if (1 == force_fetch)
+		{
+			if (NULL == (*dest = open_publisher_metadata(pname, tmp_pname)))
+				goto out;
+
+			prov_meta->values[index].handle = *dest;
+		}
+		else
+			*dest = prov_meta->values[index].handle;
+
+		ret = SUCCEED;
+	}
+out:
+	zbx_free(tmp_pname);
+
+	return ret;
+}
+
 /* expands string message from specific event handler */
-static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event)
+static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_prov_meta_t *prov_meta)
 {
 	wchar_t		*pmessage = NULL;
 	EVT_HANDLE	provider = NULL;
 	DWORD		require = 0;
-	char		*out_message = NULL, *tmp_pname = NULL;
+	char		*out_message = NULL;
+	int		refetch_done = 0;
+	DWORD		error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (provider = EvtOpenPublisherMetadata(NULL, pname, NULL, 0, 0)))
-	{
-		tmp_pname = zbx_unicode_to_utf8(pname);
-		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s",
-				tmp_pname, zbx_strerror_from_system(GetLastError()));
-		zbx_free(tmp_pname);
-		goto out;
-	}
+	if (FAIL == get_publisher_metadata(prov_meta, pname, 0, &provider))
+		goto err;
 
-	if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
+	while (1)
 	{
-		if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+		if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
 		{
-			DWORD	error = ERROR_SUCCESS;
+			int	last_err = GetLastError();
 
-			pmessage = zbx_malloc(pmessage, sizeof(WCHAR) * require);
-
-			if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, require,
-					pmessage, &require))
+			if (ERROR_INSUFFICIENT_BUFFER == last_err)
 			{
-				error = GetLastError();
+				error = ERROR_SUCCESS;
+
+				pmessage = zbx_malloc(pmessage, sizeof(WCHAR) * require);
+
+				if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent,
+						require, pmessage, &require))
+				{
+					error = GetLastError();
+				}
+
+				if (ERROR_SUCCESS == error || ERROR_EVT_UNRESOLVED_VALUE_INSERT == error ||
+						ERROR_EVT_UNRESOLVED_PARAMETER_INSERT == error ||
+						ERROR_EVT_MAX_INSERTS_REACHED == error)
+				{
+					out_message = zbx_unicode_to_utf8(pmessage);
+					goto out;
+				}
+				else
+					break;
 			}
-
-			if (ERROR_SUCCESS == error || ERROR_EVT_UNRESOLVED_VALUE_INSERT == error ||
-					ERROR_EVT_UNRESOLVED_PARAMETER_INSERT == error ||
-					ERROR_EVT_MAX_INSERTS_REACHED == error)
+			else if (ERROR_INVALID_HANDLE == last_err)
 			{
-				out_message = zbx_unicode_to_utf8(pmessage);
+				if (1 == refetch_done)
+					break;
+
+				refetch_done = 1;
+
+				if (FAIL == get_publisher_metadata(prov_meta, pname, 1, &provider))
+					break;
 			}
 			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot format message: %s", __func__,
-						zbx_strerror_from_system(error));
-				goto out;
-			}
+				break;
 		}
+		else
+			goto out;
 	}
+err:
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot format message: %s", __func__, zbx_strerror_from_system(error));
 out:
-	if (NULL != provider)
-		EvtClose(provider);
 	zbx_free(pmessage);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, out_message);
@@ -599,6 +668,7 @@ cleanup:
  *             event_bookmark - [IN/OUT] handle of Event record for parsing   *
  *             which          - [IN/OUT] position of Event Log record         *
  *             ...            - [OUT] ELR detail                              *
+ *             prov_meta      - [IN/OUT] provider metadata cache              *
  *             error          - [OUT] error message in case of failure        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -607,7 +677,8 @@ cleanup:
 static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *render_context,
 		EVT_HANDLE *event_bookmark, zbx_uint64_t *which, unsigned short *out_severity,
 		unsigned long *out_timestamp, char **out_provider, char **out_source, char **out_message,
-		unsigned long *out_eventid, zbx_uint64_t *out_keywords, char **error)
+		unsigned long *out_eventid, zbx_uint64_t *out_keywords, zbx_vector_prov_meta_t *prov_meta,
+		int gather_evt_msg, char **error)
 {
 #define EVT_VARIANT_TYPE_ARRAY	128
 #define EVT_VARIANT_TYPE_MASK	0x7f
@@ -656,7 +727,11 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	*out_severity = VAR_LEVEL(renderedContent);
 	*out_timestamp = (unsigned long)((VAR_TIME_CREATED(renderedContent) - sec_1970) / 10000000);
 	*out_eventid = VAR_EVENT_ID(renderedContent);
-	*out_message = expand_message6(pprovider, *event_bookmark);
+
+	if (1 == gather_evt_msg)
+		*out_message = expand_message6(pprovider, *event_bookmark, prov_meta);
+	else
+		*out_message = zbx_strdup(NULL, "");
 
 	if (NULL != *out_message)
 		replace_sids_to_accounts(*event_bookmark, out_message);
@@ -729,57 +804,63 @@ out:
 #undef EVT_VARIANT_TYPE_MASK
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose:  processes Event Log file in batch                                *
- *                                                                            *
- * Parameters: addrs            - [IN] vector for passing server and port     *
- *                                     where to send data                     *
- *             agent2_result    - [IN] address of buffer where to store       *
- *                                     matching log records (used only in     *
- *                                     Agent2)                                *
- *             eventlog_name    - [IN]                                        *
- *             render_context   - [IN] handle to rendering context            *
- *             query            - [IN] handle to query results                *
- *             lastlogsize      - [IN] position of last processed record      *
- *             FirstID          - [IN] first record in Event Log file         *
- *             LastID           - [IN] last record in Event Log file          *
- *             regexps          - [IN] set of regexp rules for Event Log test *
- *             pattern          - [IN] regular expression or global regular   *
- *                                     expression name (@<global regexp       *
- *                                     name>).                                *
- *             key_severity     - [IN] severity of logged data sources        *
- *             key_source       - [IN] name of logged data source             *
- *             key_logeventid   - [IN] application-specific identifier for    *
- *                                     event                                  *
- *             rate             - [IN] threshold of records count at time     *
- *             process_value_cb - [IN] callback function for sending data to  *
- *                                     server                                 *
- *             config_tls       - [IN]                                        *
- *             config_timeout   - [IN]                                        *
- *             config_source_ip - [IN]                                        *
- *             config_hostname  - [IN]                                        *
- *             metric           - [IN/OUT] parameters for Event Log process   *
- *             lastlogsize_sent - [OUT] position of last record sent to       *
- *                                      server                                *
- *             error            - [OUT] error message in case of failure      *
- *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose:  processes Event Log file in batch                                  *
+ *                                                                              *
+ * Parameters: addrs              - [IN] vector for passing server and port     *
+ *                                       where to send data                     *
+ *             agent2_result      - [IN] address of buffer where to store       *
+ *                                       matching log records (used only in     *
+ *                                       Agent2)                                *
+ *             eventlog_name      - [IN]                                        *
+ *             render_context     - [IN] handle to rendering context            *
+ *             query              - [IN] handle to query results                *
+ *             lastlogsize        - [IN] position of last processed record      *
+ *             FirstID            - [IN] first record in Event Log file         *
+ *             LastID             - [IN] last record in Event Log file          *
+ *             regexps            - [IN] set of regexp rules for Event Log test *
+ *             pattern            - [IN] regular expression or global regular   *
+ *                                       expression name (@<global regexp       *
+ *                                       name>).                                *
+ *             key_severity       - [IN] severity of logged data sources        *
+ *             key_source         - [IN] name of logged data source             *
+ *             key_logeventid     - [IN] application-specific identifier for    *
+ *                                       event                                  *
+ *             rate               - [IN] threshold of records count at time     *
+ *             process_value_cb   - [IN] callback function for sending data to  *
+ *                                       server                                 *
+ *             config_tls         - [IN]                                        *
+ *             config_timeout     - [IN]                                        *
+ *             config_source_ip   - [IN]                                        *
+ *             config_hostname    - [IN]                                        *
+ *             config_buffer_send - [IN]                                        *
+ *             config_buffer_size - [IN]                                        *
+ *             metric             - [IN/OUT] parameters for Event Log process   *
+ *             lastlogsize_sent   - [OUT] position of last record sent to       *
+ *                                        server                                *
+ *             prov_meta          - [IN/OUT] provider metadata cache            *
+ *             error              - [OUT] error message in case of failure      *
+ *                                                                              *
+ * Return value: SUCCEED or FAIL                                                *
+ *                                                                              *
+ ********************************************************************************/
 int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *eventlog_name, EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize,
 		zbx_uint64_t FirstID, zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern,
 		const char *key_severity, const char *key_source, const char *key_logeventid, int rate,
 		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
-		zbx_uint64_t *lastlogsize_sent, char **error)
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
+		int config_buffer_size, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent,
+		zbx_vector_prov_meta_t *prov_meta, char **error)
 {
 #define EVT_ARRAY_SIZE	100
+#define EVT_LOG_ITEM 0
+#define EVT_LOG_COUNT_ITEM 1
 	const char	*str_severity;
 	zbx_uint64_t	keywords, i, reading_startpoint = 0;
 	wchar_t		*eventlog_name_w = NULL;
-	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED;
+	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED, evt_item_type;
 	DWORD		required_buf_size = 0, error_code = ERROR_SUCCESS;
 
 	unsigned long	evt_timestamp, evt_eventid = 0;
@@ -791,10 +872,15 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 			ZBX_FS_UI64 ", LastID: " ZBX_FS_UI64, __func__, eventlog_name, lastlogsize, FirstID,
 			LastID);
 
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
+		evt_item_type = EVT_LOG_COUNT_ITEM;
+	else
+		evt_item_type = EVT_LOG_ITEM;
+
 	/* update counters */
 	if (1 == metric->skip_old_data)
 	{
-		metric->lastlogsize = LastID - 1;
+		metric->lastlogsize = lastlogsize = LastID - 1;
 		metric->skip_old_data = 0;
 		zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data: lastlogsize:" ZBX_FS_UI64, lastlogsize);
 		goto finish;
@@ -835,11 +921,16 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 		for (i = 0; i < required_buf_size; i++)
 		{
+			int	gather_evt_msg = 1;
+
+			if (EVT_LOG_COUNT_ITEM == evt_item_type && 1 > strlen(pattern))
+				gather_evt_msg = 0;
+
 			lastlogsize += 1;
 
 			if (SUCCEED != zbx_parse_eventlog_message6(eventlog_name_w, render_context, &event_bookmarks[i],
 					&lastlogsize, &evt_severity, &evt_timestamp, &evt_provider, &evt_source,
-					&evt_message, &evt_eventid, &keywords, error))
+					&evt_message, &evt_eventid, &keywords, prov_meta, gather_evt_msg, error))
 			{
 				goto out;
 			}
@@ -951,17 +1042,23 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 			if (1 == match)
 			{
-				send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig,
-						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
-						evt_provider, &evt_severity, &evt_eventid,
-						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-						config_timeout, config_source_ip);
-
-				if (SUCCEED == send_err)
+				if (EVT_LOG_ITEM == evt_item_type)
 				{
-					*lastlogsize_sent = lastlogsize;
-					s_count++;
+					send_err = process_value_cb(addrs, agent2_result, config_hostname,
+							metric->key_orig, evt_message, ITEM_STATE_NORMAL, &lastlogsize,
+							NULL, &evt_timestamp, evt_provider, &evt_severity, &evt_eventid,
+							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
+							config_timeout, config_source_ip, config_buffer_send,
+							config_buffer_size);
+
+					if (SUCCEED == send_err)
+					{
+						*lastlogsize_sent = lastlogsize;
+						s_count++;
+					}
 				}
+				else
+					s_count++;
 			}
 			p_count++;
 
@@ -969,15 +1066,18 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 			zbx_free(evt_provider);
 			zbx_free(evt_message);
 
-			if (SUCCEED == send_err)
+			if (EVT_LOG_ITEM == evt_item_type)
 			{
-				metric->lastlogsize = lastlogsize;
-			}
-			else
-			{
-				/* buffer is full, stop processing active checks */
-				/* till the buffer is cleared */
-				break;
+				if (SUCCEED == send_err)
+				{
+					metric->lastlogsize = lastlogsize;
+				}
+				else
+				{
+					/* buffer is full, stop processing active checks */
+					/* till the buffer is cleared */
+					break;
+				}
 			}
 
 			/* do not flood Zabbix server if file grows too fast */
@@ -994,6 +1094,23 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 	}
 finish:
 	ret = SUCCEED;
+
+	if (EVT_LOG_COUNT_ITEM == evt_item_type)
+	{
+		char	buf[ZBX_MAX_UINT64_LEN];
+
+		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
+		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
+				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
+				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip,
+				config_buffer_send, config_buffer_size);
+
+		if (SUCCEED == send_err)
+		{
+			*lastlogsize_sent = lastlogsize;
+			metric->lastlogsize = lastlogsize;
+		}
+	}
 out:
 	for (i = 0; i < required_buf_size; i++)
 	{
@@ -1006,4 +1123,6 @@ out:
 
 	return ret;
 #undef EVT_ARRAY_SIZE
+#undef EVT_LOG_COUNT_ITEM
+#undef EVT_LOG_ITEM
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,6 +81,8 @@ typedef struct pollfd zbx_pollfd_t;
 
 #endif
 
+void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
+
 int	zbx_socket_had_nonblocking_error(void);
 
 #ifdef _WINDOWS
@@ -143,7 +145,11 @@ typedef struct
 	const char		*server;
 	const int		proxymode;
 	const int		config_timeout;
+	const int		config_trapper_timeout;
 	const char		*config_source_ip;
+	const char		*config_ssl_ca_location;
+	const char		*config_ssl_cert_location;
+	const char		*config_ssl_key_location;
 }
 zbx_config_comms_args_t;
 
@@ -234,14 +240,17 @@ zbx_tcp_send_context_t;
 
 const char	*zbx_socket_strerror(void);
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
 #endif
+int	zbx_inet_pton(int af, const char *src, void *dst);
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
 
+void	zbx_socket_clean(zbx_socket_t *s);
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout);
 
@@ -280,7 +289,8 @@ void	zbx_tcp_close(zbx_socket_t *s);
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout);
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,
+		int config_tcp_max_backlog_size);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
 int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout);
@@ -305,8 +315,10 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
 
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode);
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
 int	validate_cidr(const char *ip, const char *cidr, void *value);
 
@@ -414,7 +426,10 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 void	zbx_tls_library_deinit(zbx_tls_status_t status);
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
-void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+typedef size_t	(*zbx_find_psk_in_cache_f)(const unsigned char *, unsigned char *, unsigned int *);
+
+void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg,
+		zbx_find_psk_in_cache_f zbx_find_psk_in_cache_cb_arg);
 
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);

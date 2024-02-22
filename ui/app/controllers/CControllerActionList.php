@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ class CControllerActionList extends CController {
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 				'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
-				'opconditions', 'opmessage_usr', 'opmessage_grp'
+				'opconditions', 'opmessage_usr', 'opmessage_grp', 'optag'
 			],
 			'actionids' => array_column($data['actions'], 'actionid'),
 			'preservekeys' => true

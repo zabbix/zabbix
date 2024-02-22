@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class CTriggerManager {
 		$db_actions = DBselect(
 			'SELECT ac.conditionid,ac.actionid'.
 			' FROM conditions ac'.
-			' WHERE ac.conditiontype='.CONDITION_TYPE_TRIGGER.
+			' WHERE ac.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
 				' AND '.dbConditionString('ac.value', $del_triggerids)
 		);
 		while ($db_action = DBfetch($db_actions)) {

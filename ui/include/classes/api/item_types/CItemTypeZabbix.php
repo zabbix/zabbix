@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class CItemTypeZabbix extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	const FIELD_NAMES = ['interfaceid', 'delay'];
+	const FIELD_NAMES = ['interfaceid', 'timeout', 'delay'];
 
 	/**
 	 * @inheritDoc
@@ -36,6 +36,7 @@ class CItemTypeZabbix extends CItemType {
 	public static function getCreateValidationRules(array $item): array {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
+			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -46,6 +47,7 @@ class CItemTypeZabbix extends CItemType {
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
+			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -56,6 +58,7 @@ class CItemTypeZabbix extends CItemType {
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
+			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -66,6 +69,7 @@ class CItemTypeZabbix extends CItemType {
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
+			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
 			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}

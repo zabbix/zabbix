@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,13 @@ namespace Widgets\Gauge;
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
+
+	// Form blocks.
+	public const SHOW_DESCRIPTION = 1;
+	public const SHOW_VALUE = 2;
+	public const SHOW_NEEDLE = 3;
+	public const SHOW_SCALE = 4;
+	public const SHOW_VALUE_ARC = 5;
 
 	// Description vertical position.
 	public const DESC_V_POSITION_TOP = 0;

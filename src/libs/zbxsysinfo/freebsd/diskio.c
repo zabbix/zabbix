@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ static struct statinfo	*si = NULL;
 
 int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
-	int		i;
 	struct devstat	*ds = NULL;
 	int		ret = FAIL;
 	char		dev[DEVSTAT_NAME_LEN + 10];
@@ -41,7 +40,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 	assert(devname);
 
-	for (i = 0; i < ZBX_DSTAT_MAX; i++)
+	for (int i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
 
 	if (NULL == si)
@@ -64,7 +63,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 #endif
 		return FAIL;
 
-	for (i = 0; i < si->dinfo->numdevs; i++)
+	for (int i = 0; i < si->dinfo->numdevs; i++)
 	{
 		ds = &si->dinfo->devices[i];
 
@@ -98,12 +97,10 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char		devname[32], *tmp;
+	zbx_single_diskdevice_data	*device;
+	char		devname[32], *tmp, *pd; /* pointer to device name without '/dev/' prefix, e.g. 'da0' */;
 	int		type, mode;
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
-	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
-
 	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
@@ -178,7 +175,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		/* CPU statistics collector and (optionally) disk statistics collector is started only when Zabbix */
 		/* agentd is running as a daemon. When Zabbix agent or agentd is started with "-p" or "-t" parameter */

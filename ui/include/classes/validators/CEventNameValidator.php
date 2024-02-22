@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,12 @@ class CEventNameValidator extends CValidator {
 			'host_macro_n' => true,
 			'empty_host' => true
 		]);
-		$expr_func_macro = new CExpressionMacroFunctionParser();
+		$expr_func_macro = new CExpressionMacroFunctionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
+		]);
 
 		while (isset($value[$p])) {
 			if (substr($value, $p, 2) !== '{?') {

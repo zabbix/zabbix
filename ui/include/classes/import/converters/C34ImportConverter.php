@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,6 +154,7 @@ class C34ImportConverter extends CConverter {
 				'verify_peer', 'verify_host', 'allow_traps'
 			], ''
 		));
+		$default['timeout'] = '3s';
 		$default['query_fields'] = [];
 		$default['headers'] = [];
 
@@ -173,6 +174,7 @@ class C34ImportConverter extends CConverter {
 				'verify_host', 'allow_traps'
 			], ''
 		));
+		$default['timeout'] = '3s';
 		$default['query_fields'] = [];
 		$default['headers'] = [];
 

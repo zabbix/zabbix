@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('connector')))->removeId())
 	->setId('connector-form')
 	->setName('connector_form')
-	->addItem(getMessages());
+	->addItem(getMessages())
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -117,6 +118,43 @@ $form_grid = (new CFormGrid())
 		])
 	)
 	->addItem([
+		(new CLabel(_('Type of information'), 'item_value_types'))
+			->setAsteriskMark()
+			->addClass('js-field-item-value-types'),
+		(new CFormField(
+			(new CCheckBoxList('item_value_types'))
+				->setOptions([
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
+						'label' => _('Numeric (unsigned)'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_type']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,
+						'label' => _('Numeric (float)'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_type']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR,
+						'label' => _('Character'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_type']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG,
+						'label' => _('Log'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_type']
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT,
+						'label' => _('Text'),
+						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']
+					]
+				])
+				->setVertical()
+				->setColumns(3)
+		))->addClass('js-field-item-value-types')
+	])
+	->addItem([
 		new CLabel(_('HTTP authentication'), 'authtype-focusable'),
 		new CFormField(
 			(new CSelect('authtype'))
@@ -163,12 +201,11 @@ $form_grid = (new CFormGrid())
 			->addItem([
 				(new CLabel(_('Max records per message'), 'max_records'))->setAsteriskMark(),
 				new CFormField([
-					(new CDiv(
-						(new CRadioButtonList('max_records_mode', $data['form']['max_records_mode']))
-							->addValue(_('Unlimited'), 0)
-							->addValue(_('Custom'), 1)
-							->setModern()
-					))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CRadioButtonList('max_records_mode', $data['form']['max_records_mode']))
+						->addValue(_('Unlimited'), 0)
+						->addValue(_('Custom'), 1)
+						->setModern()
+						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -186,6 +223,16 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Attempts'), 'max_attempts'))->setAsteriskMark(),
 				new CFormField(
 					(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				)
+			])
+			->addItem([
+				(new CLabel(_('Attempt interval'), 'attempt_interval'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextBox('attempt_interval', $data['form']['attempt_interval'], false,
+						DB::getFieldLength('connector', 'attempt_interval')
+					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
 				)

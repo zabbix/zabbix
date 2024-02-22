@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ zbx_pb_state_info_t;
 #define ZBX_PB_MODE_HYBRID	2
 
 int	zbx_pb_parse_mode(const char *str, int *mode);
-int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error);
+int	zbx_pb_create(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error);
+void	zbx_pb_init(void);
 void	zbx_pb_destroy(void);
 
 void	zbx_pb_update_state(int more);

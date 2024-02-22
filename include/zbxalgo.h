@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ typedef zbx_hash_t (*zbx_hash_func_t)(const void *data);
 
 zbx_hash_t	zbx_default_ptr_hash_func(const void *data);
 zbx_hash_t	zbx_default_string_hash_func(const void *data);
+zbx_hash_t	zbx_default_string_ptr_hash_func(const void *data);
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 
 #define ZBX_DEFAULT_HASH_SEED		0
@@ -45,6 +46,7 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 #define ZBX_DEFAULT_PTR_HASH_FUNC		zbx_default_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_HASH_FUNC		zbx_hash_splittable64
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
+#define ZBX_DEFAULT_STRING_PTR_HASH_FUNC	zbx_default_string_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
 
 typedef int (*zbx_compare_func_t)(const void *d1, const void *d2);
@@ -308,6 +310,7 @@ void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector);					\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value);			\
+void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type value, int before_index);	\
 void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __type *value);			\
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num);			\
@@ -347,6 +350,7 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ #
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
+ZBX_VECTOR_DECL(int32, int)
 ZBX_PTR_VECTOR_DECL(str, char *)
 ZBX_PTR_VECTOR_DECL(ptr, void *)
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
@@ -418,6 +422,20 @@ void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type va
 {														\
 	__vector_ ## __id ## _ensure_free_space(vector);							\
 	vector->values[vector->values_num++] = value;								\
+}														\
+														\
+void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type value, int before_index)	\
+{														\
+	__vector_ ## __id ## _ensure_free_space(vector);							\
+														\
+	if (0 < vector->values_num - before_index)								\
+	{													\
+		memmove(vector->values + before_index + 1, vector->values + before_index,			\
+				(vector->values_num - before_index) * sizeof(__type));				\
+	}													\
+														\
+	vector->values_num++;											\
+	vector->values[before_index] = value;									\
 }														\
 														\
 void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __type *value)			\

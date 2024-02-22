@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,16 +40,25 @@ window.connector_edit_popup = new class {
 			allow_empty: true
 		});
 
-		for (const id of ['tags', 'authtype', 'max_records_mode']) {
+		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode', 'max_attempts']) {
 			document.getElementById(id).addEventListener('change', () => this._updateForm());
 		}
 
 		this._updateForm();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
+
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	_updateForm() {
+		const data_type = this.form.querySelector('[name="data_type"]:checked').value;
+
+		for (const element of this.form.querySelectorAll('.js-field-item-value-types')) {
+			element.style.display = data_type == <?= ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ?> ? '' : 'none';
+		}
+
 		for (const tag_operator of document.getElementById('tags').querySelectorAll('.js-tag-operator')) {
 			const tag_value = tag_operator.closest('.form_row').querySelector('.js-tag-value');
 
@@ -72,6 +81,8 @@ window.connector_edit_popup = new class {
 
 		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
 		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
+
+		document.getElementById('attempt_interval').disabled = document.getElementById('max_attempts').value <= 1;
 	}
 
 	clone({title, buttons}) {
@@ -79,6 +90,8 @@ window.connector_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {
@@ -91,7 +104,7 @@ window.connector_edit_popup = new class {
 		this._post(curl.getUrl(), {connectorids: [this.connectorid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
@@ -102,8 +115,8 @@ window.connector_edit_popup = new class {
 			fields.connectorid = this.connectorid;
 		}
 
-		const fields_to_trim = ['name', 'url', 'username', 'token', 'timeout', 'http_proxy', 'ssl_cert_file',
-			'ssl_key_file', 'description'
+		const fields_to_trim = ['name', 'url', 'username', 'token', 'attempt_interval', 'timeout', 'http_proxy',
+			'ssl_cert_file', 'ssl_key_file', 'description'
 		];
 		for (const field of fields_to_trim) {
 			if (field in fields) {

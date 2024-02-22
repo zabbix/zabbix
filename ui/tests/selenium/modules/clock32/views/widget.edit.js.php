@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,17 +51,8 @@ window.widget_clock_form = new class {
 			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
-		const show = [this._show_date, this._show_time, this._show_tzone];
-
-		for (const checkbox of show) {
-			checkbox.addEventListener('change', (e) => {
-				if (show.filter((checkbox) => checkbox.checked).length > 0) {
-					this.updateForm();
-				}
-				else {
-					e.target.checked = true;
-				}
-			});
+		for (const checkbox of [this._show_date, this._show_time, this._show_tzone]) {
+			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
 		this.updateForm();

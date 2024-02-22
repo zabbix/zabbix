@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,12 +30,11 @@ class CWidgetFieldRadioButtonListView extends CWidgetFieldView {
 	public function getView(): CRadioButtonList {
 		$view = (new CRadioButtonList($this->field->getName(), $this->field->getValue()))
 			->setModern()
-			->setAriaRequired($this->isRequired());
+			->setAriaRequired($this->isRequired())
+			->setEnabled(!$this->isDisabled());
 
 		foreach ($this->field->getValues() as $key => $value) {
-			$view
-				->addValue($value, $key, null, $this->field->getAction())
-				->setEnabled(!$this->isDisabled());
+			$view->addValue($value, $key, null, $this->field->getAction());
 		}
 
 		return $view;

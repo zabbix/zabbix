@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ static int	db_trigger_expand_macros(const zbx_db_trigger *trigger, zbx_eval_cont
 	um_handle = zbx_dc_open_user_macros();
 
 	(void)zbx_eval_expand_user_macros(ctx, cache->hostids.values, cache->hostids.values_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, NULL);
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, NULL);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -160,7 +160,15 @@ static int	db_trigger_expand_macros(const zbx_db_trigger *trigger, zbx_eval_cont
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (ZBX_VARIANT_NONE != token->value.type)
 				{
-					zbx_variant_convert(&token->value, ZBX_VARIANT_STR);
+					if (FAIL == zbx_variant_convert(&token->value, ZBX_VARIANT_STR))
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "cannot convert value from %s to %s",
+								zbx_variant_type_desc(&token->value),
+								zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+
+						THIS_SHOULD_NEVER_HAPPEN;
+						return FAIL;
+					}
 					value = token->value.data.str;
 					zbx_variant_set_none(&token->value);
 					break;
@@ -607,7 +615,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 
 			evaluate_item.itemid = item.itemid;
 			evaluate_item.value_type = item.value_type;
-			evaluate_item.proxy_hostid = item.host.proxy_hostid;
+			evaluate_item.proxyid = item.host.proxyid;
 			evaluate_item.host = item.host.host;
 			evaluate_item.key_orig = item.key_orig;
 

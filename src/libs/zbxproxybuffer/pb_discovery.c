@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -295,7 +295,7 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
 		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
-				"dcheckid", "dns", NULL);
+				"dcheckid", "dns", (char *)NULL);
 
 		do
 		{
@@ -488,7 +488,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 	else
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
-				"value", "status", "dcheckid", "dns", NULL);
+				"value", "status", "dcheckid", "dns", (char *)NULL);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

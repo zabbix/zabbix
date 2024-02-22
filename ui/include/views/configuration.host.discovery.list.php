@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ $filter_column1 = (new CFormList())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -116,7 +116,7 @@ $filter_type_visibility = [];
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setFocusableElementId('label-type')
-	->addOption(new CSelectOption(-1, _('all')))
+	->addOption(new CSelectOption(-1, _('All')))
 	->setValue($data['filter']['type']);
 
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
@@ -160,7 +160,7 @@ $filter_column3 = (new CFormList());
 if ($data['context'] === 'host') {
 	$filter_column3->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter']['state']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Normal'), ITEM_STATE_NORMAL)
 			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 			->setModern(true)
@@ -169,9 +169,10 @@ if ($data['context'] === 'host') {
 
 $filter_column3->addRow(_('Status'),
 	(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+		->setEnabled($data['context'] !== 'host' || $data['filter']['state'] == -1)
 		->setModern(true)
 );
 
@@ -224,15 +225,12 @@ foreach ($data['discoveries'] as $discovery) {
 			$description[] = $discovery['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink($discovery['master_item']['name'],
-				(new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $discovery['master_item']['itemid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			))
+			$description[] = (new CLink($discovery['master_item']['name']))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL);
+				->addClass(ZBX_STYLE_TEAL)
+				->addClass('js-update-item')
+				->setAttribute('data-itemid', $discovery['master_item']['itemid'])
+				->setAttribute('data-context', $data['context']);
 		}
 
 		$description[] = NAME_DELIMITER;
@@ -266,7 +264,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
 			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
@@ -296,7 +294,8 @@ foreach ($data['discoveries'] as $discovery) {
 		$description,
 		[
 			new CLink(_('Item prototypes'),
-				(new CUrl('disc_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
@@ -304,7 +303,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Trigger prototypes'),
-				(new CUrl('trigger_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
@@ -355,8 +355,8 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'discoveryrule.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massexecute-item')
 				->addClass('js-no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		]
@@ -383,8 +383,11 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'context' => $data['context'],
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'g_hostdruleid'
+		'checkbox_object' => 'g_hostdruleid',
+		'form_name' => $discoveryForm->getName(),
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

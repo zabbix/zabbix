@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ window.token_edit_popup = {
 				else {
 					overlayDialogueDestroy(this.overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 						detail: {
 							success: response.success
 						}
@@ -136,7 +136,7 @@ window.token_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 					detail: {
 						success: response.success
 					}
@@ -233,7 +233,7 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAfterUpdate,
+				this.overlay.$dialogue[0].addEventListener('dialogue.close', this.events.overlayCloseAfterUpdate,
 					{once: true}
 				);
 
@@ -247,7 +247,7 @@ window.token_edit_popup = {
 
 	events: {
 		overlayCloseAfterUpdate() {
-			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {detail: {}}));
+			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
 		}
 	}
 };

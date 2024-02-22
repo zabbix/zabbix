@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
-#include "zbxpreproc.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -92,6 +91,27 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 #define ZBX_STATS_HISTORY_BIN_COUNTER	22
+
+/* 'zbx_pp_value_opt_t' element 'flags' values */
+#define ZBX_PP_VALUE_OPT_NONE		0x0000	/* 'zbx_pp_value_opt_t' has no data */
+#define ZBX_PP_VALUE_OPT_META		0x0001	/* 'zbx_pp_value_opt_t' has log metadata ('mtime' and 'lastlogsize') */
+#define ZBX_PP_VALUE_OPT_LOG		0x0002	/* 'zbx_pp_value_opt_t' has 'timestamp', 'severity', 'logeventid' and */
+						/* 'source' data */
+
+/* This structure is complementary data if value comes from preprocessing. */
+typedef struct
+{
+	zbx_uint32_t	flags;
+	int		mtime;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	zbx_uint64_t	lastlogsize;
+	char		*source;
+}
+zbx_pp_value_opt_t;
+
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 
 void	*zbx_dc_get_stats(int request);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);

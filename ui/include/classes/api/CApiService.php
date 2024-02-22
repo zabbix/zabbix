@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ class CApiService {
 	public static $userData;
 
 	public const ACCESS_RULES = [];
+	public const OUTPUT_FIELDS = [];
 
 	/**
 	 * The name of the table.
@@ -371,7 +372,7 @@ class CApiService {
 	 * @param string $tableName
 	 * @param array  $options
 	 *
-	 * @return array
+	 * @return string
 	 */
 	protected function createSelectQuery($tableName, array $options) {
 		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
@@ -481,59 +482,153 @@ class CApiService {
 	}
 
 	/**
-	 * Modifies the SQL parts to implement all of the output related options.
+	 * Modifies the SQL parts to implement all the output related options.
 	 *
-	 * @param string $tableName
-	 * @param string $tableAlias
+	 * @param string $table_name
+	 * @param string $table_alias
 	 * @param array  $options
-	 * @param array  $sqlParts
+	 * @param array  $sql_parts
 	 *
-	 * @return array		The resulting SQL parts array
+	 * @throws Exception
+	 *
+	 * @return array  The resulting SQL parts array.
 	 */
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pk = $this->pk($tableName);
-		$pk_composite = (strpos($pk, ',') !== false);
+	protected function applyQueryOutputOptions(string $table_name, string $table_alias, array $options,
+			array $sql_parts) {
+		$pk = $this->pk($table_name);
+		$pk_composite = strpos($pk, ',') !== false;
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-
-			$has_joins = (count($sqlParts['from']) > 1
-					|| (array_key_exists('left_join', $sqlParts) && $sqlParts['left_join']));
+			$has_joins = count($sql_parts['from']) > 1
+				|| (array_key_exists('left_join', $sql_parts) && $sql_parts['left_join']);
 
 			if ($pk_composite && $has_joins) {
 				throw new Exception('Joins with composite primary keys are not supported in this API version.');
 			}
 
-			$sqlParts['select'] = $has_joins
-				? ['COUNT(DISTINCT '.$this->fieldId($pk, $tableAlias).') AS rowscount']
+			$sql_parts['select'] = $has_joins
+				? ['COUNT(DISTINCT '.$this->fieldId($pk, $table_alias).') AS rowscount']
 				: ['COUNT(*) AS rowscount'];
 
 			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
-				foreach ($sqlParts['group'] as $fields) {
-					$sqlParts['select'][] = $fields;
+				foreach ($sql_parts['group'] as $fields) {
+					$sql_parts['select'][] = $fields;
 				}
+			}
+			elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+				foreach ($options['groupBy'] as $field) {
+					$field = $this->fieldId($field, $table_alias);
+
+					array_unshift($sql_parts['select'], $field);
+					$sql_parts['group'][] = $field;
+				}
+			}
+		}
+		elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+			$sql_parts['select'] = [];
+
+			foreach ($options['groupBy'] as $field) {
+				$field = $this->fieldId($field, $table_alias);
+
+				array_unshift($sql_parts['select'], $field);
+				$sql_parts['group'][] = $field;
 			}
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			$sqlParts['select'] = $pk_composite ? [] : [$this->fieldId($pk, $tableAlias)];
+			$sql_parts['select'] = $pk_composite ? [] : [$this->fieldId($pk, $table_alias)];
 
 			foreach ($options['output'] as $field) {
-				if ($this->hasField($field, $tableName)) {
-					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
+				if ($this->hasField($field, $table_name)) {
+					$sql_parts['select'][] = $this->fieldId($field, $table_alias);
 				}
 			}
 
-			$sqlParts['select'] = array_unique($sqlParts['select']);
+			$sql_parts['select'] = array_unique($sql_parts['select']);
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
 			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
-			$sqlParts = $this->addQuerySelect($this->fieldId('*', $tableAlias), $sqlParts);
+			$sql_parts = $this->addQuerySelect($this->fieldId('*', $table_alias), $sql_parts);
 		}
 
-		return $sqlParts;
+		return $sql_parts;
+	}
+
+	/**
+	 * Unset the NCLOB fields from output of the given options, if SQL query contains DISTINCT statement. Replace the
+	 * API_OUTPUT_EXTEND value in output of the given options to self::OUTPUT_FIELDS (if defined) or to all fields that
+	 * are specified in table schema.
+	 *
+	 * @param array $options
+	 * @param array $sql_parts
+	 */
+	protected function unsetNclobFieldsFromOutput(array &$options, array $sql_parts): void {
+		if ($options['countOutput'] || !self::dbDistinct($sql_parts)) {
+			return;
+		}
+
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
+
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB
+					&& $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
+			}
+		}
+
+		if ($nclob_fields) {
+			if ($options['output'] === API_OUTPUT_EXTEND) {
+				$output = self::OUTPUT_FIELDS
+					? self::OUTPUT_FIELDS
+					: array_keys($schema['fields']);
+			}
+			else {
+				$output = $options['output'];
+			}
+
+			$options['output'] = array_diff($output, $nclob_fields);
+		}
+	}
+
+	/**
+	 * Add NCLOB type fields if there was DISTINCT in query.
+	 *
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 *
+	 * @return array    The result array with added NCLOB fields.
+	 */
+	protected function addNclobFieldValues(array $options, array $result): array {
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
+
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
+			}
+		}
+
+		if (!$nclob_fields) {
+			return $result;
+		}
+
+		$pk = $schema['key'];
+		$options = [
+			'output' => $nclob_fields,
+			'filter' => [$pk => array_keys($result)]
+		];
+
+		$db_items = DBselect(DB::makeSql($this->tableName, $options));
+
+		while ($db_item = DBfetch($db_items)) {
+			$result[$db_item[$pk]] += $db_item;
+		}
+
+		return $result;
 	}
 
 	/**
@@ -570,44 +665,64 @@ class CApiService {
 	}
 
 	/**
-	 * Modifies the SQL parts to implement all of the sorting related options.
+	 * Modifies the SQL parts to implement all the sorting related options.
 	 * Sorting is currently only supported for CApiService::get() methods.
 	 *
-	 * @param string $tableName
-	 * @param string $tableAlias
+	 * @param string $table_name
+	 * @param string $table_alias
 	 * @param array  $options
-	 * @param array  $sqlParts
+	 * @param array  $sql_parts
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($this->sortColumns && !zbx_empty($options['sortfield'])) {
+	protected function applyQuerySortOptions(string $table_name, string $table_alias, array $options,
+			array $sql_parts): array {
+		$count_output = array_key_exists('countOutput', $options) && $options['countOutput'];
+		$group_by = array_key_exists('groupBy', $options) && $options['groupBy'];
+		$aggregate_sort_columns = [];
+
+		if ($count_output && $group_by) {
+			$aggregate_sort_columns[] = 'rowscount';
+		}
+
+		$sort_columns = $group_by ? array_merge($options['groupBy'], $aggregate_sort_columns) : $this->sortColumns;
+
+		if ($sort_columns && !zbx_empty($options['sortfield'])) {
 			$options['sortfield'] = is_array($options['sortfield'])
 				? array_unique($options['sortfield'])
 				: [$options['sortfield']];
 
 			foreach ($options['sortfield'] as $i => $sortfield) {
-				// validate sortfield
-				if (!str_in_array($sortfield, $this->sortColumns)) {
-					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
+				// Validate sortfield.
+				if (!str_in_array($sortfield, $sort_columns)) {
+					throw new APIException(ZBX_API_ERROR_INTERNAL,
+						_s('Sorting by field "%1$s" not allowed.', $sortfield)
+					);
 				}
 
-				// add sort field to order
+				// Add sort field to order.
 				$sortorder = '';
 				if (is_array($options['sortorder'])) {
 					if (!empty($options['sortorder'][$i])) {
-						$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
+						$sortorder = $options['sortorder'][$i] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
 					}
 				}
 				else {
-					$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
+					$sortorder = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
 				}
 
-				$sqlParts = $this->applyQuerySortField($sortfield, $sortorder, $tableAlias, $sqlParts);
+				if (in_array($sortfield, $aggregate_sort_columns)) {
+					$sql_parts['order'][$sortfield] = $sortfield.$sortorder;
+				}
+				else {
+					$sql_parts = $this->applyQuerySortField($sortfield, $sortorder, $table_alias, $sql_parts);
+				}
 			}
 		}
 
-		return $sqlParts;
+		return $sql_parts;
 	}
 
 	/**
@@ -1254,5 +1369,14 @@ class CApiService {
 	 */
 	protected static function checkAccess(string $rule_name): bool {
 		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));
+	}
+
+	/**
+	 * Return user session ID or user API token.
+	 *
+	 * @return string
+	 */
+	public static function getAuthIdentifier(): string {
+		return array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token'];
 	}
 }

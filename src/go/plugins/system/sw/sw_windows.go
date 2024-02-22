@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,11 +76,11 @@ type system_info struct {
 	VersionFull    string `json:"version_full"`
 }
 
-func (p *Plugin) systemSwPackages(params []string) (result interface{}, err error) {
+func (p *Plugin) systemSwPackages(params []string, timeout int) (result interface{}, err error) {
 	return nil, plugin.UnsupportedMetricError
 }
 
-func (p *Plugin) systemSwPackagesGet(params []string) (result interface{}, err error) {
+func (p *Plugin) systemSwPackagesGet(params []string, timeout int) (result interface{}, err error) {
 	return nil, plugin.UnsupportedMetricError
 }
 
@@ -157,7 +157,7 @@ func getFullOSInfoString(handle registry.Key) (result string, err error) {
 	}
 
 	build, _ = getBuildString(handle, true)
-	
+
 	return createWinInfoLineOrErr([]string{name, lab, build})
 }
 

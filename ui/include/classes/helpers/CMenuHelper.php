@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ class CMenuHelper {
 					->setAliases(['chart4.php'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_TOP_TRIGGERS)
-				? (new CMenuItem(_('Triggers top 100')))->setUrl(new CUrl('toptriggers.php'), 'toptriggers.php')
+				? (new CMenuItem(_('Top 100 triggers')))->setAction('toptriggers.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AUDIT)
 				? (new CMenuItem(_('Audit log')))->setAction('auditlog.list')
@@ -175,12 +175,12 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				? (new CMenuItem(_('Templates')))
-					->setUrl(new CUrl('templates.php'), 'templates.php')
+					->setAction('template.list')
 					->setAliases([
-						'template.dashboard.list', 'template.dashboard.edit', 'items.php?context=template',
-						'triggers.php?context=template', 'graphs.php?context=template',
-						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
-						'trigger_prototypes.php?context=template', 'host_prototypes.php?context=template',
+						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
+						'trigger.list?context=template', 'graphs.php?context=template',
+						'host_discovery.php?context=template', 'item.prototype.list?context=template',
+						'trigger.prototype.list?context=template', 'host_prototypes.php?context=template',
 						'httpconf.php?context=template'
 					])
 				: null,
@@ -188,9 +188,9 @@ class CMenuHelper {
 				? (new CMenuItem(_('Hosts')))
 					->setAction('host.list')
 					->setAliases([
-						'items.php?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
-						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
-						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
+						'item.list?context=host', 'trigger.list?context=host', 'graphs.php?context=host',
+						'host_discovery.php?context=host', 'item.prototype.list?context=host',
+						'trigger.prototype.list?context=host', 'host_prototypes.php?context=host',
 						'httpconf.php?context=host', 'host.edit'
 					])
 				: null,
@@ -341,6 +341,8 @@ class CMenuHelper {
 							->setAction('gui.edit'),
 						(new CMenuItem(_('Autoregistration')))
 							->setAction('autoreg.edit'),
+						(new CMenuItem(_('Timeouts')))
+							->setAction('timeouts.edit'),
 						(new CMenuItem(_('Images')))
 							->setAction('image.list')
 							->setAliases(['image.edit']),

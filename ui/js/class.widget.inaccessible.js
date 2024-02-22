@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class CWidgetInaccessible extends CWidget {
 
 	_updateButtons() {
 		for (const button of this._header.querySelectorAll('button')) {
-			button.hidden = !button.classList.contains('js-widget-action') || !this.isEditMode();
+			button.style.display = !button.classList.contains('js-widget-action') || !this.isEditMode() ? 'none' : '';
 		}
 	}
 
@@ -44,19 +44,11 @@ class CWidgetInaccessible extends CWidget {
 		return Promise.resolve();
 	}
 
-	getActionsContextMenu({can_paste_widget}) {
-		const menu = super.getActionsContextMenu({can_paste_widget});
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget: false, can_paste_widget});
 
 		for (const section of menu) {
 			switch (section.label) {
-				case t('Actions'):
-					for (const item of section.items) {
-						if (item.label === t('Copy')) {
-							item.disabled = true;
-						}
-					}
-					break;
-
 				case t('Refresh interval'):
 					for (const item of section.items) {
 						item.disabled = true;

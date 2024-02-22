@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,8 @@ typedef enum
 {
 	ZBX_SNMP_TYPE_UNDEFINED,
 	ZBX_SNMP_TYPE_HEX,
-	ZBX_SNMP_TYPE_BITS
+	ZBX_SNMP_TYPE_BITS,
+	ZBX_SNMP_TYPE_STRING,
 }
 zbx_snmp_type_t;
 
@@ -85,6 +86,7 @@ void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache);
 
 int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg);
+int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, char **errmsg);
 
 void	preproc_init_snmp(void);
 void	preproc_shutdown_snmp(void);

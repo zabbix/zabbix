@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,10 +31,10 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid}) {
+	constructor({container, readonly, parent_hostid}) {
+		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
-		this.$container = $('#macros_container .table-forms-td-right');
 	}
 
 	load(show_inherited_macros, templateids) {
@@ -298,5 +298,13 @@ class HostMacrosManager {
 
 			$element.val(macro_part.toUpperCase() + context_part);
 		}
+	}
+
+	getManualDiscoveryState() {
+		return HostMacrosManager.DISCOVERY_STATE_MANUAL;
+	}
+
+	getDefaultMacroType() {
+		return HostMacrosManager.ZBX_MACRO_TYPE_TEXT;
 	}
 }

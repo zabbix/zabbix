@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxproxybuffer.h"
+#include "zbxpreproc.h"
 
 #define ZBX_DIAG_PROXYBUFFER_MEMORY	0x00000001
 

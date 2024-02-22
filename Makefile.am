@@ -64,33 +64,24 @@ dbschema_mysql:
 	cd database/mysql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_oracle:
 	cd database/oracle && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
-
-export tsdb_wcompr_dir = tsdb_history_pk_upgrade_with_compression
-export tsdb_nocompr_dir = tsdb_history_pk_upgrade_no_compression
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_uint.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_log.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_str.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_text.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_uint.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_log.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_str.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_text.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
+
+dbschema_timescaledb:
+	cd database/postgresql/timescaledb && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
@@ -101,7 +92,7 @@ dbschema_c:
 	cd src/libs/zbxdbschema && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
-dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
+dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_timescaledb dbschema_sqlite3 dbschema_c
 endif
 
 gettext:
@@ -130,7 +121,7 @@ css_images:
 	cp sass/favicon.ico ui/
 
 icons_build:
-	cd sass/icons
+	cd sass/icons && \
 	npm run generate
 	cp sass/icons/dist/_icons.scss sass/stylesheets/sass/base/
 	cp sass/icons/dist/zabbix-icons.svg ui/assets/fonts/
@@ -139,7 +130,7 @@ icons_build:
 	cp sass/icons/dist/zabbix-icons.woff2 ui/assets/fonts/
 
 icons_cleanup:
-	cd sass/icons
+	cd sass/icons && \
 	npm run cleanup
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images
@@ -177,7 +168,10 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets \
-	-Wl,--wrap=open
+	-Wl,--wrap=fstat \
+	-Wl,--wrap=open \
+	-Wl,--wrap=lseek \
+	-Wl,--wrap=close
 
 WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
@@ -214,4 +208,20 @@ clean: clean-recursive modules_clean
 	cd tests && $(MAKE) clean
 endif
 
-.PHONY: test tests clean modules_build modules_clean
+sbom: sbom-ui
+
+sbom-ui: ui/sbom.json
+
+ui/sbom.json:
+	(cd ${@D} && \
+		composer CycloneDX:make-sbom --omit=dev --no-interaction \
+		--spec-version=1.4 \
+		--output-reproducible --output-format=JSON --output-file="${@F}")
+
+ui/sbom.xml:
+	(cd ${@D} && \
+		composer CycloneDX:make-sbom --omit=dev --no-interaction \
+		--spec-version=1.4 \
+		--output-reproducible --output-format=XML --output-file="${@F}")
+
+.PHONY: test tests clean modules_build modules_clean sbom sbom-ui

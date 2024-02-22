@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -279,12 +279,6 @@ static int	pb_history_export(struct zbx_json *j, int records_num, const zbx_vect
 
 		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
-
-		if (ZBX_PROXY_HISTORY_FLAG_NOVALUE == (row->flags & ZBX_PROXY_HISTORY_MASK_NOVALUE))
-		{
-			if (SUCCEED != zbx_is_counted_in_item_queue(dc_items[i].type, dc_items[i].key_orig))
-				continue;
-		}
 
 		if (0 == records_num)
 			zbx_json_addarray(j, ZBX_PROTO_TAG_HISTORY_DATA);
@@ -585,7 +579,7 @@ static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_
 
 		zbx_db_insert_prepare(&db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
-				"write_clock", NULL);
+				"write_clock", (char *)NULL);
 		do
 		{
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
@@ -746,7 +740,7 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
-				"write_clock", NULL);
+				"write_clock", (char *)NULL);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

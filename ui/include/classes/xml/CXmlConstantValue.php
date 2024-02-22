@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -281,6 +281,7 @@ class CXmlConstantValue {
 	const XML_TO_JSON = ZBX_PREPROC_XML_TO_JSON;
 	const SNMP_WALK_VALUE = ZBX_PREPROC_SNMP_WALK_VALUE;
 	const SNMP_WALK_TO_JSON = ZBX_PREPROC_SNMP_WALK_TO_JSON;
+	const SNMP_GET_VALUE = ZBX_PREPROC_SNMP_GET_VALUE;
 
 	const AND_OR = CONDITION_EVAL_TYPE_AND_OR;
 	const XML_AND = CONDITION_EVAL_TYPE_AND;

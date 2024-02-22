@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #include "zbx_sysinfo_kstat.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxnum.h"
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)
@@ -321,7 +320,7 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P tcp | grep '\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = execute_int(command, result)))
+	if (SYSINFO_RET_FAIL == (res = execute_int(command, result, request->timeout)))
 		return res;
 
 	if (1 < result->ui64)
@@ -352,7 +351,7 @@ int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P udp | grep '\\.%hu[^.].*Idle' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = execute_int(command, result)))
+	if (SYSINFO_RET_FAIL == (res = execute_int(command, result, request->timeout)))
 		return res;
 
 	if (1 < result->ui64)

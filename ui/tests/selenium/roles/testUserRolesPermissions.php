@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverKeys;
@@ -33,13 +33,16 @@ use Facebook\WebDriver\WebDriverKeys;
  */
 class testUserRolesPermissions extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -613,7 +616,7 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Scheduled reports',
 						'System information',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log',
 						'Notifications'
@@ -628,7 +631,7 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Scheduled reports',
 						'Availability report',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log',
 						'Notifications'
@@ -643,7 +646,7 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log',
 						'Notifications'
@@ -654,7 +657,7 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Reports',
-					'page' => 'Triggers top 100',
+					'page' => 'Top 100 triggers',
 					'displayed_ui' => [
 						'Availability report',
 						'System information',
@@ -663,7 +666,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Action log',
 						'Notifications'
 					],
-					'link' => ['toptriggers.php']
+					'link' => ['zabbix.php?action=toptriggers.list']
 				]
 			],
 			[
@@ -674,7 +677,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Action log',
 						'Notifications'
 					],
@@ -689,7 +692,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Notifications'
 					],
@@ -704,7 +707,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Availability report',
 						'System information',
 						'Scheduled reports',
-						'Triggers top 100',
+						'Top 100 triggers',
 						'Audit log',
 						'Action log'
 					],
@@ -753,7 +756,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['templates.php']
+					'link' => ['zabbix.php?action=template.list']
 				]
 			],
 			[
@@ -1616,7 +1619,7 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();

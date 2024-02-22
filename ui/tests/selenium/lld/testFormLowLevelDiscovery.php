@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$hostid = 30000;
@@ -317,6 +317,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 		$this->zbxTestTextNotPresent('Additional parameters');
 		$this->zbxTestAssertNotVisibleId('params_ap');
+		$form_discovery = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
@@ -389,7 +390,18 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', 'walk[OID1,OID2,...]');
+
+			//Check hintbox.
+			$hint_text = "Field requirements:".
+				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+				"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON";
+
+			$form_discovery->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
+			$this->assertEquals($hint_text, $hint->one()->getText());
+			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+			$hint->waitUntilNotPresent();
 		}
 		else {
 			$this->zbxTestTextNotVisible('SNMP OID');
@@ -411,7 +423,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				if (!isset($data['form'])) {
-					$this->zbxTestAssertElementValue('delay', '1m');
+					$this->zbxTestAssertElementValue('delay', '1h');
 				}
 				break;
 			default:

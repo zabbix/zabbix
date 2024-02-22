@@ -52,6 +52,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/multiselect";
 @import "components/radio-list-control";
 @import "components/range-control";
 @import "components/section";
@@ -60,6 +61,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/subfilter";
 @import "components/svg-gauge";
 @import "components/svg-graph";
+@import "components/svg-piechart";
 @import "components/tabfilter";
 @import "components/tabs";
 @import "components/toc";
@@ -73,8 +75,8 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
+@import "components/dashboard/widget-piechart";
 @import "components/dashboard/widget-problemsbysv";
-@import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/dashboard/widget-url";
@@ -209,18 +211,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 }
 
+.host-dashboard-header-navigation,
 .header-navigation {
-	display: inline-block;
-	position: relative;
-	margin: 0 0 5px;
-	z-index: 3;
-	max-width: calc(100% - 200px);
 	min-height: 24px;
 
 	& > ul {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
 
 		& > li {
 			margin-right: 5px;
@@ -228,8 +224,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 			> ul {
 				display: flex;
-				align-items: baseline;
-				flex-wrap: wrap;
 
 				li {
 					margin-right: 5px;
@@ -243,16 +237,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 					}
 				}
 			}
-
-			.status-container {
-				margin-right: 5px;
-				vertical-align: text-bottom;
-			}
 		}
 
 		li > span {
 			display: inline-block;
 			padding: 2px 7px;
+			margin: 1px 0;
 			line-height: 18px;
 			white-space: nowrap;
 			vertical-align: top;
@@ -261,15 +251,98 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			max-width: 250px;
 
 			a {
+				margin-top: 2px;
 				vertical-align: top;
 				text-overflow: ellipsis;
 				overflow: hidden;
 				max-width: 200px;
 				display: inline-block;
-				margin-top: 2px;
 				line-height: 14px;
 			}
+		}
+	}
+}
 
+.host-dashboard-header-navigation {
+	display: grid;
+	grid-template-columns: max-content 1fr max-content;
+	column-gap: 10px;
+
+	.host-dashboard-navigation {
+		display: grid;
+		grid-template-columns: max-content 1fr max-content;
+		column-gap: 5px;
+
+		.host-dashboard-navigation-tabs {
+			@extend .dashboard-navigation-tabs;
+
+			margin: -2px 0;
+		}
+
+		.host-dashboard-navigation-controls {
+			.btn-icon:not(:first-child) {
+				margin-left: 5px;
+			}
+		}
+	}
+
+	.filter-space {
+		display: contents;
+
+		.filter-container {
+			grid-column: 1 / -1;
+		}
+
+		li .ui-tabs-anchor {
+			vertical-align: top;
+		}
+
+		ul.ui-tabs-nav li:focus {
+			outline: none;
+		}
+
+		.filter-btn-container {
+			height: 29px;
+			z-index: 2;
+		}
+
+		.ui-tabs-nav {
+			height: 29px;
+			border-bottom: 0;
+
+			a {
+				display: inline-block;
+				box-sizing: border-box;
+				line-height: 22px;
+				margin-bottom: 5px;
+				text-align: center;
+			}
+		}
+	}
+
+	& + .list-table {
+		margin-top: 4px;
+	}
+}
+
+.header-navigation {
+	display: inline-block;
+	position: relative;
+	margin: 0 0 5px;
+	z-index: 3;
+	max-width: calc(100% - 200px);
+
+	& > ul {
+		flex-wrap: wrap;
+
+		& > li {
+			.status-container {
+				margin-right: 5px;
+				vertical-align: text-bottom;
+			}
+		}
+
+		li > span {
 			&.selected {
 				background-color: $ui-bg-color;
 				border-radius: 2px;
@@ -412,6 +485,14 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+
+		span {
+			white-space: normal;
+		}
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -455,12 +536,6 @@ form {
 	word-break: break-word;
 }
 
-.overflow-table {
-	overflow-x: auto;
-	position: relative;
-	@extend %webkit-hor-scrollbar;
-}
-
 // Filters.
 .filter-btn-container {
 	position: relative;
@@ -468,11 +543,11 @@ form {
 }
 
 .filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px;
-	padding: 10px 0;
-	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -480,10 +555,6 @@ form {
 
 	.filter-forms {
 		padding: 0 10px;
-
-		.btn-grey {
-			vertical-align: baseline;
-		}
 	}
 
 	.list-table {
@@ -522,6 +593,10 @@ form {
 		button {
 			margin: 0;
 		}
+
+		table {
+			width: auto;
+		}
 	}
 
 	button {
@@ -544,194 +619,12 @@ form {
 	color: $font-color;
 	background-color: transparent;
 	border-color: transparent;
+	vertical-align: top;
 
 	&[disabled] {
 		color: $form-disabled-font-color;
 		background-color: transparent;
 		border-color: transparent;
-	}
-}
-
-.multiselect-control {
-	display: flex;
-	position: relative;
-	vertical-align: top;
-	white-space: nowrap;
-}
-
-.multiselect {
-	@extend %form-input-style;
-	display: flex;
-	flex-direction: column;
-	position: relative;
-	margin-right: 3px;
-	min-height: 24px;
-	white-space: normal;
-
-	&.active {
-		border-color: $form-focus-border-color;
-	}
-
-	&[aria-disabled] {
-		@extend %form-disabled;
-	}
-
-	input[type="text"] {
-		border: 0;
-		background: none;
-		box-sizing: border-box;
-		width: 100%;
-		padding-bottom: 2px;
-		min-height: 20px;
-	}
-
-	&.search-disabled {
-		input[type="text"] {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 0;
-			padding: 0;
-			margin: 0;
-		}
-	}
-
-	.multiselect-list {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		padding-left: 2px;
-		padding-bottom: 2px;
-
-		li {
-			display: block; // Override ".table-forms li".
-			padding-left: 0 !important;
-			margin: 2px 2px 0 0;
-			overflow: hidden;
-			white-space: nowrap;
-			cursor: default;
-
-			&.selected {
-				.subfilter-enabled {
-					background-color: $multiselect-selected-bg-color;
-				}
-			}
-		}
-
-		.subfilter-enabled {
-			padding-right: 0;
-			display: flex;
-			flex-direction: row;
-			line-height: 18px;
-
-			> span:first-child {
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-
-			.btn-icon {
-				@extend %button-size-medium;
-
-				flex-shrink: 0;
-				margin-left: 0;
-				color: $ui-selected-color;
-
-				&:hover,
-				&:focus {
-					color: $ui-selected-hover-color;
-				}
-
-				&:active,
-				&:focus {
-					box-shadow: none;
-				}
-			}
-		}
-	}
-
-	.disabled {
-		background-color: $multiselect-disabled-bg-color;
-		opacity: 1;
-
-		.subfilter-enabled {
-			background-color: $multiselect-item-disabled-bg-color;
-			color: $multiselect-item-disabled-color;
-
-			.btn-icon {
-				pointer-events: none;
-				color: $multiselect-item-disabled-color;
-			}
-		}
-	}
-
-	div[aria-live] {
-		overflow: hidden;
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		z-index: -1;
-	}
-}
-
-.multiselect-button {
-	vertical-align: top;
-}
-
-.multiselect-suggest {
-	padding: 0 5px;
-	white-space: normal;
-	color: $font-alt-color;
-	background-color: $form-bg-color;
-
-	li {
-		display: block;
-		height: inherit;
-		line-height: normal;
-		color: $font-color;
-		padding: .4em 5px;
-		margin: 0 -5px;
-		cursor: pointer;
-		overflow: hidden;
-		text-overflow: ellipsis;
-
-		@if $ui-transitions {
-			transition: background-color $ui-controls-transition-duration ease-out;
-		}
-
-		&.suggest-hover {
-			background-color: $action-hover-color;
-		}
-	}
-}
-
-.multiselect-matches {
-	padding: .4em 5px;
-	color: $font-color;
-	font-weight: bold;
-	@extend .multiselect-suggest;
-}
-
-.multiselect-available {
-	position: absolute;
-	z-index: 20000;
-	border: 1px solid $action-border-color;
-	overflow-y: auto;
-	@extend %webkit-scrollbar;
-	box-shadow: 0 6px 10px 0 $action-shadow-color;
-}
-
-.suggest-found {
-	font-weight: bold;
-	color: $dark-yellow;
-}
-
-.suggest-new {
-	border-top: 1px solid $form-border-color;
-
-	span:first-child {
-		font-weight: bold;
 	}
 }
 
@@ -799,6 +692,7 @@ form {
 	}
 
 	.table-forms-td-left {
+		position: relative;
 		display: table-cell;
 		padding: 5px 0;
 		text-align: right;
@@ -815,6 +709,12 @@ form {
 			.icon {
 				margin-left: 5px;
 			}
+		}
+
+		.checkbox-radio {
+			right: 0;
+			margin-right: 0;
+			margin-left: 0;
 		}
 	}
 
@@ -870,12 +770,11 @@ form {
 		.wrap-multiple-controls {
 			display: flex;
 		}
+	}
 
-		.table-forms-separator {
-			.radio-segmented + .multiselect-wrapper {
-				margin-top: 5px;
-			}
-		}
+	.table-subforms {
+		margin-top: -5px;
+		margin-bottom: -5px;
 	}
 
 	h4 {
@@ -1049,8 +948,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 	}
 }
 
@@ -1073,8 +971,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 
 		&:focus {
 			border-color: $form-focus-border-color;
@@ -1146,9 +1043,10 @@ select {
 	& + label {
 		span {
 			position: relative;
+			box-sizing: border-box;
 			display: inline-block;
-			width: 14px;
-			height: 14px;
+			width: 16px;
+			height: 16px;
 			margin-right: 4px;
 			vertical-align: text-bottom;
 			background-color: $form-bg-color;
@@ -1289,6 +1187,33 @@ select {
 
 	&:focus {
 		border-color: $form-focus-border-color;
+	}
+
+	&::placeholder {
+		color: $input-placeholder-color;
+		-webkit-text-fill-color: $input-placeholder-color;
+		opacity: 1;
+	}
+}
+
+.radio-list-control {
+	&.severity {
+		vertical-align: top;
+
+		label {
+			max-width: 110px;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+	}
+}
+
+.table-forms {
+	// TODO: Should be removed after migration to the form-grid.
+	.radio-list-control {
+		&.severity {
+			vertical-align: middle;
+		}
 	}
 }
 
@@ -1460,24 +1385,23 @@ select {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
-%form-disabled {
-	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color !important;
+%form-readonly {
+	color: $font-color;
+	-webkit-text-fill-color: $font-color;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
 }
 
-/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-.safari {
-	%form-disabled {
-		-webkit-text-fill-color: $form-disabled-font-color;
-	}
+%form-disabled {
+	color: $form-disabled-font-color;
+	-webkit-text-fill-color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border-color: $form-disabled-border-color;
 
-	input,
-	textarea {
-		&[readonly] {
-			-webkit-text-fill-color: $font-color !important;
-			@extend %form-disabled;
-		}
+	&::placeholder {
+		color: $input-disabled-placeholder-color;
+		-webkit-text-fill-color: $input-disabled-placeholder-color;
+		opacity: 1;
 	}
 }
 
@@ -1839,7 +1763,7 @@ select {
 		}
 
 		.overlay-dialogue-body {
-			overflow: auto;
+			overflow-y: auto;
 			overflow-x: hidden;
 			width: 100%;
 			max-height: calc(100vh - 220px);
@@ -1849,7 +1773,7 @@ select {
 			position: relative;
 			@extend %webkit-scrollbar;
 
-			> form {
+			form {
 				padding: 2px 0;
 			}
 
@@ -1959,10 +1883,10 @@ select {
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) 1fr;
 
 		&.form-grid-1-1 {
-			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+			grid-template-columns: repeat(2, minmax(100px, max-content) 1fr);
 		}
 
 		&.form-grid-3-1 {
@@ -2565,8 +2489,8 @@ select {
 		}
 	}
 
-	&:last-child {
-		margin: 0;
+	&:last-of-type {
+		margin-right: 0;
 	}
 
 	&.green-bg {
@@ -2836,25 +2760,21 @@ span {
 	}
 }
 
-.menu-popup-preloader,
-.hintbox-preloader {
+.menu-popup-preloader {
 	background: $preloader-bg-color;
 	border: 1px solid $overlay-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-	height: 128px;
-	width: 128px;
+	height: 50px;
+	width: 50px;
 	position: fixed;
 	right: auto;
 	bottom: auto;
 	z-index: 1010;
-
-	&::before {
-		background: $preloader-bg-color;
-	}
 }
 
 .hintbox-preloader {
-	position: absolute;
+	height: 50px;
+	width: 50px;
 }
 
 $browser-logos: (
@@ -2923,6 +2843,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar {
 		width: 9px;
+		height: 9px;
 	}
 
 	&::-webkit-scrollbar-track {
@@ -2933,15 +2854,6 @@ $browser-logos: (
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
-}
-
-// TODO: Legacy
-%webkit-hor-scrollbar {
-	&::-webkit-scrollbar {
-		height: 9px;
-	}
-
-	@extend %webkit-scrollbar;
 }
 
 %cursor-drag {
@@ -3334,6 +3246,10 @@ svg {
 	overflow: hidden;
 	border-radius: 2px;
 
+	.problem-icon-list-item {
+		border-radius: 0;
+	}
+
 	&:link,
 	&:hover,
 	&:focus {
@@ -3343,18 +3259,6 @@ svg {
 	&:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
-}
-
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-::placeholder {
-	color: $input-placeholder-color;
 }
 
 .ui-sortable {
@@ -3368,6 +3272,7 @@ svg {
 
 	&.ui-sortable-disabled {
 		.drag-icon {
+			cursor: default;
 			color: $btn-icon-disabled-color;
 		}
 	}
@@ -3398,6 +3303,24 @@ svg {
 #preprocessing-test-form {
 	.table-forms-separator {
 		margin-top: -2px;
+	}
+
+	.runtime-error-fields {
+		display: flex;
+		justify-content: space-between;
+
+		label {
+			width: auto;
+			padding-inline-end: 8px;
+		}
+
+		> div {
+			display: inline-flex;
+		}
+
+		.multilineinput-control {
+			width: 250px;
+		}
 	}
 }
 
@@ -3592,16 +3515,18 @@ svg {
 }
 
 .btn-split {
-	display: inline-block;
 	position: relative;
+	display: inline-block;
 	margin-right: 10px;
 
 	li {
 		display: inline-block;
 
-		&:first-child button {
-			border-top-right-radius: 0;
-			border-bottom-right-radius: 0;
+		&:first-child {
+			button {
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
 		}
 
 		&:last-child {
@@ -3610,17 +3535,25 @@ svg {
 			button {
 				border-top-left-radius: 0;
 				border-bottom-left-radius: 0;
-
-				&[aria-expanded="true"] {
-					color: $btn-color;
-					background-color: $btn-hover-bg-color;
-					border-color: $btn-hover-border-color;
-				}
 			}
 		}
 
-		&:only-child button {
-			border-radius: 2px;
+		&:only-child {
+			button {
+				border-radius: 2px;
+			}
+		}
+	}
+
+	button {
+		&:focus {
+			z-index: 1;
+		}
+
+		&[aria-expanded="true"] {
+			color: $btn-color;
+			background-color: $btn-hover-bg-color;
+			border-color: $btn-hover-border-color;
 		}
 	}
 }
@@ -3765,8 +3698,8 @@ svg {
 	.table-col-action { width: 55px; }
 }
 
-z-select,
-.z-select {
+.z-select,
+z-select {
 	&.z-select-host-interface {
 		.description:not(:empty) {
 			display: block;
@@ -3987,6 +3920,22 @@ z-select,
 	}
 }
 
+.overlay-dialogue #templates-form {
+	#macrosFormList {
+		.form-field {
+			grid-column-start: 1;
+		}
+
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
+		}
+	}
+}
+
 .linked-templates {
 	> .table-forms {
 		margin-bottom: 5px;
@@ -4082,6 +4031,11 @@ z-select,
 	&.disabled {
 		background-color: $white;
 		opacity: 1;
+
+		.geomap-filter-button {
+			cursor: default;
+			opacity: .4;
+		}
 	}
 }
 

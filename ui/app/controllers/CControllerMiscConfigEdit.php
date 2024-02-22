@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@
 
 class CControllerMiscConfigEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'url' =>							'db config.url',
 			'discovery_groupid' =>				'db config.discovery_groupid',
@@ -36,15 +36,10 @@ class CControllerMiscConfigEdit extends CController {
 			'login_block' =>					'db config.login_block',
 			'validate_uri_schemes' =>			'db config.validate_uri_schemes',
 			'uri_valid_schemes' =>				'db config.uri_valid_schemes',
+			'x_frame_header_enabled' =>			'in 0,1',
 			'x_frame_options' =>				'db config.x_frame_options',
 			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
 			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
-			'socket_timeout' =>					'db config.socket_timeout',
-			'connect_timeout' =>				'db config.connect_timeout',
-			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
-			'script_timeout' =>					'db config.script_timeout',
-			'item_test_timeout' =>				'db config.item_test_timeout',
-			'report_test_timeout' =>			'db config.report_test_timeout',
 			'vault_provider' =>					'db config.vault_provider'
 		];
 
@@ -57,11 +52,11 @@ class CControllerMiscConfigEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'url' => $this->getInput('url', CSettingsHelper::get(CSettingsHelper::URL)),
 			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
@@ -86,38 +81,18 @@ class CControllerMiscConfigEdit extends CController {
 			'uri_valid_schemes' => $this->getInput('uri_valid_schemes', CSettingsHelper::get(
 				CSettingsHelper::URI_VALID_SCHEMES
 			)),
-			'x_frame_options' => $this->getInput('x_frame_options', CSettingsHelper::get(
-				CSettingsHelper::X_FRAME_OPTIONS
-			)),
 			'iframe_sandboxing_enabled' => $this->getInput('iframe_sandboxing_enabled', CSettingsHelper::get(
 				CSettingsHelper::IFRAME_SANDBOXING_ENABLED
 			)),
 			'iframe_sandboxing_exceptions' => $this->getInput('iframe_sandboxing_exceptions', CSettingsHelper::get(
 				CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS
 			)),
-			'socket_timeout' => $this->getInput('socket_timeout', CSettingsHelper::get(
-				CSettingsHelper::SOCKET_TIMEOUT
-			)),
-			'connect_timeout' => $this->getInput('connect_timeout', CSettingsHelper::get(
-				CSettingsHelper::CONNECT_TIMEOUT
-			)),
-			'media_type_test_timeout' => $this->getInput('media_type_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT
-			)),
-			'script_timeout' => $this->getInput('script_timeout', CSettingsHelper::get(
-				CSettingsHelper::SCRIPT_TIMEOUT
-			)),
-			'item_test_timeout' => $this->getInput('item_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::ITEM_TEST_TIMEOUT
-			)),
-			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
-			))
+			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER))
 		];
 
-		$data['vault_provider'] = $this->getInput('vault_provider',
-			CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)
-		);
+		$x_frame_options = $this->getInput('x_frame_options', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
+		$data['x_frame_header_enabled'] = strcasecmp('null', $x_frame_options) == 0 ? 0 : 1;
+		$data['x_frame_options'] = $data['x_frame_header_enabled'] == 1	? $x_frame_options : '';
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],

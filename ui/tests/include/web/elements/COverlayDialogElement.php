@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,8 +35,9 @@ class COverlayDialogElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
-	public static function find() {
-		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'))->asOverlayDialog();
+	public static function find($index = null) {
+		$suffix = ($index !== null) ? '['.($index + 1).']' : '';
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'.$suffix))->asOverlayDialog();
 	}
 
 	/**
@@ -95,10 +96,24 @@ class COverlayDialogElement extends CElement {
 
 	/**
 	 * Close overlay dialog.
+	 *
+	 * @param boolean $cancel    true if cancel button, false if close (x) button
 	 */
-	public function close() {
-		$this->query('class:btn-overlay-close')->one()->click();
-		$this->ensureNotPresent();
+	public function close($cancel = false) {
+		$count = COverlayDialogElement::find()->all()->count();
+		if ($cancel) {
+			$this->getFooter()->query('button:Cancel')->one()->click();
+		}
+		else {
+			$this->query('class:btn-overlay-close')->one()->click();
+		}
+
+		if ($count === 1) {
+			self::ensureNotPresent();
+		}
+		else {
+			$this->waitUntilNotPresent();
+		}
 	}
 
 	/**

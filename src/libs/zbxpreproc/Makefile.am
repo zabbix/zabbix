@@ -9,6 +9,7 @@ libzbxpreproc_a_SOURCES = \
 	preproc_snmp.h \
 	pp_cache.c \
 	pp_cache.h \
+	pp_diag.c \
 	pp_error.c \
 	pp_error.h \
 	pp_execute.c \

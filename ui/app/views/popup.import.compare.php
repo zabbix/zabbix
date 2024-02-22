@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,119 +21,8 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-
-
-function drawToc(array $toc): CDiv {
-	$change_types_list = (new CTag('ul', true))
-		->addClass(ZBX_STYLE_TOC_LIST);
-
-	foreach ($toc as $change_type => $entity_types) {
-		$change_types_list->addItem(drawChangeType($change_type, $entity_types));
-	}
-
-	return (new CDiv())
-		->addClass(ZBX_STYLE_TOC)
-		->addItem($change_types_list);
-}
-
-function drawChangeType(string $name, array $entity_types): CTag {
-	$entity_types_list = (new CTag('ul', true))
-		->addClass(ZBX_STYLE_TOC_SUBLIST);
-
-	foreach ($entity_types as $entity_type => $entities) {
-		$entity_types_list->addItem(drawEntityType($entity_type, $entities));
-	}
-
-	return (new CTag('li', true))
-		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CSimpleButton([
-				(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name
-			]))
-				->addClass(ZBX_STYLE_TOC_ITEM)
-				->addClass(ZBX_STYLE_TOC_ARROW)
-			)
-		)
-		->addItem($entity_types_list);
-}
-
-function drawEntityType(string $name, array $entities): CTag {
-	$entities_list = (new CTag('ul', true))
-		->addClass(ZBX_STYLE_TOC_SUBLIST);
-
-	foreach ($entities as $entity) {
-		$entities_list->addItem(drawEntity($entity));
-	}
-
-	return (new CTag('li', true))
-		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CSimpleButton([
-				(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name
-			]))
-				->addClass(ZBX_STYLE_TOC_ITEM)
-				->addClass(ZBX_STYLE_TOC_ARROW)
-			)
-		)
-		->addItem($entities_list);
-}
-
-function drawEntity(array $entity): CTag {
-	return (new CTag('li', true))
-		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))
-				->addClass(ZBX_STYLE_TOC_ITEM)
-			)
-		);
-}
-
-function drawDiff(array $diff): CDiv {
-	return (new CDiv())
-		->addClass(ZBX_STYLE_DIFF)
-		->addItem(new CPre(rowsToDivs($diff)));
-}
-
-function rowsToDivs(array $rows): array {
-	$divs = [];
-
-	$first_characters = [
-		CControllerPopupImportCompare::CHANGE_NONE => ' ',
-		CControllerPopupImportCompare::CHANGE_ADDED => '+',
-		CControllerPopupImportCompare::CHANGE_REMOVED => '-'
-	];
-
-	$classes = [
-		CControllerPopupImportCompare::CHANGE_ADDED => ZBX_STYLE_DIFF_ADDED,
-		CControllerPopupImportCompare::CHANGE_REMOVED => ZBX_STYLE_DIFF_REMOVED
-	];
-
-	foreach ($rows as $row) {
-		$lines = explode("\n", $row['value']);
-
-		foreach ($lines as $index => $line) {
-			if ($line === '') {
-				continue;
-			}
-
-			$text = $first_characters[$row['change_type']] . str_repeat(' ', $row['depth'] * 2 -1) . $line . "\n";
-			$div = (new CDiv($text));
-
-			if (array_key_exists('id', $row) && $index === 0) {
-				$div->setAttribute('id', 'importcompare_toc_' . $row['id']);
-			}
-
-			if (array_key_exists($row['change_type'], $classes)) {
-				$div->addClass($classes[$row['change_type']]);
-			}
-
-			$divs[] = $div;
-		}
-	}
-
-	return $divs;
-}
 
 if (array_key_exists('error', $data)) {
 	$output = [
@@ -187,3 +76,109 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
+
+function drawToc(array $toc): CDiv {
+	$change_types_list = (new CList())->addClass(ZBX_STYLE_TOC_LIST);
+
+	foreach ($toc as $change_type => $entity_types) {
+		$change_types_list->addItem(drawChangeType($change_type, $entity_types));
+	}
+
+	return (new CDiv())
+		->addClass(ZBX_STYLE_TOC)
+		->addItem($change_types_list);
+}
+
+function drawChangeType(string $name, array $entity_types): CTag {
+	$entity_types_list = (new CList())->addClass(ZBX_STYLE_TOC_SUBLIST);
+
+	foreach ($entity_types as $entity_type => $entities) {
+		$entity_types_list->addItem(drawEntityType($entity_type, $entities));
+	}
+
+	return new CListItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_TOC_ROW)
+			->addItem(
+				(new CButtonLink([(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name]))
+					->addClass(ZBX_STYLE_TOC_ITEM)
+					->addClass(ZBX_STYLE_TOC_ARROW)
+			),
+		$entity_types_list
+	]);
+}
+
+function drawEntityType(string $name, array $entities): CTag {
+	$entities_list = (new CList())->addClass(ZBX_STYLE_TOC_SUBLIST);
+
+	foreach ($entities as $entity) {
+		$entities_list->addItem(drawEntity($entity));
+	}
+
+	return new CListItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_TOC_ROW)
+			->addItem(
+				(new CButtonLink([(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name]))
+					->addClass(ZBX_STYLE_TOC_ITEM)
+					->addClass(ZBX_STYLE_TOC_ARROW)
+			),
+		$entities_list
+	]);
+}
+
+function drawEntity(array $entity): CTag {
+	return new CListItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_TOC_ROW)
+			->addItem(
+				(new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))->addClass(ZBX_STYLE_TOC_ITEM)
+			)
+	);
+}
+
+function drawDiff(array $diff): CDiv {
+	return (new CDiv())
+		->addClass(ZBX_STYLE_DIFF)
+		->addItem(new CPre(rowsToDivs($diff)));
+}
+
+function rowsToDivs(array $rows): array {
+	$divs = [];
+
+	$first_characters = [
+		CControllerPopupImportCompare::CHANGE_NONE => ' ',
+		CControllerPopupImportCompare::CHANGE_ADDED => '+',
+		CControllerPopupImportCompare::CHANGE_REMOVED => '-'
+	];
+
+	$classes = [
+		CControllerPopupImportCompare::CHANGE_ADDED => ZBX_STYLE_DIFF_ADDED,
+		CControllerPopupImportCompare::CHANGE_REMOVED => ZBX_STYLE_DIFF_REMOVED
+	];
+
+	foreach ($rows as $row) {
+		$lines = explode("\n", $row['value']);
+
+		foreach ($lines as $index => $line) {
+			if ($line === '') {
+				continue;
+			}
+
+			$text = $first_characters[$row['change_type']] . str_repeat(' ', $row['depth'] * 2 -1) . $line . "\n";
+			$div = (new CDiv($text));
+
+			if (array_key_exists('id', $row) && $index === 0) {
+				$div->setAttribute('id', 'importcompare_toc_' . $row['id']);
+			}
+
+			if (array_key_exists($row['change_type'], $classes)) {
+				$div->addClass($classes[$row['change_type']]);
+			}
+
+			$divs[] = $div;
+		}
+	}
+
+	return $divs;
+}

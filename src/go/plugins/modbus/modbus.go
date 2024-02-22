@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 package modbus
 
 import (
+	"encoding/binary"
 	"fmt"
 	"time"
 
-	"encoding/binary"
-
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	named "github.com/BurntSushi/locker"
 	"github.com/goburrow/modbus"
@@ -44,7 +44,7 @@ type Plugin struct {
 	options PluginOptions
 }
 
-//Session struct
+// Session struct
 type Session struct {
 	// Endpoint is a connection string consisting of a protocol scheme, a host address and a port or seral port name and attributes.
 	Endpoint string `conf:"optional"`
@@ -58,15 +58,14 @@ type Session struct {
 
 // PluginOptions -
 type PluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
-
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]*Session `conf:"optional"`
 }
 
-type bits8 uint8
-type bits16 uint16
+type (
+	bits8  uint8
+	bits16 uint16
+)
 
 // Set of supported modbus connection types
 const (
@@ -142,13 +141,20 @@ const (
 var impl Plugin
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Modbus",
-		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].")
+	err := plugin.RegisterMetrics(
+		&impl,
+		"Modbus",
+		"modbus.get",
+		"Returns a JSON array of the requested values, usage: "+
+			"modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
 }
 
 // Export - main function of plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-
 	if key != "modbus.get" {
 		return nil, plugin.UnsupportedMetricError
 	}
@@ -157,7 +163,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid number of parameters:%d", len(params))
 	}
 
-	timeout := p.options.Timeout
+	timeout := ctx.Timeout()
 	session, ok := p.options.Sessions[params[0]]
 	if ok {
 		if session.Timeout > 0 {
@@ -200,10 +206,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
-
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
-	}
 }
 
 // Validate implements the Configurator interface.
@@ -216,10 +218,6 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	if err = conf.Unmarshal(options, &opts); err != nil {
 		return err
-	}
-
-	if opts.Timeout > 30 || opts.Timeout < 0 {
-		return fmt.Errorf("Unacceptable Timeout value:%d", opts.Timeout)
 	}
 
 	for _, s := range opts.Sessions {

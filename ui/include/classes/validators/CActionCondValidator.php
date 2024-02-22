@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,13 +55,13 @@ class CActionCondValidator extends CValidator {
 
 		// Validate condition values depending on condition type.
 		switch ($condition['conditiontype']) {
-			case CONDITION_TYPE_HOST_GROUP:
-			case CONDITION_TYPE_TEMPLATE:
-			case CONDITION_TYPE_TRIGGER:
-			case CONDITION_TYPE_HOST:
-			case CONDITION_TYPE_DRULE:
-			case CONDITION_TYPE_PROXY:
-			case CONDITION_TYPE_SERVICE:
+			case ZBX_CONDITION_TYPE_HOST_GROUP:
+			case ZBX_CONDITION_TYPE_TEMPLATE:
+			case ZBX_CONDITION_TYPE_TRIGGER:
+			case ZBX_CONDITION_TYPE_HOST:
+			case ZBX_CONDITION_TYPE_DRULE:
+			case ZBX_CONDITION_TYPE_PROXY:
+			case ZBX_CONDITION_TYPE_SERVICE:
 				if (zbx_empty($condition['value']) || $condition['value'] == 0) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -77,7 +77,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DCHECK:
+			case ZBX_CONDITION_TYPE_DCHECK:
 				if (!$condition['value']) {
 					$this->setError(
 						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
@@ -85,7 +85,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DOBJECT:
+			case ZBX_CONDITION_TYPE_DOBJECT:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(
 						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
@@ -96,7 +96,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_TIME_PERIOD:
+			case ZBX_CONDITION_TYPE_TIME_PERIOD:
 				$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 
 				if ($time_period_parser->parse($condition['value']) != CParser::PARSE_SUCCESS) {
@@ -104,7 +104,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DHOST_IP:
+			case ZBX_CONDITION_TYPE_DHOST_IP:
 				$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
@@ -114,7 +114,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DSERVICE_TYPE:
+			case ZBX_CONDITION_TYPE_DSERVICE_TYPE:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -123,7 +123,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DSERVICE_PORT:
+			case ZBX_CONDITION_TYPE_DSERVICE_PORT:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -132,7 +132,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DSTATUS:
+			case ZBX_CONDITION_TYPE_DSTATUS:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -141,13 +141,13 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_SUPPRESSED:
+			case ZBX_CONDITION_TYPE_SUPPRESSED:
 				if (!zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('should be empty')));
 				}
 				break;
 
-			case CONDITION_TYPE_TRIGGER_SEVERITY:
+			case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -156,7 +156,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_EVENT_TYPE:
+			case ZBX_CONDITION_TYPE_EVENT_TYPE:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
@@ -165,7 +165,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DUPTIME:
+			case ZBX_CONDITION_TYPE_DUPTIME:
 				if (!ctype_digit(strval($condition['value'])) || $condition['value'] > SEC_PER_MONTH) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value',
 						_s('value must be between "%1$s" and "%2$s"', 0, SEC_PER_MONTH)
@@ -173,7 +173,7 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_DVALUE:
+			case ZBX_CONDITION_TYPE_DVALUE:
 				if (array_key_exists('operator', $condition) && $condition['value'] === ''
 						&& ($condition['operator'] == CONDITION_OPERATOR_EQUAL
 							|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL)) {
@@ -181,17 +181,17 @@ class CActionCondValidator extends CValidator {
 				}
 				// break; is not missing here
 
-			case CONDITION_TYPE_TRIGGER_NAME:
-			case CONDITION_TYPE_HOST_NAME:
-			case CONDITION_TYPE_HOST_METADATA:
-			case CONDITION_TYPE_EVENT_TAG:
-			case CONDITION_TYPE_SERVICE_NAME:
+			case ZBX_CONDITION_TYPE_EVENT_NAME:
+			case ZBX_CONDITION_TYPE_HOST_NAME:
+			case ZBX_CONDITION_TYPE_HOST_METADATA:
+			case ZBX_CONDITION_TYPE_EVENT_TAG:
+			case ZBX_CONDITION_TYPE_SERVICE_NAME:
 				if (zbx_empty($condition['value'])) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				break;
 
-			case CONDITION_TYPE_EVENT_TAG_VALUE:
+			case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 				if (!is_string($condition['value2']) || $condition['value2'] === '') {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value2', _('cannot be empty')));
 				}

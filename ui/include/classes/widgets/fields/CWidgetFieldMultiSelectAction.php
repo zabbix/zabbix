@@ -2,7 +2,7 @@
 declare(strict_types=0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,11 +22,14 @@ declare(strict_types=0);
 
 namespace Zabbix\Widgets\Fields;
 
-class CWidgetFieldMultiSelectAction extends CWidgetFieldMultiSelect
-{
+class CWidgetFieldMultiSelectAction extends CWidgetFieldMultiSelect {
+
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectActionView::class;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
+
+		$this->inaccessible_caption = _('Inaccessible action');
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ACTION);
 	}

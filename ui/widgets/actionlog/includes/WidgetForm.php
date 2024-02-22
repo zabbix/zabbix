@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,18 @@ use Zabbix\Widgets\{
 	CWidgetForm
 };
 
-use Zabbix\Widgets\Fields\{CWidgetFieldCheckBoxList,
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldCheckBoxList,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectUser,
 	CWidgetFieldMultiSelectAction,
 	CWidgetFieldMultiSelectMediaType,
 	CWidgetFieldSelect,
-	CWidgetFieldTextBox};
+	CWidgetFieldTextBox,
+	CWidgetFieldTimePeriod
+};
+
+use CWidgetsData;
 
 /**
  * Action log widget form.
@@ -59,6 +64,16 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldTextBox('message', _('Search string'))
+			)
+			->addField(
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), [

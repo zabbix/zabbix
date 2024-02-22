@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldTags extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTagsView::class;
 	public const DEFAULT_VALUE = [];
 	public const DEFAULT_TAG = ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''];
 
@@ -33,7 +34,6 @@ class CWidgetFieldTags extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 				'operator'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
@@ -45,15 +45,15 @@ class CWidgetFieldTags extends CWidgetField {
 	 * Get field value. If no value is set, will return default value.
 	 */
 	public function getValue() {
-		$value = parent::getValue();
+		$field_value = parent::getValue();
 
-		foreach ($value as $index => $val) {
-			if ($val['tag'] === '' && $val['value'] === '') {
-				unset($value[$index]);
+		foreach ($field_value as $index => $value) {
+			if ($value['tag'] === '' && $value['value'] === '') {
+				unset($field_value[$index]);
 			}
 		}
 
-		return $value;
+		return $field_value;
 	}
 
 	public function setValue($value): self {
@@ -63,23 +63,21 @@ class CWidgetFieldTags extends CWidgetField {
 	}
 
 	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
-
-		foreach ($value as $index => $val) {
+		foreach ($this->getValue() as $index => $value) {
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.tag.'.$index,
-				'value' => $val['tag']
+				'name' => $this->name.'.'.$index.'.'.'tag',
+				'value' => $value['tag']
 			];
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.operator.'.$index,
-				'value' => $val['operator']
+				'name' => $this->name.'.'.$index.'.'.'operator',
+				'value' => $value['operator']
 			];
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.value.'.$index,
-				'value' => $val['value']
+				'name' => $this->name.'.'.$index.'.'.'value',
+				'value' => $value['value']
 			];
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ class CDocHelper {
 	const ADMINISTRATION_PROXY_LIST =							'web_interface/frontend_sections/administration/proxies';
 	const ADMINISTRATION_REGEX_EDIT =							'regular_expressions#global-regular-expressions';
 	const ADMINISTRATION_REGEX_LIST =							'web_interface/frontend_sections/administration/general#regular-expressions';
+	const ADMINISTRATION_TIMEOUTS =								'web_interface/frontend_sections/administration/general#timeouts';
 	const ADMINISTRATION_TRIGDISPLAY_EDIT =						'web_interface/frontend_sections/administration/general#trigger-displaying-options';
 	const ALERTS_ACTION_EDIT =									'config/notifications/action#configuring-an-action';
 	const ALERTS_ACTION_LIST =									'web_interface/frontend_sections/alerts/actions';

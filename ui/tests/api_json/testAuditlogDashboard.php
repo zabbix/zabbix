@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,17 +50,17 @@ class testAuditlogDashboard extends testAuditlogCommon {
 								'fields' => [
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'service'
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => 'zabbix_server'
 									]
 								]
@@ -109,7 +109,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
 				'fields['.$fieldid[0]['widget_fieldid'].'].type' => ['add', '1'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
-				'fields['.$fieldid[0]['widget_fieldid'].'].name' => ['add', 'tags.tag.0'],
+				'fields['.$fieldid[0]['widget_fieldid'].'].name' => ['add', 'tags.0.tag'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
 				'fields['.$fieldid[0]['widget_fieldid'].'].value' => ['add', 'service'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
@@ -117,7 +117,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
 				'fields['.$fieldid[1]['widget_fieldid'].']' => ['add'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
-				'fields['.$fieldid[1]['widget_fieldid'].'].name' => ['add', 'tags.operator.0'],
+				'fields['.$fieldid[1]['widget_fieldid'].'].name' => ['add', 'tags.0.operator'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
 				'fields['.$fieldid[1]['widget_fieldid'].'].value' => ['add', '1'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
@@ -127,7 +127,7 @@ class testAuditlogDashboard extends testAuditlogCommon {
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
 				'fields['.$fieldid[2]['widget_fieldid'].'].type' => ['add', '1'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
-				'fields['.$fieldid[2]['widget_fieldid'].'].name' => ['add', 'tags.value.0'],
+				'fields['.$fieldid[2]['widget_fieldid'].'].name' => ['add', 'tags.0.value'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
 				'fields['.$fieldid[2]['widget_fieldid'].'].value' => ['add', 'zabbix_server'],
 			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.

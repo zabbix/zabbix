@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,6 +75,11 @@ zbx_hash_t	zbx_default_ptr_hash_func(const void *data)
 zbx_hash_t	zbx_default_string_hash_func(const void *data)
 {
 	return ZBX_DEFAULT_STRING_HASH_ALGO(data, strlen((const char *)data), ZBX_DEFAULT_HASH_SEED);
+}
+
+zbx_hash_t	zbx_default_string_ptr_hash_func(const void *data)
+{
+	return zbx_default_string_hash_func(*((const char * const *)data));
 }
 
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data)

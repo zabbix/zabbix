@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "zbxwin32.h"
 
-int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	PERFORMANCE_INFORMATION pfi;
 	MEMORYSTATUSEX		ms_ex;

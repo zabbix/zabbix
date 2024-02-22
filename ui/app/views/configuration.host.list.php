@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
  */
 
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
 if ($data['uncheck']) {
@@ -163,7 +165,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'proxies',
 								'srcfld1' => 'proxyid',
-								'srcfld2' => 'host',
+								'srcfld2' => 'name',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_proxyids_'
 							]
@@ -333,11 +335,9 @@ foreach ($data['hosts'] as $host) {
 		if (array_key_exists($template['templateid'], $data['writable_templates'])
 				&& $data['allowed_ui_conf_templates']) {
 			$caption = [
-				(new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))
+				(new CLink($template['name']))
+					->addClass('js-edit-template')
+					->setAttribute('data-templateid', $template['templateid'])
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
 			];
@@ -358,11 +358,9 @@ foreach ($data['hosts'] as $host) {
 			foreach ($parent_templates as $parent_template) {
 				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
 						&& $data['allowed_ui_conf_templates']) {
-					$caption[] = (new CLink($parent_template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $parent_template['templateid'])
-					))
+					$caption[] = (new CLink($parent_template['name']))
+						->addClass('js-edit-template')
+						->setAttribute('data-templateid', $parent_template['templateid'])
 						->addClass(ZBX_STYLE_LINK_ALT)
 						->addClass(ZBX_STYLE_GREY);
 				}
@@ -441,8 +439,8 @@ foreach ($data['hosts'] as $host) {
 	$monitored_by = null;
 
 	if ($show_monitored_by) {
-		$monitored_by = ($host['proxy_hostid'] != 0)
-			? $data['proxies'][$host['proxy_hostid']]['host']
+		$monitored_by = ($host['proxyid'] != 0)
+			? $data['proxies'][$host['proxyid']]['name']
 			: '';
 	}
 
@@ -451,16 +449,18 @@ foreach ($data['hosts'] as $host) {
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
-				(new CUrl('items.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.list')
+					->setArgument('context', 'host')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
-					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['items'])
 		],
 		[
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')
@@ -498,7 +498,7 @@ foreach ($data['hosts'] as $host) {
 		$monitored_by,
 		$hostTemplates,
 		$toggle_status_link,
-		getHostAvailabilityTable($host['interfaces']),
+		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]

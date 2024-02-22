@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,12 +33,6 @@ use Widgets\Map\Widget;
  */
 class WidgetMap extends CDiv
 {
-
-	/**
-	 * Reference of linked map navigation tree widget.
-	 */
-	private ?string $filter_widget_reference;
-
 	/**
 	 * Map that will be linked to 'go back to [previous map name]' link in dashboard map widget.
 	 * Array must contain at least integer value 'sysmapid' and string 'name'.
@@ -56,12 +50,6 @@ class WidgetMap extends CDiv
 	private ?int $current_sysmapid;
 
 	/**
-	 * The type of source of map widget.
-	 * Allowed values are Widget::SOURCETYPE_MAP and Widget::SOURCETYPE_FILTER.
-	 */
-	private int $source_type;
-
-	/**
 	 * Represents either this is initial or repeated load of map widget.
 	 * Allowed values are 0 and 1.
 	 */
@@ -73,15 +61,11 @@ class WidgetMap extends CDiv
 	private ?string $error;
 
 	/**
-	 * Class constructor.
-	 *
 	 * @param array       $sysmap_data      An array of requested map in the form created by CMapHelper::get() method.
 	 * @param array       $widget_settings  An array contains widget settings.
 	 *        string|null $widget_settings['error']                   A string of error message or null in case
 	 *                                                                if error is not detected.
 	 *        int         $widget_settings['current_sysmapid']        An integer of requested sysmapid.
-	 *        string      $widget_settings['filter_widget_reference'] A string of linked map navigation tree reference.
-	 *        int         $widget_settings['source_type']             The type of source of map widget.
 	 *        array|null  $widget_settings['previous_map']            Sysmapid and name of map linked as previous.
 	 *        int         $widget_settings['initial_load']            Integer represents either this is initial load
 	 *                                                                or repeated.
@@ -92,8 +76,6 @@ class WidgetMap extends CDiv
 		$this->error = $widget_settings['error'];
 		$this->sysmap_data = $sysmap_data;
 		$this->current_sysmapid = $widget_settings['current_sysmapid'];
-		$this->filter_widget_reference = $widget_settings['filter_widget_reference'];
-		$this->source_type = $widget_settings['source_type'];
 		$this->previous_map = $widget_settings['previous_map'];
 		$this->initial_load = $widget_settings['initial_load'];
 	}
@@ -104,7 +86,6 @@ class WidgetMap extends CDiv
 	public function getScriptData(): array {
 		$map_data = [
 			'current_sysmapid' => null,
-			'filter_widget_reference' => null,
 			'map_options' => null
 		];
 
@@ -112,16 +93,10 @@ class WidgetMap extends CDiv
 			$map_data['current_sysmapid'] = $this->current_sysmapid;
 		}
 
-		if ($this->source_type == Widget::SOURCETYPE_FILTER
-				&& $this->filter_widget_reference
-				&& $this->initial_load) {
-			$map_data['filter_widget_reference'] = $this->filter_widget_reference;
-		}
-
 		if ($this->sysmap_data && $this->error === null) {
 			$map_data['map_options'] = $this->sysmap_data;
 		}
-		elseif ($this->error !== null && $this->source_type == Widget::SOURCETYPE_FILTER) {
+		elseif ($this->error !== null) {
 			$map_data['error_msg'] = (new CTableInfo())
 				->setNoDataMessage($this->error)
 				->toString();
@@ -172,7 +147,7 @@ class WidgetMap extends CDiv
 			$this->addStyle('position:relative;');
 			$this->addItem($map_div);
 		}
-		elseif ($this->source_type == Widget::SOURCETYPE_MAP) {
+		else {
 			$this->addItem(
 				(new CTableInfo())->setNoDataMessage($this->error)
 			);

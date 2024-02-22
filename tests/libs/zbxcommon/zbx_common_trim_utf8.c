@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,10 @@ static const char	*read_utf8(const char *path_str, const char *path_hex)
 		zbx_mock_binary(hdata, &data, &len);
 	}
 	else
+	{
+		data = NULL;
 		fail_msg("cannot read %s/%s parameter", path_str, path_hex);
+	}
 
 	return data;
 }

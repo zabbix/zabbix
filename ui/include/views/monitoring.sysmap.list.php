@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,25 +87,35 @@ foreach ($this->data['maps'] as $map) {
 	$user_type = CWebUser::getType();
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $map['editable']) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
-		$action = $data['allowed_edit']
-			? new CLink(_('Properties'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'])
+		$properties_link = $data['allowed_edit']
+			? new CLink(_('Properties'),
+				(new CUrl('sysmaps.php'))
+					->setArgument('form', 'update')
+					->setArgument('sysmapid', $map['sysmapid'])
+			)
 			: _('Properties');
-		$constructor = $data['allowed_edit']
-			? new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid'])
-			: _('Constructor');
+		$edit_link = $data['allowed_edit']
+			? new CLink(_('Edit'),
+				(new CUrl('sysmap.php'))->setArgument('sysmapid', $map['sysmapid'])
+			)
+			: _('Edit');
 	}
 	else {
 		$checkbox = (new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']))
 			->setAttribute('disabled', 'disabled');
-		$action = '';
-		$constructor = '';
+		$properties_link = '';
+		$edit_link = '';
 	}
 	$sysmapTable->addRow([
 		$checkbox,
-		new CLink($map['name'], 'zabbix.php?action=map.view&sysmapid='.$map['sysmapid']),
+		(new CLink($map['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'map.view')
+				->setArgument('sysmapid', $map['sysmapid'])
+		)),
 		$map['width'],
 		$map['height'],
-		new CHorList([$action, $constructor])
+		new CHorList([$properties_link, $edit_link])
 	]);
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -745,6 +745,16 @@ function convertUnitsRaw(array $options): array {
 	}
 
 	if ($units === 's') {
+		if ($options['decimals'] !== null && $options['decimals'] != 0) {
+			return [
+				'value' => convertUnitSWithDecimals($value, $options['ignore_milliseconds'], $options['decimals'],
+					$options['decimals_exact']
+				),
+				'units' => '',
+				'is_mapped' => false
+			];
+		}
+
 		return [
 			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
 			'units' => '',
@@ -1768,40 +1778,6 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
  */
 function makeMessageBox(string $class, array $messages, string $title = null, bool $show_close_box = true,
 		bool $show_details = false): CTag {
-	$msg_details = null;
-	$link_details = null;
-
-	if ($messages) {
-		if ($title !== null) {
-			$link_details = (new CLinkAction())
-				->addItem(_('Details'))
-				->addItem(' ') // space
-				->addItem((new CSpan())
-					->setId('details-arrow')
-					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
-				)
-				->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
-				->onClick('
-					showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\'));
-					jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");
-					jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0);
-				');
-		}
-
-		$list = (new CList())->addClass(ZBX_STYLE_LIST_DASHED);
-
-		foreach ($messages as $message) {
-			$list->addItem($message['message']);
-		}
-
-		$msg_details = (new CDiv())
-			->addClass(ZBX_STYLE_MSG_DETAILS)
-			->addItem($list);
-
-		if ($title !== null && !$show_details) {
-			$msg_details->addStyle('display: none;');
-		}
-	}
 
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD => _('Success message'),
@@ -1809,14 +1785,39 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		ZBX_STYLE_MSG_WARNING => _('Warning message')
 	];
 
-	// Details link should be in front of title.
-	$msg_box = (new CTag('output', true, [$link_details, $title !== null ? new CSpan($title) : null, $msg_details]))
+	$message_box = (new CTag('output', true))
 		->addClass($class)
 		->setAttribute('role', 'contentinfo')
 		->setAttribute('aria-label', $aria_labels[$class]);
 
+	if ($messages && $title !== null) {
+		$message_box
+			->addItem(
+				(new CLinkAction(_('Details')))
+					->addItem(
+						(new CSpan())->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
+					)
+					->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
+					->onClick('toggleMessageBoxDetails(this);')
+			)
+			->addClass(ZBX_STYLE_COLLAPSIBLE)
+			->addClass(!$show_details ? ZBX_STYLE_COLLAPSED : null);
+	}
+
+	if ($messages) {
+		$list = (new CList())->addClass(ZBX_STYLE_LIST_DASHED);
+
+		foreach ($messages as $message) {
+			$list->addItem($message['message']);
+		}
+	}
+
+	$message_box
+		->addItem($title !== null ? new CSpan($title) : null)
+		->addItem($messages ? (new CDiv($list))->addClass(ZBX_STYLE_MSG_DETAILS) : null);
+
 	if ($show_close_box) {
-		$msg_box->addItem(
+		$message_box->addItem(
 			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
@@ -1824,7 +1825,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		);
 	}
 
-	return $msg_box;
+	return $message_box;
 }
 
 /**

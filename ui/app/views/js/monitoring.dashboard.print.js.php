@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 
 <script>
 	const view = {
-		init({dashboard, widget_defaults, time_period}) {
+		init({dashboard, widget_defaults, dashboard_time_period}) {
 			timeControl.refreshPage = false;
 
-			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
+			ZABBIX.Dashboard = new CDashboardPrint(document.querySelector('.wrapper'), {
 				containers: {
-					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
+					grid: document.querySelector('.wrapper'),
 					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
 					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
 				},
@@ -50,27 +50,37 @@
 				},
 				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-				cell_height: 70,
+				cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
 				is_editable: false,
 				is_edit_mode: false,
 				can_edit_dashboards: false,
-				is_kiosk_mode: true,
-				time_period: time_period,
-				dynamic_hostid: null
+				is_kiosk_mode: true
 			});
 
-			for (const page of dashboard.pages) {
+			const dashboard_page_containers = document.querySelectorAll('.<?= ZBX_STYLE_DASHBOARD_GRID ?>');
+
+			for (const [page_number, page] of dashboard.pages.entries()) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
-				ZABBIX.Dashboard.addDashboardPage(page);
+				ZABBIX.Dashboard.addDashboardPage(page, dashboard_page_containers[page_number]);
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
 
 			ZABBIX.Dashboard.activate();
 		}

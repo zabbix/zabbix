@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -277,7 +277,7 @@ static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint
 	if (NULL == (result = zbx_db_select_n(sql, 10000)))
 		goto out;
 
-	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", NULL);
+	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -340,7 +340,7 @@ static int	DBpatch_3010021(void)
 
 	zbx_hashset_create(&events, 1024, DBpatch_3010021_trigger_events_hash_func,
 			DBpatch_3010021_trigger_events_compare_func);
-	zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
+	zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", (char *)NULL);
 
 	do
 	{
@@ -368,7 +368,8 @@ static int	DBpatch_3010021(void)
 				goto out;
 
 			zbx_db_insert_clean(&db_insert);
-			zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
+			zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid",
+					(char *)NULL);
 		}
 
 		zbx_vector_uint64_destroy(&object_events->eventids);
@@ -409,8 +410,10 @@ static int	DBpatch_3010023(void)
 
 	operationid = zbx_db_get_maxid_num("operations", actions_num);
 
-	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", NULL);
-	zbx_db_insert_prepare(&db_insert_msg, "opmessage", "operationid", "default_msg", "subject", "message", NULL);
+	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery",
+			(char *)NULL);
+	zbx_db_insert_prepare(&db_insert_msg, "opmessage", "operationid", "default_msg", "subject", "message",
+			(char *)NULL);
 
 	zbx_db_free_result(result);
 	result = zbx_db_select("select actionid,r_shortdata,r_longdata from actions where recovery_msg=1");

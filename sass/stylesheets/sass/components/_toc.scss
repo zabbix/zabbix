@@ -1,65 +1,66 @@
 .toc {
 	.toc-row {
-		padding: 8px 10px;
+		padding: 6px 10px;
 		overflow: hidden;
+		line-height: 18px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		line-height: 14px;
-		color: $link-color;
-		border-bottom: 1px solid $table-border-color;
 		background: $toc-title-bg-color;
+		border-bottom: 1px solid $table-border-color;
+	}
+
+	.btn-link {
+		color: $toc-title-color;
+		border-style: none;
+		border-color: $toc-title-color;
+
+		&:focus {
+			border-style: solid;
+		}
 	}
 
 	.toc-arrow {
-		min-height: 14px;
+		position: relative;
 		margin-left: 12px;
-		padding: 0;
-		background-color: transparent;
-		border: 0;
 
 		.arrow-down,
-		.arrow-up {
-			margin-right: 4px;
-			margin-left: -12px;
-			transform: translateY(-1px);
+		.arrow-right {
+			position: absolute;
+			left: -12px;
+			top: 50%;
+			transform: translateY(-50%);
 		}
 
 		.arrow-down {
 			border-top-color: $toc-title-color;
 		}
 
-		.arrow-up {
-			border-bottom-color: $toc-title-color;
-		}
-
-		&:focus {
-			margin-bottom: -2px;
-			border-bottom: 2px solid $toc-title-color;
-			box-shadow: none;
+		.arrow-right {
+			border-left-color: $toc-title-color;
 		}
 	}
 
 	.toc-sublist {
 		.toc-row {
 			padding-left: 20px;
-			background: $form-bg-color;
-		}
-
-		.toc-arrow {
-			color: $font-color;
-			border-color: $font-color;
+			background-color: transparent;
 		}
 
 		.toc-sublist .toc-row {
 			padding-left: 50px;
 		}
 
+		.btn-link {
+			color: $font-color;
+			border-color: $font-color;
+		}
+
 		.arrow-down {
 			border-top-color: $toc-title-bg-color;
 		}
 
-		.arrow-up {
-			border-bottom-color: $toc-title-bg-color;
+		.arrow-right {
+			border-left-color: $toc-title-bg-color;
 		}
 	}
 }

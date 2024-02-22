@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class CWidgetClock extends CWidget {
 	onStart() {
 		this._events.resize = () => {
 			const padding = 25;
-			const header_height = this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+			const header_height = this.getViewMode() === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 				? 0
 				: this._header.offsetHeight;
 
@@ -244,6 +244,6 @@ class CWidgetClock extends CWidget {
 	}
 
 	hasPadding() {
-		return this._fields.clock_type === undefined || this._fields.clock_type == CWidgetClock.TYPE_ANALOG;
+		return this.getFields().clock_type === CWidgetClock.TYPE_ANALOG;
 	}
 }

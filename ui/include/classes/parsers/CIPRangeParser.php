@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,14 +61,9 @@ class CIPRangeParser {
 	private $dns_parser;
 
 	/**
-	 * @var CUserMacroParser
+	 * @var array
 	 */
-	private $user_macro_parser;
-
-	/**
-	 * @var CMacroParser
-	 */
-	private $macro_parser;
+	private $macro_parsers = [];
 
 	/**
 	 * Supported options:
@@ -94,11 +89,7 @@ class CIPRangeParser {
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
-		foreach (['v6', 'dns', 'ranges', 'max_ipv4_cidr', 'usermacros', 'macros'] as $option) {
-			if (array_key_exists($option, $options)) {
-				$this->options[$option] = $options[$option];
-			}
-		}
+		$this->options = $options + $this->options;
 
 		$this->ipv4_parser = new CIPv4Parser();
 		if ($this->options['v6']) {
@@ -108,10 +99,13 @@ class CIPRangeParser {
 			$this->dns_parser = new CDnsParser();
 		}
 		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
+			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['macros']) {
-			$this->macro_parser = new CMacroParser(['macros' => $this->options['macros']]);
+			array_push($this->macro_parsers,
+				new CMacroParser(['macros' => $this->options['macros']]),
+				new CMacroFunctionParser(['macros' => $this->options['macros']])
+			);
 		}
 	}
 
@@ -127,17 +121,35 @@ class CIPRangeParser {
 		$this->max_ip_count = '0';
 		$this->max_ip_range = '';
 
-		foreach (explode(',', $ranges) as $range) {
-			$range = trim($range, " \t\r\n");
+		$p = 0;
 
-			if (!$this->isValidMask($range) && !$this->isValidRange($range) && !$this->isValidDns($range)
-					&& !$this->isValidUserMacro($range) && !$this->isValidMacro($range)) {
-				$this->error = _s('invalid address range "%1$s"', $range);
-				$this->max_ip_count = '0';
-				$this->max_ip_range = '';
-
-				return false;
+		do {
+			while (isset($ranges[$p]) && strpos(" \t\r\n", $ranges[$p]) !== false) {
+				$p++;
 			}
+
+			if (isset($ranges[$p]) && !$this->parseMask($ranges, $p) && !$this->parseRange($ranges, $p)
+					&& !$this->parseDns($ranges, $p) && !$this->parseMacro($ranges, $p)) {
+				break;
+			}
+
+			while (isset($ranges[$p]) && strpos(" \t\r\n", $ranges[$p]) !== false) {
+				$p++;
+			}
+
+			if (!isset($ranges[$p]) || $ranges[$p] !== ',') {
+				break;
+			}
+			$p++;
+		}
+		while (isset($ranges[$p]));
+
+		if (isset($ranges[$p])) {
+			$this->error = _s('incorrect address starting from "%1$s"', substr($ranges, $p));
+			$this->max_ip_count = '0';
+			$this->max_ip_range = '';
+
+			return false;
 		}
 
 		return true;
@@ -174,41 +186,49 @@ class CIPRangeParser {
 	 * Validate an IP mask.
 	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidMask($range) {
-		return ($this->isValidMaskIPv4($range) || $this->isValidMaskIPv6($range));
+	private function parseMask(string $range, int &$pos): bool {
+		return $this->parseMaskIPv4($range, $pos) || $this->parseMaskIPv6($range, $pos);
 	}
 
 	/**
 	 * Validate an IPv4 mask.
 	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidMaskIPv4($range) {
-		$parts = explode('/', $range);
+	private function parseMaskIPv4(string $range, int &$pos): bool {
+		$p = $pos;
 
-		if (count($parts) != 2) {
+		if ($this->ipv4_parser->parse($range, $p) == CParser::PARSE_FAIL) {
 			return false;
 		}
+		$p += $this->ipv4_parser->getLength();
 
-		if ($this->ipv4_parser->parse($parts[0]) != CParser::PARSE_SUCCESS) {
+		if (!isset($range[$p]) || $range[$p] !== '/') {
 			return false;
 		}
+		$p++;
 
-		if (!preg_match('/^[0-9]{1,2}$/', $parts[1]) || $parts[1] > $this->options['max_ipv4_cidr']) {
+		if (!preg_match('/^[0-9]+/', substr($range, $p), $matches) || strlen($matches[0]) > 2
+				|| $matches[0] > $this->options['max_ipv4_cidr']) {
 			return false;
 		}
+		$p += strlen($matches[0]);
 
-		$ip_count = bcpow(2, 32 - $parts[1], 0);
+		$ip_count = bcpow(2, 32 - $matches[0], 0);
 
 		if (bccomp($this->max_ip_count, $ip_count) < 0) {
 			$this->max_ip_count = $ip_count;
-			$this->max_ip_range = $range;
+			$this->max_ip_range = substr($range, $pos, $p - $pos);
 		}
+
+		$pos = $p;
 
 		return true;
 	}
@@ -217,34 +237,40 @@ class CIPRangeParser {
 	 * Validate an IPv6 mask.
 	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidMaskIPv6($range) {
+	private function parseMaskIPv6(string $range, int &$pos): bool {
 		if (!$this->options['v6']) {
 			return false;
 		}
 
-		$parts = explode('/', $range);
+		$p = $pos;
 
-		if (count($parts) != 2) {
+		if ($this->ipv6_parser->parse($range, $p) == CParser::PARSE_FAIL) {
 			return false;
 		}
+		$p += $this->ipv6_parser->getLength();
 
-		if ($this->ipv6_parser->parse($parts[0]) != CParser::PARSE_SUCCESS) {
+		if (!isset($range[$p]) || $range[$p] !== '/') {
 			return false;
 		}
+		$p++;
 
-		if (!preg_match('/^[0-9]{1,3}$/', $parts[1]) || $parts[1] > 128) {
+		if (!preg_match('/^[0-9]+/', substr($range, $p), $matches) || strlen($matches[0]) > 3 || $matches[0] > 128) {
 			return false;
 		}
+		$p += strlen($matches[0]);
 
-		$ip_count = bcpow(2, 128 - $parts[1], 0);
+		$ip_count = bcpow(2, 128 - $matches[0], 0);
 
 		if (bccomp($this->max_ip_count, $ip_count) < 0) {
 			$this->max_ip_count = $ip_count;
-			$this->max_ip_range = $range;
+			$this->max_ip_range = substr($range, $pos, $p - $pos);
 		}
+
+		$pos = $p;
 
 		return true;
 	}
@@ -253,48 +279,61 @@ class CIPRangeParser {
 	 * Validate an IP address range.
 	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidRange($range) {
-		return ($this->isValidRangeIPv4($range) || $this->isValidRangeIPv6($range));
+	private function parseRange(string $range, int &$pos): bool {
+		return $this->parseRangeIPv4($range, $pos) || $this->parseRangeIPv6($range, $pos);
 	}
 
 	/**
 	 * Validate an IPv4 address range.
 	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidRangeIPv4($range) {
-		$parts = explode('.', $range);
-
+	private function parseRangeIPv4(string $range, int &$pos): bool {
+		$p = $pos;
 		$ip_count = '1';
-		$ip_parts = [];
+		$ip = '';
 
-		foreach ($parts as $part) {
-			if (preg_match('/^([0-9]{1,3})-([0-9]{1,3})$/', $part, $matches)) {
+		while (isset($range[$p])) {
+			if (preg_match('/^([0-9]{1,3})-([0-9]{1,3})/', substr($range, $p), $matches)) {
 				if (!$this->options['ranges'] || $matches[1] > $matches[2]) {
 					return false;
 				}
 
 				$ip_count = bcmul($ip_count, $matches[2] - $matches[1] + 1, 0);
-				$ip_parts[] = $matches[2];
+				$ip .= $matches[2];
+				$p += strlen($matches[0]);
+			}
+			elseif (preg_match('/^[0-9]{1,3}/', substr($range, $p), $matches)) {
+				$ip .= $matches[0];
+				$p += strlen($matches[0]);
 			}
 			else {
-				$ip_parts[] = $part;
+				return false;
 			}
+
+			if (!isset($range[$p]) || $range[$p] !== '.') {
+				break;
+			}
+			$ip .= $range[$p++];
 		}
 
-		if ($this->ipv4_parser->parse(implode('.', $ip_parts)) != CParser::PARSE_SUCCESS) {
+		if ($this->ipv4_parser->parse($ip) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
 		if (bccomp($this->max_ip_count, $ip_count) < 0) {
 			$this->max_ip_count = $ip_count;
-			$this->max_ip_range = $range;
+			$this->max_ip_range = substr($range, $pos, $p - $pos);
 		}
+
+		$pos = $p;
 
 		return true;
 	}
@@ -303,21 +342,21 @@ class CIPRangeParser {
 	 * Validate an IPv6 address range.
 	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidRangeIPv6($range) {
+	private function parseRangeIPv6(string $range, int &$pos): bool {
 		if (!$this->options['v6']) {
 			return false;
 		}
 
-		$parts = explode(':', $range);
-
+		$p = $pos;
 		$ip_count = '1';
-		$ip_parts = [];
+		$ip = '';
 
-		foreach ($parts as $part) {
-			if (preg_match('/^([a-f0-9]{1,4})-([a-f0-9]{1,4})$/i', $part, $matches)) {
+		while (isset($range[$p])) {
+			if (preg_match('/^([a-f0-9]{1,4})-([a-f0-9]{1,4})/i', substr($range, $p), $matches)) {
 				sscanf($matches[1], '%x', $from);
 				sscanf($matches[2], '%x', $to);
 
@@ -326,77 +365,79 @@ class CIPRangeParser {
 				}
 
 				$ip_count = bcmul($ip_count, $to - $from + 1, 0);
-				$ip_parts[] = $matches[1];
+				$ip .= $matches[1];
+				$p += strlen($matches[0]);
+			}
+			elseif (preg_match('/^[a-f0-9]{0,4}/i', substr($range, $p), $matches)) {
+				$ip .= $matches[0];
+				$p += strlen($matches[0]);
 			}
 			else {
-				$ip_parts[] = $part;
+				return false;
 			}
+
+			if (!isset($range[$p]) || $range[$p] !== ':') {
+				break;
+			}
+			$ip .= $range[$p++];
 		}
 
-		if ($this->ipv6_parser->parse(implode(':', $ip_parts)) != CParser::PARSE_SUCCESS) {
+		if ($this->ipv6_parser->parse($ip) != CParser::PARSE_SUCCESS) {
 			return false;
 		}
 
 		if (bccomp($this->max_ip_count, $ip_count) < 0) {
 			$this->max_ip_count = $ip_count;
-			$this->max_ip_range = $range;
+			$this->max_ip_range = substr($range, $pos, $p - $pos);
 		}
+
+		$pos = $p;
 
 		return true;
 	}
 
 	/**
-	 * Validate a DNS name.
-	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidDns($range) {
+	private function parseDns(string $range, int &$pos) {
 		if (!$this->options['dns']) {
 			return false;
 		}
 
-		if ($this->dns_parser->parse($range) != CParser::PARSE_SUCCESS) {
+		$p = $pos;
+
+		if ($this->dns_parser->parse($range, $p) == CParser::PARSE_FAIL) {
 			return false;
 		}
+		$p += $this->dns_parser->getLength();
 
 		if (bccomp($this->max_ip_count, 1) < 0) {
 			$this->max_ip_count = '1';
-			$this->max_ip_range = $range;
+			$this->max_ip_range = substr($range, $pos, $p - $pos);
 		}
+
+		$pos = $p;
 
 		return true;
 	}
 
 	/**
-	 * Validate a user macros syntax.
-	 *
 	 * @param string $range
+	 * @param int    $pos
 	 *
 	 * @return bool
 	 */
-	protected function isValidUserMacro($range) {
-		if (!$this->options['usermacros']) {
-			return false;
+	private function parseMacro(string $range, int &$pos) {
+		foreach ($this->macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($range, $pos) != CParser::PARSE_FAIL) {
+				$pos += $macro_parser->getLength();
+				return true;
+			}
 		}
 
-		return ($this->user_macro_parser->parse($range) == CParser::PARSE_SUCCESS);
-	}
-
-	/**
-	 * Validate a host macros syntax.
-	 * Example: {HOST.IP}, {HOST.CONN} etc.
-	 *
-	 * @param string $range
-	 *
-	 * @return bool
-	 */
-	protected function isValidMacro($range) {
-		if (!$this->options['macros']) {
-			return false;
-		}
-
-		return ($this->macro_parser->parse($range) == CParser::PARSE_SUCCESS);
+		return false;
 	}
 }

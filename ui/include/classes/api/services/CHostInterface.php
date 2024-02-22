@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,20 +97,19 @@ class CHostInterface extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE hi.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.zbx_dbstr($permission).
-				')';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'hi.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// interfaceids
@@ -264,7 +263,7 @@ class CHostInterface extends CApiService {
 			$interfaceDBfields = ['interfaceid' => null];
 			$dbInterfaces = $this->get([
 				'output' => API_OUTPUT_EXTEND,
-				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
+				'interfaceids' => array_column($interfaces, 'interfaceid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
@@ -282,19 +281,13 @@ class CHostInterface extends CApiService {
 
 		$dbHosts = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => zbx_objectValues($interfaces, 'hostid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$dbProxies = API::Proxy()->get([
-			'output' => ['host'],
-			'proxyids' => zbx_objectValues($interfaces, 'hostid'),
+			'hostids' => array_column($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$check_have_items = [];
+
 		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -306,6 +299,7 @@ class CHostInterface extends CApiService {
 				}
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
+
 				if (isset($interface['hostid']) && bccomp($dbInterface['hostid'], $interface['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot switch host for interface.'));
 				}
@@ -321,12 +315,8 @@ class CHostInterface extends CApiService {
 				$interface = zbx_array_merge($dbInterface, $interface);
 			}
 			else {
-				if (!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']])) {
+				if (!isset($dbHosts[$interface['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
-				if (isset($dbProxies[$interface['hostid']])) {
-					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
 				}
 				elseif (!isset($interface['type'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -347,13 +337,6 @@ class CHostInterface extends CApiService {
 						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
 							$interface['ip'],
 							$dbHosts[$interface['hostid']]['host']
-					));
-				}
-				elseif ($dbProxies && !empty($dbProxies[$interface['hostid']]['host'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
-							$interface['ip'],
-							$dbProxies[$interface['hostid']]['host']
 					));
 				}
 				else {
@@ -804,10 +787,9 @@ class CHostInterface extends CApiService {
 			return;
 		}
 
-		$user_macro_parser = new CUserMacroParser();
+		$dns_parser = new CDnsParser(['usermacros' => true, 'lldmacros' => true, 'macros' => true]);
 
-		if (!preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])
-				&& $user_macro_parser->parse($interface['dns']) != CParser::PARSE_SUCCESS) {
+		if ($dns_parser->parse($interface['dns']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect interface DNS parameter "%1$s" provided.', $interface['dns'])
 			);
@@ -827,14 +809,9 @@ class CHostInterface extends CApiService {
 			return;
 		}
 
-		$user_macro_parser = new CUserMacroParser();
-
-		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip'])
-				|| $user_macro_parser->parse($interface['ip']) == CParser::PARSE_SUCCESS) {
-			return;
-		}
-
-		$ip_parser = new CIPParser(['v6' => ZBX_HAVE_IPV6]);
+		$ip_parser = new CIPParser(
+			['usermacros' => true, 'lldmacros' => true, 'macros' => true, 'v6' => ZBX_HAVE_IPV6]
+		);
 
 		if ($ip_parser->parse($interface['ip']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid IP address "%1$s".', $interface['ip']));
@@ -1043,7 +1020,7 @@ class CHostInterface extends CApiService {
 
 	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get([
-			'output' => ['name'],
+			'output' => ['name_resolved'],
 			'selectHosts' => ['name'],
 			'interfaceids' => $interfaceIds,
 			'preservekeys' => true,
@@ -1055,7 +1032,7 @@ class CHostInterface extends CApiService {
 			$host = reset($item['hosts']);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name'], $host['name']));
+				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name_resolved'], $host['name']));
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,13 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request host field value by hostid.                               *
+ * Purpose: request proxy field value by proxyid.                               *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	expr_db_get_host_value(zbx_uint64_t hostid, char **replace_to, const char *field_name)
+int	expr_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -48,9 +48,9 @@ int	expr_db_get_host_value(zbx_uint64_t hostid, char **replace_to, const char *f
 
 	result = zbx_db_select(
 			"select %s"
-			" from hosts"
-			" where hostid=" ZBX_FS_UI64,
-			field_name, hostid);
+			" from proxy"
+			" where proxyid=" ZBX_FS_UI64,
+			field_name, proxyid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -173,21 +173,21 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 				" and i.itemid=f.itemid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
+
 	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from hosts_groups hg,rights r,users_groups ug"
-					" where h.hostid=hg.hostid"
-						" and hg.groupid=r.id"
-						" and r.groupid=ug.usrgrpid"
-						" and ug.userid=" ZBX_FS_UI64
-					" group by hg.hostid"
-					" having min(r.permission)>=%d"
+					" from host_hgset hh,permission p,user_ugset uu"
+					" where h.hostid=hh.hostid"
+						" and hh.hgsetid=p.hgsetid"
+						" and p.ugsetid=uu.ugsetid"
+						" and uu.userid=" ZBX_FS_UI64
 				")",
-				*userid, PERM_READ);
+				*userid);
 	}
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.name");
 
 	result = zbx_db_select("%s", sql);
@@ -262,14 +262,13 @@ int	expr_db_get_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from rights r,users_groups ug"
-					" where g.groupid=r.id"
-						" and r.groupid=ug.usrgrpid"
-						" and ug.userid=" ZBX_FS_UI64
-					" group by r.id"
-					" having min(r.permission)>=%d"
+					" from host_hgset hh,permission p,user_ugset uu"
+					" where i.hostid=hh.hostid"
+						" and hh.hgsetid=p.hgsetid"
+						" and p.ugsetid=uu.ugsetid"
+						" and uu.userid=" ZBX_FS_UI64
 				")",
-				*userid, PERM_READ);
+				*userid);
 	}
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by g.name");
 
@@ -388,7 +387,7 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_dc_item_t	dc_item;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	int		ret = FAIL, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -419,10 +418,12 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	}
 
 	result = zbx_db_select(
-			"select h.proxy_hostid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error"
+			"select h.proxyid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error,"
+					"irn.name_resolved"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 				" left join item_rtdata ir on ir.itemid=i.itemid"
+				" left join item_rtname irn on irn.itemid=i.itemid"
 			" where i.itemid=" ZBX_FS_UI64, itemid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
@@ -438,7 +439,10 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
-				*replace_to = zbx_strdup(*replace_to, row[3]);
+				if (FAIL == zbx_db_is_null(row[8]))
+					*replace_to = zbx_strdup(*replace_to, row[8]);
+				else
+					*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION:
@@ -451,8 +455,8 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					um_handle = zbx_dc_open_user_macros();
 					*replace_to = zbx_strdup(NULL, row[5]);
 
-					(void)zbx_dc_expand_user_macros(um_handle, replace_to, &dc_item.host.hostid, 1,
-							NULL);
+					(void)zbx_dc_expand_user_and_func_macros(um_handle, replace_to,
+							&dc_item.host.hostid, 1, NULL);
 
 					zbx_dc_close_user_macros(um_handle);
 					ret = SUCCEED;
@@ -473,26 +477,26 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxy_hostid, row[0]);
+				ZBX_DBROW2UINT64(proxyid, row[0]);
 
-				if (0 == proxy_hostid)
+				if (0 == proxyid)
 				{
 					*replace_to = zbx_strdup(*replace_to, "");
 					ret = SUCCEED;
 				}
 				else
-					ret = expr_db_get_host_value(proxy_hostid, replace_to, "host");
+					ret = expr_db_get_proxy_value(proxyid, replace_to, "name");
 				break;
 			case ZBX_REQUEST_PROXY_DESCRIPTION:
-				ZBX_DBROW2UINT64(proxy_hostid, row[0]);
+				ZBX_DBROW2UINT64(proxyid, row[0]);
 
-				if (0 == proxy_hostid)
+				if (0 == proxyid)
 				{
 					*replace_to = zbx_strdup(*replace_to, "");
 					ret = SUCCEED;
 				}
 				else
-					ret = expr_db_get_host_value(proxy_hostid, replace_to, "description");
+					ret = expr_db_get_proxy_value(proxyid, replace_to, "description");
 				break;
 			case ZBX_REQUEST_ITEM_VALUETYPE:
 				*replace_to = zbx_strdup(*replace_to, row[6]);
@@ -726,7 +730,7 @@ int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = expr_db_item_value(trigger, lastvalue, N_functionid, time(NULL), 999999999, raw);
+	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

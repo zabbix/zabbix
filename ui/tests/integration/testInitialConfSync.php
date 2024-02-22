@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
  * @backup host_tag, hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
  * @backup item_tag, lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
- * @backup lld_override_opstatus, operations, opgroup, opmessage, opmessage_grp, optemplate
+ * @backup lld_override_opstatus, operations, opgroup, opmessage, opmessage_grp, optemplate, proxy, proxy_rtdata
+ * @backup auditlog, changelog, expressions, ha_node, regexps
  */
 class testInitialConfSync extends CIntegrationTest
 {
@@ -61,7 +62,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hosts' =>
 			[
-				'insert' => '17',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -101,7 +102,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'interfaces' =>
 			[
-				'insert' => '16',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -271,7 +272,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hgroups' =>
 			[
-				'insert' => '16',
+				'insert' => '3',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -331,6 +332,14 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '2',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -372,7 +381,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"16",
+				"14",
 				"delete" =>
 				"0"
 			]
@@ -427,7 +436,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"10",
+				"9",
 				"delete" =>
 				"0"
 			]
@@ -706,6 +715,17 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' =>
 				'0'
 			]
+			],
+		[
+			'proxy' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'2',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -748,7 +768,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"21"
+				"19"
 			]
 		],
 		[
@@ -803,7 +823,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"16"
+				"15"
 			]
 		],
 		[
@@ -1068,6 +1088,14 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '2'
+			]
 		]
 	];
 
@@ -1080,6 +1108,7 @@ class testInitialConfSync extends CIntegrationTest
 	private static $regexpid;
 	private static $vaultmacroid;
 	private static $secretmacroid;
+	private static $tlshostid;
 
 	/**
 	 * @inheritdoc
@@ -1262,7 +1291,7 @@ class testInitialConfSync extends CIntegrationTest
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_NAME,
 						'operator' => CONDITION_OPERATOR_LIKE,
 						'value' => 'qqq'
 					]
@@ -1312,7 +1341,7 @@ class testInitialConfSync extends CIntegrationTest
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+						'conditiontype' => ZBX_CONDITION_TYPE_EVENT_NAME,
 						'operator' => CONDITION_OPERATOR_NOT_LIKE,
 						'value' => 'qqq'
 					]
@@ -1367,6 +1396,44 @@ class testInitialConfSync extends CIntegrationTest
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
 		$this->assertEquals(1, count($response['result']['maintenanceids']));
 		self::$maintenanceid = $response['result']['maintenanceids'][0];
+	}
+
+	private function setupTlsForHost()
+	{
+		$response = $this->call('host.get', [
+			'output' => 'hostids',
+			'filter' => [
+				'host' => ['Host1']
+			],
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+		self::$tlshostid = array_key_first($response['result']);
+
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
+	private function updateTlsForHost()
+	{
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
 	}
 
 	private function updateMaintenance()
@@ -1455,25 +1522,32 @@ class testInitialConfSync extends CIntegrationTest
 	private function createProxies()
 	{
 		$response = $this->call('proxy.create', [
-			'host' => 'ProxyA',
-			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'name' => 'ProxyA',
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+			'allowed_addresses' => '10.0.2.15,zabbix.test',
+			'tls_connect' => HOST_ENCRYPTION_NONE,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8',
 			'hosts' => []
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 		self::$proxyid_active = $response['result']['proxyids'][0];
 
 		$response = $this->call('proxy.create', [
-			'host' => 'ProxyP',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'name' => 'ProxyP',
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [],
-			'interface' => [
-				"ip" => "127.0.0.1",
-				"dns" => "",
-				"useip" => "1",
-				"port" => "10099"
-			]
+			'address' => '127.0.0.1',
+			'port' => '10099',
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_NONE,
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
 		]);
-		$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid_passive = $response['result']['proxyids'][0];
 	}
 
@@ -1481,21 +1555,17 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid_active,
-			'proxy_address' => "127.9.9.9"
+			'allowed_addresses' => '127.9.9.9'
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid_passive,
-			'host' => "ProxyP1",
-			'interface' => [
-				"ip" => "127.1.30.2",
-				"dns" => "",
-				"useip" => "1",
-				"port" => "10299"
-			]
+			'name' => 'ProxyP1',
+			'address' => '127.1.30.2',
+			'port' => '10299'
 		]);
-		$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey('proxyids', $response['result']);
 	}
 
 	private function createGlobalMacros()
@@ -1787,6 +1857,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->createActions();
 		$this->createMaintenance();
+		$this->setupTlsForHost();
 	}
 
 	/**
@@ -1901,6 +1972,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->updateGlobalMacro();
 		$this->updateAction();
+		$this->updateTlsForHost();
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);

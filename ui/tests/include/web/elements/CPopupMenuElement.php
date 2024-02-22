@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -152,5 +152,16 @@ class CPopupMenuElement extends CElement {
 	 */
 	public function getSelected() {
 		return $this->query('xpath:.//a[contains(@aria-label, "selected")]')->one();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isDisplayed();
+		};
 	}
 }

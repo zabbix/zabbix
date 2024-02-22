@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 * be disabled otherwise).
 			 */
 			$steps = $this->getInput('steps', []);
+
 			if ($ret && $steps) {
 				$steps = normalizeItemPreprocessingSteps($steps);
 
@@ -116,7 +117,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 						break;
 
 					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+						$api_input_rules = CItemPrototype::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
 						break;
 
 					case self::ZBX_TEST_TYPE_LLD:
@@ -127,6 +128,32 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
 					error($error);
 					$ret = false;
+				}
+
+				if ($ret && $this->test_type != self::ZBX_TEST_TYPE_LLD) {
+					$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+						'type' =>	['type' => API_ANY],
+						'params' =>	['type' => API_ANY]
+					]];
+					$_steps = [];
+
+					foreach ($steps as $i => $step) {
+						if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+							[$match_type] = explode("\n", $step['params']);
+
+							if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+								$_steps[$i] = [
+									'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+									'params' => ZBX_PREPROC_MATCH_ERROR_ANY
+								];
+							}
+						}
+					}
+
+					if (!CApiInputValidator::validateUniqueness($api_input_rules, $_steps, '', $error)) {
+						error($error);
+						$ret = false;
+					}
 				}
 			}
 			elseif ($ret && !$this->is_item_testable) {
@@ -161,19 +188,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps_input = $this->getInput('steps', []);
-		$preprocessing_steps_input = normalizeItemPreprocessingSteps($preprocessing_steps_input);
-		$preprocessing_steps = [];
-		foreach ($preprocessing_steps_input as $preproc) {
-			if ($preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-				array_unshift($preprocessing_steps, $preproc);
-			}
-			else {
-				$preprocessing_steps[] = $preproc;
-			}
-		}
-
-		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
+		$preprocessing_steps = CItemGeneralHelper::sortPreprocessingSteps((array) $this->getInput('steps', []));
+		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
+		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
@@ -263,19 +280,27 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					$texts_having_macros = array_filter($inputs[$field][$key], function($str) {
-						return (strstr($str, '{') !== false);
-					});
+				foreach ($inputs[$field] as $num => $row) {
+					if ($row['name'] === '') {
+						unset($inputs[$field][$num]);
+					}
+				}
 
-					if ($texts_having_macros) {
-						$supported_macros = array_merge_recursive($supported_macros, $macros);
-						$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
-						$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+				$texts_having_macros = array_merge(
+					array_column($inputs[$field], 'name'),
+					array_column($inputs[$field], 'value')
+				);
+				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
+					return (strstr($str, '{') !== false);
+				});
 
-						if ($support_lldmacros) {
-							$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
-						}
+				if ($texts_having_macros) {
+					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+
+					if ($support_lldmacros) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 					}
 				}
 			}
@@ -403,6 +428,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
+			'not_supported' => array_key_exists('not_supported', $data) ? $data['not_supported'] : 0,
+			'runtime_error' => array_key_exists('runtime_error', $data) ? $data['runtime_error'] : '',
 			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
 			'macros' => $usermacros['macros'],
 			'show_prev' => $show_prev,

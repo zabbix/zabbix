@@ -1,7 +1,10 @@
 if SERVER
 noinst_PROGRAMS = \
 	DBselect_uint64 \
-	DBadd_condition_alloc
+	DBadd_condition_alloc \
+	zbx_merge_tags \
+	zbx_del_tags \
+	zbx_add_tags
 else
 if PROXY
 noinst_PROGRAMS = \
@@ -15,6 +18,7 @@ COMMON_SRC = \
 COMMON_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 COMMON_LIB = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
@@ -65,7 +69,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
-	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
+	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -114,6 +118,51 @@ DBadd_condition_alloc_LDADD += @SERVER_LIBS@
 DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
+
+zbx_merge_tags_SOURCES = \
+	dbhigh_test.c \
+	zbx_merge_tags.c \
+	$(COMMON_SRC)
+
+zbx_merge_tags_LDADD = \
+	$(SERVER_COMMON_LIB) \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a
+
+zbx_merge_tags_LDADD += @SERVER_LIBS@
+
+zbx_merge_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_merge_tags_CFLAGS = $(COMMON_FLAGS)
+
+zbx_del_tags_SOURCES = \
+	dbhigh_test.c \
+	zbx_del_tags.c \
+	$(COMMON_SRC)
+
+zbx_del_tags_LDADD = \
+	$(SERVER_COMMON_LIB) \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a
+
+zbx_del_tags_LDADD += @SERVER_LIBS@
+
+zbx_del_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_del_tags_CFLAGS = $(COMMON_FLAGS)
+
+zbx_add_tags_SOURCES = \
+	dbhigh_test.c \
+	zbx_add_tags.c \
+	$(COMMON_SRC)
+
+zbx_add_tags_LDADD = \
+	$(SERVER_COMMON_LIB) \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a
+
+zbx_add_tags_LDADD += @SERVER_LIBS@
+
+zbx_add_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_add_tags_CFLAGS = $(COMMON_FLAGS)
 
 else
 if PROXY

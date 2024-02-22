@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,36 +37,30 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 // Proxy tab.
 
 $interface = (new CTable())
-	->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')])
+	->setHeader([_('Address'), _('Port')])
 	->addRow([
-		(new CTextBox('ip', $data['form']['interface']['ip'], false, DB::getFieldLength('interface', 'ip')))
-			->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
-		(new CTextBox('dns', $data['form']['interface']['dns'], false, DB::getFieldLength('interface', 'dns')))
-			->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
-		(new CRadioButtonList('useip', (int) $data['form']['interface']['useip']))
-			->addValue('IP', INTERFACE_USE_IP)
-			->addValue('DNS', INTERFACE_USE_DNS)
-			->setModern(true),
-		(new CTextBox('port', $data['form']['interface']['port'], false, DB::getFieldLength('interface', 'port')))
+		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
+			->setWidth(336),
+		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setAriaRequired()
 	]);
 
 $proxy_tab = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Proxy name'), 'host'))->setAsteriskMark(),
+		(new CLabel(_('Proxy name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('host', $data['form']['host'], false, DB::getFieldLength('hosts', 'host')))
+			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
-		new CLabel(_('Proxy mode'), 'status'),
+		new CLabel(_('Proxy mode'), 'operating_mode'),
 		new CFormField(
-			(new CRadioButtonList('status', $data['form']['status']))
-				->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
-				->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+			(new CRadioButtonList('operating_mode', $data['form']['operating_mode']))
+				->addValue(_('Active'), PROXY_OPERATING_MODE_ACTIVE)
+				->addValue(_('Passive'), PROXY_OPERATING_MODE_PASSIVE)
 				->setModern(true)
 		)
 	])
@@ -79,10 +73,10 @@ $proxy_tab = (new CFormGrid())
 		))->addClass('js-interface')
 	])
 	->addItem([
-		(new CLabel(_('Proxy address'), 'proxy_address'))->addClass('js-proxy-address'),
+		(new CLabel(_('Proxy address'), 'allowed_addresses'))->addClass('js-proxy-address'),
 		(new CFormField(
-			(new CTextBox('proxy_address', $data['form']['proxy_address'], false,
-				DB::getFieldLength('hosts', 'proxy_address')
+			(new CTextBox('allowed_addresses', $data['form']['allowed_addresses'], false,
+				DB::getFieldLength('proxy', 'allowed_addresses')
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('js-proxy-address')
 	])
@@ -90,7 +84,7 @@ $proxy_tab = (new CFormGrid())
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['form']['description']))
-				->setMaxlength(DB::getFieldLength('hosts', 'description'))
+				->setMaxlength(DB::getFieldLength('proxy', 'description'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	]);
@@ -136,7 +130,7 @@ $encryption_tab = (new CFormGrid())
 			->setAsteriskMark(),
 		(new CFormField(
 			(new CTextBox('tls_psk_identity', $data['form']['tls_psk_identity'], false,
-				DB::getFieldLength('hosts', 'tls_psk_identity')
+				DB::getFieldLength('proxy', 'tls_psk_identity')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -147,7 +141,7 @@ $encryption_tab = (new CFormGrid())
 			->addClass('js-tls-psk')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('tls_psk', $data['form']['tls_psk'], false, DB::getFieldLength('hosts', 'tls_psk')))
+			(new CTextBox('tls_psk', $data['form']['tls_psk'], false, DB::getFieldLength('proxy', 'tls_psk')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->disableAutocomplete()
@@ -186,10 +180,133 @@ $encryption_tab
 		))->addClass('js-tls-subject')
 	]);
 
-$tabs = (new CTabView())
+// Timeouts tab.
+$custom_timeouts_enabled = $data['form']['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED;
+$version_mismatch_hint = $data['version_mismatch']
+	? new CSpan(makeWarningIcon(_('Timeouts are disabled because the proxy and server versions do not match.')))
+	: null;
+
+$timeouts_tab = (new CFormGrid())
+	->addItem([
+		new CLabel([_('Timeouts for item types'), $version_mismatch_hint], 'custom_timeouts'),
+		new CFormField([
+			(new CRadioButtonList('custom_timeouts', $data['form']['custom_timeouts']))
+				->addValue(_('Global'), ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED)
+				->addValue(_('Override'), ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED)
+				->setModern()
+				->setEnabled(!$data['version_mismatch']),
+			$data['user']['can_edit_global_timeouts']
+				? (new CLink(_('Global timeouts'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+				))->setTarget('_blank')
+				: null
+		])
+	])
+	->addItem([
+		(new CLabel(_('Zabbix agent'), 'timeout_zabbix_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_zabbix_agent', $data['form']['timeout_zabbix_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_zabbix_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Simple check'), 'timeout_simple_check'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_simple_check', $data['form']['timeout_simple_check'], false,
+				DB::getFieldLength('proxy', 'timeout_simple_check')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('SNMP agent'), 'timeout_snmp_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_snmp_agent', $data['form']['timeout_snmp_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_snmp_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('External check'), 'timeout_external_check'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_external_check', $data['form']['timeout_external_check'], false,
+				DB::getFieldLength('proxy', 'timeout_external_check')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Database monitor'), 'timeout_db_monitor'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_db_monitor', $data['form']['timeout_db_monitor'], false,
+				DB::getFieldLength('proxy', 'timeout_db_monitor')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('HTTP agent'), 'timeout_http_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_http_agent', $data['form']['timeout_http_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_http_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('SSH agent'), 'timeout_ssh_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_ssh_agent', $data['form']['timeout_ssh_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_ssh_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('TELNET agent'), 'timeout_telnet_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_telnet_agent', $data['form']['timeout_telnet_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_telnet_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'timeout_script'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_script', $data['form']['timeout_script'], false,
+				DB::getFieldLength('proxy', 'timeout_script')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	]);
+
+$tabs = (new CTabView(['id' => 'proxy-tabs']))
 	->setSelected(0)
 	->addTab('proxy-tab', _('Proxy'), $proxy_tab)
-	->addTab('proxy-encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_PROXY_ENCRYPTION);
+	->addTab('proxy-encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_PROXY_ENCRYPTION)
+	->addTab('proxy-timeouts-tab', _('Timeouts'), $timeouts_tab, TAB_INDICATOR_PROXY_TIMEOUTS);
 
 // Output.
 

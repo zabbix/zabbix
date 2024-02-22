@@ -111,7 +111,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco ASAv: {#CISCO.IF.NAME} Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|Cisco ASAv: {#CISCO.IF.NAME} Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'eternal off' interfaces.)<br><br>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule Memory discovery
 

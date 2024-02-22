@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,11 +22,18 @@
 namespace Zabbix\Core;
 
 use CControllerDashboardWidgetEdit,
-	CControllerDashboardWidgetView;
+	CControllerDashboardWidgetView,
+	CWidgetsData;
 
-use Zabbix\Widgets\CWidgetForm;
+use Zabbix\Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
 
-use Zabbix\Widgets\Fields\CWidgetFieldSelect;
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldReference,
+	CWidgetFieldSelect
+};
 
 /**
  * Base class for user widgets. If Widget.php is not provided by user widget, this class will be instantiated instead.
@@ -37,10 +44,6 @@ class CWidget extends CModule {
 	public const DEFAULT_JS_CLASS		= 'CWidget';
 	public const DEFAULT_SIZE			= ['width' => 12, 'height' => 5];
 	public const DEFAULT_REFRESH_RATE	= 60;
-
-	// Dashboard widget dynamic state.
-	public const SIMPLE_ITEM = 0;
-	public const DYNAMIC_ITEM = 1;
 
 	final public function getForm(array $values, ?string $templateid): CWidgetForm {
 		$form_class = implode('\\', [$this->getNamespace(), 'Includes', $this->manifest['widget']['form_class']]);
@@ -61,9 +64,47 @@ class CWidget extends CModule {
 			))->setDefault(-1)
 		);
 
-		return $form
-			->addFields()
-			->setFieldsValues();
+		$in_params = $this->getIn();
+
+		if ($form_class === CWidgetForm::class) {
+			foreach ($in_params as $name => $param) {
+				$form->addField($this->makeField($name, $param));
+			}
+		}
+		else {
+			$form->addFields();
+		}
+
+		$data_types = CWidgetsData::getDataTypes();
+
+		/** @var CWidgetField $field */
+		foreach ($form->getFields() as $field) {
+			if (array_key_exists($field->getName(), $in_params)) {
+				$data_type = $in_params[$field->getName()]['type'];
+
+				$field->setInType($data_type);
+
+				if (array_key_exists($data_type, $data_types) && $data_types[$data_type]['accepts_dashboard']) {
+					$field->acceptDashboard();
+				}
+
+				$field->acceptWidget();
+
+				if (array_key_exists('prevent_default', $in_params[$field->getName()])) {
+					$field->preventDefault();
+				}
+			}
+		}
+
+		if ($this->getOut()) {
+			$form->addField(
+				new CWidgetFieldReference()
+			);
+		}
+
+		$form->setFieldsValues();
+
+		return $form;
 	}
 
 	final public function getActions(): array {
@@ -91,7 +132,9 @@ class CWidget extends CModule {
 		return [
 			'name' => $this->getDefaultName(),
 			'size' => $this->getDefaultSize(),
-			'js_class' => $this->getJSClass()
+			'js_class' => $this->getJSClass(),
+			'in' => $this->getIn(),
+			'out' => $this->getOut()
 		];
 	}
 
@@ -135,14 +178,18 @@ class CWidget extends CModule {
 		return $this->manifest['widget']['js_class'];
 	}
 
+	public function getIn(): array {
+		return $this->manifest['widget']['in'];
+	}
+
+	public function getOut(): array {
+		return $this->manifest['widget']['out'];
+	}
+
 	public function getDefaultRefreshRate(): int {
 		return array_key_exists($this->manifest['widget']['refresh_rate'], self::getRefreshRates())
 			? (int) $this->manifest['widget']['refresh_rate']
 			: self::DEFAULT_REFRESH_RATE;
-	}
-
-	public function usesTimeSelector(array $fields_values): bool {
-		return (bool) $this->manifest['widget']['use_time_selector'];
 	}
 
 	private static function getRefreshRates(): array {
@@ -155,5 +202,21 @@ class CWidget extends CModule {
 			600 => _n('%1$s minute', '%1$s minutes', 10),
 			900 => _n('%1$s minute', '%1$s minutes', 15)
 		];
+	}
+
+	private function makeField($name, $param): ?CWidgetField {
+		$data_types = CWidgetsData::getDataTypes();
+
+		if (!array_key_exists($param['type'], $data_types)) {
+			return null;
+		}
+
+		[
+			'field_class' => $field_class,
+			'label' => $label,
+			'is_multiple' => $is_multiple
+		] = $data_types[$param['type']];
+
+		return (new $field_class($name, $label))->setMultiple($is_multiple);
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ zbx_startup_type_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert service state code from value used in Microsoft Windows   *
+ * Purpose: converts service state code from value used in Microsoft Windows  *
  *          to value used in Zabbix                                           *
  *                                                                            *
  * Parameters: state - [IN] service state code (e.g. obtained via             *
- *                     QueryServiceStatus() function)                         *
+ *                          QueryServiceStatus() function)                    *
  *                                                                            *
  * Return value: service state code used in Zabbix or 7 if service state code *
  *               is not recognized by this function                           *
@@ -124,8 +124,8 @@ static void	log_if_buffer_too_small(const char *function_name, DWORD sz)
  * Parameters:                                                                *
  *     hService - [IN] QueryServiceConfig() parameter 'hService'              *
  *     buf      - [OUT] QueryServiceConfig() parameter 'lpServiceConfig'.     *
- *                Pointer to a caller supplied buffer with size               *
- *                ZBX_QSC_BUFSIZE bytes !                                     *
+ *                      Pointer to a caller supplied buffer with size         *
+ *                      ZBX_QSC_BUFSIZE bytes !                               *
  * Return value:                                                              *
  *      SUCCEED - data were successfully copied into 'buf'                    *
  *      FAIL    - use zbx_strerror_from_system(GetLastError()) to see what    *
@@ -152,12 +152,12 @@ static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf
  *     hService    - [IN] QueryServiceConfig2() parameter 'hService'          *
  *     dwInfoLevel - [IN] QueryServiceConfig2() parameter 'dwInfoLevel'       *
  *     buf         - [OUT] QueryServiceConfig2() parameter 'lpBuffer'.        *
- *                   Pointer to a caller supplied buffer with size            *
- *                   ZBX_QSC_BUFSIZE bytes !                                  *
+ *                         Pointer to a caller supplied buffer with size      *
+ *                         ZBX_QSC_BUFSIZE bytes !                            *
  * Return value:                                                              *
- *      SUCCEED - data were successfully copied into 'buf'                    *
+ *      SUCCEED - data was successfully copied into 'buf'                     *
  *      FAIL    - use zbx_strerror_from_system(GetLastError()) to see what    *
- *            failed                                                          *
+ *                failed                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_get_service_config2(SC_HANDLE hService, DWORD dwInfoLevel, LPBYTE buf)

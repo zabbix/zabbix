@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,6 +190,18 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		$info_table->addRow(
 			(new CRow([$dbversion['database'], $dbversion['current_version'], $error]))->addClass(ZBX_STYLE_RED)
 		);
+	}
+
+	foreach ($data['system_info']['dbversion_status'] as $dbversion ) {
+		if ($dbversion['database'] === 'Oracle') {
+			$db_error = _(
+				'Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions.'
+			);
+
+			$info_table->addRow(
+				(new CRow([$dbversion['database'], '', $db_error]))->addClass(ZBX_STYLE_RED)
+			);
+		}
 	}
 
 	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])) {

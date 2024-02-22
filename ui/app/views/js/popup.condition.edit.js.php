@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ window.condition_popup = new class {
 	}
 
 	_loadViews() {
-		if (this.form.querySelector('#condition-type').value == <?= CONDITION_TYPE_SERVICE ?>) {
+		if (this.form.querySelector('#condition-type').value == <?= ZBX_CONDITION_TYPE_SERVICE ?>) {
 			$('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => this.selectServices());
@@ -142,7 +142,9 @@ window.condition_popup = new class {
 	}
 
 	selectServices() {
-		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
+		const overlay = PopUp('popup.services', {title: t('Services')},
+			{dialogueid: 'services', dialogue_class: 'modal-popup-generic'}
+		);
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
 			for (const service of e.detail) {

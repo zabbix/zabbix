@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,11 +33,10 @@ typedef enum
 }
 zbx_async_task_state_t;
 
-typedef int (*zbx_async_task_process_cb_t)(short event, void *data);
+typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd, const char *addr, char *dnserr);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
-
-void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
-		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
+void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
+		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
 #endif
 #endif

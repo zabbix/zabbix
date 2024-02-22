@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
@@ -492,7 +491,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->param = -1.0;			\
 	} while(0)
 
-	int				zbx_proc_mode, i;
+	int				zbx_proc_mode;
 	struct zbx_json			j;
 	HANDLE				hProcessSnap, hThreadSnap;
 	PROCESSENTRY32			pe32;
@@ -684,14 +683,12 @@ next:
 
 	if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
 	{
-		int	k;
-
-		for (i = 0; i < proc_data_ctx.values_num; i++)
+		for (int i = 0; i < proc_data_ctx.values_num; i++)
 		{
 			proc_data = proc_data_ctx.values[i];
 			proc_data->processes = 1;
 
-			for (k = i + 1; k < proc_data_ctx.values_num; k++)
+			for (int k = i + 1; k < proc_data_ctx.values_num; k++)
 			{
 				proc_data_t	*pdata_cmp = proc_data_ctx.values[k];
 
@@ -726,7 +723,7 @@ next:
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < proc_data_ctx.values_num; i++)
+	for (int i = 0; i < proc_data_ctx.values_num; i++)
 	{
 		proc_data = proc_data_ctx.values[i];
 

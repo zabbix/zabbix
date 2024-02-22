@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class CControllerDiscoveryEdit extends CController {
 
 		if ($this->hasInput('druleid')) {
 			$drules = API::DRule()->get([
-				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status', 'concurrency_max'],
+				'output' => ['name', 'proxyid', 'iprange', 'delay', 'status', 'concurrency_max'],
 				'druleids' => $this->getInput('druleid'),
 				'selectDChecks' => [
 					'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
@@ -111,7 +111,7 @@ class CControllerDiscoveryEdit extends CController {
 			'delay' => DB::getDefault('drules', 'delay'),
 			'status' => DB::getDefault('drules', 'status'),
 			'concurrency_max' => DB::getDefault('drules', 'concurrency_max'),
-			'proxy_hostid' => 0,
+			'proxyid' => 0,
 			'uniqueness_criteria' => -1,
 			'host_source' => DB::getDefault('dchecks', 'host_source'),
 			'name_source' => DB::getDefault('dchecks', 'name_source')
@@ -136,9 +136,9 @@ class CControllerDiscoveryEdit extends CController {
 		];
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host']
+			'output' => ['proxyid', 'name']
 		]);
-		CArrayHelper::sort($data['proxies'], ['host']);
+		CArrayHelper::sort($data['proxies'], ['name']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));

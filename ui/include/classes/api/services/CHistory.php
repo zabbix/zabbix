@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ class CHistory extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'push' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName;
@@ -329,13 +330,16 @@ class CHistory extends CApiService {
 	 * @throws APIException if compression is enabled
 	 */
 	private static function validateClear(array $itemids, array &$db_items = null): void {
+		global $DB;
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
+				&& self::checkCompressionAvailability() === true) {
 			self::exception(ZBX_API_ERROR_INTERNAL, _('History cleanup is not supported if compression is enabled'));
 		}
 
@@ -350,5 +354,61 @@ class CHistory extends CApiService {
 		if (count($db_items) != count($itemids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+	}
+
+	/**
+	 * Returns true if database supports data compression. False otherwise.
+	 */
+	private static function checkCompressionAvailability(): bool {
+		$dbversion_status = CSettingsHelper::getDbVersionStatus();
+
+		foreach ($dbversion_status as $dbversion) {
+			if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				return array_key_exists('compression_availability', $dbversion)
+					&& (bool) $dbversion['compression_availability'];
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array $history
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function push(array $history): array {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'itemid' =>	['type' => API_ID],
+			'host' =>	['type' => API_STRING_UTF8],
+			'key' =>	['type' => API_STRING_UTF8],
+			'value' =>	['type' => API_VALUE, 'flags' => API_REQUIRED],
+			'clock' =>	['type' => API_TIMESTAMP],
+			'ns' =>		['type' => API_INT32, 'in' => '0:999999999']
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $history, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$result = $zabbix_server->pushHistory($history, self::getAuthIdentifier());
+
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $zabbix_server->getError());
+		}
+
+		return [
+			'response' => 'success',
+			'data' => $result
+		];
 	}
 }

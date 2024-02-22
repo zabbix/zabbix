@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,17 +29,17 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareProxyData
  *
- * @backup hosts
+ * @backup proxy
  */
 class testFormAdministrationProxies extends CWebTest {
 
-	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
+	private $sql = 'SELECT * FROM proxy ORDER BY proxyid';
 
-	private static $update_proxy = 'Active proxy for update';
-	private static $change_active_proxy = 'Active proxy for refresh cancel simple update';
-	private static $change_passive_proxy = 'Passive proxy for refresh cancel simple update';
-	private static $delete_proxy_with_hosts = 'Proxy_2 for filter';
-	private static $delete_proxy_with_discovery_rule = 'Proxy for Discovery rule';
+	protected static $update_proxy = 'Active proxy for update';
+	const CHANGE_ACTIVE_PROXY = 'Active proxy for refresh cancel simple update';
+	const CHANGE_PASSIVE_PROXY = 'Passive proxy for refresh cancel simple update';
+	const DELETE_PROXY_WITH_HOSTS = 'Proxy_2 for filter';
+	const DELETE_PROXY_WITH_DISCOVERY_RULE = 'Delete Proxy used in Network discovery rule';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -56,15 +56,15 @@ class testFormAdministrationProxies extends CWebTest {
 	public function prepareProxyData() {
 		CDataHelper::call('proxy.create', [
 			[
-				'host' => self::$update_proxy,
-				'status' => 5,
+				'name' => self::$update_proxy,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Description for update',
 				'tls_connect' => 1,
 				'tls_accept'=> 1
 			],
 			[
-				'host' => self::$change_active_proxy,
-				'status' => 5,
+				'name' => self::CHANGE_ACTIVE_PROXY,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
 				'tls_accept'=> 7,
@@ -72,22 +72,38 @@ class testFormAdministrationProxies extends CWebTest {
 				'tls_psk' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
 				'tls_issuer' => 'activerefreshpsk',
 				'tls_subject' => 'activerefreshpsk',
-				'proxy_address' => '127.0.1.2'
+				'allowed_addresses' => '127.0.1.2',
+				'custom_timeouts' => 1,
+				'timeout_zabbix_agent' => '300s',
+				'timeout_simple_check' => '300s',
+				'timeout_snmp_agent' => '300s',
+				'timeout_external_check' => '300s',
+				'timeout_db_monitor' => '300s',
+				'timeout_http_agent' => '300s',
+				'timeout_ssh_agent' => '300s',
+				'timeout_telnet_agent' => '300s',
+				'timeout_script' => '300s'
 			],
 			[
-				'host' => self::$change_passive_proxy,
-				'status' => 6,
+				'name' => self::CHANGE_PASSIVE_PROXY,
+				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+				'address' => '127.9.9.9',
+				'port' => 10051,
 				'description' => '_Passive description for refresh',
 				'tls_connect' => 4,
 				'tls_accept'=> 1,
 				'tls_issuer' => 'passiverefreshpsk',
 				'tls_subject' => 'passiverefreshpsk',
-				'interface' => [
-					'ip' => '127.9.9.9',
-					'dns' => 'refreshdns',
-					'useip' => '0',
-					'port' => '220'
-				]
+				'custom_timeouts' => 1,
+				'timeout_zabbix_agent' => '300s',
+				'timeout_simple_check' => '300s',
+				'timeout_snmp_agent' => '300s',
+				'timeout_external_check' => '300s',
+				'timeout_db_monitor' => '300s',
+				'timeout_http_agent' => '300s',
+				'timeout_ssh_agent' => '300s',
+				'timeout_telnet_agent' => '300s',
+				'timeout_script' => '300s'
 			]
 		]);
 	}
@@ -97,7 +113,7 @@ class testFormAdministrationProxies extends CWebTest {
 			// Data for Active proxy mode and Connections to proxy - No encryption.
 			[
 				[
-					'mode' => 'Active',
+					'operating_mode' => 'Active',
 					'check_layout' => true,
 					'check_alert' => true,
 					'Connections to proxy' => 'No encryption',
@@ -185,7 +201,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Active',
+					'operating_mode' => 'Active',
 					'Connections to proxy' => 'PSK',
 					'settings' => [
 						[
@@ -271,7 +287,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Active',
+					'operating_mode' => 'Active',
 					'Connections to proxy' => 'Certificate',
 					'settings' => [
 						[
@@ -358,7 +374,7 @@ class testFormAdministrationProxies extends CWebTest {
 			// Data for Passive proxy mode.
 			[
 				[
-					'mode' => 'Passive',
+					'operating_mode' => 'Passive',
 					'check_layout' => true,
 					'Connections from proxy' => [
 						'id:tls_accept_none' => true,
@@ -398,7 +414,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Passive',
+					'operating_mode' => 'Passive',
 					'Connections from proxy' => [
 						'id:tls_accept_none' => false,
 						'id:tls_accept_psk' => true,
@@ -437,7 +453,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Passive',
+					'operating_mode' => 'Passive',
 					'Connections from proxy' => [
 						'id:tls_accept_none' => false,
 						'id:tls_accept_psk' => false,
@@ -489,7 +505,7 @@ class testFormAdministrationProxies extends CWebTest {
 
 		// Following checks should be performed only in first case, because form is the same in all cases.
 		if (CTestArrayHelper::get($data, 'check_layout')) {
-			if ($data['mode'] === 'Active') {
+			if ($data['operating_mode'] === 'Active') {
 				// Check fields lengths.
 				$field_maxlengths = [
 					'Proxy name' => 128,
@@ -507,8 +523,42 @@ class testFormAdministrationProxies extends CWebTest {
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
 
+				// Check timeouts.
+				$form->selectTab('Timeouts');
+
+				// Check Timeouts for item types radio buttons.
+				$this->assertEquals(['Global', 'Override'],
+						$form->getField('Timeouts for item types')->asSegmentedRadio()->getLabels()->asText()
+				);
+
+				// Global timeouts link is clickable.
+				$this->assertTrue($form->query('link:Global timeouts')->one()->isClickable());
+
+				// Default value for proxy should be Global.
+				$form->checkValue(['Timeouts for item types' => 'Global']);
+
+				// Available timeouts list.
+				$timeouts = ['Zabbix agent', 'Simple check', 'SNMP agent', 'External check', 'Database monitor',
+						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script'
+				];
+
+				// Every timeout has mandatory status.
+				$this->assertEquals($timeouts, $form->getRequiredLabels());
+
+				// Check timeouts fields values and status after switching between Global and Override.
+				foreach (['Override' => true, 'Global' => false] as $timeout => $enabled) {
+					$form->fill(['Timeouts for item types' => $timeout]);
+
+					foreach ($timeouts as $timeout) {
+						$field = $form->getField($timeout);
+						$this->assertEquals('3s', $field->getValue());
+						$this->assertEquals(255, $field->getAttribute('maxlength'));
+						$this->assertEquals($enabled, $field->isClickable());
+					}
+				}
+
 				// Check form tabs.
-				$this->assertEquals(['Proxy', 'Encryption'], $form->getTabs());
+				$this->assertEquals(['Proxy', 'Encryption', 'Timeouts'], $form->getTabs());
 				$form->checkValue(['Proxy mode' => 'Active']);
 			}
 			else{
@@ -520,18 +570,15 @@ class testFormAdministrationProxies extends CWebTest {
 				// Check Interface field for passive scenario.
 				$selector = 'xpath:.//div[@class="table-forms-separator"]/table';
 				$this->assertTrue($dialog->query($selector)->one()->isEnabled());
-				$this->assertEquals(['IP address', 'DNS name', 'Connect to', 'Port'],
-						$dialog->query($selector)->one()->asTable()->getHeadersText()
-				);
+				$this->assertEquals(['Address', 'Port'], $dialog->query($selector)->one()->asTable()->getHeadersText());
 
 				// Check interface fields values.
-				foreach (['ip' => '127.0.0.1', 'dns' => 'localhost', 'port' => '10051'] as $id => $value) {
+				foreach (['address' => '127.0.0.1', 'port' => '10051'] as $id => $value) {
 					$this->assertEquals($value, $dialog->query('id', $id)->one()->getValue());
 				}
-				$this->assertEquals('IP', $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue());
 
 				// Check interface fields lengths.
-				foreach (['ip' => 64, 'dns' => 255, 'port' => 64] as $id => $length) {
+				foreach (['address' => 255, 'port' => 64] as $id => $length) {
 					$this->assertEquals($length, $dialog->query('id', $id)->one()->getAttribute('maxlength'));
 				}
 			}
@@ -546,7 +593,7 @@ class testFormAdministrationProxies extends CWebTest {
 			]);
 		}
 		else {
-			if ($data['mode'] === 'Passive') {
+			if ($data['operating_mode'] === 'Passive') {
 				$form->fill(['Proxy mode' => 'Passive']);
 			}
 
@@ -554,16 +601,16 @@ class testFormAdministrationProxies extends CWebTest {
 		}
 
 		// Condition for checking connection encryption fields.
-		$condition = ($data['mode'] === 'Active')
+		$condition = ($data['operating_mode'] === 'Active')
 			? ($data['Connections to proxy'] !== 'No encryption')
 			: ($data['Connections from proxy'] !== [
-				'id:tls_accept_none' => true,
-				'id:tls_accept_psk' => false,
-				'id:tls_accept_certificate' => false
-			]);
+					'id:tls_accept_none' => true,
+					'id:tls_accept_psk' => false,
+					'id:tls_accept_certificate' => false
+				]);
 
-		$checked_proxy = ($data['mode'] === 'Active') ? 'Active' : 'Passive';
-		$opposite_proxy = ($data['mode'] === 'Active') ? 'Passive' : 'Active';
+		$checked_proxy = ($data['operating_mode'] === 'Active') ? 'Active' : 'Passive';
+		$opposite_proxy = ($data['operating_mode'] === 'Active') ? 'Passive' : 'Active';
 
 		$this->switchAndAssertEncryption($data, $form, $condition, $checked_proxy, $opposite_proxy);
 
@@ -632,7 +679,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [],
-					'error' => 'Incorrect value for field "host": cannot be empty.'
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -662,7 +709,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => ''
 					],
-					'error' => 'Incorrect value for field "host": cannot be empty.'
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -671,7 +718,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '@#$%^&*()_+'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -680,7 +727,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '😀'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -689,7 +736,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{$USERMACRO}'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -698,7 +745,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{#LLDMACRO}'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -707,7 +754,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'кириллица'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -716,9 +763,9 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'Empty IP address',
 						'Proxy mode' => 'Passive',
-						'id:ip' => ''
+						'id:address' => ''
 					],
-					'error' => 'Incorrect value for field "IP address": cannot be empty.'
+					'error' => 'Incorrect value for field "Address": cannot be empty.'
 				]
 			],
 			[
@@ -736,23 +783,11 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'Empty DNS',
+						'Proxy name' => 'Wrong Address',
 						'Proxy mode' => 'Passive',
-						'id:dns' => '',
-						'id:useip' => 'DNS'
+						'id:address' => '🙂🙂🙂😀😀😀'
 					],
-					'error' => 'Incorrect value for field "DNS name": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Wrong IP',
-						'Proxy mode' => 'Passive',
-						'id:ip' => '127.0.0.999'
-					],
-					'error' => 'Invalid parameter "/1/interface/ip": an IP address is expected.'
+					'error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
 				]
 			],
 			[
@@ -763,7 +798,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:port' => 65536
 					],
-					'error' => 'Invalid parameter "/1/interface/port": value must be one of 0-65535.'
+					'error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
 				]
 			],
 			[
@@ -841,6 +876,691 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'All timeouts fields empty',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '',
+						'Simple check' => '',
+						'SNMP agent' => '',
+						'External check' => '',
+						'Database monitor' => '',
+						'HTTP agent' => '',
+						'SSH agent' => '',
+						'TELNET agent' => '',
+						'Script' => ''
+					],
+					'error' => [
+						'Incorrect value for field "timeout_zabbix_agent": cannot be empty.',
+						'Incorrect value for field "timeout_simple_check": cannot be empty.',
+						'Incorrect value for field "timeout_snmp_agent": cannot be empty.',
+						'Incorrect value for field "timeout_external_check": cannot be empty.',
+						'Incorrect value for field "timeout_db_monitor": cannot be empty.',
+						'Incorrect value for field "timeout_http_agent": cannot be empty.',
+						'Incorrect value for field "timeout_ssh_agent": cannot be empty.',
+						'Incorrect value for field "timeout_telnet_agent": cannot be empty.',
+						'Incorrect value for field "timeout_script": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Zabbix agent timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Zabbix agent timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Zabbix agent timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Zabbix agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Simple check timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Simple check' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Simple check timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Simple check' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Simple check timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Simple check' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_simple_check": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Simple check timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Simple check' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_simple_check": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SNMP agent timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SNMP agent timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SNMP agent timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": a number is too large'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SNMP agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'External check timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'External check timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'External check timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'External check timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Database monitor timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Database monitor' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Database monitor timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Database monitor' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Database monitor timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Database monitor' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_db_monitor": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Database monitor timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Database monitor' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_db_monitor": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'HTTP agent timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'HTTP agent' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'HTTP agent timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'HTTP agent' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'HTTP agent timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'HTTP agent' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_http_agent": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'HTTP agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'HTTP agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_http_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SSH agent timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SSH agent timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SSH agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'SSH agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'TELNET agent timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'TELNET agent timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'TELNET agent timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'TELNET agent timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Script timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Script' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Script timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Script' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Script timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Script' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_script": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Script timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Script' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_script": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - global macros',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'TELNET agent' => '{PROXY.NAME}'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - LLD macros',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '{#MACROS}'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - XSS',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SSH agent' => '<script>alert("hi!");</script>'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - unicode',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'SNMP agent' => '☺♥²©™"\''
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Timeouts field - error order',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'External check' => 'test',
+						'TELNET agent' => '800'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'proxy_fields' => [
+						'Proxy name' => 'All timeouts fields - 300',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '300',
+						'Simple check' => '300',
+						'SNMP agent' => '300',
+						'External check' => '300',
+						'Database monitor' => '300',
+						'HTTP agent' => '300',
+						'SSH agent' => '300',
+						'TELNET agent' => '300',
+						'Script' => '300'
+					]
+				]
+			],
+			[
+				[
+					'proxy_fields' => [
+						'Proxy name' => 'All timeouts fields - macros',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Zabbix agent' => '{$MACROS}',
+						'Simple check' => '{$MACROS}',
+						'SNMP agent' => '{$MACROS}',
+						'External check' => '{$MACROS}',
+						'Database monitor' => '{$MACROS}',
+						'HTTP agent' => '{$MACROS}',
+						'SSH agent' => '{$MACROS}',
+						'TELNET agent' => '{$MACROS}',
+						'Script' => '{$MACROS}'
+					]
+				]
+			],
+			[
+				[
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy No encryption',
 						'Proxy mode' => 'Passive'
@@ -874,8 +1594,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'IPv6',
 						'Proxy mode' => 'Passive',
-						'id:ip' => '::1',
-						'id:useip' => 'IP',
+						'id:address' => '::1',
 						'id:port' => 999
 					]
 				]
@@ -903,9 +1622,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy PSK',
 						'Proxy mode' => 'Passive',
-						'id:ip' => '192.168.2.3',
-						'id:dns' => 'mytesthost',
-						'id:useip' => 'DNS',
+						'id:address' => '192.168.2.3',
 						'id:port' => 65535
 					],
 					'encryption_fields' => [
@@ -935,8 +1652,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'IPv6 _2',
 						'Proxy mode' => 'Passive',
-						'id:ip' => 'fe80::1ff:fe23:4567:890a',
-						'id:useip' => 'IP',
+						'id:address' => 'fe80::1ff:fe23:4567:890a',
 						'id:port' => 0
 					]
 				]
@@ -991,9 +1707,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy Certificate',
 						'Proxy mode' => 'Passive',
-						'id:ip' => '192.168.3.99',
-						'id:dns' => 'mytesthost',
-						'id:useip' => 'IP'
+						'id:address' => '192.168.3.99'
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'Certificate',
@@ -1088,6 +1802,14 @@ class testFormAdministrationProxies extends CWebTest {
 			}
 		}
 
+		if (CTestArrayHelper::get($data, 'timeout_fields')) {
+			$form->selectTab('Timeouts');
+			$form->invalidate();
+
+			$form->fill(['Timeouts for item types' => 'Override']);
+			$form->fill($data['timeout_fields']);
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -1138,7 +1860,9 @@ class testFormAdministrationProxies extends CWebTest {
 			$dialog->close();
 
 			// Check DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy_fields']['Proxy name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM proxy WHERE name ='.
+					zbx_dbstr($data['proxy_fields']['Proxy name']))
+			);
 
 			if ($update) {
 				self::$update_proxy = $data['proxy_fields']['Proxy name'];
@@ -1150,12 +1874,46 @@ class testFormAdministrationProxies extends CWebTest {
 		return [
 			[
 				[
-					'proxy' => self::$change_active_proxy
+					'proxy' => self::CHANGE_ACTIVE_PROXY
 				]
 			],
 			[
 				[
-					'proxy' => self::$change_passive_proxy
+					'proxy' => self::CHANGE_PASSIVE_PROXY
+				]
+			],
+			[
+				[
+					'proxy' => 'Active proxy to delete',
+					'encryption_fields' => [
+						'id:tls_accept_none' => true,
+						'id:tls_accept_psk' => true,
+						'id:tls_accept_certificate' => true,
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'PSK',
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
+					]
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 3',
+					'encryption_fields' => [
+						'Connections to proxy' => 'Certificate',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
 				]
 			]
 		];
@@ -1204,7 +1962,7 @@ class testFormAdministrationProxies extends CWebTest {
 		$original_fields = $form->getFields()->asValues();
 
 		// Get original passive proxy interface fields.
-		if (strpos($data['proxy'], 'passive')) {
+		if (str_contains($data['proxy'], 'Passive')) {
 			$original_fields = $this->getInterfaceValues($dialog, $original_fields);
 		}
 
@@ -1216,6 +1974,8 @@ class testFormAdministrationProxies extends CWebTest {
 		$form->fill(['Proxy name' => $new_name]);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Proxy added');
+		// The next message 'Proxy updated' may not update on time.
+		CMessageElement::find()->one()->close();
 
 		// Check cloned proxy form fields.
 		$this->query('link', $new_name)->one()->waitUntilClickable()->click();
@@ -1225,12 +1985,22 @@ class testFormAdministrationProxies extends CWebTest {
 		$cloned_fields = $form->getFields()->asValues();
 
 		// Get cloned passive proxy interface fields.
-		if (strpos($data['proxy'], 'passive')) {
+		if (str_contains($data['proxy'], 'Passive')) {
 			$cloned_fields = $this->getInterfaceValues($dialog, $cloned_fields);
 		}
 
 		$this->assertEquals($original_fields, $cloned_fields);
-		$dialog->close();
+
+		// Check "Encryption" tabs functionality.
+		if (CTestArrayHelper::get($data, 'encryption_fields')) {
+			$form->selectTab('Encryption');
+			$form->fill($data['encryption_fields']);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Proxy updated');
+		}
+		else {
+			$dialog->close();
+		}
 	}
 
 	/**
@@ -1242,10 +2012,9 @@ class testFormAdministrationProxies extends CWebTest {
 	 * @return array
 	 */
 	private function getInterfaceValues($dialog, $fields) {
-		foreach (['ip', 'dns', 'port'] as $id) {
+		foreach (['address', 'port'] as $id) {
 			$fields[$id] = $dialog->query('id', $id)->one()->getValue();
 		}
-		$fields['useip'] = $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue();
 
 		return $fields;
 	}
@@ -1313,9 +2082,7 @@ class testFormAdministrationProxies extends CWebTest {
 			'proxy_fields' => [
 				'Proxy name' => 'Proxy for cancel',
 				'Proxy mode' => 'Passive',
-				'id:ip' => '192.8.8.8',
-				'id:dns' => 'canceldns',
-				'id:useip' => 'DNS',
+				'id:address' => '192.8.8.8',
 				'id:port' => 222,
 				'Description' => 'Description for cancel'
 			],
@@ -1369,15 +2136,16 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'proxy' => self::$delete_proxy_with_hosts,
+					'proxy' => self::DELETE_PROXY_WITH_HOSTS,
 					'error' => "Host \"Host_2 with proxy\" is monitored by proxy \"Proxy_2 for filter\"."
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'proxy' => self::$delete_proxy_with_discovery_rule,
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
+					'proxy' => self::DELETE_PROXY_WITH_DISCOVERY_RULE,
+					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
+						"\"Discovery rule for proxy delete test\"."
 				]
 			]
 		]);

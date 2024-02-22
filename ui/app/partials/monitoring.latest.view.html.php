@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ $form = (new CForm('GET', 'history.php'))
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
-$table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+$table = (new CTableInfo())->addClass(ZBX_STYLE_LIST_TABLE_FIXED);
 
 // Latest data header.
 $col_check_all = new CColHeader(
@@ -257,7 +257,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 			$item_delay = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -273,15 +273,31 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$table_row = new CRow([
 			$checkbox,
-			$host_name_container,
-			(new CCol([$item_name, $item_key]))->addClass($state_css),
-			(new CCol($item_delay))->addClass($state_css),
-			(new CCol($item_history))->addClass($state_css),
-			(new CCol($item_trends))->addClass($state_css),
-			(new CCol(item_type2str($item['type'])))->addClass($state_css),
-			(new CCol($last_check))->addClass($state_css),
-			(new CCol($last_value))->addClass($state_css),
-			(new CCol($change))->addClass($state_css),
+			(new CCol($host_name_container))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol([$item_name, $item_key]))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item_delay))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item_history))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item_trends))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol(item_type2str($item['type'])))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_check))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_value))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($change))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
@@ -290,11 +306,19 @@ foreach ($data['items'] as $itemid => $item) {
 	else {
 		$table_row = new CRow([
 			$checkbox,
-			$host_name_container,
-			(new CCol($item_name))->addClass($state_css),
-			(new CCol($last_check))->addClass($state_css),
-			(new CCol($last_value))->addClass($state_css),
-			(new CCol($change))->addClass($state_css),
+			(new CCol($host_name_container))->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item_name))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_check))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_value))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($change))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
@@ -307,10 +331,10 @@ foreach ($data['items'] as $itemid => $item) {
 $button_list = [
 	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph'), 'attributes' => ['data-required' => 'graph']],
 	GRAPH_TYPE_NORMAL => ['name' => _('Display graph'), 'attributes' => ['data-required' => 'graph']],
-	'item.masscheck_now' => [
+	'item.execute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
-			->onClick('view.massCheckNow(this);')
 			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massexecute-item')
 			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -408,7 +408,7 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$this->setUTFValue($container->query('xpath', $xpath)->one()->detect(), $value);
+					$container->query('xpath', $xpath)->one()->detect()->fill($value);
 				}
 			}
 
@@ -424,24 +424,9 @@ class CFormElement extends CElement {
 			return $this;
 		}
 
-		$this->setUTFValue($element, $values);
+		$element->fill($values);
 
 		return $this;
-	}
-
-	/**
-	 * Function for utf8mb4 values detection and filling.
-	 *
-	 * @param CElement $element   element to be filled
-	 * @param string   $value     value to be filled in
-	 */
-	protected function setUTFValue($element, $value) {
-		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
-		}
-		else {
-			$element->fill($value);
-		}
 	}
 
 	/**
@@ -506,7 +491,13 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	protected function checkFieldValue($field, $values, $raise_exception = true) {
-		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class, CHostInterfaceElement::class];
+		$classes = [
+			CMultifieldTableElement::class,
+			CMultiselectElement::class,
+			CCheckboxListElement::class,
+			CHostInterfaceElement::class,
+			CFormElement::class
+		];
 		$element = $this->getField($field);
 
 		if (is_array($values) && !in_array(get_class($element), $classes)) {

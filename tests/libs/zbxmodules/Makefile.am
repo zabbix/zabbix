@@ -65,6 +65,7 @@ server_module_load_LDADD = $(COMMON_LIBS1) \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(COMMON_LIBS2) @SERVER_LIBS@
+server_module_load_LDFLAGS = @SERVER_LDFLAGS@
 
 endif
 
@@ -87,6 +88,7 @@ proxy_module_load_LDADD = $(COMMON_LIBS1) \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(COMMON_LIBS2) @PROXY_LIBS@
+proxy_module_load_LDFLAGS = @PROXY_LDFLAGS@
 
 endif
 
@@ -110,10 +112,10 @@ agent_module_load_LDADD = $(COMMON_LIBS1) \
 	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
 	$(COMMON_LIBS2) \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
-	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	@AGENT_LIBS@
+agent_module_load_LDFLAGS = @AGENT_LDFLAGS@
 
 endif

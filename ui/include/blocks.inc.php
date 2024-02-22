@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ function getSystemStatusData(array $filter) {
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
 	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
-	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
+	$filter_tags = array_key_exists('tags', $filter) && $filter['tags'] ? $filter['tags'] : null;
 	$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
@@ -135,13 +135,8 @@ function getSystemStatusData(array $filter) {
 		'preservekeys' => true
 	];
 
-	if (array_key_exists('severities', $filter)) {
-		$filter_severities = implode(',', $filter['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-			$options['severities'] = $filter['severities'];
-		}
+	if (array_key_exists('severities', $filter) && $filter['severities']) {
+		$options['severities'] = $filter['severities'];
 	}
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
@@ -185,13 +180,13 @@ function getSystemStatusData(array $filter) {
 		$data['triggers'] = API::Trigger()->get($options);
 
 		if ($show_opdata && $data['triggers']) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name_resolved', 'key_', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			foreach ($data['triggers'] as &$trigger) {
 				foreach ($trigger['functions'] as $function) {
@@ -258,11 +253,11 @@ function getSystemStatusData(array $filter) {
 		// actions & tags
 		$problems_data = API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
-			'eventids' => array_keys($visible_problems),
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
 			'selectTags' => ['tag', 'value'],
+			'eventids' => array_keys($visible_problems),
 			'preservekeys' => true
 		]);
 

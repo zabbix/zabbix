@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,9 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldIntegerBox extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldIntegerBoxView::class;
+
+	private int $min;
 	private int $max;
 
 	/**
@@ -34,11 +37,10 @@ class CWidgetFieldIntegerBox extends CWidgetField {
 	public function __construct(string $name, string $label = null, int $min = 0, int $max = ZBX_MAX_INT32) {
 		parent::__construct($name, $label);
 
+		$this->min = $min;
 		$this->max = $max;
 
-		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => $min.':'.$this->max]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function setValue($value): self {
@@ -47,5 +49,10 @@ class CWidgetFieldIntegerBox extends CWidgetField {
 
 	public function getMaxLength(): int {
 		return strlen((string) $this->max);
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => $this->min.':'.$this->max];
 	}
 }

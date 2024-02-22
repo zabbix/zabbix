@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,9 +82,9 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => '',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Incorrect value for field "Template name": cannot be empty.'
+						'Incorrect value for field "template_name": cannot be empty.'
 					]
 
 				]
@@ -94,7 +94,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Without groups',
 					'remove_group' => 'Templates',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add template',
 					'errors' => [
 						'Field "groups" is mandatory.'
 					]
@@ -108,7 +108,7 @@ class testFormTemplate extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTemplate_Create($data) {
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates');
 		$filter->submit();
@@ -122,7 +122,7 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('group', $data)) {
-			$this->zbxTestClickButtonMultiselect('groups_');
+			$this->zbxTestClickButtonMultiselect('template_groups_');
 			$this->zbxTestLaunchOverlayDialog('Template groups');
 			$this->zbxTestClickLinkTextWait($data['group']);
 		}
@@ -132,7 +132,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 			for ($i = 0; $i < 3; $i++) {
 				try {
-					$this->zbxTestMultiselectNew('groups_', $data['new_group']);
+					$this->zbxTestMultiselectNew('template_groups_', $data['new_group']);
 					$selected = true;
 					break;
 				} catch (NoSuchElementException $ex) {
@@ -150,10 +150,10 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('remove_group', $data)) {
-			$this->zbxTestMultiselectRemove('groups_', $data['remove_group']);
+			$this->zbxTestMultiselectRemove('template_groups_', $data['remove_group']);
 		}
 
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->clickModalFooterButton('Add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -187,10 +187,7 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestLogin('templates.php?page=1');
-			$filter->invalidate();
-			$filter->getField('Template groups')->select('Templates');
-			$filter->submit();
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			$this->filterAndOpenTemplate($name);
@@ -198,14 +195,14 @@ class testFormTemplate extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
 
-			$this->zbxTestMultiselectAssertSelected('groups_', 'Templates');
+			$this->zbxTestMultiselectAssertSelected('template_groups_', 'Templates');
 
 			if (array_key_exists('new_group', $data)) {
-				$this->zbxTestMultiselectAssertSelected('groups_', $data['new_group']);
+				$this->zbxTestMultiselectAssertSelected('template_groups_', $data['new_group']);
 			}
 
 			if (array_key_exists('group', $data)) {
-				$this->zbxTestMultiselectAssertSelected('groups_', $data['group']);
+				$this->zbxTestMultiselectAssertSelected('template_groups_', $data['group']);
 			}
 
 			if (isset ($data['visible_name'])) {
@@ -216,15 +213,17 @@ class testFormTemplate extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('description', $data['description']);
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testFormTemplate_UpdateTemplateName() {
 		$new_template_name = 'Changed template name';
 
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template_edit_name);
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
-		$this->zbxTestClickWait('update');
+		$this->clickModalFooterButton('Update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$new_template_name."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_edit_name'"));
@@ -233,11 +232,15 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_CloneTemplate() {
 		$cloned_template_name = 'Cloned template';
 
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template_clone);
-		$this->zbxTestClickWait('clone');
+
+		$this->clickModalFooterButton('Clone');
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+
+		$this->clickModalFooterButton('Add');
+		COverlayDialogElement::find()->one()->ensureNotPresent();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
@@ -250,9 +253,9 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_Delete() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template);
-		$this->zbxTestClickWait('delete');
+		$this->clickModalFooterButton('Delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
 
@@ -262,9 +265,9 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_DeleteAndClearTemplate() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template_full_delete."'");
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template_full_delete);
-		$this->zbxTestClickWait('delete_and_clear');
+		$this->clickModalFooterButton('Delete and clear');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE hostid='".$template['hostid']."'"));
@@ -288,5 +291,16 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
+	}
+
+	/**
+	 * Clicks a button on the footer of the modal.
+	 *
+	 * @param string text    text of the button to be clicked
+	 */
+	protected function clickModalFooterButton($text) {
+		COverlayDialogElement::find()->one()
+				->query('xpath:./div[@class="overlay-dialogue-footer"]/button[text()='.CXPathHelper::escapeQuotes($text).']')
+				->WaitUntilClickable()->one()->click();
 	}
 }

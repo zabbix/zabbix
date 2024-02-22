@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, request->timeout, NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
 	return ret;

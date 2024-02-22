@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 
 class CLabel extends CTag {
 
+	private bool $has_asterisk = false;
+
 	public function __construct($label, $id = null) {
 		parent::__construct('label', true, $label);
 
@@ -38,11 +40,21 @@ class CLabel extends CTag {
 	/**
 	 * Allow to add visual 'asterisk' mark to label.
 	 *
-	 * @param bool $add_asterisk  Define is label marked with asterisk or not.
+	 * @param bool $has_asterisk  Define is label marked with asterisk or not.
 	 *
 	 * @return CLabel
 	 */
-	public function setAsteriskMark($add_asterisk = true) {
-		return $this->addClass($add_asterisk ? ZBX_STYLE_FIELD_LABEL_ASTERISK : null);
+	public function setAsteriskMark(bool $has_asterisk = true): self {
+		$this->has_asterisk = $has_asterisk;
+
+		return $this;
+	}
+
+	public function toString($destroy = true) {
+		if ($this->has_asterisk) {
+			$this->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK);
+		}
+
+		return parent::toString($destroy);
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_metrics();
 
-	zbx_execute_agent_check(in_command_string, flags_uint32, &result);
+	zbx_execute_agent_check(in_command_string, flags_uint32, &result, 3);
 
 	if (NULL != (p = strchr(in_command_string, '[')))
 		zbx_strlcpy(key, in_command_string, p - in_command_string + 1);

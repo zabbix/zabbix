@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ void	discoverer_job_free(zbx_discoverer_job_t *job)
 	zbx_free(job);
 }
 
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout)
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule)
 {
 	zbx_discoverer_job_t	*job;
 
@@ -98,7 +98,6 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeo
 	job->druleid = drule->druleid;
 	job->workers_max = drule->concurrency_max;
 	job->workers_used = 0;
-	job->config_timeout = cfg_timeout;
 	job->drule_revision = drule->revision;
 	job->status = DISCOVERER_JOB_STATUS_QUEUED;
 	zbx_list_create(&job->tasks);

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,19 +70,50 @@ class CControllerHostGroupEdit extends CController{
 			$groups = API::HostGroup()->get([
 				'output' => ['name', 'flags'],
 				'selectHosts' => ['hostid'],
-				'selectDiscoveryRule' => ['itemid', 'name'],
-				'selectHostPrototype' => ['hostid'],
+				'selectDiscoveryRules' => ['itemid', 'name'],
+				'selectHostPrototypes' => ['hostid'],
 				'groupids' => $data['groupid']
 			]);
 
 			$data = array_merge($data, $groups[0]);
+			CArrayHelper::sort($data['discoveryRules'], ['name']);
 
-			$data['is_discovery_rule_editable'] = $data['discoveryRule']
-				&& API::DiscoveryRule()->get([
+			$data['discoveryRules'] = array_values($data['discoveryRules']);
+
+			$discovery_ruleids = $data['discoveryRules']
+				? array_column($data['discoveryRules'], 'itemid')
+				: [];
+
+			$host_prototypes = [];
+
+			if ($discovery_ruleids) {
+				$editable_discovery_ruleids = API::DiscoveryRule()->get([
 					'output' => [],
-					'itemids' => $data['discoveryRule']['itemid'],
+					'itemids' => $discovery_ruleids,
+					'editable' => true,
+					'preservekeys' => true
+				]);
+
+				foreach ($data['discoveryRules'] as &$discovery_rule) {
+					$discovery_rule['is_editable'] = array_key_exists($discovery_rule['itemid'],
+						$editable_discovery_ruleids
+					);
+				}
+				unset($discovery_rule);
+
+				$host_prototypes = API::HostPrototype()->get([
+					'output' => ['hostid'],
+					'selectDiscoveryRule' => ['itemid'],
+					'hostids' => array_column($data['hostPrototypes'], 'hostid'),
 					'editable' => true
 				]);
+			}
+
+			$data['ldd_rule_to_host_prototype'] = [];
+
+			foreach ($host_prototypes as $prototype) {
+				$data['ldd_rule_to_host_prototype'][$prototype['discoveryRule']['itemid']][] = $prototype['hostid'];
+			}
 
 			$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 		}

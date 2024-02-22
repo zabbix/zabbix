@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,6 +59,14 @@ class CRadioButtonList extends CList {
 		$this->modern = false;
 		$this->readonly = false;
 		$this->setId(zbx_formatDomId($name));
+	}
+
+	public function setValues(array $values): self {
+		foreach ($values as $value) {
+			$this->addValue($value['name'], $value['value'], $value['id'] ?? null, $value['on_change'] ?? null);
+		}
+
+		return $this;
 	}
 
 	/**

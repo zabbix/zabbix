@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,12 @@ class CExpressionMacroFunctionParserTest extends TestCase {
 	 * @param array   $result
 	 */
 	public function testExpressionMacroFunctionParser(string $source, int $pos, array $result) {
-		$expression_macro_function_parser = new CExpressionMacroFunctionParser();
+		$expression_macro_function_parser = new CExpressionMacroFunctionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
+		]);
 
 		$this->assertSame($result, [
 			'rc' => $expression_macro_function_parser->parse($source, $pos),

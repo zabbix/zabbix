@@ -1,0 +1,50 @@
+[
+    {
+        "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["^(\\d+)", "\\1"]
+        },
+        "result": "2876256"
+    },
+    {
+        "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["^(\\d+):(\\d+:\\d+\\.\\d+)", "\\2"]
+        },
+        "result": "20231009:190531.385"
+    },
+    {
+        "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["\\d+:\\d+\\.\\d+", "\\0"]
+        },
+        "result": "20231009:190531.385"
+    },
+    {
+        "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["\\d+:\\d+\\.\\d+", "time:\\0"]
+        },
+        "result": "time:20231009:190531.385"
+    },
+    {
+        "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["\\d+:\\d+\\.\\d+", "\\1"]
+        },
+        "result": ""
+    },
+    {
+        "value": "2876256:20231009:190531.385 server #18 started [history syncer #4",
+        "macrofunc": {
+            "function": "regsub",
+            "parameters": ["Server", "\\0"]
+        },
+        "result": ""
+    }
+]

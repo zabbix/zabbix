@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
 #include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxpreprocbase.h"
+#include "zbxtime.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 
@@ -128,10 +131,15 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	}
 
 	size = 0;
-	if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_VALUE, &values[*values_num], &size, NULL))
+	if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_RUNTIME_ERROR, &values[*values_num], &size,
+			NULL))
 	{
-		*error = zbx_strdup(NULL, "Missing value field.");
-		goto out;
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_VALUE, &values[*values_num], &size,
+				NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing value field.");
+			goto out;
+		}
 	}
 	ts[(*values_num)++] = ts_now;
 
@@ -196,7 +204,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		{
 			zbx_free(step_params);
 			zbx_free(error_handler_params);
-			*bypass_first = 1;
+			(*bypass_first)++;
 		}
 
 		step_params = NULL;
@@ -316,10 +324,10 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
 
-	if (1 == bypass_first)
+	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, ZBX_PROTO_TAG_VALUE, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(json);
 	}
 
@@ -339,7 +347,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
 				{
-					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error,
+					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, result->value.data.err,
 							ZBX_JSON_TYPE_STRING);
 				}
 			}

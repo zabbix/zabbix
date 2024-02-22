@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ class CDHost extends CApiService {
 	protected $tableName = 'dhosts';
 	protected $tableAlias = 'dh';
 	protected $sortColumns = ['dhostid', 'druleid'];
+
+	public const OUTPUT_FIELDS = ['dhostid', 'druleid', 'status', 'lastup', 'lastdown'];
 
 	/**
 	 * Get host data.

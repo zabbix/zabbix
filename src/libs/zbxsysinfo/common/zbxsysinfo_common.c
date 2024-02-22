@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,8 +78,9 @@ static zbx_metric_t	parameters_common[] =
 	{"vfs.dir.count",	CF_HAVEPARAMS,	vfs_dir_count,		VFS_TEST_DIR},
 	{"vfs.dir.get",		CF_HAVEPARAMS,	vfs_dir_get,		VFS_TEST_DIR},
 
-	{"net.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"},
-	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"},
+	{"net.dns",		CF_HAVEPARAMS,	net_dns,		NULL},
+	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		NULL},
+	{"net.dns.perf",	CF_HAVEPARAMS,	net_dns_perf,		NULL},
 	{"net.tcp.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.dns.query",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_HAVEPARAMS,	net_tcp_port,		",80"},
@@ -91,6 +92,7 @@ static zbx_metric_t	parameters_common[] =
 	{"logrt",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"logrt.count",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	only_active,		"system"},
+	{"eventlog.count",	CF_HAVEPARAMS,	only_active,		"system"},
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	zabbix_stats,		"127.0.0.1,10051"},
 
@@ -118,12 +120,12 @@ static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-static int	execute_str_local(const char *command, AGENT_RESULT *result, const char* dir)
+static int	execute_str_local(const char *command, AGENT_RESULT *result, const char* dir, int timeout)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), sysinfo_get_config_timeout(),
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), timeout,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, dir))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
@@ -152,17 +154,17 @@ int	execute_user_parameter(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	return execute_str_local(get_rparam(request, 0), result, user_parameter_dir);
+	return execute_str_local(get_rparam(request, 0), result, user_parameter_dir, request->timeout);
 }
 
-int	execute_str(const char *command, AGENT_RESULT *result)
+int	execute_str(const char *command, AGENT_RESULT *result, int timeout)
 {
-	return execute_str_local(command, result, NULL);
+	return execute_str_local(command, result, NULL, timeout);
 }
 
-int	execute_dbl(const char *command, AGENT_RESULT *result)
+int	execute_dbl(const char *command, AGENT_RESULT *result, int timeout)
 {
-	if (SYSINFO_RET_OK != execute_str(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result, timeout))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_DBL_RESULT(result))
@@ -177,9 +179,9 @@ int	execute_dbl(const char *command, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	execute_int(const char *command, AGENT_RESULT *result)
+int	execute_int(const char *command, AGENT_RESULT *result, int timeout)
 {
-	if (SYSINFO_RET_OK != execute_str(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result, timeout))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_UI64_RESULT(result))
@@ -217,7 +219,7 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
-		return execute_str(command, result);
+		return execute_str(command, result, request->timeout);
 	}
 	else if (0 == strcmp(flag, "nowait"))
 	{
@@ -240,9 +242,7 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	level;
-
-	level = LOG_LEVEL_DEBUG;
+	int	level = LOG_LEVEL_DEBUG;
 
 	if (0 != sysinfo_get_config_log_remote_commands())
 		level = LOG_LEVEL_WARNING;

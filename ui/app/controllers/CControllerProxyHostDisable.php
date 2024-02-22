@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CControllerProxyHostDisable extends CController {
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
 			'filter' => [
-				'proxy_hostid' => $this->getInput('proxyids'),
+				'proxyid' => $this->getInput('proxyids'),
 				'status' => HOST_STATUS_MONITORED
 			]
 		]);

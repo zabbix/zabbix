@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldRadioButtonList extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldRadioButtonListView::class;
+
 	private array $values;
 
 	/**
@@ -37,9 +39,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 
 		$this->values = $values;
 
-		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function getValues(): array {
@@ -48,5 +48,10 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 
 	public function setValue($value): self {
 		return parent::setValue((int) $value);
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => implode(',', array_keys($this->values))];
 	}
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 
 namespace Widgets\Item\Includes;
 
-use API;
+use API,
+	CItemHelper,
+	CWidgetsData;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -34,11 +36,13 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
 	CWidgetFieldTextBox,
-	CWidgetFieldThresholds
+	CWidgetFieldThresholds,
+	CWidgetFieldTimePeriod
 };
 
 use Widgets\Item\Widget;
@@ -56,6 +60,10 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_VALUE_SIZE = 45;
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
+
+	public const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
+	public const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
+	public const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
 
 	private bool $is_binary_units = false;
 
@@ -76,8 +84,30 @@ class WidgetForm extends CWidgetForm {
 		}
 	}
 
+	public function getFieldsValues(): array {
+		$fields_values = parent::getFieldsValues();
+
+		if ($fields_values['aggregate_function'] == AGGREGATE_NONE) {
+			unset($fields_values['time_period']);
+		}
+
+		return $fields_values;
+	}
+
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		$show = $this->getFieldValue('show');
+
+		if (!$show) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
+
+			return $errors;
+		}
 
 		// Check if one of the objects (description, value or time) occupies same space.
 		$fields = [
@@ -87,7 +117,6 @@ class WidgetForm extends CWidgetForm {
 		];
 
 		$fields_count = count($fields);
-		$show = $this->getFieldValue('show');
 
 		for ($i = 0; $i < $fields_count - 1; $i++) {
 			if (!in_array($fields[$i]['show'], $show)) {
@@ -257,11 +286,39 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
+				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
+					AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+					AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+					AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+					AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+					AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+					AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+					AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
+					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
+				]))->setDefault(AGGREGATE_NONE)
+			)
+			->addField(
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('history', _('History data'), [
+					self::ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
+					self::ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
+					self::ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(self::ITEM_VALUE_DATA_SOURCE_AUTO)
+			)
+			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

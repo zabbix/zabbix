@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(_('<empty string>')) ?>}
+			{error: escapeHtml(step.error) || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
 		));
 	}
 	else if (typeof step.result === 'undefined' || step.result === null) {
@@ -45,7 +45,7 @@ function makeStepResult(step) {
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
-			jQuery.extend({result: step.result})
+			{result: step.result, result_hint: escapeHtml(step.result)}
 		));
 	}
 	else {
@@ -71,7 +71,7 @@ function disableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxy_hostid').prop('disabled', true);
+			jQuery('#proxyid').prop('disabled', true);
 		<?php endif ?>
 
 	<?php else: ?>
@@ -103,7 +103,7 @@ function enableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxy_hostid').prop('disabled', false);
+			jQuery('#proxyid').prop('disabled', false);
 		<?php endif ?>
 
 	<?php else: ?>
@@ -160,7 +160,7 @@ function itemGetValueTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
-		proxy_hostid: form_data['proxy_hostid'],
+		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		value: form_data['value']
@@ -247,13 +247,14 @@ function itemCompleteTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
-		proxy_hostid: form_data['proxy_hostid'],
+		proxyid: form_data['proxyid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
 		value: form_data['value'],
-		not_supported: form_data['not_supported']
+		not_supported: form_data['not_supported'],
+		runtime_error: form_data['runtime_error']
 	});
 
 	<?php if ($data['show_prev']): ?>
@@ -301,7 +302,17 @@ function itemCompleteTest(overlay) {
 				}
 			<?php endif ?>
 
+			if ('not_supported' in ret && jQuery('[name="not_supported"]', $form).length) {
+				jQuery('[name="not_supported"]', $form)
+					.prop('checked', ret.not_supported != 0)
+					.trigger('change');
+			}
+
 			jQuery('#value', $form).multilineInput('value', ret.value);
+
+			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
+				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
+			}
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -370,13 +381,13 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.result})));
+					]) ?>, {failed: step.result, failed_hint: escapeHtml(step.result)})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set error to')
-					]) ?>, {failed: step.failed})));
+					]) ?>, {failed: step.failed, failed_hint: escapeHtml(step.failed)})));
 					break;
 			}
 		}
@@ -401,6 +412,7 @@ function saveItemTestInputs() {
 		$test_obj,
 		input_values = {
 			value: jQuery('#value').multilineInput('value'),
+			not_supported: jQuery('[name="not_supported"]').is(':checked') ? 1 : 0,
 			eol: jQuery('#eol').find(':checked').val()
 		},
 		form_data = $form.serializeJSON(),
@@ -408,9 +420,13 @@ function saveItemTestInputs() {
 		macros = {};
 
 	<?php if ($data['is_item_testable']): ?>
+		if (jQuery('#runtime_error').length) {
+			input_values.runtime_error = jQuery('#runtime_error').multilineInput('value');
+		}
+
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
-			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
+			proxyid: jQuery('#proxyid', $form).val(),
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val(),
@@ -432,7 +448,7 @@ function saveItemTestInputs() {
 	input_values.macros = macros;
 
 	<?php if ($data['step_obj'] == -2): ?>
-		$test_obj = jQuery('.tfoot-buttons');
+		$test_obj = jQuery('.overlay-dialogue-footer');
 	<?php elseif ($data['step_obj'] == -1): ?>
 		$test_obj = jQuery('.preprocessing-list-foot', jQuery('#preprocessing'));
 	<?php else: ?>
@@ -454,7 +470,17 @@ jQuery(document).ready(function($) {
 		value: <?= json_encode($data['value']) ?>,
 		monospace_font: false,
 		autofocus: true,
-		readonly: false,
+		readonly: <?= $data['not_supported'] != 0 ? 'true' : 'false' ?>,
+		grow: 'auto',
+		rows: 0
+	});
+
+	$('#runtime_error').length && $('#runtime_error').multilineInput({
+		placeholder: <?= json_encode(_('error text')) ?>,
+		value: <?= json_encode($data['runtime_error']) ?>,
+		monospace_font: false,
+		autofocus: true,
+		readonly: <?= $data['not_supported'] != 0 ? 'false' : 'true' ?>,
 		grow: 'auto',
 		rows: 0
 	});
@@ -468,27 +494,26 @@ jQuery(document).ready(function($) {
 		rows: 0
 	});
 
+	$('#not_supported').on('change', function() {
+		const $form = $('#preprocessing-test-form');
+
+		$('#value', $form).multilineInput(this.checked ? 'setReadOnly' : 'unsetReadOnly');
+		$('#runtime_error', $form).length && $('#runtime_error', $form).multilineInput(
+			this.checked && !$('[name="get_value"]', $form).is(':checked') ? 'unsetReadOnly' : 'setReadOnly'
+		);
+	});
+
 	<?php if ($data['is_item_testable']): ?>
-		$('#not_supported').on('change', function() {
-			var $form = $('#preprocessing-test-form');
-
-			if ($(this).is(':checked')) {
-				$('#value', $form).multilineInput('setReadOnly');
-			}
-			else {
-				$('#value', $form).multilineInput('unsetReadOnly');
-			}
-		});
-
 		$('#get_value').on('change', function() {
 			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
-				$not_supported = $('#not_supported', $form);
+				$not_supported = $('[name="not_supported"]', $form);
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
 				$not_supported.prop('disabled', true);
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
@@ -496,7 +521,7 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxy_hostid').prop('disabled', false);
+					$('#proxyid').prop('disabled', false);
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>
@@ -557,8 +582,14 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
-				$not_supported.prop('disabled', false);
+				if ($not_supported.length) {
+					$not_supported
+						.prop('disabled', false)
+						.trigger('change');
+				}
+				else {
+					$('#value', $form).multilineInput('unsetReadOnly');
+				}
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');
@@ -566,7 +597,7 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxy_hostid').prop('disabled', true);
+					$('#proxyid').prop('disabled', true);
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>

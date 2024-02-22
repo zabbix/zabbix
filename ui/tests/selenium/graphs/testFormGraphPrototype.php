@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
  * @onBefore prepareGraphPrototypesData
  *
  * @onAfter clearData
+ *
+ * @dataSource WebScenarios, AllItemValueTypes
  */
 class testFormGraphPrototype extends testFormGraphs {
 
@@ -153,7 +155,7 @@ class testFormGraphPrototype extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Empty color.'
+						'Empty colour.'
 					]
 				]
 			],
@@ -249,7 +251,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -514,7 +516,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Failed step of scenario "Scenario for Update".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -522,7 +524,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
+							'item' => 'Failed step of scenario "Scenario for Delete".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Simple',
@@ -542,7 +544,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Response code for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -550,7 +552,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
+							'item' => 'Download speed for scenario "Scenario for Update".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -679,6 +681,16 @@ class testFormGraphPrototype extends testFormGraphs {
 
 	public function testFormGraphPrototype_Delete() {
 		$this->checkDelete();
+	}
+
+	/**
+	 * Test for checking that only permitted item types are accessible for graph prototype creation.
+	 */
+	public function testFormGraphPrototype_CheckAvailableItems() {
+		$lldid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr(self::LLD_WITH_ITEMS));
+		$url = 'graphs.php?form=create&parent_discoveryid='.$lldid.'&context=host';
+
+		$this->checkAvailableItems($url);
 	}
 
 	public static function getTextItemPrototypesData() {

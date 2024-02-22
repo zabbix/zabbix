@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,41 +131,39 @@ class Proxies {
 			$disabled_hosts_data[] = [
 				'host' => $host,
 				'groups' => [['groupid' => $hostgroupid]],
-				'status' => 1
+				'status' => HOST_STATUS_NOT_MONITORED
 			];
 		}
-		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
+		CDataHelper::call('host.create', $disabled_hosts_data);
 		$disabled_hostids = CDataHelper::getIds('host');
 
 		// Create active proxies.
 		$active_proxy_data = [];
+
 		foreach (self::$active_proxies as $proxy) {
 			$active_proxy_data[] = [
-				'host' => $proxy,
-				'status' => 5
+				'name' => $proxy,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			];
 		}
 
-		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
-		$active_proxyids = CDataHelper::getIds('host');
+		CDataHelper::call('proxy.create', $active_proxy_data);
+		$active_proxyids = CDataHelper::getIds('name');
 
 		// Create passive proxies.
 		$passive_proxy_data = [];
+
 		foreach (self::$passive_proxies as $proxy) {
 			$passive_proxy_data[] = [
-				'host' => $proxy,
-				'status' => 6,
-				'interface' => [
-					'ip'=> '127.0.0.1',
-					'dns' => '',
-					'useip' => '1',
-					'port' => '10051'
-				]
+				'name' => $proxy,
+				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+				'address' => '127.0.0.1',
+				'port' => '10051'
 			];
 		}
 
-		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
-		$passive_proxyids = CDataHelper::getIds('host');
+		CDataHelper::call('proxy.create', $passive_proxy_data);
+		$passive_proxyids = CDataHelper::getIds('name');
 
 		// Add hosts to proxies.
 		CDataHelper::call('proxy.update', [
@@ -245,15 +243,29 @@ class Proxies {
 			]
 		]);
 
+		$proxies = CDataHelper::call('proxy.create',
+			[['name' => 'Delete Proxy used in Network discovery rule', 'operating_mode' => 0]]
+		);
+		$delete_proxy = $proxies['proxyids'][0];
+
+		CDataHelper::call('drule.create', [
+			[
+				'name' => 'Discovery rule for proxy delete test',
+				'iprange' => '192.168.1.1-255',
+				'proxyid' => $delete_proxy,
+				'dchecks' => [['type' => SVC_IMAP, 'ports' => 10050]]
+			]
+		]);
+
 		/**
 		 * Add proxies versions.
 		 * Supported version "60400" is hardcoded one time, so that no need to change it,
 		 * even if newer versions of Zabbix are released.
 		 */
-		DBexecute('UPDATE host_rtdata SET version=60400, compatibility=1 WHERE hostid='.zbx_dbstr($active_proxyids['active_current']));
-		DBexecute('UPDATE host_rtdata SET version=60200, compatibility=2 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_outdated']));
-		DBexecute('UPDATE host_rtdata SET version=0, compatibility=0 WHERE hostid='.zbx_dbstr($active_proxyids['active_unknown']));
-		DBexecute('UPDATE host_rtdata SET version=50401, compatibility=3 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
+		DBexecute('UPDATE proxy_rtdata SET version=60400, compatibility=1 WHERE proxyid='.zbx_dbstr($active_proxyids['active_current']));
+		DBexecute('UPDATE proxy_rtdata SET version=60200, compatibility=2 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_outdated']));
+		DBexecute('UPDATE proxy_rtdata SET version=0, compatibility=0 WHERE proxyid='.zbx_dbstr($active_proxyids['active_unknown']));
+		DBexecute('UPDATE proxy_rtdata SET version=50401, compatibility=3 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
 		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
 	}
 }

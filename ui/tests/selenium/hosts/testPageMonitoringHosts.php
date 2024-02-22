@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,19 +20,31 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup profiles
  *
- * @dataSource TagFilter
+ * @dataSource TagFilter, UserPermissions
  */
 class testPageMonitoringHosts extends CWebTest {
 
-	use TagTrait;
-	use TableTrait;
+	/**
+	 * Attach TableBehavior and TagBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_0'
+			]
+		];
+	}
 
 	/**
 	 * Id of host that was updated.
@@ -789,7 +801,6 @@ class testPageMonitoringHosts extends CWebTest {
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('class:list-table')->waitUntilPresent()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
-		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
@@ -865,7 +876,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'link_name' => 'Dashboards',
-					'page_header' => 'Network interfaces'
+					'page_header' => 'Host dashboards'
 				]
 			],
 			[

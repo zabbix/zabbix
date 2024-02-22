@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxlog.h"
 #include "zbxwin32.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
@@ -39,16 +38,16 @@
 
 #define ZBX_REGKEY_VERSION	"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 
-/******************************************************************************
- *                                                                            *
- * Purpose: join strings into one, placing separator in between them,         *
- *          skipping empty strings                                            *
- *                                                                            *
- * Parameters: separator - separator to place in between strings              *
- *             count     - number of strings                                  *
- *             ...       - strings to join (strings can be empty  or NULL)    *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: joins strings into one, placing separator in between them,          *
+ *          skipping empty strings                                              *
+ *                                                                              *
+ * Parameters: separator - [IN] separator to place in between strings           *
+ *             count     - [IN] number of strings                               *
+ *             ...       - [IN] strings to join (strings can be empty  or NULL) *
+ *                                                                              *
+ ********************************************************************************/
 static char	*join_nonempty_strs(const char *separator, size_t count, ...)
 {
 	char	*arg;
@@ -135,18 +134,19 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static char	*get_registry_value(HKEY hKey, LPCTSTR name, DWORD value_type)
 {
-	DWORD	szData;
+	DWORD	szData = 0;
 	wchar_t	*value = NULL;
 	char	*ret = NULL;
 
 	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))
 	{
-		value = zbx_malloc(NULL, szData);
+		value = zbx_malloc(NULL, szData + sizeof(wchar_t));
+
 		/* syscall RegQueryValueEx does not guarantee that the returned string will be '\0' terminated */
 		if (ERROR_SUCCESS != RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)value, &szData))
 			zbx_free(value);
 		else
-			value[szData - 1] = '\0';
+			value[szData / sizeof(wchar_t)] = L'\0';
 	}
 
 	if (NULL == value)
@@ -183,6 +183,8 @@ static char	*get_build_string(HKEY handle, int include_descriptor)
 		minor = get_registry_value(handle, TEXT(ZBX_REGVALUE_MINOR), REG_DWORD);
 
 	str = join_nonempty_strs(".", 2, major, minor);
+	zbx_free(major);
+	zbx_free(minor);
 
 	if (include_descriptor && 0 < strlen(str))
 		return zbx_dsprintf(str, "Build %s", str);
@@ -192,8 +194,7 @@ static char	*get_build_string(HKEY handle, int include_descriptor)
 
 static char	*get_full_os_info(HKEY handle)
 {
-	char	*res = NULL;
-	char	*name, *lab, *build;
+	char	*name, *lab, *build, *res = NULL;
 
 	name = get_registry_value(handle, TEXT(ZBX_REGVALUE_PRODUCTNAME), REG_MULTI_SZ);
 	lab = get_registry_value(handle, TEXT(ZBX_REGVALUE_BUILDLABEX), REG_MULTI_SZ);

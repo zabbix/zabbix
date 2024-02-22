@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ require_once dirname(__FILE__).'/testHostPrototypeInventory.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testItem.php';
 require_once dirname(__FILE__).'/testItemPrototype.php';
+require_once dirname(__FILE__).'/testItemPreprocessing.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testProxy.php';
@@ -78,6 +79,7 @@ require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
+require_once dirname(__FILE__).'/testWebScenarioPermissions.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -107,7 +109,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testConnector');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
-		// $suite->addTestSuite('testDependentItems');
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testGraphPrototype');
 		$suite->addTestSuite('testHaNode');
@@ -121,6 +123,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testItem');
 		$suite->addTestSuite('testItemPrototype');
+		$suite->addTestSuite('testItemPreprocessing');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testMap');
 		$suite->addTestSuite('testProxy');
@@ -144,6 +147,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');
+		$suite->addTestSuite('testWebScenarioPermissions');
 
 		return $suite;
 	}

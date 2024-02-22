@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -28,8 +29,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 
-	public $link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::DISCOVERY_RULEID;
-	public $ready_link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.self::DISCOVERY_RULEID.'&itemid=';
+	public $link = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::DISCOVERY_RULEID;
 	public $button = 'Create item prototype';
 	public $success_message = 'Item prototype added';
 	public $fail_message = 'Cannot add item prototype';
@@ -37,9 +37,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	const DISCOVERY_RULEID			= 133800;	// 'Simple form test host' => 'testFormDiscoveryRule'
 	const TEMPL_INHERITANCE_RULEID	= 15011;	//'testInheritanceDiscoveryRule'
 	const HOST_INHERITANCE_RULEID	= 15016;	// 'Template inheritance test host' -> 'testInheritanceDiscoveryRule'
-	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
 	const CLONE_RULEID				= 133800;	// 'Host for triggers filtering' -> 'Discovery rule for triggers filtering'
-	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 
 	public function getItemPrototypePrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -79,7 +77,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Prometheus to JSON LLD macro in parameter 1 ',
+						'Name' => 'Prometheus to JSON LLD macro in parameter 1',
 						'Key' => 'json-parameter-macro-1[{#KEY}]'
 					],
 					'preprocessing' => [
@@ -133,14 +131,12 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	 * @onBefore prepareCloneItemPrototypePreprocessing
 	 */
 	public function testFormPreprocessingItemPrototype_CloneItemPrototype() {
-		$link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.self::CLONE_RULEID.
-				'&itemid='.self::CLONE_ITEM_PROTOTYPEID;
+		$link = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::CLONE_RULEID;
 		$this->checkCloneItem($link, 'Item prototype');
 	}
 
 	public function testFormPreprocessingItemPrototype_CloneTemplatedItemPrototype() {
-		$link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID.
-				'&itemid='.self::INHERITED_ITEM_PROTOTYPE;
+		$link = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID;
 		$this->checkCloneItem($link, 'Item prototype', $templated = true);
 	}
 
@@ -155,8 +151,8 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
 	public function testFormPreprocessingItemPrototype_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'disc_prototypes.php?context=template&parent_discoveryid='.self::TEMPL_INHERITANCE_RULEID;
-		$host_link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID;
+		$this->link = 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='.self::TEMPL_INHERITANCE_RULEID;
+		$host_link = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

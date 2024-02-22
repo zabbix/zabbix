@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,14 +72,14 @@ $items = [];
 $value_type = '';
 
 if ($itemids) {
-	$items = API::Item()->get([
-		'output' => ['itemid', 'name', 'value_type'],
+	$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+		'output' => ['itemid', 'name_resolved', 'value_type'],
 		'selectHosts' => ['name'],
 		'itemids' => $itemids,
 		'preservekeys' => true,
 		'templated' => false,
 		'webitems' => true
-	]);
+	]), ['name_resolved' => 'name']);
 
 	if (getRequest('action') == HISTORY_BATCH_GRAPH) {
 		// Remove items that are not numeric.

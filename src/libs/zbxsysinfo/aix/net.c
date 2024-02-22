@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxstr.h"
 
 typedef struct
@@ -206,7 +205,7 @@ int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
-	int			rc, i, ret = SYSINFO_RET_FAIL;
+	int			rc, ret = SYSINFO_RET_FAIL;
 	perfstat_id_t		ps_id;
 	perfstat_netinterface_t	*ps_netif = NULL;
 	struct zbx_json		j;
@@ -239,7 +238,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 		ret = SYSINFO_RET_OK;
 
 	/* collecting of the information for each of the interfaces */
-	for (i = 0; i < rc; i++)
+	for (int i = 0; i < rc; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", ps_netif[i].name, ZBX_JSON_TYPE_STRING);

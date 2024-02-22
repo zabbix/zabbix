@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 <script type="text/x-jquery-tmpl" id="url-tpl">
 	<?= (new CRow([
 			(new CTextBox('urls[#{id}][name]'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CTextBox('urls[#{id}][url]', false, DB::getFieldLength('sysmap_url', 'url')))
+			(new CTextBox('urls[#{id}][url]', '', false, DB::getFieldLength('sysmap_url', 'url')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CSelect('urls[#{id}][elementtype]'))
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),

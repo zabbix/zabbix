@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,14 +36,6 @@
 #else
 
 #define HTTPS_SCHEME_STR	"https://"
-
-typedef struct
-{
-	char	*data;
-	size_t	allocated;
-	size_t	offset;
-}
-http_response_t;
 
 #endif
 
@@ -127,31 +119,13 @@ static int	check_common_params(const char *host, const char *path, char **error)
 }
 
 #ifdef HAVE_LIBCURL
-static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	size_t		r_size = size * nmemb;
-	http_response_t	*response;
-
-	response = (http_response_t*)userdata;
-	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
-
-	return r_size;
-}
-
-static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	ZBX_UNUSED(ptr);
-	ZBX_UNUSED(userdata);
-
-	return size * nmemb;
-}
-
-static int	curl_page_get(char *url, char **buffer, char **error)
+static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 {
 	CURLcode		err;
-	http_response_t		page = {0};
 	CURL			*easyhandle;
 	int			ret = SYSINFO_RET_FAIL;
+	zbx_http_response_t	body = {0}, header = {0};
+	char			errbuf[CURL_ERROR_SIZE];
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -164,19 +138,32 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION,
-			NULL != buffer ? curl_write_cb : curl_ignore_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
 			(NULL != sysinfo_get_config_source_ip() &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE,
 					sysinfo_get_config_source_ip()))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
-					(long)sysinfo_get_config_timeout())) ||
+					(long)timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
 		goto out;
+	}
+
+	if (NULL != buffer)
+	{
+		if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb,
+				zbx_curl_write_cb, errbuf, error))
+		{
+			goto out;
+		}
+	}
+	else
+	{
+		if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_ignore_cb,
+				zbx_curl_ignore_cb, errbuf, error))
+		{
+			goto out;
+		}
 	}
 
 #if LIBCURL_VERSION_NUM >= 0x071304
@@ -192,27 +179,37 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 		goto out;
 	}
 #endif
-
+	*errbuf = '\0';
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{
 		if (NULL != buffer)
-			*buffer = page.data;
+		{
+			if (NULL != body.data)
+			{
+				zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
+				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
+			}
+			*buffer = header.data;
+			header.data = NULL;
+		}
 
 		ret = SYSINFO_RET_OK;
 	}
 	else
 	{
-		zbx_free(page.data);
-		*error = zbx_dsprintf(*error, "Cannot perform cURL request: %s.", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot perform request: %s", '\0' == *errbuf ?
+				curl_easy_strerror(err) : errbuf);
 	}
-
 out:
 	curl_easy_cleanup(easyhandle);
+	zbx_free(header.data);
+	zbx_free(body.data);
 
 	return ret;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
+		char **error)
 {
 	char	*url = NULL;
 	int	ret;
@@ -257,7 +254,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	ret = curl_page_get(url, buffer, error);
+	ret = curl_page_get(url, timeout, buffer, error);
 out:
 	zbx_free(url);
 
@@ -284,7 +281,8 @@ static char	*find_port_sep(char *host, size_t len)
 	return NULL;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, char **buffer, char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
+		char **error)
 {
 	char		*url = NULL, *hostname = NULL, *path_loc = NULL;
 	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
@@ -398,8 +396,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), hostname, port_num,
-			sysinfo_get_config_timeout(), ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), hostname, port_num, timeout,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;
 
@@ -459,7 +457,7 @@ int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, &buffer, &error)))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, buffer);
@@ -488,7 +486,7 @@ int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, NULL, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, NULL, &error)))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	else
 		SET_MSG_RESULT(result, error);
@@ -533,7 +531,7 @@ int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == output || '\0' == *output)
 		output = "\\0";
 
-	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
+	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, request->timeout, &buffer, &error)))
 	{
 		char	*ptr = NULL, *str;
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,14 +29,6 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
-
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
@@ -48,7 +40,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -57,7 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: null;
 
 			if ($this->isTemplateDashboard()) {
-				$filter_hostids = [$this->getInput('dynamic_hostid')];
+				$filter_hostids = $this->fields_values['override_hostid'];
 			}
 			else {
 				$filter_hostids = $this->fields_values['hostids'] ?: null;
@@ -169,7 +161,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				],
 				'severities' => $filter_severities,
 				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
+				'tags' => $this->fields_values['tags'] ?: null,
 				'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
 				'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 				'symptom' => false
@@ -259,7 +251,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$data += [
 				'filter' => [
 					'hostids' => $this->isTemplateDashboard()
-						? [$this->getInput('dynamic_hostid')]
+						? $this->fields_values['override_hostid']
 						: $this->fields_values['hostids'],
 					'problem' => $this->fields_values['problem'],
 					'severities' => $filter_severities,

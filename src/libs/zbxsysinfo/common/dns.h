@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,5 +92,6 @@
 
 int	net_dns(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_dns_record(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_dns_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_NET_H */

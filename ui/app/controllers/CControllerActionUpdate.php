@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,11 +120,11 @@ class CControllerActionUpdate extends CController {
 					unset($condition['formulaid']);
 				}
 
-				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_SUPPRESSED) {
 					unset($condition['value']);
 				}
 
-				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+				if ($condition['conditiontype'] != ZBX_CONDITION_TYPE_EVENT_TAG_VALUE) {
 					unset($condition['value2']);
 				}
 				unset($condition['row_index'], $condition['name']);

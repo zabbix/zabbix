@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ else {
 							'popup' => [
 								'filter_preselect' => [
 									'id' => 'filter_groupids_',
-									'submit_as' => 'groupid'
+									'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -285,8 +285,10 @@ $graphForm->addItem([
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid'],
-		'checkbox_object' => 'group_graphid'
+		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
+		'checkbox_object' => 'group_graphid',
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

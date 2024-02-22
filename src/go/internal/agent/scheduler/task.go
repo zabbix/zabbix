@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,11 +153,35 @@ type exporterTask struct {
 	output  plugin.ResultWriter
 }
 
+func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.ContextProvider) (any, error) {
+	exporter, _ := a.(plugin.Exporter)
+
+	if a.HandleTimeout() {
+		return exporter.Export(key, params, ctx)
+	}
+
+	var ret any
+	var err error
+	tc := make(chan bool)
+
+	go func() {
+		ret, err = exporter.Export(key, params, ctx)
+		tc <- true
+	}()
+
+	select {
+	case <-tc:
+	case <-time.After(time.Second * time.Duration(ctx.Timeout())):
+		err = fmt.Errorf("Timeout occurred while gathering data.")
+	}
+
+	return ret, err
+}
+
 func (t *exporterTask) perform(s Scheduler) {
 	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
-		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
 		var key string
 		var params []string
@@ -165,9 +189,10 @@ func (t *exporterTask) perform(s Scheduler) {
 
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
-			if ret, err = exporter.Export(key, params, t); err == nil {
+			ret, err = invokeExport(t.plugin.impl, key, params, t)
+
+			if err == nil {
 				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
@@ -246,6 +271,14 @@ func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *exporterTask) Timeout() int {
+	return t.item.timeout
+}
+
+func (t *exporterTask) Delay() string {
+	return t.item.delay
+}
+
 // directExporterTask provides access to plugin Exporter interaface.
 // It's used for non-recurring exporter requests - single passive checks
 // and internal requests to obtain HostnameItem, HostMetadataItem,
@@ -263,11 +296,34 @@ type directExporterTask struct {
 func (t *directExporterTask) isRecurring() bool {
 	return !t.done
 }
+
+func (t *directExporterTask) invokeExport(key string, params []string) (any, error) {
+	ret, err := invokeExport(t.plugin.impl, key, params, t)
+
+	if err != nil {
+		log.Debugf("failed to execute direct exporter task for key '%s[%s]' error: '%s'", key, params, err.Error())
+
+		return nil, err
+	}
+
+	log.Debugf("executed direct exporter task for key '%s[%s]'", key, params)
+	if ret != nil {
+		rt := reflect.TypeOf(ret)
+		switch rt.Kind() {
+		case reflect.Slice, reflect.Array:
+			return nil, errors.New("Multiple return values are not supported for single passive checks")
+		default:
+			return ret, nil
+		}
+	}
+
+	return ret, nil
+}
+
 func (t *directExporterTask) perform(s Scheduler) {
 	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
-		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
 		var key string
 		var params []string
@@ -281,22 +337,11 @@ func (t *directExporterTask) perform(s Scheduler) {
 				var ret interface{}
 				log.Debugf("executing direct exporter task for key '%s'", itemkey)
 
-				if ret, err = exporter.Export(key, params, t); err == nil {
-					log.Debugf("executed direct exporter task for key '%s'", itemkey)
-					if ret != nil {
-						rt := reflect.TypeOf(ret)
-						switch rt.Kind() {
-						case reflect.Slice, reflect.Array:
-							err = errors.New("Multiple return values are not supported for single passive checks")
-						default:
-							result = itemutil.ValueToResult(t.item.itemid, now, ret)
-							t.output.Write(result)
-							t.done = true
-						}
-					}
-				} else {
-					log.Debugf("failed to execute direct exporter task for key '%s' error: '%s'",
-						itemkey, err.Error())
+				ret, err = t.invokeExport(key, params)
+				if err == nil {
+					result = itemutil.ValueToResult(t.item.itemid, now, ret)
+					t.output.Write(result)
+					t.done = true
 				}
 			}
 		}
@@ -343,6 +388,14 @@ func (t *directExporterTask) Meta() (meta *plugin.Meta) {
 
 func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *directExporterTask) Timeout() int {
+	return t.item.timeout
+}
+
+func (t *directExporterTask) Delay() string {
+	return t.item.delay
 }
 
 // starterTask provides access to plugin Exporter interaface Start() method.
@@ -402,15 +455,15 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 // stopperTask provides access to plugin Watcher interaface.
 type watcherTask struct {
 	taskBase
-	requests []*plugin.Request
-	client   ClientAccessor
+	items  []*plugin.Item
+	client ClientAccessor
 }
 
 func (t *watcherTask) perform(s Scheduler) {
 	log.Debugf("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.requests, t)
+		watcher.Watch(t.items, t)
 		s.FinishTask(t)
 	}()
 }
@@ -448,6 +501,14 @@ func (t *watcherTask) Meta() (meta *plugin.Meta) {
 
 func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *watcherTask) Timeout() int {
+	return 0
+}
+
+func (t *watcherTask) Delay() string {
+	return ""
 }
 
 // configuratorTask provides access to plugin Configurator interaface.

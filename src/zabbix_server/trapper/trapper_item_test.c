@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,17 +20,23 @@
 #include "trapper_item_test.h"
 #include "zbxexpression.h"
 
-#include "../poller/poller.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxeval.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxpoller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
+#include "zbxversion.h"
 #ifdef HAVE_OPENIPMI
-#include "../ipmi/ipmi.h"
+#include "zbxipmi.h"
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"
-
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static void	dump_item(const zbx_dc_item_t *item)
 {
@@ -65,7 +71,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  password:'%s'", item->password);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_contextname:'%s'", item->snmpv3_contextname);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  jmx_endpoint:'%s'", item->jmx_endpoint);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  timeout:'%s'", item->timeout);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  timeout: %d", item->timeout);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  url:'%s'", item->url);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  query_fields:'%s'", item->query_fields);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  posts:'%s'", ZBX_NULL2STR(item->posts));
@@ -80,7 +86,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  address:'%s'", ZBX_NULL2STR(item->interface.addr));
 		zbx_log_handle(LOG_LEVEL_TRACE, "  port: %u", item->interface.port);
 		zbx_log_handle(LOG_LEVEL_TRACE, "hostid: " ZBX_FS_UI64, item->host.hostid);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  proxy_hostid: " ZBX_FS_UI64, item->host.proxy_hostid);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  proxyid: " ZBX_FS_UI64, item->host.proxyid);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  host:'%s'", item->host.host);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  maintenance_status: %u", item->host.maintenance_status);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  maintenance_type: %u", item->host.maintenance_type);
@@ -141,8 +147,11 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
-int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -162,10 +171,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
 	item.key = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_");
 
-	if (0 != proxy_hostid && FAIL == zbx_is_item_processed_by_server(item.type, item.key))
+	if (0 != proxyid && FAIL == zbx_is_item_processed_by_server(item.type, item.key))
 	{
 		ret = zbx_tm_execute_task_data(jp_data->start, (size_t)(jp_data->end - jp_data->start + 1),
-				proxy_hostid, info);
+				proxyid, info);
 		goto out;
 	}
 
@@ -191,7 +200,24 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.privatekey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey");
 	item.password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PASSWORD, table_items, "password");
 	item.jmx_endpoint = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint");
-	item.timeout = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout");
+
+	switch (item.type)
+	{
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+		case ITEM_TYPE_SIMPLE:
+		case ITEM_TYPE_EXTERNAL:
+		case ITEM_TYPE_DB_MONITOR:
+		case ITEM_TYPE_SSH:
+		case ITEM_TYPE_TELNET:
+		case ITEM_TYPE_SNMP:
+		case ITEM_TYPE_SCRIPT:
+		case ITEM_TYPE_HTTPAGENT:
+			db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
+					sizeof(item.timeout_orig));
+			break;
+	}
+
 	item.url = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_URL, table_items, "url");
 	item.query_fields = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields");
 
@@ -226,6 +252,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		ZBX_STR2UINT64(item.interface.interfaceid, tmp);
 	else
 		item.interface.interfaceid = 0;
+
+	item.interface.version = ZBX_COMPONENT_VERSION(7, 0, 0);
 
 	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_USEIP, table_interface, "useip", &item.interface.useip);
 
@@ -328,7 +356,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		else
 		{
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
+			if (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
 			{
 				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.");
@@ -336,6 +364,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			else
 				ret = zbx_ipmi_test_item(&item, info);
 #else
+			ZBX_UNUSED(get_config_forks);
 			*info = zbx_strdup(NULL, "Support for IPMI was not compiled in.");
 #endif
 		}
@@ -370,7 +399,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		}
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
-				config_startup_time);
+				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
+				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb);
 
 		switch (errcode)
 		{
@@ -406,7 +436,6 @@ out:
 	zbx_free(item.privatekey);
 	zbx_free(item.password);
 	zbx_free(item.jmx_endpoint);
-	zbx_free(item.timeout);
 	zbx_free(item.url);
 	zbx_free(item.query_fields);
 	zbx_free(item.posts);
@@ -430,13 +459,16 @@ out:
 }
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		json;
 	char			tmp[MAX_ID_LEN + 1];
-	zbx_uint64_t		proxy_hostid;
+	zbx_uint64_t		proxyid;
 	int			ret;
 	char			*info;
 
@@ -462,12 +494,14 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zbx_json_init(&json, 1024);
 
-	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp), NULL))
-		ZBX_STR2UINT64(proxy_hostid, tmp);
+	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
+		ZBX_STR2UINT64(proxyid, tmp);
 	else
-		proxy_hostid = 0;
+		proxyid = 0;
 
-	ret = zbx_trapper_item_test_run(&jp_data, proxy_hostid, &info, config_comms, config_startup_time);
+	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
+			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
+			config_externalscripts, get_value_internal_ext_cb);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);

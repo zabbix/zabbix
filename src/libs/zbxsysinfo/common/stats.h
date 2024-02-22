@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ typedef struct
 {
 	ZBX_CPUS_STAT_DATA	cpus;
 #ifndef _WINDOWS
-	int 			diskstat_shmid;
+	int			diskstat_shmid;
 #endif
 #ifdef ZBX_PROCSTAT_COLLECTOR
 	zbx_dshm_t		procstat;
@@ -56,12 +56,16 @@ typedef struct
 	zbx_kstat_t		kstat;
 #endif
 }
-ZBX_COLLECTOR_DATA;
+zbx_collector_data;
 
-extern ZBX_COLLECTOR_DATA	*collector;
+int	cpu_collector_started(void);
+zbx_collector_data	*get_collector(void);
+
 #ifndef _WINDOWS
-extern ZBX_DISKDEVICES_DATA	*diskdevices;
-extern int			my_diskstat_shmid;
+zbx_diskdevices_data	*get_diskdevices(void);
+int	diskdevice_collector_started(void);
+void	stats_lock_diskstats(void);
+void	stats_unlock_diskstats(void);
 #endif
 
 void	diskstat_shm_init(void);

@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,14 @@ package perfmon
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/pdh"
 	"zabbix.com/pkg/win32"
 )
@@ -40,6 +43,10 @@ const (
 	langDefault = 0
 	langEnglish = 1
 )
+
+var impl Plugin = Plugin{
+	counters: make(map[perfCounterIndex]*perfCounter),
+}
 
 type perfCounterIndex struct {
 	path string
@@ -64,79 +71,176 @@ type Plugin struct {
 	collectError error
 }
 
-var impl Plugin = Plugin{
-	counters: make(map[perfCounterIndex]*perfCounter),
-}
-
 type historyIndex int
 
-func (h historyIndex) inc(interval int) historyIndex {
-	h++
-	if int(h) == interval {
-		h = 0
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsPerfMon",
+		"perf_counter", "Value of any Windows performance counter.",
+		"perf_counter_en", "Value of any Windows performance counter in English.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
-	return h
 }
 
-func (h historyIndex) dec(interval int) historyIndex {
-	h--
-	if int(h) < 0 {
-		h = historyIndex(interval - 1)
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+	var lang int
+	switch key {
+	case "perf_counter":
+		lang = langDefault
+	case "perf_counter_en":
+		lang = langEnglish
+	default:
+		return nil, zbxerr.New(fmt.Sprintf("metric key %q not found", key)).Wrap(zbxerr.ErrorUnsupportedMetric)
 	}
-	return h
+
+	if ctx == nil {
+		return nil, zbxerr.New("this item is available only in daemon mode")
+	}
+
+	if len(params) > 2 {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+	if len(params) == 0 || params[0] == "" {
+		return nil, zbxerr.New("invalid first parameter")
+	}
+
+	var interval int64 = 1
+	var err error
+
+	if len(params) == 2 && params[1] != "" {
+		if interval, err = strconv.ParseInt(params[1], 10, 32); err != nil {
+			return nil, zbxerr.New("invalid second parameter").Wrap(err)
+		}
+
+		if interval < 1 || interval > maxInterval {
+			return nil, zbxerr.New(fmt.Sprintf("interval %d out of range [%d, %d]", interval, 1, maxInterval))
+		}
+	}
+
+	path, err := pdh.ConvertPath(params[0])
+	if err != nil {
+		p.Debugf("cannot convert performance counter path: %s", err)
+		return nil, zbxerr.New("invalid performance counter path")
+	}
+
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.query == 0 {
+		p.query, err = win32.PdhOpenQuery(nil, 0)
+		if err != nil {
+			return nil, zbxerr.New("cannot open query").Wrap(err)
+		}
+	}
+
+	index := perfCounterIndex{path, lang}
+	counter, ok := p.counters[index]
+	if !ok {
+		err = p.addCounter(index, interval)
+		if err != nil {
+			p.collectError = zbxerr.New(
+				fmt.Sprintf("failed to get counter for path %q and lang %d", path, lang),
+			).Wrap(err)
+		}
+
+		return nil, p.collectError
+	}
+
+	if p.collectError != nil {
+		return nil, p.collectError
+	}
+
+	return counter.getHistory(int(interval))
 }
 
-func (h historyIndex) sub(value int, interval int) historyIndex {
-	h -= historyIndex(value)
-	for int(h) < 0 {
-		h += historyIndex(interval)
-	}
-	return h
-}
-
-func (p *Plugin) Collect() (err error) {
+func (p *Plugin) Collect() error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	if len(p.counters) == 0 {
-		return
+		return nil
 	}
 
-	p.collectError = win32.PdhCollectQueryData(p.query)
+	p.setCounterData()
 
-	expireTime := time.Now().Add(-maxInactivityPeriod)
-	for index, c := range p.counters {
-		if c.lastAccess.Before(expireTime) || nil != p.collectError {
-			if cerr := win32.PdhRemoveCounter(c.handle); cerr != nil {
-				p.Debugf("error while removing counter '%s': %s", index.path, cerr)
-			}
-			delete(p.counters, index)
-			continue
+	if p.collectError != nil {
+		p.Debugf("reset counter query: '%s'", p.collectError)
+
+		err := win32.PdhCloseQuery(p.query)
+		if err != nil {
+			p.Warningf("error while closing query '%s'", err)
 		}
-		c.history[c.tail], c.err = win32.PdhGetFormattedCounterValueDouble(c.handle)
-		if c.tail = c.tail.inc(c.interval); c.tail == c.head {
-			c.head = c.head.inc(c.interval)
-		}
+
+		p.query = 0
+
+		return p.collectError
 	}
 
-	return p.collectError
+	return nil
 }
 
 func (p *Plugin) Period() int {
 	return 1
 }
 
-// addCounter adds new performance counter to query. The plugin mutex must be locked.
-func (p *Plugin) addCounter(index perfCounterIndex, interval int64) (err error) {
-	var handle win32.PDH_HCOUNTER
-	if index.lang == langEnglish {
-		handle, err = win32.PdhAddEnglishCounter(p.query, index.path, 0)
-	} else {
-		handle, err = win32.PdhAddCounter(p.query, index.path, 0)
-	}
+func (p *Plugin) Start() {
+}
+
+func (p *Plugin) Stop() {
+}
+
+func (p *Plugin) setCounterData() {
+	p.collectError = nil
+
+	err := win32.PdhCollectQueryData(p.query)
 	if err != nil {
-		return
+		p.collectError = fmt.Errorf("cannot collect value %s", err)
 	}
+
+	expireTime := time.Now().Add(-maxInactivityPeriod)
+
+	for index, c := range p.counters {
+		if c.lastAccess.Before(expireTime) || p.collectError != nil {
+			err = win32.PdhRemoveCounter(c.handle)
+			if err != nil {
+				p.Warningf("error while removing counter '%s': %s", index.path, err)
+			}
+
+			delete(p.counters, index)
+
+			continue
+		}
+
+		c.err = nil
+
+		c.history[c.tail], err = win32.PdhGetFormattedCounterValueDouble(c.handle, 1)
+		if err != nil {
+			zbxErr := zbxerr.New(
+				fmt.Sprintf("failed to retrieve pdh counter value double for index %s", index.path),
+			).Wrap(err)
+			if !errors.Is(err, win32.NegDenomErr) {
+				c.err = zbxErr
+			}
+
+			p.Debugf("%s", zbxErr)
+		}
+
+		if c.tail = c.tail.inc(c.interval); c.tail == c.head {
+			c.head = c.head.inc(c.interval)
+		}
+	}
+}
+
+// addCounter adds new performance counter to query. The plugin mutex must be locked.
+func (p *Plugin) addCounter(index perfCounterIndex, interval int64) error {
+	handle, err := p.getCounters(index)
+	if err != nil {
+		return err
+	}
+
 	// extend the interval buffer by 1 to reserve space so tail/head doesn't overlap
 	// when the buffer is full
 	interval++
@@ -147,7 +251,29 @@ func (p *Plugin) addCounter(index perfCounterIndex, interval int64) (err error) 
 		interval:   int(interval),
 		handle:     handle,
 	}
-	return
+
+	return nil
+}
+
+func (p *Plugin) getCounters(index perfCounterIndex) (win32.PDH_HCOUNTER, error) {
+	var counter win32.PDH_HCOUNTER
+	var err error
+
+	if index.lang == langEnglish {
+		counter, err = win32.PdhAddEnglishCounter(p.query, index.path, 0)
+		if err != nil {
+			return 0, zbxerr.New("cannot add english counter").Wrap(err)
+		}
+
+		return counter, nil
+	}
+
+	counter, err = win32.PdhAddCounter(p.query, index.path, 0)
+	if err != nil {
+		return 0, zbxerr.New("cannot add counter").Wrap(err)
+	}
+
+	return counter, nil
 }
 
 func (c *perfCounter) getHistory(interval int) (value interface{}, err error) {
@@ -196,80 +322,29 @@ func (c *perfCounter) getHistory(interval int) (value interface{}, err error) {
 	return nil, nil
 }
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	var lang int
-	switch key {
-	case "perf_counter":
-		lang = langDefault
-	case "perf_counter_en":
-		lang = langEnglish
-	default:
-		return nil, errors.New("Unsupported metric.")
+func (h historyIndex) inc(interval int) historyIndex {
+	h++
+	if int(h) == interval {
+		h = 0
 	}
 
-	if ctx == nil {
-		return nil, errors.New("This item is available only in daemon mode.")
-	}
-
-	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
-	}
-	if len(params) == 0 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
-	}
-
-	var interval int64
-	if len(params) == 1 || params[1] == "" {
-		interval = 1
-	} else {
-		if interval, err = strconv.ParseInt(params[1], 10, 32); err != nil {
-			return nil, errors.New("Invalid second parameter.")
-		}
-		if interval < 1 || interval > maxInterval {
-			return nil, errors.New("Interval out of range.")
-		}
-	}
-
-	if path, tmperr := pdh.ConvertPath(params[0]); tmperr != nil {
-		p.Debugf("cannot convert performance counter path: %s", tmperr)
-		return nil, errors.New("Invalid performance counter path.")
-	} else {
-		p.mutex.Lock()
-		defer p.mutex.Unlock()
-
-		if p.query == 0 {
-			if p.query, err = win32.PdhOpenQuery(nil, 0); err != nil {
-				return
-			}
-		}
-
-		index := perfCounterIndex{path, lang}
-		if counter, ok := p.counters[index]; ok {
-			if p.collectError != nil {
-				return nil, p.collectError
-			}
-
-			return counter.getHistory(int(interval))
-		} else {
-			if err = p.addCounter(index, interval); err != nil {
-				return nil, err
-			}
-
-			return nil, p.collectError
-		}
-	}
+	return h
 }
 
-func (p *Plugin) Start() {
+func (h historyIndex) dec(interval int) historyIndex {
+	h--
+	if int(h) < 0 {
+		h = historyIndex(interval - 1)
+	}
+
+	return h
 }
 
-func (p *Plugin) Stop() {
-}
+func (h historyIndex) sub(value, interval int) historyIndex {
+	h -= historyIndex(value)
+	for int(h) < 0 {
+		h += historyIndex(interval)
+	}
 
-func init() {
-	plugin.RegisterMetrics(&impl, "WindowsPerfMon",
-		"perf_counter", "Value of any Windows performance counter.",
-		"perf_counter_en", "Value of any Windows performance counter in English.",
-	)
+	return h
 }

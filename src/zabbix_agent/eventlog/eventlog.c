@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@
 
 /* winevt.h contents START */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
-/* winevt.h contents END */
 
-extern int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
+BOOL WINAPI	EvtClose(EVT_HANDLE Object);
+/* winevt.h contents END */
 
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 {
@@ -72,14 +72,18 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, char **error)
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
+		int config_buffer_size, int config_eventlog_max_lines_per_second, char **error)
 {
-	int		rate, ret = FAIL;
-	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *maxlines_persec, *key_severity, *key_source, *key_logeventid, *skip;
-	OSVERSIONINFO	versionInfo;
+	int 			ret = FAIL, rate, max_rate = MAX_VALUE_LINES;
+	AGENT_REQUEST		request;
+	const char		*filename, *pattern, *maxlines_persec, *skip,*key_severity, *key_source,
+				*key_logeventid;
+	OSVERSIONINFO		versionInfo;
+	zbx_vector_prov_meta_t	prov_meta;
 
 	zbx_init_agent_request(&request);
+	zbx_vector_prov_meta_create(&prov_meta);
 
 	if (SUCCEED != zbx_parse_item_key(metric->key, &request))
 	{
@@ -145,11 +149,16 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 		goto out;
 	}
 
+	max_rate *= 0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags) ? MAX_VALUE_LINES_MULTIPLIER : 1;
+
 	if (NULL == (maxlines_persec = get_rparam(&request, 5)) || '\0' == *maxlines_persec)
 	{
-		rate = CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
+		rate = config_eventlog_max_lines_per_second;
+
+		if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
+			rate *= MAX_VALUE_LINES_MULTIPLIER;
 	}
-	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
+	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || max_rate < rate)
 	{
 		*error = zbx_strdup(*error, "Invalid sixth parameter.");
 		goto out;
@@ -189,8 +198,17 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 			ret = process_eventslog6(addrs, agent2_result, filename, &eventlog6_render_context,
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
-					config_tls, config_timeout, config_source_ip, config_hostname, metric,
-					lastlogsize_sent, error);
+					config_tls, config_timeout, config_source_ip, config_hostname,
+					config_buffer_send, config_buffer_size, metric, lastlogsize_sent, &prov_meta,
+					error);
+
+			for (int i = 0; i < prov_meta.values_num; i++)
+			{
+				if (NULL != prov_meta.values[i].handle)
+					EvtClose(prov_meta.values[i].handle);
+
+				zbx_free(prov_meta.values[i].name);
+			}
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -203,9 +221,11 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
 				key_logeventid, rate, process_value_cb, config_tls, config_timeout, config_source_ip,
-				config_hostname, metric, lastlogsize_sent, error);
+				config_hostname, config_buffer_send, config_buffer_size, metric, lastlogsize_sent,
+				error);
 	}
 out:
+	zbx_vector_prov_meta_destroy(&prov_meta);
 	zbx_free_agent_request(&request);
 
 	return ret;

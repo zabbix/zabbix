@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxregexp.h"
-#include "zbxlog.h"
 #include "../common/stats.h"
+
+#include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -58,14 +58,14 @@ zbx_sysinfo_proc_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get Solaris version at runtime                                    *
+ * Purpose: gets Solaris version at runtime                                   *
  *                                                                            *
  * Parameters:                                                                *
  *     major_version - [OUT] major version (e.g. 5)                           *
  *     minor_version - [OUT] minor version (e.g. 9 for Solaris 9, 10 for      *
  *                           Solaris 10, 11 for Solaris 11)                   *
  * Return value:                                                              *
- *     SUCCEED - no errors, FAIL - an error occurred                          *
+ *     SUCCEED - no errors, FAIL - error occurred                             *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *minor_version)
@@ -94,12 +94,12 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find if zones are supported                                       *
+ * Purpose: finds if zones are supported                                      *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - zones supported                                              *
- *     FAIL - zones not supported or error occurred. For our purposes error   *
- *            counts as no support for zones.                                 *
+ *     SUCCEED - zones are supported                                          *
+ *     FAIL - Zones are not supported or error occurred. For our purposes     *
+ *            error counts as 'no support' for zones.                         *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_detect_zone_support(void)
@@ -210,14 +210,14 @@ static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get single process information                                    *
+ * Purpose: gets single process information                                   *
  *                                                                            *
- * Parameters: pid    - [IN] the process pid                                  *
- *             flags  - [IN] the flags specifying the process properties      *
- *                          that must be returned                             *
- *             proc   - [OUT] the process data                                *
- *             psinfo - [OUT] the raw process information data                *
- * Return value: SUCCEED - the process information was retrieved successfully *
+ * Parameters: pid    - [IN]                                                  *
+ *             flags  - [IN] flags specifying process properties that must be *
+ *                           returned                                         *
+ *             proc   - [OUT] process data                                    *
+ *             psinfo - [OUT] raw process information data                    *
+ * Return value: SUCCEED - process information was retrieved successfully     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -277,11 +277,13 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 				if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
 				{
-					int	i;
+					l = l - 2;
 
-					for (i = 0, l -= 2; i < l; i++)
+					for (int i = 0; i < l; i++)
+					{
 						if ('\0' == line[i])
 							line[i] = ' ';
+					}
 
 					proc->cmdline = zbx_strdup(NULL, line);
 				}
@@ -299,7 +301,7 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process name matches filter                         *
+ * Purpose: checks if process name matches filter                             *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
@@ -318,7 +320,7 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process user matches filter                         *
+ * Purpose: checks if process user matches filter                             *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo)
@@ -334,15 +336,15 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process command line matches filter                 *
+ * Purpose: checks if process command line matches filter                     *
  *                                                                            *
  ******************************************************************************/
-static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdline)
+static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const zbx_regexp_t *cmdline)
 {
 	if (NULL == cmdline)
 		return SUCCEED;
 
-	if (NULL != proc->cmdline && NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
+	if (NULL != proc->cmdline && 0 == zbx_regexp_match_precompiled(proc->cmdline, cmdline))
 		return SUCCEED;
 
 	return FAIL;
@@ -351,7 +353,7 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 #ifdef HAVE_ZONE_H
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process zone matches filter                         *
+ * Purpose: checks if process zone matches filter                             *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, zoneid_t zoneid)
@@ -368,11 +370,11 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the process properties (except zone) matches filter     *
+ * Purpose: checks if process properties (except zone) matches filter         *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo, const char *procname,
-		const char *cmdline)
+		const zbx_regexp_t *cmdline)
 {
 	if (SUCCEED != proc_match_user(proc, usrinfo))
 		return FAIL;
@@ -388,20 +390,22 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 
 int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *memtype = NULL;
+	char			*procname, *proccomm, *param, *memtype = NULL, *rxp_error = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0;
+	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0, ret = SYSINFO_RET_OK;
 	zbx_uint64_t		mem_size = 0, byte_value = 0;
 	double			pct_size = 0.0, pct_value = 0.0;
 	size_t			*p_value;
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
@@ -422,7 +426,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto clean;
 			}
 
 			invalid_user = 1;
@@ -444,11 +449,24 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+	{
 		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
+	}
 	else
 		proccomm = NULL;
 
@@ -469,7 +487,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
@@ -478,7 +497,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -488,7 +508,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm_rxp))
 		{
 			if (NULL != p_value)
 			{
@@ -547,26 +567,31 @@ out:
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
+clean:
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *zone_parameter;
+	char			*procname, *proccomm, *param, *zone_parameter, *rxp_error = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
+	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat, ret = SYSINFO_RET_OK;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
 	int			zoneflag;
 #endif
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
@@ -587,7 +612,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto clean;
 			}
 
 			invalid_user = 1;
@@ -609,11 +635,24 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+	{
 		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
+	}
 	else
 		proccomm = NULL;
 
@@ -633,7 +672,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 					" with agent running on a Solaris version with zone support, but compiled on"
 					" a Solaris version without zone support. Consider using \"all\" or install"
 					" agent with Solaris zone support."));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
 		}
 #endif
 	}
@@ -646,7 +686,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 #ifdef HAVE_ZONE_H
 	zoneid = getzoneid();
@@ -658,7 +699,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -669,7 +711,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm_rxp))
 		{
 #ifdef HAVE_ZONE_H
 			if (SUCCEED != proc_match_zone(&proc, zoneflag, zoneid))
@@ -695,21 +737,24 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
+clean:
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: reads process cpu utilization values from /proc/[pid]/usage file  *
  *                                                                            *
- * Parameters: procutil - [IN/OUT] the process cpu utilization data           *
+ * Parameters: procutil - [IN/OUT] process cpu utilization data               *
  *                                                                            *
- * Return value: SUCCEED - the process cpu utilization data was read          *
+ * Return value: SUCCEED - process cpu utilization data was read              *
  *                         successfully                                       *
  *               <0      - otherwise, -errno code is returned                 *
  *                                                                            *
- * Comments: we use /proc/[pid]/usage since /proc/[pid]/status contains       *
+ * Comments: We use /proc/[pid]/usage since /proc/[pid]/status contains       *
  *           sensitive information and by default can only be read by the     *
  *           owner or privileged user.                                        *
  *                                                                            *
@@ -764,19 +809,17 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get process cpu utilization data                                  *
+ * Purpose: gets process cpu utilization data                                 *
  *                                                                            *
- * Parameters: procs     - [IN/OUT] an array of process utilization data      *
- *             procs_num - [IN] the number of items in procs array            *
+ * Parameters: procs     - [IN/OUT] array of process utilization data         *
+ *             procs_num - [IN] number of items in procs array                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __func__, procs_num);
 
-	for (i = 0; i < procs_num; i++)
+	for (int i = 0; i < procs_num; i++)
 		procs[i].error = proc_read_cpu_util(&procs[i]);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
@@ -784,13 +827,13 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get system processes                                              *
+ * Purpose: gets system processes                                             *
  *                                                                            *
- * Parameters: processes - [OUT] the system processes                         *
- *             flags     - [IN] the flags specifying the process properties   *
- *                              that must be returned                         *
+ * Parameters: processes - [OUT] system processes                             *
+ *             flags     - [IN] flags specifying process properties that must *
+ *                              be returned                                   *
  *                                                                            *
- * Return value: SUCCEED - the system processes were retrieved successfully   *
+ * Return value: SUCCEED - system processes were retrieved successfully       *
  *               FAIL    - failed to open /proc directory                     *
  *                                                                            *
  ******************************************************************************/
@@ -835,7 +878,7 @@ out:
  *                                                                            *
  * Purpose: frees process vector read by zbx_proc_get_processes function      *
  *                                                                            *
- * Parameters: processes - [IN/OUT] the process vector to free                *
+ * Parameters: processes - [IN/OUT] process vector to free                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
@@ -845,23 +888,21 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get pids matching the specified process name, user name and       *
- *          command line                                                      *
+ * Purpose: gets pids matching specified process name, user name and command  *
+ *          line                                                              *
  *                                                                            *
- * Parameters: procname    - [IN] the process name, NULL - all                *
- *             username    - [IN] the user name, NULL - all                   *
- *             cmdline     - [IN] the command line, NULL - all                *
- *             pids        - [OUT] the vector of matching pids                *
- *                                                                            *
- * Return value: SUCCEED   - the pids were read successfully                  *
- *               -errno    - failed to read pids                              *
+ * Parameters: processes   - [IN]                                             *
+ *             procname    - [IN] NULL - all                                  *
+ *             username    - [IN] ...                                         *
+ *             cmdline     - [IN] ...                                         *
+ *             flags       - [IN]                                             *
+ *             pids        - [OUT] vector of matching pids                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
 		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids)
 {
 	struct passwd		*usrinfo;
-	int			i;
 	zbx_sysinfo_proc_t	*proc;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
@@ -884,7 +925,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	zoneid = getzoneid();
 #endif
 
-	for (i = 0; i < processes->values_num; i++)
+	for (int i = 0; i < processes->values_num; i++)
 	{
 		proc = (zbx_sysinfo_proc_t *)processes->values[i];
 

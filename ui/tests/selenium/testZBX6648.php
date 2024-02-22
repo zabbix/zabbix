@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class testZBX6648 extends CLegacyWebTest {
 	public function testZBX6648_eventFilter($zbx_data) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
 		$this->zbxTestClickButtonMultiselect('triggerids_0');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 
@@ -76,7 +76,7 @@ class testZBX6648 extends CLegacyWebTest {
 			case 'both' :
 			case 'enabled' :
 				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')
-					->asMultiselect()->one()->waitUntilVisible();
+						->asMultiselect()->one()->waitUntilVisible();
 				$host->fill([
 					'values' => $zbx_data['host'],
 					'context' => $zbx_data['hostgroup']
@@ -87,7 +87,7 @@ class testZBX6648 extends CLegacyWebTest {
 			case 'no hosts' :
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				COverlayDialogElement::find()->all()->last()->query('class:multiselect-button')->one()->click();
+				COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
 				break;

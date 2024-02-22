@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class TopHostsWidget {
 
-	/**
-	 * Id of items by name.
-	 *
-	 * @var integer
-	 */
-	protected static $itemids;
+	const ZABBIX_SERVER_HOSTID = 10084; // ЗАББИКС Сервер.
 
 	/**
 	 * Create data for testDashboardTopHostsWidget test.
@@ -38,34 +34,27 @@ class TopHostsWidget {
 		CDataHelper::call('item.create', [
 			[
 				'name' => 'top_hosts_trap_text',
-				'key_' => 'top_hosts_trap_text',
-				'hostid' => 10084,
-				'type' => 2,
-				'value_type' => 4
+				'key_' => 'top_hosts_text',
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			[
 				'name' => 'top_hosts_trap_log',
-				'key_' => 'top_hosts_trap_log',
-				'hostid' => 10084,
-				'type' => 2,
-				'value_type' => 2
+				'key_' => 'top_hosts_log',
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_LOG
 			],
 			[
 				'name' => 'top_hosts_trap_char',
-				'key_' => 'top_hosts_trap_char',
-				'hostid' => 10084,
-				'type' => 2,
-				'value_type' => 1
+				'key_' => 'top_hosts_char',
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_STR
 			]
 		]);
-
-		self::$itemids = CDataHelper::getIds('name');
-
-		// Add value to item displayed in Top Hosts widget.
-		CDataHelper::addItemData(99086, 1000);
-		CDataHelper::addItemData(self::$itemids['top_hosts_trap_text'], 'Text for text item');
-		CDataHelper::addItemData(self::$itemids['top_hosts_trap_log'], 'Logs for text item');
-		CDataHelper::addItemData(self::$itemids['top_hosts_trap_char'], 'characters_here');
+		$itemids = CDataHelper::getIds('name');
 
 		// Create dashboards for Top host widget testing.
 		CDataHelper::call('dashboard.create', [
@@ -87,138 +76,128 @@ class TopHostsWidget {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'test update column 1'
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.data.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.item.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.item',
 										'value' => 'Available memory'
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.decimal_places.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.decimal_places',
 										'value' =>  4
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.display.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.history.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'column',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.name',
+										'value' => 'test update column 2'
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.data.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.data',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.item.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.item',
 										'value' => 'Available memory in %'
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.timeshift.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.decimal_places.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.decimal_places',
 										'value' =>  2
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.display.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.display',
 										'value' => 1
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.history.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.history',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.base_color.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.base_color',
 										'value' => ''
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.1.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.1.color.0',
 										'value' => 'FF465C'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.1.threshold.0',
 										'value' => '100'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.1.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.1.color.1',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.1.threshold.1',
 										'value' => '600'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.color.0',
 										'value' => 'FF465C'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.threshold.0',
 										'value' => '100'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.color.1',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.threshold.1',
 										'value' => '600'
 									]
 								]
@@ -251,47 +230,42 @@ class TopHostsWidget {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'delete widget column 1'
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.data.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.item.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.item',
 										'value' => 'Available memory'
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.display.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.history.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'column',
 										'value' => 0
 									]
@@ -319,118 +293,113 @@ class TopHostsWidget {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'remove top hosts column 1'
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.data.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.item.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.item',
 										'value' => 'Available memory'
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.display.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.history.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'column',
 										'value' => 0
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.name',
+										'value' => 'remove top hosts column 2'
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.data.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.data',
 										'value' => 2
 									],
 									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.base_color.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.base_color',
 										'value' => ''
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.color.0',
 										'value' => 'FF465C'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.threshold.0',
 										'value' => '100'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.color.1',
 										'value' => '4000FF'
 									],
 									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columnsthresholds.0.threshold.1',
 										'value' => '1000'
 									],
 									[
-										'type' => 1,
-										'name' => 'tags.tag.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.tag',
 										'value' => 'tag1'
 									],
 									[
-										'type' => 0,
-										'name' => 'tags.operator.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
-										'name' => 'tags.value.0',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.value',
 										'value' => 'val1'
 									],
 									[
-										'type' => 1,
-										'name' => 'tags.tag.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.1.tag',
 										'value' => 'tag2'
 									],
 									[
-										'type' => 0,
-										'name' => 'tags.operator.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.1.operator',
 										'value' => 0
 									],
 									[
-										'type' => 1,
-										'name' => 'tags.value.1',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.1.value',
 										'value' => 'val2'
 									]
 								]
@@ -452,9 +421,11 @@ class TopHostsWidget {
 				'pages' => [[]]
 			]
 		]);
+		$dashboardids = CDataHelper::getIds('name');
 
 		return [
-			'dashboardids' => CDataHelper::getIds('name')
+			'dashboardids' => $dashboardids,
+			'itemids' => $itemids
 		];
 	}
 }

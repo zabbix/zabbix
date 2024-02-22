@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
+#include "zbxstr.h"
 
 #include <unistd.h>
 #include <stropts.h>
@@ -198,7 +199,6 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_free(if_list);
 #else
 	struct if_nameindex	*ni;
-	int			i;
 
 	if (NULL == (ni = if_nameindex()))
 	{
@@ -208,7 +208,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; 0 != ni[i].if_index; i++)
+	for (int i = 0; 0 != ni[i].if_index; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", ni[i].if_name, ZBX_JSON_TYPE_STRING);
@@ -315,7 +315,7 @@ static int get_ppa(int fd, const char *if_name, int *ppa)
 {
 	dl_hp_ppa_req_t		ppa_req;
 	dl_hp_ppa_ack_t		*dlp;
-	int			i, ret = FAIL, flags = RS_HIPRI, res;
+	int			ret = FAIL, flags = RS_HIPRI, res;
 	char			*buf = NULL, *ppa_data_buf = NULL;
 
 	ppa_req.dl_primitive = DL_HP_PPA_REQ;
@@ -363,7 +363,7 @@ static int get_ppa(int fd, const char *if_name, int *ppa)
 
 		buf = zbx_malloc(buf, if_name_sz);
 
-		for (i = 0; i < dlp->dl_count; i++)
+		for (int i = 0; i < dlp->dl_count; i++)
 		{
 #define PPA(n)	(*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))
 			zbx_snprintf(buf, if_name_sz, "%s%d", PPA(i).dl_module_id_1, PPA(i).dl_ppa);
