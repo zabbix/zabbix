@@ -261,18 +261,19 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 	{
 		zbx_uint64_t	id;
 		int		discovery_flag, del_flag, object_lastcheck, object_ts_disable, object_status,
-				ts_disable;
+				ts_disable, disable_source;
 		const char	*name;
 
 		cb_info_disable(objects->values[i], &id, &discovery_flag, &del_flag, &object_lastcheck,
-				&object_ts_disable, &object_status, &name);
+				&object_ts_disable, &object_status, &disable_source, &name);
 
 		if (0 == id || 0 != del_flag)
 			continue;
 
 		if (0 != discovery_flag)
 		{
-			if (ZBX_LLD_OBJECT_STATUS_DISABLED == object_status)
+			if (ZBX_LLD_OBJECT_STATUS_DISABLED == object_status &&
+					ZBX_LLD_DISABLE_SOURCE_LLD_LOST == disable_source)
 			{
 				zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
 
@@ -283,9 +284,10 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 			continue;
 		}
 
-		if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type ||
+		if ((ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type ||
 				(ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck >
-				(ts_disable = lld_end_of_life(object_lastcheck, enabled_lifetime->duration))))
+				(ts_disable = lld_end_of_life(object_lastcheck, enabled_lifetime->duration)))) &&
+				ZBX_LLD_OBJECT_STATUS_ENABLED == object_status)
 		{
 			zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
 

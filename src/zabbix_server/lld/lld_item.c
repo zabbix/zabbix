@@ -281,6 +281,7 @@ typedef struct
 	unsigned char			discovery_status;
 	int				ts_delete;
 	int				ts_disable;
+	unsigned char			disable_source;
 }
 zbx_item_discovery_t;
 
@@ -347,7 +348,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select itemid,key_,lastcheck,status,ts_delete,ts_disable,parent_itemid"
+			"select itemid,key_,lastcheck,status,ts_delete,ts_disable,disable_source,parent_itemid"
 			" from item_discovery"
 			" where");
 
@@ -362,7 +363,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 		zbx_item_discovery_t	*item_discovery;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(parent_id, row[6]);
+		ZBX_STR2UINT64(parent_id, row[7]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &parent_id,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -383,6 +384,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 		ZBX_STR2UCHAR(item_discovery->discovery_status, row[3]);
 		item_discovery->ts_delete = atoi(row[4]);
 		item_discovery->ts_disable = atoi(row[5]);
+		ZBX_STR2UCHAR(item_discovery->disable_source, row[6]);
 
 		zbx_vector_item_discovery_append(&item_discoveries, item_discovery);
 	}
@@ -439,6 +441,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 			item->discovery_status = item_discovery->discovery_status;
 			item->ts_delete = item_discovery->ts_delete;
 			item->ts_disable = item_discovery->ts_disable;
+			item->disable_source = item_discovery->disable_source;
 
 			item->name = zbx_strdup(NULL, row[1]);
 			item->name_proto = NULL;
@@ -1794,6 +1797,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 	item->ts_delete = 0;
 	item->ts_disable = 0;
+	item->disable_source = ZBX_LLD_DISABLE_SOURCE_DEFAULT;
 	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
@@ -4141,7 +4145,7 @@ static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_f
 }
 
 static	void	get_item_info_disable(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
-		int *lastcheck, int *ts_disable, int *status, const char **name)
+		int *lastcheck, int *ts_disable, int *status, int *disable_source, const char **name)
 {
 	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
 
@@ -4151,6 +4155,7 @@ static	void	get_item_info_disable(const void *object, zbx_uint64_t *id, int *dis
 	*lastcheck = item->lastcheck;
 	*ts_disable = item->ts_disable;
 	*status = ITEM_STATUS_ACTIVE == item->status ? ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
+	*disable_source = item->disable_source;
 	*name = item->name;
 }
 

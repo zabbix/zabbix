@@ -120,6 +120,7 @@ typedef struct
 	unsigned char		discovery_status;
 	int			ts_delete;
 	int			ts_disable;
+	unsigned char		disable_source;
 	unsigned char		status;
 	unsigned char		priority_orig;
 	unsigned char		priority;
@@ -417,7 +418,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
 				"t.comments,t.url,t.url_name,t.recovery_expression,t.recovery_mode,t.correlation_mode,"
 				"t.correlation_tag,t.manual_close,t.opdata,td.lastcheck,td.discovery_status,"
-				"td.ts_delete,td.ts_disable,t.event_name"
+				"td.ts_delete,td.ts_disable,td.ts_disable_source,t.event_name"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -503,12 +504,13 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->correlation_tag_orig = NULL;
 		trigger->opdata = zbx_strdup(NULL, row[14]);
 		trigger->opdata_orig = NULL;
-		trigger->event_name = zbx_strdup(NULL, row[19]);
+		trigger->event_name = zbx_strdup(NULL, row[20]);
 		trigger->event_name_orig = NULL;
 		trigger->lastcheck = atoi(row[15]);
 		ZBX_STR2UCHAR(trigger->discovery_status, row[16]);
 		trigger->ts_delete = atoi(row[17]);
 		trigger->ts_disable = atoi(row[18]);
+		ZBX_STR2UCHAR(trigger->disable_source, row[19]);
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
@@ -1500,6 +1502,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		trigger->ts_delete = 0;
 		trigger->ts_disable = 0;
+		trigger->disable_source = ZBX_LLD_DISABLE_SOURCE_DEFAULT;
 		trigger->parent_triggerid = trigger_prototype->triggerid;
 
 		trigger->description = zbx_strdup(NULL, trigger_prototype->description);
@@ -3612,7 +3615,7 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
 }
 
 static	void	get_trigger_info_disable(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
-		int *lastcheck, int *ts_disable, int *status, const char **name)
+		int *lastcheck, int *ts_disable, int *status, int *disable_source, const char **name)
 {
 	const zbx_lld_trigger_t	*trigger = (const zbx_lld_trigger_t *)object;
 
@@ -3623,6 +3626,7 @@ static	void	get_trigger_info_disable(const void *object, zbx_uint64_t *id, int *
 	*ts_disable = trigger->ts_disable;
 	*status = TRIGGER_STATUS_ENABLED == trigger->status ?
 			ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
+	*disable_source = trigger->disable_source;
 	*name = trigger->description;
 }
 

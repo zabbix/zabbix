@@ -289,6 +289,7 @@ struct zbx_lld_item_full_s
 	unsigned char			discovery_status;
 	int				ts_delete;
 	int				ts_disable;
+	unsigned char			disable_source;
 	const zbx_lld_row_t		*lld_row;
 	zbx_vector_lld_item_preproc_t	preproc_ops;
 	zbx_vector_lld_item_full_t	dependent_items;
@@ -359,7 +360,7 @@ typedef void	(*delete_ids_f)(zbx_vector_uint64_t *ids, int audit_context_mode);
 typedef void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *discovered, int *lastcheck,
 		unsigned char *discovery_status, int *ts_delete, const char **name);
 typedef void	(*get_object_info_disable_f)(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
-		int *lastcheck, int *ts_disable, int *status, const char **name);
+		int *lastcheck, int *ts_disable, int *status, int *disable_source, const char **name);
 typedef void	(*object_audit_entry_create_f)(int audit_context_mode, int audit_action, zbx_uint64_t objectid,
 		const char *name, int flags);
 typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_uint64_t objectid, int flags,
