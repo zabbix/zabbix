@@ -232,13 +232,11 @@ void	zbx_mock_test_entry(void **state)
 
 		if (ITEM_TYPE_SNMP == item.type)
 		{
-			const char	*snmp_oid = test_config.snmp_oid;
-
 			item.itemtype.snmpitem = &snmpitem_local;
 
 			ZBX_DC_SNMPITEM	*snmpitem = item.itemtype.snmpitem;
 
-			snmpitem->snmp_oid = zbx_strdup(NULL, snmp_oid);
+			snmpitem->snmp_oid = test_config.snmp_oid;
 
 			if (0 == strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
@@ -266,8 +264,6 @@ void	zbx_mock_test_entry(void **state)
 				(int)test_config.poller_type, (int)test_config.flags, (int)test_config.test_number);
 
 		DCitem_poller_type_update_test(&item, &host, test_config.flags);
-
-		zbx_free((char *)snmpitem_local.snmp_oid);
 
 		zbx_mock_assert_int_eq(buffer, test_config.result_poller_type, item.poller_type);
 	}
