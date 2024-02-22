@@ -93,19 +93,25 @@ zabbix_export:
             
             		var filters = [];
             
-            		/* TODO: There should be an explanation as to what this regex does. */
-            		const isValidFilterExpression = /!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/;
+            		/* The anatomy is roughly this; prefix/key: value
+            		 *
+            		 * The 1st capture group is around the prefix/key, where the
+            		 * prefix is in a non-capture group `(?:...)` followed by a `?`
+            		 * making it optional
+            		 *
+            		 * The 2nd capture group is whatever follows after `:` and whitespace.
+            		 */
+            		const filterCapture = /((?:[\w\.-]+\/)?[\w\.-]+)\s*:\s*(.*)/;
             		const onComma = /\s*,\s*/;
-            		const onColon = /\s*:\s*/;
             
             		csv.split(onComma).forEach(function (kv) {
-            			if (!isValidFilterExpression.test(kv)) {
+            			var match = kv.match(filterCapture);
+            			if (!match) {
             				Zabbix.log(3, 'Cannot parse filter from: "' + kv + '"');
             				return;
             			}
             
-            			var pair = kv.split(onColon);
-            			filters.push({ key: pair[0], expression: pair[1] });
+            			filters.push({ key: match[0], expression: match[1] });
             		});
             
             		return filters;
