@@ -229,8 +229,6 @@ void	zbx_mock_test_entry(void **state)
 		item.key = test_config.key;
 		item.poller_type = test_config.poller_type;
 		item.itemid = 1;
-		
-
 
 		if (ITEM_TYPE_SNMP == item.type)
 		{
