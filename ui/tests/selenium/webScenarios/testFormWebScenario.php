@@ -180,12 +180,13 @@ class testFormWebScenario extends CWebTest {
 		if (array_key_exists('scenario_name', $data)) {
 			$scenario_fields['Name'] = ['value' => $data['scenario_name'], 'enabled' => false, 'maxlength' => 64];
 			$scenario_fields['Agent']['value'] = 'Internet Explorer 10';
+
 			$parent_field = $form->getField('Parent web scenarios');
 			$this->assertTrue($parent_field->isCLickable());
 
 			// Check that link in "Parent web scenarios" field leads to config of this web scenario on template.
 			$this->assertEquals('httpconf.php?form=update&hostid='.self::$templateid.'&httptestid='.self::$template_scenarioid.
-					'&context=template', $parent_field->query('xpath:.//a')->one()->getAttribute('href')
+					'&context=template', $parent_field->query('link', self::$template_name)->one()->getAttribute('href')
 			);
 		}
 
