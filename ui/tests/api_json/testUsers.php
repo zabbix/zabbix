@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @onBefore prepareUsersData
  *
- * @backup users
+ * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, config
  */
 class testUsers extends CAPITest {
 
@@ -570,7 +570,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'username' => 'API user creat with MFA TOTP method',
+						'username' => 'API user create with MFA TOTP method',
 						'roleid' => 1,
 						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
@@ -589,7 +589,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'username' => 'API user creat with non-existing MFA TOTP method',
+						'username' => 'API user create with non-existing MFA TOTP method',
 						'roleid' => 1,
 						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [
@@ -608,7 +608,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'username' => 'API user creat with MFA DUO method',
+						'username' => 'API user create with MFA DUO method',
 						'roleid' => 1,
 						'passwd' => 'Z@bb1x1234',
 						'usrgrps' => [

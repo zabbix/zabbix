@@ -3432,7 +3432,7 @@ class CUser extends CApiService {
 	 *
 	 * @param array  $data
 	 * @param string $data['sessionid']                               User's sessionid passed in session data.
-	 * @param string $data['mfaid']                                   User's mfaid passed ins session data.
+	 * @param string $data['mfaid']                                   User's mfaid passed in session data.
 	 * @param string $data['redirect_uri']                            Redirect uri that will be used for Duo MFA.
 	 * @param array  $data['mfa_response_data']                       Array with data for MFA response confirmation.
 	 * @param int    $data['mfa_response_data']['verification_code']  TOTP MFA verification code.

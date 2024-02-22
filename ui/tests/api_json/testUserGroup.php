@@ -24,9 +24,42 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @onBefore  prepareTestData
  *
- * @backup usrgrp
+ * @backup usrgrp, userdirectory, mfa
  */
 class testUserGroup extends CAPITest {
+
+	public static $data = [
+		'usrgrpid' => [],
+		'userdirectoryid' => [],
+		'mfaid' => []
+	];
+
+	/**
+	 * Create data to be used in tests.
+	 */
+	public function prepareTestData(): void {
+		$response = CDataHelper::call('userdirectory.create', [[
+			'name' => 'API LDAP #1',
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap.forumsys.com',
+			'port' => 389,
+			'base_dn' => 'dc=example,dc=com',
+			'search_attribute' => 'uid'
+		]]);
+
+		$this->assertArrayHasKey('userdirectoryids', $response);
+		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
+
+		$mfa = CDataHelper::call('mfa.create', [[
+			'type' => MFA_TYPE_TOTP,
+			'name' => 'MFA TOTP method',
+			'hash_function' => TOTP_HASH_SHA1,
+			'code_length' => TOTP_CODE_LENGTH_8
+		]]);
+
+		$this->assertArrayHasKey('mfaids', $mfa);
+		self::$data['mfaid'] = array_combine(['MFA TOTP method'], $mfa['mfaids']);
+	}
 
 	public static function usergroup_create() {
 		return [
@@ -1005,12 +1038,6 @@ class testUserGroup extends CAPITest {
 		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
 	}
 
-	public static $data = [
-		'usrgrpid' => [],
-		'userdirectoryid' => [],
-		'mfaid' => []
-	];
-
 	/**
 	 * Replace name by value for property names in self::$data.
 	 *
@@ -1030,32 +1057,5 @@ class testUserGroup extends CAPITest {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Create data to be used in tests.
-	 */
-	public function prepareTestData(): void {
-		$response = CDataHelper::call('userdirectory.create', [[
-			'name' => 'API LDAP #1',
-			'idp_type' => IDP_TYPE_LDAP,
-			'host' => 'ldap.forumsys.com',
-			'port' => 389,
-			'base_dn' => 'dc=example,dc=com',
-			'search_attribute' => 'uid'
-		]]);
-
-		$this->assertArrayHasKey('userdirectoryids', $response);
-		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
-
-		$mfa = CDataHelper::call('mfa.create', [[
-			'type' => MFA_TYPE_TOTP,
-			'name' => 'MFA TOTP method',
-			'hash_function' => TOTP_HASH_SHA1,
-			'code_length' => TOTP_CODE_LENGTH_8
-		]]);
-
-		$this->assertArrayHasKey('mfaids', $mfa);
-		self::$data['mfaid'] = array_combine(['MFA TOTP method'], $mfa['mfaids']);
 	}
 }

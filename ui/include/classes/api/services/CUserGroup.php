@@ -329,9 +329,7 @@ class CUserGroup extends CApiService {
 
 		$usrgrpids = array_column($usrgrps, 'usrgrpid');
 		$db_usrgrps = API::UserGroup()->get([
-			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status', 'userdirectoryid',
-				'mfa_status', 'mfaid'
-			],
+			'output' => self::OUTPUT_FIELDS,
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
 		]);
@@ -1641,7 +1639,7 @@ class CUserGroup extends CApiService {
 
 		foreach ($usrgrps as $i => $usrgrp) {
 			if (array_key_exists('mfaid', $usrgrp) && $usrgrp['mfaid'] != 0
-				&& !array_key_exists($usrgrp['mfaid'], $db_mfas)) {
+					&& !array_key_exists($usrgrp['mfaid'], $db_mfas)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/mfaid',
 						_('referred object does not exist')
