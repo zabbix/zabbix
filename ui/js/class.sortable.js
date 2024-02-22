@@ -122,6 +122,9 @@ class CSortable {
 	#drag_scroll_timeout = null;
 	#drag_scroll_direction = 0;
 
+	#resize_observer;
+	#resize_observer_connected = false;
+
 	#mutation_observer;
 	#mutation_observer_connected = false;
 
@@ -171,6 +174,7 @@ class CSortable {
 
 		this.#is_enabled_sorting = enable_sorting;
 
+		this.#resize_observer = new ResizeObserver(this.#listeners.resize);
 		this.#mutation_observer = new MutationObserver(this.#listeners.mutation);
 		this.#intersection_observer = new IntersectionObserver(this.#listeners.intersection);
 
@@ -207,6 +211,7 @@ class CSortable {
 
 		if (enable) {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+			this.#observeResize();
 			this.#observeMutations();
 			this.#observeIntersection();
 			this.#updateItems();
@@ -214,6 +219,7 @@ class CSortable {
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
+			this.#observeResize(false);
 			this.#observeMutations(false);
 			this.#observeIntersection(false);
 			this.#cancelDragging();
@@ -795,6 +801,23 @@ class CSortable {
 		}
 	}
 
+	#observeResize(observe_resize = true) {
+		if (observe_resize === this.#resize_observer_connected) {
+			return observe_resize;
+		}
+
+		if (observe_resize) {
+			this.#resize_observer.observe(this.#target);
+		}
+		else {
+			this.#resize_observer.disconnect();
+		}
+
+		this.#resize_observer_connected = observe_resize;
+
+		return !observe_resize;
+	}
+
 	#observeMutations(observe_mutations = true) {
 		if (observe_mutations === this.#mutation_observer_connected) {
 			return observe_mutations;
@@ -1088,6 +1111,10 @@ class CSortable {
 
 		transitionCancel: (e) => {
 			this.#listeners.transitionEnd(e);
+		},
+
+		resize: () => {
+			this.#scrollTo(Math.min(this.#scroll_pos, this.#getScrollMax()));
 		},
 
 		mutation: (records) => {
