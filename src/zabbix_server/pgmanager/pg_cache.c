@@ -312,7 +312,7 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATUS_ONLINE != proxy->status)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
 			continue;
 
 		for (int j = 0; j < limit - proxy->hosts.values_num && j < hosts_num; j++)
@@ -349,7 +349,7 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATUS_ONLINE == proxy->status)
+		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state)
 		{
 			if (proxy->hosts.values_num > max_hosts)
 				max_hosts = proxy->hosts.values_num;
@@ -417,14 +417,14 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 	{
 		zbx_pg_group_t	*group = cache->group_updates.values[i];
 
-		if (ZBX_PG_GROUP_STATUS_ONLINE == group->status)
+		if (ZBX_PG_GROUP_STATE_ONLINE == group->state)
 			pg_cache_reassign_hosts(cache, group);
 
 		if (ZBX_PG_GROUP_FLAGS_NONE != group->flags)
 		{
 			zbx_pg_update_t	group_update = {
 					.objectid = group->proxy_groupid,
-					.status = group->status,
+					.state = group->state,
 					.flags = group->flags
 				};
 
@@ -439,7 +439,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 				{
 					zbx_pg_update_t	proxy_update = {
 							.objectid = proxy->proxyid,
-							.status = proxy->status,
+							.state = proxy->state,
 							.flags = proxy->flags
 						};
 
@@ -454,10 +454,10 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 	{
 		zbx_pg_group_t	*group = cache->group_updates.values[i];
 
-		if (ZBX_PG_GROUP_STATUS_RECOVERY == group->status)
+		if (ZBX_PG_GROUP_STATE_RECOVERY == group->state)
 		{
-			/* recovery status change is also affected by time, not only proxy status changes - */
-			/* leave it in updates to periodically check until it changes status                */
+			/* recovery state change is also affected by time, not only proxy state changes - */
+			/* leave it in updates to periodically check until it changes state               */
 			i++;
 		}
 		else
@@ -636,9 +636,9 @@ void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t
 static void	pg_cache_dump_group(zbx_pg_group_t *group)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "proxy group:" ZBX_FS_UI64 " %s", group->proxy_groupid, group->name);
-	zabbix_log(LOG_LEVEL_TRACE, "    status:%d failover_delay:%s min_online:%s revision:" ZBX_FS_UI64
+	zabbix_log(LOG_LEVEL_TRACE, "    state:%d failover_delay:%s min_online:%s revision:" ZBX_FS_UI64
 			" hostmap_revision:" ZBX_FS_UI64,
-			group->status, group->failover_delay, group->min_online, group->revision,
+			group->state, group->failover_delay, group->min_online, group->revision,
 			group->hostmap_revision);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    hostids:");
@@ -663,8 +663,8 @@ static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 	if (NULL != proxy->group)
 		groupid = proxy->group->proxy_groupid;
 
-	zabbix_log(LOG_LEVEL_TRACE, "    status:%d lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
-			proxy->status, proxy->lastaccess, proxy->firstaccess, groupid);
+	zabbix_log(LOG_LEVEL_TRACE, "    state:%d lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
+			proxy->state, proxy->lastaccess, proxy->firstaccess, groupid);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    hostids:");
 	for (int i = 0; i < proxy->hosts.values_num; i++)

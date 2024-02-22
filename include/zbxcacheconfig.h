@@ -1395,13 +1395,13 @@ typedef struct zbx_pg_group zbx_pg_group_t;
 /* proxy */
 
 #define ZBX_PG_PROXY_FLAGS_NONE		0x0000
-#define ZBX_PG_PROXY_UPDATE_STATUS	0x0001
+#define ZBX_PG_PROXY_UPDATE_STATE	0x0001
 
 typedef struct
 {
 	zbx_uint64_t			proxyid;
 	char				*name;
-	int				status;
+	int				state;
 	int				lastaccess;
 	int				firstaccess;
 	int				sync_time;	/* sync_time is used to stop collecting potentially infinite */
@@ -1418,7 +1418,7 @@ zbx_pg_proxy_t;
 ZBX_PTR_VECTOR_DECL(pg_proxy_ptr, zbx_pg_proxy_t *)
 
 #define ZBX_PG_GROUP_FLAGS_NONE		0x0000
-#define ZBX_PG_GROUP_UPDATE_STATUS	0x0001
+#define ZBX_PG_GROUP_UPDATE_STATE	0x0001
 #define ZBX_PG_GROUP_UPDATE_HP_MAP	0x0002
 #define ZBX_PG_GROUP_SYNC_ADDED		0x0100
 #define ZBX_PG_GROUP_SYNC_MODIFIED	0x0200
@@ -1433,8 +1433,8 @@ struct zbx_pg_group
 	zbx_uint64_t			revision;
 	zbx_uint64_t			hostmap_revision;
 	zbx_uint64_t			sync_revision;
-	int				status;
-	int				status_time;
+	int				state;
+	int				state_time;
 	zbx_uint32_t			flags;
 	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
 	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */

@@ -24,15 +24,15 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
-#define ZBX_PG_PROXY_STATUS_UNKNOWN	0
-#define ZBX_PG_PROXY_STATUS_OFFLINE	1
-#define ZBX_PG_PROXY_STATUS_ONLINE	2
+#define ZBX_PG_PROXY_STATE_UNKNOWN	0
+#define ZBX_PG_PROXY_STATE_OFFLINE	1
+#define ZBX_PG_PROXY_STATE_ONLINE	2
 
-#define ZBX_PG_GROUP_STATUS_UNKNOWN	0
-#define ZBX_PG_GROUP_STATUS_OFFLINE	1
-#define ZBX_PG_GROUP_STATUS_RECOVERY	2
-#define ZBX_PG_GROUP_STATUS_ONLINE	3
-#define ZBX_PG_GROUP_STATUS_DECAY	4
+#define ZBX_PG_GROUP_STATE_UNKNOWN	0
+#define ZBX_PG_GROUP_STATE_OFFLINE	1
+#define ZBX_PG_GROUP_STATE_RECOVERY	2
+#define ZBX_PG_GROUP_STATE_ONLINE	3
+#define ZBX_PG_GROUP_STATE_DECAY	4
 
 typedef struct
 {
@@ -56,7 +56,7 @@ zbx_pg_cache_t;
 typedef struct
 {
 	zbx_uint64_t	objectid;
-	int		status;
+	int		state;
 	zbx_uint32_t	flags;
 }
 zbx_pg_update_t;

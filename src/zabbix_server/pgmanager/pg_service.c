@@ -199,7 +199,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 {
 	unsigned char	*ptr, *data;
-	int		status, proxies_online_num = 0;
+	int		state, proxies_online_num = 0;
 	zbx_uint32_t	data_len;
 	zbx_pg_group_t	*pg, *proxy_group = NULL;
 	const char	*name = (const char *)message->data;
@@ -228,11 +228,11 @@ static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 
 		for (int i = 0; i < proxy_group->proxies.values_num; i++)
 		{
-			if (ZBX_PG_PROXY_STATUS_ONLINE == proxy_group->proxies.values[i]->status)
+			if (ZBX_PG_PROXY_STATE_ONLINE == proxy_group->proxies.values[i]->state)
 				proxies_online_num++;
 		}
 
-		ptr += zbx_serialize_value(ptr, proxy_group->status);
+		ptr += zbx_serialize_value(ptr, proxy_group->state);
 		ptr += zbx_serialize_value(ptr, proxies_online_num);
 		ptr += zbx_serialize_value(ptr, proxy_group->proxies.values_num);
 
@@ -245,8 +245,8 @@ static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 	}
 	else
 	{
-		status = -1;
-		zbx_ipc_client_send(client, ZBX_IPC_PGM_STATS, (const unsigned char *)&status, sizeof(status));
+		state = -1;
+		zbx_ipc_client_send(client, ZBX_IPC_PGM_STATS, (const unsigned char *)&state, sizeof(state));
 	}
 
 	pg_cache_unlock(pgs->cache);
