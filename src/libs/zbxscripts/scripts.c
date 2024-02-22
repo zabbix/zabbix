@@ -522,12 +522,13 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, const char *config_ssh_key_location, char *error,
+		size_t max_error_len)
 {
 	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int		(*function)(zbx_dc_item_t *, const char*, AGENT_RESULT *);
+	int		(*function)(zbx_dc_item_t *, const char*, const char *config_ssh_key_location, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -589,7 +590,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = function(&item, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = function(&item, config_source_ip, config_ssh_key_location, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -862,8 +863,8 @@ out:
  **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
-		size_t max_error_len, char **debug)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type, char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -923,7 +924,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
 			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, config_source_ip,
-					error, max_error_len);
+					config_ssh_key_location, error, max_error_len);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);

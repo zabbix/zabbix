@@ -151,7 +151,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
-		zbx_get_value_internal_ext_f get_value_internal_ext_cb)
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -400,7 +400,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
-				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb);
+				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
+				config_ssh_key_location);
 
 		switch (errcode)
 		{
@@ -462,7 +463,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
-		zbx_get_value_internal_ext_f get_value_internal_ext_cb)
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
@@ -501,7 +502,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
-			config_externalscripts, get_value_internal_ext_cb);
+			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);

@@ -47,6 +47,7 @@ typedef struct
 	int				config_java_gateway_port;
 	const char			*config_externalscripts;
 	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
+	const char			*config_ssh_key_location;
 }
 zbx_thread_trapper_args;
 
