@@ -278,7 +278,7 @@ class CUser extends CApiService {
 		self::updateGroups($users);
 		self::updateUgSets($users);
 		self::updateMedias($users);
-		self::updateMfaTotpSecret($users);
+		self::updateMfaTotpSecrets($users);
 
 		foreach ($users as &$user) {
 			unset($user['role_type']);
@@ -601,7 +601,7 @@ class CUser extends CApiService {
 		self::updateGroups($users, $db_users);
 		self::updateUgSets($users, $db_users);
 		self::updateMedias($users, $db_users);
-		self::updateMfaTotpSecret($users, $db_users);
+		self::updateMfaTotpSecrets($users, $db_users);
 
 		foreach ($users as &$user) {
 			unset($user['role_type']);
@@ -778,7 +778,7 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Check if MFA method, used in users data, exist.
+	 * Checks if MFA TOTP method exists that is used in users data.
 	 *
 	 * @param array $users
 	 * @param int   $users[]['mfa_totp_secrets']['mfaid']  (optional)
@@ -787,6 +787,7 @@ class CUser extends CApiService {
 	 */
 	private function checkMfaMethods(array $users): void {
 		$mfaids = [];
+
 		foreach ($users as $user) {
 			if (array_key_exists('mfa_totp_secrets', $user)) {
 				$mfaids += array_column($user['mfa_totp_secrets'], 'mfaid', 'mfaid');
@@ -803,7 +804,9 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 		$ids = array_diff_key($mfaids, $db_mfaids);
-		$types = array_column($db_mfaids, 'type');
+		$invalid_mfas = array_filter($db_mfaids, function ($mfa) {
+			return $mfa['type'] != MFA_TYPE_TOTP;
+		});
 
 		if ($ids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -811,7 +814,7 @@ class CUser extends CApiService {
 			);
 		}
 
-		if (in_array(MFA_TYPE_DUO, $types)) {
+		if ($invalid_mfas) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_('Incorrect MFA method type, TOTP secret is not available.')
 			);
@@ -1791,9 +1794,9 @@ class CUser extends CApiService {
 	/**
 	 * @param array $users
 	 */
-	private static function updateMfaTotpSecret(array &$users, array $db_users = null): void {
-		$ins_mfa_totp_secrets = [];
-		$del_mfa_totp_secrets = [];
+	private static function updateMfaTotpSecrets(array &$users, array $db_users = null): void {
+		$ins_secrets = [];
+		$del_secrets = [];
 
 		foreach ($users as $i => &$user) {
 			if (!array_key_exists('mfa_totp_secrets', $user)) {
@@ -1804,9 +1807,12 @@ class CUser extends CApiService {
 			$db_mfa_totp_secrets = ($db_users !== null) ? $db_users[$user['userid']]['mfa_totp_secrets'] : [];
 
 			foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-				$mfa_totp_secretid = key(array_filter($db_mfa_totp_secrets, static function (array $db_mfa_totp_secret) use ($mfa_totp_secret): bool {
-					return $mfa_totp_secret['mfaid'] === $db_mfa_totp_secret['mfaid']
-						&& (!array_key_exists('totp_secret', $mfa_totp_secret) || $mfa_totp_secret['totp_secret'] === $db_mfa_totp_secret['totp_secret']);
+				$mfa_totp_secretid = key(array_filter($db_mfa_totp_secrets,
+					static function (array $db_mfa_totp_secret) use ($mfa_totp_secret): bool {
+						return $mfa_totp_secret['mfaid'] === $db_mfa_totp_secret['mfaid']
+							&& (!array_key_exists('totp_secret', $mfa_totp_secret)
+								|| $mfa_totp_secret['totp_secret'] === $db_mfa_totp_secret['totp_secret']
+							);
 				}));
 
 				if ($mfa_totp_secretid !== null) {
@@ -1814,14 +1820,14 @@ class CUser extends CApiService {
 					unset($db_mfa_totp_secrets[$mfa_totp_secretid]);
 				}
 				else {
-					$ins_mfa_totp_secrets[] = ['userid' => $user['userid']] + $mfa_totp_secret;
+					$ins_secrets[] = ['userid' => $user['userid']] + $mfa_totp_secret;
 					$changed = true;
 				}
 			}
 			unset($mfa_totp_secret);
 
 			if ($db_mfa_totp_secrets) {
-				$del_mfa_totp_secrets = array_merge($del_mfa_totp_secrets, array_keys($db_mfa_totp_secrets));
+				$del_secrets = array_merge($del_secrets, array_keys($db_mfa_totp_secrets));
 				$changed = true;
 			}
 
@@ -1833,12 +1839,12 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		if ($del_mfa_totp_secrets) {
-			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_mfa_totp_secrets]);
+		if ($del_secrets) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_secrets]);
 		}
 
-		if ($ins_mfa_totp_secrets) {
-			$mfa_totp_secretids = DB::insert('mfa_totp_secret', $ins_mfa_totp_secrets);
+		if ($ins_secrets) {
+			$mfa_totp_secretids = DB::insert('mfa_totp_secret', $ins_secrets);
 		}
 
 		foreach ($users as &$user) {
@@ -2590,7 +2596,7 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function increaseFailedLoginAttempts(array $db_user): void {
+	private static function increaseFailedLoginAttempts(array &$db_user): void {
 		$attempt_failed = $db_user['attempt_failed'] + 1;
 
 		DB::update('users', [
@@ -2608,6 +2614,14 @@ class CUser extends CApiService {
 		self::addAuditLogByUser($db_user['userid'], CWebUser::getIp(), $db_user['username'],
 			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
 		);
+
+		$db_users =  DB::select('users', [
+			'output' => ['attempt_failed', 'attempt_clock'],
+			'userids' => $db_user['userid'],
+			'limit' => 1
+		]);
+
+		$db_user = array_merge($db_user, $db_users[0]);
 	}
 
 	private static function checkGroupStatus(array $db_user, int $group_status): void {
@@ -3336,57 +3350,49 @@ class CUser extends CApiService {
 	 * Returns data necessary for user.confirm method.
 	 *
 	 * @param array  $session_data
-	 * @param string $session_data['sessionid']     User's sessionid passed in session data.
-	 * @param string $session_data['mfaid']         User's mfaid passed ins session data.
-	 * @param string $session_data['redirect_uri']  Redirect uri that will be used for Duo MFA.
 	 *
-	 * Returns:
-	 *                     data['mfa']
-	 *                     data['userid]
-	 *
-	 * If MFA_TYPE_TOTP and user has no totp_secret additionally returns:
-	 *                     data['totp_secret']
-	 *                     data['qr_code_url']
-	 *
-	 * If MFA_TYPE_DUO additionally returns:
-	 *                     data['username']
-	 *                     data['state']
-	 *                     data['prompt_uri']
+	 * @return array  data['mfa']
+	 * @return string data['userid]
+	 * @return string data['totp_secret']  If MFA_TYPE_TOTP and user has no totp_secret.
+	 * @return string data['qr_code_url']  If MFA_TYPE_TOTP and user has no totp_secret.
+	 * @return string data['username']     If MFA_TYPE_DUO.
+	 * @return string data['state']        If MFA_TYPE_DUO.
+	 * @return string data['prompt_uri']   If MFA_TYPE_DUO.
 	 */
 	public static function getConfirmData(array $session_data): array {
-		$userid = DB::select('sessions', [
+		$userids = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => ['sessionid' => $session_data['sessionid']]
 		]);
 
-		if (!$userid) {
+		if (!$userids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
 		}
 
-		$userid = $userid[0];
+		$userid = $userids[0]['userid'];
 
-		[$mfa] = DB::select('mfa', [
+		$mfas = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
 			'filter' => ['mfaid' => $session_data['mfaid']]
 		]);
+		$mfa = $mfas[0];
 
 		$data = [
 			'sessionid' => $session_data['sessionid'],
 			'mfa' => $mfa,
-			'userid' => $userid['userid']
+			'userid' => $userid
 		];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			$totp_generator = self::createTotpGenerator($data['mfa']);
-
 			$user_totp_secret = DB::select('mfa_totp_secret', [
 				'output' => ['totp_secret'],
 				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
 			]);
 
 			if (!$user_totp_secret) {
+				$totp_generator = self::createTotpGenerator($data['mfa']);
 				$data['totp_secret'] = $totp_generator->generateSecretKey(TOTP_SECRET_LENGTH_32);
 				$data['qr_code_url'] = $totp_generator->getQRCodeUrl('Zabbix', $data['mfa']['name'],
 					$data['totp_secret']
@@ -3422,6 +3428,7 @@ class CUser extends CApiService {
 
 	/**
 	 * Check MFA method authentication for the user based on provided data.
+	 * Returns 'sessionid' and 'mfa' object, in case MFA authentication was successful or throws Exception.
 	 *
 	 * @param array  $data
 	 * @param string $data['sessionid']                               User's sessionid passed in session data.
@@ -3435,74 +3442,65 @@ class CUser extends CApiService {
 	 * @param string $data['mfa_response_data']['state']              DUO MFA state from session.
 	 * @param string $data['mfa_response_data']['username']           DUO MFA username from session.
 	 *
-	 * Returns 'sessionid' and 'mfa' object, in case MFA authentication was successful or throws Exception.
+	 * @return array
 	 */
 	public static function confirm(array $data): array {
-		$userid = DB::select('sessions', [
+		$userids = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => ['sessionid' => $data['sessionid']]
 		]);
 
-		if (!$userid) {
+		if (!$userids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
 		}
 
-		$userid = $userid[0];
+		$userid = $userids[0]['userid'];
 
-		[$mfa] = DB::select('mfa', [
+		$mfas = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
 			'filter' => ['mfaid' => $data['mfaid']]
 		]);
+		$mfa = $mfas[0];
 
-		[$failed_login_data] = DB::select('users', [
-			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'username', 'attempt_failed'],
 			'userids' => $userid,
 			'limit' => 1
 		]);
+		$db_user = $db_users[0];
 		$mfa_response_data = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			$totp_generator = self::createTotpGenerator($mfa);
-
 			if (!array_key_exists('totp_secret', $mfa_response_data) || $mfa_response_data['totp_secret'] == '') {
-				$user_totp_secret = DB::select('mfa_totp_secret', [
+				$user_totp_secrets = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
-					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid['userid']]
+					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
 				]);
-				$user_totp_secret = $user_totp_secret[0]['totp_secret'];
+				$user_totp_secret = $user_totp_secrets[0]['totp_secret'];
 			}
 			else {
 				$user_totp_secret = $mfa_response_data['totp_secret'];
 			}
 
-			$valid_code = $totp_generator->verifyKey($user_totp_secret, $mfa_response_data['verification_code']);
+			$valid_code = (self::createTotpGenerator($mfa))
+				->verifyKey($user_totp_secret, $mfa_response_data['verification_code']);
 
 			if ($valid_code) {
-				if (array_key_exists('totp_secret', $mfa_response_data) && $mfa_response_data['totp_secret'] != '') {
+				if (array_key_exists('totp_secret', $mfa_response_data) && $mfa_response_data['totp_secret'] !== '') {
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $mfa['mfaid'],
-						'userid' => $userid['userid'],
+						'userid' => $userid,
 						'totp_secret' => $mfa_response_data['totp_secret']
 					]]);
 				}
 			}
 			else {
-				self::increaseFailedLoginAttempts($failed_login_data);
-
-				if (($failed_login_data['attempt_failed'] + 1) >= CSettingsHelper::get(
-					CSettingsHelper::LOGIN_ATTEMPTS
-				)) {
-					[$failed_login_data] = DB::select('users', [
-						'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
-						'userids' => $userid,
-						'limit' => 1
-					]);
-				}
+				self::increaseFailedLoginAttempts($db_user);
 
 				try {
-					self::checkLoginTemporarilyBlocked($failed_login_data);
+					self::checkLoginTemporarilyBlocked($db_user);
 				}
 				catch (Exception $e) {
 					DB::delete('sessions', ['sessionid' => $data['sessionid']]);
@@ -3516,7 +3514,7 @@ class CUser extends CApiService {
 
 		if ($mfa['type'] == MFA_TYPE_DUO) {
 			if (!array_key_exists('state', $mfa_response_data) || !array_key_exists('username', $mfa_response_data)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No saved state please login again.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No saved state, please login again.'));
 			}
 
 			if ($mfa_response_data['duo_state'] != $mfa_response_data['state']) {
@@ -3551,7 +3549,7 @@ class CUser extends CApiService {
 		);
 
 		CWebUser::checkAuthentication($data['sessionid']);
-		self::resetFailedLoginAttempts($failed_login_data);
+		self::resetFailedLoginAttempts($db_user);
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
 		return [
@@ -3608,18 +3606,12 @@ class CUser extends CApiService {
 	 * Returns the list of userids that have enrolled to TOTP mfa and have TOTP secrets.
 	 *
 	 * @param array $userids  Userids to check for TOTP secrets.
-	 *
-	 * Returns array of userids that have TOTP secrets or empty array.
 	 */
 	public static function getUseridsWithMfaTotpSecrets(array $userids = []): array {
+		$options = ['output' => ['userid']];
+
 		if ($userids) {
-			$options = [
-				'output' => ['userid'],
-				'filter' => ['userid' => $userids]
-			];
-		}
-		else {
-			$options = ['output' => ['userid']];
+			$options['filter'] = ['userid' => $userids];
 		}
 
 		$userids_with_totp = DB::select('mfa_totp_secret', $options);
