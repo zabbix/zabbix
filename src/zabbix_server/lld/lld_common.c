@@ -283,12 +283,6 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 			continue;
 		}
 
-		if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type && 0 != object_ts_disable)
-		{
-			zbx_vector_uint64_append(&ts_ids, id);
-			continue;
-		}
-
 		if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type ||
 				(ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck >
 				(ts_disable = lld_end_of_life(object_lastcheck, enabled_lifetime->duration))))
@@ -304,6 +298,10 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 			zbx_uint64_pair_t	pair = {.first = id, .second = (zbx_uint64_t)ts_disable};
 
 			zbx_vector_uint64_pair_append(&ts_upd, pair);
+		}
+		else if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type && 0 != object_ts_disable)
+		{
+			zbx_vector_uint64_append(&ts_ids, id);
 		}
 	}
 
