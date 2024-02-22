@@ -2045,6 +2045,7 @@ int	zbx_db_get_row_num(zbx_db_result_t result)
 #elif defined(HAVE_MYSQL)
 	return (int)mysql_num_rows(result->result);
 #else
+	ZBX_UNUSED(result);
 	return 0;
 #endif
 }
