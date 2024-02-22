@@ -19,8 +19,11 @@
 
 #include "rtc_proxy.h"
 
+#include "zbxcommon.h"
 #include "zbx_rtc_constants.h"
 #include "zbxdiag.h"
+#include "zbxjson.h"
+
 
 /******************************************************************************
  *                                                                            *

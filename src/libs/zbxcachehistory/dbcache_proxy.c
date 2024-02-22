@@ -19,6 +19,11 @@
 
 #include "zbxcachehistory.h"
 #include "zbxcachehistory_proxy.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
+#include "zbxhistory.h"
+#include "zbxtypes.h"
+#include "zbxvariant.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
@@ -27,8 +32,8 @@
 #include "zbx_item_constants.h"
 #include "zbxproxybuffer.h"
 
-static char		*sql = NULL;
-static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
+static char	*sql = NULL;
+static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
 
 /******************************************************************************
  *                                                                            *
