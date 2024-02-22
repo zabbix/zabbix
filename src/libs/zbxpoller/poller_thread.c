@@ -78,7 +78,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 	zbx_free(result);
 }
 
-static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
+static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent_result_ptr_t *add_results,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
@@ -544,7 +544,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 /* Actually this could be called by trapper, without poller being initialized, */
 /* so cannot call poller_get_progname(), need progname to be passed directly. */
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
-		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
+		zbx_vector_agent_result_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
@@ -639,6 +639,8 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 	}
 }
 
+ZBX_PTR_VECTOR_IMPL(agent_result_ptr, AGENT_RESULT*)
+
 /***********************************************************************************
  *                                                                                 *
  * Purpose: retrieves values of metrics from monitored hosts                       *
@@ -670,14 +672,15 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
-	zbx_dc_item_t		item, *items;
-	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
-	int			errcodes[ZBX_MAX_POLLER_ITEMS];
-	zbx_timespec_t		timespec;
-	int			num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
-	zbx_vector_ptr_t	add_results;
-	unsigned char		*data = NULL;
-	size_t			data_alloc = 0, data_offset = 0;
+	zbx_dc_item_t			item, *items;
+	AGENT_RESULT			results[ZBX_MAX_POLLER_ITEMS];
+	int				errcodes[ZBX_MAX_POLLER_ITEMS];
+	zbx_timespec_t			timespec;
+	int				num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
+	//zbx_vector_ptr_t	add_results;
+	zbx_vector_agent_result_ptr_t	add_results;
+	unsigned char			*data = NULL;
+	size_t				data_alloc = 0, data_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -690,7 +693,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		goto exit;
 	}
 
-	zbx_vector_ptr_create(&add_results);
+	//zbx_vector_ptr_create(&add_results);
+	zbx_vector_agent_result_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
@@ -795,8 +799,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	zbx_dc_config_clean_items(items, NULL, (size_t)num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
-	zbx_vector_ptr_destroy(&add_results);
+	zbx_vector_agent_result_ptr_clear_ext(&add_results, zbx_free_agent_result_ptr);
+	zbx_vector_agent_result_ptr_destroy(&add_results);
 
 	if (NULL != data)
 	{

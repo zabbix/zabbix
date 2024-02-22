@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-
 #ifndef ZABBIX_CHECKS_SIMPLE_VMWARE_H
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
+
+#include "zbxpoller.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "zbxalgo.h"
@@ -31,7 +31,7 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results);
+		zbx_vector_agent_result_ptr_t *add_results);
 
 int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

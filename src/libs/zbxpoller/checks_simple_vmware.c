@@ -1031,7 +1031,7 @@ out:
 }
 
 static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t eventlog_last_key,
-		const zbx_dc_item_t *item, zbx_vector_ptr_t *add_results)
+		const zbx_dc_item_t *item, zbx_vector_agent_result_ptr_t *add_results)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
@@ -1057,7 +1057,7 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_u
 				add_result->log->timestamp = event->timestamp;
 			}
 
-			zbx_vector_ptr_append(add_results, add_result);
+			zbx_vector_agent_result_ptr_append(add_results, add_result);
 		}
 		else
 			zbx_free(add_result);
@@ -1134,7 +1134,7 @@ static int	evt_severities_to_mask(const char *severity, unsigned char *mask, cha
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results)
+		zbx_vector_agent_result_ptr_t *add_results)
 {
 	const char		*url, *skip, *severity_str;
 	unsigned char		skip_old, severity = 0;
