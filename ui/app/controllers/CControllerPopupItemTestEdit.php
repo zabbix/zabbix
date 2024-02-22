@@ -84,14 +84,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			unset($_REQUEST['interfaceid']);
 		}
 
-		$error = '';
-		$result = $this->validateInput($fields) && $this->checkTestInputs($error);
+		$result = $this->validateInput($fields) && $this->checkTestInputs();
 
 		if (!$result) {
-			if ($error !== '') {
-				error($error);
-			}
-
 			$output = [];
 
 			if ($messages = get_and_clear_messages()) {
@@ -104,7 +99,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		return $result;
 	}
 
-	private function checkTestInputs(string &$error = ''): bool {
+	private function checkTestInputs(): bool {
 		$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
 		$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
 		$this->test_type = (int) $this->getInput('test_type');
@@ -115,7 +110,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			$item_key_parser = new CItemKey();
 
 			if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
-				$error = _s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError());
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
 
 				return false;
 			}
@@ -145,6 +140,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+				error($error);
+
 				return false;
 			}
 
@@ -169,12 +166,14 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				}
 
 				if (!CApiInputValidator::validateUniqueness($api_input_rules, $_steps, '', $error)) {
+					error($error);
+
 					return false;
 				}
 			}
 		}
 		elseif (!$this->is_item_testable) {
-			$error = _s('Test of "%1$s" items is not supported.', item_type2str($this->item_type));
+			error(_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)));
 
 			return false;
 		}

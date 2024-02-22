@@ -1165,10 +1165,12 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Gathers (non-empty) properties needed for server to collect item value.
 	 *
-	 * @param array $data  (optional) Appended with `item` and `host` parameters.
+	 * @return array $data
+	 * @return array $data['item]
+	 * @return array $data['host]
 	 */
-	protected function prepareTestData(?array &$data = []): void {
-		$data = ($data === null ? [] : $data ) + $this->getItemTestProperties($this->getInputAll(), true);
+	protected function prepareTestData(): array {
+		$data = $this->getItemTestProperties($this->getInputAll(), true);
 		$data = $this->resolveItemPropertyMacros($data);
 
 		if ($data['item']['type'] == ITEM_TYPE_CALCULATED) {
@@ -1203,6 +1205,8 @@ abstract class CControllerPopupItemTest extends CController {
 		if (array_key_exists('parameters', $data['item'])) {
 			$data['item']['parameters'] = array_column($data['item']['parameters'], 'value', 'name');
 		}
+
+		return $data;
 	}
 
 	/**

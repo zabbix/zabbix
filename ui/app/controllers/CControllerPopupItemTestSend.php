@@ -288,7 +288,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		if ($this->get_value_from_host) {
-			$this->prepareTestData($data);
+			$data += $this->prepareTestData();
 		}
 		else {
 			$data['item']['value'] = $this->getInput('value', '');
@@ -316,31 +316,31 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$output = ['user' => ['debug_mode' => $this->getDebugMode()]];
 
 		if ($result === false) {
-			$error = $server->getError();
+			error($server->getError());
 		}
 		else {
-			$error = '';
-
-			$this->processTestResult($data, $steps_data, $result, $error, $output);
+			$this->processTestResult($data, $steps_data, $result, $output);
 		}
 
-		if ($error !== '') {
-			error($error);
-		}
+		$messages = get_and_clear_messages();
 
-		if ($messages = get_and_clear_messages()) {
+		if ($messages) {
+			foreach ($messages as &$message) {
+				if ($message['message'] === '') {
+					$message['message'] = _('<empty string>');
+				}
+			}
+			unset($message);
+
 			$output['error']['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
-	private function processTestResult(array $data, array $steps_data, array $result, string &$error,
-			array &$output = []): void {
-		$error = '';
-
+	private function processTestResult(array $data, array $steps_data, array $result, array &$output = []): void {
 		if (array_key_exists('error', $result)) {
-			$error = $result['error'];
+			error($result['error']);
 
 			return;
 		}
@@ -360,7 +360,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$output['not_supported'] = self::NOT_SUPPORTED_STATE;
 				}
 				else {
-					$error = $result_item['error'];
+					error($result_item['error']);
 
 					return;
 				}
@@ -443,7 +443,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$output['steps'] = $steps_data;
 
 		if (array_key_exists('error', $result_preproc)) {
-			$error = $result_preproc['error'] === '' ? _('<empty string>') : $result_preproc['error'];
+			error($result_preproc['error']);
 
 			return;
 		}

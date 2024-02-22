@@ -164,8 +164,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$this->prepareTestData($data);
-
 		$output = [
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -177,7 +175,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $server->testItem($data, CSessionHelper::getId());
+		$result = $server->testItem($this->prepareTestData(), CSessionHelper::getId());
 
 		// Handle the response.
 		if ($result === false) {
@@ -203,7 +201,16 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			}
 		}
 
-		if ($messages = get_and_clear_messages()) {
+		$messages = get_and_clear_messages();
+
+		if ($messages) {
+			foreach ($messages as &$message) {
+				if ($message['message'] === '') {
+					$message['message'] = _('<empty string>');
+				}
+			}
+			unset($message);
+
 			$output['error']['messages'] = array_column($messages, 'message');
 		}
 
