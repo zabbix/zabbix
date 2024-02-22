@@ -798,7 +798,6 @@ class CConfigurationExport {
 				}
 			}
 
-
 			$inherit_options = [
 				'output' => array_merge($this->dataFields['drule'], ['templateid']),
 				'templateids' => $templateids,

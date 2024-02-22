@@ -233,7 +233,6 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
 	}
 
-
 	// get hosts
 	$db_host = API::Host()->get($options);
 
@@ -690,9 +689,9 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
  * Returns the indicator for lost LLD entity.
  *
  * @param int     $current_time           Current Unix timestamp.
- * @param int     $lifetime_type          Type of deletion. ????
+ * @param int     $lifetime_type          Scenario for deleting lost LLD resources.
  * @param int     $ts_delete              Deletion timestamp of the entity.
- * @param int     $enabled_lifetime_type  Type of disabling. ????
+ * @param int     $enabled_lifetime_type  Scenario for disabling lost LLD resources.
  * @param int     $ts_disable             Disabling timestamp of the entity.
  * @param string  $entity                 Type of entity.
  *
