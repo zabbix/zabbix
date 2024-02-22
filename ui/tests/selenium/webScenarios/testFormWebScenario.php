@@ -180,13 +180,12 @@ class testFormWebScenario extends CWebTest {
 		if (array_key_exists('scenario_name', $data)) {
 			$scenario_fields['Name'] = ['value' => $data['scenario_name'], 'enabled' => false, 'maxlength' => 64];
 			$scenario_fields['Agent']['value'] = 'Internet Explorer 10';
-
 			$parent_field = $form->getField('Parent web scenarios');
 			$this->assertTrue($parent_field->isCLickable());
 
 			// Check that link in "Parent web scenarios" field leads to config of this web scenario on template.
 			$this->assertEquals('httpconf.php?form=update&hostid='.self::$templateid.'&httptestid='.self::$template_scenarioid.
-					'&context=template', $parent_field->query('link', self::$template_name)->one()->getAttribute('href')
+					'&context=template', $parent_field->query('xpath:.//a')->one()->getAttribute('href')
 			);
 		}
 
@@ -231,8 +230,9 @@ class testFormWebScenario extends CWebTest {
 
 			// Check the presence of the draggable icon.
 			if ($row_draggable) {
-				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
-				$this->assertFalse($drag_icon->isEnabled());
+				$this->assertEquals('sortable sortable-disabled',
+						$table->query('xpath:.//tbody')->one()->getAttribute('class')
+				);
 			}
 			else {
 				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
@@ -246,9 +246,11 @@ class testFormWebScenario extends CWebTest {
 
 			// Check that draggable icon becomes enabled when a new row is added.
 			if ($row_draggable) {
-				$this->assertFalse($drag_icon->isEnabled());
+				$this->assertEquals('sortable sortable-disabled',
+						$table->query('xpath:.//tbody')->one()->getAttribute('class')
+				);
 				$add_button->click();
-				$this->assertTrue($drag_icon->isEnabled());
+				$this->assertEquals('sortable', $table->query('xpath:.//tbody')->one()->getAttribute('class'));
 			}
 		}
 
