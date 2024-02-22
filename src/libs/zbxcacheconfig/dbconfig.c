@@ -21,6 +21,7 @@
 
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 #include "zbxtasks.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
@@ -656,7 +657,7 @@ void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *f
 
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
-	return DCfind_id_ext(hashset, id, size, found, 0);
+	return DCfind_id_ext(hashset, id, size, found, ZBX_UNIQ_FALSE);
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
