@@ -583,8 +583,12 @@ class CSortable {
 	}
 
 	#getScrollMax() {
+		this.#target.style.overflow = 'hidden';
+
 		const scroll_max =
 			(this.#is_horizontal ? this.#target.scrollWidth : this.#target.scrollHeight) - this.#getTargetLoc().dim;
+
+		this.#target.style.overflow = '';
 
 		return scroll_max >= 0.5 ? scroll_max : 0;
 	}
@@ -972,9 +976,9 @@ class CSortable {
 			this.#cancelDragScrolling();
 
 			if (this.#scrollRel(e.deltaY !== 0 ? e.deltaY : e.deltaX) !== 0
-					|| (this.#is_horizontal && this.#getScrollMax() > 0)
 					|| this.#is_dragging
-					|| this.#hasTransitions()) {
+					|| this.#hasTransitions()
+					|| (this.#is_horizontal && this.#getScrollMax() > 0)) {
 				e.preventDefault();
 			}
 
