@@ -551,7 +551,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_psk_orig = NULL;
 		host->jp_row = NULL;
 		host->inventory_mode = HOST_INVENTORY_DISABLED;
-		host->status = atoi(row[23]);
+		ZBX_STR2UCHAR(host->status, row[23]);
 		host->custom_interfaces_orig = 0;
 		host->proxyid_orig = 0;
 		host->ipmi_authtype_orig = 0;
