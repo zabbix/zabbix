@@ -95,7 +95,6 @@ class CTabFilter extends CBaseComponent {
 	 * @param {CTabFilterItem} item  Filter item object.
 	 */
 	scrollIntoView(item) {
-		console.log('scrollIntoView', item._target);
 		setTimeout(() => this.#tabs_sortable.scrollIntoView(item._target.parentNode, {immediate: true}));
 	}
 
