@@ -267,6 +267,9 @@ void	zbx_mock_test_entry(void **state)
 
 		DCitem_poller_type_update_test(&item, &host, test_config.flags);
 
+		if (ITEM_TYPE_SNMP == item.type)
+			zbx_free(snmpitem->snmp_oid);
+
 		zbx_mock_assert_int_eq(buffer, test_config.result_poller_type, item.poller_type);
 	}
 }
