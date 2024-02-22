@@ -232,17 +232,11 @@ void	zbx_mock_test_entry(void **state)
 
 		if (ITEM_TYPE_SNMP == item.type)
 		{
-			int		found;
 			const char	*snmp_oid = test_config.snmp_oid;
 
 			item.itemtype.snmpitem = &snmpitem_local;
 
 			ZBX_DC_SNMPITEM	*snmpitem = item.itemtype.snmpitem;
-
-			if (0 == found)
-			{
-				snmpitem->snmp_oid = NULL;
-			}
 
 			snmpitem->snmp_oid = zbx_strdup((char *)snmpitem->snmp_oid, snmp_oid);
 
