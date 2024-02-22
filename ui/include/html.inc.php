@@ -754,12 +754,6 @@ function getLldLostEntityIndicator(int $current_time, int $lifetime_type, int $t
 							_('has been disabled'), _('will not be deleted')
 						);
 						break;
-					// todo - check whether icon should be displayed in this scenario. Probably not? E.S.
-//					case ZBX_LLD_DISABLE_NEVER:
-//						$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-//							_('will not be disabled'), _('will not be deleted')
-//						);
-//						break;
 				}
 				break;
 		}
