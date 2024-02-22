@@ -665,7 +665,7 @@ class CSVGHoneycomb {
 					lines,
 					lines_count,
 					line_max_length: Math.ceil(Math.max(...lines.map(line => line.length)) / 8) * 8,
-					color: d.is_numeric && this.#config[c_param].color !== '' ? this.#config[c_param].color : null,
+					color: d.is_numeric && this.#config[c_param].color !== '' ? `#${this.#config[c_param].color}` : null,
 					font_size: 0,
 					font_weight,
 					is_custom_size
