@@ -245,7 +245,7 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 		// [2]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-installed-size
 
 		if split[4] != "" {
-			size, err = strconv.ParseUint(split[4], 10, 64);
+			size, err = strconv.ParseUint(split[4], 10, 64)
 			if err != nil {
 				return "", err
 			}

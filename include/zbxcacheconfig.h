@@ -247,6 +247,7 @@ typedef struct
 	unsigned char		status;
 	unsigned char		history;
 	unsigned char		trends;
+	unsigned char		has_trigger;
 }
 zbx_history_sync_item_t;
 
@@ -478,6 +479,7 @@ typedef struct
 	unsigned char	autoreg_tls_accept;
 	char		*default_timezone;
 	int		auditlog_enabled;
+	int		auditlog_mode;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -496,6 +498,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT		__UINT64_C(0x0000000000000080)
 #define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED		__UINT64_C(0x0000000000000200)
+#define ZBX_CONFIG_FLAGS_AUDITLOG_MODE			__UINT64_C(0x0000000000000400)
 
 typedef struct
 {
@@ -785,6 +788,7 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 		int itemids_num);
 void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
 void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
+int	zbx_dc_config_history_get_trends_sec(const char *trends_period, int trends_global, int hk_trends);
 
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num);
@@ -965,14 +969,6 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
 
-
-#define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
-#define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
-#define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
-#define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
-#define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
-#define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
-
 typedef struct zbx_hc_data
 {
 	zbx_history_value_t	value;
@@ -1037,6 +1033,7 @@ zbx_trigger_dep_t;
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids);
 
 /* data session support */
 
@@ -1109,11 +1106,19 @@ zbx_event_suppress_query_t;
 
 ZBX_PTR_VECTOR_DECL(event_suppress_query_ptr, zbx_event_suppress_query_t*)
 
-#define ZBX_MAINTENANCE_UPDATE_TRUE	1
-#define ZBX_MAINTENANCE_UPDATE_FALSE	0
+#define ZBX_FLAG_MAINTENANCE_UPDATE_NONE	0x00
+#define ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE	0x01
+#define ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD	0x02
+
+typedef enum
+{
+	MAINTENANCE_TIMER_INITIALIZED = 0,
+	MAINTENANCE_TIMER_PENDING
+}
+zbx_maintenance_timer_t;
 
 void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
-int	zbx_dc_update_maintenances(void);
+int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer);
 void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids,
 		zbx_vector_host_maintenance_diff_ptr_t *updates);
 void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_host_maintenance_diff_ptr_t *updates);
@@ -1125,6 +1130,7 @@ void	zbx_dc_maintenance_set_update_flags(void);
 void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
+int	zbx_dc_maintenance_check_immediate_update(void);
 
 int	zbx_dc_maintenance_has_tags(void);
 

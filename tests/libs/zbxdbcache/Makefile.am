@@ -136,7 +136,7 @@ COMMON_WRAP_FUNCS = \
 zbx_vc_get_values_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_get_values.c \
-	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
+	valuecache_test.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -157,7 +157,7 @@ zbx_vc_get_values_CFLAGS = \
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_add_values.c \
-	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
+	valuecache_test.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -178,7 +178,7 @@ zbx_vc_add_values_CFLAGS = \
 zbx_vc_get_value_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_get_value.c \
-	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
+	valuecache_test.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 

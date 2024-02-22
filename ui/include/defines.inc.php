@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0beta1');
+define('ZABBIX_VERSION',		'7.0.0beta2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050225);
+define('ZABBIX_DB_VERSION',		6050232);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -548,6 +548,7 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
+define('ZBX_LLD_RULE_DELAY_DEFAULT',		'1h');
 define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
@@ -1817,7 +1818,7 @@ define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
 define('TAB_INDICATOR_EXCLUDED_DOWNTIMES', 'excluded-downtimes');
 define('TAB_INDICATOR_FILTERS', 'filters');
-define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_FRONTEND_NOTIFICATIONS', 'frontend-notifications');
 define('TAB_INDICATOR_GRAPH_AXES', 'graph-axes');
 define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');

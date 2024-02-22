@@ -243,7 +243,7 @@ zabbix_export:
           timeout: '{$HPE.SYNERGY.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}'
+              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}:{$HPE.SYNERGY.API.PORT}'
             - name: password
               value: '{$HPE.SYNERGY.API.PASSWORD}'
             - name: username

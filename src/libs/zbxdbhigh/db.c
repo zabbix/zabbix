@@ -61,6 +61,7 @@
 #endif
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
+ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 
 static int	connection_failure;
 
@@ -1677,6 +1678,8 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 			(*sql_offset)--;
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
+#else
+		ZBX_UNUSED(sql_alloc);
 #endif
 #if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 		/* make sure we are not called twice without */

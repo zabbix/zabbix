@@ -25,6 +25,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
+#include "zbxpoller.h"
 
 #define ZBX_IPC_SERVICE_TRAPPER	"trapper"
 
@@ -42,6 +43,10 @@ typedef struct
 	int				proxydata_frequency;
 	zbx_get_config_forks_f		get_process_forks_cb_arg;
 	const char			*config_stats_allowed_ip;
+	const char			*config_java_gateway;
+	int				config_java_gateway_port;
+	const char			*config_externalscripts;
+	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
 }
 zbx_thread_trapper_args;
 

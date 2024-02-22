@@ -716,11 +716,8 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 		if (0 != value->meta)
 			zbx_set_agent_result_meta(&result, value->lastlogsize, value->mtime);
 
-		if (0 != ZBX_ISSET_VALUE(&result) || 0 != ZBX_ISSET_META(&result))
-		{
-			item->state = ITEM_STATE_NORMAL;
-			process_item_value(item, &result, &value->ts, h_num, NULL);
-		}
+		item->state = ITEM_STATE_NORMAL;
+		process_item_value(item, &result, &value->ts, h_num, NULL);
 
 		zbx_free_agent_result(&result);
 	}

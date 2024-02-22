@@ -17,19 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "zbxcachevalue.h"
-#include "zbxcacheconfig.h"
-#include "zbxjson.h"
-#include "zbxtime.h"
-#include "zbxconnector.h"
-#include "../ha/ha.h"
-#include "zbxproxybuffer.h"
-#include "zbxpgservice.h"
+#include "poller_server.h"
 
-#include "checks_internal.h"
+#include "../ha/ha.h"
 #include "../lld/lld_protocol.h"
 
+#include "zbxcachevalue.h"
+#include "zbxcacheconfig.h"
+#include "zbxconnector.h"
+#include "zbxproxybuffer.h"
+#include "zbxpgservice.h"
 
 static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option, AGENT_RESULT *result)
 {
@@ -81,19 +78,19 @@ static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option,
  *                                                                            *
  * Purpose: processes program type (server) specific internal checks          *
  *                                                                            *
- * Parameters: param1  - [IN] the first parameter                             *
- *             request - [IN] the request                                     *
- *             result  - [OUT] the result                                     *
+ * Parameters: param1  - [IN] first parameter                                 *
+ *             request - [IN]                                                 *
+ *             result  - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
- *               FAIL - not a server specific internal check                  *
+ *               FAIL - not server specific internal check                    *
  *                                                                            *
  * Comments: This function is used to process server specific internal checks *
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_server(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
 	const char	*param2;
@@ -157,8 +154,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 				param2 = get_rparam(request, 1);
 
 				if (SUCCEED == (res = zbx_dc_get_proxy_delay_by_name(param2, &tmp, &error)) &&
-						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2, &lastaccess,
-						&error)))
+						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2,
+						&lastaccess, &error)))
 				{
 					value = tmp + time(NULL) - lastaccess;
 				}
@@ -446,4 +443,3 @@ void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
 {
 	memset(info, 0, sizeof(zbx_pb_state_info_t));
 }
-

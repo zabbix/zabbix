@@ -423,7 +423,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				if (!isset($data['form'])) {
-					$this->zbxTestAssertElementValue('delay', '1m');
+					$this->zbxTestAssertElementValue('delay', '1h');
 				}
 				break;
 			default:
