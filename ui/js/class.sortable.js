@@ -902,7 +902,6 @@ class CSortable {
 
 					this.#toggleListeners(CSortable.LISTENERS_SCROLL_DRAG);
 
-					// Prevent content selection and fix slow visual performance.
 					e.preventDefault();
 
 					break;

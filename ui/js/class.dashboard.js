@@ -2212,13 +2212,7 @@ class CDashboard {
 				this._updateNavigationButtons();
 			},
 
-			tabsDragStart: () => {
-				this._selected_dashboard_page.blockInteraction();
-			},
-
 			tabsDragEnd: () => {
-				this._selected_dashboard_page.unblockInteraction();
-
 				this._updateNavigationButtons();
 			},
 
@@ -2226,6 +2220,14 @@ class CDashboard {
 				this._setInitialDashboardPage(this._selected_dashboard_page);
 
 				this._is_unsaved = true;
+			},
+
+			tabsMouseDown: (e) => {
+				const tab = e.target.closest('li');
+
+				if (tab !== null && tab.parentElement === this._tabs.getTarget()) {
+					tab.focus();
+				}
 			},
 
 			tabsClick: (e) => {
@@ -2370,10 +2372,10 @@ class CDashboard {
 			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
 			new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);
 
-			this._tabs.on(CSortable.EVENT_DRAG_START, this._events.tabsDragStart);
 			this._tabs.on(CSortable.EVENT_DRAG_END, this._events.tabsDragEnd);
 			this._tabs.on(CSortable.EVENT_SORT, this._events.tabsSort);
 
+			this._containers.navigation_tabs.addEventListener('mousedown', this._events.tabsMouseDown);
 			this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
 			this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);
 
