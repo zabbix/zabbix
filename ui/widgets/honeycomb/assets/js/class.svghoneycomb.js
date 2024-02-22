@@ -36,7 +36,7 @@ class CSVGHoneycomb {
 	static ID_COUNTER = 0;
 
 	static CELL_WIDTH_MIN = 50;
-	static LABEL_WIDTH_MIN = 60;
+	static LABEL_WIDTH_MIN = 56;
 	static FONT_SIZE_MIN = 12;
 	static LINE_HEIGHT = 1.15;
 
@@ -205,7 +205,8 @@ class CSVGHoneycomb {
 
 		this.#honeycomb_container = this.#container
 			.append('g')
-			.attr('class', CSVGHoneycomb.ZBX_STYLE_HONEYCOMB_CONTAINER);
+			.attr('class', CSVGHoneycomb.ZBX_STYLE_HONEYCOMB_CONTAINER)
+			.style('--line-height', CSVGHoneycomb.LINE_HEIGHT);
 
 		this.#cell_path = this.#generatePath(this.#cell_height, this.#cells_gap);
 		this.#canvas_context = document.createElement('canvas').getContext('2d');
@@ -324,6 +325,7 @@ class CSVGHoneycomb {
 		);
 
 		this.#honeycomb_container
+			.style('--stroke-width', 2 / this.#container_params.scale)
 			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
 			.each((d, i, cells) => {
 				if (d.scale_timeout !== undefined) {
@@ -360,7 +362,6 @@ class CSVGHoneycomb {
 					.style('--y', d => `${d.position.y}px`)
 					.style('--fill', d => this.#getFillColor(d))
 					.style('--stroke', d => this.#getFillColor(d))
-					.style('--stroke-width', 2 / this.#container_params.scale)
 					.call(cell => cell
 						.append('path')
 						.attr('d', this.#cell_path)
@@ -384,7 +385,6 @@ class CSVGHoneycomb {
 					.style('--y', d => `${d.position.y}px`)
 					.style('--fill', d => this.#getFillColor(d))
 					.style('--stroke', d => this.#getFillColor(d))
-					.style('--stroke-width', 2 / this.#container_params.scale)
 					.each((d, i, cells) => {
 						const cell = d3.select(cells[i]);
 
@@ -621,11 +621,10 @@ class CSVGHoneycomb {
 	#resizeLabels(cell, width, height) {
 		cell
 			.call(cell => cell.select('foreignObject')
-				.attr('x', this.#container_params.cell_padding - width / 2)
-				.attr('y', -height / 2)
+				.attr('x', d => d.position.x + this.#container_params.cell_padding - width / 2)
+				.attr('y', d => d.position.y + -height / 2)
 				.attr('width', width - this.#container_params.cell_padding * 2)
 				.attr('height', height)
-				.style('--line-height', CSVGHoneycomb.LINE_HEIGHT)
 			)
 			.call(cell => cell.select(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`)
 				.style('max-height', d => `${d.labels.primary.lines_count * CSVGHoneycomb.LINE_HEIGHT}em`)

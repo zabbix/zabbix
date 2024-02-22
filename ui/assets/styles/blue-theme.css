@@ -3572,7 +3572,7 @@ section {
         --stroke: transparent;
         transform: translate(var(--x), var(--y)); }
     .svg-honeycomb .svg-honeycomb-cell foreignObject {
-      transform: translate(var(--px), var(--py));
+      transform: translate(var(--dx, 0px), var(--dy, 0px));
       transition: transform 0.3s, x 0.3s, y 0.3s, width 0.3s, height 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-content {
       display: grid;
@@ -3601,6 +3601,11 @@ section {
     transform: translate(var(--px), var(--py)); }
     .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
       fill: var(--color); }
+
+.dashboard-is-edit-mode .svg-honeycomb-container:not(:hover) .svg-honeycomb-cell path,
+.dashboard-is-edit-mode .svg-honeycomb-container:not(:hover) .svg-honeycomb-cell foreignObject,
+.dashboard-is-edit-mode .svg-honeycomb-container:not(:hover) .svg-honeycomb-cell .svg-honeycomb-label {
+  transition: none; }
 
 .filter-container.tabfilter-container {
   padding: 0;

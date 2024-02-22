@@ -41,7 +41,7 @@
 		}
 
 		foreignObject {
-			transform: translate(var(--px), var(--py));
+			transform: translate(var(--dx, 0px), var(--dy, 0px));
 
 			@if $ui-transitions {
 				transition: transform $ui-transition-duration,
@@ -70,7 +70,7 @@
 
 			@if $ui-transitions {
 				transition: max-height $ui-transition-duration,
-				font-size $ui-transition-duration;
+							font-size $ui-transition-duration;
 			}
 		}
 
@@ -94,6 +94,20 @@
 
 		circle {
 			fill: var(--color);
+		}
+	}
+}
+
+.dashboard-is-edit-mode {
+	.svg-honeycomb-container:not(:hover) {
+		.svg-honeycomb-cell {
+			path,
+			foreignObject,
+			.svg-honeycomb-label {
+				@if $ui-transitions {
+					transition: none;
+				}
+			}
 		}
 	}
 }
