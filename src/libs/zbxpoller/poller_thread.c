@@ -677,7 +677,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	int				errcodes[ZBX_MAX_POLLER_ITEMS];
 	zbx_timespec_t			timespec;
 	int				num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
-	//zbx_vector_ptr_t	add_results;
 	zbx_vector_agent_result_ptr_t	add_results;
 	unsigned char			*data = NULL;
 	size_t				data_alloc = 0, data_offset = 0;
@@ -693,7 +692,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		goto exit;
 	}
 
-	//zbx_vector_ptr_create(&add_results);
 	zbx_vector_agent_result_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);

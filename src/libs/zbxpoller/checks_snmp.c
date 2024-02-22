@@ -1999,6 +1999,9 @@ typedef struct
 }
 zbx_snmp_dobject_t;
 
+ZBX_PTR_VECTOR_DECL(snmp_dobject_ptr, zbx_snmp_dobject_t*)
+ZBX_PTR_VECTOR_IMPL(snmp_dobject_ptr, zbx_snmp_dobject_t*)
+
 /* helper data structure used by snmp discovery */
 typedef struct
 {
@@ -2009,7 +2012,7 @@ typedef struct
 	zbx_hashset_t		objects;
 
 	/* the index (order) of discovered SNMP objects */
-	zbx_vector_ptr_t	index;
+	zbx_vector_snmp_dobject_ptr_t	index;
 
 	/* request data structure used to parse discovery OID key */
 	AGENT_REQUEST		request;
@@ -2092,7 +2095,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 	}
 
 	zbx_hashset_create(&data->objects, 10, zbx_snmp_dobject_hash, zbx_snmp_dobject_compare);
-	zbx_vector_ptr_create(&data->index);
+	zbx_vector_snmp_dobject_ptr_create(&data->index);
 
 	ret = SUCCEED;
 out:
@@ -2114,7 +2117,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	zbx_hashset_iter_t	iter;
 	zbx_snmp_dobject_t	*obj;
 
-	zbx_vector_ptr_destroy(&data->index);
+	zbx_vector_snmp_dobject_ptr_destroy(&data->index);
 
 	zbx_hashset_iter_reset(&data->objects, &iter);
 	while (NULL != (obj = (zbx_snmp_dobject_t *)zbx_hashset_iter_next(&iter)))
@@ -2147,7 +2150,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *snmp_oid, const ch
 		memset(new_obj.values, 0, sizeof(char *) * data->request.nparam / 2);
 
 		obj = (zbx_snmp_dobject_t *)zbx_hashset_insert(&data->objects, &new_obj, sizeof(new_obj));
-		zbx_vector_ptr_append(&data->index, obj);
+		zbx_vector_snmp_dobject_ptr_append(&data->index, obj);
 	}
 
 	obj->values[data->num] = zbx_strdup(NULL, value);
@@ -2361,7 +2364,8 @@ static int	snmp_native_quote_string_value(char *buffer, size_t buffer_size, char
 	{
 		return FAIL;
 	}
-	if (!sprint_realloc_asciistring((unsigned char **)&buffer, &buffer_size, &output_len, 0, (unsigned char *)str, len))
+	if (!sprint_realloc_asciistring((unsigned char **)&buffer, &buffer_size, &output_len, 0, (unsigned char *)str,
+			len))
 	{
 		return FAIL;
 	}
@@ -3643,8 +3647,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			goto exit;
 		}
 
-		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail, poller_type);
+		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error,
+				sizeof(error), &max_succeed, &min_fail, poller_type);
 
 		zbx_snmp_close_session(ssp);
 	}
