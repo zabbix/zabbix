@@ -3491,7 +3491,7 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == config->items.num_slots)
+	if (0 == config->item_discovery.num_slots)
 	{
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
@@ -3613,7 +3613,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == config->preprocitems.num_slots)
+	if (0 == config->triggers.num_slots)
 	{
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
