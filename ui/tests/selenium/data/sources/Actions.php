@@ -32,6 +32,20 @@ class Actions {
 	 * @return array
 	 */
 	public static function load() {
+		CDataHelper::call('proxy.create',
+			[
+				[
+					'name' => 'Proxy for Actions 1',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				],
+				[
+					'name' => 'Proxy for Actions 2',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				]
+			]
+		);
+		$proxyids = CDataHelper::getIds('name');
+
 		$scripts = CDataHelper::call('script.create', [
 			[
 				'name' => 'Reboot',
@@ -43,7 +57,6 @@ class Actions {
 			]
 		]);
 		$reboot_scriptid = $scripts['scriptids'][0];
-
 
 			CDataHelper::call('action.create', [
 			// Service action.
@@ -286,12 +299,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 20001 // Proxy for Actions.
+							'value' => $proxyids['Proxy for Actions 1']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 20000 // Proxy for Discovery rule.
+							'value' => $proxyids['Proxy for Actions 2']
 						]
 					]
 				],
@@ -346,12 +359,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 20001 // Proxy for Actions.
+							'value' => $proxyids['Proxy for Actions 1']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 20000 // Proxy for Discovery rule.
+							'value' => $proxyids['Proxy for Actions 2']
 						]
 					]
 				],

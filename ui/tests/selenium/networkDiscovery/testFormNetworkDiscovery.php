@@ -821,7 +821,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'All fields',
-						'Discovery by proxy' => 'Proxy for Actions',
+						'Discovery by proxy' => 'Test Proxy',
 						'IP range' => '192.168.251.253-254',
 						'id:concurrency_max_type' => 'One',
 						'Update interval' => 604800,
@@ -1925,7 +1925,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Fill form's fields.
 				$form->fill([
 					'Name' => $new_name,
-					'Discovery by proxy' => 'Proxy for Actions',
+					'Discovery by proxy' => 'Test Proxy',
 					'Update interval' => '15s',
 					'Enabled' => false
 				]);

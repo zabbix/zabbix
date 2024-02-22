@@ -40,7 +40,7 @@ class testItemTest extends CWebTest {
 		];
 	}
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Proxy for Discovery rule'
+	const HOST_ID = 99136;		// 'Test item host'
 	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	/**

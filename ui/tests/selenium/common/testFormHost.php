@@ -166,11 +166,14 @@ class testFormHost extends CWebTest {
 			]
 		];
 
-		$groups = [
+		$groups = [['groupid' => 4]]; // Zabbix servers.
+		$proxies = CDataHelper::call('proxy.create', [
 			[
-				'groupid' => 4
+				'name' => 'Test Host Proxy',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			]
-		];
+		]);
+		$proxyid = $proxies['proxyids'][0];
 
 		$result = CDataHelper::createHosts([
 			[
@@ -179,7 +182,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxyid' => 20000,
+				'proxyid' => $proxyid,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -187,7 +190,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxyid' => 20000,
+				'proxyid' => $proxyid,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -791,7 +794,7 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Host with all interfaces visible name',
 						'Host groups' => 'Zabbix servers',
 						'Description' => 'Added description for host with all interfaces',
-						'Monitored by proxy' => 'Proxy for Discovery rule',
+						'Monitored by proxy' => 'Test Host Proxy',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -1521,7 +1524,7 @@ class testFormHost extends CWebTest {
 				'Visible name' => 'testFormHost_Update Visible name',
 				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
-				'Monitored by proxy' => 'Proxy for Discovery rule',
+				'Monitored by proxy' => 'Test Host Proxy',
 				'Enabled' => true
 			],
 			'interfaces' => [

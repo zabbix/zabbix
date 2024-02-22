@@ -1,9 +1,6 @@
 -- Activate Zabbix Server, set visible name and make it a more unique name
 UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
-
 -- Add maps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (3, 'Test map 1', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 
