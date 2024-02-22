@@ -3500,57 +3500,61 @@ section {
     height: 10px;
     margin-right: 10px; }
 
-.svg-honeycomb {
+.svg-honeycomb .svg-honeycomb-container {
   --color: #eeeeee;
   --fill: #335463;
-  --stroke: #335463;
+  --stroke: transparent;
   --stroke-hover: #2a4652;
+  --stroke-selected: #192931;
   --no-data-color: #cacaca;
-  --no-data-fill: #111111;
-  --no-data-stroke: #111111; }
-  .svg-honeycomb feDropShadow {
-    flood-opacity: var(--shadow-opacity, 0); }
-  .svg-honeycomb .svg-honeycomb-cell {
-    --px: calc(var(--x) + var(--dx, 0px));
-    --py: calc(var(--y) + var(--dy, 0px));
-    cursor: pointer; }
-    .svg-honeycomb .svg-honeycomb-cell path {
-      fill: var(--fill);
-      stroke: var(--stroke, var(--fill));
-      stroke-width: var(--stroke-width, 0);
-      transform: translate(var(--px), var(--py)) scale(var(--scale, 1)); }
-      .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
-        --fill: transparent;
-        --stroke: transparent;
-        transform: translate(var(--x), var(--y)); }
-    .svg-honeycomb .svg-honeycomb-cell foreignObject {
-      transform: translate(var(--dx, 0px), var(--dy, 0px)); }
-    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-content {
-      display: grid;
-      grid-auto-rows: minmax(max-content, auto);
-      align-content: stretch;
-      align-items: center;
-      height: 100%;
-      text-align: center;
-      line-height: var(--line-height);
-      color: var(--color); }
-    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap; }
-    .svg-honeycomb .svg-honeycomb-cell:hover {
-      --stroke: var(--stroke-hover); }
-  .svg-honeycomb .svg-honeycomb-cell-no-data,
-  .svg-honeycomb .svg-honeycomb-cell-other {
-    --color: var(--no-data-color);
-    --fill: var(--no-data-fill);
-    --stroke: var(--no-data-stroke);
-    --stroke-hover: var(--no-data-stroke);
-    cursor: default; }
-  .svg-honeycomb .svg-honeycomb-cell-other-ellipsis {
-    transform: translate(var(--px), var(--py)); }
-    .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
-      fill: var(--color); }
+  --no-data-fill: #111111; }
+.svg-honeycomb feDropShadow {
+  flood-opacity: var(--shadow-opacity, 0); }
+.svg-honeycomb .svg-honeycomb-cell {
+  --px: calc(var(--x) + var(--dx, 0px));
+  --py: calc(var(--y) + var(--dy, 0px));
+  --cell-stroke: var(--stroke);
+  --cell-stroke-width: var(--stroke-width);
+  cursor: pointer; }
+  .svg-honeycomb .svg-honeycomb-cell path {
+    fill: var(--fill);
+    stroke: var(--cell-stroke);
+    stroke-width: var(--cell-stroke-width);
+    transform: translate(var(--px), var(--py)) scale(var(--scale, 1)); }
+    .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
+      --fill: transparent;
+      --cell-stroke: transparent;
+      transform: translate(var(--x), var(--y)); }
+  .svg-honeycomb .svg-honeycomb-cell foreignObject {
+    transform: translate(var(--dx, 0px), var(--dy, 0px)); }
+  .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-content {
+    display: grid;
+    grid-auto-rows: minmax(max-content, auto);
+    align-content: stretch;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    line-height: var(--line-height);
+    color: var(--color); }
+  .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+  .svg-honeycomb .svg-honeycomb-cell:hover {
+    --stroke: var(--stroke-hover); }
+  .svg-honeycomb .svg-honeycomb-cell.svg-honeycomb-cell-selected {
+    --cell-stroke: var(--stroke-selected);
+    --cell-stroke-width: calc(var(--stroke-width) * 2); }
+.svg-honeycomb .svg-honeycomb-cell-no-data,
+.svg-honeycomb .svg-honeycomb-cell-other {
+  --color: var(--no-data-color);
+  --fill: var(--no-data-fill);
+  --stroke-hover: transparent;
+  cursor: default; }
+.svg-honeycomb .svg-honeycomb-cell-other-ellipsis {
+  transform: translate(var(--px), var(--py)); }
+  .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
+    fill: var(--color); }
 
 .filter-container.tabfilter-container {
   padding: 0;

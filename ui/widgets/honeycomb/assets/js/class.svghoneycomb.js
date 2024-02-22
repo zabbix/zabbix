@@ -23,6 +23,7 @@ class CSVGHoneycomb {
 	static ZBX_STYLE_CLASS =				'svg-honeycomb';
 	static ZBX_STYLE_HONEYCOMB_CONTAINER =	'svg-honeycomb-container';
 	static ZBX_STYLE_CELL =					'svg-honeycomb-cell';
+	static ZBX_STYLE_CELL_SELECTED =		'svg-honeycomb-cell-selected';
 	static ZBX_STYLE_CELL_NO_DATA =			'svg-honeycomb-cell-no-data';
 	static ZBX_STYLE_CELL_SHADOW =			'svg-honeycomb-cell-shadow';
 	static ZBX_STYLE_CELL_OTHER =			'svg-honeycomb-cell-other';
@@ -391,6 +392,11 @@ class CSVGHoneycomb {
 						if (d.no_data !== true && d.has_more !== true) {
 							this.#drawLabel(cell);
 						}
+
+						cell.style('--stroke-selected', cell.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED)
+							? d3.color(this.#getFillColor(d))?.darker(.6).formatHex()
+							: null
+						);
 					}),
 				exit => exit.remove()
 			);
@@ -438,6 +444,17 @@ class CSVGHoneycomb {
 		cell
 			.call(cell => this.#drawLabel(cell))
 			.on('click', (e, d) => {
+				this.#honeycomb_container
+					.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
+					.each((datum, i, cells) => {
+						d3.select(cells[i])
+							.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED, d === datum)
+							.style('--stroke-selected', d === datum
+								? d3.color(this.#getFillColor(datum))?.darker(.6).formatHex()
+								: null
+							)
+					});
+
 				this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_CLICK, {
 					detail: {
 						hostid: d.hostid,
@@ -554,8 +571,8 @@ class CSVGHoneycomb {
 			.style('--dx', null)
 			.style('--dy', null)
 			.style('--stroke', d => this.#getFillColor(d))
-			.style('--scale', null)
 			.style('--stroke-width', null)
+			.style('--scale', null)
 			.select('path')
 			.style('filter', null);
 
