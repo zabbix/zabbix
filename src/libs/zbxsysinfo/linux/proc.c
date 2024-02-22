@@ -1898,6 +1898,10 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
+
+		if (NULL != proccomm_rxp)
+			zbx_regexp_free(proccomm_rxp);
+
 		return SYSINFO_RET_FAIL;
 	}
 
