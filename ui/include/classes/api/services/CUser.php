@@ -816,7 +816,7 @@ class CUser extends CApiService {
 
 		if ($invalid_mfas) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect MFA method type, TOTP secret is not available.')
+				_s('Incorrect MFA method with ID "%1$s" type, TOTP secret is not available.', key($invalid_mfas))
 			);
 		}
 	}
@@ -1028,47 +1028,6 @@ class CUser extends CApiService {
 			}
 		}
 		unset($user);
-	}
-
-	/**
-	 * Check does the user belong to at least one group with GROUP_GUI_ACCESS_INTERNAL frontend access.
-	 * Check does the user belong to at least one group with GROUP_GUI_ACCESS_SYSTEM when default frontend access
-	 * is set to GROUP_GUI_ACCESS_INTERNAL.
-	 * If user is without user groups default frontend access method is checked.
-	 *
-	 * @param array  $user
-	 * @param int    $user['userdirectoryid']
-	 * @param array  $user['usrgrps']                     (optional)
-	 * @param string $user['usrgrps'][]['usrgrpid']
-	 * @param array  $db_usrgrps
-	 * @param int    $db_usrgrps[usrgrpid]['gui_access']
-	 *
-	 * @return bool
-	 */
-	private static function hasInternalAuth($user, $db_usrgrps) {
-		if ($user['userdirectoryid']) {
-			return false;
-		}
-
-		$system_gui_access =
-			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
-				? GROUP_GUI_ACCESS_INTERNAL
-				: GROUP_GUI_ACCESS_LDAP;
-
-		if (!array_key_exists('usrgrps', $user) || !$user['usrgrps']) {
-			return $system_gui_access == GROUP_GUI_ACCESS_INTERNAL;
-		}
-
-		foreach($user['usrgrps'] as $usrgrp) {
-			$gui_access = (int) $db_usrgrps[$usrgrp['usrgrpid']]['gui_access'];
-			$gui_access = ($gui_access == GROUP_GUI_ACCESS_SYSTEM) ? $system_gui_access : $gui_access;
-
-			if ($gui_access == GROUP_GUI_ACCESS_INTERNAL) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -2522,10 +2481,9 @@ class CUser extends CApiService {
 			return;
 		}
 
-		$login_blocking_interval = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK));
-		$actual_login_blocking_interval = time() - $db_user['attempt_clock'];
+		$blocked_duration = time() - $db_user['attempt_clock'];
 
-		if ($actual_login_blocking_interval < $login_blocking_interval) {
+		if ($blocked_duration < timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))) {
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);
@@ -2597,31 +2555,23 @@ class CUser extends CApiService {
 	}
 
 	private static function increaseFailedLoginAttempts(array &$db_user): void {
-		$attempt_failed = $db_user['attempt_failed'] + 1;
-
-		DB::update('users', [
-			'values' => [
-				'attempt_failed' => $attempt_failed,
-				'attempt_clock' => time(),
-				'attempt_ip' => substr(CWebUser::getIp(), 0, 39)
-			],
-			'where' => ['userid' => $db_user['userid']]
-		]);
-
-		$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
-		$db_users = [$db_user['userid'] => $db_user];
-
-		self::addAuditLogByUser($db_user['userid'], CWebUser::getIp(), $db_user['username'],
-			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+		DBexecute(
+			'UPDATE users SET'.
+				' attempt_failed=attempt_failed + 1,attempt_clock='.time().','.
+				' attempt_ip='.zbx_dbstr(substr(CWebUser::getIp(), 0, 39)).
+			'WHERE userid='.zbx_dbstr($db_user['userid'])
 		);
 
-		$db_users =  DB::select('users', [
-			'output' => ['attempt_failed', 'attempt_clock'],
-			'userids' => $db_user['userid'],
-			'limit' => 1
+		[$_db_user] =  DB::select('users', [
+			'output' => ['userid', 'attempt_failed', 'attempt_clock'],
+			'userids' => $db_user['userid']
 		]);
 
-		$db_user = array_merge($db_user, $db_users[0]);
+		self::addAuditLogByUser($db_user['userid'], CWebUser::getIp(), $db_user['username'],
+			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, [$_db_user], [$db_user['userid'] => $db_user]
+		);
+
+		$db_user = $_db_user + $db_user;
 	}
 
 	private static function checkGroupStatus(array $db_user, int $group_status): void {
@@ -3428,7 +3378,7 @@ class CUser extends CApiService {
 
 	/**
 	 * Check MFA method authentication for the user based on provided data.
-	 * Returns 'sessionid' and 'mfa' object, in case MFA authentication was successful or throws Exception.
+	 * Returns 'sessionid' and 'mfa' object, in case MFA authentication was successful.
 	 *
 	 * @param array  $data
 	 * @param string $data['sessionid']                               User's sessionid passed in session data.
@@ -3443,6 +3393,8 @@ class CUser extends CApiService {
 	 * @param string $data['mfa_response_data']['username']           DUO MFA username from session.
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
 	public static function confirm(array $data): array {
 		$userids = DB::select('sessions', [
@@ -3465,34 +3417,33 @@ class CUser extends CApiService {
 		$mfa = $mfas[0];
 
 		$db_users = DB::select('users', [
-			'output' => ['userid', 'username', 'attempt_failed'],
-			'userids' => $userid,
-			'limit' => 1
+			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
+			'userids' => $userid
 		]);
 		$db_user = $db_users[0];
-		$mfa_response_data = $data['mfa_response_data'];
+		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			if (!array_key_exists('totp_secret', $mfa_response_data) || $mfa_response_data['totp_secret'] == '') {
-				$user_totp_secrets = DB::select('mfa_totp_secret', [
+			if (!array_key_exists('totp_secret', $mfa_response) || $mfa_response['totp_secret'] == '') {
+				$user_secrets = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
 					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
 				]);
-				$user_totp_secret = $user_totp_secrets[0]['totp_secret'];
+				$user_secret = $user_secrets[0]['totp_secret'];
 			}
 			else {
-				$user_totp_secret = $mfa_response_data['totp_secret'];
+				$user_secret = $mfa_response['totp_secret'];
 			}
 
 			$valid_code = (self::createTotpGenerator($mfa))
-				->verifyKey($user_totp_secret, $mfa_response_data['verification_code']);
+				->verifyKey($user_secret, $mfa_response['verification_code']);
 
 			if ($valid_code) {
-				if (array_key_exists('totp_secret', $mfa_response_data) && $mfa_response_data['totp_secret'] !== '') {
+				if (array_key_exists('totp_secret', $mfa_response) && $mfa_response['totp_secret'] !== '') {
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $mfa['mfaid'],
 						'userid' => $userid,
-						'totp_secret' => $mfa_response_data['totp_secret']
+						'totp_secret' => $mfa_response['totp_secret']
 					]]);
 				}
 			}
@@ -3513,11 +3464,11 @@ class CUser extends CApiService {
 		}
 
 		if ($mfa['type'] == MFA_TYPE_DUO) {
-			if (!array_key_exists('state', $mfa_response_data) || !array_key_exists('username', $mfa_response_data)) {
+			if (!array_key_exists('state', $mfa_response) || !array_key_exists('username', $mfa_response)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No saved state, please login again.'));
 			}
 
-			if ($mfa_response_data['duo_state'] != $mfa_response_data['state']) {
+			if ($mfa_response['duo_state'] != $mfa_response['state']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Duo state does not match saved state.'));
 			}
 
@@ -3526,8 +3477,8 @@ class CUser extends CApiService {
 					$mfa['api_hostname'], $data['redirect_uri']
 				);
 
-				$duo_client->exchangeAuthorizationCodeFor2FAResult($mfa_response_data['duo_code'],
-					$mfa_response_data['username']
+				$duo_client->exchangeAuthorizationCodeFor2FAResult($mfa_response['duo_code'],
+					$mfa_response['username']
 				);
 			} catch (DuoException $e) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Error decoding Duo result.'));
