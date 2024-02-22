@@ -114,6 +114,7 @@ typedef struct
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG |	\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE | ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA |			\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LLD_TRIGGER_UPDATE_URL_NAME)
+#define ZBX_FLAG_LLD_TRIGGER_DELETE			__UINT64_C(0x8000)
 	zbx_uint64_t		flags;
 	int			lastcheck;
 	unsigned char		discovery_status;
@@ -3598,7 +3599,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 }
 
 static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, int *ts_disable, const char **name)
+		unsigned char *discovery_status, int *ts_delete, const char **name)
 {
 	const zbx_lld_trigger_t	*trigger = (const zbx_lld_trigger_t *)object;
 
@@ -3607,7 +3608,21 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
 	*lastcheck = trigger->lastcheck;
 	*discovery_status = trigger->discovery_status;
 	*ts_delete = trigger->ts_delete;
+	*name = trigger->description;
+}
+
+static	void	get_trigger_info_disable(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
+		int *lastcheck, int *ts_disable, int *status, const char **name)
+{
+	const zbx_lld_trigger_t	*trigger = (const zbx_lld_trigger_t *)object;
+
+	*id = trigger->triggerid;
+	*discovery_flag = trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+	*del_flag = 0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DELETE) ? 0 : 1;
+	*lastcheck = trigger->lastcheck;
 	*ts_disable = trigger->ts_disable;
+	*status = TRIGGER_STATUS_ENABLED == trigger->status ?
+			ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
 	*name = trigger->description;
 }
 
@@ -3617,6 +3632,13 @@ static	int	get_trigger_status_value(int status)
 		return TRIGGER_STATUS_ENABLED;
 
 	return TRIGGER_STATUS_DISABLED;
+}
+
+static	void	set_trigger_flag_delete(void *object)
+{
+	zbx_lld_trigger_t	*trigger = (zbx_lld_trigger_t *)object;
+
+	trigger->flags |= ZBX_FLAG_LLD_TRIGGER_DELETE;
 }
 
 /******************************************************************************
@@ -3684,10 +3706,12 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_dependencies_validate(&triggers, error);
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macro_paths, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
-	lld_process_lost_objects("triggers", "trigger_discovery", "triggerid", (const zbx_vector_ptr_t *)&triggers,
-			lifetime, enabled_lifetime, lastcheck, zbx_db_delete_triggers, get_trigger_info,
-			zbx_audit_trigger_create_entry, zbx_audit_trigger_update_json_update_status,
-			get_trigger_status_value);
+	lld_remove_lost_objects("trigger_discovery", "triggerid", (zbx_vector_ptr_t *)&triggers, lifetime,
+			lastcheck, zbx_db_delete_triggers, get_trigger_info, set_trigger_flag_delete,
+			zbx_audit_trigger_create_entry);
+	lld_disable_lost_objects("triggers", "trigger_discovery", "triggerid", (const zbx_vector_ptr_t *)&triggers,
+			enabled_lifetime, lastcheck, get_trigger_info_disable, get_trigger_status_value,
+			zbx_audit_trigger_create_entry, zbx_audit_trigger_update_json_update_status);
 	/* cleaning */
 
 	zbx_vector_ptr_clear_ext(&items, (zbx_mem_free_func_t)lld_item_free);

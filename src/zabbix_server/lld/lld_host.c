@@ -4471,8 +4471,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_db_begin();
-
 	for (i = 0; i < hosts->values_num; i++)
 	{
 		host = (zbx_lld_host_t *)hosts->values[i];
@@ -4519,6 +4517,8 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 					(ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration))))
 			{
 				zbx_vector_uint64_append(&dis_hostids, host->hostid);
+				zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE,
+						host->hostid, host->host);
 				zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 				continue;
@@ -4547,6 +4547,8 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 			if (SUCCEED == lld_host_enable_validate(host->hostid))
 			{
 				zbx_vector_uint64_append(&dis_hostids, host->hostid);
+				zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE,
+						host->hostid, host->host);
 				zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 						HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED);
 			}
@@ -4628,10 +4630,12 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 	{
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_execute("%s", sql);
-	}
+		zbx_db_begin();
 
-	zbx_db_commit();
+		zbx_db_execute("%s", sql);
+
+		zbx_db_commit();
+	}
 
 	zbx_free(sql);
 

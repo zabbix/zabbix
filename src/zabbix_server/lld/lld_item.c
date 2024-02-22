@@ -4128,7 +4128,7 @@ out:
 }
 
 static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, int *ts_disable, const char **name)
+		unsigned char *discovery_status, int *ts_delete, const char **name)
 {
 	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
 
@@ -4137,7 +4137,20 @@ static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_f
 	*lastcheck = item->lastcheck;
 	*discovery_status = item->discovery_status;
 	*ts_delete = item->ts_delete;
+	*name = item->name;
+}
+
+static	void	get_item_info_disable(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
+		int *lastcheck, int *ts_disable, int *status, const char **name)
+{
+	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
+
+	*id = item->itemid;
+	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	*del_flag = 0 == (item->flags & ZBX_FLAG_LLD_ITEM_DELETE) ? 0 : 1;
+	*lastcheck = item->lastcheck;
 	*ts_disable = item->ts_disable;
+	*status = ITEM_STATUS_ACTIVE == item->status ? ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
 	*name = item->name;
 }
 
@@ -4147,6 +4160,13 @@ static	int	get_item_status_value(int status)
 		return ITEM_STATUS_ACTIVE;
 
 	return ITEM_STATUS_DISABLED;
+}
+
+static	void	set_item_flag_delete(void *object)
+{
+	zbx_lld_item_full_t	*item = (zbx_lld_item_full_t *)object;
+
+	item->flags |= ZBX_FLAG_LLD_ITEM_DELETE;
 }
 
 static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_row_t *lld_rows,
@@ -4490,9 +4510,14 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	}
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
-	lld_process_lost_objects("items", "item_discovery", "itemid", (const zbx_vector_ptr_t *)&items, lifetime,
-			enabled_lifetime, lastcheck, zbx_db_delete_items, get_item_info, zbx_audit_item_create_entry,
-			zbx_audit_item_update_json_update_status, get_item_status_value);
+
+	lld_remove_lost_objects("item_discovery", "itemid", (zbx_vector_ptr_t *)&items, lifetime,
+			lastcheck, zbx_db_delete_items, get_item_info, set_item_flag_delete,
+			zbx_audit_item_create_entry);
+
+	lld_disable_lost_objects("items", "item_discovery", "itemid", (const zbx_vector_ptr_t *)&items,
+			enabled_lifetime, lastcheck, get_item_info_disable, get_item_status_value,
+			zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
 clean:
 	zbx_hashset_destroy(&items_index);
 
