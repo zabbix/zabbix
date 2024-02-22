@@ -418,7 +418,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
 				"t.comments,t.url,t.url_name,t.recovery_expression,t.recovery_mode,t.correlation_mode,"
 				"t.correlation_tag,t.manual_close,t.opdata,td.lastcheck,td.discovery_status,"
-				"td.ts_delete,td.ts_disable,td.ts_disable_source,t.event_name"
+				"td.ts_delete,td.ts_disable,td.ts_disable_source,t.event_name,t.status"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -511,6 +511,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->ts_delete = atoi(row[17]);
 		trigger->ts_disable = atoi(row[18]);
 		ZBX_STR2UCHAR(trigger->disable_source, row[19]);
+		ZBX_STR2UCHAR(trigger->status, row[21]);
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);

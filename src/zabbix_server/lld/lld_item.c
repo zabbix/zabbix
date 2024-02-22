@@ -408,7 +408,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 					"master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,"
 					"post_type,http_proxy,headers,retrieve_mode,request_method,output_format,"
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
-					"allow_traps"
+					"allow_traps,status"
 				" from items"
 				" where");
 
@@ -629,6 +629,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS;
 				item->allow_traps_orig = (unsigned char)atoi(row[42]);
 			}
+
+			ZBX_STR2UCHAR(item->status, row[43]);
 
 			item->lld_row = NULL;
 

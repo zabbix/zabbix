@@ -520,7 +520,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 			"select hd.hostid,hd.host,hd.lastcheck,hd.ts_delete,h.host,h.name,h.proxyid,"
 				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,hi.inventory_mode,"
 				"h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,"
-				"h.custom_interfaces,hh.hgsetid,hd.status,hd.ts_disable,hd.disable_source"
+				"h.custom_interfaces,hh.hgsetid,hd.status,hd.ts_disable,hd.disable_source,h.status"
 			" from host_discovery hd"
 				" join hosts h"
 					" on hd.hostid=h.hostid"
@@ -551,7 +551,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_psk_orig = NULL;
 		host->jp_row = NULL;
 		host->inventory_mode = HOST_INVENTORY_DISABLED;
-		host->status = 0;
+		host->status = atoi(row[23]);
 		host->custom_interfaces_orig = 0;
 		host->proxyid_orig = 0;
 		host->ipmi_authtype_orig = 0;
@@ -4557,7 +4557,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 				continue;
 			}
 
-			zbx_vector_uint64_append(&dis_hostids, host->hostid);
+			zbx_vector_uint64_append(&en_hostids, host->hostid);
 			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, host->hostid,
 					host->host);
 			zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
