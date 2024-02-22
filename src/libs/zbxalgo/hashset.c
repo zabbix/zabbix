@@ -190,10 +190,10 @@ int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 {
-	return zbx_hashset_insert_ext(hs, data, size, 0);
+	return zbx_hashset_insert_ext(hs, data, size, 0, ZBX_UNIQ_FALSE);
 }
 
-void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset)
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, unsigned char uniq)
 {
 	int			slot;
 	zbx_hash_t		hash;
@@ -204,16 +204,21 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 
 	hash = hs->hash_func(data);
 
-	slot = hash % hs->num_slots;
-	entry = hs->slots[slot];
-
-	while (NULL != entry)
+	if (ZBX_UNIQ_FALSE == uniq)
 	{
-		if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
-			break;
+		slot = hash % hs->num_slots;
+		entry = hs->slots[slot];
 
-		entry = entry->next;
+		while (NULL != entry)
+		{
+			if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
+				break;
+
+			entry = entry->next;
+		}
 	}
+	else
+		entry = NULL;
 
 	if (NULL == entry)
 	{

@@ -470,6 +470,12 @@ static void	DCdump_sshitem(const ZBX_DC_SSHITEM *sshitem)
 			sshitem->privatekey);
 }
 
+static void	DCdump_depitem(const ZBX_DC_DEPENDENTITEM *depitem)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "  depitem:[last_master_itemid:" ZBX_FS_UI64 " master_itemid:"
+			ZBX_FS_UI64"]", depitem->last_master_itemid, depitem->master_itemid);
+}
+
 static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[url:'%s']", httpitem->url);
@@ -556,17 +562,6 @@ static void	DCdump_preprocitem(const ZBX_DC_PREPROCITEM *preprocitem)
 	}
 }
 
-/* item type specific information debug logging support */
-
-typedef void (*zbx_dc_dump_func_t)(void *);
-
-typedef struct
-{
-	zbx_hashset_t		*hashset;
-	zbx_dc_dump_func_t	dump_func;
-}
-zbx_trace_item_t;
-
 static void	DCdump_item_tags(const ZBX_DC_ITEM *item)
 {
 	int			i;
@@ -595,23 +590,6 @@ static void	DCdump_items(void)
 	zbx_hashset_iter_t	iter;
 	int			i, j;
 	zbx_vector_ptr_t	index;
-	void			*ptr;
-	zbx_trace_item_t	trace_items[] =
-	{
-		{&config->numitems, (zbx_dc_dump_func_t)DCdump_numitem},
-		{&config->snmpitems, (zbx_dc_dump_func_t)DCdump_snmpitem},
-		{&config->ipmiitems, (zbx_dc_dump_func_t)DCdump_ipmiitem},
-		{&config->trapitems, (zbx_dc_dump_func_t)DCdump_trapitem},
-		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
-		{&config->dbitems, (zbx_dc_dump_func_t)DCdump_dbitem},
-		{&config->sshitems, (zbx_dc_dump_func_t)DCdump_sshitem},
-		{&config->telnetitems, (zbx_dc_dump_func_t)DCdump_telnetitem},
-		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
-		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
-		{&config->calcitems, (zbx_dc_dump_func_t)DCdump_calcitem},
-		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
-		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
-	};
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -641,10 +619,75 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
 		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u", item->queue_priority);
 
-		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
+		switch ((zbx_item_value_type_t)item->value_type)
 		{
-			if (NULL != (ptr = zbx_hashset_search(trace_items[j].hashset, &item->itemid)))
-				trace_items[j].dump_func(ptr);
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				DCdump_numitem(item->itemvaluetype.numitem);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				if (NULL != item->itemvaluetype.logitem)
+					DCdump_logitem(item->itemvaluetype.logitem);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_NONE:
+				break;
+		}
+
+		switch ((zbx_item_type_t)item->type)
+		{
+			case ITEM_TYPE_ZABBIX:
+				break;
+			case ITEM_TYPE_TRAPPER:
+				if (NULL != item->itemtype.trapitem)
+					DCdump_trapitem(item->itemtype.trapitem);
+				break;
+			case ITEM_TYPE_SIMPLE:
+				DCdump_simpleitem(item->itemtype.simpleitem);
+				break;
+			case ITEM_TYPE_INTERNAL:
+				break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				break;
+			case ITEM_TYPE_HTTPTEST:
+				break;
+			case ITEM_TYPE_EXTERNAL:
+				break;
+			case ITEM_TYPE_DB_MONITOR:
+				if (NULL != item->itemtype.dbitem)
+					DCdump_dbitem(item->itemtype.dbitem);
+				break;
+			case ITEM_TYPE_IPMI:
+				DCdump_ipmiitem(item->itemtype.ipmiitem);
+				break;
+			case ITEM_TYPE_SSH:
+				DCdump_sshitem(item->itemtype.sshitem);
+				break;
+			case ITEM_TYPE_TELNET:
+				DCdump_telnetitem(item->itemtype.telnetitem);
+				break;
+			case ITEM_TYPE_CALCULATED:
+				DCdump_calcitem(item->itemtype.calcitem);
+				break;
+			case ITEM_TYPE_JMX:
+				DCdump_jmxitem(item->itemtype.jmxitem);
+				break;
+			case ITEM_TYPE_SNMPTRAP:
+				break;
+			case ITEM_TYPE_DEPENDENT:
+				DCdump_depitem(item->itemtype.depitem);
+				break;
+			case ITEM_TYPE_HTTPAGENT:
+				DCdump_httpitem(item->itemtype.httpitem);
+				break;
+			case ITEM_TYPE_SNMP:
+				DCdump_snmpitem(item->itemtype.snmpitem);
+				break;
+			case ITEM_TYPE_SCRIPT:
+				DCdump_scriptitem(item->itemtype.scriptitem);
+				break;
 		}
 
 		if (NULL != item->master_item)

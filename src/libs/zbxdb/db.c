@@ -2038,6 +2038,17 @@ static void	db_set_fetch_error(int dberr)
 }
 #endif
 
+int	zbx_db_get_row_num(zbx_db_result_t result)
+{
+#if defined(HAVE_POSTGRESQL)
+	return result->row_num;
+#elif defined(HAVE_MYSQL)
+	return (int)mysql_num_rows(result->result);
+#else
+	return 0;
+#endif
+}
+
 zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 {
 #if defined(HAVE_ORACLE)

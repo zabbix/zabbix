@@ -1488,7 +1488,7 @@ int	zbx_calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_in
 		time_t	next_interval, t, tmax, scheduled_check = 0;
 
 		/* first try to parse out and calculate scheduled intervals */
-		if (NULL != custom_intervals)
+		if (NULL != custom_intervals && NULL != custom_intervals->scheduling)
 			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now);
 
 		/* Try to find the nearest 'nextcheck' value with condition */
@@ -1566,7 +1566,7 @@ int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_cust
 	time_t	next_interval, tmax, scheduled_check = 0;
 
 	/* first try to parse out and calculate scheduled intervals */
-	if (NULL != custom_intervals)
+	if (NULL != custom_intervals && NULL != custom_intervals->scheduling)
 		scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, disable_until);
 
 	/* Try to find the nearest 'nextcheck' value with condition */

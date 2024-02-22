@@ -133,7 +133,7 @@ static char	*dbsync_strdup(const char *str)
 	if (NULL == ptr)
 	{
 		ptr = zbx_hashset_insert_ext(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
+				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_TRUE);
 
 		*(zbx_uint32_t *)ptr = 0;
 	}
@@ -769,6 +769,24 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets the number of rows                                           *
+ *                                                                            *
+ * Parameters: sync - [IN] the changeset                                      *
+ *                                                                            *
+ * Return value: number of rows to sync                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_UPDATE == sync->mode)
+		return sync->rows.values_num;
+
+	return zbx_db_get_row_num(sync->dbresult);
 }
 
 /******************************************************************************
