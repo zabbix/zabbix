@@ -162,7 +162,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Commands' => '/sbin/shutdown -r',
 						'User group' => 'All',
 						'Host group' => 'Zabbix servers',
-						'Host access' => 'Write'
+						'Host access' => 'Read'
 					],
 					[
 						'Name' => self::HOST_GROUP_SCRIPT,

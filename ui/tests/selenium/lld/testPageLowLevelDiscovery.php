@@ -473,6 +473,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'fifth LLD',
 						'forth LLD',
 						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
+						'LLD for Deleting',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'LLD number 8',
