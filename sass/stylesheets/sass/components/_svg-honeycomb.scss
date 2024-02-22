@@ -2,7 +2,7 @@
 	--color: #{$honeycomb-label-color};
 	--fill: #{$honeycomb-cell-color};
 	--stroke: #{$honeycomb-cell-color};
-	--stroke-hover: #{darken($honeycomb-cell-color, 12%)};
+	--stroke-hover: #{darken($honeycomb-cell-color, 5%)};
 	--no-data-color: #{$honeycomb-no-data-label-color};
 	--no-data-fill: #{$honeycomb-no-data-cell-color};
 	--no-data-stroke: #{$honeycomb-no-data-cell-color};
@@ -50,25 +50,27 @@
 							width $ui-transition-duration,
 							height $ui-transition-duration;
 			}
+		}
 
-			.svg-honeycomb-content {
-				display: grid;
-				align-content: space-evenly;
-				height: 100%;
-				text-align: center;
-				line-height: 1.2;
-				color: var(--color);
-			}
+		.svg-honeycomb-content {
+			display: grid;
+			grid-auto-rows: minmax(max-content, auto);
+			align-content: stretch;
+			align-items: center;
+			height: 100%;
+			text-align: center;
+			line-height: var(--line-height);
+			color: var(--color);
+		}
 
-			.svg-honeycomb-label {
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+		.svg-honeycomb-label {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 
-				@if $ui-transitions {
-					transition: max-height $ui-transition-duration,
-								font-size $ui-transition-duration;
-				}
+			@if $ui-transitions {
+				transition: max-height $ui-transition-duration,
+				font-size $ui-transition-duration;
 			}
 		}
 

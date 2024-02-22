@@ -2012,9 +2012,6 @@ button {
     border-color: #909090; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #909090; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
-  transition-property: width, height, left, top;
-  transition-duration: 0.15s; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus .ui-resizable-handle {
@@ -3504,7 +3501,7 @@ section {
   --color: #1f2c33;
   --fill: #aad7e9;
   --stroke: #aad7e9;
-  --stroke-hover: #79c0dc;
+  --stroke-hover: #96cde4;
   --no-data-color: #1f2c33;
   --no-data-fill: #f3f3f3;
   --no-data-stroke: #f3f3f3; }
@@ -3525,17 +3522,19 @@ section {
         transform: translate(var(--x), var(--y)); }
     .svg-honeycomb .svg-honeycomb-cell foreignObject {
       transform: translate(var(--px), var(--py)); }
-      .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-content {
-        display: grid;
-        align-content: space-evenly;
-        height: 100%;
-        text-align: center;
-        line-height: 1.2;
-        color: var(--color); }
-      .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-label {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap; }
+    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-content {
+      display: grid;
+      grid-auto-rows: minmax(max-content, auto);
+      align-content: stretch;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+      line-height: var(--line-height);
+      color: var(--color); }
+    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
     .svg-honeycomb .svg-honeycomb-cell:hover {
       --stroke: var(--stroke-hover); }
   .svg-honeycomb .svg-honeycomb-cell-no-data,
