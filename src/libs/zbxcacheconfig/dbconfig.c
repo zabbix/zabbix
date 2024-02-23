@@ -509,7 +509,6 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 	zbx_uint64_t		seed;
 	int			simple_interval, disable_until, ret;
 	zbx_custom_interval_t	*custom_intervals;
-	char			*delay_s;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
@@ -520,9 +519,16 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 	seed = get_item_nextcheck_seed(item, item->interfaceid, item->type, item->key);
 
-	delay_s = dc_expand_user_and_func_macros_dyn(item->delay, &item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
-	ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
-	zbx_free(delay_s);
+	if (0 == strncmp(item->delay, "{$", ZBX_CONST_STRLEN("{$")))
+	{
+		char	*delay_s;
+
+		delay_s = dc_expand_user_and_func_macros_dyn(item->delay, &item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
+		zbx_free(delay_s);
+	}
+	else
+		ret = zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, error);
 
 	if (SUCCEED != ret)
 	{
