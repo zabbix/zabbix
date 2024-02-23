@@ -69,6 +69,7 @@ class testMfa extends CAPITest {
 
 		$usrgrpids = CDataHelper::call('usergroup.create', [
 			'name' => 'User group with MFA',
+			'mfa_status' => GROUP_MFA_ENABLED,
 			'mfaid' => self::$data['mfaids']['DUO test case 2']
 		]);
 		$this->assertArrayHasKey('usrgrpids', $usrgrpids);
