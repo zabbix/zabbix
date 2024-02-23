@@ -1400,6 +1400,7 @@ typedef struct zbx_pg_group zbx_pg_group_t;
 typedef struct
 {
 	zbx_uint64_t			proxyid;
+	zbx_uint64_t			revision;
 	char				*name;
 	int				state;
 	int				lastaccess;

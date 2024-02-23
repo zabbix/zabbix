@@ -199,26 +199,22 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 
 	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_uint64_t	old_proxy_groupid;
-
 		proxy = (zbx_pg_proxy_t *)zbx_hashset_search(proxies, &dc_proxy->proxyid);
 
-		if (0 == dc_proxy->proxy_groupid)
+		if (NULL != proxy)
 		{
-			if (NULL != proxy && NULL != proxy->group)
+			if (NULL != proxy->group && proxy->group->proxy_groupid != dc_proxy->proxy_groupid)
 			{
 				zbx_objmove_t	reloc = {
 						.objid = proxy->proxyid,
 						.srcid = proxy->group->proxy_groupid,
-						.dstid = 0
+						.dstid = dc_proxy->proxy_groupid
 					};
 
 				zbx_vector_objmove_append_ptr(proxy_reloc, &reloc);
 			}
-			continue;
 		}
-
-		if (NULL == proxy)
+		else
 		{
 			zbx_pg_proxy_t	proxy_local = {.proxyid = dc_proxy->proxyid};
 
@@ -226,22 +222,19 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 
 			zbx_vector_pg_host_ptr_create(&proxy->hosts);
 			zbx_vector_pg_host_create(&proxy->deleted_group_hosts);
-		}
 
-		proxy->lastaccess = dc_proxy->lastaccess;
-
-		old_proxy_groupid = (NULL == proxy->group ? 0 : proxy->group->proxy_groupid);
-
-		if (old_proxy_groupid != dc_proxy->proxy_groupid)
-		{
+			/* add the same srcid and dstid to indicate that a new group is added */
 			zbx_objmove_t	reloc = {
 					.objid = proxy->proxyid,
-					.srcid = old_proxy_groupid,
-					.dstid = dc_proxy->proxy_groupid
+					.srcid = dc_proxy->proxy_groupid,
+					.dstid = dc_proxy->proxy_groupid,
 				};
 
 			zbx_vector_objmove_append_ptr(proxy_reloc, &reloc);
 		}
+
+		proxy->lastaccess = dc_proxy->lastaccess;
+		proxy->revision = *revision;
 
 		if (NULL == proxy->name || 0 != strcmp(proxy->name, dc_proxy->name))
 			proxy->name = zbx_strdup(proxy->name, dc_proxy->name);

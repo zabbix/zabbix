@@ -15032,9 +15032,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			if (0 == lost && proxy->lastaccess != diff->lastaccess)
 			{
 				proxy->lastaccess = diff->lastaccess;
-
-				if (0 != proxy->proxy_groupid)
-					lastaccess = proxy->lastaccess;
+				lastaccess = proxy->lastaccess;
 			}
 
 			/* proxy last access in database is updated separately in  */

@@ -174,6 +174,8 @@ static void	pgm_update_state(zbx_pg_cache_t *cache)
 
 	now = (int)time(NULL);
 
+	/* update proxy online/offline states based on their firtaccess/lastaccess times */
+
 	zbx_hashset_iter_reset(&cache->groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -233,9 +235,13 @@ static void	pgm_update_state(zbx_pg_cache_t *cache)
 
 	for (int i = 0; i < cache->group_updates.values_num; i++)
 	{
+		group = cache->group_updates.values[i];
+
+		if (ZBX_PG_GROUP_STATE_DISABLED == group->state)
+			continue;
+
 		int	online = 0, offline = 0, healthy = 0, total;
 
-		group = cache->group_updates.values[i];
 		total = group->proxies.values_num;
 
 		tmp = zbx_strdup(NULL, group->failover_delay);
@@ -670,51 +676,9 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 
 static void	pgm_update_proxies(zbx_pg_cache_t *cache)
 {
-	zbx_vector_objmove_t	proxy_reloc;
-
-	zbx_vector_objmove_create(&proxy_reloc);
-
 	pg_cache_lock(cache);
-
-	zbx_dc_fetch_proxies(&cache->proxies, &cache->proxy_revision, &proxy_reloc);
-
-	for (int i = 0; i < proxy_reloc.values_num; i++)
-	{
-		zbx_pg_group_t	*group;
-		zbx_pg_proxy_t	*proxy;
-		zbx_objmove_t	*reloc = &proxy_reloc.values[i];
-
-		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &reloc->objid)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		if (0 != reloc->srcid)
-		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->srcid)))
-			{
-				pg_cache_group_remove_proxy(cache, group, proxy);
-				pg_cache_queue_group_update(cache, group);
-			}
-		}
-
-		if (0 != reloc->dstid)
-		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->dstid)))
-			{
-				proxy->group = group;
-				zbx_vector_pg_proxy_ptr_append(&group->proxies, proxy);
-				pg_cache_queue_group_update(cache, group);
-			}
-		}
-		else
-			pg_cache_proxy_free(cache, proxy);
-	}
-
+	pg_cache_update_proxies(cache);
 	pg_cache_unlock(cache);
-
-	zbx_vector_objmove_destroy(&proxy_reloc);
 }
 
 static void	pgm_update_groups(zbx_pg_cache_t *cache)

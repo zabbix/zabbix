@@ -75,6 +75,24 @@ void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add proxy group for standalone proxies                            *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_add_standalone_proxy_group(zbx_pg_cache_t *cache)
+{
+	zbx_pg_group_t	*group, group_local = {.proxy_groupid = 0};
+
+	group = (zbx_pg_group_t *)zbx_hashset_insert(&cache->groups, &group_local, sizeof(group_local));
+	zbx_vector_pg_proxy_ptr_create(&group->proxies);
+	zbx_vector_uint64_create(&group->hostids);
+	zbx_vector_uint64_create(&group->new_hostids);
+	group->state = ZBX_PG_GROUP_STATE_DISABLED;
+	group->min_online = zbx_strdup(NULL, "0");
+	group->failover_delay = zbx_dsprintf(NULL, ZBX_PG_DEFAULT_FAILOVER_DELAY_STR);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: initialize proxy group cache                                      *
  *                                                                            *
  ******************************************************************************/
@@ -95,6 +113,8 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 
 	cache->startup_time = (int)time(NULL);
 	cache->hostmap_revision = map_revision;
+
+	pg_cache_add_standalone_proxy_group(cache);
 }
 
 /******************************************************************************
@@ -430,22 +450,22 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 
 			zbx_vector_pg_update_append_ptr(groups, &group_update);
 			group->flags = ZBX_PG_GROUP_FLAGS_NONE;
+		}
 
-			for (int j = 0; j < group->proxies.values_num; j++)
+		for (int j = 0; j < group->proxies.values_num; j++)
+		{
+			zbx_pg_proxy_t	*proxy = group->proxies.values[j];
+
+			if (ZBX_PG_PROXY_FLAGS_NONE != proxy->flags)
 			{
-				zbx_pg_proxy_t	*proxy = group->proxies.values[j];
+				zbx_pg_update_t	proxy_update = {
+						.objectid = proxy->proxyid,
+						.state = proxy->state,
+						.flags = proxy->flags
+					};
 
-				if (ZBX_PG_PROXY_FLAGS_NONE != proxy->flags)
-				{
-					zbx_pg_update_t	proxy_update = {
-							.objectid = proxy->proxyid,
-							.state = proxy->state,
-							.flags = proxy->flags
-						};
-
-					zbx_vector_pg_update_append_ptr(proxies, &proxy_update);
-					proxy->flags = ZBX_PG_GROUP_FLAGS_NONE;
-				}
+				zbx_vector_pg_update_append_ptr(proxies, &proxy_update);
+				proxy->flags = ZBX_PG_GROUP_FLAGS_NONE;
 			}
 		}
 	}
@@ -595,9 +615,15 @@ void	pg_cache_update_groups(zbx_pg_cache_t *cache)
 	zbx_hashset_iter_t	iter;
 	zbx_pg_group_t		*group;
 
+	/* remove deleted groups */
+
 	zbx_hashset_iter_reset(&cache->groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 	{
+		/* skip the internal standalone proxy group */
+		if (0 == group->proxy_groupid)
+			continue;
+
 		if (ZBX_PG_GROUP_FLAGS_NONE == group->flags)
 		{
 			pg_group_clear(group);
@@ -610,6 +636,67 @@ void	pg_cache_update_groups(zbx_pg_cache_t *cache)
 		if (old_revision < group->revision)
 			pg_cache_queue_group_update(cache, group);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update proxy cache from configuration cache                       *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_update_proxies(zbx_pg_cache_t *cache)
+{
+	zbx_vector_objmove_t	proxy_reloc;
+	zbx_hashset_iter_t	iter;
+	zbx_pg_proxy_t		*proxy;
+
+	zbx_vector_objmove_create(&proxy_reloc);
+
+	zbx_dc_fetch_proxies(&cache->proxies, &cache->proxy_revision, &proxy_reloc);
+
+	/* remove deleted proxies */
+
+	zbx_hashset_iter_reset(&cache->proxies, &iter);
+	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (proxy->revision == cache->proxy_revision)
+			continue;
+
+		pg_cache_group_remove_proxy(cache, proxy->group, proxy);
+		pg_proxy_clear(proxy);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	/* add proxies to groups */
+	for (int i = 0; i < proxy_reloc.values_num; i++)
+	{
+		zbx_pg_group_t	*group;
+		zbx_objmove_t	*reloc = &proxy_reloc.values[i];
+
+		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &reloc->objid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		/* new proxies will have the same srcid and dstid and no old group needs to be updated */
+		if (reloc->srcid != reloc->dstid)
+		{
+			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->srcid)))
+			{
+				pg_cache_group_remove_proxy(cache, group, proxy);
+				pg_cache_queue_group_update(cache, group);
+			}
+		}
+
+		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->dstid)))
+		{
+			proxy->group = group;
+			zbx_vector_pg_proxy_ptr_append(&group->proxies, proxy);
+			pg_cache_queue_group_update(cache, group);
+		}
+	}
+
+	zbx_vector_objmove_destroy(&proxy_reloc);
 }
 
 /******************************************************************************

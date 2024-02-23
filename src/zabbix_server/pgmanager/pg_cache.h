@@ -33,6 +33,7 @@
 #define ZBX_PG_GROUP_STATE_RECOVERY	2
 #define ZBX_PG_GROUP_STATE_ONLINE	3
 #define ZBX_PG_GROUP_STATE_DECAY	4
+#define ZBX_PG_GROUP_STATE_DISABLED	5
 
 typedef struct
 {
@@ -81,6 +82,7 @@ void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_u
 void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uint64_t proxyid);
 
 void	pg_cache_update_groups(zbx_pg_cache_t *cache);
+void	pg_cache_update_proxies(zbx_pg_cache_t *cache);
 void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t *groupids);
 
 void	pg_cache_lock(zbx_pg_cache_t *cache);
