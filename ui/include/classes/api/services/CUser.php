@@ -3424,7 +3424,7 @@ class CUser extends CApiService {
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			if (!array_key_exists('totp_secret', $mfa_response) || $mfa_response['totp_secret'] === '') {
+			if (!array_key_exists('totp_secret', $mfa_response) || $mfa_response['totp_secret'] == null) {
 				$user_secrets = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
 					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
@@ -3498,7 +3498,7 @@ class CUser extends CApiService {
 
 		DBexecute(
 			'DELETE FROM sessions'.
-				' WHERE '.dbConditionId('userid', [$userid['userid']]).
+				' WHERE '.dbConditionId('userid', [$userid]).
 					' AND '.dbConditionInt('status', [ZBX_SESSION_CONFIRMATION_REQUIRED]).
 					' AND lastaccess<'.zbx_dbstr($outdated)
 		);
