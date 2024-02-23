@@ -3246,9 +3246,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		else
 			ZBX_STR2UCHAR(value_type, row[4]);
 
-		if (SUCCEED == DCstrpool_replace(found, &item->key, row[5]))
-			flags |= ZBX_ITEM_KEY_CHANGED;
-
 		if (0 == found)
 		{
 			item->triggers = NULL;
