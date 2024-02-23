@@ -527,14 +527,9 @@ static const char	*zbx_strpool_intern(const char *str)
 	void		*record;
 	zbx_uint32_t	*refcount;
 
-	record = zbx_hashset_search(&config->strpool, str - REFCOUNT_FIELD_SIZE);
+	record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
+			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_FALSE);
 
-	if (NULL == record)
-	{
-		record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_TRUE);
-		*(zbx_uint32_t *)record = 0;
-	}
 
 	refcount = (zbx_uint32_t *)record;
 	(*refcount)++;

@@ -190,7 +190,7 @@ int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 {
-	return zbx_hashset_insert_ext(hs, data, size, 0, 0);
+	return zbx_hashset_insert_ext(hs, data, size, 0, ZBX_UNIQ_FALSE);
 }
 
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, unsigned char uniq)
@@ -230,6 +230,9 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 
 		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->mem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET + size)))
 			return NULL;
+
+		if (0 != offset)
+			memset(entry->data, 0, offset);
 
 		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
 		entry->hash = hash;
