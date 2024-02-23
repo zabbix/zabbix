@@ -22,6 +22,7 @@ package version
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 )
 
@@ -123,6 +124,10 @@ func CompileMode() string {
 	return compileMode
 }
 
+func GoVersion() string {
+	return runtime.Version()
+}
+
 func TitleMessage() string {
 	var title string = titleMessage
 	if "windows" == compileOs {
@@ -142,7 +147,8 @@ func TitleMessage() string {
 
 func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
-	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
+	fmt.Printf("Revision %s %s, compilation time: %s %s, built with: %s\n", Revision(), RevDate(), CompileDate(),
+		CompileTime(), GoVersion())
 
 	for _, msg := range additionalMessages {
 		fmt.Println(msg)
