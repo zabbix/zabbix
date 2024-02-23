@@ -389,8 +389,7 @@ foreach ($data['hosts'] as $host) {
 		&& $host['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD;
 
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-		$info_icons[] = getLldLostEntityIndicator($current_time, $host['discoveryRule']['lifetime_type'],
-			$host['hostDiscovery']['ts_delete'], $host['discoveryRule']['enabled_lifetime_type'],
+		$info_icons[] = getLldLostEntityIndicator($current_time, $host['hostDiscovery']['ts_delete'],
 			$host['hostDiscovery']['ts_disable'], $disabled_by_lld, 'host'
 		);
 	}

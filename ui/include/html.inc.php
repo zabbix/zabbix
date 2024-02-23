@@ -362,8 +362,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_icons = [getLldLostEntityIndicator(time(), $db_host['discoveryRule']['lifetime_type'],
-				$db_host['hostDiscovery']['ts_delete'], $db_host['discoveryRule']['enabled_lifetime_type'],
+			$info_icons = [getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
 				$db_host['hostDiscovery']['ts_disable'], $disabled_by_lld, 'host'
 			)];
 
@@ -675,16 +674,13 @@ function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks =
 function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
 	// Check if the element should've been deleted in the past.
 	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('host group'),
+			_('will be deleted the next time discovery rule is processed')
 		);
 	}
 	else {
-		$warning = _s(
-			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('host group'),
+			_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 		);
 	}
 
@@ -695,78 +691,74 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
  * Returns the indicator for lost LLD entity.
  *
  * @param int     $current_time           Current Unix timestamp.
- * @param int     $lifetime_type          Scenario for deleting lost LLD resources.
  * @param int     $ts_delete              Deletion timestamp of the entity.
- * @param int     $enabled_lifetime_type  Scenario for disabling lost LLD resources.
  * @param int     $ts_disable             Disabling timestamp of the entity.
  * @param string  $entity                 Type of entity.
  *
  * @throws Exception
  */
-function getLldLostEntityIndicator(int $current_time, int $lifetime_type, int $ts_delete, int $enabled_lifetime_type,
-		int $ts_disable, bool $disabled_by_lld, string $entity): ?CSimpleButton {
+function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_disable, bool $disabled_by_lld,
+		string $entity): ?CSimpleButton {
 	$warning = '';
 
-	switch (true) {
-		case $lifetime_type != ZBX_LLD_DELETE_NEVER && $current_time > $ts_delete:
-			$warning = _s('The %1$s is not discovered anymore and %2$s.', _($entity),
-				_('will be deleted the next time discovery rule is processed')
+	if($disabled_by_lld) {
+		if ($ts_delete > 0) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+				_('has been disabled'),
+				_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 			);
-			break;
-
-		case $disabled_by_lld:
-			if ($lifetime_type == ZBX_LLD_DELETE_AFTER) {
+		}
+		elseif ($ts_delete == 0) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+				_('has been disabled'), _('will not be deleted')
+			);
+		}
+	}
+	else {
+		if ($ts_delete > 0) {
+			if ($current_time > $ts_delete) {
+				$warning = _s('The %1$s is not discovered anymore and %2$s.', _($entity),
+					_('will be deleted the next time discovery rule is processed')
+				);
+			}
+			if ($ts_disable > 0) {
 				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-					_('has been disabled'),
+					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
 					_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 				);
 			}
-			elseif ($lifetime_type == ZBX_LLD_DELETE_NEVER) {
-				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-					_('has been disabled'), _('will not be deleted')
+			if ($ts_disable == 0) {
+				$warning = _s('The %1$s is not discovered anymore and %2$s.',
+					_($entity),
+					_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 				);
 			}
-			break;
-
-		case $enabled_lifetime_type != ZBX_LLD_DISABLE_NEVER && ($ts_disable !== '0' && $current_time > $ts_disable):
+		}
+		elseif($ts_disable != 0 && ($ts_disable !== '0' && $current_time > $ts_disable)) {
 			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.',
 				_($entity),
 				_('will be disabled the next time discovery rule is processed'),
-				$lifetime_type == ZBX_LLD_DELETE_AFTER
+				$ts_delete > 0
 					? _s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 					: _('will not be deleted')
 			);
-			break;
-
-		default:
-			if ($lifetime_type == ZBX_LLD_DELETE_AFTER) {
-				if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER) {
-					$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-						_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
-						_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
-					);
-				}
-				elseif ($enabled_lifetime_type == ZBX_LLD_DISABLE_NEVER) {
-					$warning = _s('The %1$s is not discovered anymore and %2$s.',
-						_($entity),
-						_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
-					);
-				}
-			}
-			elseif ($lifetime_type == ZBX_LLD_DELETE_NEVER) {
-				if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER) {
+		}
+		else {
+			if ($ts_delete == 0) {
+				if ($ts_disable > 0) {
 					$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
 						_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
 						_('will not be deleted')
 					);
 				}
-				elseif ($enabled_lifetime_type == ZBX_LLD_DISABLE_NEVER) {
+				elseif ($ts_disable == 0) {
 					$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
 						_('will not be disabled'),
 						_('will not be deleted')
 					);
 				}
 			}
+		}
 	}
 
 	return $warning === '' ? null : makeWarningIcon($warning);
@@ -775,25 +767,28 @@ function getLldLostEntityIndicator(int $current_time, int $lifetime_type, int $t
 /**
  * Returns the discovered graph lifetime indicator.
  *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the graph.
+ * @param int $current_time   Current Unix timestamp.
+ * @param int $ts_delete      Deletion timestamp of the graph.
  *
  * @throws Exception
  */
-function getGraphLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The graph is not discovered anymore and will be deleted the next time discovery rule is processed.'
+function getGraphLifetimeIndicator(int $current_time, int $ts_delete): ?CSimpleButton {
+	if ($ts_delete == 0) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('graph'),
+			_('will not be deleted')
 		);
 	}
 	else {
-		$warning = _s(
-			'The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
+		if ($current_time > $ts_delete && $ts_delete != 0) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s.', _('graph'),
+				_('will be deleted the next time discovery rule is processed')
+			);
+		}
+		else {
+			$warning = _s('The %1$s is not discovered anymore and %2$s.', _('graph'),
+				_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+			);
+		}
 	}
 
 	return makeWarningIcon($warning);

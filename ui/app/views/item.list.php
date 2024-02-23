@@ -169,8 +169,7 @@ foreach ($data['items'] as $item) {
 		}
 
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_cell[] = getLldLostEntityIndicator(time(), $item['discoveryRule']['lifetime_type'],
-				$item['itemDiscovery']['ts_delete'], $item['discoveryRule']['enabled_lifetime_type'],
+			$info_cell[] = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
 				$item['itemDiscovery']['ts_disable'], $disabled_by_lld, 'item'
 			);
 		}

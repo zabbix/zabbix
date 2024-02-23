@@ -692,7 +692,8 @@ else {
 	// Get graphs after paging.
 	$options = [
 		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
-		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type'],
+		'selectGraphDiscovery'	=> ['status', 'ts_delete'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),

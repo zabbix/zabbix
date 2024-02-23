@@ -301,8 +301,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 		if (array_key_exists('status', $trigger['triggerDiscovery'])
 				&& $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['discoveryRule']['lifetime_type'],
-				$trigger['triggerDiscovery']['ts_delete'], $trigger['discoveryRule']['enabled_lifetime_type'],
+			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['triggerDiscovery']['ts_delete'],
 				$trigger['triggerDiscovery']['ts_disable'], $disabled_by_lld, 'trigger'
 			);
 		}
