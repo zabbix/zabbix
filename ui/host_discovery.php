@@ -577,7 +577,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
 
 			if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
-					&& $item['lifetime'] < $item['enabled_lifetime']) {
+					&& $item['lifetime'] < $item['enabled_lifetime']
+					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
 				$result = false;
 
 				error(_s(

@@ -154,6 +154,10 @@ foreach ($data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
+	$disabled_by_lld = $item['status'] == ITEM_STATUS_DISABLED
+		&& (array_key_exists('disable_source', $item['itemDiscovery'])
+		&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD);
+
 	// Info
 	$info_cell = null;
 
@@ -167,18 +171,12 @@ foreach ($data['items'] as $item) {
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 			$info_cell[] = getLldLostEntityIndicator(time(), $item['discoveryRule']['lifetime_type'],
 				$item['itemDiscovery']['ts_delete'], $item['discoveryRule']['enabled_lifetime_type'],
-				$item['itemDiscovery']['ts_disable'], 'item'
+				$item['itemDiscovery']['ts_disable'], $disabled_by_lld, 'item'
 			);
 		}
 
 		$info_cell = makeInformationList($info_cell);
 	}
-
-	$lost_lld_info_icon = $item['status'] == ITEM_STATUS_DISABLED
-			&& (array_key_exists('disable_source', $item['itemDiscovery'])
-				&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD)
-		? makeDescriptionIcon(_('Disabled automatically by an LLD rule.'))
-		: null;
 
 	$can_execute = in_array($item['type'], $data['check_now_types']) && $item['status'] == ITEM_STATUS_ACTIVE
 		&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED;
@@ -213,7 +211,10 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		(new CDiv([$status, $lost_lld_info_icon]))->addClass(ZBX_STYLE_NOWRAP),
+		(new CDiv([
+			$status,
+			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
+		]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['tags'][$item['itemid']],
 		$info_cell
 	];
