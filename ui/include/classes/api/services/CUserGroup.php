@@ -261,7 +261,7 @@ class CUserGroup extends CApiService {
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED])],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED]), 'default' => DB::getDefault('usrgrp', 'mfa_status')],
 			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
 											['else' => true, 'type' => API_ID, 'in' => '0']
