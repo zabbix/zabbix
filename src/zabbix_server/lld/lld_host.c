@@ -4561,7 +4561,8 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 						ts_disable, host->hostid);
 			}
 
-			if ((ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type && lastcheck <= ts_disable) ||
+			if ((ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck <= ts_disable) ||
+					ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type ||
 					HOST_STATUS_NOT_MONITORED == host->status ||
 					SUCCEED != zbx_db_lock_hostid(host->hostid) ||
 					FAIL == lld_host_disable_validate(host->hostid))
