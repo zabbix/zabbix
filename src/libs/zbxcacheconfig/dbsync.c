@@ -29,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include <stddef.h>
 
 /* global correlation constants */
 #define ZBX_CORRELATION_ENABLED				0
@@ -127,9 +128,10 @@ static int	dbsync_strpool_compare_func(const void *d1, const void *d2)
 static char	*dbsync_strdup(const char *str)
 {
 	void	*ptr;
+	size_t	size = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
 
-	ptr = zbx_hashset_insert_ext(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE,
-			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_FALSE);
+	ptr = zbx_hashset_insert_ext(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE, size, REFCOUNT_FIELD_SIZE,
+			size, ZBX_UNIQ_FALSE);
 
 	(*(zbx_uint32_t *)ptr)++;
 

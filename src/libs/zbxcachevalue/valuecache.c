@@ -973,28 +973,21 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 {
 	void	*ptr;
+	int	tries = 0;
+	size_t	len;
 
-	ptr = zbx_hashset_search(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE);
+	len = strlen(str) + 1;
 
-	if (NULL == ptr)
+	while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
+			REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE, REFCOUNT_FIELD_SIZE + len,
+			ZBX_UNIQ_FALSE)))
 	{
-		int	tries = 0;
-		size_t	len;
-
-		len = strlen(str) + 1;
-
-		while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_TRUE)))
-		{
-			/* If there is not enough space - free enough to store string + hashset entry overhead */
-			/* and try inserting one more time. If it fails again, then fail the function.         */
-			if (0 == tries++)
-				vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
-			else
-				return NULL;
-		}
-
-		*(zbx_uint32_t *)ptr = 0;
+		/* If there is not enough space - free enough to store string + hashset entry overhead */
+		/* and try inserting one more time. If it fails again, then fail the function.         */
+		if (0 == tries++)
+			vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
+		else
+			return NULL;
 	}
 
 	(*(zbx_uint32_t *)ptr)++;

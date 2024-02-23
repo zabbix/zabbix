@@ -639,19 +639,16 @@ static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now, int c
  ******************************************************************************/
 void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq)
 {
-	void		*ptr = NULL;
-	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
+	void	*ptr = NULL;
 
 	if (ZBX_UNIQ_TRUE == uniq || NULL == (ptr = zbx_hashset_search(hashset, &id)))
 	{
 		*found = 0;
 
-		buffer[0] = id;
-
 		if (NULL == ptr)
 			uniq = ZBX_UNIQ_TRUE;
 
-		ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
+		ptr = zbx_hashset_insert_ext(hashset, &id, size, 0, sizeof(id), uniq);
 	}
 	else
 	{
@@ -740,12 +737,14 @@ const char	*dc_strpool_intern(const char *str)
 {
 	void		*record;
 	zbx_uint32_t	*refcount;
+	size_t		size;
 
 	if (NULL == str)
 		return NULL;
 
-	record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
-			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_FALSE);
+	size = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+	record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE, size, REFCOUNT_FIELD_SIZE, size,
+			ZBX_UNIQ_FALSE);
 
 	refcount = (zbx_uint32_t *)record;
 	(*refcount)++;
