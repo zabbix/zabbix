@@ -949,6 +949,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'name' => 'API group mfa #1',
+						'mfa_status' => GROUP_MFA_ENABLED,
 						'mfaid' => 'MFA TOTP method'
 					]
 				],
@@ -958,6 +959,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'name' => 'API group mfa #2',
+						'mfa_status' => GROUP_MFA_ENABLED,
 						'mfaid' => 0
 					]
 				],
@@ -972,6 +974,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'name' => 'API group mfa #3',
+						'mfa_status' => GROUP_MFA_ENABLED,
 						'mfaid' => 999
 					]
 				],
@@ -999,6 +1002,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'usrgrpid' => 'API group ldap #1',
+						'mfa_status' => GROUP_MFA_ENABLED,
 						'mfaid' => 'MFA TOTP method'
 					]
 				],
@@ -1008,6 +1012,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'usrgrpid' => 'API group ldap #2',
+						'mfa_status' => GROUP_MFA_ENABLED,
 						'mfaid' => 0
 					]
 				],
@@ -1022,6 +1027,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'usrgrpid' => 'API group ldap #3',
+						'mfa_status' => GROUP_MFA_ENABLED,
 						'mfaid' => 999
 					]
 				],
