@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-11-06 20:49+0000\n"
+"PO-Revision-Date: 2024-02-18 13:51+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -10541,7 +10541,7 @@ msgstr "Largeur de ligne"
 #: include/views/configuration.template.massupdate.php:94
 #: include/views/monitoring.sysmap.constructor.php:44
 msgid "Link"
-msgstr "Lien"
+msgstr "Lier"
 
 #: include/views/js/monitoring.sysmaps.js.php:721
 #: include/views/js/monitoring.sysmaps.js.php:732
