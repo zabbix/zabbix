@@ -304,15 +304,17 @@ class CMfa extends CApiService {
 
 		$mfas = $this->extendObjectsByKey($mfas, $db_mfas, 'mfaid', ['type']);
 
+		$mfa_defaults = [
+			'hash_function' => DB::getDefault('mfa', 'hash_function'),
+			'code_length' => DB::getDefault('mfa', 'code_length'),
+			'api_hostname' => DB::getDefault('mfa', 'api_hostname'),
+			'clientid' => DB::getDefault('mfa', 'clientid'),
+			'client_secret' => DB::getDefault('mfa', 'client_secret')
+		];
+
 		foreach ($mfas as &$mfa) {
 			if ($mfa['type'] != $db_mfas[$mfa['mfaid']]['type']) {
-				$mfa += [
-					'hash_function' => DB::getDefault('mfa', 'hash_function'),
-					'code_length' => DB::getDefault('mfa', 'code_length'),
-					'api_hostname' => DB::getDefault('mfa', 'api_hostname'),
-					'clientid' => DB::getDefault('mfa', 'clientid'),
-					'client_secret' => DB::getDefault('mfa', 'client_secret')
-				];
+				$mfa += $mfa_defaults;
 			}
 		}
 		unset($mfa);

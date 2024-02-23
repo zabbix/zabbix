@@ -867,7 +867,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '123456']
 					]
 				]],
-				'expected_error' => 'Invalid parameter "/0/usrgrps/0": object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1": object does not exist.'
 			],
 			[
 				'user' => [[
