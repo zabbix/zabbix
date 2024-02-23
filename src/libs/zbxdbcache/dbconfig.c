@@ -530,7 +530,6 @@ static const char	*zbx_strpool_intern(const char *str)
 	record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
 			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_FALSE);
 
-
 	refcount = (zbx_uint32_t *)record;
 	(*refcount)++;
 
@@ -3137,7 +3136,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
-	int			found, update_index, ret, i, old_nextcheck, uniq = ZBX_UNIQ_FALSE;
+	int			found, ret, i, old_nextcheck, uniq = ZBX_UNIQ_FALSE;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 	zbx_item_value_type_t	old_value_type;
@@ -3185,8 +3184,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		/* see whether we should and can update items_hk index at this point */
 
-		update_index = 0;
-
 		if (0 == found || 0 != strcmp(item->key, row[5]))
 		{
 			if (1 == found)
@@ -3208,14 +3205,23 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 				}
 			}
 
-			item_hk_local.hostid = hostid;
-			item_hk_local.key = row[5];
-			item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_search(&config->items_hk, &item_hk_local);
+			if (SUCCEED == DCstrpool_replace(found, &item->key, row[5]))
+				flags |= ZBX_ITEM_KEY_CHANGED;
 
-			if (NULL != item_hk)
-				item_hk->item_ptr = item;
-			else
-				update_index = 1;
+			item_hk_local.hostid = hostid;
+			item_hk_local.key = item->key;
+			item_hk_local.item_ptr = NULL;
+			item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_insert(&config->items_hk, &item_hk_local,
+					sizeof(ZBX_DC_ITEM_HK));
+
+			item_hk->item_ptr = item;
+			if (NULL == item_hk_local.item_ptr)
+				zbx_strpool_acquire(item->key);
+		}
+		else
+		{
+			if (SUCCEED == DCstrpool_replace(found, &item->key, row[5]))
+				flags |= ZBX_ITEM_KEY_CHANGED;
 		}
 
 		/* store new information in item structure */
@@ -3307,17 +3313,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		dc_item_value_type_add(found, item, &old_value_type, row);
 		dc_item_type_add(found, item, &old_type, &dep_items, row);
-
-		/* update items_hk index using new data, if not done already */
-
-		if (1 == update_index)
-		{
-			item_hk_local.hostid = item->hostid;
-			item_hk_local.key = zbx_strpool_acquire(item->key);
-			item_hk_local.item_ptr = item;
-			zbx_hashset_insert_ext(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK), 0,
-					ZBX_UNIQ_TRUE);
-		}
 
 		/* process item intervals and update item nextcheck */
 
