@@ -277,8 +277,8 @@ clean:
  *          target host, since they are not present on the template trigger.                              *
  *                                                                                                        *
  * Parameters:                                                                                            *
- *             trids               - [IN] vector of host trigger ids, which descriptions match at least   *
- *                                        one of the triggers from templates                              *
+ *             trids               - [IN] vector of host trigger ids, whose descriptions match at least   *
+ *                                        one of triggers from templates                                  *
  *             links               - [OUT] pairs of template trigger dependencies, list of links_up and   *
  *                                         links_down, links that we want to be present on target host    *
  *             links_processed     - [OUT] processed links with entries that are already present excluded *

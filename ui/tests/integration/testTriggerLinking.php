@@ -57,11 +57,6 @@ class testTriggerLinking extends CIntegrationTest {
 	const NUMBER_OF_TEMPLATES = 10;
 	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 20;
 
-	/* When resolving conflicts during linking - trigger is considered unique if its description and expression match
-		every template contains a set of triggers with:
-		1) unique description and unique expression
-		2) same description and unique expression. */
-
 	private static $templateids = array();
 	private static $stringids = array();
 
@@ -91,7 +86,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 
 		/* Create special template X, that will have trigger description (but not expression) conflict
-			with triggers from the first template. It will be linked in the separation action from
+			with triggers from the first template. It will be linked in the separate action from
 			all other templates. (when agent2 with new host metadata starts). */
 		$response = $this->call('template.create', [
 			'host' =>  self::$templateX_name,
@@ -106,7 +101,7 @@ class testTriggerLinking extends CIntegrationTest {
 			self::$templateX_ID = $response['result']['templateids'][0];
 	}
 
-	public function setupActions()
+	private static function setupActionsToLinkFirstSetOfTemplates()
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -148,7 +143,17 @@ class testTriggerLinking extends CIntegrationTest {
 		self::$firstActionID = $response['result']['actionids'][0];
 	}
 
-	public function setupActions2()
+
+	/* When resolving conflicts during trigger linking two triggers are considered the same trigger if both
+		triggers have the same description and the same expression.
+
+		Every template contains a set of triggers with:
+		1) unique description and unique expression
+		2) same description and unique expression.
+
+		(unique - means unique on template level).
+	*/
+	private static function setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates()
 	{
 		$response = $this->call('action.delete', [self::$firstActionID]);
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
@@ -179,10 +184,10 @@ class testTriggerLinking extends CIntegrationTest {
 	/**
 	* @inheritdoc
 	*/
-	public function prepareDataX() {
+	private static function prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates() {
 
 		$z = 'a';
-		/* There is divide by 2, since we create 2 triggers in every stage*/
+		/* There is divide by 2, since we create 2 triggers in every stage. */
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE / 2; $i++)
 		{
 			array_push(self::$stringids, $z);
@@ -308,7 +313,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
 
-		$this->setupActions();
+		$this->setupActionsToLinkFirstSetOfTemplates();
 
 		return true;
 	}
@@ -321,7 +326,7 @@ class testTriggerLinking extends CIntegrationTest {
 	public function serverConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 5,
+				'DebugLevel' => 4,
 				'LogFileSize' => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
@@ -458,14 +463,14 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
-		$this->prepareDataX();
+		$this->prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->checkTriggersCreate();
-		$this->setupActions2();
+		$this->setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates();
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_AGENT);
 
