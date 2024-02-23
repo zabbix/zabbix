@@ -4447,8 +4447,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const zbx_lld_host_t	*host;
-	zbx_vector_uint64_t	del_hostids, lc_hostids, ts_hostids, lost_hostids, discovered_hostids, dis_hostids,
-				en_hostids;
+	zbx_vector_uint64_t	del_hostids, lc_hostids, lost_hostids, discovered_hostids, dis_hostids, en_hostids;
 	zbx_vector_str_t	del_hosts;
 	zbx_hashset_t		ids_names;
 	zbx_id_name_pair_t	local_id_name_pair;
@@ -4465,7 +4464,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_str_create(&del_hosts);
 	zbx_vector_uint64_create(&lc_hostids);
-	zbx_vector_uint64_create(&ts_hostids);
 	zbx_vector_uint64_create(&lost_hostids);
 	zbx_vector_uint64_create(&discovered_hostids);
 	zbx_vector_uint64_create(&dis_hostids);
@@ -4515,7 +4513,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
 				ts_disable = 0;
-			if (ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type)
+			else if (ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type)
 				ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration);
 
 			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type &&
@@ -4598,16 +4596,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	if (0 != ts_hostids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set ts_delete=0 where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-				ts_hostids.values, ts_hostids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
 	if (0 != en_hostids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
@@ -4676,7 +4664,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 	zbx_vector_uint64_destroy(&lost_hostids);
 	zbx_vector_uint64_destroy(&discovered_hostids);
-	zbx_vector_uint64_destroy(&ts_hostids);
 	zbx_vector_uint64_destroy(&lc_hostids);
 	zbx_vector_uint64_destroy(&del_hostids);
 	zbx_vector_str_clear_ext(&del_hosts, zbx_str_free);
