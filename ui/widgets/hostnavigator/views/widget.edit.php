@@ -28,34 +28,42 @@
 
 $form = new CWidgetFormView($data);
 
+$groupids_field = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
+	: null;
+
+$hosts_field = array_key_exists('hosts', $data['fields'])
+	? (new CWidgetFieldHostPatternSelectView($data['fields']['hosts']))
+		->setPlaceholder(_('host pattern'))
+		->setFilterPreselect([
+			'id' => $groupids_field->getId(),
+			'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+			'submit_as' => 'groupid'
+		])
+	: null;
+
 $form
-	->addField(array_key_exists('groupids', $data['fields'])
-		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
-		: null
-	)
-	->addField(array_key_exists('hosts', $data['fields'])
-		? (new CWidgetFieldHostPatternSelectView($data['fields']['hosts']))->setPlaceholder(_('host pattern'))
-		: null
-	)
+	->addField($groupids_field)
+	->addField($hosts_field)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['status'])
 	)
-	->addField(array_key_exists('evaltype', $data['fields'])
-		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+	->addField(array_key_exists('host_tags_evaltype', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['host_tags_evaltype'])
 		: null
 	)
-	->addField(array_key_exists('tags', $data['fields'])
-		? new CWidgetFieldTagsView($data['fields']['tags'])
+	->addField(array_key_exists('host_tags', $data['fields'])
+		? new CWidgetFieldTagsView($data['fields']['host_tags'])
 		: null
-	)
-	->addField(
-		new CWidgetFieldSeveritiesView($data['fields']['severities'])
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['problems'])
+	)
+	->addField(
+		new CWidgetFieldSeveritiesView($data['fields']['severities'])
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['limit'])

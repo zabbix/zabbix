@@ -20,4 +20,27 @@
 
 class CWidgetHostNavigator extends CWidget {
 
+	#host_list = null;
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			with_config: this.#host_list === null ? 1 : undefined
+		};
+	}
+
+	updateProperties({name, view_mode, fields}) {
+		this.#host_list = null;
+
+		super.updateProperties({name, view_mode, fields});
+	}
+
+	setContents(response) {
+		if (this.#host_list === null) {
+			this.#host_list = response.hosts;
+		}
+	}
+
+	hasPadding() {
+		return false;
+	}
 }

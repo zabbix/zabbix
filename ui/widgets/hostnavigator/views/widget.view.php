@@ -25,3 +25,13 @@
  * @var CView $this
  * @var array $data
  */
+
+$view = new CWidgetView($data);
+
+foreach ($data['vars'] as $name => $value) {
+	if ($value !== null) {
+		$view->setVar($name, $value);
+	}
+}
+
+$view->show();

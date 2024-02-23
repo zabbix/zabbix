@@ -30,6 +30,8 @@ class CMultiSelect extends CTag {
 	 */
 	const SEARCH_METHOD = 'multiselect.get';
 
+	const FILTER_PRESELECT_ACCEPT_ID = 'id';
+
 	/**
 	 * @var array
 	 */
@@ -443,7 +445,7 @@ class CMultiSelect extends CTag {
 		$is_valid = true;
 
 		foreach (array_keys($field) as $option) {
-			if (!in_array($option, ['id', 'submit_as', 'submit_parameters', 'multiple'])) {
+			if (!in_array($option, ['id', 'accept', 'submit_as', 'submit_parameters', 'multiple'])) {
 				error('unsupported option: '.$path.'[\''.$option.'\']');
 				$is_valid = false;
 			}
@@ -454,8 +456,13 @@ class CMultiSelect extends CTag {
 			$is_valid = false;
 		}
 
-		if (array_key_exists('submit_as', $field)
-				&& (!is_string($field['submit_as']) || $field['submit_as'] === '')) {
+		if (array_key_exists('accept', $field) && $field['accept'] !== self::FILTER_PRESELECT_ACCEPT_ID) {
+			error('invalid property: '.$path.'[\'accept\']');
+			$is_valid = false;
+		}
+
+		if (!array_key_exists('submit_as', $field)
+			|| !is_string($field['submit_as']) || $field['submit_as'] === '') {
 			error('invalid property: '.$path.'[\'submit_as\']');
 			$is_valid = false;
 		}

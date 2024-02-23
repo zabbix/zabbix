@@ -31,6 +31,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldHostPatternSelect,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSeverities,
 	CWidgetFieldTags
@@ -68,17 +69,14 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: (new CWidgetFieldRadioButtonList('evaltype', _('Host tags'), [
+				: (new CWidgetFieldRadioButtonList('host_tags_evaltype', _('Host tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: new CWidgetFieldTags('tags')
-			)
-			->addField(
-				new CWidgetFieldSeverities('severities', _('Severity'))
+				: new CWidgetFieldTags('host_tags')
 			)
 			->addField(
 				new CWidgetFieldCheckBox('maintenance',
@@ -93,9 +91,15 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::PROBLEMS_UNSUPPRESSED)
 			)
 			->addField(
+				new CWidgetFieldSeverities('severities', _('Severity'))
+			)
+			->addField(
 				(new CWidgetFieldIntegerBox('limit', _('Host limit'), 1, 9999))
 					->setDefault(100)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY |CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }
