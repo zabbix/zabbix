@@ -189,7 +189,7 @@ class testMfa extends CAPITest {
 						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/api_hostname": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "api_hostname" is missing.'
 			],
 			'Missing MFA DUO clientid' => [
 				'mfas' => [
@@ -197,7 +197,7 @@ class testMfa extends CAPITest {
 						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/clientid": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "clientid" is missing.'
 			],
 			'Missing MFA DUO client_secret' => [
 				'mfas' => [
@@ -205,24 +205,24 @@ class testMfa extends CAPITest {
 						'clientid' => 'AAA58NOODEGUA6ST7AAA'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/client_secret": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "client_secret" is missing.'
 			],
-			'Unexpected parameter api_hostname with TOTP method' => [
+			'Non-default parameter api_hostname with TOTP method' => [
 				'mfas' => [
 					['type' => MFA_TYPE_TOTP, 'name' => 'TOTP 4', 'hash_function' => TOTP_HASH_SHA1, 'code_length' => TOTP_CODE_LENGTH_6,
 						'api_hostname' => 'api-999a9a99.duosecurity.com'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "api_hostname".'
+				'expected_error' => 'Invalid parameter "/1/api_hostname": value must be empty.'
 			],
-			'Unexpected parameter has_function with DUO method' => [
+			'Non-default parameter has_function with DUO method' => [
 				'mfas' => [
 					['type' => MFA_TYPE_DUO, 'name' => 'DUO 4', 'api_hostname' => 'api-999a9a99.duosecurity.com',
 						'clientid' => 'AAA58NOODEGUA6ST7AAA',
-						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult', 'hash_function' => TOTP_HASH_SHA1
+						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult', 'hash_function' => TOTP_HASH_SHA256
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "hash_function".'
+				'expected_error' => 'Invalid parameter "/1/hash_function": value must be "1".'
 			]
 		];
 	}
