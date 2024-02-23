@@ -146,10 +146,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
-			templated:                           <?= $data['limited'] ? 1 : 0 ?>,
-			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
-			ZBX_STYLE_TD_DRAG_ICON:              <?= zbx_jsvalue(ZBX_STYLE_TD_DRAG_ICON) ?>,
-			ZBX_STYLE_DISABLED:                  <?= zbx_jsvalue(ZBX_STYLE_DISABLED) ?>,
+			templated:                      <?= $data['limited'] ? 1 : 0 ?>,
 			msg: {
 				yes:                        <?= json_encode(_('Yes')) ?>,
 				no:                         <?= json_encode(_('No')) ?>,
@@ -443,6 +440,7 @@
 		if (!lldoverrides.templated) {
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
+				this.onSortOrderChange();
 			}.bind(this));
 
 			dynamicRowsBindNewRow(this.$container);
@@ -453,13 +451,12 @@
 			});
 		}
 
-		const sortable_lld_overrides = new CSortable(this.$container[0].querySelector('tbody'), {
+		new CSortable(this.$container[0].querySelector('tbody'), {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			freeze_end: 1,
 			enable_sorting: <?= json_encode(!$data['limited']) ?>
-		});
-
-		sortable_lld_overrides.on(CSortable.EVENT_SORT, () => this.onSortOrderChange());
+		})
+			.on(CSortable.EVENT_SORT, () => this.onSortOrderChange());
 
 		this.renderData();
 	}
