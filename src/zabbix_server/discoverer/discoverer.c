@@ -34,12 +34,12 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 #include "discoverer_async.h"
-#include "zbxproxybuffer.h"
 #include "zbx_discoverer_constants.h"
 #include "discoverer_taskprep.h"
 #include "discoverer_int.h"
 #include "zbxtimekeeper.h"
 #include "zbxpoller.h"
+
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>

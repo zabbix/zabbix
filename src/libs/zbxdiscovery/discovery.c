@@ -19,8 +19,6 @@
 
 #include "zbxdiscovery.h"
 
-#include "zbxtime.h"
-#include "zbxnum.h"
 #include "zbxserialize.h"
 #include "zbx_discoverer_constants.h"
 
