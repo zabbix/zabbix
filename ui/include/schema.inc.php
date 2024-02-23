@@ -10097,7 +10097,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'status' => [
+			'state' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -10136,7 +10136,7 @@ return [
 				'length' => 255,
 				'default' => '1'
 			],
-			'status' => [
+			'state' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -10178,7 +10178,7 @@ return [
 				'length' => 20,
 				'default' => '0'
 			],
-			'tls_connect' => [
+			'tls_accept' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

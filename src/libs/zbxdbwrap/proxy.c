@@ -1614,7 +1614,7 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 		}
 	}
 
-	if (FAIL == (ret = zbx_dc_config_get_host_by_name(tmp, &host, &redirect)))
+	if (FAIL == (ret = zbx_dc_config_get_host_by_name(tmp, sock, &host, &redirect)))
 	{
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
 		/* send success response so agent will not retry upload with the same non-existing host */
@@ -1699,7 +1699,7 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_comms_redirect_t	redirect;
 			zbx_uint64_t		hostid;
 
-			if (SUCCEED_PARTIAL == (ret = zbx_dc_config_get_hostid_by_name(host, &hostid, &redirect)))
+			if (SUCCEED_PARTIAL == (ret = zbx_dc_config_get_hostid_by_name(host, sock, &hostid, &redirect)))
 			{
 				struct zbx_json	j;
 

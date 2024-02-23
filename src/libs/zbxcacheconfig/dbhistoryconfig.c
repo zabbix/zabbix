@@ -1065,6 +1065,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
  * Purpose: get host information by name                                      *
  *                                                                            *
  * Parameters: host      - [IN] host name                                     *
+ *             sock      - [IN] connection socket                             *
  *             mode      - [IN] host retrieval mode                           *
  *             recv_host - [OUT] host information                             *
  *             redirect  - [OUT] host redirection data (optional)             *
@@ -1075,15 +1076,24 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
  *               FAIL            - host not found                             *
  *                                                                            *
  ******************************************************************************/
-static int	dc_config_get_host_by_name(const char *host, unsigned int mode, zbx_history_recv_host_t *recv_host,
-		zbx_comms_redirect_t *redirect)
+static int	dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, unsigned int mode,
+		zbx_history_recv_host_t *recv_host, zbx_comms_redirect_t *redirect)
 {
-	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_HOST	*dc_host = NULL;
 	int			ret = FAIL;
+	char			*error = NULL;
+	zbx_tls_conn_attr_t	attr;
+
+	if (FAIL == zbx_tls_get_attr(sock, &attr, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get connection attributes: %s", __func__, error);
+		zbx_free(error);
+		return FAIL;
+	}
 
 	RDLOCK_CACHE;
 
-	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, redirect))
+	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, &attr, redirect))
 	{
 		ret = SUCCEED_PARTIAL;
 		goto out;
@@ -1105,6 +1115,7 @@ out:
  * Purpose: get host information by name                                      *
  *                                                                            *
  * Parameters: host      - [IN] host name                                     *
+ *             sock      - [IN] connection socket                             *
  *             recv_host - [OUT] host information                             *
  *             redirect  - [OUT] host redirection data (optional)             *
  *                                                                            *
@@ -1114,10 +1125,10 @@ out:
  *               FAIL            - host not found                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *recv_host,
+int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
 		zbx_comms_redirect_t *redirect)
 {
-	return dc_config_get_host_by_name(host, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
+	return dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
 }
 
 /******************************************************************************
@@ -1125,6 +1136,7 @@ int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *re
  * Purpose: get host identifier by name                                       *
  *                                                                            *
  * Parameters: host     - [IN] host name                                      *
+ *             sock     - [IN] connection socket                              *
  *             hostid   - [OUT] host identifier                               *
  *             redirect - [OUT] host redirection data (optional)              *
  *                                                                            *
@@ -1134,12 +1146,13 @@ int	zbx_dc_config_get_host_by_name(const char *host, zbx_history_recv_host_t *re
  *               FAIL            - host not found                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid, zbx_comms_redirect_t *redirect)
+int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		zbx_comms_redirect_t *redirect)
 {
 	zbx_history_recv_host_t	recv_host;
 	int			ret;
 
-	if (SUCCEED == (ret = dc_config_get_host_by_name(host, 0, &recv_host, redirect)))
+	if (SUCCEED == (ret = dc_config_get_host_by_name(host, sock, 0, &recv_host, redirect)))
 		*hostid = recv_host.hostid;
 
 	return ret;

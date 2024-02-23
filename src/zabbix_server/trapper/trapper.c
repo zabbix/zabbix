@@ -1016,7 +1016,7 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
 
-	if (FAIL == (ret = zbx_dc_config_get_host_by_name(host, &recv_host, &redirect)))
+	if (FAIL == (ret = zbx_dc_config_get_host_by_name(host, sock, &recv_host, &redirect)))
 		return FAIL;
 
 	if (SUCCEED_PARTIAL == ret)

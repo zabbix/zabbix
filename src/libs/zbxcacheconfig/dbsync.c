@@ -4173,12 +4173,13 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hp.hostproxyid,hp.hostid,hp.host,hp.proxyid,hp.revision,h.host"
+			"select hp.hostproxyid,hp.hostid,hp.host,hp.proxyid,hp.revision,h.host,hp.tls_accept,"
+				"hp.tls_issuer,hp.tls_subject,hp.tls_psk_identity,hp.tls_psk"
 			" from host_proxy hp"
 			" left join hosts h"
 				" on hp.hostid=h.hostid");
 
-	dbsync_prepare(sync, 6, NULL);
+	dbsync_prepare(sync, 11, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

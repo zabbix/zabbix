@@ -1325,7 +1325,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-static void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk)
+void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk)
 {
 	/* Maintain 'psks' index. Unlink and delete the PSK identity. */
 	if (NULL != tls_dc_psk)
@@ -1344,7 +1344,7 @@ static void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk)
 	}
 }
 
-static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name, int found,
+ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name, int found,
 		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk)
 {
 	ZBX_DC_PSK	*psk_i, psk_i_local;
@@ -9323,7 +9323,7 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char **error)
 {
-	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
 	const char		*msg;
@@ -9334,7 +9334,7 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 
 	RDLOCK_CACHE;
 
-	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, redirect))
+	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, &attr, redirect))
 	{
 		UNLOCK_CACHE;
 
@@ -9368,7 +9368,7 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 		return FAIL;
 	}
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (FAIL == zbx_tls_validate_attr(sock, &attr, dc_host->tls_issuer, dc_host->tls_subject,
+	if (FAIL == zbx_tls_validate_attr(&attr, dc_host->tls_issuer, dc_host->tls_subject,
 			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{
 		UNLOCK_CACHE;

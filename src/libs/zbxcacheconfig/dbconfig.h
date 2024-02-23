@@ -927,6 +927,12 @@ typedef struct
 	zbx_uint64_t	proxyid;
 	zbx_uint64_t	revision;
 	const char	*host;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*tls_subject;
+	const char	*tls_issuer;
+	ZBX_DC_PSK	*tls_dc_psk;
+#endif
+	unsigned char	tls_accept;
 }
 zbx_dc_host_proxy_t;
 
@@ -1136,5 +1142,12 @@ void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint6
 void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
 
 void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff);
+
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk);
+ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name, int found,
+		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk);
+#endif
 
 #endif

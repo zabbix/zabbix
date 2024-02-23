@@ -26,7 +26,7 @@
 void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision);
 void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision);
 void	dc_update_host_proxy(const char *host_old, const char *host_new);
-int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect);
+int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_comms_redirect_t *redirect);
 void	dc_update_proxy_failover_delay(void);
 
 #endif

@@ -313,10 +313,16 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	int				ret;
 	ZBX_DC_HOST			*dc_host;
 	zbx_vector_dc_host_ptr_t	hosts;
+	zbx_hashset_t			psk_owners;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_dc_host_ptr_create(&hosts);
+
+	/* Encryption data in host_proxy table is stored and synced only on proxy. */
+	/* The identify conflicts have been already checked by server, so they can */
+	/* be skipped by using separate psk_owner registry.                        */
+	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -329,7 +335,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(hostproxyid, row[0]);
 
-		hp = (zbx_dc_host_proxy_t *)DCfind_id(&config->host_proxy, hostproxyid, sizeof(ZBX_DC_PROXY),
+		hp = (zbx_dc_host_proxy_t *)DCfind_id(&config->host_proxy, hostproxyid, sizeof(zbx_dc_host_proxy_t),
 				&found);
 
 		ZBX_DBROW2UINT64(hp->hostid, row[1]);
@@ -338,6 +344,15 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (SUCCEED != zbx_db_is_null(row[5]))	/* server */
 		{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			if (0 == found)
+			{
+				hp->tls_issuer = NULL;
+				hp->tls_subject = NULL;
+				hp->tls_dc_psk = NULL;
+			}
+#endif
+
 			dc_strpool_replace(found, &hp->host, row[5]);
 
 			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hp->hostid)))
@@ -355,7 +370,16 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			}
 		}
 		else	/* proxy */
+		{
 			dc_strpool_replace(found, &hp->host, row[2]);
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			ZBX_STR2UCHAR(hp->tls_accept, row[6]);
+			dc_strpool_replace(found, &hp->tls_issuer, row[7]);
+			dc_strpool_replace(found, &hp->tls_subject, row[8]);
+			hp->tls_dc_psk = dc_psk_sync(row[9], row[10], hp->host, found, NULL, hp->tls_dc_psk);
+#endif
+		}
 
 		dc_register_host_proxy(hp);
 	}
@@ -377,6 +401,17 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		dc_deregister_host_proxy(hp);
+
+		dc_strpool_release(hp->host);
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		if (NULL != hp->tls_issuer)	/* proxy */
+		{
+			dc_strpool_release(hp->tls_issuer);
+			dc_strpool_release(hp->tls_subject);
+			dc_psk_unlink(hp->tls_dc_psk);
+		}
+#endif
 		zbx_hashset_remove_direct(&config->host_proxy, hp);
 	}
 
@@ -402,6 +437,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_vector_uint64_destroy(&hostids);
 	}
 
+	zbx_hashset_destroy(&psk_owners);
 	zbx_vector_dc_host_ptr_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -412,13 +448,14 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
  * Purpose: get redirection information for the host                          *
  *                                                                            *
  * Parameters: host     - [IN] host name                                      *
+ *             attr     - [IN] connection attributes                          *
  *             redirect - [OUT] redirection information                       *
  *                                                                            *
  * Return value: SUCCEED - host must be redirected to the returned address    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
+int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_comms_redirect_t *redirect)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
 	ZBX_DC_PROXY			*proxy;
@@ -429,25 +466,23 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hpi->host_proxy->proxyid)))
 		return FAIL;
 
-	if (NULL != config->proxy_hostname)
+	if (NULL != config->proxy_hostname && 0 == strcmp(proxy->name, config->proxy_hostname))
 	{
-		if (0 == strcmp(proxy->name, config->proxy_hostname))
+		int	now;
+
+		now = (int)time(NULL);
+
+		/* check if proxy is not offline and the client redirect should be reset */
+		if (now - config->proxy_lastonline < config->proxy_failover_delay ||
+				now - hpi->lastreset < config->proxy_failover_delay)
 		{
-			int	now;
-
-			now = (int)time(NULL);
-
-			if (now - config->proxy_lastonline < config->proxy_failover_delay ||
-					now - hpi->lastreset < config->proxy_failover_delay)
-			{
-				return FAIL;
-			}
-
-			hpi->lastreset = now;
-			redirect->reset = ZBX_REDIRECT_RESET;
-
-			return SUCCEED;
+			return FAIL;
 		}
+
+		hpi->lastreset = now;
+		redirect->reset = ZBX_REDIRECT_RESET;
+
+		return SUCCEED;
 	}
 
 	const char	*local_port = proxy->local_port;
@@ -465,6 +500,60 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 
 	redirect->revision = hpi->host_proxy->revision;
 	redirect->reset = 0;
+
+	unsigned char	tls_accept;
+	const char	*tls_issuer;
+	const char	*tls_subject;
+	ZBX_DC_PSK	*dc_psk = NULL;
+
+	if (NULL != config->proxy_hostname)
+	{
+		/* on proxy encryption information is taken from host_proxy redirect mapping */
+		tls_accept = hpi->host_proxy->tls_accept;
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		tls_issuer = hpi->host_proxy->tls_issuer;
+		tls_subject = hpi->host_proxy->tls_subject;
+		dc_psk = hpi->host_proxy->tls_dc_psk;
+#endif
+	}
+	else
+	{
+		ZBX_DC_HOST	*dc_host;
+
+		/* on server encryption information is taken from hosts, block redirection for unknown hosts */
+		if (NULL == (dc_host = DCfind_host(host)))
+			return FAIL;
+
+		tls_accept = dc_host->tls_accept;
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		tls_issuer = dc_host->tls_issuer;
+		tls_subject = dc_host->tls_subject;
+		dc_psk = dc_host->tls_dc_psk;
+#endif
+	}
+
+	if (0 == ((unsigned int)tls_accept & attr->connection_type))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot perform host \"host\" redirection: connection of type \"%s\""
+				" is not allowed",
+				host, zbx_tcp_connection_type_name(attr->connection_type));
+
+		return FAIL;
+	}
+
+	const char	*msg;
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (FAIL == zbx_tls_validate_attr(attr, tls_issuer, tls_subject,
+			NULL == dc_psk ? NULL : dc_psk->tls_psk_identity, &msg))
+	{
+
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot perform host \"%s\" redirection: %s", host, msg);
+		return FAIL;
+	}
+#endif
 
 	return SUCCEED;
 }
