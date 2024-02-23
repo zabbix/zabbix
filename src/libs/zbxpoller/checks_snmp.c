@@ -2005,13 +2005,13 @@ ZBX_PTR_VECTOR_IMPL(snmp_dobject_ptr, zbx_snmp_dobject_t*)
 /* helper data structure used by snmp discovery */
 typedef struct
 {
-	/* the index of OID being currently processed (walked) */
+	/* index of OID being currently processed (walked) */
 	int			num;
 
-	/* the discovered SNMP objects */
+	/* discovered SNMP objects */
 	zbx_hashset_t		objects;
 
-	/* the index (order) of discovered SNMP objects */
+	/* index (order) of discovered SNMP objects */
 	zbx_vector_snmp_dobject_ptr_t	index;
 
 	/* request data structure used to parse discovery OID key */
@@ -3415,8 +3415,12 @@ int	zbx_get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char 
 	return errcode;
 }
 
-/* Actually this could be called by discoverer, without poller being initialized, */
-/* so cannot call poller_get_progname(), need progname to be passed directly. */
+/*******************************************************************************************
+ *                                                                                         *
+ * Comment: Actually this could be called by discoverer, without poller being initialized, *
+ *          so cannot call poller_get_progname(), need progname to be passed directly.     *
+ *                                                                                         *
+ *******************************************************************************************/
 static void	zbx_init_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;

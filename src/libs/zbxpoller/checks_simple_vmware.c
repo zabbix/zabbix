@@ -595,13 +595,13 @@ out:
  *                                                                            *
  * Purpose: retrieves hypervisor property                                     *
  *                                                                            *
- * Parameters: request   - [IN] The original request. The first parameter is  *
- *                              vmware service URL and the second parameter.  *
- *                              is hypervisor uuid.                           *
- *             username  - [IN] vmware service user name                      *
- *             password  - [IN] vmware service password                       *
- *             propid    - [IN] property id                                   *
- *             result    - [OUT] request result                               *
+ * Parameters: request  - [IN] The original request. The first parameter is   *
+ *                             vmware service URL and the second parameter.   *
+ *                             is hypervisor uuid.                            *
+ *             username - [IN] vmware service user name                       *
+ *             password - [IN] vmware service password                        *
+ *             propid   - [IN] property id                                    *
+ *             result   - [OUT] request result                                *
  *                                                                            *
  ******************************************************************************/
 static int	get_vcenter_hvprop(const AGENT_REQUEST *request, const char *username, const char *password, int propid,

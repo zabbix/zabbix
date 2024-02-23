@@ -130,8 +130,6 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
 
 /********************************************************************************
  *                                                                              *
- * Purpose: activates item interface                                            *
- *                                                                              *
  * Parameters: ts          - [IN] timestamp                                     *
  *             interface   - [IN]                                               *
  *             itemid      - [IN]                                               *
@@ -188,8 +186,6 @@ out:
 }
 
 /***********************************************************************************
- *                                                                                 *
- * Purpose: deactivates item interface                                             *
  *                                                                                 *
  * Parameters: ts                 - [IN] timestamp                                 *
  *             interface          - [IN]                                           *
