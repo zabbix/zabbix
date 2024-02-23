@@ -2016,7 +2016,7 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
  *             config_trapper_timeout  - [IN]                                 *
  *             config_source_ip        - [IN]                                 *
  *             config_ssh_key_location - [IN]                                 *
- *             config_forks            - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
  *             program_type            - [IN]                                 *
  *                                                                            *
  * Comments: Action recovery operations have a single escalation step, so     *

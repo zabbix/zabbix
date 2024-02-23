@@ -23,7 +23,6 @@
 #include "zbxpoller.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,

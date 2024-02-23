@@ -54,6 +54,7 @@
  *             config_timeout                - [IN]                                   *
  *             config_trapper_timeout        - [IN]                                   *
  *             config_source_ip              - [IN]                                   *
+ *             config_ssh_key_location       - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
  *             get_config_forks              - [IN]                                   *
