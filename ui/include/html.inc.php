@@ -267,14 +267,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$db_host = reset($db_host);
 
 	if (!$is_template) {
-		// Get count for item type ITEM_TYPE_ZABBIX_ACTIVE (7).
-		$db_item_active_count = API::Item()->get([
-			'countOutput' => true,
-			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-			'hostids' => [$hostid]
-		]);
-
-		if ($db_item_active_count > 0) {
+		if (getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
 				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
@@ -283,6 +276,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			];
 			unset($db_host['active_available']);
 		}
+
+		$db_host['has_passive_checks'] = (bool) getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, [$hostid]);
 	}
 
 	// get lld-rules
@@ -359,7 +354,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
@@ -635,8 +630,13 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 
 /**
  * Create HTML helper element for host interfaces availability.
+ *
+ * @param array $host_interfaces
+ * @param bool $passive_checks
+ *
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks = true): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -655,7 +655,9 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 		];
 	}
 
-	return (new CHostAvailability())->setInterfaces($interfaces);
+	return (new CHostAvailability())
+		->setInterfaces($interfaces)
+		->enablePassiveChecks($passive_checks);
 }
 
 /**

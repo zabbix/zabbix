@@ -1487,7 +1487,7 @@ class testFormAlertsScripts extends CWebTest {
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
 			$this->openScriptForm($id, false);
 
-			if(array_key_exists('Advanced configuration', $data['fields'])) {
+			if (array_key_exists('Advanced configuration', $data['fields'])) {
 				$form->fill(['Advanced configuration' => true]);
 			}
 

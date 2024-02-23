@@ -507,7 +507,7 @@ foreach ($data['hosts'] as $host) {
 				? makeDescriptionIcon(_('Disabled automatically by an LLD rule.'))
 				: null
 		],
-		getHostAvailabilityTable($host['interfaces']),
+		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]
