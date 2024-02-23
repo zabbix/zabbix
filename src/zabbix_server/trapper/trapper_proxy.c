@@ -31,7 +31,6 @@
 #include "zbxdbwrap.h"
 #include "zbxproxybuffer.h"
 #include "zbxcompress.h"
-#include "zbxcachehistory.h"
 
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)
