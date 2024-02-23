@@ -986,6 +986,8 @@ class testDashboardGaugeWidget extends testWidgets {
 				self::$update_gauge = $header;
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testDashboardGaugeWidget_SimpleUpdate() {
@@ -1014,7 +1016,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'cancel_form' => false,
-					'create_widget' => false,
+					'create_widget' => true,
 					'save_dashboard' => false
 				]
 			],
@@ -1102,6 +1104,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getValues());
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.

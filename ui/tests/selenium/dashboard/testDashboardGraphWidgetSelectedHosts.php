@@ -418,6 +418,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		if (CTestArrayHelper::get($data, 'keyboard_navigation')) {
 			$this->checkSuggestionListWithKeyboardNavigation($data, $form, $field);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**

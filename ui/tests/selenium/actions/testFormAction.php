@@ -1045,6 +1045,11 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestAssertVisibleXpath('//button[@class="js-add"]');
 		$this->zbxTestAssertVisibleXpath('//button[@class="btn-alt js-cancel"]');
+
+		if ($new_operation_operationtype !== null) {
+			COverlayDialogElement::find()->all()->last()->close();
+		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/*

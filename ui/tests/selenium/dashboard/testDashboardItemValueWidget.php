@@ -1458,6 +1458,8 @@ class testDashboardItemValueWidget extends testWidgets {
 		if ($expected === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			COverlayDialogElement::ensureNotPresent();
@@ -1644,6 +1646,8 @@ class testDashboardItemValueWidget extends testWidgets {
 			$this->assertEquals($values, $dashboard->getWidget(self::$old_name)->edit()->getFields()
 					->filter(CElementFilter::VISIBLE)->asValues()
 			);
+
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.
@@ -2050,6 +2054,8 @@ class testDashboardItemValueWidget extends testWidgets {
 			// Close the hint-box.
 			$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getThresholdData() {

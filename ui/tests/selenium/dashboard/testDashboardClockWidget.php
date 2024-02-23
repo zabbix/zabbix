@@ -344,6 +344,8 @@ class testDashboardClockWidget extends testWidgets {
 		}
 
 		$this->assertEquals(['Item', 'Show'], $form->getRequiredLabels());
+
+		$dialog->close();
 	}
 
 	/**
@@ -1043,6 +1045,8 @@ class testDashboardClockWidget extends testWidgets {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -1093,7 +1097,7 @@ class testDashboardClockWidget extends testWidgets {
 			[
 				[
 					'cancel_form' => false,
-					'create_widget' => false,
+					'create_widget' => true,
 					'save_dashboard' => false
 				]
 			],
@@ -1184,6 +1188,7 @@ class testDashboardClockWidget extends testWidgets {
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget('CancelClock')->edit()->getFields()->asValues());
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.

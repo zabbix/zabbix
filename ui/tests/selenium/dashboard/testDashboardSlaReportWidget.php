@@ -216,6 +216,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		foreach ([$sla_data, $service_data] as $dialog_data) {
 			$this->checkDialogContents($dialog_data, true);
 		}
+
+		$dialog->close();
 	}
 
 	public function getSlaReportConfigurationFormData() {
