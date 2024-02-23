@@ -3424,7 +3424,7 @@ class CUser extends CApiService {
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			if (!array_key_exists('totp_secret', $mfa_response) || $mfa_response['totp_secret'] == '') {
+			if (!array_key_exists('totp_secret', $mfa_response) || $mfa_response['totp_secret'] === '') {
 				$user_secrets = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
 					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
@@ -3459,7 +3459,9 @@ class CUser extends CApiService {
 					throw $e;
 				}
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('The verification code was incorrect, please try again.'));
+				self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+					_('The verification code was incorrect, please try again.')
+				);
 			}
 		}
 
@@ -3481,7 +3483,9 @@ class CUser extends CApiService {
 					$mfa_response['username']
 				);
 			} catch (DuoException $e) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Error decoding Duo result.'));
+				self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+					_('Error decoding Duo result.')
+				);
 			}
 		}
 
