@@ -344,11 +344,10 @@
 			if (row !== null) {
 				row_index = row.dataset.row_index;
 
-				popup_params = {
-					name: row.querySelector(`[name="saml_provision_media[${row_index}][name]"`).value,
-					attribute: row.querySelector(`[name="saml_provision_media[${row_index}][attribute]"`).value,
-					mediatypeid: row.querySelector(`[name="saml_provision_media[${row_index}][mediatypeid]"`).value
-				};
+				popup_params = Object.fromEntries(
+					[...row.querySelectorAll(`[name^="saml_provision_media[${row_index}]"]`)].map(
+						i => [i.name.match(/\[([^\]]+)\]$/)[1], i.value]
+				));
 			}
 			else {
 				while (this.saml_media_type_mapping_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
@@ -423,17 +422,10 @@
 					return element.name.substring(start, end);
 				});
 				const provision_media = provision_media_indexes.map((i) => {
-					return {
-						name: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_media][${i}][name]"`
-						).value,
-						mediatypeid: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_media][${i}][mediatypeid]"`
-						).value,
-						attribute: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_media][${i}][attribute]"`
-						).value
-					};
+					return Object.fromEntries(
+						[...row.querySelectorAll(`[name^="ldap_servers[${row_index}][provision_media][${i}]"]`)].map(
+							i => [i.name.match(/\[([^\]]+)\]$/)[1], i.value]
+					));
 				});
 
 				popup_params = {

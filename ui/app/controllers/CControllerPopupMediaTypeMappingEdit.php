@@ -29,9 +29,13 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'add_media_type_mapping' =>		'in 1',
+			'userdirectory_mediaid' =>		'id',
 			'name' =>						'string',
+			'mediatypeid' =>				'db media_type.mediatypeid',
 			'attribute' =>					'string',
-			'mediatypeid' =>				'db media_type.mediatypeid'
+			'period' =>						'time_periods',
+			'severity' =>					'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1),
+			'active' =>						'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -64,14 +68,28 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'add_media_type_mapping' => $this->getInput('add_media_type_mapping', 0),
-			'name' => $this->getInput('name', ''),
-			'attribute' => $this->getInput('attribute', ''),
-			'mediatypeid' => $this->getInput('mediatypeid', 0),
+			'add_media_type_mapping' => 0,
+			'userdirectory_mediaid' => 0,
+			'name' => '',
+			'attribute' => '',
+			'mediatypeid' => 0,
+			'period' => ZBX_DEFAULT_INTERVAL,
+			'severity' => $this->hasInput('add_media_type_mapping') ? pow(2, TRIGGER_SEVERITY_COUNT) - 1 : 0,
+			'active' => MEDIA_STATUS_ACTIVE
+		];
+		$this->getInputs($data, array_keys($data));
+		$data += [
+			'severities' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		foreach (CSeverityHelper::getSeverities() as $severity) {
+			if (pow(2, $severity['value']) & $data['severity']) {
+				$data['severities'][] = $severity['value'];
+			}
+		}
 
 		$data['db_mediatypes'] = API::MediaType()->get(['output' => ['name', 'mediatypeid']]);
 		CArrayHelper::sort($data['db_mediatypes'], ['name']);

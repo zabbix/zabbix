@@ -593,9 +593,13 @@ $templates['saml_provisioning_media_row'] = (string) (new CRow([
 		(new CLink('#{name}', 'javascript:void(0);'))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addClass('js-edit'),
+		(new CVar('saml_provision_media[#{row_index}][userdirectory_mediaid]', '#{userdirectory_mediaid}'))->removeId(),
 		(new CVar('saml_provision_media[#{row_index}][name]', '#{name}'))->removeId(),
 		(new CVar('saml_provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))->removeId()
+		(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))->removeId(),
+		(new CVar('saml_provision_media[#{row_index}][period]', '#{period}'))->removeId(),
+		(new CVar('saml_provision_media[#{row_index}][severity]', '#{severity}'))->removeId(),
+		(new CVar('saml_provision_media[#{row_index}][active]', '#{active}'))->removeId()
 	],
 	(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),

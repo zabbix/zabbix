@@ -28,9 +28,13 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mediatypeid' =>		'required|db media_type.mediatypeid',
-			'name' =>				'required|string|not_empty',
-			'attribute' =>			'required|string|not_empty'
+			'userdirectory_mediaid' => 	'id',
+			'mediatypeid' =>			'required|db media_type.mediatypeid',
+			'name' =>					'required|string|not_empty',
+			'attribute' =>				'required|string|not_empty',
+			'period' =>					'required|time_periods',
+			'severity' =>				'array',
+			'active' =>					'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,9 +59,18 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'name' => $this->getInput('name'),
-			'attribute' => $this->getInput('attribute')
+			'userdirectory_mediaid' => 0,
+			'name' => '',
+			'attribute' => '',
+			'period' => ZBX_DEFAULT_INTERVAL,
+			'active' => MEDIA_STATUS_DISABLED
 		];
+		$this->getInputs($data, array_keys($data));
+
+		$data['severity'] = 0;
+		foreach ($this->getInput('severity', []) as $severity) {
+			$data['severity'] += pow(2, $severity);
+		}
 
 		$media_type = API::MediaType()->get([
 			'output' => ['name', 'mediatypeid'],

@@ -65,6 +65,36 @@ $form
 					->setId('attribute')
 			)
 		])
+		->addItem([
+			new CLabel(_('User media')),
+			new CFormField((new CFormGrid([
+				[
+					(new CLabel(_('When active'), 'period'))->setAsteriskMark(),
+					new CFormField((new CTextBox('period', $data['period'], false,
+							DB::getFieldLength('userdirectory_media', 'period')
+						))
+							->setAriaRequired()
+							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
+					)
+				],
+				[
+					new CLabel(_('Use if severity')),
+					new CFormField(
+						(new CCheckBoxList('severity'))
+							->setOptions(CSeverityHelper::getSeverities())
+							->setChecked($data['severities'])
+							->setVertical(true)
+					)
+				],
+				[
+					new CLabel(_('Create enabled'), 'enabled'),
+					new CFormField(
+						(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
+							->setChecked($data['active'] == MEDIA_STATUS_ACTIVE)
+					)
+				]
+			]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP))
+		])
 	)
 	->addItem(
 		(new CScriptTag('
@@ -85,6 +115,7 @@ if ($data['add_media_type_mapping']) {
 	];
 }
 else {
+	$form->addVar('userdirectory_mediaid', $data['userdirectory_mediaid']);
 	$title = _('Media type mapping');
 	$buttons = [
 		[
