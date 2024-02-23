@@ -222,7 +222,7 @@ class testMfa extends CAPITest {
 						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult', 'hash_function' => TOTP_HASH_SHA256
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/hash_function": value must be "1".'
+				'expected_error' => 'Invalid parameter "/1/hash_function": value must be 1.'
 			]
 		];
 	}
@@ -332,13 +332,13 @@ class testMfa extends CAPITest {
 				'mfas' => [
 					['mfaid' => 'TOTP test case 1', 'api_hostname' => 'host.name']
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "api_hostname".'
+				'expected_error' => 'Invalid parameter "/1/api_hostname": value must be empty.'
 			],
 			'Update TOTP specific field to DUO method' => [
 				'mfas' => [
-					['mfaid' => 'DUO test case 1', 'code_length' => TOTP_CODE_LENGTH_6]
+					['mfaid' => 'DUO test case 1', 'code_length' => TOTP_CODE_LENGTH_8]
 				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "code_length".'
+				'expected_error' => 'Invalid parameter "/1/code_length": value must be 6.'
 			],
 			'Update TOTP method with invalid hash_function' => [
 				'mfas' => [
