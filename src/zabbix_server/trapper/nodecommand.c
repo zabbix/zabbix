@@ -693,18 +693,19 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process command received from the frontend                        *
+ * Purpose: process command received from frontend                            *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
-	char			*result = NULL, *send = NULL, *debug = NULL, *manualinput = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
-				clientip[MAX_STRING_LEN], tmp_manualinput[MAX_STRING_LEN];
+	char			*result = NULL, *send = NULL, *debug = NULL, *manualinput = NULL, tmp[64],
+				tmp_hostid[64], tmp_eventid[64], clientip[MAX_STRING_LEN],
+				tmp_manualinput[MAX_STRING_LEN];
 	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	struct zbx_json		j;
