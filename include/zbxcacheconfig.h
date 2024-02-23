@@ -592,6 +592,8 @@ typedef struct
 }
 zbx_queue_item_t;
 
+ZBX_PTR_VECTOR_DECL(queue_item_ptr, zbx_queue_item_t *)
+
 typedef union
 {
 	zbx_uint64_t	ui64;
@@ -605,6 +607,8 @@ typedef struct
 	zbx_counter_value_t	counter_value;
 }
 zbx_proxy_counter_t;
+
+ZBX_PTR_VECTOR_DECL(proxy_counter_ptr, zbx_proxy_counter_t *)
 
 typedef struct
 {
@@ -910,8 +914,11 @@ void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
-void	zbx_dc_free_item_queue(zbx_vector_ptr_t *queue);
-int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to);
+/* void	zbx_dc_free_item_queue(zbx_vector_ptr_t *queue); */
+/* int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to); */
+
+void	zbx_dc_free_item_queue(zbx_vector_queue_item_ptr_t *queue);
+int	zbx_dc_get_item_queue(zbx_vector_queue_item_ptr_t *queue, int from, int to);
 
 zbx_uint64_t	zbx_dc_get_item_count(zbx_uint64_t hostid);
 zbx_uint64_t	zbx_dc_get_item_unsupported_count(zbx_uint64_t hostid);
@@ -920,11 +927,13 @@ double		zbx_dc_get_required_performance(void);
 zbx_uint64_t	zbx_dc_get_host_count(void);
 void		zbx_dc_get_count_stats_all(zbx_config_cache_info_t *stats);
 
-void	zbx_dc_get_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not_monitored,
-		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
-		zbx_vector_ptr_t *items_disabled, zbx_uint64_t *triggers_enabled_ok,
+void    zbx_dc_get_status(zbx_vector_proxy_counter_ptr_t *hosts_monitored,
+		zbx_vector_proxy_counter_ptr_t *hosts_not_monitored,
+		zbx_vector_proxy_counter_ptr_t *items_active_normal,
+		zbx_vector_proxy_counter_ptr_t *items_active_notsupported,
+		zbx_vector_proxy_counter_ptr_t *items_disabled, uint64_t *triggers_enabled_ok,
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
-		zbx_vector_ptr_t *required_performance);
+		zbx_vector_proxy_counter_ptr_t *required_performance);
 
 void	zbx_dc_get_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num);
 void	zbx_dc_get_expressions_by_name(zbx_vector_expression_t *expressions, const char *name);

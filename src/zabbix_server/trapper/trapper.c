@@ -75,8 +75,8 @@ zbx_user_stats_t;
 
 typedef union
 {
-	zbx_counter_value_t	counter;	/* single global counter */
-	zbx_vector_ptr_t	counters;	/* array of per proxy counters */
+	zbx_counter_value_t	counter;		/* single global counter */
+	zbx_vector_proxy_counter_ptr_t	counters;	/* array of per proxy counters */
 }
 zbx_entry_info_t;
 
@@ -314,20 +314,21 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
  *                                                                            *
  * Purpose: process queue request                                             *
  *                                                                            *
- * Parameters:  sock              - [IN] the request socket                   *
- *              jp                - [IN] the request data                     *
+ * Parameters:  sock              - [IN] request socket                       *
+ *              jp                - [IN] request data                         *
  *              config_timeout    - [IN]                                      *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
 {
-	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
+	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, limit;
 	char			type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_user_t		user;
-	zbx_vector_ptr_t	queue;
+	//zbx_vector_ptr_t	queue;
+	zbx_vector_queue_item_ptr_t queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
 	zbx_queue_stats_t	*stats;
@@ -372,7 +373,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 	}
 
 	now = (int)time(NULL);
-	zbx_vector_ptr_create(&queue);
+	//zbx_vector_ptr_create(&queue);
+	zbx_vector_queue_item_ptr_create(&queue);
 	zbx_dc_get_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -384,7 +386,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			/* gather queue stats by item type */
-			for (i = 0; i < queue.values_num; i++)
+			for (int i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = (zbx_uint64_t)item->type;
@@ -410,7 +412,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			/* gather queue stats by proxy hostid */
-			for (i = 0; i < queue.values_num; i++)
+			for (int i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = item->proxyid;
@@ -432,14 +434,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-			for (i = 0; i < queue.values_num && i < limit; i++)
+			for (int i = 0; i < queue.values_num && i < limit; i++)
 			{
-				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
+				zbx_queue_item_t	*item = queue.values[i];
 
 				zbx_json_addobject(&json, NULL);
 				zbx_json_adduint64(&json, "itemid", item->itemid);
@@ -458,7 +460,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_dc_free_item_queue(&queue);
-	zbx_vector_ptr_destroy(&queue);
+	zbx_vector_queue_item_ptr_destroy(&queue);
 
 	zbx_json_free(&json);
 
@@ -544,29 +546,43 @@ static int		templates_res, users_res;
 
 static void	zbx_status_counters_init(void)
 {
-	zbx_vector_ptr_create(&hosts_monitored.counters);
-	zbx_vector_ptr_create(&hosts_not_monitored.counters);
-	zbx_vector_ptr_create(&items_active_normal.counters);
-	zbx_vector_ptr_create(&items_active_notsupported.counters);
-	zbx_vector_ptr_create(&items_disabled.counters);
-	zbx_vector_ptr_create(&required_performance.counters);
+	/* zbx_vector_ptr_create(&hosts_monitored.counters); */
+	/* zbx_vector_ptr_create(&hosts_not_monitored.counters); */
+	/* zbx_vector_ptr_create(&items_active_normal.counters); */
+	/* zbx_vector_ptr_create(&items_active_notsupported.counters); */
+	/* zbx_vector_ptr_create(&items_disabled.counters); */
+	/* zbx_vector_ptr_create(&required_performance.counters); */
+
+	zbx_vector_proxy_counter_ptr_create(&hosts_monitored.counters);
+	zbx_vector_proxy_counter_ptr_create(&hosts_not_monitored.counters);
+	zbx_vector_proxy_counter_ptr_create(&items_active_normal.counters);
+	zbx_vector_proxy_counter_ptr_create(&items_active_notsupported.counters);
+	zbx_vector_proxy_counter_ptr_create(&items_disabled.counters);
+	zbx_vector_proxy_counter_ptr_create(&required_performance.counters);
 }
 
 static void	zbx_status_counters_free(void)
 {
-	zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func);
+	/* zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_mem_free_func); */
+	/* zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_mem_free_func); */
+	/* zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_mem_free_func); */
+	/* zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func); */
+	/* zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func); */
+	/* zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func); */
 
-	zbx_vector_ptr_destroy(&hosts_monitored.counters);
-	zbx_vector_ptr_destroy(&hosts_not_monitored.counters);
-	zbx_vector_ptr_destroy(&items_active_normal.counters);
-	zbx_vector_ptr_destroy(&items_active_notsupported.counters);
-	zbx_vector_ptr_destroy(&items_disabled.counters);
-	zbx_vector_ptr_destroy(&required_performance.counters);
+	/* zbx_vector_ptr_destroy(&hosts_monitored.counters); */
+	/* zbx_vector_ptr_destroy(&hosts_not_monitored.counters); */
+	/* zbx_vector_ptr_destroy(&items_active_normal.counters); */
+	/* zbx_vector_ptr_destroy(&items_active_notsupported.counters); */
+	/* zbx_vector_ptr_destroy(&items_disabled.counters); */
+	/* zbx_vector_ptr_destroy(&required_performance.counters); */
+
+	zbx_vector_proxy_counter_ptr_destroy(&hosts_monitored.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&hosts_not_monitored.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&items_active_normal.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&items_active_notsupported.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&items_disabled.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&required_performance.counters);
 }
 
 const zbx_status_section_t	status_sections[] = {
