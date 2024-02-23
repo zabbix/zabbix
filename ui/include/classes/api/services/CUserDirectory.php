@@ -1155,7 +1155,8 @@ class CUserDirectory extends CApiService {
 			$indexes = [];
 
 			foreach ($userdirectory['provision_media'] as $i => $provision_media) {
-				if (!array_key_exists('userdirectory_mediaid', $provision_media)) {
+				if (!array_key_exists('userdirectory_mediaid', $provision_media)
+						|| !array_key_exists($provision_media['userdirectory_mediaid'], $db_provision_medias)) {
 					$provision_media['userdirectoryid'] = $userdirectory['userdirectoryid'];
 					$ins_provision_medias[] = $provision_media;
 					$indexes[] = $i;
