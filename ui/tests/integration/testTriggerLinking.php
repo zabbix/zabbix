@@ -86,7 +86,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 
 		/* Create special template X, that will have trigger description (but not expression) conflict
-			with triggers from the first template. It will be linked in the separate action from
+			with triggers from the first template. It will be linked in a separate action from
 			all other templates. (when agent2 with new host metadata starts). */
 		$response = $this->call('template.create', [
 			'host' =>  self::$templateX_name,
@@ -101,7 +101,7 @@ class testTriggerLinking extends CIntegrationTest {
 			self::$templateX_ID = $response['result']['templateids'][0];
 	}
 
-	private function setupActionsToLinkFirstSetOfTemplates()
+	private function setupActionsToLinkTemplates1()
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -313,7 +313,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['triggerids']);
 
-		$this->setupActionsToLinkFirstSetOfTemplates();
+		$this->setupActionsToLinkTemplates1();
 
 		return true;
 	}
