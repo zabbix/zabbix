@@ -68,7 +68,7 @@ class testTriggerLinking extends CIntegrationTest {
 		only templateX will be linked. */
 	private static $firstActionID;
 
-	public function createTemplates() {
+	private function createTemplates() {
 
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
 			$response = $this->call('template.create', [
@@ -101,7 +101,7 @@ class testTriggerLinking extends CIntegrationTest {
 			self::$templateX_ID = $response['result']['templateids'][0];
 	}
 
-	private static function setupActionsToLinkFirstSetOfTemplates()
+	private function setupActionsToLinkFirstSetOfTemplates()
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -153,7 +153,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		(unique - means unique on template level).
 	*/
-	private static function setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates()
+	private function setupActionToLinkTemplateXThatConflictsWithAlreadyLinkedTemplates()
 	{
 		$response = $this->call('action.delete', [self::$firstActionID]);
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
@@ -184,7 +184,7 @@ class testTriggerLinking extends CIntegrationTest {
 	/**
 	* @inheritdoc
 	*/
-	private static function prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates() {
+	private function prepareTemplatesWithConflictsAndSetupActionsToLinkFirstSetOfTemplates() {
 
 		$z = 'a';
 		/* There is divide by 2, since we create 2 triggers in every stage. */
@@ -367,7 +367,7 @@ class testTriggerLinking extends CIntegrationTest {
 		];
 	}
 
-	public function checkTriggersCreate() {
+	private function checkTriggersCreate() {
 
 		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
 		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
