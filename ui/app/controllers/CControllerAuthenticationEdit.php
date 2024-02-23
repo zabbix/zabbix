@@ -142,7 +142,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 				'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
-				'jit_provision_interval' => '',
+				'jit_provision_interval' => $auth[CAuthenticationHelper::JIT_PROVISION_INTERVAL],
 				'ldap_jit_status' => ZBX_AUTH_LDAP_DISABLED,
 				'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 				'saml_jit_status' => JIT_PROVISIONING_DISABLED,

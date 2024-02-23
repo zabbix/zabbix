@@ -378,7 +378,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 
 			if ($this->getInput('ldap_jit_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-				$fields['jit_provision_interval'] = '1h';
+				$fields['jit_provision_interval'] = DB::getDefault('config', 'jit_provision_interval');
 			}
 		}
 

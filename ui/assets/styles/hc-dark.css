@@ -3367,7 +3367,12 @@ section {
 .svg-gauge {
   fill: #ffffff; }
   .svg-gauge .svg-gauge-description {
-    text-anchor: middle; }
+    text-align: center;
+    white-space: nowrap;
+    color: #ffffff; }
+    .svg-gauge .svg-gauge-description div {
+      overflow: hidden;
+      text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-thresholds-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
     fill: #111111; }

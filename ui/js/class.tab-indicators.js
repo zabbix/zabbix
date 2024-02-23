@@ -188,8 +188,8 @@ class TabIndicatorFactory {
 				return new EncryptionTabIndicatorItem;
 			case 'Filters':
 				return new FiltersTabIndicatorItem;
-			case 'FrontendMessage':
-				return new FrontendMessageTabIndicatorItem;
+			case 'FrontendNotifications':
+				return new FrontendNotificationsTabIndicatorItem;
 			case 'GraphAxes':
 				return new GraphAxesTabIndicatorItem;
 			case 'GraphDataset':
@@ -1278,7 +1278,7 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
+class FrontendNotificationsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);

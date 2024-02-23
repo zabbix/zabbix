@@ -234,7 +234,7 @@ zabbix_export:
           timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}:{$HPE.PRIMERA.API.PORT}'
             - name: password
               value: '{$HPE.PRIMERA.API.PASSWORD}'
             - name: username

@@ -3413,7 +3413,12 @@ section {
 .svg-gauge {
   fill: #1f2c33; }
   .svg-gauge .svg-gauge-description {
-    text-anchor: middle; }
+    text-align: center;
+    white-space: nowrap;
+    color: #1f2c33; }
+    .svg-gauge .svg-gauge-description div {
+      overflow: hidden;
+      text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-thresholds-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
     fill: #ebebeb; }
