@@ -846,11 +846,11 @@ class CUser extends CApiService {
 
 		foreach ($user_group_indexes as $usrgrpid => $indexes) {
 			if (!array_key_exists($usrgrpid, $db_user_groups)) {
-				$i1 = key($indexes) + 1;
-				$i2 = $indexes[$i1] + 1;
+				$i1 = key($indexes);
+				$i2 = $indexes[$i1];
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.$i1.'/usrgrps/'.$i2, _('object does not exist'))
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i1 + 1).'/usrgrps/'.($i2 + 1), _('object does not exist'))
 				);
 			}
 		}
