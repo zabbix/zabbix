@@ -179,12 +179,10 @@ static zbx_vmcheck_t	vmchecks[] =
  ******************************************************************************/
 static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 {
-	zbx_vmcheck_t	*check;
-
 	if (0 != strncmp(key, ZBX_VMWARE_PREFIX, ZBX_CONST_STRLEN(ZBX_VMWARE_PREFIX)))
 		return FAIL;
 
-	for (check = vmchecks; NULL != check->key; check++)
+	for (zbx_vmcheck_t *check = vmchecks; NULL != check->key; check++)
 	{
 		if (0 == strcmp(key + ZBX_CONST_STRLEN(ZBX_VMWARE_PREFIX), check->key))
 		{
@@ -196,7 +194,7 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
+int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent_result_ptr_t *add_results,
 		zbx_get_config_forks_f get_config_forks)
 {
 	AGENT_REQUEST	request;

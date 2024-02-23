@@ -1160,7 +1160,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, zbx_uint64_t actionid,
 		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1454,8 +1455,9 @@ fail:
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
-							config_trapper_timeout, config_source_ip, get_config_forks,
-							program_type, NULL, error, sizeof(error), NULL);
+							config_trapper_timeout, config_source_ip,
+							config_ssh_key_location, get_config_forks, program_type, NULL,
+							error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else
@@ -1884,7 +1886,8 @@ succeed:
 static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_event *event,
 		const zbx_db_action *action, const zbx_db_service *service, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1951,8 +1954,8 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 					execute_commands(event, NULL, NULL, NULL, service, action->actionid,
 							operationid, escalation->esc_step,
 							ZBX_MACRO_TYPE_MESSAGE_NORMAL, default_timezone, config_timeout,
-							config_trapper_timeout, config_source_ip, get_config_forks,
-							program_type);
+							config_trapper_timeout, config_source_ip,
+							config_ssh_key_location, get_config_forks, program_type);
 					break;
 			}
 		}
@@ -2003,17 +2006,18 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
  *                                                                            *
  * Purpose: executes escalation recovery operations                           *
  *                                                                            *
- * Parameters: event                  - [IN]                                  *
- *             r_event                - [IN] recovery event                   *
- *             action                 - [IN]                                  *
- *             service                - [IN]                                  *
- *             default_timezone       - [IN]                                  *
- *             roles                  - [IN]                                  *
- *             config_timeout         - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
- *             config_forks           - [IN]                                  *
- *             program_type           - [IN]                                  *
+ * Parameters: event                   - [IN]                                 *
+ *             r_event                 - [IN] recovery event                  *
+ *             action                  - [IN]                                 *
+ *             service                 - [IN]                                 *
+ *             default_timezone        - [IN]                                 *
+ *             roles                   - [IN]                                 *
+ *             config_timeout          - [IN]                                 *
+ *             config_trapper_timeout  - [IN]                                 *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssh_key_location - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
+ *             program_type            - [IN]                                 *
  *                                                                            *
  * Comments: Action recovery operations have a single escalation step, so     *
  *           alerts created by escalation recovery operations must have       *
@@ -2023,7 +2027,8 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 static void	escalation_execute_recovery_operations(zbx_db_event *event, const zbx_db_event *r_event,
 		const zbx_db_action *action, const zbx_db_service *service, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -2063,8 +2068,8 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 			case ZBX_OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, NULL, NULL, service, action->actionid, operationid, 1,
 						ZBX_MACRO_TYPE_MESSAGE_RECOVERY, default_timezone, config_timeout,
-						config_trapper_timeout, config_source_ip, get_config_forks,
-						program_type);
+						config_trapper_timeout, config_source_ip, config_ssh_key_location,
+						get_config_forks, program_type);
 				break;
 		}
 	}
@@ -2077,19 +2082,20 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 
 /******************************************************************************
  *                                                                            *
- * Parameters: event                  - [IN]                                  *
- *             r_event                - [IN] recovery event                   *
- *             action                 - [IN]                                  *
- *             ack                    - [IN]                                  *
- *             service_alarm          - [IN]                                  *
- *             service                - [IN]                                  *
- *             default_timezone       - [IN]                                  *
- *             roles                  - [IN]                                  *
- *             config_timeout         - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
- *             get_config_forks       - [IN]                                  *
- *             program_type           - [IN]                                  *
+ * Parameters: event                   - [IN]                                 *
+ *             r_event                 - [IN] recovery event                  *
+ *             action                  - [IN]                                 *
+ *             ack                     - [IN]                                 *
+ *             service_alarm           - [IN]                                 *
+ *             service                 - [IN]                                 *
+ *             default_timezone        - [IN]                                 *
+ *             roles                   - [IN]                                 *
+ *             config_timeout          - [IN]                                 *
+ *             config_trapper_timeout  - [IN]                                 *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssh_key_location - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
+ *             program_type            - [IN]                                 *
  *                                                                            *
  * Comments: Action update operations have a single escalation step, so       *
  *           alerts created by escalation update operations must have         *
@@ -2099,8 +2105,8 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_db_event *r_event,
 		const zbx_db_action *action, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
 		const zbx_db_service *service, const char *default_timezone, zbx_hashset_t *roles, int config_timeout,
-		int config_trapper_timeout, const char *config_source_ip, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -2148,7 +2154,7 @@ static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_
 				execute_commands(event, r_event, ack, service_alarm, service, action->actionid,
 						operationid, 1, ZBX_MACRO_TYPE_MESSAGE_UPDATE, default_timezone,
 						config_timeout, config_trapper_timeout, config_source_ip,
-						get_config_forks, program_type);
+						config_ssh_key_location, get_config_forks, program_type);
 				break;
 		}
 	}
@@ -2541,29 +2547,31 @@ static void	escalation_cancel(zbx_db_escalation *escalation, const zbx_db_action
  *                                                                            *
  * Purpose: executes next escalation step                                     *
  *                                                                            *
- * Parameters: escalation             - [IN/OUT] escalation to execute        *
- *             action                 - [IN]                                  *
- *             event                  - [IN]                                  *
- *             service                - [IN]                                  *
- *             default_timezone       - [IN]                                  *
- *             roles                  - [IN]                                  *
- *             config_timeout         - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
- *             get_config_forks       - [IN]                                  *
- *             program_type           - [IN]                                  *
+ * Parameters: escalation              - [IN/OUT] escalation to execute       *
+ *             action                  - [IN]                                 *
+ *             event                   - [IN]                                 *
+ *             service                 - [IN]                                 *
+ *             default_timezone        - [IN]                                 *
+ *             roles                   - [IN]                                 *
+ *             config_timeout          - [IN]                                 *
+ *             config_trapper_timeout  - [IN]                                 *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssh_key_location - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
+ *             program_type            - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
 		const zbx_db_service *service, const char *default_timezone, zbx_hashset_t *roles, int config_timeout,
-		int config_trapper_timeout, const char *config_source_ip, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_operations(escalation, event, action, service, default_timezone, roles, config_timeout,
-			config_trapper_timeout, config_source_ip, get_config_forks, program_type);
+			config_trapper_timeout, config_source_ip, config_ssh_key_location, get_config_forks,
+			program_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2572,30 +2580,33 @@ static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_actio
  *                                                                            *
  * Purpose: processes escalation recovery                                     *
  *                                                                            *
- * Parameters: escalation             - [IN/OUT] escalation to recovery       *
- *             action                 - [IN]                                  *
- *             event                  - [IN]                                  *
- *             r_event                - [IN] recovery event                   *
- *             service                - [IN]                                  *
- *             default_timezone       - [IN]                                  *
- *             roles                  - [IN]                                  *
- *             config_timeout         - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
- *             get_config_forks       - [IN]                                  *
- *             program_type           - [IN]                                  *
+ * Parameters: escalation              - [IN/OUT] escalation to recovery      *
+ *             action                  - [IN]                                 *
+ *             event                   - [IN]                                 *
+ *             r_event                 - [IN] recovery event                  *
+ *             service                 - [IN]                                 *
+ *             default_timezone        - [IN]                                 *
+ *             roles                   - [IN]                                 *
+ *             config_timeout          - [IN]                                 *
+ *             config_trapper_timeout  - [IN]                                 *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssh_key_location - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
+ *             program_type            - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
 		const zbx_db_event *r_event, const zbx_db_service *service, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles,
-			config_timeout, config_trapper_timeout, config_source_ip, get_config_forks, program_type);
+			config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
+			get_config_forks, program_type);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2606,23 +2617,25 @@ static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_actio
  *                                                                            *
  * Purpose: processes escalation acknowledgment                               *
  *                                                                            *
- * Parameters: escalation             - [IN/OUT] escalation to recovery       *
- *             action                 - [IN]                                  *
- *             event                  - [IN]                                  *
- *             r_event                - [IN] recovery event                   *
- *             default_timezone       - [IN]                                  *
- *             roles                  - [IN]                                  *
- *             config_timeout         - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
- *             get_config_forks       - [IN]                                  *
- *             program_type           - [IN]                                  *
+ * Parameters: escalation              - [IN/OUT] escalation to recovery      *
+ *             action                  - [IN]                                 *
+ *             event                   - [IN]                                 *
+ *             r_event                 - [IN] recovery event                  *
+ *             default_timezone        - [IN]                                 *
+ *             roles                   - [IN]                                 *
+ *             config_timeout          - [IN]                                 *
+ *             config_trapper_timeout  - [IN]                                 *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssh_key_location - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
+ *             program_type            - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_action *action,
 		zbx_db_event *event, const zbx_db_event *r_event, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		unsigned char program_type)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -2650,8 +2663,8 @@ static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_a
 		ack.suppress_until = atoi(row[6]);
 
 		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles,
-				config_timeout, config_trapper_timeout, config_source_ip, get_config_forks,
-				program_type);
+				config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
+				get_config_forks, program_type);
 	}
 
 	zbx_db_free_result(result);
@@ -2665,32 +2678,34 @@ static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_a
  *                                                                            *
  * Purpose: processes update escalation                                       *
  *                                                                            *
- * Parameters: escalation             - [IN/OUT] escalation to recovery       *
- *             action                 - [IN]                                  *
- *             event                  - [IN]                                  *
- *             service_alarm          - [IN]                                  *
- *             service                - [IN]                                  *
- *             default_timezone       - [IN]                                  *
- *             roles                  - [IN]                                  *
- *             config_timeout         - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
- *             get_config_forks       - [IN]                                  *
- *             program_type           - [IN]                                  *
+ * Parameters: escalation              - [IN/OUT] escalation to recovery      *
+ *             action                  - [IN]                                 *
+ *             event                   - [IN]                                 *
+ *             service_alarm           - [IN]                                 *
+ *             service                 - [IN]                                 *
+ *             default_timezone        - [IN]                                 *
+ *             roles                   - [IN]                                 *
+ *             config_timeout          - [IN]                                 *
+ *             config_trapper_timeout  - [IN]                                 *
+ *             config_source_ip        - [IN]                                 *
+ *             config_ssh_key_location - [IN]                                 *
+ *             get_config_forks        - [IN]                                 *
+ *             program_type            - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_update(zbx_db_escalation *escalation, const zbx_db_action *action,
 		zbx_db_event *event, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *default_timezone, zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_source_ip, const char *config_ssh_key_location,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
 			escalation_status_string(escalation->status));
 
 	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone,
-			roles, config_timeout, config_trapper_timeout, config_source_ip, get_config_forks,
-			program_type);
+			roles, config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
+			get_config_forks, program_type);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -3021,7 +3036,8 @@ static void	service_role_clean(zbx_service_role_t *role)
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalation_ptr_t *escalations,
 		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *problem_eventids, zbx_vector_uint64_t *actionids,
 		const char *default_timezone, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_source_ip, const char *config_ssh_key_location,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	int					ret;
 	zbx_vector_uint64_t			escalationids, symptom_eventids;
@@ -3214,7 +3230,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			/* the escalation is cancelled and this code will not be reached     */
 			escalation_update(escalation, action, event, service_alarm, service, default_timezone,
 					&service_roles, config_timeout, config_trapper_timeout, config_source_ip,
-					get_config_forks, program_type);
+					config_ssh_key_location, get_config_forks, program_type);
 		}
 		else if (0 != escalation->acknowledgeid)
 		{
@@ -3238,8 +3254,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			}
 
 			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &service_roles,
-					config_timeout, config_trapper_timeout, config_source_ip, get_config_forks,
-					program_type);
+					config_timeout, config_trapper_timeout, config_source_ip,
+					config_ssh_key_location, get_config_forks, program_type);
 		}
 		else if (NULL != r_event)
 		{
@@ -3247,13 +3263,14 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			{
 				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
 						config_timeout, config_trapper_timeout, config_source_ip,
-						get_config_forks, program_type);
+						config_ssh_key_location, get_config_forks, program_type);
 			}
 			else
 			{
 				escalation_recover(escalation, action, event, r_event, service, default_timezone,
 						&service_roles, config_timeout, config_trapper_timeout,
-						config_source_ip, get_config_forks, program_type);
+						config_source_ip, config_ssh_key_location, get_config_forks,
+						program_type);
 			}
 		}
 		else if (escalation->nextcheck <= now)
@@ -3262,7 +3279,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			{
 				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
 						config_timeout, config_trapper_timeout, config_source_ip,
-						get_config_forks, program_type);
+						config_ssh_key_location, get_config_forks, program_type);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
@@ -3395,36 +3412,38 @@ out:
 #undef ZBX_DIFF_ESCALATION_UPDATE_STATUS
 #undef ZBX_DIFF_ESCALATION_UPDATE
 
-/*******************************************************************************
- *                                                                             *
- * Purpose: Executes escalation steps and recovery operations;                 *
- *          postpones escalations during maintenance and due to trigger dep.;  *
- *          deletes completed escalations from the database;                   *
- *          cancels escalations due to changed configuration, etc.             *
- *                                                                             *
- * Parameters: now                    - [IN] current time                      *
- *             nextcheck              - [IN/OUT] time of next invocation       *
- *             escalation_source      - [IN] type of escalations to be handled *
- *             default_timezone       - [IN]                                   *
- *             process_num            - [IN] process number                    *
- *             config_timeout         - [IN]                                   *
- *             config_trapper_timeout - [IN]                                   *
- *             config_source_ip       - [IN]                                   *
- *             get_config_forks       - [IN]                                   *
- *             program_type           - [IN]                                   *
- *                                                                             *
- * Return value: count of deleted escalations                                  *
- *                                                                             *
- * Comments: actions.c:process_actions() creates pseudo-escalations also for   *
- *           EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION events,     *
- *           this function handles message and command operations for these    *
- *           events while host, group, template operations are handled         *
- *           in process_actions().                                             *
- *                                                                             *
- *******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: Executes escalation steps and recovery operations;                  *
+ *          postpones escalations during maintenance and due to trigger dep.;   *
+ *          deletes completed escalations from the database;                    *
+ *          cancels escalations due to changed configuration, etc.              *
+ *                                                                              *
+ * Parameters: now                     - [IN] current time                      *
+ *             nextcheck               - [IN/OUT] time of next invocation       *
+ *             escalation_source       - [IN] type of escalations to be handled *
+ *             default_timezone        - [IN]                                   *
+ *             process_num             - [IN] process number                    *
+ *             config_timeout          - [IN]                                   *
+ *             config_trapper_timeout  - [IN]                                   *
+ *             config_source_ip        - [IN]                                   *
+ *             config_ssh_key_location - [IN]                                   *
+ *             get_config_forks        - [IN]                                   *
+ *             program_type            - [IN]                                   *
+ *                                                                              *
+ * Return value: count of deleted escalations                                   *
+ *                                                                              *
+ * Comments: actions.c:process_actions() creates pseudo-escalations also for    *
+ *           EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION events,      *
+ *           this function handles message and command operations for these     *
+ *           events while host, group, template operations are handled          *
+ *           in process_actions().                                              *
+ *                                                                              *
+ ********************************************************************************/
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source,
 		const char *default_timezone, int process_num, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		const char *config_source_ip, const char *config_ssh_key_location,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	int				ret = 0;
 	zbx_db_result_t			result;
@@ -3548,7 +3567,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 					&actionids, default_timezone, config_timeout, config_trapper_timeout,
-					config_source_ip, get_config_forks, program_type);
+					config_source_ip, config_ssh_key_location, get_config_forks, program_type);
 			zbx_vector_db_escalation_ptr_clear_ext(&escalations,
 					(void (*)(zbx_db_escalation *))zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
@@ -3564,7 +3583,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	{
 		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 				&actionids, default_timezone, config_timeout, config_trapper_timeout,
-				config_source_ip, get_config_forks, program_type);
+				config_source_ip, config_ssh_key_location, get_config_forks, program_type);
 		zbx_vector_db_escalation_ptr_clear_ext(&escalations, (void (*)(zbx_db_escalation *))zbx_ptr_free);
 	}
 
@@ -3637,19 +3656,23 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
-				escalator_args_in->get_process_forks_cb_arg, info->program_type);
+				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
+				info->program_type);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
-				escalator_args_in->get_process_forks_cb_arg, info->program_type);
+				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
+				info->program_type);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
-				escalator_args_in->get_process_forks_cb_arg, info->program_type);
+				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
+				info->program_type);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
-				escalator_args_in->get_process_forks_cb_arg, info->program_type);
+				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
+				info->program_type);
 
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
