@@ -30,11 +30,10 @@
 	line-height: $svg-legend-line-height;
 
 	.svg-graph-legend-header {
-		justify-self: end;
 		color: $font-alt-color;
 
 		&:first-of-type {
-			grid-column: 2;
+			grid-column-start: 2;
 		}
 	}
 
@@ -58,8 +57,13 @@
 
 	.svg-graph-legend-no-data {
 		grid-column: 2 / -1;
-		justify-self: end;
 		color: $font-alt-color;
+	}
+
+	.svg-graph-legend-header,
+	.svg-graph-legend-no-data,
+	.svg-graph-legend-value {
+		text-align: right;
 	}
 
 	&.svg-graph-legend-statistic {
@@ -67,11 +71,7 @@
 		justify-content: stretch;
 
 		.svg-graph-legend-item {
-			grid-column: 1;
-		}
-
-		.svg-graph-legend-value {
-			justify-self: end;
+			grid-column-start: 1;
 		}
 	}
 }
