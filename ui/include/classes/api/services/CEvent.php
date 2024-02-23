@@ -1603,7 +1603,7 @@ class CEvent extends CApiService {
 		 *   - eventid for OK event
 		 *   - eventid with source, that is not trigger
 		 *   - no read rights for related trigger
-		 *   - unexisting eventid
+		 *   - nonexistent eventid
 		 */
 		if (count($eventids) != count($events)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

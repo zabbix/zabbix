@@ -648,7 +648,7 @@ class CMacrosResolverHelper {
 	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
 	 * and user data macros.
 	 *
-	 * @param array  $data                          Array of unersolved macros.
+	 * @param array  $data                          Array of unresolved macros.
 	 * @param array  $data[<hostid>]                Array of scripts. Contains script ID as keys.
 	 * @param array  $data[<hostid>][<scriptid>]    Script fields to resolve macros for.
 	 * @param array  $manualinput_values
@@ -664,7 +664,7 @@ class CMacrosResolverHelper {
 	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
 	 * inventory<1-9> macros, user macros, event macros and user data macros.
 	 *
-	 * @param array  $data                                  Array of unersolved macros.
+	 * @param array  $data                                  Array of unresolved macros.
 	 * @param array  $data[<eventid>]                       Array of scripts. Contains script ID as keys.
 	 * @param array  $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
 	 * @param array  $events                                Array of events.

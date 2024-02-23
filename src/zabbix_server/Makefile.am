@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	actions \
 	dbconfig \
 	diag \
 	discoverer \
@@ -32,10 +33,7 @@ sbin_PROGRAMS = zabbix_server
 noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
-	db_lengths.h \
-	actions.c \
-	actions.h \
-	zbxreport.h
+	db_lengths_constants.h
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
@@ -45,7 +43,7 @@ libzbxserver_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = \
-	server.h \
+	server_constants.h \
 	server.c
 
 zabbix_server_LDADD = \
@@ -55,12 +53,13 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
+	actions/libzbxactions.a \
 	pinger/libzbxpinger.a \
-	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_server.a \
+	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \

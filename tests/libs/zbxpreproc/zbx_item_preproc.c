@@ -274,7 +274,9 @@ static int	check_mib_existence(zbx_pp_step_t *op)
 }
 #endif
 
+#ifdef HAVE_NETSNMP
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "preproc_mock_progname")
+#endif
 
 void	zbx_mock_test_entry(void **state)
 {

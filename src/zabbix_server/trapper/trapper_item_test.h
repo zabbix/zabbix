@@ -22,12 +22,16 @@
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
+#include "zbxpoller.h"
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks);
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb);
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks);
-
+		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb);
 #endif
