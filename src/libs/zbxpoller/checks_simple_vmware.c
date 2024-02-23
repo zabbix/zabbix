@@ -299,7 +299,8 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 		goto out;
 	}
 
-	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
@@ -3005,7 +3006,8 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp,
+				vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					name));
@@ -3387,7 +3389,8 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 		dsname_cmp.name = (char *)ds_name;
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp,
+				vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					ds_name));
@@ -4385,8 +4388,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 				rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
-				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(&service->data->resourcepools,
-						&rpool_cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(
+						&service->data->resourcepools, &rpool_cmp,
+						ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 				{
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", ZBX_NULL2EMPTY_STR(
 							service->data->resourcepools.values[idx]->path),
