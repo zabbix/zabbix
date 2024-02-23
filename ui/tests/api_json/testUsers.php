@@ -348,7 +348,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => 7]
 					]
 				],
-				'Incorrect value for field "passwd": cannot be empty.'
+				'User "API user create without password" must have a password, because internal authentication is in effect.'
 			],
 			// Check user username.
 			[
@@ -471,7 +471,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '123456']
 					]
 				],
-				'expected_error' => 'User group with ID "123456" is not available.'
+				'expected_error' => 'Invalid parameter "/0/usrgrps/0": object does not exist.'
 			],
 			[
 				'user' => [
@@ -622,7 +622,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Incorrect MFA method type "DUO Universal Prompt" is not available for TOTP secret.'
+				'expected_error' => 'Incorrect MFA method with ID "12" type, TOTP secret is not available.'
 			]
 		];
 	}
@@ -867,7 +867,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '123456']
 					]
 				]],
-				'expected_error' => 'User group with ID "123456" is not available.'
+				'expected_error' => 'Invalid parameter "/0/usrgrps/0": object does not exist.'
 			],
 			[
 				'user' => [[
