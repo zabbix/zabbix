@@ -5420,7 +5420,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		op = (zbx_dc_preproc_op_t *)DCfind_id_ext(&config->preprocops, item_preprocid,
 				sizeof(zbx_dc_preproc_op_t), &found, uniq);
 
-
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
 		op->step = atoi(row[4]);
@@ -7157,7 +7156,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->item_discovery, 0);
 	CREATE_HASHSET(config->prototype_items, 0);
 	CREATE_HASHSET(config->functions, 0);
-	CREATE_HASHSET(config->triggers, 100);
+	CREATE_HASHSET(config->triggers, 0);
 	CREATE_HASHSET(config->trigdeps, 0);
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
