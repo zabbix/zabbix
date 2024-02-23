@@ -7167,7 +7167,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->location = ZBX_LOC_NOWHERE;
 			proxy->revision = revision;
 			proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
-			proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
+			dc_strpool_replace(found, &proxy->version_str, ZBX_VERSION_UNDEFINED_STR);
 			proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 			proxy->lastaccess = atoi(row[12]);
 			proxy->last_cfg_error_time = 0;
