@@ -3355,12 +3355,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			item_hk_local.hostid = hostid;
 			item_hk_local.key = item->key;
 			item_hk_local.item_ptr = NULL;
+
 			item_hk = (ZBX_DC_ITEM_HK *)zbx_hashset_insert(&config->items_hk, &item_hk_local,
 					sizeof(ZBX_DC_ITEM_HK));
 
-			item_hk->item_ptr = item;
-			if (NULL == item_hk_local.item_ptr)
+			if (NULL == item_hk->item_ptr)
 				dc_strpool_acquire(item->key);
+			item_hk->item_ptr = item;
 		}
 		else
 		{
