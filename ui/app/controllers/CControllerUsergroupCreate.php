@@ -122,12 +122,14 @@ class CControllerUsergroupCreate extends CController {
 			}
 		}
 
-		if ($user_group['mfaid'] == -1) {
-			$user_group['mfa_status'] = GROUP_MFA_DISABLED;
-			unset($user_group['mfaid']);
-		}
-		else {
-			$user_group['mfa_status'] = GROUP_MFA_ENABLED;
+		if (array_key_exists('mfaid', $user_group)) {
+			if ($user_group['mfaid'] == -1) {
+				$user_group['mfa_status'] = GROUP_MFA_DISABLED;
+				unset($user_group['mfaid']);
+			}
+			else {
+				$user_group['mfa_status'] = GROUP_MFA_ENABLED;
+			}
 		}
 
 		$result = (bool) API::UserGroup()->create($user_group);
