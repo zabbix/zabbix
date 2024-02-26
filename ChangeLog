@@ -712,6 +712,7 @@ A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item f
 ........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
 ...G...... [ZBX-23858] fixed injection vulnerability in Zabbix agent 2 smartctl plugin (esneiders)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.8
@@ -2338,6 +2339,7 @@ A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item f
 ........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
 ...G...... [ZBX-23858] fixed injection vulnerability in Zabbix agent 2 smartctl plugin (esneiders)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.23
@@ -5159,6 +5161,7 @@ Bug fixes:
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.39
