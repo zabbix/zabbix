@@ -690,19 +690,19 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
 /**
  * Returns the indicator for lost LLD entity.
  *
- * @param int     $current_time     Current Unix timestamp.
- * @param int     $ts_delete        Deletion timestamp of the entity.
- * @param int     $ts_disable       Disabling timestamp of the entity.
- * @param boolean $disabled_by_lld  Indicator whether entity was disabled by an LLD rule.
- * @param string  $entity           Type of entity.
+ * @param int    $current_time     Current Unix timestamp.
+ * @param int    $ts_delete        Deletion timestamp of the entity.
+ * @param int    $ts_disable       Disabling timestamp of the entity.
+ * @param string    $disabled_by_lld  Indicator whether entity was disabled by an LLD rule.
+ * @param string $entity           Type of entity.
  *
  * @throws Exception
  */
-function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_disable, bool $disabled_by_lld,
-		string $entity): ?CSimpleButton {
+function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_disable, string $disable_source,
+		bool $disabled, string $entity): ?CSimpleButton {
 	$warning = '';
 
-	if($disabled_by_lld) {
+	if ($disable_source == ZBX_DISABLE_SOURCE_LLD) {
 		if ($ts_delete > 0 && $current_time < $ts_delete) {
 			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity), _('has been disabled'),
 				_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
@@ -719,7 +719,12 @@ function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_di
 			);
 		}
 	}
-	elseif ($ts_delete > 0) {
+	elseif ($disabled && $disable_source == ZBX_DISABLE_DEFAULT && $ts_delete > 0) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity), _('has been manually disabled'),
+			_('will not be deleted')
+		);
+	}
+	elseif (!$disabled && $ts_delete > 0) {
 		$delete_msg = _s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete));
 
 		switch (true) {
@@ -748,8 +753,8 @@ function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_di
 				break;
 		}
 	}
-	elseif ($ts_delete == 0) {
-		$delete_msg =  _('will not be deleted');
+	elseif (!$disabled &&$ts_delete == 0) {
+		$delete_msg = _('will not be deleted');
 
 		switch (true) {
 			case $ts_disable > 0:
