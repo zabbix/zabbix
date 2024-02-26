@@ -255,7 +255,7 @@ out:
  *             counterid - [IN] performance counter identifier                *
  *             instance  - [IN] performance counter instance or "" for        *
  *                              aggregate data                                *
- *             coeff     - [IN] coefficient to apply to the value             *
+ *             coeff     - [IN] coefficient to apply to value                 *
  *             unit      - [IN] counter unit info (kilo, mega, % etc)         *
  *             result    - [OUT] output result                                *
  *                                                                            *
@@ -287,7 +287,7 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 
 	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
-		/* the requested counter has not been queried yet */
+		/* requested counter has not been queried yet */
 		zabbix_log(LOG_LEVEL_DEBUG, "performance data is not yet ready, ignoring request");
 		ret = SYSINFO_RET_OK;
 		goto out;
@@ -299,7 +299,8 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 		goto out;
 	}
 
-	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
@@ -345,7 +346,7 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 		goto out;
 	}
 
-	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
+	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it. */
 	if (ZBX_MAX_UINT64 == perfvalue->value)
 	{
 		ret = SYSINFO_RET_OK;
@@ -403,7 +404,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets vmware performance counter value by the path                 *
+ * Purpose: gets vmware performance counter value by path                     *
  *                                                                            *
  * Parameters: service  - [IN] vmware service                                 *
  *             type     - [IN] performance entity type (HostSystem,           *
@@ -413,7 +414,7 @@ out:
  *                             (<group>/<key>[<rollup type>])                 *
  *             instance - [IN] performance counter instance or "" for         *
  *                             aggregate data                                 *
- *             coeff    - [IN] coefficient to apply to the value              *
+ *             coeff    - [IN] coefficient to apply to value                  *
  *             result   - [OUT] output result                                 *
  *                                                                            *
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
@@ -529,7 +530,7 @@ out:
  * Purpose: retrieves data from virtual machine details                       *
  *                                                                            *
  * Parameters: request   - [IN] The original request. The first parameter is  *
- *                              vmware service URL and the second parameter   *
+ *                              vmware service URL and the second parameter.  *
  *                              is virtual machine uuid.                      *
  *             username  - [IN] vmware service user name                      *
  *             password  - [IN] vmware service password                       *
@@ -595,13 +596,13 @@ out:
  *                                                                            *
  * Purpose: retrieves hypervisor property                                     *
  *                                                                            *
- * Parameters: request   - [IN] The original request. The first parameter is  *
- *                              vmware service URL and the second parameter   *
- *                              is hypervisor uuid.                           *
- *             username  - [IN] vmware service user name                      *
- *             password  - [IN] vmware service password                       *
- *             propid    - [IN] property id                                   *
- *             result    - [OUT] request result                               *
+ * Parameters: request  - [IN] The original request. The first parameter is   *
+ *                             vmware service URL and the second parameter.   *
+ *                             is hypervisor uuid.                            *
+ *             username - [IN] vmware service user name                       *
+ *             password - [IN] vmware service password                        *
+ *             propid   - [IN] property id                                    *
+ *             result   - [OUT] request result                                *
  *                                                                            *
  ******************************************************************************/
 static int	get_vcenter_hvprop(const AGENT_REQUEST *request, const char *username, const char *password, int propid,
@@ -1031,7 +1032,7 @@ out:
 }
 
 static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t eventlog_last_key,
-		const zbx_dc_item_t *item, zbx_vector_ptr_t *add_results)
+		const zbx_dc_item_t *item, zbx_vector_agent_result_ptr_t *add_results)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
@@ -1057,7 +1058,7 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_u
 				add_result->log->timestamp = event->timestamp;
 			}
 
-			zbx_vector_ptr_append(add_results, add_result);
+			zbx_vector_agent_result_ptr_append(add_results, add_result);
 		}
 		else
 			zbx_free(add_result);
@@ -1098,8 +1099,8 @@ static int	severity_to_mask(const char *level, unsigned char *severity_mask)
  *                                                                            *
  * Purpose: converts VMware event log level severity to bitmask               *
  *                                                                            *
- * Parameters: severity - [IN]  event severity value from item parameter,     *
- *                              which might contain multiple severity levels  *
+ * Parameters: severity - [IN] event severity value from item parameter,      *
+ *                             which might contain multiple severity levels   *
  *             mask     - [OUT] result of conversion                          *
  *             error    - [OUT] error message in case of an error             *
  *                                                                            *
@@ -1134,7 +1135,7 @@ static int	evt_severities_to_mask(const char *severity, unsigned char *mask, cha
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results)
+		zbx_vector_agent_result_ptr_t *add_results)
 {
 	const char		*url, *skip, *severity_str;
 	unsigned char		skip_old, severity = 0;
@@ -1188,7 +1189,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
 			(0 != skip_old && 0 != service->eventlog.last_key ))
 	{
-		/* this may happen if recreate item vmware.eventlog for the same service URL */
+		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;
 		service->eventlog.skip_old = skip_old;
 	}
@@ -1199,8 +1200,8 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	}
 	else if (request->lastlogsize < service->eventlog.last_key && 0 != request->lastlogsize)
 	{
-		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
-		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
+		/* This may happen if there are multiple vmware.eventlog items for the same service URL or item has   */
+		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet. */
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
 		goto unlock;
 	}
@@ -3005,7 +3006,8 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp,
+				vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					name));
@@ -3204,7 +3206,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, counterid,
 			instance, 1, unit, result);
 unlock:
@@ -3265,7 +3267,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_HV, hv->id, counterid, instance, 1, unit,
 			result);
 unlock:
@@ -3387,7 +3389,8 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 		dsname_cmp.name = (char *)ds_name;
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp,
+				vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					ds_name));
@@ -3557,7 +3560,7 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_DS, ds->id, counterid, instance, 1, unit,
 			result);
 unlock:
@@ -4385,8 +4388,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 				rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
-				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(&service->data->resourcepools,
-						&rpool_cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(
+						&service->data->resourcepools, &rpool_cmp,
+						ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 				{
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", ZBX_NULL2EMPTY_STR(
 							service->data->resourcepools.values[idx]->path),
@@ -5361,7 +5365,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_VM, vm->id, counterid, instance, 1, unit,
 			result);
 unlock:
@@ -5959,7 +5963,7 @@ static int	check_vcenter_rp_common(const char *url, const char *username, const 
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_RESOURCEPOOL, rpid, counterid, "", 0,
 			unit, result);
 unlock:

@@ -27,14 +27,14 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: write interface availability changes into database                *
+ * Purpose: writes interface availability changes into database               *
  *                                                                            *
- * Parameters: data        - [IN/OUT] the serialized availability data        *
- *             data_alloc  - [IN/OUT] the serialized availability data size   *
- *             data_alloc  - [IN/OUT] the serialized availability data offset *
- *             ia          - [IN] the interface availability data             *
+ * Parameters: data        - [IN/OUT] serialized availability data            *
+ *             data_alloc  - [IN/OUT] serialized availability data size       *
+ *             data_offset - [IN/OUT] serialized availability data offset     *
+ *             ia          - [IN] interface availability data                 *
  *                                                                            *
- * Return value: SUCCEED - the availability changes were written into db      *
+ * Return value: SUCCEED - availability changes were written into db          *
  *               FAIL    - no changes in availability data were detected      *
  *                                                                            *
  ******************************************************************************/
@@ -51,10 +51,8 @@ static int	update_interface_availability(unsigned char **data, size_t *data_allo
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get interface availability data                                   *
- *                                                                            *
- * Parameters: dc_interface - [IN] the interface                              *
- *             ia           - [OUT] the interface availability data           *
+ * Parameters: dc_interface - [IN] interface                                  *
+ *             ia           - [OUT] interface availability data               *
  *                                                                            *
  ******************************************************************************/
 static void	interface_get_availability(const zbx_dc_interface_t *dc_interface, zbx_interface_availability_t *ia)
@@ -73,10 +71,8 @@ static void	interface_get_availability(const zbx_dc_interface_t *dc_interface, z
 
 /********************************************************************************
  *                                                                              *
- * Purpose: sets interface availability data                                    *
- *                                                                              *
- * Parameters: dc_interface - [IN/OUT] the interface                            *
- *             ia           - [IN] the interface availability data              *
+ * Parameters: dc_interface - [IN/OUT] interface                                *
+ *             ia           - [IN] interface availability data                  *
  *                                                                              *
  *******************************************************************************/
 static void	interface_set_availability(zbx_dc_interface_t *dc_interface, const zbx_interface_availability_t *ia)
@@ -134,15 +130,15 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
 
 /********************************************************************************
  *                                                                              *
- * Purpose: activate item interface                                             *
- *                                                                              *
- * Parameters: ts          - [IN] the timestamp                                 *
- *             item        - [IN/OUT] the item                                  *
-*              version     - [IN/OUT] interface version                         *
- *             data        - [IN/OUT] the serialized availability data          *
- *             data_alloc  - [IN/OUT] the serialized availability data size     *
- *             data_offset - [IN/OUT] the serialized availability data offset   *
- *             ts          - [IN] the timestamp                                 *
+ * Parameters: ts          - [IN] timestamp                                     *
+ *             interface   - [IN]                                               *
+ *             itemid      - [IN]                                               *
+ *             type        - [IN]                                               *
+ *             host        - [IN]                                               *
+ *             version     - [IN/OUT] interface version                         *
+ *             data        - [IN/OUT] serialized availability data              *
+ *             data_alloc  - [IN/OUT] serialized availability data size         *
+ *             data_offset - [IN/OUT] serialized availability data offset       *
  *                                                                              *
  *******************************************************************************/
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
@@ -191,10 +187,12 @@ out:
 
 /***********************************************************************************
  *                                                                                 *
- * Purpose: deactivate item interface                                              *
- *                                                                                 *
  * Parameters: ts                 - [IN] timestamp                                 *
- *             item               - [IN/OUT] item                                  *
+ *             interface          - [IN]                                           *
+ *             itemid             - [IN]                                           *
+ *             type               - [IN]                                           *
+ *             host               - [IN]                                           *
+ *             key_orig           - [IN]                                           *
  *             data               - [IN/OUT] serialized availability data          *
  *             data_alloc         - [IN/OUT] serialized availability data size     *
  *             data_alloc         - [IN/OUT] serialized availability data offset   *
