@@ -12684,7 +12684,6 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
  * Parameters: queue - [IN] item queue data vector to free                      *
  *                                                                              *
  *******************************************************************************/
-//void	zbx_dc_free_item_queue(zbx_vector_ptr_t *queue)
 void	zbx_dc_free_item_queue(zbx_vector_queue_item_ptr_t *queue)
 {
 	for (int i = 0; i < queue->values_num; i++)
@@ -12703,7 +12702,6 @@ void	zbx_dc_free_item_queue(zbx_vector_queue_item_ptr_t *queue)
  * Return value: number of delayed items                                      *
  *                                                                            *
  ******************************************************************************/
-//int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 int	zbx_dc_get_item_queue(zbx_vector_queue_item_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;

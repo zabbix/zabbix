@@ -324,14 +324,13 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
  ******************************************************************************/
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
 {
-	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, limit;
-	char			type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
-	zbx_user_t		user;
-	//zbx_vector_ptr_t	queue;
-	zbx_vector_queue_item_ptr_t queue;
-	struct zbx_json		json;
-	zbx_hashset_t		queue_stats;
-	zbx_queue_stats_t	*stats;
+	int				ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, limit;
+	char				type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
+	zbx_user_t			user;
+	zbx_vector_queue_item_ptr_t	queue;
+	struct zbx_json			json;
+	zbx_hashset_t			queue_stats;
+	zbx_queue_stats_t		*stats;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -373,7 +372,6 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 	}
 
 	now = (int)time(NULL);
-	//zbx_vector_ptr_create(&queue);
 	zbx_vector_queue_item_ptr_create(&queue);
 	zbx_dc_get_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
@@ -546,13 +544,6 @@ static int		templates_res, users_res;
 
 static void	zbx_status_counters_init(void)
 {
-	/* zbx_vector_ptr_create(&hosts_monitored.counters); */
-	/* zbx_vector_ptr_create(&hosts_not_monitored.counters); */
-	/* zbx_vector_ptr_create(&items_active_normal.counters); */
-	/* zbx_vector_ptr_create(&items_active_notsupported.counters); */
-	/* zbx_vector_ptr_create(&items_disabled.counters); */
-	/* zbx_vector_ptr_create(&required_performance.counters); */
-
 	zbx_vector_proxy_counter_ptr_create(&hosts_monitored.counters);
 	zbx_vector_proxy_counter_ptr_create(&hosts_not_monitored.counters);
 	zbx_vector_proxy_counter_ptr_create(&items_active_normal.counters);
@@ -563,20 +554,6 @@ static void	zbx_status_counters_init(void)
 
 static void	zbx_status_counters_free(void)
 {
-	/* zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_mem_free_func); */
-	/* zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_mem_free_func); */
-	/* zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_mem_free_func); */
-	/* zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func); */
-	/* zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func); */
-	/* zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func); */
-
-	/* zbx_vector_ptr_destroy(&hosts_monitored.counters); */
-	/* zbx_vector_ptr_destroy(&hosts_not_monitored.counters); */
-	/* zbx_vector_ptr_destroy(&items_active_normal.counters); */
-	/* zbx_vector_ptr_destroy(&items_active_notsupported.counters); */
-	/* zbx_vector_ptr_destroy(&items_disabled.counters); */
-	/* zbx_vector_ptr_destroy(&required_performance.counters); */
-
 	zbx_vector_proxy_counter_ptr_destroy(&hosts_monitored.counters);
 	zbx_vector_proxy_counter_ptr_destroy(&hosts_not_monitored.counters);
 	zbx_vector_proxy_counter_ptr_destroy(&items_active_normal.counters);
