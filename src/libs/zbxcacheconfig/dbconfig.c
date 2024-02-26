@@ -7084,10 +7084,13 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 	zbx_uint64_t		proxyid;
 	unsigned char		mode, custom_timeouts;
 	time_t			now;
+	char			*version_str;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
+
+	version_str = zbx_strdup(NULL, ZBX_VERSION_UNDEFINED_STR);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -7167,7 +7170,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->location = ZBX_LOC_NOWHERE;
 			proxy->revision = revision;
 			proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
-			dc_strpool_replace(found, &proxy->version_str, ZBX_VERSION_UNDEFINED_STR);
+			dc_strpool_replace(found, &proxy->version_str, version_str);
 			proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 			proxy->lastaccess = atoi(row[12]);
 			proxy->last_cfg_error_time = 0;
@@ -7227,6 +7230,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		DCsync_proxy_remove(proxy);
 	}
+
+	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
