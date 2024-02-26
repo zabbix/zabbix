@@ -88,6 +88,11 @@ class C64ImportConverterTest extends CImportConverterTest {
 		}
 		unset($lld_rule);
 
+		foreach ($expected_lld_rules as &$lld_rule) {
+			$lld_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
+		}
+		unset($lld_rule);
+
 		return [
 			[
 				[],
@@ -205,7 +210,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'trigger_prototypes' => $source_triggers
 					]
 				],
-				'trigger_prototypes' => $source_triggers
+				'trigger_prototypes' => $source_triggers,
+				'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 			]
 		];
 		$expected_lld_rules = [
@@ -218,7 +224,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'trigger_prototypes' => $expected_triggers
 					]
 				],
-				'trigger_prototypes' => $expected_triggers
+				'trigger_prototypes' => $expected_triggers,
+				'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 			]
 		];
 
@@ -439,7 +446,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $source_item_prototypes
+									'item_prototypes' => $source_item_prototypes,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
@@ -463,7 +471,9 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $expected_item_prototypes
+									'item_prototypes' => $expected_item_prototypes,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
@@ -474,7 +484,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $expected_item_prototypes
+									'item_prototypes' => $expected_item_prototypes,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
