@@ -57,10 +57,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout)
 {
-	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
-	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
-	const char	*p;
-	const char	*p_ip, *p_dns;
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX], ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
+	const char	*p, *p_ip, *p_dns;
 	int		now;
 
 	p_ip = ip;
@@ -232,7 +230,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-#undef PROXY_AUTO_REGISTRATION_HEARTBEAT
+#undef AUTO_REGISTRATION_HEARTBEAT
 	return ret;
 }
 
@@ -378,7 +376,6 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 {
 #define ZBX_KEY_LOG		1
 #define ZBX_KEY_EVENTLOG	2
-
 	AGENT_REQUEST	request;
 	int		item_key;
 	const char	*param;
@@ -416,6 +413,8 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	}
 out:
 	zbx_free_agent_request(&request);
+#undef ZBX_KEY_LOG
+#undef ZBX_KEY_EVENTLOG
 }
 
 /******************************************************************************
@@ -439,9 +438,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	struct zbx_json		json;
 	int			ret = FAIL, i, version, num = 0;
 	zbx_uint64_t		hostid, revision, agent_config_revision;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
-	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
-	size_t			buffer_size, reserved = 0;
+	size_t			host_metadata_alloc = 1,	/* for at least NUL-terminated string */
+				interface_alloc = 1,		/* for at least NUL-terminated string */
+				buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
 	zbx_session_t		*session = NULL;

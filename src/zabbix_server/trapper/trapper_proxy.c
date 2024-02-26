@@ -72,7 +72,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock, int config_timeout)
  *             buffer_size     - [IN]                                         *
  *             reserved        - [IN]                                         *
  *             config_timeout  - [IN]                                         *
- *             error           - [OUT] the error message                      *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,

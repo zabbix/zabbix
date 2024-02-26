@@ -55,15 +55,15 @@ static void	hp_item_value_free(zbx_hp_item_value_t *hp)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create item value from json data                                  *
+ * Purpose: creates item value from json data                                 *
  *                                                                            *
  * Parameters: pnext     - [IN] json data                                     *
  *             now       - [IN] current time                                  *
  *             ns_offset - [IN/OUT] nanosecond offset to apply when json data *
- *                         does not include ns tag                            *
+ *                                  does not include ns tag                   *
  *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: The created value or NULL in the case of an error            *
+ * Return value: created value or NULL in case of error                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_hp_item_value_t	*create_item_value(const char *pnext, time_t now, int *ns_offset, char **error)
@@ -205,7 +205,7 @@ zbx_host_permission_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate item configuration if it can accept history              *
+ * Purpose: validates item configuration if it can accept history             *
  *                                                                            *
  * Return value: SUCCEED - item can accept history values                     *
  *               FAIL    - item configuration error                           *
