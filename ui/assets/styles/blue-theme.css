@@ -1133,9 +1133,9 @@ footer {
     .form-grid table .form_row td,
     .form-grid table .sortable-item:not(.sortable-item-frozen) td {
       line-height: 24px; }
-    .form-grid table .sortable td.td-drag-icon {
+    .form-grid table .sortable-item td.td-drag-icon {
       line-height: inherit; }
-    .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
+    .form-grid table .sortable-item td.wordbreak, .form-grid table .sortable-item td.wordwrap {
       line-height: 1.4em; }
   .form-grid th {
     padding: 0 5px 0 0;
