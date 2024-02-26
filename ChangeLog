@@ -1,6 +1,7 @@
 Changes for 7.0.0beta2
 
 New features:
+........S. [ZBXNEXT-9012] updated max supported TimescaleDB version to 2.14 (mprihodko)
 ..F....... [ZBXNEXT-8853] implemented synchronized notification snooze status across user sessions (esekace)
 ..F....... [ZBXNEXT-8838] changed LLD rule default update interval to 1h (dpetra)
 .......PS. [ZBXNEXT-8983] updated max supported MariaDB version to 11.2 (mprihodko)
@@ -9,6 +10,9 @@ New features:
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
+...G...PS. [ZBX-24017] added support of null for nodata value in Agent JSON protocol (dgoloscapov)
+...G...... [ZBX-23888] added setting Agent items to unsupported state when invalid regexp is supplied (dgoloscapov)
+...G...PS. [ZBX-23941] fixed error message in log if TLS handshake has timed out (vso)
 .......P.. [ZBX-23124] fixed items with disabled history being sometimes stuck in non-supported state (wiper)
 .........T [ZBX-23586] fixed filter evaluation type of organizations discovery in Cisco Meraki dashboard by HTTP template (drasikhov)
 .......PS. [ZBX-23607] added quoting string values when producing SNMP walk[] output (asitals)
@@ -708,6 +712,7 @@ A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item f
 ........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
 ...G...... [ZBX-23858] fixed injection vulnerability in Zabbix agent 2 smartctl plugin (esneiders)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.8
@@ -2192,6 +2197,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.27
+
+6.0.27rc1 was released as 6.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.27rc1
 
 New features:
@@ -2334,6 +2344,7 @@ A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item f
 ........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
 ...G...... [ZBX-23858] fixed injection vulnerability in Zabbix agent 2 smartctl plugin (esneiders)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.23
@@ -5155,6 +5166,7 @@ Bug fixes:
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.39
