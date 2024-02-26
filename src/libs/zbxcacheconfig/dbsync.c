@@ -285,10 +285,8 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 	if (NULL == sync->preproc_row_func)
 		return row;
 
-	sync->row = sync->preproc_row_func(sync, row);
-
 	/* row is unchanged, preprocessing was not performed */
-	if (sync->row == row)
+	if (row == sync->preproc_row_func(sync, row))
 		return row;
 
 	/* free the resources allocated by last preprocessing call */
@@ -1622,6 +1620,7 @@ static char	**dbsync_interface_preproc_row(zbx_dbsync_t *sync, char **row)
 	ZBX_STR2UINT64(hostid, row[1]);
 
 	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+	row = sync->row;
 
 	/* expand user macros */
 	if (NULL != strstr(row[5], "{$"))
@@ -1734,6 +1733,7 @@ static char	**dbsync_item_preproc_row(zbx_dbsync_t *sync, char **row)
 
 		/* copy the original data */
 		memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+		row = sync->row;
 
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 		{
@@ -2014,6 +2014,7 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 		return row;
 
 	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+	row = sync->row;
 
 	if (FAIL == zbx_eval_parse_expression(&ctx, row[2], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
 	{
@@ -2195,7 +2196,7 @@ static char	**dbsync_function_preproc_row(zbx_dbsync_t *sync, char **row)
 	const char	*row3;
 
 	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
-
+	row = sync->row;
 	/* first parameter is /host/key placeholder $, don't cache it */
 	if (NULL == (row3 = strchr(row[3], ',')))
 		row3 = "";
