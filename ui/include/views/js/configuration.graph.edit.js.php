@@ -480,12 +480,12 @@
 				$('form[name="' + view.form_name + '"]').submit();
 			});
 
-			const sortable_items = new CSortable(document.querySelector('#itemsTable tbody'), {
+			new CSortable(document.querySelector('#itemsTable tbody'), {
 				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				freeze_end: 1
-			});
-
-			sortable_items.on(CSortable.EVENT_SORT, this.recalculateSortOrder);
+				freeze_end: 1,
+				enable_sorting: !this.graphs.readonly
+			})
+				.on(CSortable.EVENT_SORT, this.recalculateSortOrder);
 
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},

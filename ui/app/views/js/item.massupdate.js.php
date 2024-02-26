@@ -61,27 +61,25 @@
 })();
 
 // Headers.
-(() => {
-	jQuery('#headers-table')
-		.dynamicRows({
-			template: '#item-header-row-tmpl',
-			rows: <?= json_encode($data['headers']) ?>,
-			allow_empty: true,
-			sortable: true,
-			sortable_options: {
-				target: 'tbody',
-				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				freeze_end: 1
+jQuery('#headers-table')
+	.dynamicRows({
+		template: '#item-header-row-tmpl',
+		rows: <?= json_encode($data['headers']) ?>,
+		allow_empty: true,
+		sortable: true,
+		sortable_options: {
+			target: 'tbody',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 1
+		}
+	})
+	.on('tableupdate.dynamicRows', (e) => {
+		e.target.querySelectorAll('.form_row').forEach((row, index) => {
+			for (const field of row.querySelectorAll('[name^="headers["]')) {
+				field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
 			}
-		})
-		.on('tableupdate.dynamicRows', (e) => {
-			e.target.querySelectorAll('.form_row').forEach((row, index) => {
-				for (const field of row.querySelectorAll('[name^="headers["]')) {
-					field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
-				}
-			});
 		});
-})();
+	});
 
 // Timeout.
 (() => {
