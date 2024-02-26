@@ -271,8 +271,6 @@
 							.filter(field => field.value === '')
 							.length == 2
 					);
-
-					jQuery('#query-fields-table').trigger('tableupdate.dynamicRows');
 				}
 
 				url_node.val(url.url);

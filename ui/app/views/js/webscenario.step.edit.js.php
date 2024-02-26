@@ -201,7 +201,6 @@ window.webscenario_step_edit_popup = new class {
 			const $table = jQuery(this.#post_fields);
 
 			$table.data('dynamicRows').addRows(pairs);
-			$table.trigger('tableupdate.dynamicRows');
 		}
 		else {
 			for (const row of this.#post_fields.querySelectorAll('tbody .form_row')) {
@@ -352,8 +351,6 @@ window.webscenario_step_edit_popup = new class {
 				.filter(field => field.value === '')
 				.length == 2
 		);
-
-		jQuery(this.#query_fields).trigger('tableupdate.dynamicRows');
 	}
 
 	#post(url, data, success_callback) {
