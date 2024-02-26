@@ -23,15 +23,17 @@
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"
-#include "zbxnum.h"
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager_proxy.h"
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
+#include "version.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxtypes.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -88,7 +90,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
-				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
+				areg_records = 0, more_history, more_discovery, more_areg, proxy_delay,
 				host_avail_records = 0, data_read = FAIL;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
@@ -298,7 +300,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg,
+			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
