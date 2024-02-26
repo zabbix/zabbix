@@ -41,13 +41,13 @@ ZBX_PTR_VECTOR_DECL(vmware_perf_value_ptr, zbx_vmware_perf_value_t *)
 /* performance data for a performance collector entity */
 typedef struct
 {
-	/* entity type: HostSystem, Datastore or VirtualMachine */
+	/* entity type: HostSystem, datastore or VirtualMachine */
 	char			*type;
 
 	/* entity id */
 	char			*id;
 
-	/* the performance counter values */
+	/* performance counter values */
 	zbx_vector_vmware_perf_value_ptr_t	values;
 
 	/* error information */

@@ -19,11 +19,27 @@
 #ifndef ZABBIX_VMWARE_INTERNAL_H
 #define ZABBIX_VMWARE_INTERNAL_H
 
-#include "config.h"
+#include "zbxvmware.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "zbxxml.h"
+#endif
 
-#include "zbxxml.h"
+typedef struct
+{
+	time_t			nextcheck;
+#define ZBX_VMWARE_UPDATE_CONF		1
+#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
+#define ZBX_VMWARE_UPDATE_REST_TAGS	3
+	int			type;
+	int			expired;
+	zbx_vmware_service_t	*service;
+}
+zbx_vmware_job_t;
+
+zbx_vmware_t			*zbx_vmware_get_vmware(void);
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
@@ -175,6 +191,36 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len);
 void	evt_msg_strpool_strfree(char *str);
 
+#define ZBX_XNN(NN)			"*[local-name()='" NN "']"
+#define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
+#define ZBX_XPATH_LN(LN)			"/" ZBX_XPATH_NN(LN)
+#define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
+#define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
+#define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
+
+typedef struct
+{
+	char	*data;
+	size_t	alloc;
+	size_t	offset;
+}
+ZBX_HTTPPAGE;
+
+int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
+		const char *config_source_ip, int config_vmware_timeout, char **error);
+
+typedef struct
+{
+	char	*key;
+	char	*value;
+}
+zbx_vmware_key_value_t;
+ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
+void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
+
+char	*vmware_shared_strdup(const char *str);
+void	vmware_shared_strfree(char *str);
+int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_INTERNAL_H */
