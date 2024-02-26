@@ -356,14 +356,16 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
 
-		$disabled_by_lld = $db_host['status'] == HOST_STATUS_NOT_MONITORED
-			&& array_key_exists('disable_source', $db_host['hostDiscovery'])
-			&& $db_host['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD;
+		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED
+				&& array_key_exists('disable_source', $db_host['hostDiscovery'])
+			? $db_host['hostDiscovery']['disable_source']
+			: '';
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 			$info_icons = [getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
-				$db_host['hostDiscovery']['ts_disable'], $disabled_by_lld, 'host'
+				$db_host['hostDiscovery']['ts_disable'], $disable_source, $db_host['status'] == HOST_STATUS_NOT_MONITORED,
+				'host'
 			)];
 
 			$list->addItem(makeInformationList($info_icons));
@@ -690,11 +692,12 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
 /**
  * Returns the indicator for lost LLD entity.
  *
- * @param int    $current_time     Current Unix timestamp.
- * @param int    $ts_delete        Deletion timestamp of the entity.
- * @param int    $ts_disable       Disabling timestamp of the entity.
- * @param string    $disabled_by_lld  Indicator whether entity was disabled by an LLD rule.
- * @param string $entity           Type of entity.
+ * @param int     $current_time    Current Unix timestamp.
+ * @param int     $ts_delete       Deletion timestamp of the entity.
+ * @param int     $ts_disable      Disabling timestamp of the entity.
+ * @param string  $disable_source  Indicator whether entity was disabled by an LLD rule or manually.
+ * @param boolean $disabled        Indicator whether entity is disabled.
+ * @param string  $entity          Type of entity.
  *
  * @throws Exception
  */

@@ -288,9 +288,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description = array_merge($description, [(new CDiv($trigger_deps))->addClass('dependencies')]);
 	}
 
-	$disabled_by_lld = $trigger['status'] == TRIGGER_STATUS_DISABLED
-		&& (array_key_exists('disable_source', $trigger['triggerDiscovery'])
-		&& $trigger['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD);
+	$disable_source = $trigger['status'] == TRIGGER_STATUS_DISABLED
+			&& array_key_exists('disable_source', $trigger['triggerDiscovery'])
+		? $trigger['triggerDiscovery']['disable_source']
+		: '';
 
 	// info
 	if ($data['show_info_column']) {
@@ -302,7 +303,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		if (array_key_exists('status', $trigger['triggerDiscovery'])
 				&& $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['triggerDiscovery']['ts_delete'],
-				$trigger['triggerDiscovery']['ts_disable'], $disabled_by_lld, 'trigger'
+				$trigger['triggerDiscovery']['ts_disable'], $disable_source,
+				$trigger['status'] == TRIGGER_STATUS_DISABLED, 'trigger'
 			);
 		}
 	}
@@ -341,6 +343,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			($trigger['value'] == TRIGGER_VALUE_TRUE) ? ZBX_STYLE_PROBLEM_UNACK_FG : ZBX_STYLE_OK_UNACK_FG
 		)
 		: '';
+
+	$disabled_by_lld = $trigger['status'] == TRIGGER_STATUS_DISABLED
+		&& (array_key_exists('disable_source', $trigger['triggerDiscovery'])
+			&& $trigger['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD);
 
 	$triggers_table->addRow([
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
