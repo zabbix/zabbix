@@ -39,9 +39,9 @@
  *                                                                                *
  * Purpose: perform active agent auto registration                                *
  *                                                                                *
- * Parameters: host            - [IN] name of the host to be added or updated     *
- *             ip              - [IN] IP address of the host                      *
- *             port            - [IN] port of the host                            *
+ * Parameters: host            - [IN] name of host to be added or updated         *
+ *             ip              - [IN] IP address of host                          *
+ *             port            - [IN] port of host                                *
  *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
  *                                    ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
  *             host_metadata   - [IN] host metadata                               *
@@ -142,7 +142,7 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: check for host name and return hostid                                *
+ * Purpose: checks for host name and return hostid                               *
  *                                                                               *
  * Parameters: sock           - [IN] open socket of server-agent connection      *
  *             host           - [IN] host name                                   *
@@ -158,7 +158,7 @@ out:
  *             error          - [OUT] error message (buffer provided by caller)  *
  *                                                                               *
  * Return value:  SUCCEED - host is found                                        *
- *                FAIL - an error occurred or host not found                     *
+ *                FAIL - error occurred or host not found                        *
  *                                                                               *
  * Comments: NB! adds host to the database if it does not exist or if it         *
  *           exists but metadata, interface, interface type or port has          *
@@ -238,15 +238,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send list of active checks to the host (older version agent)      *
+ * Purpose: sends list of active checks to the host (older version agent)     *
  *                                                                            *
- * Parameters: sock           - open socket of server-agent connection        *
- *             request        - request buffer                                *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             request        - [IN] request buffer                           *
  *             events_cbs     - [IN]                                          *
  *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  * Comments: format of the request: ZBX_GET_ACTIVE_CHECKS\n<host name>\n      *
  *           format of the list: key:delay:last_log_size                      *
@@ -354,10 +354,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: append non duplicate string to the string vector                  *
+ * Purpose: appends non duplicate string to string vector                     *
  *                                                                            *
- * Parameters: vector - [IN/OUT] the string vector                            *
- *             str    - [IN] the string to append                             *
+ * Parameters: vector - [IN/OUT] string vector                                *
+ *             str    - [IN] string to append                                 *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str)
@@ -368,10 +368,10 @@ static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extract global regular expression names from item key             *
+ * Purpose: extracts global regular expression names from item key            *
  *                                                                            *
- * Parameters: key     - [IN] the item key to parse                           *
- *             regexps - [OUT] the extracted regular expression names         *
+ * Parameters: key     - [IN] item key to parse                               *
+ *             regexps - [OUT] extracted regular expression names             *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t *regexps)
@@ -420,10 +420,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send list of active checks to the host                            *
+ * Purpose: sends list of active checks to host                               *
  *                                                                            *
- * Parameters: sock           - open socket of server-agent connection        *
- *             jp             - request buffer                                *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             jp             - [IN] request buffer                           *
  *             events_cbs     - [IN]                                          *
  *             config_timeout - [IN]                                          *
  *                                                                            *

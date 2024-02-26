@@ -122,7 +122,7 @@ zbx_status_section_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes the received values from active agents                  *
+ * Purpose: processes received values from active agents                      *
  *                                                                            *
  ******************************************************************************/
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
@@ -163,7 +163,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes the received values from senders                        *
+ * Purpose: processes received values from senders                            *
  *                                                                            *
  ******************************************************************************/
 static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
@@ -194,7 +194,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process heartbeat sent by proxy servers                           *
+ * Purpose: processes heartbeat sent by proxy servers                         *
  *                                                                            *
  ******************************************************************************/
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
@@ -246,10 +246,10 @@ zbx_queue_stats_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update queue stats with a new item delay                          *
+ * Purpose: updates queue stats with new item delay                           *
  *                                                                            *
- * Parameters: stats   - [IN] the queue stats                                 *
- *             delay   - [IN] the delay time of an delayed item               *
+ * Parameters: stats - [IN] queue stats                                       *
+ *             delay - [IN] delay time of delayed item                        *
  *                                                                            *
  ******************************************************************************/
 static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
@@ -270,11 +270,11 @@ static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: export queue stats to JSON format                                 *
+ * Purpose: exports queue stats to JSON format                                *
  *                                                                            *
- * Parameters: queue_stats - [IN] a hashset containing item stats             *
- *             id_name     - [IN] the name of stats id field                  *
- *             json        - [OUT] the output JSON                            *
+ * Parameters: queue_stats - [IN] hashset containing item stats               *
+ *             id_name     - [IN] name of stats id field                      *
+ *             json        - [OUT] output JSON                                *
  *                                                                            *
  ******************************************************************************/
 static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, struct zbx_json *json)
@@ -312,11 +312,11 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process queue request                                             *
+ * Purpose: processes queue request                                           *
  *                                                                            *
- * Parameters:  sock              - [IN] request socket                       *
- *              jp                - [IN] request data                         *
- *              config_timeout    - [IN]                                      *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              jp             - [IN] request data                            *
+ *              config_timeout - [IN]                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - error occurred                                       *
@@ -797,14 +797,14 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process status request                                            *
+ * Purpose: processes status request                                          *
  *                                                                            *
- * Parameters:  sock              - [IN] the request socket                   *
- *              jp                - [IN] the request data                     *
- *              config_timeout    - [IN]                                      *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              jp             - [IN] request data                            *
+ *              config_timeout - [IN]                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)

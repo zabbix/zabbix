@@ -33,17 +33,17 @@
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: replace occurrence of macro in input string with value given in       *
+ * Purpose: replaces occurrence of macro in input string with value given in      *
  *          macrovalue, with memory management                                    *
  *                                                                                *
  * Parameters:  in               - [IN] input string to be processed              *
  *              macro            - [IN] macro to replace                          *
- *              macrovalue       - [IN] value to replace the macro with           *
- *              out              - [IN/OUT] pointer to memory holding the result  *
- *              out_alloc        - [IN/OUT] size of the memory holding the result *
+ *              macrovalue       - [IN] value to replace macro with               *
+ *              out              - [IN/OUT] pointer to memory holding result      *
+ *              out_alloc        - [IN/OUT] size of memory holding result         *
  *                                                                                *
- * Return value:  SUCCEED - the remote command was executed successfully          *
- *                FAIL    - an error occurred                                     *
+ * Return value:  SUCCEED - remote command was executed successfully              *
+ *                FAIL    - error occurred                                        *
  *                                                                                *
  **********************************************************************************/
 static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
@@ -70,10 +70,10 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute remote command and wait for the result                    *
+ * Purpose: executes remote command and waits for result                      *
  *                                                                            *
- * Return value:  SUCCEED - the remote command was executed successfully      *
- *                FAIL    - an error occurred                                 *
+ * Return value:  SUCCEED - remote command was executed successfully          *
+ *                FAIL    - error occurred                                    *
  *                                                                            *
  ******************************************************************************/
 static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host, char **info, char *error,
@@ -232,14 +232,14 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the specified event id corresponds to a problem event    *
- *          caused by a trigger, find its recovery event (if it exists)       *
+ * Purpose: Checks if the specified event id corresponds to a problem event   *
+ *          caused by a trigger, finds its recovery event (if it exists).     *
  *                                                                            *
- * Parameters:  eventid       - [IN] the id of event                          *
- *              r_eventid     - [OUT] the id of recovery event (0 if there is *
- *                              no recovery event                             *
- *              error         - [OUT] the error message buffer                *
- *              error_len     - [IN] the size of error message buffer         *
+ * Parameters:  eventid       - [IN]                                          *
+ *              r_eventid     - [OUT] id of recovery event (0 if there is no  *
+ *                                    recovery event)                         *
+ *              error         - [OUT] error message buffer                    *
+ *              error_len     - [IN] size of error message buffer             *
  *                                                                            *
  * Return value:  SUCCEED or FAIL (with 'error' message)                      *
  *                                                                            *
@@ -268,11 +268,11 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validates given user input with a validator of given type         *
+ * Purpose: validates given user input with validator of given type           *
  *                                                                            *
  * Parameters:  manualinput     - [IN] user provided input string             *
- *              validator       - [IN] string containing a validator          *
- *              validator_type  - [IN] indicator for how to interpret the     *
+ *              validator       - [IN] string containing validator            *
+ *              validator_type  - [IN] indicator for how to interpret         *
  *                                     validator string                       *
  *                                                                            *
  * Return value:  SUCCEED or FAIL                                             *
@@ -304,14 +304,14 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
 
 /**************************************************************************************
  *                                                                                    *
- * Purpose: executing command                                                         *
+ * Purpose: executes command                                                          *
  *                                                                                    *
  * Parameters:  scriptid                - [IN] id of script to be executed            *
- *              hostid                  - [IN] host the script will be executed on    *
+ *              hostid                  - [IN] host script will be executed on        *
  *              eventid                 - [IN]                                        *
  *              user                    - [IN] user who executes command              *
  *              clientip                - [IN] IP of client                           *
- *              manualinput             - [IN] user provided value to the script      *
+ *              manualinput             - [IN] user provided value to script          *
  *              config_timeout          - [IN]                                        *
  *              config_trapper_timeout  - [IN]                                        *
  *              config_source_ip        - [IN]                                        *
@@ -322,7 +322,7 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
  *              debug                   - [OUT] debug data (optional)                 *
  *                                                                                    *
  * Return value:  SUCCEED - processed successfully                                    *
- *                FAIL - an error occurred                                            *
+ *                FAIL - error occurred                                               *
  *                                                                                    *
  * Comments: either 'hostid' or 'eventid' must be > 0, but not both                   *
  *                                                                                    *
@@ -646,11 +646,11 @@ zbx_user_role_permission_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
+ * Purpose: Checks if the user has specific or default access for             *
+ *          administration actions.                                           *
  *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
+ * Return value:  SUCCEED - access is granted                                 *
+ *                FAIL    - access is denied                                  *
  *                                                                            *
  ******************************************************************************/
 static int	check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
@@ -693,7 +693,7 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process command received from frontend                            *
+ * Purpose: processes command received from frontend                          *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - error occurred                                       *

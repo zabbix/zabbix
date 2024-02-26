@@ -26,12 +26,11 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: takes a string token, hashes it with sha-512 and then formats the *
- *          resulting binary into the printable hex string                    *
+ * Purpose: Takes a string token, hashes it with sha-512 and then formats the *
+ *          resulting binary into the printable hex string.                   *
  *                                                                            *
- * Parameters: auth_token               - [IN] string auth token              *
- *             hash_res_stringhexes     - [OUT] hashed and formatted auth     *
- *                                        token                               *
+ * Parameters: auth_token           - [IN] string auth token                  *
+ *             hash_res_stringhexes - [OUT] hashed and formatted auth token   *
  *                                                                            *
  ******************************************************************************/
 static void	format_auth_token_hash(const char *auth_token, char *hash_res_stringhexes)
@@ -55,11 +54,11 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 
 /******************************************************************************
  *                                                                            *
- * Purpose: authenticate and initialize user data from the supplied json      *
+ * Purpose: authenticates and initializes user data from supplied json        *
  *                                                                            *
- * Parameters: jp         - [IN] the request                                  *
- *             user       - [OUT] the user data                               *
- *             result     - [OUT] error logging                               *
+ * Parameters: jp     - [IN] request                                          *
+ *             user   - [OUT] user data                                       *
+ *             result - [OUT] error logging                                   *
  *                                                                            *
  * Return value: SUCCEED - managed to find and authenticate user              *
  *               FAIL    - otherwise                                          *
