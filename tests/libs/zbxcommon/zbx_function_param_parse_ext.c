@@ -87,7 +87,10 @@ static void	get_parameters(const char *path, zbx_vector_str_t *params)
 		const char	*param;
 
 		if (ZBX_MOCK_SUCCESS != err || ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hparam, &param)))
+		{
+			param = NULL;
 			fail_msg("Cannot read param #%d: %s", params_num, zbx_mock_error_string(err));
+		}
 
 		zbx_vector_str_append(params, (char *)param);
 

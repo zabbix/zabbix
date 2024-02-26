@@ -40,7 +40,7 @@ function getItemFormData(array $item = []) {
 		'key' => getRequest('key', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
 		'hostname' => getRequest('hostname'),
-		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+		'delay' => getRequest('delay', ZBX_LLD_RULE_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
@@ -256,7 +256,7 @@ function getItemFormData(array $item = []) {
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
 								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
-						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+						$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
 					}
 				}
 
@@ -277,7 +277,7 @@ function getItemFormData(array $item = []) {
 				}
 			}
 			else {
-				$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+				$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
 			}
 
 			$data['history'] = $data['item']['history'];

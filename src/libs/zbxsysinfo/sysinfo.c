@@ -990,6 +990,9 @@ void	zbx_test_parameter(const char *key)
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
+		if (0 == ZBX_ISSET_VALUE(&result))
+			printf(" [-|" ZBX_NODATA "]");
+
 		if (0 != ZBX_ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 

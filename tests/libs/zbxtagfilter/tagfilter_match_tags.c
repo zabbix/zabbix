@@ -32,11 +32,19 @@ static int	get_eval_type(const char *eval_type_str)
 	int	eval_type;
 
 	if (0 == strcasecmp(eval_type_str, "AND/OR"))
+	{
 		eval_type = ZBX_CONDITION_EVAL_TYPE_AND_OR;
+	}
 	else if (0 == strcasecmp(eval_type_str, "OR"))
+	{
 		eval_type = ZBX_CONDITION_EVAL_TYPE_OR;
+	}
 	else
+	{
 		fail_msg("unknown eval_type value '%s'", eval_type_str);
+
+		return 0;
+	}
 
 	return eval_type;
 }
@@ -67,19 +75,35 @@ static unsigned char	get_operator(const char *op_str)
 	unsigned char op;
 
 	if (0 == strcasecmp(op_str, "EQUAL"))
+	{
 		op = ZBX_CONDITION_OPERATOR_EQUAL;
+	}
 	else if (0 == strcasecmp(op_str, "NOT EQUAL"))
+	{
 		op = ZBX_CONDITION_OPERATOR_NOT_EQUAL;
+	}
 	else if (0 == strcasecmp(op_str, "LIKE"))
+	{
 		op = ZBX_CONDITION_OPERATOR_LIKE;
+	}
 	else if (0 == strcasecmp(op_str, "NOT LIKE"))
+	{
 		op = ZBX_CONDITION_OPERATOR_NOT_LIKE;
+	}
 	else if (0 == strcasecmp(op_str, "EXIST"))
+	{
 		op = ZBX_CONDITION_OPERATOR_EXIST;
+	}
 	else if (0 == strcasecmp(op_str, "NOT EXIST"))
+	{
 		op = ZBX_CONDITION_OPERATOR_NOT_EXIST;
+	}
 	else
+	{
 		fail_msg("unknown operator value '%s'", op_str);
+
+		return 0;
+	}
 
 	return op;
 }

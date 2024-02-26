@@ -8421,6 +8421,11 @@ msgstr ""
 msgid "Frontend messaging"
 msgstr ""
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -13309,6 +13314,11 @@ msgstr ""
 
 #: jsLoader.php:284
 msgid "Mute"
+msgstr ""
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
 msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
@@ -18461,6 +18471,11 @@ msgstr ""
 msgid "Snooze"
 msgstr ""
 
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr ""
+
 #: include/hosts.inc.php:174
 msgid "Software"
 msgstr ""
@@ -20837,6 +20852,11 @@ msgstr ""
 
 #: jsLoader.php:286
 msgid "Unmute"
+msgstr ""
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
 msgstr ""
 
 #: app/partials/administration.system.info.php:161

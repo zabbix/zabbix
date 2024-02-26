@@ -256,7 +256,6 @@ typedef struct
 #define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HGSETID		__UINT64_C(0x00008000)	/* host_hgset.hgsetid field should be updated */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -265,8 +264,7 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS | ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY |	\
-		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK | ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES |		\
-		ZBX_FLAG_LLD_HOST_UPDATE_HGSETID)
+		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK | ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES)
 	zbx_uint64_t			flags;
 	const struct zbx_json_parse	*jp_row;
 	signed char			inventory_mode;
@@ -287,6 +285,11 @@ typedef struct
 	char				tls_accept_orig;
 	zbx_uint64_t			hgsetid_orig;
 	zbx_lld_hgset_t			*hgset;
+
+#define ZBX_LLD_HOST_HGSET_ACTION_IDLE		0
+#define ZBX_LLD_HOST_HGSET_ACTION_ADD		1
+#define ZBX_LLD_HOST_HGSET_ACTION_UPDATE	2
+	unsigned char			hgset_action;
 }
 zbx_lld_host_t;
 
@@ -535,7 +538,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 			" from host_discovery hd"
 				" join hosts h"
 					" on hd.hostid=h.hostid"
-				" join host_hgset hh"
+				" left join host_hgset hh"
 					" on hh.hostid=h.hostid"
 				" left join host_inventory hi"
 					" on hd.hostid=hi.hostid"
@@ -571,7 +574,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_accept_orig = 0;
 		host->flags = 0x00;
 		ZBX_STR2UCHAR(host->custom_interfaces, row[18]);
-		ZBX_STR2UINT64(host->hgsetid_orig, row[19]);
+		host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
 
 		ZBX_DBROW2UINT64(db_proxyid, row[6]);
 		if (db_proxyid != proxyid)
@@ -644,6 +647,11 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 			host->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 		else
 			host->inventory_mode_orig = (signed char)atoi(row[11]);
+
+		if (SUCCEED == zbx_db_is_null(row[19]))
+			host->hgsetid_orig = 0;
+		else
+			ZBX_STR2UINT64(host->hgsetid_orig, row[19]);
 
 		zbx_vector_uint64_create(&host->groupids);
 		zbx_vector_uint64_create(&host->old_groupids);
@@ -1035,6 +1043,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			host->ipmi_authtype_orig = 0;
 			host->ipmi_privilege_orig = 0;
 			host->hgsetid_orig = 0;
+			host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
 
 			zbx_vector_ptr_append(hosts, host);
 		}
@@ -1318,7 +1327,7 @@ static zbx_lld_hgset_t	*lld_hgset_make(zbx_vector_uint64_t *groupids)
 	return hgset;
 }
 
-static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t *hgsets,
+static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t *hgsets,
 		zbx_vector_uint64_t *del_hgsetids)
 {
 	char				*sql = NULL;
@@ -1348,11 +1357,15 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 		if (0 == host->groupids.values_num)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
+			host->hgset = NULL;
+			zabbix_log(LOG_LEVEL_WARNING, "%s() detected host without groups [parent_hostid=" ZBX_FS_UI64
+					", hostid=" ZBX_FS_UI64 "], permissions will not be granted", __func__,
+					parent_hostid, host->hostid);
 			continue;
 		}
 
-		zbx_vector_uint64_append(&hostids, host->hostid);
+		if (0 != host->hostid)
+			zbx_vector_uint64_append(&hostids, host->hostid);
 
 		if (0 < host->old_groupids.values_num)
 		{
@@ -1400,11 +1413,16 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 			zbx_vector_lld_hgset_ptr_append(hgsets, hgset);
 		}
 
-		if (0 != host->hostid && (0 < host->new_groupids.values_num ||
-				host->groupids.values_num != host->old_groupids.values_num))
+		if (0 != host->hostid && 0 == host->new_groupids.values_num &&
+				host->groupids.values_num == host->old_groupids.values_num)
 		{
-			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HGSETID;
+			continue;
 		}
+
+		if (0 == host->hostid || 0 == host->old_groupids.values_num)
+			host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_ADD;
+		else
+			host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_UPDATE;
 	}
 
 	zbx_vector_str_create(&hashes);
@@ -1441,13 +1459,12 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 	zbx_vector_str_destroy(&hashes);
 
 	/* get hgset ids to be deleted */
-
 	if (0 < del_hgsetids->values_num)
 	{
 		zbx_vector_uint64_sort(del_hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hgsetid from host_hgset where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct hgsetid from host_hgset where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", del_hgsetids->values,
 				del_hgsetids->values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
@@ -1461,8 +1478,7 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 			ZBX_STR2UINT64(hgsetid, row[0]);
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3345,7 +3361,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0,
-				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0;
+				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0, new_host_hgsets = 0,
+				upd_host_hgsets = 0;
 	zbx_uint64_t		hosttagid = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
@@ -3383,6 +3400,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		if (0 == host->hostid)
 		{
 			new_hosts++;
+
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 				new_host_inventories++;
 		}
@@ -3421,6 +3439,11 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		}
 
 		new_hostgroups += host->new_groupids.values_num;
+
+		if (ZBX_LLD_HOST_HGSET_ACTION_ADD == host->hgset_action)
+			new_host_hgsets++;
+		else if (ZBX_LLD_HOST_HGSET_ACTION_UPDATE == host->hgset_action)
+			upd_host_hgsets++;
 
 		for (j = 0; j < host->interfaces.values_num; j++)
 		{
@@ -3532,7 +3555,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			0 == del_host_inventory_hostids.values_num && 0 == del_interfaceids.values_num &&
 			0 == new_snmp && 0 == upd_snmp && 0 == del_snmp_ids.values_num &&
 			0 == new_tags && 0 == upd_tags && 0 == del_tagids.values_num &&
-			0 == new_hgsets && 0 == del_hgsetids->values_num && 0 == permissions->values_num)
+			0 == new_hgsets && 0 == del_hgsetids->values_num && 0 == permissions->values_num &&
+			0 == new_host_hgsets && 0 == upd_host_hgsets)
 	{
 		goto out;
 	}
@@ -3565,6 +3589,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				(char *)NULL);
 		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available",
 				(char *)NULL);
+	}
+
+	if (0 != new_host_hgsets)
+	{
 		zbx_db_insert_prepare(&db_insert_host_hgset, "host_hgset", "hostid", "hgsetid",
 				(char *)NULL);
 	}
@@ -3575,7 +3603,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				(char *)NULL);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags ||
+			0 != upd_host_hgsets)
 	{
 		zbx_db_begin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
@@ -3680,7 +3709,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
-			zbx_db_insert_add_values(&db_insert_host_hgset, host->hostid, host->hgset->hgsetid);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
@@ -3887,15 +3915,19 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 				zbx_free(value_esc);
 			}
+		}
 
-			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID))
-			{
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-						"update host_hgset"
-						" set hgsetid=" ZBX_FS_UI64
-						" where hostid=" ZBX_FS_UI64 ";\n",
-						host->hgset->hgsetid, host->hostid);
-			}
+		if (ZBX_LLD_HOST_HGSET_ACTION_ADD == host->hgset_action)
+		{
+			zbx_db_insert_add_values(&db_insert_host_hgset, host->hostid, host->hgset->hgsetid);
+		}
+		else if (ZBX_LLD_HOST_HGSET_ACTION_UPDATE == host->hgset_action)
+		{
+			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+					"update host_hgset"
+					" set hgsetid=" ZBX_FS_UI64
+					" where hostid=" ZBX_FS_UI64 ";\n",
+					host->hgset->hgsetid, host->hostid);
 		}
 
 		for (j = 0; j < host->interfaces.values_num; j++)
@@ -4182,7 +4214,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 		zbx_db_insert_execute(&db_insert_host_rtdata);
 		zbx_db_insert_clean(&db_insert_host_rtdata);
+	}
 
+	if (0 != new_host_hgsets)
+	{
 		zbx_db_insert_execute(&db_insert_host_hgset);
 		zbx_db_insert_clean(&db_insert_host_hgset);
 	}
@@ -5617,7 +5652,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 
 		if (0 != hosts.values_num)
 		{
-			lld_hgsets_make(&hosts, &hgsets, &del_hgsetids);
+			lld_hgsets_make(parent_hostid, &hosts, &hgsets, &del_hgsetids);
 			lld_permissions_make(&permissions, &hgsets);
 		}
 
