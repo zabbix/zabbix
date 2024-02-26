@@ -32,15 +32,17 @@ class CControllerPopupMedia extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dstfrm' =>			'required|string',
-			'media' =>			'int32',
-			'mediatypeid' =>	'db media_type.mediatypeid',
-			'sendto' =>			'string',
-			'sendto_emails'	=>	'array',
-			'period' =>			'time_periods',
-			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
-			'severity' =>		'',
-			'add' =>			'in 1'
+			'dstfrm' =>					'required|string',
+			'media' =>					'int32',
+			'mediaid' =>				'id',
+			'mediatypeid' =>			'db media_type.mediatypeid',
+			'sendto' =>					'string',
+			'sendto_emails'	=>			'array',
+			'period' =>					'time_periods',
+			'active' =>					'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
+			'severity' =>				'',
+			'userdirectory_mediaid' =>	'id',
+			'add' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -71,11 +73,13 @@ class CControllerPopupMedia extends CController {
 		$page_options = [
 			'dstfrm' => $this->getInput('dstfrm'),
 			'media' => $this->getInput('media', -1),
+			'mediaid' => $this->getInput('mediaid', 0),
 			'sendto' => $this->getInput('sendto', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
 			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
-			'sendto_emails' => array_values($this->getInput('sendto_emails', ['']))
+			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
+			'userdirectory_mediaid' => $this->getInput('userdirectory_mediaid', 0)
 		];
 
 		// Validation before adding Media to user's Media tab.
