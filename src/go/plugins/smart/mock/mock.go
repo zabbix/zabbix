@@ -31,7 +31,7 @@ func (c *MockController) Execute(args ...string) ([]byte, error) {
 	}()
 
 	if c.count >= len(c.expectations) {
-		panic("unexpected call to Execute")
+		panic(fmt.Sprintf("unexpected call to Execute with args: %v", args))
 	}
 
 	e := c.expectations[c.count]

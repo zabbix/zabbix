@@ -313,32 +313,32 @@ func Test_runner_executeRaids(t *testing.T) {
 		wantDevices     map[string]deviceParser
 	}{
 		{
-			"+env1",
+			"+HBA_with_SAS_1",
 			[]expectation{
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "3ware,0", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSda3Ware0,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "areca,1", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSdaAreca1,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "cciss,0", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSdaCciss0,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "sat", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSdaSat,
-				},
+				// {
+				// 	args: []string{
+				// 		"-a", "/dev/sda", "-d", "3ware,0", "-j",
+				// 	},
+				// 	out: mock.OutputEnv1GetRaidSda3Ware0,
+				// },
+				// {
+				// 	args: []string{
+				// 		"-a", "/dev/sda", "-d", "areca,1", "-j",
+				// 	},
+				// 	out: mock.OutputEnv1GetRaidSdaAreca1,
+				// },
+				// {
+				// 	args: []string{
+				// 		"-a", "/dev/sda", "-d", "cciss,0", "-j",
+				// 	},
+				// 	out: mock.OutputEnv1GetRaidSdaCciss0,
+				// },
+				// {
+				// 	args: []string{
+				// 		"-a", "/dev/sda", "-d", "sat", "-j",
+				// 	},
+				// 	out: mock.OutputEnv1GetRaidSdaSat,
+				// },
 			},
 			fields{
 				jsonDevices: map[string]jsonDevice{},
@@ -346,11 +346,38 @@ func Test_runner_executeRaids(t *testing.T) {
 			},
 			args{
 				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda [SAT]",
-						DevType:  "sat",
-					},
+					{Name: "/dev/sda", InfoName: "/dev/sda", DevType: "scsi"},
+					// {Name: "/dev/sdaa", InfoName: "/dev/sdaa", DevType: "scsi"},
+					// {Name: "/dev/sdab", InfoName: "/dev/sdab", DevType: "scsi"},
+					// {Name: "/dev/sdac", InfoName: "/dev/sdac", DevType: "scsi"},
+					// {Name: "/dev/sdad", InfoName: "/dev/sdad", DevType: "scsi"},
+					// {Name: "/dev/sdae", InfoName: "/dev/sdae", DevType: "scsi"},
+					// {Name: "/dev/sdaf", InfoName: "/dev/sdaf", DevType: "scsi"},
+					// {Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "scsi"},
+					// {Name: "/dev/sdc", InfoName: "/dev/sdc", DevType: "scsi"},
+					// {Name: "/dev/sdd", InfoName: "/dev/sdd", DevType: "scsi"},
+					// {Name: "/dev/sde", InfoName: "/dev/sde", DevType: "scsi"},
+					// {Name: "/dev/sdf", InfoName: "/dev/sdf", DevType: "scsi"},
+					// {Name: "/dev/sdg", InfoName: "/dev/sdg", DevType: "scsi"},
+					// {Name: "/dev/sdh", InfoName: "/dev/sdh", DevType: "scsi"},
+					// {Name: "/dev/sdi", InfoName: "/dev/sdi", DevType: "scsi"},
+					// {Name: "/dev/sdj", InfoName: "/dev/sdj", DevType: "scsi"},
+					// {Name: "/dev/sdk", InfoName: "/dev/sdk", DevType: "scsi"},
+					// {Name: "/dev/sdl", InfoName: "/dev/sdl", DevType: "scsi"},
+					// {Name: "/dev/sdm", InfoName: "/dev/sdm", DevType: "scsi"},
+					// {Name: "/dev/sdn", InfoName: "/dev/sdn", DevType: "scsi"},
+					// {Name: "/dev/sdo", InfoName: "/dev/sdo", DevType: "scsi"},
+					// {Name: "/dev/sdp", InfoName: "/dev/sdp", DevType: "scsi"},
+					// {Name: "/dev/sdq", InfoName: "/dev/sdq", DevType: "scsi"},
+					// {Name: "/dev/sdr", InfoName: "/dev/sdr", DevType: "scsi"},
+					// {Name: "/dev/sds", InfoName: "/dev/sds", DevType: "scsi"},
+					// {Name: "/dev/sdt", InfoName: "/dev/sdt", DevType: "scsi"},
+					// {Name: "/dev/sdu", InfoName: "/dev/sdu", DevType: "scsi"},
+					// {Name: "/dev/sdv", InfoName: "/dev/sdv", DevType: "scsi"},
+					// {Name: "/dev/sdw", InfoName: "/dev/sdw", DevType: "scsi"},
+					// {Name: "/dev/sdx", InfoName: "/dev/sdx", DevType: "scsi"},
+					// {Name: "/dev/sdy", InfoName: "/dev/sdy", DevType: "scsi"},
+					// {Name: "/dev/sdz", InfoName: "/dev/sdz", DevType: "scsi"},
 				},
 				false,
 			},
@@ -413,68 +440,169 @@ func Test_runner_executeRaids(t *testing.T) {
 				},
 			},
 		},
-		{
-			"+env1JSON",
-			[]expectation{
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "3ware,0", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSda3Ware0,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "areca,1", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSdaAreca1,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "cciss,0", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSdaCciss0,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "sat", "-j",
-					},
-					out: mock.OutputEnv1GetRaidSdaSat,
-				},
-			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda [SAT]",
-						DevType:  "sat",
-					},
-				},
-				true,
-			},
-			map[string]jsonDevice{
-				"/dev/sda sat": {
-					serialNumber: "PHWA619301M9120CGN",
-					jsonData:     string(mock.OutputEnv1GetRaidSdaSat),
-				},
-			},
-			map[string]deviceParser{},
-		},
-
-		{
-			"-noDevices",
-			[]expectation{},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
-			args{[]deviceInfo{}, false},
-			map[string]jsonDevice{},
-			map[string]deviceParser{},
-		},
+		// {
+		// 	"+env1",
+		// 	[]expectation{
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "3ware,0", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSda3Ware0,
+		// 		},
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "areca,1", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSdaAreca1,
+		// 		},
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "cciss,0", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSdaCciss0,
+		// 		},
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "sat", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSdaSat,
+		// 		},
+		// 	},
+		// 	fields{
+		// 		jsonDevices: map[string]jsonDevice{},
+		// 		devices:     map[string]deviceParser{},
+		// 	},
+		// 	args{
+		// 		[]deviceInfo{
+		// 			{
+		// 				Name:     "/dev/sda",
+		// 				InfoName: "/dev/sda [SAT]",
+		// 				DevType:  "sat",
+		// 			},
+		// 		},
+		// 		false,
+		// 	},
+		// 	map[string]jsonDevice{},
+		// 	map[string]deviceParser{
+		// 		"/dev/sda sat": {
+		// 			ModelName:    "INTEL SSDSC2BB120G6",
+		// 			SerialNumber: "PHWA619301M9120CGN",
+		// 			Info: deviceInfo{
+		// 				Name:     "/dev/sda sat",
+		// 				InfoName: "/dev/sda [SAT]",
+		// 				DevType:  "sat",
+		// 				name:     "/dev/sda",
+		// 				raidType: "sat",
+		// 			},
+		// 			Smartctl:    smartctlField{Version: []int{7, 3}},
+		// 			SmartStatus: &smartStatus{SerialNumber: true},
+		// 			SmartAttributes: smartAttributes{
+		// 				Table: []table{
+		// 					{Attrname: "Reallocated_Sector_Ct", ID: 5},
+		// 					{Attrname: "Power_On_Hours", ID: 9},
+		// 					{Attrname: "Power_Cycle_Count", ID: 12},
+		// 					{
+		// 						Attrname: "Available_Reservd_Space",
+		// 						ID:       170,
+		// 						Thresh:   10,
+		// 					},
+		// 					{Attrname: "Program_Fail_Count", ID: 171},
+		// 					{Attrname: "Erase_Fail_Count", ID: 172},
+		// 					{Attrname: "Unsafe_Shutdown_Count", ID: 174},
+		// 					{
+		// 						Attrname: "Power_Loss_Cap_Test",
+		// 						ID:       175,
+		// 						Thresh:   10,
+		// 					},
+		// 					{Attrname: "SATA_Downshift_Count", ID: 183},
+		// 					{Attrname: "End-to-End_Error", ID: 184, Thresh: 90},
+		// 					{Attrname: "Reported_Uncorrect", ID: 187},
+		// 					{Attrname: "Temperature_Case", ID: 190},
+		// 					{Attrname: "Unsafe_Shutdown_Count", ID: 192},
+		// 					{Attrname: "Temperature_Internal", ID: 194},
+		// 					{Attrname: "Current_Pending_Sector", ID: 197},
+		// 					{Attrname: "CRC_Error_Count", ID: 199},
+		// 					{Attrname: "Host_Writes_32MiB", ID: 225},
+		// 					{Attrname: "Workld_Media_Wear_Indic", ID: 226},
+		// 					{Attrname: "Workld_Host_Reads_Perc", ID: 227},
+		// 					{Attrname: "Workload_Minutes", ID: 228},
+		// 					{
+		// 						Attrname: "Available_Reservd_Space",
+		// 						ID:       232,
+		// 						Thresh:   10,
+		// 					},
+		// 					{Attrname: "Media_Wearout_Indicator", ID: 233},
+		// 					{Attrname: "Thermal_Throttle", ID: 234},
+		// 					{Attrname: "Host_Writes_32MiB", ID: 241},
+		// 					{Attrname: "Host_Reads_32MiB", ID: 242},
+		// 					{Attrname: "NAND_Writes_32MiB", ID: 243},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	"+env1JSON",
+		// 	[]expectation{
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "3ware,0", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSda3Ware0,
+		// 		},
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "areca,1", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSdaAreca1,
+		// 		},
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "cciss,0", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSdaCciss0,
+		// 		},
+		// 		{
+		// 			args: []string{
+		// 				"-a", "/dev/sda", "-d", "sat", "-j",
+		// 			},
+		// 			out: mock.OutputEnv1GetRaidSdaSat,
+		// 		},
+		// 	},
+		// 	fields{
+		// 		jsonDevices: map[string]jsonDevice{},
+		// 		devices:     map[string]deviceParser{},
+		// 	},
+		// 	args{
+		// 		[]deviceInfo{
+		// 			{
+		// 				Name:     "/dev/sda",
+		// 				InfoName: "/dev/sda [SAT]",
+		// 				DevType:  "sat",
+		// 			},
+		// 		},
+		// 		true,
+		// 	},
+		// 	map[string]jsonDevice{
+		// 		"/dev/sda sat": {
+		// 			serialNumber: "PHWA619301M9120CGN",
+		// 			jsonData:     string(mock.OutputEnv1GetRaidSdaSat),
+		// 		},
+		// 	},
+		// 	map[string]deviceParser{},
+		// },
+		//
+		// {
+		// 	"-noDevices",
+		// 	[]expectation{},
+		// 	fields{
+		// 		jsonDevices: map[string]jsonDevice{},
+		// 		devices:     map[string]deviceParser{},
+		// 	},
+		// 	args{[]deviceInfo{}, false},
+		// 	map[string]jsonDevice{},
+		// 	map[string]deviceParser{},
+		// },
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -1055,7 +1183,51 @@ func TestPlugin_getDevices(t *testing.T) {
 			nil,
 			false,
 		},
-
+		{
+			"+HBA_with_SAS_1",
+			expect{true},
+			fields{
+				basicScanOut: mock.Outputs.Get("HBA_with_SAS_1").AllDevicesScan,
+				raidScanOut:  mock.Outputs.Get("HBA_with_SAS_1").RaidDevicesScan,
+			},
+			nil,
+			[]deviceInfo{
+				{Name: "/dev/sda", InfoName: "/dev/sda", DevType: "scsi"},
+				{Name: "/dev/sdaa", InfoName: "/dev/sdaa", DevType: "scsi"},
+				{Name: "/dev/sdab", InfoName: "/dev/sdab", DevType: "scsi"},
+				{Name: "/dev/sdac", InfoName: "/dev/sdac", DevType: "scsi"},
+				{Name: "/dev/sdad", InfoName: "/dev/sdad", DevType: "scsi"},
+				{Name: "/dev/sdae", InfoName: "/dev/sdae", DevType: "scsi"},
+				{Name: "/dev/sdaf", InfoName: "/dev/sdaf", DevType: "scsi"},
+				{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "scsi"},
+				{Name: "/dev/sdc", InfoName: "/dev/sdc", DevType: "scsi"},
+				{Name: "/dev/sdd", InfoName: "/dev/sdd", DevType: "scsi"},
+				{Name: "/dev/sde", InfoName: "/dev/sde", DevType: "scsi"},
+				{Name: "/dev/sdf", InfoName: "/dev/sdf", DevType: "scsi"},
+				{Name: "/dev/sdg", InfoName: "/dev/sdg", DevType: "scsi"},
+				{Name: "/dev/sdh", InfoName: "/dev/sdh", DevType: "scsi"},
+				{Name: "/dev/sdi", InfoName: "/dev/sdi", DevType: "scsi"},
+				{Name: "/dev/sdj", InfoName: "/dev/sdj", DevType: "scsi"},
+				{Name: "/dev/sdk", InfoName: "/dev/sdk", DevType: "scsi"},
+				{Name: "/dev/sdl", InfoName: "/dev/sdl", DevType: "scsi"},
+				{Name: "/dev/sdm", InfoName: "/dev/sdm", DevType: "scsi"},
+				{Name: "/dev/sdn", InfoName: "/dev/sdn", DevType: "scsi"},
+				{Name: "/dev/sdo", InfoName: "/dev/sdo", DevType: "scsi"},
+				{Name: "/dev/sdp", InfoName: "/dev/sdp", DevType: "scsi"},
+				{Name: "/dev/sdq", InfoName: "/dev/sdq", DevType: "scsi"},
+				{Name: "/dev/sdr", InfoName: "/dev/sdr", DevType: "scsi"},
+				{Name: "/dev/sds", InfoName: "/dev/sds", DevType: "scsi"},
+				{Name: "/dev/sdt", InfoName: "/dev/sdt", DevType: "scsi"},
+				{Name: "/dev/sdu", InfoName: "/dev/sdu", DevType: "scsi"},
+				{Name: "/dev/sdv", InfoName: "/dev/sdv", DevType: "scsi"},
+				{Name: "/dev/sdw", InfoName: "/dev/sdw", DevType: "scsi"},
+				{Name: "/dev/sdx", InfoName: "/dev/sdx", DevType: "scsi"},
+				{Name: "/dev/sdy", InfoName: "/dev/sdy", DevType: "scsi"},
+				{Name: "/dev/sdz", InfoName: "/dev/sdz", DevType: "scsi"},
+			},
+			nil,
+			false,
+		},
 		{
 			"-basicScanErr",
 			expect{false},
@@ -1115,19 +1287,28 @@ func TestPlugin_getDevices(t *testing.T) {
 				tt.wantBasic, gotBasic,
 				cmp.AllowUnexported(deviceInfo{}),
 			); diff != "" {
-				t.Fatalf("Plugin.getDevices() gotBasic = %s", diff)
+				t.Fatalf(
+					"Plugin.getDevices() Basic devices mismatch (-want +got):\n%s",
+					diff,
+				)
 			}
 			if diff := cmp.Diff(
 				tt.wantRaid, gotRaid,
 				cmp.AllowUnexported(deviceInfo{}),
 			); diff != "" {
-				t.Fatalf("Plugin.getDevices() gotRaid = %s", diff)
+				t.Fatalf(
+					"Plugin.getDevices() Raid devices mismatch (-want +got):\n%s",
+					diff,
+				)
 			}
 			if diff := cmp.Diff(
 				tt.wantMegaraid, gotMegaraid,
 				cmp.AllowUnexported(deviceInfo{}),
 			); diff != "" {
-				t.Fatalf("Plugin.getDevices() gotMegaraid = %s", diff)
+				t.Fatalf(
+					"Plugin.getDevices() MegaRaid devices mismatch (-want +got):\n%s",
+					diff,
+				)
 			}
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(

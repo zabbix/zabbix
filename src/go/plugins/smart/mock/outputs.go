@@ -1,6 +1,49 @@
 package mock
 
-import _ "embed"
+import (
+	_ "embed"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+)
+
+var Outputs = EnvironmentCollection{}
+
+type EnvironmentCollection map[string]Environment
+
+type Environment struct {
+	Version         json.RawMessage `json:"version"`
+	AllDevicesScan  json.RawMessage `json:"all_devices_scan"`
+	RaidDevicesScan json.RawMessage `json:"raid_devices_scan"`
+}
+
+func init() {
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		panic("No caller information")
+	}
+
+	b, err := os.ReadFile(filepath.Join(filepath.Dir(file), "outputs.json"))
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(b, &Outputs)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (ec EnvironmentCollection) Get(name string) Environment {
+	e, ok := ec[name]
+	if !ok {
+		panic(fmt.Sprintf("Environment %s not found", name))
+	}
+
+	return e
+}
 
 var (
 	//go:embed outputs/version_valid.json

@@ -1,0 +1,425 @@
+{
+  "HBA_with_SAS_1": {
+    "version": {
+      "json_format_version": [1, 0],
+      "smartctl": {
+        "version": [7, 3],
+        "svn_revision": "5338",
+        "platform_info": "x86_64-linux-6.1.0-13-amd64",
+        "build_info": "(local build)",
+        "argv": ["smartctl", "-j", "-V"],
+        "exit_status": 0
+      }
+    },
+    "all_devices_scan": {
+      "json_format_version": [1, 0],
+      "smartctl": {
+        "version": [7, 3],
+        "svn_revision": "5338",
+        "platform_info": "x86_64-linux-6.1.0-13-amd64",
+        "build_info": "(local build)",
+        "argv": ["smartctl", "--scan", "-j"],
+        "exit_status": 0
+      },
+      "devices": [
+        {
+          "name": "/dev/sda",
+          "info_name": "/dev/sda",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdb",
+          "info_name": "/dev/sdb",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdc",
+          "info_name": "/dev/sdc",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdd",
+          "info_name": "/dev/sdd",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sde",
+          "info_name": "/dev/sde",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdf",
+          "info_name": "/dev/sdf",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdg",
+          "info_name": "/dev/sdg",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdh",
+          "info_name": "/dev/sdh",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdi",
+          "info_name": "/dev/sdi",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdj",
+          "info_name": "/dev/sdj",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdk",
+          "info_name": "/dev/sdk",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdl",
+          "info_name": "/dev/sdl",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdm",
+          "info_name": "/dev/sdm",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdn",
+          "info_name": "/dev/sdn",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdo",
+          "info_name": "/dev/sdo",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdp",
+          "info_name": "/dev/sdp",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdq",
+          "info_name": "/dev/sdq",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdr",
+          "info_name": "/dev/sdr",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sds",
+          "info_name": "/dev/sds",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdt",
+          "info_name": "/dev/sdt",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdu",
+          "info_name": "/dev/sdu",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdv",
+          "info_name": "/dev/sdv",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdw",
+          "info_name": "/dev/sdw",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdx",
+          "info_name": "/dev/sdx",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdy",
+          "info_name": "/dev/sdy",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdz",
+          "info_name": "/dev/sdz",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdaa",
+          "info_name": "/dev/sdaa",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdab",
+          "info_name": "/dev/sdab",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdac",
+          "info_name": "/dev/sdac",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdad",
+          "info_name": "/dev/sdad",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdae",
+          "info_name": "/dev/sdae",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdaf",
+          "info_name": "/dev/sdaf",
+          "type": "scsi",
+          "protocol": "SCSI"
+        }
+      ]
+    },
+    "raid_devices_scan": {
+      "json_format_version": [1, 0],
+      "smartctl": {
+        "version": [7, 3],
+        "svn_revision": "5338",
+        "platform_info": "x86_64-linux-6.1.0-13-amd64",
+        "build_info": "(local build)",
+        "argv": ["smartctl", "--scan", "-j", "-d", "sat"],
+        "exit_status": 0
+      },
+      "devices": [
+        {
+          "name": "/dev/sda",
+          "info_name": "/dev/sda",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdb",
+          "info_name": "/dev/sdb",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdc",
+          "info_name": "/dev/sdc",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdd",
+          "info_name": "/dev/sdd",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sde",
+          "info_name": "/dev/sde",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdf",
+          "info_name": "/dev/sdf",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdg",
+          "info_name": "/dev/sdg",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdh",
+          "info_name": "/dev/sdh",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdi",
+          "info_name": "/dev/sdi",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdj",
+          "info_name": "/dev/sdj",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdk",
+          "info_name": "/dev/sdk",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdl",
+          "info_name": "/dev/sdl",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdm",
+          "info_name": "/dev/sdm",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdn",
+          "info_name": "/dev/sdn",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdo",
+          "info_name": "/dev/sdo",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdp",
+          "info_name": "/dev/sdp",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdq",
+          "info_name": "/dev/sdq",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdr",
+          "info_name": "/dev/sdr",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sds",
+          "info_name": "/dev/sds",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdt",
+          "info_name": "/dev/sdt",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdu",
+          "info_name": "/dev/sdu",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdv",
+          "info_name": "/dev/sdv",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdw",
+          "info_name": "/dev/sdw",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdx",
+          "info_name": "/dev/sdx",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdy",
+          "info_name": "/dev/sdy",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdz",
+          "info_name": "/dev/sdz",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdaa",
+          "info_name": "/dev/sdaa",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdab",
+          "info_name": "/dev/sdab",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdac",
+          "info_name": "/dev/sdac",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdad",
+          "info_name": "/dev/sdad",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdae",
+          "info_name": "/dev/sdae",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        {
+          "name": "/dev/sdaf",
+          "info_name": "/dev/sdaf",
+          "type": "scsi",
+          "protocol": "SCSI"
+        }
+      ]
+    }
+  }
+}

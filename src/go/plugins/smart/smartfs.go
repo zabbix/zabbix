@@ -602,7 +602,9 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 		)
 		if err != nil {
 			r.plugin.Tracef(
-				"failed to get megaraid device with name %s, %s", raid.name, err.Error(),
+				"failed to get megaraid device with name %s, %s",
+				raid.name,
+				err.Error(),
 			)
 
 			continue
@@ -610,7 +612,11 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 
 		var dp deviceParser
 		if err = json.Unmarshal(device, &dp); err != nil {
-			r.plugin.Tracef("failed to unmarshal megaraid device with name %s, %s", raid.name, err.Error())
+			r.plugin.Tracef(
+				"failed to unmarshal megaraid device with name %s, %s",
+				raid.name,
+				err.Error(),
+			)
 
 			continue
 		}
@@ -731,9 +737,9 @@ func (dp *deviceParser) checkErr() error {
 }
 
 // getDevices returns a parsed slices of all devices returned by smartctl scan.
-// Returns a separate slice for both normal and raid devices.
+// Returns a separate slice for basic, raid and megaraid devices. (in the described order)
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
+func (p *Plugin) getDevices() ([]deviceInfo, []deviceInfo, []deviceInfo, error) {
 	basicTmp, err := p.scanDevices("--scan", "-j")
 	if err != nil {
 		return nil, nil, nil, errs.Wrap(err, "failed to scan for devices")
@@ -744,9 +750,9 @@ func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 		return nil, nil, nil, errs.Wrap(err, "failed to scan for sat devices")
 	}
 
-	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
+	basic, raid, megaraid := formatDeviceOutput(basicTmp, raidTmp)
 
-	return
+	return basic, raid, megaraid, nil
 }
 
 // formatDeviceOutput removes raid devices from basic device list and separates megaraid devices from the rest of raid
