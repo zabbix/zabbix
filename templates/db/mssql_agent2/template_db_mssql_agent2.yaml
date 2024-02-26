@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-15T14:48:10Z'
+  date: '2024-02-26T14:29:18Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -3125,7 +3125,7 @@ zabbix_export:
                   expression: 'last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Not healthy'
                   priority: HIGH
-                  description: 'The synchronization state of the local availability database is "Not syncrhonizing".'
+                  description: 'The synchronization state of the local availability database is "Not synchronizing".'
                   tags:
                     - tag: availability-group
                       value: '{#GROUP_NAME}'
