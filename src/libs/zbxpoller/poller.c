@@ -195,7 +195,7 @@ out:
  *             key_orig           - [IN]                                           *
  *             data               - [IN/OUT] serialized availability data          *
  *             data_alloc         - [IN/OUT] serialized availability data size     *
- *             data_alloc         - [IN/OUT] serialized availability data offset   *
+ *             data_offset        - [IN/OUT] serialized availability data offset   *
  *             ts                 - [IN] timestamp                                 *
  *             unavailable_delay  - [IN]                                           *
  *             unreachable_period - [IN]                                           *
