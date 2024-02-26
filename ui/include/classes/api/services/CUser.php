@@ -916,7 +916,8 @@ class CUser extends CApiService {
 				}
 			}
 
-			if (self::getAuthTypeByGuiAccess($gui_access) == ZBX_AUTH_INTERNAL) {
+			if ($gui_access != GROUP_GUI_ACCESS_DISABLED
+					&& self::getAuthTypeByGuiAccess($gui_access) == ZBX_AUTH_INTERNAL) {
 				if ($db_users === null) {
 					$username = $user['username'];
 				}
