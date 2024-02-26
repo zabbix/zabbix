@@ -432,18 +432,19 @@
 			$preprocessing = $(obj.querySelector('#preprocessing'));
 		}
 
-		const sortable_preprocessing = new CSortable($preprocessing[0], {
+		new CSortable($preprocessing[0], {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			enable_sorting: $preprocessing[0].dataset.readonly == 0,
 			freeze_start: 1,
 			freeze_end: 1
-		});
-
-		sortable_preprocessing.on(CSortable.EVENT_SORT, () => {
-			$preprocessing[0].querySelectorAll('.preprocessing-list-item').forEach((list_item, index) => {
-				list_item.querySelector('[name*="sortorder"]').value = index;
+		})
+			.on(CSortable.EVENT_SORT, () => {
+				$preprocessing[0].querySelectorAll('.preprocessing-list-item').forEach((list_item, index) => {
+					list_item.querySelector('[name*="sortorder"]').value = index;
+				});
 			});
-		});
+
+		const change_event = new CustomEvent('item.preprocessing.change');
 
 		let step_index = $preprocessing.find('.preprocessing-list-item').length;
 
@@ -478,6 +479,7 @@
 					}
 				}
 
+				$preprocessing[0].dispatchEvent(change_event);
 				step_index++;
 			})
 			.on('click', '#preproc_test_all', function() {
@@ -518,6 +520,8 @@
 						$(this).find('[name*="sortorder"]').val(i++);
 					});
 				}
+
+				$preprocessing[0].dispatchEvent(change_event);
 			})
 			.on('change', 'z-select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
