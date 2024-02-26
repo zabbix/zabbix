@@ -124,10 +124,6 @@ func CompileMode() string {
 	return compileMode
 }
 
-func GoVersion() string {
-	return runtime.Version()
-}
-
 func TitleMessage() string {
 	var title string = titleMessage
 	if "windows" == compileOs {
@@ -145,10 +141,13 @@ func TitleMessage() string {
 	return title
 }
 
+// Display shows program version.
+// Program version includes Zabbix revision and it's time and date, compilation time and date, Go compiler tree's
+// version string, copyright message, and additionalMessages provided by the caller function.
 func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
 	fmt.Printf("Revision %s %s, compilation time: %s %s, built with: %s\n", Revision(), RevDate(), CompileDate(),
-		CompileTime(), GoVersion())
+		CompileTime(), runtime.Version())
 
 	for _, msg := range additionalMessages {
 		fmt.Println(msg)
