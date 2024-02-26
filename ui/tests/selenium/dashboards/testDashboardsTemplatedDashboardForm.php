@@ -4328,7 +4328,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			'class:clock',
 			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
-			'xpath://footer'
+			'xpath://footer',
+			// Cover Geomap widget, because it's screenshots are not stable.
+			'xpath://div[contains(@class, "leaflet-container")]'
 		];
 		$skip_elements = [];
 
