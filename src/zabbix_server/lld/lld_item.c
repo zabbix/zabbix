@@ -41,6 +41,7 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "../server_constants.h"
 
 #define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
@@ -1799,7 +1800,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 	item->ts_delete = 0;
 	item->ts_disable = 0;
-	item->disable_source = ZBX_LLD_DISABLE_SOURCE_DEFAULT;
+	item->disable_source = ZBX_DISABLE_SOURCE_DEFAULT;
 	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
@@ -4147,7 +4148,7 @@ static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_f
 }
 
 static	void	get_item_info_disable(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
-		int *lastcheck, int *ts_disable, int *status, int *disable_source, const char **name)
+		int *lastcheck, int *ts_disable, int *status, int *disable_source, char **name)
 {
 	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
 

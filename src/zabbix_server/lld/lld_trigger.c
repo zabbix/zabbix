@@ -35,6 +35,7 @@
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "../server_constants.h"
 
 typedef struct
 {
@@ -1503,7 +1504,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		trigger->ts_delete = 0;
 		trigger->ts_disable = 0;
-		trigger->disable_source = ZBX_LLD_DISABLE_SOURCE_DEFAULT;
+		trigger->disable_source = ZBX_DISABLE_SOURCE_DEFAULT;
 		trigger->parent_triggerid = trigger_prototype->triggerid;
 
 		trigger->description = zbx_strdup(NULL, trigger_prototype->description);
@@ -3616,7 +3617,7 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
 }
 
 static	void	get_trigger_info_disable(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
-		int *lastcheck, int *ts_disable, int *status, int *disable_source, const char **name)
+		int *lastcheck, int *ts_disable, int *status, int *disable_source, char **name)
 {
 	const zbx_lld_trigger_t	*trigger = (const zbx_lld_trigger_t *)object;
 

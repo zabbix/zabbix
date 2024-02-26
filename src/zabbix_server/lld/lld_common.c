@@ -24,6 +24,7 @@
 #include "audit/zbxaudit_item.h"
 #include "audit/zbxaudit_graph.h"
 #include "audit/zbxaudit_trigger.h"
+#include "../server_constants.h"
 
 ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
 ZBX_VECTOR_IMPL(id_name_pair, zbx_id_name_pair_t)
@@ -262,7 +263,7 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 		zbx_uint64_t	id;
 		int		discovery_flag, del_flag, object_lastcheck, object_ts_disable, object_status,
 				ts_disable, disable_source;
-		const char	*name;
+		char		*name;
 
 		cb_info_disable(objects->values[i], &id, &discovery_flag, &del_flag, &object_lastcheck,
 				&object_ts_disable, &object_status, &disable_source, &name);
@@ -273,7 +274,7 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 		if (0 != discovery_flag)
 		{
 			if (ZBX_LLD_OBJECT_STATUS_DISABLED == object_status &&
-					ZBX_LLD_DISABLE_SOURCE_LLD_LOST == disable_source)
+					ZBX_DISABLE_SOURCE_LLD_LOST == disable_source)
 			{
 				zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
 
@@ -363,7 +364,7 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 
 				ZBX_STR2UCHAR(disable_source, row[2]);
 
-				if (ZBX_LLD_DISABLE_SOURCE_LLD_LOST == disable_source)
+				if (ZBX_DISABLE_SOURCE_LLD_LOST == disable_source)
 				{
 					cb_audit_create(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE,
 							en_objs.values[i].id, en_objs.values[i].name,
@@ -433,7 +434,7 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 	if (0 != dis_ids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set disable_source=%d where",
-				table, ZBX_LLD_DISABLE_SOURCE_LLD_LOST);
+				table, ZBX_DISABLE_SOURCE_LLD_LOST);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, id_name, dis_ids.values, dis_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}

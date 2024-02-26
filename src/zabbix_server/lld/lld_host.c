@@ -36,6 +36,7 @@
 #include "zbxexpr.h"
 #include "zbxcrypto.h"
 #include "zbxhash.h"
+#include "../server_constants.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0
@@ -987,7 +988,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		host->ts_delete = 0;
 		host->ts_disable = 0;
-		host->disable_source = ZBX_LLD_DISABLE_SOURCE_DEFAULT;
+		host->disable_source = ZBX_DISABLE_SOURCE_DEFAULT;
 		host->host = zbx_strdup(NULL, host_proto);
 		host->host_orig = NULL;
 		zbx_substitute_lld_macros(&host->host, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
@@ -4461,7 +4462,7 @@ static int	lld_host_enable_validate(zbx_uint64_t hostid)
 
 		ZBX_STR2UCHAR(disable_source, row[1]);
 
-		if (ZBX_LLD_DISABLE_SOURCE_LLD_LOST == disable_source)
+		if (ZBX_DISABLE_SOURCE_LLD_LOST == disable_source)
 			ret = SUCCEED;
 	}
 	zbx_db_free_result(result);
@@ -4584,7 +4585,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 				zbx_vector_uint64_append(&discovered_hostids, host->hostid);
 
 			if (HOST_STATUS_MONITORED == host->status ||
-					ZBX_LLD_DISABLE_SOURCE_LLD_LOST != host->disable_source ||
+					ZBX_DISABLE_SOURCE_LLD_LOST != host->disable_source ||
 					SUCCEED != zbx_db_lock_hostid(host->hostid) ||
 					SUCCEED != lld_host_enable_validate(host->hostid))
 			{
@@ -4646,7 +4647,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 	if (0 != dis_hostids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set disable_source=%d where",
-				ZBX_LLD_DISABLE_SOURCE_LLD_LOST);
+				ZBX_DISABLE_SOURCE_LLD_LOST);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");

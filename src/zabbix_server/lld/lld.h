@@ -53,9 +53,6 @@ zbx_id_name_pair_t;
 #define ZBX_LLD_DISCOVERY_STATUS_NORMAL		0
 #define ZBX_LLD_DISCOVERY_STATUS_LOST		1
 
-#define ZBX_LLD_DISABLE_SOURCE_DEFAULT		0
-#define ZBX_LLD_DISABLE_SOURCE_LLD_LOST		1
-
 #define ZBX_LLD_OBJECT_STATUS_ENABLED		0
 #define ZBX_LLD_OBJECT_STATUS_DISABLED		1
 
@@ -360,7 +357,7 @@ typedef void	(*delete_ids_f)(zbx_vector_uint64_t *ids, int audit_context_mode);
 typedef void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *discovered, int *lastcheck,
 		unsigned char *discovery_status, int *ts_delete, const char **name);
 typedef void	(*get_object_info_disable_f)(const void *object, zbx_uint64_t *id, int *discovery_flag, int *del_flag,
-		int *lastcheck, int *ts_disable, int *status, int *disable_source, const char **name);
+		int *lastcheck, int *ts_disable, int *status, int *disable_source, char **name);
 typedef void	(*object_audit_entry_create_f)(int audit_context_mode, int audit_action, zbx_uint64_t objectid,
 		const char *name, int flags);
 typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_uint64_t objectid, int flags,

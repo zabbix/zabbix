@@ -30,7 +30,7 @@
 #include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_discoverer_constants.h"
-#include "../lld/lld.h"
+#include "../server_constants.h"
 
 typedef enum
 {
@@ -998,7 +998,7 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 				" from host_discovery"
 				" where disable_source=%d"
 					" and hostid=" ZBX_FS_UI64,
-				ZBX_LLD_DISABLE_SOURCE_LLD_LOST, hostid);
+				ZBX_DISABLE_SOURCE_LLD_LOST, hostid);
 
 		result = zbx_db_select_n(sql, 1);
 		zbx_free(sql);
@@ -1008,7 +1008,7 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 			zbx_db_execute("update host_discovery"
 					" set disable_source=%d"
 					" where hostid=" ZBX_FS_UI64,
-					ZBX_LLD_DISABLE_SOURCE_DEFAULT, hostid);
+					ZBX_DISABLE_SOURCE_DEFAULT, hostid);
 		}
 		zbx_db_free_result(result);
 	}
