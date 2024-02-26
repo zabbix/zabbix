@@ -56,6 +56,13 @@ class CSortable {
 	static ZBX_STYLE_ITEM = 'sortable-item';
 
 	/**
+	 * Class applied to frozen item elements.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_ITEM_FROZEN = 'sortable-item-frozen';
+
+	/**
 	 * Class applied to elements of item while it is being dragged.
 	 *
 	 * @type {string}
@@ -371,9 +378,12 @@ class CSortable {
 		}
 
 		this.mutate(() => {
-			for (const item of this.#items) {
+			for (const [index, item] of this.#items.entries()) {
 				for (const element of item.elements_live) {
 					element.classList.add(CSortable.ZBX_STYLE_ITEM);
+					element.classList.toggle(CSortable.ZBX_STYLE_ITEM_FROZEN,
+						index < this.#freeze_start || index > this.#items.length - 1 - this.#freeze_end
+					);
 				}
 			}
 		});

@@ -1131,7 +1131,7 @@ footer {
     .form-grid table.table-initial-width {
       width: auto; }
     .form-grid table .form_row td,
-    .form-grid table .sortable td {
+    .form-grid table .sortable-item:not(.sortable-item-frozen) td {
       line-height: 24px; }
     .form-grid table .sortable td.td-drag-icon {
       line-height: inherit; }

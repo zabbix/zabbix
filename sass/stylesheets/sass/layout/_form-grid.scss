@@ -218,7 +218,7 @@
 		}
 
 		.form_row,
-		.sortable {
+		.sortable-item:not(.sortable-item-frozen) {
 			td {
 				line-height: 24px;
 			}
