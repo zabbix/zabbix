@@ -201,8 +201,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		{
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
-				if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
-						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
+				if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
+						interface, (int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
 							interface, events_cbs, config_timeout);
@@ -221,8 +221,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
 			0 != zbx_dc_get_auto_registration_action_count())
 	{
-		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
-				heartbeat))
+		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
+				(int)time(NULL), heartbeat))
 		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
 					events_cbs, config_timeout);

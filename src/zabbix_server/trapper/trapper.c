@@ -506,8 +506,8 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 	zbx_db_free_result(result);
 	now = (int)time(NULL);
 
-	if (NULL == (result = zbx_db_select("select max(lastaccess) from sessions where status=%d group by userid,status",
-			ZBX_SESSION_ACTIVE)))
+	if (NULL == (result = zbx_db_select("select max(lastaccess) from sessions where status=%d group by userid"
+			",status", ZBX_SESSION_ACTIVE)))
 	{
 		goto out;
 	}
@@ -1342,7 +1342,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb, zbx_dc_get_psk_by_identity);
+	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb,
+			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 

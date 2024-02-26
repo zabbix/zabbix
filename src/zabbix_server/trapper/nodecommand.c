@@ -46,7 +46,8 @@
  *                FAIL    - error occurred                                        *
  *                                                                                *
  **********************************************************************************/
-static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
+static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
+		size_t *out_alloc)
 {
 	zbx_token_t	token;
 	int		pos = 0;
@@ -129,8 +130,8 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 	zbx_db_row_t	row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
-	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
-			",username,password,publickey,privatekey"
+	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port"
+			",authtype,username,password,publickey,privatekey"
 			",manualinput,manualinput_validator,manualinput_validator_type"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
@@ -250,9 +251,11 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	zbx_db_result_t	db_result;
 	zbx_db_row_t	row;
 
-	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
+	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64,
+			eventid)))
 	{
-		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.", error_len);
+		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.",
+				error_len);
 		return FAIL;
 	}
 
@@ -500,7 +503,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator, script.manualinput_validator_type))
+		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator,
+				script.manualinput_validator_type))
 		{
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
 			goto fail;
@@ -527,7 +531,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput,
 						&expanded_value, &expanded_value_size);
 
-				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second, expanded_value);
+				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second,
+						expanded_value);
 
 				zbx_free(expanded_value);
 			}
@@ -556,9 +561,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
-				NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
+				&host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type,
+				error, sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;

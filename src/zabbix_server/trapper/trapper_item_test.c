@@ -227,7 +227,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	item.headers = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
 
-	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items, "ssl_cert_file");
+	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items,
+			"ssl_cert_file");
 	item.ssl_key_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
 	item.ssl_key_password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
@@ -264,8 +265,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	}
 	else
 	{
-		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns", item.interface.dns_orig,
-				sizeof(item.interface.dns_orig));
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns",
+				item.interface.dns_orig, sizeof(item.interface.dns_orig));
 		item.interface.addr = item.interface.dns_orig;
 	}
 
@@ -282,9 +283,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		table_interface_snmp = zbx_db_get_table("interface_snmp");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_VERSION, table_interface_snmp, "version", &item.snmp_version);
-	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp, "community");
-	item.snmpv3_securityname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_SECURITYNAME, table_interface_snmp,
-			"securityname");
+	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp,
+			"community");
+	item.snmpv3_securityname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_SECURITYNAME,
+			table_interface_snmp, "securityname");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_SECURITYLEVEL, table_interface_snmp, "securitylevel",
 			&item.snmpv3_securitylevel);
@@ -387,7 +389,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			zbx_eval_context_t	ctx;
 			char			*error = NULL;
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION,
+					&error))
 			{
 				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 				zbx_free(error);

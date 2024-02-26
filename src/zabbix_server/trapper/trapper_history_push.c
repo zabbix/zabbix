@@ -474,7 +474,8 @@ static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr,
 		{
 			int	index;
 
-			if (FAIL == (index = zbx_vector_host_key_bsearch(&hostkeys, values->values[i]->hk, hk_compare)))
+			if (FAIL == (index = zbx_vector_host_key_bsearch(&hostkeys, values->values[i]->hk,
+					hk_compare)))
 			{
 				zbx_json_addobject(j, NULL);
 				zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, 0);
