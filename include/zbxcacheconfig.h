@@ -914,8 +914,6 @@ void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
-/* void	zbx_dc_free_item_queue(zbx_vector_ptr_t *queue); */
-/* int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to); */
 
 void	zbx_dc_free_item_queue(zbx_vector_queue_item_ptr_t *queue);
 int	zbx_dc_get_item_queue(zbx_vector_queue_item_ptr_t *queue, int from, int to);

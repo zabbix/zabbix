@@ -80,7 +80,6 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
 static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host, char **info, char *error,
 		size_t max_error_len)
 {
-	int		time_start;
 	zbx_uint64_t	taskid;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
@@ -91,7 +90,7 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		return FAIL;
 	}
 
-	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
+	for (int time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
 	{
 		result = zbx_db_select(
 				"select tr.status,tr.info"
