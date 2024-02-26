@@ -311,7 +311,7 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The local availability database has a non-working state.</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.state["{#DBNAME}"])>0`|Warning||
-|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Not healthy|<p>The synchronization state of the local availability database is "Not syncrhonizing".</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=0`|High||
+|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Not healthy|<p>The synchronization state of the local availability database is "Not synchronizing".</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=0`|High||
 |MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Partially healthy|<p>A database on a synchronous-commit availability replica is considered partially healthy if synchronization state is "Synchronizing".</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=1`|Average||
 
 ### LLD rule Non-local database discovery

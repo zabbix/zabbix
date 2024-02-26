@@ -3127,7 +3127,7 @@ zabbix_export:
                   expression: 'last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=0'
                   name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Not healthy'
                   priority: HIGH
-                  description: 'The synchronization state of the local availability database is "Not syncrhonizing".'
+                  description: 'The synchronization state of the local availability database is "Not synchronizing".'
                   tags:
                     - tag: availability-group
                       value: '{#GROUP_NAME}'
