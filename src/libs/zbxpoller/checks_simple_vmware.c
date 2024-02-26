@@ -262,7 +262,7 @@ out:
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
  *               SYSINFO_RET_OK, result has no value - performance counter    *
- *                               was found without a value                    *
+ *                               was found without value                      *
  *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
  *                                                                            *
  * Comments: There can be situation when performance counter is configured    *
@@ -420,7 +420,7 @@ out:
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
  *               SYSINFO_RET_OK, result has no value - performance counter    *
- *                               was found without a value                    *
+ *                               was found without value                      *
  *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
  *                                                                            *
  * Comments: There can be situation when performance counter is configured    *
@@ -530,12 +530,11 @@ out:
  * Purpose: retrieves data from virtual machine details                       *
  *                                                                            *
  * Parameters: request   - [IN] The original request. The first parameter is  *
- *                              vmware service URL and the second parameter.  *
+ *                              vmware service URL and the second parameter   *
  *                              is virtual machine uuid.                      *
  *             username  - [IN] vmware service user name                      *
  *             password  - [IN] vmware service password                       *
  *             propid    - [IN]                                               *
- *             xpath     - [IN] xpath describing data to retrieve             *
  *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
@@ -1102,7 +1101,7 @@ static int	severity_to_mask(const char *level, unsigned char *severity_mask)
  * Parameters: severity - [IN] event severity value from item parameter,      *
  *                             which might contain multiple severity levels   *
  *             mask     - [OUT] result of conversion                          *
- *             error    - [OUT] error message in case of an error             *
+ *             error    - [OUT] error message in case of error                *
  *                                                                            *
  * Return value: SUCCEED - if no errors were detected                         *
  *               FAIL    - otherwise                                          *
