@@ -62,8 +62,8 @@ class CHostGroup extends CApiService {
 			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
 			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 			'ipmi_sensor', 'jmx_endpoint', 'interfaceid', 'username', 'publickey', 'privatekey', 'password', 'snmp_oid',
-			'parameters', 'params', 'delay', 'master_itemid', 'lifetime', 'trapper_hosts',
-			'allow_traps', 'description', 'status', 'state', 'error', 'templateid'
+			'parameters', 'params', 'delay', 'master_itemid', 'lifetime', 'trapper_hosts', 'allow_traps', 'description',
+			'status', 'state', 'error', 'templateid'
 		];
 		$host_prototype_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
 			'custom_interfaces', 'uuid'
