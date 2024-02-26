@@ -312,25 +312,7 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 
 	zbx_db_begin();
 
-	for (i = upd_ids.values_num - 1; i >= 0; i--)
-	{
-		if (SUCCEED != zbx_db_lock_record(table_obj, upd_ids.values[i], NULL, 0))
-		{
-			int			j;
-			zbx_uint64_t		id = upd_ids.values[i];
-			zbx_uint64_pair_t	pair = {.first = id};
-
-			if (FAIL != (j = zbx_vector_uint64_bsearch(&ts_ids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				zbx_vector_uint64_remove(&ts_ids, j);
-
-			if (FAIL != (j = zbx_vector_uint64_pair_search(&ts_upd, pair, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				zbx_vector_uint64_pair_remove_noorder(&ts_upd, j);
-
-			zbx_vector_uint64_remove(&upd_ids, i);
-		}
-	}
-
-	if (0 != upd_ids.values_num)
+	if (0 != upd_ids.values_num && SUCCEED == zbx_db_lock_records(table_obj, &upd_ids))
 	{
 		zbx_db_result_t	result;
 		zbx_db_row_t	row;
