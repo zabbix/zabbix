@@ -176,14 +176,12 @@ foreach ($data['groups'] as $group) {
 		$max = 0;
 
 		foreach ($group['groupDiscoveries'] as $group_discovery) {
-			foreach ($group['discoveryRules'] as $discovery_rule) {
-				if ($discovery_rule['lifetime_type'] == ZBX_LLD_DELETE_NEVER) {
-					$max = 0;
-					break;
-				}
-
-				$max = max($max, (int) $group_discovery['ts_delete']);
+			if ($group_discovery['ts_delete'] == 0) {
+				$max = 0;
+				break;
 			}
+
+			$max = max($max, (int) $group_discovery['ts_delete']);
 		}
 
 		if ($max > 0) {

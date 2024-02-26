@@ -690,10 +690,11 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
 /**
  * Returns the indicator for lost LLD entity.
  *
- * @param int     $current_time           Current Unix timestamp.
- * @param int     $ts_delete              Deletion timestamp of the entity.
- * @param int     $ts_disable             Disabling timestamp of the entity.
- * @param string  $entity                 Type of entity.
+ * @param int     $current_time     Current Unix timestamp.
+ * @param int     $ts_delete        Deletion timestamp of the entity.
+ * @param int     $ts_disable       Disabling timestamp of the entity.
+ * @param boolean $disabled_by_lld  Indicator whether entity was disabled by an LLD rule.
+ * @param string  $entity           Type of entity.
  *
  * @throws Exception
  */
@@ -702,62 +703,72 @@ function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_di
 	$warning = '';
 
 	if($disabled_by_lld) {
-		if ($ts_delete > 0) {
-			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-				_('has been disabled'),
+		if ($ts_delete > 0 && $current_time < $ts_delete) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity), _('has been disabled'),
 				_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 			);
 		}
 		elseif ($ts_delete == 0) {
-			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-				_('has been disabled'), _('will not be deleted')
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity), _('has been disabled'),
+				_('will not be deleted')
+			);
+		}
+		elseif ($current_time > $ts_delete) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity), _('has been disabled'),
+				_('will be deleted the next time discovery rule is processed')
 			);
 		}
 	}
-	else {
-		if ($ts_delete > 0) {
-			if ($current_time > $ts_delete) {
+	elseif ($ts_delete > 0) {
+		$delete_msg = _s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete));
+
+		switch (true) {
+			case $current_time > $ts_delete:
 				$warning = _s('The %1$s is not discovered anymore and %2$s.', _($entity),
 					_('will be deleted the next time discovery rule is processed')
 				);
-			}
-			if ($ts_disable > 0) {
+				break;
+
+			case $ts_disable == 0:
 				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
-					_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+					_s('will not be disabled'), $delete_msg
 				);
-			}
-			if ($ts_disable == 0) {
-				$warning = _s('The %1$s is not discovered anymore and %2$s.',
-					_($entity),
-					_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+				break;
+
+			case $ts_disable > 0 && $ts_disable > $current_time:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)), $delete_msg
 				);
-			}
+				break;
+
+			case $ts_disable != 0 && $current_time > $ts_disable:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+					_('will be disabled the next time discovery rule is processed'), $delete_msg
+				);
+				break;
 		}
-		elseif($ts_disable != 0 && ($ts_disable !== '0' && $current_time > $ts_disable)) {
-			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.',
-				_($entity),
-				_('will be disabled the next time discovery rule is processed'),
-				$ts_delete > 0
-					? _s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
-					: _('will not be deleted')
-			);
-		}
-		else {
-			if ($ts_delete == 0) {
-				if ($ts_disable > 0) {
-					$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-						_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
-						_('will not be deleted')
-					);
-				}
-				elseif ($ts_disable == 0) {
-					$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
-						_('will not be disabled'),
-						_('will not be deleted')
-					);
-				}
-			}
+	}
+	elseif ($ts_delete == 0) {
+		$delete_msg =  _('will not be deleted');
+
+		switch (true) {
+			case $ts_disable > 0:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)), $delete_msg
+				);
+				break;
+
+			case $ts_disable == 0:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+					_('will not be disabled'), $delete_msg
+				);
+				break;
+
+			case $ts_disable != 0 && $current_time > $ts_disable:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+					_('will be disabled the next time discovery rule is processed'), $delete_msg
+				);
+				break;
 		}
 	}
 
