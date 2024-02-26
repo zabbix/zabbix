@@ -6542,7 +6542,10 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_db_free_result(result);
 
 	if (0 == hgsets.values_num)
+	{
+		sql_offset = 0;
 		goto skip_permissions;
+	}
 
 	/* calculate hash for last hgset in vector */
 	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
