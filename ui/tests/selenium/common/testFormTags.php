@@ -609,7 +609,7 @@ class testFormTags extends CWebTest {
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
 
-			if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype'])) {
+			if (!in_array($object, ['host', 'host prototype', 'web scenario'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}

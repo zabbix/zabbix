@@ -2153,6 +2153,10 @@ abstract class testFormPreprocessing extends CWebTest {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
 		}
+
+		if (!$lld) {
+			COverlayDialogElement::find()->one()->close();
+		}
 	}
 
 	/*
@@ -2257,6 +2261,10 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($data['preprocessing']);
+
+		if (!$lld) {
+			COverlayDialogElement::find()->one()->close();
+		}
 	}
 
 	/**
@@ -2514,6 +2522,10 @@ abstract class testFormPreprocessing extends CWebTest {
 				$this->assertTrue($steps[$i]['on_fail']->isSelected());
 				$this->assertTrue($steps[$i]['on_fail']->isEnabled());
 			}
+		}
+
+		if (!$lld) {
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 
@@ -2833,6 +2845,10 @@ abstract class testFormPreprocessing extends CWebTest {
 					break;
 			}
 		}
+
+		if (!$lld) {
+			COverlayDialogElement::find()->one()->close();
+		}
 	}
 
 	/**
@@ -2905,6 +2921,10 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->invalidate();
 		$this->assertEquals($cloned_values['Name'], $form->getField('Name')->getValue());
 		$this->checkPreprocessingSteps($form, $original_steps);
+
+		if ($item === 'Item' || $item === 'Item prototype') {
+			COverlayDialogElement::find()->one()->close();
+		}
 	}
 
 	/**

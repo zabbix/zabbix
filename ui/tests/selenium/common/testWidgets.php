@@ -94,6 +94,11 @@ class testWidgets extends CWebTest {
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
 		$items_dialog->close();
+
+		if ($widget === 'Top hosts') {
+			$select_form->close();
+		}
+
 		$widget_dialog->close();
 	}
 }

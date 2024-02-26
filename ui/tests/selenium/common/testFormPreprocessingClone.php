@@ -256,6 +256,7 @@ class testFormPreprocessingClone extends CWebTest {
 		$this->query('link:'.CDBHelper::getValue('SELECT name FROM items WHERE itemid ='.$this->itemid))->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilPresent()->asForm()->selectTab('Preprocessing');
 		$item_original_steps = $this->listPreprocessingSteps();
+		COverlayDialogElement::find()->one()->close();
 
 		// Get LLD key and  preprocessing.
 		$lld_key = CDBHelper::getValue('SELECT key_ FROM items WHERE itemid ='.$this->lldid);
@@ -295,6 +296,7 @@ class testFormPreprocessingClone extends CWebTest {
 		COverlayDialogElement::find()->one()->asForm()->waitUntilPresent()->selectTab('Preprocessing');
 		$item_cloned_steps = $this->listPreprocessingSteps();
 		$this->assertEquals($item_original_steps, $item_cloned_steps);
+		COverlayDialogElement::find()->one()->close();
 
 		// Get new cloned lld rule id and assert lld preprocessing.
 		$new_lldid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid ='.$cloned_hostid.
@@ -308,9 +310,11 @@ class testFormPreprocessingClone extends CWebTest {
 		$this->page->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$new_lldid.'&context='.$context);
 		$this->query('link:'.CDBHelper::getValue('SELECT name FROM items WHERE itemid ='.$new_item_prototypeid))->one()
 				->click();
-		COverlayDialogElement::find()->one()->asForm()->waitUntilPresent()->selectTab('Preprocessing');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilPresent();
+		$dialog->asForm()->selectTab('Preprocessing');
 		$item_prototype_cloned_steps = $this->listPreprocessingSteps();
 		$this->assertEquals($item_prototype_original_steps, $item_prototype_cloned_steps);
+		$dialog->close();
 	}
 
 	/**

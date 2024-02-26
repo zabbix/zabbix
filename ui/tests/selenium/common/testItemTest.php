@@ -1050,7 +1050,7 @@ class testItemTest extends CWebTest {
 					unset($macro);
 				}
 
-				if ($macros['expected']){
+				if ($macros['expected']) {
 					foreach ($test_form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
@@ -1088,9 +1088,11 @@ class testItemTest extends CWebTest {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['error']);
-				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				break;
 		}
+
+		$overlay->close();
+		$dialog->close();
 	}
 
 	/**

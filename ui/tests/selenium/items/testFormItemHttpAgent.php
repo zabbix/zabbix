@@ -59,9 +59,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				);
 			}
 			else {
-			$this->assertEquals($value, $form_field->getValue());
+				$this->assertEquals($value, $form_field->getValue());
 			}
 		}
+
+		$dialog->close();
 	}
 
 	/**
@@ -306,7 +308,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");
 			$result = trim(preg_replace('/\s\s+/', ' ', $get_text));
 			$this->assertEquals($result, $data['error']);
+
+			COverlayDialogElement::find()->all()->last()->close();
 		}
+
+		$dialog->close();
 	}
 
 	/*
@@ -385,6 +391,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		// Check error message on posting the form.
 		$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
+
+		$dialog->close();
 	}
 
 	public static function getCreateValidationData() {

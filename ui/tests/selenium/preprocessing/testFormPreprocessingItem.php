@@ -136,9 +136,11 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		// Open original item form and get steps text.
 		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.$original_hostid);
 		$this->query('link', $item_name)->one()->click();
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
+		$dialog->close();
 		// Open copied item form, get steps text and compare to original.
 		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID);
 		$this->query('link', $item_name)->one()->click();
@@ -154,6 +156,8 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
 			$this->assertNull($step->getAttribute('readonly'));
 		}
+
+		$dialog->close();
 	}
 
 	/**
@@ -241,5 +245,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 			// Check that entered value did not disappear.
 			$this->assertEquals('test', $form->getField($fields['value'])->getValue());
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 }

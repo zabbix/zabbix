@@ -1040,6 +1040,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				}
 			}
 		}
+
+		$dialog->close();
 	}
 
 	// Returns update data
@@ -2178,9 +2180,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$this->zbxTestCheckTitle('Configuration of item prototypes');
 					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent(['Name', 'Type', 'Key']);
+
 					if (isset($data['formula'])) {
 						$this->zbxTestAssertElementValue('formula', $data['formulaValue']);
 					}
+
+					$dialog->close();
 					break;
 			}
 		}
@@ -2249,6 +2254,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
 			}
+
+			$dialog_check->close();
 		}
 
 		if (isset($data['dbCheck'])) {

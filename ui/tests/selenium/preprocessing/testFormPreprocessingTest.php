@@ -238,6 +238,7 @@ class testFormPreprocessingTest extends CWebTest {
 			$this->addPreprocessingSteps([$step]);
 			$this->checkTestOverlay($data, 'name:preprocessing['.$i.'][test]', in_array($step['type'], $this->change_types), $i);
 		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getTestAllStepsData() {
@@ -451,6 +452,8 @@ class testFormPreprocessingTest extends CWebTest {
 			}
 		}
 		$this->checkTestOverlay($data, 'button:Test all steps', $prev_enabled);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getSortingData() {
@@ -493,7 +496,7 @@ class testFormPreprocessingTest extends CWebTest {
 	 *
 	 * @dataProvider getSortingData
 	 */
-	public function testFormItemPreprocessingTest_Sorting($data) {
+	public function testFormPreprocessingTest_Sorting($data) {
 		// Result order of steps.
 		$preprocessing = [
 			['type' => 'Check for not supported value'],
@@ -526,6 +529,8 @@ class testFormPreprocessingTest extends CWebTest {
 		$this->query('link', self::$name)->one()->click();
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($preprocessing);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	private function openPreprocessing($data) {
@@ -557,7 +562,7 @@ class testFormPreprocessingTest extends CWebTest {
 			case TEST_BAD:
 				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
-				$dialog->query('class:btn-overlay-close')->one()->click();
+				$dialog->close();
 				break;
 
 			case TEST_GOOD:
@@ -650,7 +655,7 @@ class testFormPreprocessingTest extends CWebTest {
 				$message = $form->getOverlayMessage();
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost:10051" refused. Possible reasons:'));
-				$dialog->query('class:btn-overlay-close')->one()->click();
+				$dialog->close();
 				break;
 
 			case 'Cancel':
@@ -658,7 +663,7 @@ class testFormPreprocessingTest extends CWebTest {
 				break;
 
 			default:
-				$dialog->query('class:btn-overlay-close')->one()->click();
+				$dialog->close();
 		}
 	}
 }

@@ -3582,6 +3582,8 @@ class testCalculatedFormula extends CWebTest {
 			$this->assertMessage(TEST_BAD, $title, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));
+
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ($prototype ? 'Item prototype added' : 'Item added'));

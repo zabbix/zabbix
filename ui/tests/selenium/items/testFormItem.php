@@ -926,6 +926,8 @@ class testFormItem extends CLegacyWebTest {
 				}
 			}
 		}
+
+		$dialog->close();
 	}
 
 	// Returns update data
@@ -1987,9 +1989,12 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestCheckTitle('Configuration of items');
 					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent(['Host', 'Name', 'Key']);
+
 					if (isset($data['formula'])) {
 						$this->zbxTestAssertElementValue('formula', $data['formulaValue']);
 					}
+
+					$dialog->close();
 					break;
 				}
 			}
@@ -2074,6 +2079,8 @@ class testFormItem extends CLegacyWebTest {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
 			}
+
+			$dialog_check->close();
 		}
 	}
 
@@ -2104,11 +2111,13 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
 		$this->zbxTestClickLinkTextWait($this->item);
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue']", 'Overridden by global housekeeping settings (99d)');
 		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
+		$dialog->close();
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
 

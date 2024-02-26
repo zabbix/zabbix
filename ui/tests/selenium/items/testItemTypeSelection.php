@@ -266,5 +266,7 @@ class testItemTypeSelection extends CWebTest {
 		}
 
 		$this->assertEquals($data['type'], $form->getField('Type of information')->getValue());
+
+		COverlayDialogElement::find()->one()->close();
 	}
 }

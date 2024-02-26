@@ -145,29 +145,27 @@ class testTemplateInheritance extends CLegacyWebTest {
 				break;
 		}
 
-		switch ($result) {
-			case TEST_GOOD:
-				// check that the inherited item matches the original
-				$this->zbxTestOpen(self::HOST_LIST_PAGE);
-				$this->filterEntriesAndOpenObjects($this->hostName, 'Items', 'Items');
-				$this->zbxTestCheckHeader('Items');
-				$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
-				$this->zbxTestClickLinkTextWait($itemName);
-				$this->zbxTestAssertElementValue('name', $itemName);
-				$this->zbxTestAssertElementValue('key', $keyName);
-				$this->zbxTestDropdownAssertSelected('type', 'Simple check');
-				$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
-				$this->zbxTestAssertElementValue('units', 'units');
-				$this->zbxTestAssertElementValue('delay', '33s');
-				$this->zbxTestAssertElementValue('history', '54d');
-				$this->zbxTestAssertElementValue('trends', '55d');
-				$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
-				$this->zbxTestTextPresent('Parent items');
-				$this->zbxTestTextPresent($template);
-				break;
-			case TEST_BAD:
-				break;
+		if ($result === TEST_GOOD) {
+			// check that the inherited item matches the original
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$this->filterEntriesAndOpenObjects($this->hostName, 'Items', 'Items');
+			$this->zbxTestCheckHeader('Items');
+			$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
+			$this->zbxTestClickLinkTextWait($itemName);
+			$this->zbxTestAssertElementValue('name', $itemName);
+			$this->zbxTestAssertElementValue('key', $keyName);
+			$this->zbxTestDropdownAssertSelected('type', 'Simple check');
+			$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
+			$this->zbxTestAssertElementValue('units', 'units');
+			$this->zbxTestAssertElementValue('delay', '33s');
+			$this->zbxTestAssertElementValue('history', '54d');
+			$this->zbxTestAssertElementValue('trends', '55d');
+			$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
+			$this->zbxTestTextPresent('Parent items');
+			$this->zbxTestTextPresent($template);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testTemplateInheritance_unlinkHost(){
@@ -391,6 +389,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
+
+		$overlay->close();
 	}
 
 	/**

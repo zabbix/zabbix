@@ -1171,6 +1171,8 @@ class testFormNetworkDiscovery extends CWebTest {
 					$this->assertEquals($old_hash, $this->getHash());
 
 					// After checking error in overlay no need to test further form.
+					$check_dialog->close();
+					$dialog->close();
 					return;
 				}
 
