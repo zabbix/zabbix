@@ -275,13 +275,18 @@ typedef struct
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;
+	const char		*timeout;
 	ZBX_DC_TRIGGER		**triggers;
 	ZBX_DC_ITEMTYPE		itemtype;
 	ZBX_DC_ITEMVALUETYPE	itemvaluetype;
+	zbx_uint64_t		revision;
+	zbx_uint64_t		templateid;
+	ZBX_DC_PREPROCITEM	*preproc_item;
+	ZBX_DC_MASTERITEM	*master_item;
+	zbx_vector_ptr_t	tags;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
-	zbx_uint64_t		revision;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -293,12 +298,6 @@ typedef struct
 	unsigned char		status;
 	unsigned char		queue_priority;
 	unsigned char		update_triggers;
-	zbx_uint64_t		templateid;
-	ZBX_DC_PREPROCITEM	*preproc_item;
-	ZBX_DC_MASTERITEM	*master_item;
-
-	zbx_vector_ptr_t	tags;
-	const char		*timeout;
 }
 ZBX_DC_ITEM;
 
