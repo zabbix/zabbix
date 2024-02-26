@@ -168,8 +168,7 @@
 
 			if (!this.#is_templated) {
 				new CSortable(this.#steps.querySelector('tbody'), {
-					selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-					enable_sorting: !this.#is_templated
+					selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
 				});
 			}
 		}
