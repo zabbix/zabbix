@@ -786,7 +786,7 @@ class CSortable {
 	#toggleListeners(mode) {
 		this.#target.removeEventListener('mousedown', this.#listeners.mouseDown);
 		this.#target.removeEventListener('wheel', this.#listeners.wheel);
-		this.#target.removeEventListener('keydown', this.#listeners.keydown);
+		this.#target.removeEventListener('keydown', this.#listeners.keyDown);
 		this.#target.removeEventListener('focusin', this.#listeners.focusIn);
 		this.#target.removeEventListener('transitionrun', this.#listeners.transitionRun);
 		this.#target.removeEventListener('transitionend', this.#listeners.transitionEnd);
@@ -800,7 +800,7 @@ class CSortable {
 			case CSortable.LISTENERS_SCROLL:
 				this.#target.addEventListener('mousedown', this.#listeners.mouseDown);
 				this.#target.addEventListener('wheel', this.#listeners.wheel);
-				this.#target.addEventListener('keydown', this.#listeners.keydown);
+				this.#target.addEventListener('keydown', this.#listeners.keyDown);
 				this.#target.addEventListener('focusin', this.#listeners.focusIn);
 				this.#target.addEventListener('transitionrun', this.#listeners.transitionRun);
 				this.#target.addEventListener('transitionend', this.#listeners.transitionEnd);
@@ -1029,7 +1029,7 @@ class CSortable {
 			}
 		},
 
-		keydown: (e) => {
+		keyDown: (e) => {
 			if (!this.#is_enabled_sorting) {
 				return;
 			}
