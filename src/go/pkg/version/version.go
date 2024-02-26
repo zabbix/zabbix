@@ -147,7 +147,8 @@ func TitleMessage() string {
 func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
 	fmt.Printf("Revision %s %s, compilation time: %s %s, built with: %s\n",
-		Revision(), RevDate(), CompileDate(), CompileTime(), runtime.Version())
+		Revision(), RevDate(), CompileDate(), CompileTime(), runtime.Version(),
+	)
 
 	for _, msg := range additionalMessages {
 		fmt.Println(msg)
