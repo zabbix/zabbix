@@ -38,7 +38,7 @@
 				height: size,
 				colorDark : styles.color,
 				colorLight : styles.backgroundColor,
-				correctLevel : QRCode.CorrectLevel.H
+				correctLevel : QRCode.CorrectLevel.L
 			});
 		}
 	}

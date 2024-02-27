@@ -5627,13 +5627,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   background-color: #2b2b2b; }
 
 .qr-code img {
-  image-rendering: optimizeSpeed;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -o-crisp-edges;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: pixelated;
-  image-rendering: optimize-contrast;
-  -ms-interpolation-mode: nearest-neighbor; }
+  image-rendering: pixelated; }
 
 .menu-popup-overlay {
   position: fixed;
