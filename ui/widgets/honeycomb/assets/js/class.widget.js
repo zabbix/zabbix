@@ -88,13 +88,21 @@ class CWidgetHoneycomb extends CWidget {
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_LEAVE, e => {
 				this.#interacting_timeout_id = setTimeout(() => {
 					this.#user_interacting = false;
-				}, 1000)
+				}, 1000);
 			});
 		}
 
 		this.#honeycomb.setValue({
 			cells: response.cells
 		});
+	}
+
+	onFeedback({type, value, descriptor}) {
+		if (type === '_itemid') {
+			return this.#honeycomb.selectCell(value);
+		}
+
+		return super.onFeedback({type, value, descriptor});
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

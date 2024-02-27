@@ -243,6 +243,26 @@ class CSVGHoneycomb {
 		this.#updateCells();
 	}
 
+	selectCell(itemid) {
+		let has_selected = false;
+
+		this.#honeycomb_container
+			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
+			.each((d, i, cells) => {
+				const selected = d.itemid == itemid;
+
+				if (selected) {
+					has_selected = true;
+				}
+
+				d3.select(cells[i])
+					.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED, selected)
+					.style('--stroke-selected', selected ? d3.color(this.#getFillColor(d))?.darker(.6).formatHex() : null)
+			});
+
+		return has_selected;
+	}
+
 	/**
 	 * Get the root SVG element.
 	 *
@@ -444,23 +464,14 @@ class CSVGHoneycomb {
 		cell
 			.call(cell => this.#drawLabel(cell))
 			.on('click', (e, d) => {
-				this.#honeycomb_container
-					.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
-					.each((datum, i, cells) => {
-						d3.select(cells[i])
-							.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED, d === datum)
-							.style('--stroke-selected', d === datum
-								? d3.color(this.#getFillColor(datum))?.darker(.6).formatHex()
-								: null
-							)
+				if (this.selectCell(d.itemid)) {
+					this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_CLICK, {
+						detail: {
+							hostid: d.hostid,
+							itemid: d.itemid
+						}
 					});
-
-				this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_CLICK, {
-					detail: {
-						hostid: d.hostid,
-						itemid: d.itemid
-					}
-				});
+				}
 			})
 			.on('mouseenter', (e, d) => {
 				if (d.scale_timeout === undefined) {
