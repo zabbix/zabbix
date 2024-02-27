@@ -107,6 +107,139 @@ class testDiscoveryRule extends CAPITest {
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 				]).'.'
+			],
+			'Test invalid lifetime_type value' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete immediately',
+					'key_' => 'apillddelete',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'lifetime_type' => '4'
+				],
+				'expected_error' => 'Invalid parameter "/1/lifetime_type": value must be one of '.implode(', ', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]).'.'
+			],
+			'Test invalid lifetime value' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete after',
+					'key_' => 'apillddeleteafter',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'lifetime' => 'aaaaaaa'
+				],
+				'expected_error' => 'Invalid parameter "/1/lifetime": a time unit is expected.'
+			],
+			'Test invalid lifetime value (array)' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete after',
+					'key_' => 'apillddeleteafter',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'lifetime' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/lifetime": a character string is expected.'
+			],
+			'Test unexpected lifetime parameter' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete immediately',
+					'key_' => 'apillddeletenow',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
+					'lifetime' => '14d'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "lifetime".'
+			],
+			'Test unexpected enabled_lifetime_type parameter' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete immediately',
+					'key_' => 'apillddeletenow',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "enabled_lifetime_type".'
+			],
+			'Test invalid enabled_lifetime_type value' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule disable',
+					'key_' => 'apillddisable',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'enabled_lifetime_type' => '4'
+				],
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime_type": value must be one of '.implode(', ', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY]).'.'
+			],
+			'Test invalid enabled_lifetime value' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete after',
+					'key_' => 'apillddelete',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
+					'enabled_lifetime' => 'aaaaaaa'
+				],
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": a time unit is expected.'
+			],
+			'Test invalid enabled_lifetime value (array)' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete default and disable after',
+					'key_' => 'apillddisable',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
+					'enabled_lifetime' => []
+				],
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": a character string is expected.'
+			],
+			'Test unexpected enabled_lifetime parameter with disable never' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete default and disable never',
+					'key_' => 'apillddisablenever',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
+					'enabled_lifetime' => '1h'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "enabled_lifetime".'
+			],
+			'Test unexpected enabled_lifetime parameter with disable immediately' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule disable immediately',
+					'key_' => 'apillddisablenever',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY,
+					'enabled_lifetime' => '1h'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "enabled_lifetime".'
+			],
+			'Test invalid lifetime and enabled_lifetime values' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule disable after deletion',
+					'key_' => 'apillddisableafterdelete',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_ZABBIX,
+					'interfaceid' => '50022',
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'lifetime' => '7h',
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
+					'enabled_lifetime' => '77h',
+					'delay' => '30s'
+				],
+				'expected_error' => 'Invalid parameter "/1": "Delete lost resources" value must be greater than "Disable lost resources" value.'
 			]
 		];
 
@@ -257,6 +390,43 @@ class testDiscoveryRule extends CAPITest {
 					'key_' => 'mqtt.get[1]',
 					'hostid' => '50009',
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE
+				],
+				'expected_error' => null
+			],
+			'Test with lifetime and enabled_lifetime values' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule disable before deletion',
+					'key_' => 'api_disable_before_deletion',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_INTERNAL,
+					'delay' => '1h',
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'lifetime' => '14d',
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
+					'enabled_lifetime' => '24h'
+				],
+				'expected_error' => null
+			],
+			'Test with immediate deletion' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete immediately',
+					'key_' => 'api_delete_immediately',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_INTERNAL,
+					'delay' => '1h',
+					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
+				],
+				'expected_error' => null
+			],
+			'Test with no deletion and no disabling' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule delete never disable never',
+					'key_' => 'api_disable_never_delete_never',
+					'hostid' => '50009',
+					'type' => ITEM_TYPE_INTERNAL,
+					'delay' => '1h',
+					'lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER
 				],
 				'expected_error' => null
 			]
@@ -2736,9 +2906,10 @@ class testDiscoveryRule extends CAPITest {
 				'SELECT i.itemid,i.type,i.snmp_oid,i.hostid,i.name,i.key_,i.delay,i.status,i.value_type,'.
 					'i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.authtype,i.username,'.
 					'i.password,i.publickey,i.privatekey,i.flags,i.description,i.inventory_link,i.lifetime,'.
-					'i.jmx_endpoint,i.url,i.query_fields,i.timeout,i.posts,i.status_codes,i.follow_redirects,'.
-					'i.post_type,i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.ssl_cert_file,'.
-					'i.ssl_key_file,i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps'.
+					'i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime,i.jmx_endpoint,i.url,i.query_fields,'.
+					'i.timeout,i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,'.
+					'i.retrieve_mode,i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
+					'i.verify_host,i.allow_traps'.
 				' FROM items i'.
 				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
 			);
@@ -2752,10 +2923,11 @@ class testDiscoveryRule extends CAPITest {
 				'SELECT dest.itemid,dest.type,dest.snmp_oid,dest.hostid,dest.name,dest.key_,dest.delay,dest.status,'.
 					'dest.value_type,dest.trapper_hosts,dest.units,dest.logtimefmt,dest.valuemapid,dest.params,'.
 					'dest.ipmi_sensor,dest.authtype,dest.username,dest.password,dest.publickey,dest.privatekey,'.
-					'dest.flags,dest.description,dest.inventory_link,dest.lifetime,dest.jmx_endpoint,dest.url,'.
-					'dest.query_fields,dest.timeout,dest.posts,dest.status_codes,dest.follow_redirects,dest.post_type,'.
-					'dest.http_proxy,dest.headers,dest.retrieve_mode,dest.request_method,dest.ssl_cert_file,'.
-					'dest.ssl_key_file,dest.ssl_key_password,dest.verify_peer,dest.verify_host,dest.allow_traps'.
+					'dest.flags,dest.description,dest.inventory_link,dest.lifetime,dest.lifetime_type,'.
+					'dest.enabled_lifetime,dest.enabled_lifetime,dest.jmx_endpoint,dest.url,dest.query_fields,'.
+					'dest.timeout,dest.posts,dest.status_codes,dest.follow_redirects,dest.post_type,dest.http_proxy,'.
+					'dest.headers,dest.retrieve_mode,dest.request_method,dest.ssl_cert_file,dest.ssl_key_file,'.
+					'dest.ssl_key_password,dest.verify_peer,dest.verify_host,dest.allow_traps'.
 				' FROM items dest,items src'.
 				' WHERE '.dbConditionId('src.itemid', $params['discoveryids']).
 					' AND dest.key_=src.key_'.

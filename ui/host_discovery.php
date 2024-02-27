@@ -552,38 +552,37 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
 		}
 
-		// Reset the values to default.
-		if ($lifetime_type != ZBX_LLD_DELETE_AFTER) {
-			$lifetime = DB::getDefault('items', 'lifetime');
-		}
-
-		if ($enabled_lifetime_type != ZBX_LLD_DISABLE_AFTER) {
-			$enabled_lifetime = DB::getDefault('items', 'enabled_lifetime');
-		}
-
 		$input += [
 			'lifetime_type' => $lifetime_type,
-			'lifetime' => $lifetime,
 			'enabled_lifetime_type' => $enabled_lifetime_type,
-			'enabled_lifetime' => $enabled_lifetime
 		];
+
+		if ($lifetime_type == ZBX_LLD_DELETE_AFTER) {
+			$input['lifetime'] = $lifetime;
+		}
+
+		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER) {
+			$input['enabled_lifetime'] = $enabled_lifetime;
+		}
 
 		$result = true;
 
-		$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros([$input], ['lifetime', 'enabled_lifetime']);
+		if (array_key_exists('lifetime', $input) && array_key_exists('enabled_lifetime', $input)) {
+			$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros([$input], ['lifetime', 'enabled_lifetime']);
 
-		foreach ($resolved_items as $item) {
-			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
-			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+			foreach ($resolved_items as $item) {
+				$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
+				$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
 
-			if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
-					&& $item['lifetime'] < $item['enabled_lifetime']
-					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
-				$result = false;
+				if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
+						&& $item['lifetime'] < $item['enabled_lifetime']
+						&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
+					$result = false;
 
-				error(_s(
-					'"%1$s" value must be greater than "%2$s" value.', 'Delete lost resources', 'Disable lost resources'
-				));
+					error(_s(
+						'"%1$s" value must be greater than "%2$s" value.', 'Delete lost resources', 'Disable lost resources'
+					));
+				}
 			}
 		}
 

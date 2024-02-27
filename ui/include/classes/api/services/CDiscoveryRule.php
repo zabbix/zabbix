@@ -942,9 +942,9 @@ class CDiscoveryRule extends CItemGeneral {
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_RULE);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
-			'host_status' =>	    	['type' => API_ANY],
-			'flags' =>			    	['type' => API_ANY],
-			'uuid' =>			    	['type' => API_MULTIPLE, 'rules' => [
+			'host_status' =>			['type' => API_ANY],
+			'flags' =>					['type' => API_ANY],
+			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
@@ -952,10 +952,19 @@ class CDiscoveryRule extends CItemGeneral {
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>					['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
-			'lifetime_type' =>			['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'lifetime_type')],
-			'lifetime' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-			'enabled_lifetime_type' =>	['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'enabled_lifetime_type')],
-			'enabled_lifetime' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+			'lifetime_type' =>			['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'lifetime_type'), 'default' => DB::getDefault('items', 'lifetime_type')],
+			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime'), 'default' => DB::getDefault('items', 'lifetime')],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'flags' =>API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'enabled_lifetime_type'), 'default' => DB::getDefault('items', 'enabled_lifetime_type')],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime'), 'default' => DB::getDefault('items', 'enabled_lifetime')],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
 			'preprocessing' =>			self::getPreprocessingValidationRules(),
@@ -979,6 +988,31 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
+		self::validateLifetimeFields($items);
+	}
+
+	/**
+	 * @param array $items
+	 */
+	private static function validateLifetimeFields(array $items): void {
+		$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['lifetime', 'enabled_lifetime']);
+
+		foreach ($resolved_items as $index => $item) {
+			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
+			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+
+			if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
+					&& $item['lifetime'] < $item['enabled_lifetime']
+					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
+						_s('"%1$s" value must be greater than "%2$s" value', 'Delete lost resources',
+							'Disable lost resources'
+						)
+					)
+				);
+			}
+		}
 	}
 
 	/**
@@ -1120,6 +1154,7 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
+		self::validateLifetimeFields($items);
 	}
 
 	/**
