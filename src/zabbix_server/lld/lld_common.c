@@ -21,9 +21,8 @@
 
 #include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
-#include "audit/zbxaudit_item.h"
-#include "audit/zbxaudit_graph.h"
-#include "audit/zbxaudit_trigger.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
 #include "../server_constants.h"
 
 ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
@@ -382,7 +381,7 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	/* udpate object table */
+	/* update object table */
 
 	if (0 != dis_ids.values_num)
 	{
