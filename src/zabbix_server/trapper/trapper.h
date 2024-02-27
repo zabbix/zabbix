@@ -27,8 +27,6 @@
 #include "zbxvault.h"
 #include "zbxpoller.h"
 
-#define ZBX_IPC_SERVICE_TRAPPER	"trapper"
-
 zbx_get_program_type_f trapper_get_program_type(void);
 
 typedef struct

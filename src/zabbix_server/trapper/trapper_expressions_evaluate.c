@@ -28,7 +28,7 @@
 #include "zbxeval.h"
 #include "zbxjson.h"
 
-static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
+static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_str_t *expressions,
 				char **error)
 {
 	char			buffer[MAX_STRING_LEN];
@@ -59,7 +59,7 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next_value(&jp_expressions, ptr, buffer, sizeof(buffer), NULL));)
 	{
-		zbx_vector_ptr_append(expressions, zbx_strdup(NULL, buffer));
+		zbx_vector_str_append(expressions, zbx_strdup(NULL, buffer));
 	}
 
 	ret = SUCCEED;
@@ -100,11 +100,11 @@ static int	trapper_expression_evaluate(const char *expression, const zbx_timespe
 
 static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	int			ret = FAIL, i;
-	zbx_vector_ptr_t	expressions;
+	int			ret = FAIL;
+	zbx_vector_str_t	expressions;
 	zbx_timespec_t		ts;
 
-	zbx_vector_ptr_create(&expressions);
+	zbx_vector_str_create(&expressions);
 
 	if (FAIL == trapper_parse_expressions_evaluate(jp, &expressions, error))
 		goto out;
@@ -114,7 +114,7 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	zbx_timespec(&ts);
 
-	for (i = 0; i < expressions.values_num; i++)
+	for (int i = 0; i < expressions.values_num; i++)
 	{
 		double	expr_result;
 		char	*errmsg = NULL;
@@ -141,8 +141,8 @@ static int	trapper_expressions_evaluate_run(const struct zbx_json_parse *jp, str
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&expressions, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_destroy(&expressions);
+	zbx_vector_str_clear_ext(&expressions, zbx_str_free);
+	zbx_vector_str_destroy(&expressions);
 
 	return ret;
 }
