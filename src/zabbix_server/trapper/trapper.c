@@ -554,6 +554,13 @@ static void	zbx_status_counters_init(void)
 
 static void	zbx_status_counters_free(void)
 {
+	zbx_vector_proxy_counter_ptr_clear_ext(&hosts_monitored.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&hosts_not_monitored.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&items_active_normal.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&items_active_notsupported.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&items_disabled.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&required_performance.counters, zbx_proxy_counter_ptr_free);
+
 	zbx_vector_proxy_counter_ptr_destroy(&hosts_monitored.counters);
 	zbx_vector_proxy_counter_ptr_destroy(&hosts_not_monitored.counters);
 	zbx_vector_proxy_counter_ptr_destroy(&items_active_normal.counters);
@@ -738,7 +745,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
 	int				i;
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, status_stats_export");
 	zbx_status_counters_init();
 
 	/* get status information */

@@ -103,6 +103,11 @@ ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
 ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
 ZBX_PTR_VECTOR_IMPL(proxy_counter_ptr, zbx_proxy_counter_t *)
 
+void     zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
+{
+	zbx_free(proxy_counter);
+}
+
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 

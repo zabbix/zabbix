@@ -610,6 +610,8 @@ zbx_proxy_counter_t;
 
 ZBX_PTR_VECTOR_DECL(proxy_counter_ptr, zbx_proxy_counter_t *)
 
+void     zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter);
+
 typedef struct
 {
 	unsigned char	type;
@@ -925,7 +927,7 @@ double		zbx_dc_get_required_performance(void);
 zbx_uint64_t	zbx_dc_get_host_count(void);
 void		zbx_dc_get_count_stats_all(zbx_config_cache_info_t *stats);
 
-void    zbx_dc_get_status(zbx_vector_proxy_counter_ptr_t *hosts_monitored,
+void	zbx_dc_get_status(zbx_vector_proxy_counter_ptr_t *hosts_monitored,
 		zbx_vector_proxy_counter_ptr_t *hosts_not_monitored,
 		zbx_vector_proxy_counter_ptr_t *items_active_normal,
 		zbx_vector_proxy_counter_ptr_t *items_active_notsupported,

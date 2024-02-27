@@ -37,14 +37,15 @@
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: perform active agent auto registration                                *
+ * Purpose: performs active agent auto registration                               *
  *                                                                                *
  * Parameters: host            - [IN] name of host to be added or updated         *
  *             ip              - [IN] IP address of host                          *
  *             port            - [IN] port of host                                *
  *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
  *                                    ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
- *             host_metadata   - [IN] host metadata                               *
+ *                                    flag                                        *
+ *             host_metadata   - [IN]                                             *
  *             flag            - [IN] flag describing interface type              *
  *             interface       - [IN] interface value if flag is not default      *
  *             events_cbs      - [IN]                                             *
@@ -140,18 +141,18 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: checks for host name and return hostid                               *
+ * Purpose: checks for host name and returns hostid                              *
  *                                                                               *
  * Parameters: sock           - [IN] open socket of server-agent connection      *
  *             host           - [IN] host name                                   *
- *             ip             - [IN] IP address of the host                      *
- *             port           - [IN] port of the host                            *
- *             host_metadata  - [IN] host metadata                               *
+ *             ip             - [IN] IP address of host                          *
+ *             port           - [IN] port of host                                *
+ *             host_metadata  - [IN]                                             *
  *             flag           - [IN] flag describing interface type              *
  *             interface      - [IN] interface value if flag is not default      *
  *             events_cbs     - [IN]                                             *
  *             config_timeout - [IN]                                             *
- *             hostid         - [OUT] host ID                                    *
+ *             hostid         - [OUT]                                            *
  *             revision       - [OUT] host configuration revision                *
  *             error          - [OUT] error message (buffer provided by caller)  *
  *                                                                               *
@@ -236,7 +237,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sends list of active checks to the host (older version agent)     *
+ * Purpose: sends list of active checks to host (older version agent)         *
  *                                                                            *
  * Parameters: sock           - [IN] open socket of server-agent connection   *
  *             request        - [IN] request buffer                           *
@@ -253,10 +254,10 @@ out:
 int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_events_funcs_t *events_cbs,
 		int config_timeout)
 {
-	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
-	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
-	int			ret = FAIL, i, num = 0;
-	zbx_uint64_t		hostid, revision;
+	char		*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
+	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
+	int		ret = FAIL, i, num = 0;
+	zbx_uint64_t	hostid, revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -382,11 +383,17 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
+	{
 		item_key = ZBX_KEY_LOG;
+	}
 	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
+	{
 		item_key = ZBX_KEY_EVENTLOG;
+	}
 	else
+	{
 		return;
+	}
 
 	zbx_init_agent_request(&request);
 
@@ -436,7 +443,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL, i, version, num = 0;
+	int			ret = FAIL, version, num = 0;
 	zbx_uint64_t		hostid, revision, agent_config_revision;
 	size_t			host_metadata_alloc = 1,	/* for at least NUL-terminated string */
 				interface_alloc = 1,		/* for at least NUL-terminated string */
@@ -565,7 +572,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		um_handle = zbx_dc_open_user_macros();
 
-		for (i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
@@ -665,7 +672,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_REGEXP);
 
-		for (i = 0; i < regexps.values_num; i++)
+		for (int i = 0; i < regexps.values_num; i++)
 		{
 			zbx_expression_t	*regexp = regexps.values[i];
 
@@ -739,7 +746,7 @@ error:
 
 	zbx_json_free(&json);
 out:
-	for (i = 0; i < names.values_num; i++)
+	for (int i = 0; i < names.values_num; i++)
 		zbx_free(names.values[i]);
 
 	zbx_vector_str_destroy(&names);

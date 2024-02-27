@@ -235,11 +235,11 @@ fail:
  * Purpose: Checks if the specified event id corresponds to a problem event   *
  *          caused by a trigger, finds its recovery event (if it exists).     *
  *                                                                            *
- * Parameters:  eventid       - [IN]                                          *
- *              r_eventid     - [OUT] id of recovery event (0 if there is no  *
+ * Parameters:  eventid   - [IN]                                              *
+ *              r_eventid - [OUT] id of recovery event (0 if there is no      *
  *                                    recovery event)                         *
- *              error         - [OUT] error message buffer                    *
- *              error_len     - [IN] size of error message buffer             *
+ *              error     - [OUT] error message buffer                        *
+ *              error_len - [IN] size of error message buffer                 *
  *                                                                            *
  * Return value:  SUCCEED or FAIL (with 'error' message)                      *
  *                                                                            *
@@ -250,7 +250,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	zbx_db_result_t	db_result;
 	zbx_db_row_t	row;
 
-	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64,
+	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid=" ZBX_FS_UI64,
 			eventid)))
 	{
 		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.",
@@ -272,15 +272,16 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                            *
  * Purpose: validates given user input with validator of given type           *
  *                                                                            *
- * Parameters:  manualinput     - [IN] user provided input string             *
- *              validator       - [IN] string containing validator            *
- *              validator_type  - [IN] indicator for how to interpret         *
+ * Parameters:  manualinput    - [IN] user provided input string              *
+ *              validator      - [IN] string containing validator             *
+ *              validator_type - [IN] indicator for how to interpret          *
  *                                     validator string                       *
  *                                                                            *
  * Return value:  SUCCEED or FAIL                                             *
  *                                                                            *
  ******************************************************************************/
-static int validate_manualinput(const char *manualinput, const char *validator, const unsigned char validator_type)
+static int	validate_manualinput(const char *manualinput, const char *validator,
+		const unsigned char validator_type)
 {
 	int	ret = FAIL;
 
@@ -312,7 +313,7 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
  *              hostid                  - [IN] host script will be executed on        *
  *              eventid                 - [IN]                                        *
  *              user                    - [IN] user who executes command              *
- *              clientip                - [IN] IP of client                           *
+ *              clientip                - [IN]                                        *
  *              manualinput             - [IN] user provided value to script          *
  *              config_timeout          - [IN]                                        *
  *              config_trapper_timeout  - [IN]                                        *
@@ -334,7 +335,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char *config_source_ip, const char *config_ssh_key_location,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0, i, n, macro_type;
+	int			ret = FAIL, scope = 0, macro_type;
 	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
@@ -518,7 +519,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
 		{
-			for (n = 0; n < webhook_params.values_num; n++)
+			for (int n = 0; n < webhook_params.values_num; n++)
 			{
 				char	*expanded_value = NULL;
 				size_t	expanded_value_size;
@@ -570,7 +571,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
-		for (i = 0; i < webhook_params.values_num; i++)
+		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
@@ -624,7 +625,7 @@ fail:
 	zbx_free(webhook_params_json);
 	zbx_free(user_timezone);
 
-	for (i = 0; i < webhook_params.values_num; i++)
+	for (int i = 0; i < webhook_params.values_num; i++)
 	{
 		zbx_free(webhook_params.values[i].first);
 		zbx_free(webhook_params.values[i].second);
