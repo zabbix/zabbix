@@ -954,16 +954,17 @@ class CDiscoveryRule extends CItemGeneral {
 			'key_' =>					['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
 			'lifetime_type' =>			['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'lifetime_type'), 'default' => DB::getDefault('items', 'lifetime_type')],
 			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime'), 'default' => DB::getDefault('items', 'lifetime')],
-											['else' => true, 'type' => API_UNEXPECTED]
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'lifetime')]
 			]],
 			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'flags' =>API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'enabled_lifetime_type'), 'default' => DB::getDefault('items', 'enabled_lifetime_type')],
-											['else' => true, 'type' => API_UNEXPECTED]
+											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('items', 'enabled_lifetime_type'), 'default' => DB::getDefault('items', 'enabled_lifetime_type')]
 			]],
 			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime'), 'default' => DB::getDefault('items', 'enabled_lifetime')],
-											['else' => true, 'type' => API_UNEXPECTED]
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_IMMEDIATELY])], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'enabled_lifetime')],
+											['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'enabled_lifetime')]
 			]],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
@@ -995,9 +996,17 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array $items
 	 */
 	private static function validateLifetimeFields(array $items): void {
-		$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['lifetime', 'enabled_lifetime']);
+		$resolved_items = [];
 
-		foreach ($resolved_items as $index => $item) {
+		foreach ($items as $index => $item) {
+			if(array_key_exists('enabled_lifetime', $item) && array_key_exists('lifetime', $item)) {
+				$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros([$item], [
+					'lifetime', 'enabled_lifetime'
+				]);
+			}
+		}
+
+		foreach ($resolved_items as $item) {
 			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
 			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
 
