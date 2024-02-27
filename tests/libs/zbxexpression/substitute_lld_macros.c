@@ -28,7 +28,7 @@
 #include "zbxmockutil.h"
 
 
-static void	get_macros(const char *path, zbx_vector_lld_macro_path_t *macros)
+static void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros)
 {
 	zbx_lld_macro_path_t	*macro;
 	zbx_mock_handle_t	hmacros, hmacro;
@@ -97,7 +97,7 @@ void	zbx_mock_test_entry(void **state)
 	int				expected_ret, returned_ret, flags;
 	char				*expression;
 	const char			*expected_expression, *lld_row;
-	zbx_vector_lld_macro_path_t	macros;
+	zbx_vector_lld_macro_path_ptr_t	macros;
 	struct zbx_json_parse		jp;
 
 	ZBX_UNUSED(state);

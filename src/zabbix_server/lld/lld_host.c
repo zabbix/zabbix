@@ -948,7 +948,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macros, unsigned char custom_iface, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -1754,7 +1754,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 }
 
 static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const char *name_proto,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_lld_group_t			*group;
 	zbx_lld_group_discovery_t	*discovery;
@@ -1791,7 +1791,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_lld_group_ptr_t *groups,
 		const zbx_vector_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	i;
 
@@ -2083,7 +2083,7 @@ static void	lld_group_candidates_validate_db(zbx_vector_lld_group_ptr_t *groups_
  *                                                                            *
  ******************************************************************************/
 static int	lld_group_rename_discovery_link(zbx_lld_group_t *dst, const zbx_lld_group_t *src,
-		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_t *lld_macros)
+		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	ret = FAIL;
 	char	*name = NULL;
@@ -2131,7 +2131,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, const zbx_lld_group_t *src,
-		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_t *lld_macros)
+		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2154,7 +2154,7 @@ static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, 
  ******************************************************************************/
 static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2221,7 +2221,7 @@ static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, z
  ******************************************************************************/
 static void	lld_groups_validate(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2958,7 +2958,7 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -5090,7 +5090,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
  *                                                                            *
  ******************************************************************************/
 static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -5498,8 +5498,8 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;

@@ -52,9 +52,9 @@ typedef struct
 }
 zbx_item_dependence_t;
 
-ZBX_PTR_VECTOR_IMPL(lld_item_full, zbx_lld_item_full_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
-ZBX_PTR_VECTOR_IMPL(lld_item_preproc, zbx_lld_item_preproc_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
 
 static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, zbx_uint64_t flags,
 		int step, int type, const char *params, int error_handler, const char *error_handler_params)
@@ -188,10 +188,10 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->ssl_key_file);
 	zbx_free(item_prototype->ssl_key_password);
 
-	zbx_vector_lld_row_destroy(&item_prototype->lld_rows);
+	zbx_vector_lld_row_ptr_destroy(&item_prototype->lld_rows);
 
-	zbx_vector_lld_item_preproc_clear_ext(&item_prototype->preproc_ops, lld_item_preproc_free);
-	zbx_vector_lld_item_preproc_destroy(&item_prototype->preproc_ops);
+	zbx_vector_lld_item_preproc_ptr_clear_ext(&item_prototype->preproc_ops, lld_item_preproc_free);
+	zbx_vector_lld_item_preproc_ptr_destroy(&item_prototype->preproc_ops);
 
 	zbx_vector_item_param_ptr_clear_ext(&item_prototype->item_params, zbx_item_param_free);
 	zbx_vector_item_param_ptr_destroy(&item_prototype->item_params);
@@ -257,13 +257,13 @@ static void	lld_item_free(zbx_lld_item_full_t *item)
 	zbx_free(item->publickey_orig);
 	zbx_free(item->privatekey_orig);
 
-	zbx_vector_lld_item_preproc_clear_ext(&item->preproc_ops, lld_item_preproc_free);
-	zbx_vector_lld_item_preproc_destroy(&item->preproc_ops);
+	zbx_vector_lld_item_preproc_ptr_clear_ext(&item->preproc_ops, lld_item_preproc_free);
+	zbx_vector_lld_item_preproc_ptr_destroy(&item->preproc_ops);
 	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_param_free);
 	zbx_vector_item_param_ptr_destroy(&item->item_params);
 	zbx_vector_db_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&item->item_tags);
-	zbx_vector_lld_item_full_destroy(&item->dependent_items);
+	zbx_vector_lld_item_full_ptr_destroy(&item->dependent_items);
 
 	zbx_vector_db_tag_ptr_destroy(&item->override_tags);
 
@@ -281,8 +281,8 @@ typedef struct
 }
 zbx_item_discovery_t;
 
-ZBX_PTR_VECTOR_DECL(item_discovery, zbx_item_discovery_t *)
-ZBX_PTR_VECTOR_IMPL(item_discovery, zbx_item_discovery_t *)
+ZBX_PTR_VECTOR_DECL(item_discovery_ptr, zbx_item_discovery_t *)
+ZBX_PTR_VECTOR_IMPL(item_discovery_ptr, zbx_item_discovery_t *)
 
 static void	zbx_item_discovery_free(zbx_item_discovery_t *data)
 {
@@ -314,7 +314,7 @@ static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sq
  *             items           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_item_full_t *items)
+static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -1742,7 +1742,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_t *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	int	ret;
 
@@ -1768,7 +1768,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype,
-		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_item_full_t		*item;
 	const struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -1996,7 +1996,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_lld_item_full_t *item, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, zbx_lld_item_full_t *item, char **error)
 {
 	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -2347,7 +2347,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items,
 		zbx_hashset_t *items_index, char **error)
 {
 	int				i, j, index;
@@ -2455,7 +2455,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
  *                                                                            *
  ******************************************************************************/
 static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **sub_params)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **sub_params)
 {
 	int	params_num = 1, flags1, flags2;
 
@@ -2539,7 +2539,7 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items)
 {
 	int				i, j, index, preproc_num;
 	zbx_lld_item_full_t		*item;
@@ -2659,7 +2659,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
 {
 	int				i, j, index;
 	zbx_lld_item_prototype_t	*item_proto;
@@ -2728,7 +2728,7 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
 {
 	int				i, j, index;
 	zbx_lld_item_prototype_t	*item_proto;
@@ -4416,7 +4416,7 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_t *items, zbx_hash
  *                                                                            *
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		item_prototypes, item_dependencies;
 	zbx_hashset_t			items_index;

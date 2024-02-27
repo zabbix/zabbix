@@ -1148,7 +1148,7 @@ static void	lld_trigger_expression_simplify_and_expand(const zbx_lld_trigger_t *
 }
 
 static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	int	ret;
 	size_t	exp_alloc = 0, exp_offset = 0;
@@ -1171,7 +1171,7 @@ static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_p
 }
 
 static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions,
-		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros,
+		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macros,
 		char **error)
 {
 	int			i, ret, function_found = 0;
@@ -1239,7 +1239,7 @@ static void	lld_functions_delete(zbx_vector_ptr_t *functions)
 
 static int	lld_functions_make(const zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *functions,
 		const zbx_vector_ptr_t *items, const zbx_vector_lld_item_link_t *item_links,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	int				i, index, ret = FAIL;
 	const zbx_lld_function_t	*function_proto;
@@ -1294,7 +1294,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macros, char *err, size_t err_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char *err, size_t err_len)
 {
 	zbx_eval_context_t	ctx;
 	int			i;
@@ -1347,7 +1347,7 @@ out:
  ******************************************************************************/
 static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype, zbx_vector_ptr_t *triggers,
 		const zbx_vector_ptr_t *items, zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	zbx_lld_trigger_t		*trigger;
 	char				*buffer = NULL, *expression = NULL, *recovery_expression = NULL, err[64];
@@ -1628,7 +1628,7 @@ static int	items_triggers_compare_func(const void *d1, const void *d2)
 
 static void	lld_triggers_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
 		const zbx_vector_ptr_t *items, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int					i, j;
@@ -1888,7 +1888,7 @@ static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_protot
  ******************************************************************************/
 static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
 		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_t	*trigger;
 	int			i;
@@ -1941,7 +1941,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_tags_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
-		const zbx_vector_lld_row_t *lld_rows, const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_row_t *lld_rows, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int				i, j;
@@ -3612,7 +3612,7 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
  *                                                                            *
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		trigger_prototypes;
 	zbx_vector_ptr_t		triggers;
