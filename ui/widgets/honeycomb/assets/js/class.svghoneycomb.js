@@ -508,7 +508,7 @@ class CSVGHoneycomb {
 		const scale = Math.min(
 			this.#container_params.width / Math.sqrt(3) * 2 + margin.horizontal * 2,
 			this.#container_params.height + this.#cells_gap + margin.vertical * 2,
-			this.#cell_height * (0.15 / this.#container_params.scale + 0.55)
+			this.#cell_height * Math.max(1.1, (0.15 / this.#container_params.scale + 0.55))
 		);
 
 		const scaled_size = {
