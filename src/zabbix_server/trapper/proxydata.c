@@ -82,7 +82,7 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if 'proxy data' packet has historical data                  *
+ * Purpose: checks if 'proxy data' packet has historical data                 *
  *                                                                            *
  * Return value: SUCCEED - 'proxy data' contains no historical records        *
  *               FAIL    - otherwise                                          *
