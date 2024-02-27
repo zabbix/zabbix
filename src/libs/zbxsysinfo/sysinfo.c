@@ -1236,13 +1236,12 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
 	zbx_uint64_t	value_uint64;
 	int		ret = FAIL;
+	double		dbl_tmp;
 
 	assert(result);
 
 	switch (value_type)
 	{
-		double	dbl_tmp;
-
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_trim_integer(c);
 			del_zeros(c);
