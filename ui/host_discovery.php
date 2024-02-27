@@ -554,7 +554,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$input += [
 			'lifetime_type' => $lifetime_type,
-			'enabled_lifetime_type' => $enabled_lifetime_type,
+			'enabled_lifetime_type' => $enabled_lifetime_type
 		];
 
 		if ($lifetime_type == ZBX_LLD_DELETE_AFTER) {
