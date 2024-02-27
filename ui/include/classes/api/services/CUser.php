@@ -3425,22 +3425,18 @@ class CUser extends CApiService {
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			if (!array_key_exists('totp_secret', $mfa_response) || $mfa_response['totp_secret'] == null) {
-				$user_secrets = DB::select('mfa_totp_secret', [
-					'output' => ['totp_secret'],
-					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
-				]);
-				$user_secret = $user_secrets[0]['totp_secret'];
-			}
-			else {
-				$user_secret = $mfa_response['totp_secret'];
-			}
+			$db_user_secrets = DB::select('mfa_totp_secret', [
+				'output' => ['totp_secret'],
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
+			]);
+
+			$user_secret = $db_user_secrets ? $db_user_secrets[0]['totp_secret'] : $mfa_response['totp_secret'];
 
 			$valid_code = (self::createTotpGenerator($mfa))
 				->verifyKey($user_secret, $mfa_response['verification_code']);
 
 			if ($valid_code) {
-				if (array_key_exists('totp_secret', $mfa_response) && $mfa_response['totp_secret'] !== '') {
+				if (!$db_user_secrets) {
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $mfa['mfaid'],
 						'userid' => $userid,
