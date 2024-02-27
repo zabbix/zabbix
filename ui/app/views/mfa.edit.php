@@ -62,7 +62,10 @@ $form
 			])
 		])
 		->addItem([
-			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+			(new CLabel([
+				_('Name'),
+				makeHelpIcon(_('Shown as the account name to all MFA users in authenticator apps.'))
+			], 'name'))->setAsteriskMark(),
 			new CFormField(
 				(new CTextBox('name', $data['name'], false, DB::getFieldLength('mfa', 'name')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
