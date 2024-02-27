@@ -518,9 +518,6 @@ int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx
 	if (0 == num)
 		return FAIL;
 
-	if (*idx == num)
-		return FAIL;
-
 	if (0 == memcmp(ipaddress, z, ZBX_IPRANGE_V4 == ipranges->type ?
 			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
 	{
@@ -528,6 +525,9 @@ int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx
 		zbx_iprange_first(ipranges, ipaddress);
 		return SUCCEED;
 	}
+
+	if (*idx == num)
+		return FAIL;
 
 	do
 	{

@@ -619,8 +619,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		zbx_discoverer_results_t	*result;
 		zbx_dc_dcheck_t			*dcheck = task->dchecks.values[task->range.state.index_dcheck];
 
-		(void)zbx_iprange_ip2str(task->range.ipranges->values[task->range.state.index_ip].type,
-				task->range.state.ipaddress, ip, sizeof(ip));
+		TASK_IP2STR(task, ip);
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG) && '\0' == *first_ip)
 			zbx_strlcpy(first_ip, ip, sizeof(first_ip));

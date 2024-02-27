@@ -112,16 +112,8 @@ static int	discoverer_result_compare(const void *d1, const void *d2)
 	return strcmp(r1->ip, r2->ip);
 }
 
-static int	discoverer_results_ptr_compare(const void *d1, const void *d2)
-{
-	const zbx_discoverer_results_t	*r1 = *((const zbx_discoverer_results_t * const *)d1);
-	const zbx_discoverer_results_t	*r2 = *((const zbx_discoverer_results_t * const *)d2);
-
-	return discoverer_result_compare(r1, r2);
-}
-
 static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint64_t druleid, const char *ip,
-		zbx_uint64_t count, zbx_uint64_t *current_count)
+		zbx_uint64_t count)
 {
 	zbx_discoverer_check_count_t	*check_count, cmp;
 
@@ -132,9 +124,6 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
 		return FAIL;
 
 	check_count->count -= count;
-
-	if (NULL != current_count)
-		*current_count = check_count->count;
 
 	return SUCCEED;
 }
@@ -832,55 +821,57 @@ zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const z
 	return result;
 }
 
+static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_dst, zbx_uint64_t druleid,
+		zbx_uint64_t unique_dcheckid, char *ip)
+{
+	zbx_discoverer_results_t	*dst, src = {.druleid = druleid, .ip = ip};
+
+	if (NULL == (dst = zbx_hashset_search(hr_dst, &src)))
+	{
+		dst = zbx_hashset_insert(hr_dst, &src, sizeof(zbx_discoverer_results_t));
+
+		zbx_vector_discoverer_services_ptr_create(&dst->services);
+		dst->ip = zbx_strdup(NULL, ip);
+		dst->now = (int)time(NULL);
+		dst->unique_dcheckid = unique_dcheckid;
+		dst->dnsname = zbx_strdup(NULL, "");
+	}
+
+	return dst;
+}
+
 ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
 ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
 
-static void	discoverer_icmp_result_proc(const zbx_uint64_t druleid, const int dcheck_idx,
-		const zbx_discoverer_task_t *task, const zbx_vector_fping_host_t *hosts,
-		zbx_vector_discoverer_results_ptr_t *results)
+static int	discoverer_icmp_result_merge(zbx_hashset_t *incomplete_checks_count, zbx_hashset_t *results,
+		const zbx_uint64_t druleid, const int dcheckid, const zbx_uint64_t unique_dcheckid,
+		const zbx_vector_fping_host_t *hosts)
 {
-	int			i;
-	const zbx_uint64_t	unique_dcheckid = task->unique_dcheckid,
-				dcheckid = task->dchecks.values[dcheck_idx]->dcheckid;
+	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		ZBX_FPING_HOST			*h = &hosts->values[i];
 		zbx_discoverer_dservice_t	*service;
-		zbx_discoverer_results_t	result_cmp, *result;
-		int				idx;
+		zbx_discoverer_results_t	*result;
+		ZBX_FPING_HOST			*h = &hosts->values[i];
+		char				*ip = h->addr;
+
+		if (FAIL == discoverer_check_count_decrease(incomplete_checks_count, druleid, ip, 1))
+		{
+			return FAIL;	/* config revision id was changed */
+		}
+
+		/* we must register at least 1 empty result per ip */
+		result = discoverer_results_host_reg(results, druleid, unique_dcheckid, ip);
 
 		if (0 == h->rcv)
 			continue;
 
-		result_cmp.ip = h->addr;
-		result_cmp.druleid = druleid;
-
-		if (0 == dcheck_idx || FAIL == (idx = zbx_vector_discoverer_results_ptr_bsearch(results,
-				&result_cmp, discoverer_results_ptr_compare)))
+		if (NULL == result->dnsname || ('\0' == *result->dnsname && '\0' != *h->dnsname))
 		{
-			result = discoverer_result_create(druleid, unique_dcheckid);
-			result->ip = h->addr;
-			h->addr = NULL;
-
-			if (0 != dcheck_idx)
-			{
-				idx = zbx_vector_discoverer_results_ptr_nearestindex(results, result,
-						discoverer_results_ptr_compare);
-				zbx_vector_discoverer_results_ptr_insert(results, result, idx);
-			}
-			else
-				zbx_vector_discoverer_results_ptr_append(results, result);
-		}
-		else
-			result = results->values[idx];
-
-		if (NULL == result->dnsname)
-		{
-			result->dnsname = h->dnsname;
-			h->dnsname = NULL;
+			result->dnsname = zbx_strdup(result->dnsname, h->dnsname);
 		}
 
 		service = result_dservice_create(0, dcheckid);
@@ -888,24 +879,23 @@ static void	discoverer_icmp_result_proc(const zbx_uint64_t druleid, const int dc
 		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 	}
 
-	if (0 == dcheck_idx)
-		zbx_vector_discoverer_results_ptr_sort(results, discoverer_results_ptr_compare);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() results:%d", log_worker_id, __func__, hosts->values_num);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() results:%d", log_worker_id, __func__, results->values_num);
+	return SUCCEED;
 }
 
 static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *task,
-		const int dcheck_idx, int worker_max, zbx_vector_discoverer_results_ptr_t *results, int *stop,
-		char **error)
+		const int dcheck_idx, int worker_max, int *stop, char **error)
 {
 	char				err[ZBX_ITEM_ERROR_LEN_MAX], ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int				i, ret = SUCCEED;
+	int				i, ret = SUCCEED, abort = SUCCEED;
 	zbx_uint64_t			count = 0;
 	zbx_vector_fping_host_t		hosts;
 	const zbx_dc_dcheck_t		*dcheck = task->dchecks.values[dcheck_idx];
+	ZBX_FPING_HOST			host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d resolve_dns:%d dchecks:%d", log_worker_id,
-			__func__, task->range.ipranges->values_num, task->dchecks.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d dcheck_idx:%d task state count:%d", log_worker_id,
+			__func__, task->range.ipranges->values_num, dcheck_idx, task->range.state.count);
 
 	zbx_vector_fping_host_create(&hosts);
 
@@ -916,16 +906,25 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		count += zbx_iprange_volume(&task->range.ipranges->values[i]);
 
 	zbx_vector_fping_host_reserve(&hosts, (size_t)hosts.values_num + (size_t)count);
-	*ip = '\0';
 
-	while (0 == *stop && SUCCEED == zbx_iprange_uniq_next(task->range.ipranges->values,
-			task->range.ipranges->values_num, ip, sizeof(ip)) && 0 != task->range.state.count--)
+	TASK_IP2STR(task, ip);
+	task->range.state.count--;
+	memset(&host, 0, sizeof(host));
+	host.addr = zbx_strdup(NULL, ip);
+	zbx_vector_fping_host_append(&hosts, host);
+
+	while (0 == *stop && SUCCEED == abort && 0 != task->range.state.count &&
+			SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
+			&task->range.state.index_ip, task->range.state.ipaddress))
 	{
-		ZBX_FPING_HOST	host;
-
-		memset(&host, 0, sizeof(host));
-		host.addr = zbx_strdup(NULL, ip);
-		zbx_vector_fping_host_append(&hosts, host);
+		if (worker_max > hosts.values_num)
+		{
+			memset(&host, 0, sizeof(host));
+			TASK_IP2STR(task, ip);
+			task->range.state.count--;
+			host.addr = zbx_strdup(NULL, ip);
+			zbx_vector_fping_host_append(&hosts, host);
+		}
 
 		if (worker_max > hosts.values_num)
 			continue;
@@ -940,7 +939,11 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		}
 		else
 		{
-			discoverer_icmp_result_proc(druleid, dcheck_idx, task, &hosts, results);
+
+			pthread_mutex_lock(&dmanager.results_lock);
+			abort = discoverer_icmp_result_merge(&dmanager.incomplete_checks_count, &dmanager.results,
+					druleid, dcheck->dcheckid, task->unique_dcheckid, &hosts);
+			pthread_mutex_unlock(&dmanager.results_lock);
 		}
 
 		for (i = 0; i < hosts.values_num; i++)
@@ -963,7 +966,10 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		}
 		else
 		{
-			discoverer_icmp_result_proc(druleid, dcheck_idx, task, &hosts, results);
+			pthread_mutex_lock(&dmanager.results_lock);
+			(void)discoverer_icmp_result_merge(&dmanager.incomplete_checks_count, &dmanager.results,
+					druleid, dcheck->dcheckid, task->unique_dcheckid, &hosts);
+			pthread_mutex_unlock(&dmanager.results_lock);
 		}
 	}
 
@@ -975,28 +981,10 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 
 	zbx_vector_fping_host_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() results:%d", log_worker_id, __func__, results->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:%d", log_worker_id, __func__,
+			task->range.state.count);
 
 	return ret;
-}
-
-static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_dst, zbx_uint64_t druleid,
-		zbx_uint64_t unique_dcheckid, char *ip)
-{
-	zbx_discoverer_results_t	*dst, src = {.druleid = druleid, .ip = ip};
-
-	if (NULL == (dst = zbx_hashset_search(hr_dst, &src)))
-	{
-		dst = zbx_hashset_insert(hr_dst, &src, sizeof(zbx_discoverer_results_t));
-
-		zbx_vector_discoverer_services_ptr_create(&dst->services);
-		dst->ip = zbx_strdup(NULL, ip);
-		dst->now = (int)time(NULL);
-		dst->unique_dcheckid = unique_dcheckid;
-		dst->dnsname = zbx_strdup(NULL, "");
-	}
-
-	return dst;
 }
 
 static void	discoverer_results_move_value(zbx_discoverer_results_t *src, zbx_hashset_t *hr_dst)
@@ -1044,7 +1032,7 @@ void	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discov
 			continue;
 
 		if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
-				src->ip, src->processed_checks_per_ip, NULL))
+				src->ip, src->processed_checks_per_ip))
 		{
 			continue;	/* config revision id was changed */
 		}
@@ -1057,67 +1045,18 @@ void	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discov
 			hr_dst->num_data);
 }
 
-static void	discoverer_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src,
-		zbx_discoverer_task_t *task)
-{
-	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
-	zbx_uint64_t	druleid = task->dchecks.values[0]->druleid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() src:%d dst:%d", log_worker_id, __func__, vr_src->values_num,
-			hr_dst->num_data);
-
-	*ip = '\0';
-
-	while (SUCCEED == zbx_iprange_uniq_next(task->range.ipranges->values,
-			task->range.ipranges->values_num, ip, sizeof(ip)))
-	{
-		zbx_discoverer_results_t	cmp;
-		int				i;
-		zbx_uint64_t 			check_count_rest;
-
-		if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
-				ip, discoverer_task_check_count_get(task), &check_count_rest))
-		{
-			continue;	/* config revision id was changed */
-		}
-
-		cmp.druleid = druleid;
-		cmp.ip = ip;
-
-		if (FAIL == (i = zbx_vector_discoverer_results_ptr_bsearch(vr_src, &cmp,
-				discoverer_results_ptr_compare)))
-		{
-			if (0 == check_count_rest)
-				(void)discoverer_results_host_reg(hr_dst, druleid, task->unique_dcheckid, ip);
-
-			continue;
-		}
-
-		discoverer_results_move_value(vr_src->values[i], hr_dst);
-		zbx_vector_discoverer_results_ptr_remove(vr_src, i);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() src:%d dst:%d", log_worker_id, __func__, vr_src->values_num,
-			hr_dst->num_data);
-}
-
 static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		char **error)
 {
-	zbx_vector_discoverer_results_ptr_t	results;
-	int					i, ret = SUCCEED;
+	int	i, ret = SUCCEED;
 
-	zbx_vector_discoverer_results_ptr_create(&results);
-
-	for (i = 0; i < task->dchecks.values_num && SUCCEED == ret; i++)
-		ret = discoverer_icmp(druleid, task, i, worker_max, &results, stop, error);
-
-	pthread_mutex_lock(&dmanager.results_lock);
-	discoverer_results_merge(&dmanager.results, &results, task);
-	pthread_mutex_unlock(&dmanager.results_lock);
-
-	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
-	zbx_vector_discoverer_results_ptr_destroy(&results);
+	for (i = task->range.state.index_dcheck; i < task->dchecks.values_num && SUCCEED == ret &&
+			0 != task->range.state.count; i++)
+	{
+		ret = discoverer_icmp(druleid, task, i, worker_max, stop, error);
+		task->range.state.index_ip = 0;
+		zbx_iprange_first(task->range.ipranges->values, task->range.state.ipaddress);
+	}
 
 	return ret;
 }
@@ -1147,7 +1086,7 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 	pthread_mutex_lock(&dmanager.results_lock);
 
-	if (SUCCEED == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
+	if (SUCCEED == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1))
 	{
 		/* we must register at least 1 empty result per ip */
 		result = discoverer_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);

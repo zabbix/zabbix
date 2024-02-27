@@ -97,7 +97,7 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 
 zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 {
-	return (zbx_uint64_t)task->dchecks.values_num;
+	return task->range.state.count;
 }
 
 static zbx_discoverer_task_t	*discoverer_task_clone(zbx_discoverer_task_t *task)

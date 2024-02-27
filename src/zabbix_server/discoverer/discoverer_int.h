@@ -28,7 +28,9 @@
 #define DISCOVERER_WORKER_INIT_NONE	0x00
 #define DISCOVERER_WORKER_INIT_THREAD	0x01
 
-#define GET_DTYPE(t)	t->dchecks.values[0]->type
+#define GET_DTYPE(t)		t->dchecks.values[0]->type
+#define TASK_IP2STR(t, ip_str)	(void)zbx_iprange_ip2str(t->range.ipranges->values[t->range.state.index_ip].type, \
+					t->range.state.ipaddress, ip_str, sizeof(ip_str))
 
 typedef struct
 {

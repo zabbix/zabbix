@@ -188,7 +188,81 @@ static void	process_rangetask_copy(zbx_discoverer_task_t *task, zbx_task_range_t
 	zbx_vector_dc_dcheck_ptr_create(&task_out->dchecks);
 	zbx_vector_dc_dcheck_ptr_append_array(&task_out->dchecks, task->dchecks.values, task->dchecks.values_num);
 	task_out->range = *range;
-	task->range.id++;
+	(task->range.id)++;
+}
+
+static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vector_portrange_t *port_ranges,
+		int *total, zbx_hashset_t *tasks_dst)
+{
+	zbx_task_range_t	range;
+
+	task->range.state.count = 0;
+	range = task->range;
+	task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
+	memset(task->range.state.ipaddress, 0, sizeof(task->range.state.ipaddress));
+
+	while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values,
+			task->range.ipranges->values_num, &task->range.state.index_ip,
+			task->range.state.ipaddress))
+	{
+		for (; task->range.state.index_dcheck < task->dchecks.values_num;
+				task->range.state.index_dcheck++)
+		{
+			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.index_dcheck];
+
+			dcheck_port_ranges_get(dcheck->ports, port_ranges);
+
+			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges->values, port_ranges->values_num,
+					&task->range.state.index_port, &task->range.state.port))
+			{
+				if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
+				{
+					process_rangetask_copy(task, &range, tasks_dst);
+					range = task->range;
+				}
+
+				range.state.count++;
+				(*total)++;
+			}
+
+			task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
+			zbx_vector_portrange_clear(port_ranges);
+		}
+
+		task->range.state.index_dcheck = 0;
+	}
+
+	if (0 != range.state.count)
+		process_rangetask_copy(task, &range, tasks_dst);
+}
+
+static void	process_task_range_split_icmp(zbx_discoverer_task_t *task, int *total, zbx_hashset_t *tasks_dst)
+{
+	zbx_task_range_t	range;
+
+	task->range.state.count = 0;
+	range = task->range;
+
+	for (; task->range.state.index_dcheck < task->dchecks.values_num; task->range.state.index_dcheck++)
+	{
+		memset(task->range.state.ipaddress, 0, sizeof(task->range.state.ipaddress));
+
+		while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
+				&task->range.state.index_ip, task->range.state.ipaddress))
+		{
+			if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
+			{
+				process_rangetask_copy(task, &range, tasks_dst);
+				range = task->range;
+			}
+
+			range.state.count++;
+			(*total)++;
+		}
+	}
+
+	if (0 != range.state.count)
+		process_rangetask_copy(task, &range, tasks_dst);
 }
 
 static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *tasks_dst)
@@ -205,46 +279,10 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 
 	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_task_range_t	range;
-
-		task->range.state.count = 0;
-		range = task->range;
-		task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
-		memset(task->range.state.ipaddress, 0, sizeof(task->range.state.ipaddress));
-
-		while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values,
-				task->range.ipranges->values_num, &task->range.state.index_ip,
-				task->range.state.ipaddress))
-		{
-			for (; task->range.state.index_dcheck < task->dchecks.values_num;
-					task->range.state.index_dcheck++)
-			{
-				zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.index_dcheck];
-
-				dcheck_port_ranges_get(dcheck->ports, &port_ranges);
-
-				while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
-						&task->range.state.index_port, &task->range.state.port))
-				{
-					if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
-					{
-						process_rangetask_copy(task, &range, tasks_dst);
-						range = task->range;
-					}
-
-					range.state.count++;
-					total++;
-				}
-
-				task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
-				zbx_vector_portrange_clear(&port_ranges);
-			}
-
-			task->range.state.index_dcheck = 0;
-		}
-
-		if (0 != range.state.count)
-			process_rangetask_copy(task, &range, tasks_dst);
+		if (SVC_ICMPPING == GET_DTYPE(task))
+			process_task_range_split_icmp(task, &total, tasks_dst);
+		else
+			process_task_range_split_async(task, &port_ranges, &total, tasks_dst);
 
 		discoverer_task_clear(task);
 		zbx_hashset_iter_remove(&iter);
