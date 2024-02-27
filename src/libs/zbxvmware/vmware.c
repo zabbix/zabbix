@@ -67,8 +67,6 @@
  */
 
 
-#define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
-
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_vmware_t	*vmware = NULL;
@@ -129,22 +127,6 @@ zbx_vmware_rpool_chunk_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
-
-#define ZBX_XPATH_FAULTSTRING(sz)									\
-	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
-
-#define ZBX_XPATH_FAULT_FAST(name)									\
-	"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
-
-#define ZBX_XPATH_FAULT_SLOW(max_len)									\
-	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
-	"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
-	ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
-	ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
-	"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
-
-#define ZBX_XPATH_VMWARE_ABOUT(property)								\
-	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 /* string pool support */
 
@@ -272,7 +254,7 @@ int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2)
  *                                                                            *
  * Purpose: frees resources allocated to store custom query params value data *
  *                                                                            *
- * Parameters: cq_value - [IN] the custom query value data                    *
+ * Parameters: cq_value - [IN] custom query value data                        *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_vmware_cq_value_free(zbx_vmware_cq_value_t *cq_value)
@@ -283,15 +265,16 @@ static void	zbx_vmware_cq_value_free(zbx_vmware_cq_value_t *cq_value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: abstracts the curl_easy_setopt/curl_easy_perform call pair        *
+ * Purpose: abstracts curl_easy_setopt/curl_easy_perform call pair            *
  *                                                                            *
- * Parameters: easyhandle - [IN] the CURL handle                              *
- *             request    - [IN] the http request                             *
- *             response   - [OUT] the http response                           *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             request    - [IN] http request                                 *
+ *             response   - [OUT] http response                               *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the http request was completed successfully        *
- *               FAIL    - the http request has failed                        *
+ * Return value: SUCCEED - http request was completed successfully            *
+ *               FAIL    - http request has failed                            *
+ *                                                                            *
  ******************************************************************************/
 static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **response, char **error)
 {
@@ -302,7 +285,10 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, request)))
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		{
+			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+		}
 
 		return FAIL;
 	}
@@ -333,16 +319,16 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
  *                                                                            *
  * Purpose: unification of vmware web service call with SOAP error validation *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
- *             request    - [IN] the http request                             *
- *             xdoc       - [OUT] the xml document response (optional)        *
- *             token      - [OUT] the soap token for next query (optional)    *
- *             error      - [OUT] the error message in the case of failure    *
- *                                (optional)                                  *
+ * Parameters: fn_parent  - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             request    - [IN] http request                                 *
+ *             xdoc       - [OUT] xml document response (optional)            *
+ *             token      - [OUT] soap token for next query (optional)        *
+ *             error      - [OUT] error message in case of failure (optional) *
  *                                                                            *
- * Return value: SUCCEED - the SOAP request was completed successfully        *
- *               FAIL    - the SOAP request has failed                        *
+ * Return value: SUCCEED - SOAP request was completed successfully            *
+ *               FAIL    - SOAP request has failed                            *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error)
@@ -351,6 +337,19 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 		"/*[local-name()='Envelope']/*[local-name()='Body']"	\
 		"/*[local-name()='RetrievePropertiesExResponse']"	\
 		"/*[local-name()='returnval']/*[local-name()='token'][1]"
+
+#	define ZBX_XPATH_FAULT_SLOW(max_len)									\
+		"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
+		"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
+		ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
+		ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
+		"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
+
+#	define ZBX_XPATH_FAULTSTRING(sz)									\
+		(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
+
+#	define	ZBX_XPATH_FAULT_FAST(name)									\
+		"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
 
 	xmlDoc		*doc;
 	ZBX_HTTPPAGE	*resp;
@@ -408,17 +407,20 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 	return ret;
 
 #	undef ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN
+#	undef ZBX_XPATH_FAULTSTRING
+#	undef ZBX_XPATH_FAULT_SLOW
+#	undef ZBX_XPATH_FAULT_FAST
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads the vmware object properties by their xpaths from xml data  *
+ * Purpose: reads vmware object properties by their xpaths from xml data      *
  *                                                                            *
- * Parameters: xdoc      - [IN] the xml document                              *
- *             propmap   - [IN] the xpaths of the properties to read          *
- *             props_num - [IN] the number of properties to read              *
+ * Parameters: xdoc      - [IN] xml document                                  *
+ *             propmap   - [IN] xpaths of properties to read                  *
+ *             props_num - [IN] number of properties to read                  *
  *                                                                            *
- * Return value: an array of property values                                  *
+ * Return value: array of property values                                     *
  *                                                                            *
  * Comments: The array with property values must be freed by the caller.      *
  *                                                                            *
@@ -478,7 +480,7 @@ char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, int pro
  * Purpose: frees shared resources allocated to store custom query params     *
  *          data                                                              *
  *                                                                            *
- * Parameters: params - [IN] custom query params data                         *
+ * Parameters: cq_param - [IN] custom query params data                       *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_cq_param_shared_free(zbx_vmware_custquery_param_t cq_param)
@@ -491,7 +493,7 @@ static void	vmware_cq_param_shared_free(zbx_vmware_custquery_param_t cq_param)
  *                                                                            *
  * Purpose: frees resources allocated to store custom query params data       *
  *                                                                            *
- * Parameters: params - [IN] the custom query params data                     *
+ * Parameters: cq_param - [IN] custom query params data                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vmware_cq_param_free(zbx_vmware_custquery_param_t cq_param)
@@ -504,7 +506,7 @@ void	zbx_vmware_cq_param_free(zbx_vmware_custquery_param_t cq_param)
  *                                                                            *
  * Purpose: frees shared resources allocated to store datastore data          *
  *                                                                            *
- * Parameters: datastore   - [IN] the datastore                               *
+ * Parameters: datastore - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
@@ -530,7 +532,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware cluster          *
  *                                                                            *
- * Parameters: cluster   - [IN] the vmware cluster                            *
+ * Parameters: cluster - [IN] vmware cluster                                  *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
@@ -557,7 +559,7 @@ static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service data     *
  *                                                                            *
- * Parameters: data   - [IN] the vmware service data                          *
+ * Parameters: data - [IN] vmware service data                                *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_data_shared_free(zbx_vmware_data_t *data)
@@ -633,7 +635,7 @@ static void	vmware_shared_cust_query_clean(zbx_vmware_cust_query_t *cust_query)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service          *
  *                                                                            *
- * Parameters: data   - [IN] the vmware service data                          *
+ * Parameters: service - [IN] vmware service data                             *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_shared_free(zbx_vmware_service_t *service)
@@ -694,7 +696,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
  *                                                                            *
  * Purpose: frees resources allocated to store datacenter data                *
  *                                                                            *
- * Parameters: datacenter   - [IN] the datacenter                             *
+ * Parameters: datacenter - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
@@ -726,7 +728,7 @@ static void	vmware_rp_chunk_free(zbx_vmware_rpool_chunk_t *rp_chunk)
  *                                                                            *
  * Purpose: frees resources allocated to store resourcepool data              *
  *                                                                            *
- * Parameters: resourcepool   - [IN] the resourcepool                         *
+ * Parameters: resourcepool - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
@@ -741,7 +743,7 @@ static void	vmware_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
  *                                                                            *
  * Purpose: frees resources allocated to store dvswitch data                  *
  *                                                                            *
- * Parameters: dvs - [IN] the dvswitch                                        *
+ * Parameters: dvs - [IN] dvswitch                                            *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_dvswitch_free(zbx_vmware_dvswitch_t *dvs)
@@ -756,18 +758,16 @@ static void	vmware_dvswitch_free(zbx_vmware_dvswitch_t *dvs)
  *                                                                            *
  * Purpose: frees shared resources allocated to store properties list         *
  *                                                                            *
- * Parameters: props     - [IN] the properties list                           *
- *             props_num - [IN] the number of properties in the list          *
+ * Parameters: props     - [IN] properties list                               *
+ *             props_num - [IN] number of properties in list                  *
  *                                                                            *
  ******************************************************************************/
 void	vmware_props_free(char **props, int props_num)
 {
-	int	i;
-
 	if (NULL == props)
 		return;
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 		zbx_free(props[i]);
 
 	zbx_free(props);
@@ -777,7 +777,7 @@ void	vmware_props_free(char **props, int props_num)
  *                                                                            *
  * Purpose: frees resources allocated to store alarm data                     *
  *                                                                            *
- * Parameters: alarm - [IN] the alarm object                                  *
+ * Parameters: alarm - [IN] alarm object                                      *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
@@ -795,7 +795,7 @@ static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
  *                                                                            *
  * Purpose: frees resources allocated to store alarm details data             *
  *                                                                            *
- * Parameters: details - [IN] the alarm details object                        *
+ * Parameters: details - [IN] alarm details object                            *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_alarm_details_free(zbx_vmware_alarm_details_t *details)
@@ -811,7 +811,7 @@ static void	vmware_alarm_details_free(zbx_vmware_alarm_details_t *details)
  *                                                                            *
  * Purpose: frees resources allocated to store vmware cluster                 *
  *                                                                            *
- * Parameters: cluster   - [IN] the vmware cluster                            *
+ * Parameters: cluster - [IN] vmware cluster                                  *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
@@ -830,7 +830,7 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  *                                                                            *
  * Purpose: frees resources allocated to store vmware service data            *
  *                                                                            *
- * Parameters: data   - [IN] the vmware service data                          *
+ * Parameters: data - [IN] vmware service data                                *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_data_free(zbx_vmware_data_t *data)
@@ -874,15 +874,12 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: authenticates vmware service                                       *
- *                                                                             *
  * Parameters: service               - [IN] vmware service                     *
  *             easyhandle            - [IN] CURL handle                        *
  *             page                  - [IN] CURL output buffer                 *
  *             config_source_ip      - [IN]                                    *
  *             config_vmware_timeout - [IN]                                    *
- *             error                 - [OUT] error message in the case of      *
- *                                          failure                            *
+ *             error                 - [OUT] error message in case of failure  *
  *                                                                             *
  * Return value: SUCCEED - authentication was completed successfully           *
  *               FAIL    - authentication process has failed                   *
@@ -917,7 +914,8 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEDATA, page)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PRIVATE, page)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, curl_header_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION,
+					curl_header_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, service->url)) ||
@@ -1007,15 +1005,16 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef ZBX_POST_VMWARE_AUTH
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Close unused connection with vCenter                              *
+ * Purpose: closes unused connection with vCenter                             *
  *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             easyhandle - [IN] the CURL handle                              *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
@@ -1033,6 +1032,8 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 			get_vmware_service_objects()[service->type].session_manager);
 
 	return zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error);
+
+#	undef ZBX_POST_VMWARE_LOGOUT
 }
 
 int	zbx_property_collection_init(CURL *easyhandle, const char *property_collection_query,
@@ -1103,13 +1104,13 @@ void	zbx_property_collection_free(zbx_property_collection_iter *iter)
  *                                                                            *
  * Purpose: retrieves vmware service instance contents                        *
  *                                                                            *
- * Parameters: easyhandle - [IN] the CURL handle                              *
- *             version    - [OUT] the version of the instance                 *
- *             fullname   - [OUT] the fullname of the instance                *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             version    - [OUT] version of instance                         *
+ *             fullname   - [OUT] fullname of instance                        *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the contents were retrieved successfully           *
- *               FAIL    - the content retrieval failed                       *
+ * Return value: SUCCEED - contents were retrieved successfully               *
+ *               FAIL    - content retrieval failed                           *
  *                                                                            *
  ******************************************************************************/
 static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **fullname, char **error)
@@ -1120,6 +1121,9 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 			"<ns0:_this type=\"ServiceInstance\">ServiceInstance</ns0:_this>"	\
 		"</ns0:RetrieveServiceContent>"							\
 		ZBX_POST_VSPHERE_FOOTER
+
+#	define ZBX_XPATH_VMWARE_ABOUT(property)							\
+		"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 	xmlDoc	*doc = NULL;
 
@@ -1142,19 +1146,20 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
+#	undef ZBX_XPATH_VMWARE_ABOUT
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: gets alarm details                                                *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             alarm_id     - [IN] alarm details                              *
- *             details      - [IN/OUT] alarms cache data                      *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             alarm_id   - [IN] alarm details                                *
+ *             details    - [IN/OUT] alarms cache data                        *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: index - element id in the vector                             *
+ * Return value: index - element id in vector                                 *
  *               FAIL  - operation has failed                                 *
  *                                                                            *
  ******************************************************************************/
@@ -1250,14 +1255,14 @@ out:
  *                                                                            *
  * Purpose: gets open alarms and their details                                *
  *                                                                            *
- * Parameters: func_parent  - [IN] parent function name                       *
- *             service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             xdoc         - [IN] xml doc with info about alarms             *
- *             node         - [IN] xml node with info about alarms            *
- *             ids          - [IN] linked alarms ids                          *
- *             alarms_data  - [IN/OUT] all alarms with cache                  *
- *             error        - [OUT] error message in the case of failure      *
+ * Parameters: func_parent - [IN] parent function name                        *
+ *             service     - [IN] vmware service                              *
+ *             easyhandle  - [IN] CURL handle                                 *
+ *             xdoc        - [IN] xml doc with info about alarms              *
+ *             node        - [IN] xml node with info about alarms             *
+ *             ids         - [IN] linked alarms ids                           *
+ *             alarms_data - [IN/OUT] all alarms with cache                   *
+ *             error       - [OUT] error message in case of failure           *
  *                                                                            *
  * Return value: SUCCEED   - operation has completed successfully             *
  *               FAIL      - operation has failed                             *
@@ -1363,7 +1368,7 @@ clean:
  * Purpose: sorting function to sort Datacenter vector by id                  *
  *                                                                            *
  ******************************************************************************/
-int	vmware_dc_id_compare(const void *d1, const void *d2)
+int	zbx_vmware_dc_id_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datacenter_t	*dc1 = *(const zbx_vmware_datacenter_t * const *)d1;
 	const zbx_vmware_datacenter_t	*dc2 = *(const zbx_vmware_datacenter_t * const *)d2;
@@ -1389,7 +1394,7 @@ int	vmware_custom_attr_compare_name(const void *a1, const void *a2)
  * Purpose: sorting function to sort DVSwitch vector by uuid                  *
  *                                                                            *
  ******************************************************************************/
-int	vmware_dvs_uuid_compare(const void *d1, const void *d2)
+int	zbx_vmware_dvs_uuid_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_dvswitch_t	*dvs1 = *(const zbx_vmware_dvswitch_t * const *)d1;
 	const zbx_vmware_dvswitch_t	*dvs2 = *(const zbx_vmware_dvswitch_t * const *)d2;
@@ -1417,10 +1422,10 @@ static int	vmware_cq_instance_id_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort Datastore names vector by name           *
+ * Purpose: sorting function to sort datastore names vector by name           *
  *                                                                            *
  ******************************************************************************/
-int	vmware_dsname_compare(const void *d1, const void *d2)
+int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
 	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
@@ -1428,7 +1433,7 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	return strcmp(ds1->name, ds2->name);
 }
 
-int	vmware_pnic_compare(const void *v1, const void *v2)
+int	zbx_vmware_pnic_compare(const void *v1, const void *v2)
 {
 	const zbx_vmware_pnic_t		*nic1 = *(const zbx_vmware_pnic_t * const *)v1;
 	const zbx_vmware_pnic_t		*nic2 = *(const zbx_vmware_pnic_t * const *)v2;
@@ -1440,13 +1445,13 @@ int	vmware_pnic_compare(const void *v1, const void *v2)
  *                                                                             *
  * Purpose: retrieves list of vmware service clusters and resource pools       *
  *                                                                             *
- * Parameters: service       - [IN] vmware service                             *
- *             easyhandle    - [IN] CURL handle                                *
- *             cluster_data  - [OUT] pointer to output variable                *
- *             clusters      - [OUT] pointer to resulting clusters vector      *
- *             rp_chunks     - [OUT] pointer to resulting resource pool vector *
- *             alarms_data   - [OUT] vector with all alarms                    *
- *             error         - [OUT] error message in case of failure          *
+ * Parameters: service      - [IN] vmware service                              *
+ *             easyhandle   - [IN] CURL handle                                 *
+ *             cluster_data - [OUT] pointer to output variable                 *
+ *             clusters     - [OUT] pointer to resulting clusters vector       *
+ *             rp_chunks    - [OUT] pointer to resulting resource pool vector  *
+ *             alarms_data  - [OUT] vector with all alarms                     *
+ *             error        - [OUT] error message in case of failure           *
  *                                                                             *
  * Return value: SUCCEED - operation has completed successfully                *
  *               FAIL    - operation has failed                                *
@@ -1456,9 +1461,9 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 		xmlDoc *cluster_data, zbx_vector_vmware_cluster_ptr_t *clusters,
 		zbx_vector_vmware_rpool_chunk_ptr_t *rp_chunks, zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
-#define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
+#	define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
-#define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID								\
+#	define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
 
 	int			ret;
@@ -1566,19 +1571,19 @@ out:
 
 	return ret;
 
-#undef ZBX_XPATH_GET_RESOURCEPOOL_PARENTID
-#undef ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID
+#	undef ZBX_XPATH_GET_RESOURCEPOOL_PARENTID
+#	undef ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves status of specified vmware cluster                      *
  *                                                                            *
- * Parameters: easyhandle   - [IN] CURL handle                                *
- *             datastores   - [IN] all available Datastores                   *
- *             cluster      - [IN/OUT]                                        *
- *             cq_values    - [IN/OUT] vector with custom query entries       *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             datastores - [IN] all available datastores                     *
+ *             cluster    - [IN/OUT]                                          *
+ *             cq_values  - [IN/OUT] vector with custom query entries         *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -1671,7 +1676,7 @@ out:
  *                                                                             *
  * Parameters: service       - [IN] vmware service                             *
  *             easyhandle    - [IN] CURL handle                                *
- *             datastores    - [IN] all available Datastores                   *
+ *             datastores    - [IN] all available datastores                   *
  *             cq_values     - [IN/OUT] vector with custom query entries       *
  *             clusters      - [OUT] pointer to resulting clusters vector      *
  *             resourcepools - [OUT] pointer to resulting resource pool vector *
@@ -1937,6 +1942,7 @@ out:
 			clusters->values_num, resourcepools->values_num);
 
 	return ret;
+
 #	undef ZBX_POST_VCENTER_CLUSTER
 }
 
@@ -1944,9 +1950,9 @@ out:
  *                                                                            *
  * Purpose: initializes vmware service object                                 *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             error        - [OUT] error message in the case of failure      *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -2061,7 +2067,6 @@ out:
 	return ret;
 }
 
-
 /*******************************************************************************
  *                                                                             *
  * Purpose: moves custom query response to shared memory                       *
@@ -2091,7 +2096,7 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_ptr_t *c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collects custom requests of the selected type                     *
+ * Purpose: collects custom requests of selected type                         *
  *                                                                            *
  * Parameters: cust_queries        - [IN] hashset with all type custom        *
  *                                        queries                             *
@@ -2232,6 +2237,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 	zbx_xml_free_doc(doc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() count: %d / %d", __func__, count, cq_values->values_num);
+#	undef	ZBX_POST_FETCH_DV_PORTS
 }
 
 /******************************************************************************
@@ -2296,7 +2302,7 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 #	define ZBX_POST_OBJ_PROP									\
 		ZBX_POST_VSPHERE_HEADER									\
 		"<ns0:RetrievePropertiesEx>"								\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
 			"<ns0:specSet>"									\
 				"<ns0:propSet>"								\
 					"<ns0:type>%s</ns0:type>"					\
@@ -2395,14 +2401,14 @@ char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_ptr_t *cq_values, co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set CURL headers for soap request                                 *
+ * Purpose: sets CURL headers for soap request                                *
  *                                                                            *
  * Parameters: easyhandle - [IN] prepared cURL connection handle              *
  *             vc_version - [IN] major version of vc                          *
- *             headers    - [IN/OUT] the CURL headers                         *
- *             error      - [OUT] the error message in the case of failure    *
+ *             headers    - [IN/OUT] CURL headers                             *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the headers were set successfully                  *
+ * Return value: SUCCEED - headers were set successfully                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -2448,6 +2454,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
 int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout, int cache_update_period)
 {
+#define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
 	zbx_vmware_data_t		*data;
@@ -2532,7 +2539,8 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 		goto clean;
 	}
 
-	zbx_vector_vmware_datastore_ptr_reserve(&data->datastores, (size_t)(dss.values_num + data->datastores.values_alloc));
+	zbx_vector_vmware_datastore_ptr_reserve(&data->datastores, (size_t)(dss.values_num +
+			data->datastores.values_alloc));
 
 	for (int i = 0; i < dss.values_num; i++)
 	{
@@ -2592,7 +2600,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 				zbx_str_uint64_pair_name_compare);
 	}
 
-	zbx_vector_vmware_datastore_ptr_sort(&data->datastores, vmware_ds_uuid_compare);
+	zbx_vector_vmware_datastore_ptr_sort(&data->datastores, zbx_vmware_ds_uuid_compare);
 
 	vmware_service_dvswitch_load(easyhandle, &dvs_query_values);
 	vmware_service_props_load(easyhandle, get_vmware_service_objects()[service->type].property_collector,
@@ -2776,6 +2784,7 @@ out:
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, msg);
 
 	return ret;
+#undef ZBX_INIT_UPD_XML_SIZE
 }
 
 /******************************************************************************
@@ -2817,8 +2826,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  *             username - [IN] VMware service username                        *
  *             password - [IN] VMware service password                        *
  *                                                                            *
- * Return value: requested service object or NULL if the object is not yet    *
- *               ready.                                                       *
+ * Return value: requested service object or NULL if object is not yet ready  *
  *                                                                            *
  * Comments: VMware lock must be locked with zbx_vmware_lock() function       *
  *           before calling this function.                                    *
@@ -2831,7 +2839,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  ******************************************************************************/
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password)
 {
-	int			i, now;
+	int			now;
 	zbx_vmware_service_t	*service = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, username, url);
@@ -2841,7 +2849,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 
 	now = time(NULL);
 
-	for (i = 0; i < vmware->services.values_num; i++)
+	for (int i = 0; i < vmware->services.values_num; i++)
 	{
 		service = (zbx_vmware_service_t *)vmware->services.values[i];
 
@@ -2894,27 +2902,27 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: start monitoring custom query of the specified entity             *
+ * Purpose: starts monitoring custom query of specified entity                *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             soap_type    - [IN] the entity type                            *
- *             id           - [IN] the entity id                              *
- *             key          - [IN] the custom query id                        *
- *             query_type   - [IN] the type of query                          *
- *             mode         - [IN] the mode of output value for custom query  *
- *             query_params - [IN] array of name  and value for custom        *
- *                                  query filter                              *
+ * Parameters: service      - [IN] vmware service                             *
+ *             soap_type    - [IN] entity type                                *
+ *             id           - [IN] entity id                                  *
+ *             key          - [IN] custom query id                            *
+ *             query_type   - [IN]                                            *
+ *             mode         - [IN] mode of output value for custom query      *
+ *             query_params - [IN] array of name and value for custom         *
+ *                                 query filter                               *
  *                                                                            *
- * Return value: SUCCEED - the entity counter was added to monitoring list.   *
- *               FAIL    - the custom query of the specified entity           *
- *                         is already being monitored.                        *
+ * Return value: SUCCEED - entity counter was added to monitoring list        *
+ *               FAIL    - custom query of specified entity is already being  *
+ *                         monitored                                          *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *soap_type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
 		zbx_vector_custquery_param_t *query_params)
 {
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	zbx_vmware_cust_query_t	cq, *pcq;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_type:%s id:%s query_type:%u key:%s", __func__, soap_type, id,
@@ -2940,7 +2948,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 		cq.query_params = NULL;
 	}
 
-	for (i = 0; NULL != cq.query_params && i < query_params->values_num; i++)
+	for (int i = 0; NULL != cq.query_params && i < query_params->values_num; i++)
 	{
 		zbx_vmware_custquery_param_t	cqp;
 
@@ -2961,14 +2969,14 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
  *                                                                            *
  * Purpose: gets performance entity by type and id                            *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             soap_type    - [IN] the entity type                            *
- *             id           - [IN] the entity id                              *
- *             key          - [IN] the custom query id                        *
- *             query_type   - [IN] the type of query                          *
- *             mode         - [IN] the mode of output value for custom query  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             soap_type    - [IN] entity type                                *
+ *             id           - [IN] entity id                                  *
+ *             key          - [IN] custom query id                            *
+ *             query_type   - [IN]                                            *
+ *             mode         - [IN] mode of output value for custom query      *
  *                                                                            *
- * Return value: the custom query entity or NULL if not found                 *
+ * Return value: custom query entity or NULL if not found                     *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *soap_type,
@@ -2997,6 +3005,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 void	zbx_vmware_destroy(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (NULL != vmware_shmem_get_vmware_mem())
 	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
@@ -3035,10 +3044,10 @@ void	zbx_vmware_unlock(void)
  *                                                                            *
  * Purpose: gets vmware collector statistics                                  *
  *                                                                            *
- * Parameters: stats   - [OUT] the vmware collector statistics                *
+ * Parameters: stats - [OUT] vmware collector statistics                      *
  *                                                                            *
- * Return value: SUCCEED - the statistics were retrieved successfully         *
- *               FAIL     - no vmware collectors are running                  *
+ * Return value: SUCCEED - statistics were retrieved successfully             *
+ *               FAIL    - no vmware collectors are running                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
@@ -3060,12 +3069,12 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create job to update vmware data periodically and increase        *
+ * Purpose: creates job to update vmware data periodically and increase       *
  *          service ref counter                                               *
  *                                                                            *
- * Parameters: vmw      - [IN] the vmware object                              *
- *             service  - [IN] the vmware service                             *
- *             job_type - [IN] the vmware job type                            *
+ * Parameters: vmw      - [IN] vmware object                                  *
+ *             service  - [IN] vmware service                                 *
+ *             job_type - [IN] vmware job type                                *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type)
@@ -3085,9 +3094,9 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: destroy vmware job and service removing                           *
+ * Purpose: destroys vmware job and service removing                          *
  *                                                                            *
- * Parameters: job - [IN] the job object                                      *
+ * Parameters: job - [IN] job object                                          *
  *                                                                            *
  * Return value: count of removed services                                    *
  *                                                                            *
@@ -3114,10 +3123,10 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set shared error of vmware job tags update                        *
+ * Purpose: sets shared error of vmware job tags update                       *
  *                                                                            *
- * Parameters: error     - [IN] the error message of failure                  *
- *             data_tags - [OUT] the data_tags container                      *
+ * Parameters: error     - [IN] error message of failure                      *
+ *             data_tags - [OUT] data_tags container                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags)

@@ -66,11 +66,11 @@ $available_js = [
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
-	'jquery.js' => 'vendors/',
-	'jquery-ui.js' => 'vendors/',
-	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
-	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
-	'd3.v7.min.js' => 'vendors/',
+	'jquery.js' => 'vendors/jQuery/',
+	'jquery-ui.js' => 'vendors/jQueryUI/',
+	'leaflet.js' => 'vendors/Leaflet/',
+	'leaflet.markercluster.js' => 'vendors/Leaflet.markercluster/',
+	'd3.js' => 'vendors/D3/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',

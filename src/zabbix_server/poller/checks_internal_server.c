@@ -24,6 +24,7 @@
 
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
+#include "zbxtime.h"
 #include "zbxconnector.h"
 #include "zbxproxybuffer.h"
 

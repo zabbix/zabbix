@@ -205,6 +205,7 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 		assert(0);
 
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_KEYS);
+
 	for (int i = j; i < num; i++)
 	{
 		if (SUCCEED != errcodes[i])

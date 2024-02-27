@@ -192,6 +192,7 @@ static char				zbx_snmp_init_bulkwalk_done;
 static pthread_rwlock_t			snmp_exec_rwlock;
 static char				snmp_rwlock_init_done;
 static zbx_hashset_t	engineid_cache;
+static int		engineid_cache_initialized = 0;
 
 #define ZBX_SNMP_GET	0
 #define ZBX_SNMP_WALK	1
@@ -286,6 +287,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	zbx_snmp_engineid_device_t	d;
 	u_int				current_engineboots = 0;
 	int				ret = SUCCEED;
+
+	if (0 == engineid_cache_initialized)
+		return SUCCEED;
 
 	local_record.engineid_len = session->securityEngineIDLen;
 	memcpy(&local_record.engineid, session->securityEngineID, session->securityEngineIDLen);
@@ -399,6 +403,7 @@ void	zbx_housekeep_snmp_engineid_cache(void)
 void	zbx_init_snmp_engineid_cache(void)
 {
 	zbx_hashset_create(&engineid_cache, 100, snmp_engineid_cache_hash, snmp_engineid_cache_compare);
+	engineid_cache_initialized = 1;
 }
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
@@ -837,18 +842,18 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	}
 	else if (SNMP_VERSION_3 == session.version)
 	{
-		/* set the SNMPv3 user name */
+		/* set SNMPv3 user name */
 		session.securityName = snmpv3_securityname;
 		session.securityNameLen = strlen(session.securityName);
 
-		/* set the SNMPv3 context if specified */
+		/* set SNMPv3 context if specified */
 		if ('\0' != *snmpv3_contextname)
 		{
 			session.contextName = snmpv3_contextname;
 			session.contextNameLen = strlen(session.contextName);
 		}
 
-		/* set the security level to authenticated, but not encrypted */
+		/* set security level to authenticated, but not encrypted */
 		switch (snmpv3_securitylevel)
 		{
 			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
@@ -902,34 +907,34 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 				{
 #ifdef HAVE_NETSNMP_SESSION_DES
 					case ITEM_SNMPV3_PRIVPROTOCOL_DES:
-						/* set the privacy protocol to DES */
+						/* set privacy protocol to DES */
 						session.securityPrivProto = usmDESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
 						break;
 #endif
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES128:
-						/* set the privacy protocol to AES128 */
+						/* set privacy protocol to AES128 */
 						session.securityPrivProto = usmAESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
 						break;
 #ifdef HAVE_NETSNMP_STRONG_PRIV
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192:
-						/* set the privacy protocol to AES192 */
+						/* set privacy protocol to AES192 */
 						session.securityPrivProto = usmAES192PrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES192PrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256:
-						/* set the privacy protocol to AES256 */
+						/* set privacy protocol to AES256 */
 						session.securityPrivProto = usmAES256PrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES256PrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192C:
-						/* set the privacy protocol to AES192 (Cisco version) */
+						/* set privacy protocol to AES192 (Cisco version) */
 						session.securityPrivProto = usmAES192CiscoPrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES192CiscoPrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256C:
-						/* set the privacy protocol to AES256 (Cisco version) */
+						/* set privacy protocol to AES256 (Cisco version) */
 						session.securityPrivProto = usmAES256CiscoPrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES256CiscoPrivProtocol);
 						break;
@@ -1999,17 +2004,20 @@ typedef struct
 }
 zbx_snmp_dobject_t;
 
+ZBX_PTR_VECTOR_DECL(snmp_dobject_ptr, zbx_snmp_dobject_t*)
+ZBX_PTR_VECTOR_IMPL(snmp_dobject_ptr, zbx_snmp_dobject_t*)
+
 /* helper data structure used by snmp discovery */
 typedef struct
 {
-	/* the index of OID being currently processed (walked) */
+	/* index of OID being currently processed (walked) */
 	int			num;
 
-	/* the discovered SNMP objects */
+	/* discovered SNMP objects */
 	zbx_hashset_t		objects;
 
-	/* the index (order) of discovered SNMP objects */
-	zbx_vector_ptr_t	index;
+	/* index (order) of discovered SNMP objects */
+	zbx_vector_snmp_dobject_ptr_t	index;
 
 	/* request data structure used to parse discovery OID key */
 	AGENT_REQUEST		request;
@@ -2092,7 +2100,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 	}
 
 	zbx_hashset_create(&data->objects, 10, zbx_snmp_dobject_hash, zbx_snmp_dobject_compare);
-	zbx_vector_ptr_create(&data->index);
+	zbx_vector_snmp_dobject_ptr_create(&data->index);
 
 	ret = SUCCEED;
 out:
@@ -2114,7 +2122,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	zbx_hashset_iter_t	iter;
 	zbx_snmp_dobject_t	*obj;
 
-	zbx_vector_ptr_destroy(&data->index);
+	zbx_vector_snmp_dobject_ptr_destroy(&data->index);
 
 	zbx_hashset_iter_reset(&data->objects, &iter);
 	while (NULL != (obj = (zbx_snmp_dobject_t *)zbx_hashset_iter_next(&iter)))
@@ -2147,7 +2155,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *snmp_oid, const ch
 		memset(new_obj.values, 0, sizeof(char *) * data->request.nparam / 2);
 
 		obj = (zbx_snmp_dobject_t *)zbx_hashset_insert(&data->objects, &new_obj, sizeof(new_obj));
-		zbx_vector_ptr_append(&data->index, obj);
+		zbx_vector_snmp_dobject_ptr_append(&data->index, obj);
 	}
 
 	obj->values[data->num] = zbx_strdup(NULL, value);
@@ -2341,6 +2349,151 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: quotes string value same way Net-SNMP library does it             *
+ *                                                                            *
+ * Parameters: buffer      - [OUT] output buffer                              *
+ *             buffer_size - [IN] output buffer size                          *
+ *             str         - [IN] SNMP variable                               *
+ *             len         - [IN]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - string was quoted successfully                     *
+ *               FAIL    - output buffer is too small                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	snmp_native_quote_string_value(char *buffer, size_t buffer_size, char *str, size_t len)
+{
+	size_t output_len = 0;
+
+	if (!snmp_cstrcat((unsigned char **)&buffer, &buffer_size, &output_len, 0, "\""))
+	{
+		return FAIL;
+	}
+	if (!sprint_realloc_asciistring((unsigned char **)&buffer, &buffer_size, &output_len, 0, (unsigned char *)str,
+			len))
+	{
+		return FAIL;
+	}
+	if (!snmp_cstrcat((unsigned char **)&buffer, &buffer_size, &output_len, 0, "\""))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: quotes string value if Net-SNMP library hasn't quoted it          *
+ *                                                                            *
+ * Parameters: buffer      - [OUT]                                            *
+ *             buffer_size - [IN] output buffer size                          *
+ *             var         - [IN] SNMP variable                               *
+ *                                                                            *
+ * Return value: SUCCEED - string was quoted successfully                     *
+ *               FAIL    - output buffer is too small                         *
+ *                                                                            *
+ * Comments: When producing the output, Net-SNMP library sometimes quotes     *
+ *           string values, sometimes it doesn't quote them. This makes it    *
+ *           impossible to correctly parse string values, because there is    *
+ *           no way for parser to tell if string value was quoted - quote     *
+ *           character in the beginning of the value can either indicate that *
+ *           the value was quoted, or be a part of the actual value. To deal  *
+ *           with this issue, we can analyze the output that was produced by  *
+ *           the library, compare it to raw value and try to guess if the     *
+ *           value was quoted. If it wasn't, we can manually quote the value. *
+ *           This way, string values will always be quoted and parser should  *
+ *           not have issues with parsing them.                               *
+ *                                                                            *
+ *           When formatting string values, Net-SNMP library checks if        *
+ *           display hint is available for specific OID. If yes, then value   *
+ *           is not quoted. If hint is not used, then library outputs it      *
+ *           either as unoquoted Hex-STRING value, or as quoted STRING value, *
+ *           or as quoted empty string without specifying the type.           *
+ *           See sprint_realloc_octet_string() for exact implementation.      *
+ *                                                                            *
+ ******************************************************************************/
+static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct variable_list *var)
+{
+#define TYPE_STR_HEX_STRING	"Hex-STRING: "
+#define TYPE_STR_STRING		"STRING: "
+	int	ret;
+	char	*buf;
+	char	quoted_buf[MAX_STRING_LEN];
+
+	buf = strstr(buffer, " = ");
+	if (NULL == buf)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() ' = ' not found in buffer '%s'", __func__, buffer);
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
+	buf += 3;
+
+	if (0 == var->val_len && 0 == strcmp(buf, "\"\""))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (0 == strncmp(buf, TYPE_STR_HEX_STRING, sizeof(TYPE_STR_HEX_STRING) - 1))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (0 != strncmp(buf, TYPE_STR_STRING, sizeof(TYPE_STR_STRING) - 1))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() expected 'STRING' type in buffer '%s'", __func__, buffer);
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
+	buf += sizeof(TYPE_STR_STRING) - 1;
+
+	buffer_size -= (size_t)(buf - buffer);
+
+	if ('"' == *buf)
+	{
+		if (SUCCEED != snmp_native_quote_string_value(quoted_buf, buffer_size, (char *) var->val.string,
+				var->val_len))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s() quoting value failed, buffer too small", __func__);
+			ret = FAIL;
+			goto out;
+		}
+
+		/* If value produced by Net-SNMP library is the same as "manually quoted string", then we can assume  */
+		/* that the library quoted the value and no further actions are needed.                               */
+		/* If values are different, quote character is probably part of the value, but we cannot just use     */
+		/* quoted_buf as the final result, because value might have been altered to produce the output        */
+		/* because of the display hints. We have to quote the value that was produced by Net-SNMP library,    */
+		/* not the raw value.                                                                                 */
+		if (0 == strcmp(buf, quoted_buf))
+		{
+			ret = SUCCEED;
+			goto out;
+		}
+	}
+
+	if (SUCCEED != snmp_native_quote_string_value(quoted_buf, buffer_size, buf, strlen(buf)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() quoting value failed, buffer too small", __func__);
+		ret = FAIL;
+		goto out;
+	}
+
+	zbx_strlcpy(buf, quoted_buf, buffer_size);
+
+	ret = SUCCEED;
+out:
+	return ret;
+#undef TYPE_STR_HEX_STRING
+#undef TYPE_STR_STRING
+}
+
 static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		zbx_bulkwalk_context_t *bulkwalk_context, char **results, size_t *results_alloc,
 		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface,
@@ -2415,6 +2568,9 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 				bulkwalk_context->running = 0;
 
 			snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
+
+			if (ASN_OCTET_STR == var->type)
+				snmp_quote_string_value(buffer, sizeof(buffer), var);
 
 			if (NULL != *results)
 				zbx_chrcpy_alloc(results, results_alloc, results_offset, '\n');
@@ -3264,8 +3420,12 @@ int	zbx_get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char 
 	return errcode;
 }
 
-/* Actually this could be called by discoverer, without poller being initialized, */
-/* so cannot call poller_get_progname(), need progname to be passed directly. */
+/*******************************************************************************************
+ *                                                                                         *
+ * Comment: Actually this could be called by discoverer, without poller being initialized, *
+ *          so cannot call poller_get_progname(), need progname to be passed directly.     *
+ *                                                                                         *
+ *******************************************************************************************/
 static void	zbx_init_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;
@@ -3289,8 +3449,12 @@ static void	zbx_init_snmp(const char *progname)
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-/* Actually this could be called by discoverer, without poller being initialized, */
-/* so cannot call poller_get_progname(), need progname to be passed directly. */
+/*******************************************************************************************
+ *                                                                                         *
+ * Comment: Actually this could be called by discoverer, without poller being initialized, *
+ *          so cannot call poller_get_progname(), need progname to be passed directly.     *
+ *                                                                                         *
+ *******************************************************************************************/
 static void	zbx_shutdown_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;
@@ -3497,8 +3661,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			goto exit;
 		}
 
-		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail, poller_type);
+		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error,
+				sizeof(error), &max_succeed, &min_fail, poller_type);
 
 		zbx_snmp_close_session(ssp);
 	}
