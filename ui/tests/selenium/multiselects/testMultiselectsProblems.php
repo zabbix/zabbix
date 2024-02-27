@@ -272,5 +272,7 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 				$this->assertFalse($group_overlay->query('link', $data['hostgroup'])->exists());
 				break;
 		}
+
+		$this->closeMultiselectDialogs();
 	}
 }
