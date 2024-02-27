@@ -23,6 +23,7 @@ class CCheckBoxList extends CList {
 
 	private const ZBX_STYLE_CLASS = 'checkbox-list';
 
+	private const ZBX_STYLE_LAYOUT_FIXED = 'fixed';
 	private const ZBX_STYLE_VERTICAL = 'vertical';
 
 	/**
@@ -36,14 +37,19 @@ class CCheckBoxList extends CList {
 	protected $name;
 
 	/**
+	 * Checkboxes id unique suffix.
+	 */
+	protected $uniqid = '';
+
+	/**
 	 * @var bool $enabled
 	 */
 	protected $enabled = true;
 
 	/**
-	 * Checkboxes id unique suffix.
+	 * @var bool $layout_fixed
 	 */
-	protected $uniqid = '';
+	protected $layout_fixed = false;
 
 	/**
 	 * @var bool $vertical
@@ -54,11 +60,6 @@ class CCheckBoxList extends CList {
 	 * @var int $columns
 	 */
 	protected $columns;
-
-	/**
-	 * @var bool $are_checkbox_titles_enabled
-	 */
-	protected bool $are_checkbox_titles_enabled = false;
 
 	/**
 	 * @param string $name
@@ -141,6 +142,19 @@ class CCheckBoxList extends CList {
 	}
 
 	/**
+	 * Make columns the same size.
+	 *
+	 * @param bool $layout_fixed
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setLayoutFixed(bool $layout_fixed = true): CCheckBoxList {
+		$this->layout_fixed = $layout_fixed;
+
+		return $this;
+	}
+
+	/**
 	 * Display checkboxes in vertical order.
 	 *
 	 * @param bool $vertical
@@ -166,17 +180,6 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
-	/**
-	 * @param bool $enable_label_titles
-	 *
-	 * @return $this
-	 */
-	public function enableLabelTitles(bool $enable_label_titles = true): self {
-		$this->are_checkbox_titles_enabled = $enable_label_titles;
-
-		return $this;
-	}
-
 	/*
 	 * @param bool $destroy
 	 *
@@ -184,6 +187,10 @@ class CCheckBoxList extends CList {
 	 */
 	public function toString($destroy = true) {
 		$this->addStyle('--columns: '.$this->columns.';');
+
+		if ($this->layout_fixed) {
+			$this->addClass(self::ZBX_STYLE_LAYOUT_FIXED);
+		}
 
 		if ($this->vertical) {
 			$max_rows = (int) ceil(count($this->values) / $this->columns);
@@ -198,10 +205,6 @@ class CCheckBoxList extends CList {
 				->setLabel($value['label'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
-
-			if ($this->are_checkbox_titles_enabled) {
-				$checkbox->setLabelTitle($value['label']);
-			}
 
 			if (array_key_exists('id', $value) || $this->uniqid !== '') {
 				$checkbox->setId(array_key_exists('id', $value)
