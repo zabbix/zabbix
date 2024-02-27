@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-21T12:36:19Z'
+  date: '2024-02-26T09:53:10Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -66,7 +66,7 @@ zabbix_export:
               name: 'Check Point: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'ICMP packets loss detected.'
+              description: 'ICMP packet loss detected.'
               dependencies:
                 - name: 'Check Point: Unavailable by ICMP ping'
                   expression: 'max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0'
@@ -128,7 +128,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: LOG
-          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items.'
+          description: 'Used to collect all SNMP traps unmatched by other `snmptrap` items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             - tag: component
@@ -144,7 +144,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
+            Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.
           inventory_link: CONTACT
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -163,7 +163,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: CHECKPOINT-MIB
-            The average time the CPU has spent doing nothing.
+            Average time the CPU has spent doing nothing.
           tags:
             - tag: component
               value: cpu
@@ -189,7 +189,7 @@ zabbix_export:
           value_type: FLOAT
           description: |
             MIB: UCD-SNMP-MIB
-            The average number of processes being or waiting executed over past 1 minute.
+            Average number of processes being executed or waiting over the last minute.
           tags:
             - tag: component
               value: cpu
@@ -202,7 +202,7 @@ zabbix_export:
           value_type: FLOAT
           description: |
             MIB: UCD-SNMP-MIB
-            The average number of processes being or waiting executed over past 5 minute.
+            Average number of processes being executed or waiting over the last 5 minutes.
           tags:
             - tag: component
               value: cpu
@@ -215,7 +215,7 @@ zabbix_export:
           value_type: FLOAT
           description: |
             MIB: UCD-SNMP-MIB
-            The average number of processes being or waiting executed over past 15 minute.
+            Average number of processes being executed or waiting over the last 15 minutes.
           tags:
             - tag: component
               value: cpu
@@ -262,7 +262,21 @@ zabbix_export:
           units: '%'
           description: |
             MIB: CHECKPOINT-MIB
-            The average time the CPU has spent running the kernel and its processes.
+            Average time the CPU has spent running the kernel and its processes.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 7a8a46d486404a5184a7fdba0832c50f
+          name: 'Check Point: CPU user time'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.1.0
+          key: system.cpu.user
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: CHECKPOINT-MIB
+            Average time the CPU has spent running user processes that are not niced.
           tags:
             - tag: component
               value: cpu
@@ -270,7 +284,7 @@ zabbix_export:
           name: 'Check Point: CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.4.0
-          key: system.cpu.usage
+          key: system.cpu.util
           history: 7d
           value_type: FLOAT
           units: '%'
@@ -282,29 +296,15 @@ zabbix_export:
               value: cpu
           triggers:
             - uuid: b9df7717d21145dc86954380422671a9
-              expression: 'min(/Check Point Next Generation Firewall by SNMP/system.cpu.usage,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Check Point Next Generation Firewall by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'Check Point: High CPU utilization'
               event_name: 'Check Point: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
-        - uuid: 7a8a46d486404a5184a7fdba0832c50f
-          name: 'Check Point: CPU user time'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.1.0
-          key: system.cpu.user
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: |
-            MIB: CHECKPOINT-MIB
-            The average time the CPU has spent running users' processes that are not niced.
-          tags:
-            - tag: component
-              value: cpu
         - uuid: a7ad79b572ab4e678011aa8ee810cd75
           name: 'Check Point: System description'
           type: SNMP_AGENT
@@ -316,7 +316,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            A textual description of the entity. This value should include the full name and version identification of the system's hardware type, software operating system, and networking software.
+            Full name and version identification of the system's hardware type, software operating system, and networking software.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -335,7 +335,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: CHECKPOINT-MIB
-            Appliance Manufacturer.
+            Appliance manufacturer.
           inventory_link: VENDOR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -355,7 +355,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: CHECKPOINT-MIB
-            Appliance Product Name.
+            Appliance product name.
           inventory_link: MODEL
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -375,7 +375,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: CHECKPOINT-MIB
-            Appliance Serial Number.
+            Appliance serial number.
           inventory_link: SERIALNO_A
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -392,7 +392,7 @@ zabbix_export:
               name: 'Check Point: Device has been replaced'
               event_name: 'Check Point: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
+              description: 'The device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -408,7 +408,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet`, `3rd floor`). If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -428,7 +428,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.
+            An administratively-assigned name for the node (the node's fully-qualified domain name). If not provided, the value is a zero-length string.
           inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -461,7 +461,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.
+            The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -609,7 +609,8 @@ zabbix_export:
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
-            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Availability of SNMP checks on the host. The value of this item corresponds to the availability icons in the host list.
+            
             Possible values:
             0 - not available
             1 - available
@@ -641,7 +642,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#CPU.ID},1.3.6.1.4.1.2620.1.6.7.5.1.1]'
           key: cpu.discovery
           delay: 1h
-          description: 'Discovering CPU from CHECKPOINT-MIB.'
+          description: 'For discovering CPU from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 0d17d7831b954decada6fba5f14f9265
               name: 'CPU Core {#CPU.ID}: CPU idle time'
@@ -653,7 +654,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                The time the CPU {#CPU.ID} has spent doing nothing.
+                The time the CPU `{#CPU.ID}` has spent doing nothing.
               tags:
                 - tag: component
                   value: cpu
@@ -667,21 +668,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                The time the CPU {#CPU.ID} has spent running the kernel and its processes.
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: 54c95169f93a497c9ba4b83874ec85ea
-              name: 'CPU Core {#CPU.ID}: CPU utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.5.1.5.{#SNMPINDEX}'
-              key: 'system.core.usage[multiProcUsage.{#CPU.ID}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: CHECKPOINT-MIB
-                CPU {#CPU.ID} utilization in %.
+                The time the CPU `{#CPU.ID}` has spent running the kernel and its processes.
               tags:
                 - tag: component
                   value: cpu
@@ -695,7 +682,21 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                The time the CPU {#CPU.ID} has spent running users' processes that are not niced.
+                The time the CPU `{#CPU.ID}` has spent running user processes that are not niced.
+              tags:
+                - tag: component
+                  value: cpu
+            - uuid: 54c95169f93a497c9ba4b83874ec85ea
+              name: 'CPU Core {#CPU.ID}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.5.1.5.{#SNMPINDEX}'
+              key: 'system.core.util[multiProcUsage.{#CPU.ID}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: CHECKPOINT-MIB
+                CPU `{#CPU.ID}` utilization in %.
               tags:
                 - tag: component
                   value: cpu
@@ -725,7 +726,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.1.6.7.8.2.1.2,{#FAN.UNIT},1.3.6.1.4.1.2620.1.6.7.8.2.1.4]'
           key: fan.discovery
           delay: 1h
-          description: 'Discovering fan sensors from CHECKPOINT-MIB.'
+          description: 'For discovering fan sensors from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 4d334701a73a4295a7b3a45a7925ed76
               name: 'FAN {#SNMPINDEX}: Fan speed'
@@ -738,7 +739,7 @@ zabbix_export:
               units: '!{#FAN.UNIT}'
               description: |
                 MIB: CHECKPOINT-MIB
-                Current speed of the Fan.
+                Current speed of the fan.
               tags:
                 - tag: component
                   value: fan
@@ -754,7 +755,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: CHECKPOINT-MIB
-                Current status of the Fan tray.
+                Current status of the fan tray.
               valuemap:
                 name: 'FanSensor Status'
               tags:
@@ -788,7 +789,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#FW.STATE},1.3.6.1.4.1.2620.1.1.1]'
           key: fw.discovery
           delay: 1h
-          description: 'This discovery will create set of firewall metrics from CHECKPOINT-MIB if Firewall is installed.'
+          description: 'This discovery will create a set of firewall metrics from CHECKPOINT-MIB if the firewall is installed.'
           item_prototypes:
             - uuid: ff64891849684cc88ae5414c0bc1b0bb
               name: 'Check Point Firewall: Accepted packets per second{#SINGLETON}'
@@ -798,7 +799,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: CHECKPOINT-MIB
-                The number of accepted packets per second.
+                Number of accepted packets per second.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -838,7 +839,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: CHECKPOINT-MIB
-                The number of dropped packets per second.
+                Number of dropped packets per second.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -855,7 +856,7 @@ zabbix_export:
               units: unixtime
               description: |
                 MIB: CHECKPOINT-MIB
-                The latest installation time of the Firewall loaded filter.
+                Last install time of the firewall filter.
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
@@ -876,7 +877,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: CHECKPOINT-MIB
-                The name of the Firewall loaded filter.
+                Name of the firewall filter.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -892,7 +893,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: CHECKPOINT-MIB
-                The number of logged packets per second.
+                Number of logged packets per second.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -908,7 +909,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: CHECKPOINT-MIB
-                The number of rejected packets per second.
+                Number of rejected packets per second.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -955,7 +956,7 @@ zabbix_export:
                   event_name: 'Check Point Firewall: Number of dropped packets has been increased: >{$FW.DROPPED.PACKETS.TH}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'This trigger uses utilized drops number, an increase in which indicates if the instance is fully utilized.'
+                  description: 'This trigger uses the number of dropped packets, an increase of which indicates that the instance is fully utilized.'
                   tags:
                     - tag: scope
                       value: availability
@@ -968,7 +969,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: CHECKPOINT-MIB
-                Current version of the Firewall.
+                Current version of the firewall.
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
@@ -1085,7 +1086,7 @@ zabbix_export:
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: L
-          description: 'Discovering interfaces from IF-MIB.'
+          description: 'For discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: fa2d9726b0ce42c6ac16d61a8abbe8c6
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
@@ -1097,7 +1098,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1118,8 +1119,9 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                For packet-oriented interfaces - the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces - the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1141,8 +1143,8 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of `ifInOctets`.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1167,7 +1169,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1188,8 +1190,9 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                For packet-oriented interfaces - the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces - the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1211,8 +1214,8 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of `ifOutOctets`.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1239,8 +1242,8 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second.
-                If this object reports a value of `n` then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
-                For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. 
+                If this object reports a value of `n`, then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
+                For interfaces that do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
                 - type: MULTIPLIER
@@ -1266,12 +1269,12 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
-                - The testing(3) state indicates that no operational packets can be passed.
-                - If ifAdminStatus is down(2), then ifOperStatus should be down(2).
-                - If ifAdminStatus is changed to up(1), then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic.
-                - It should change to dormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection).
-                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state.
-                - It should remain in the notPresent(6) state if the interface has missing (typically, hardware) components.
+                - The `testing(3)` state indicates that no operational packets can be passed.
+                - If `ifAdminStatus` is `down(2)`, then `ifOperStatus` should be `down(2)`.
+                - If `ifAdminStatus` is changed to `up(1)`, then `ifOperStatus` should change to `up(1)` if the interface is ready to transmit and receive network traffic.
+                - It should change to `dormant(5)` if the interface is waiting for external actions (such as a serial line waiting for an incoming connection).
+                - It should remain in the `down(2)` state if and only if there is a fault that prevents it from going to the `up(1)` state.
+                - It should remain in the `notPresent(6)` state if the interface has missing (typically, hardware) components.
               valuemap:
                 name: 'Interface Status'
               tags:
@@ -1292,8 +1295,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the interface link status is down.
-                    2. `{&#36;NET.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface link is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface link status was up to (1) sometime before.
+                    2. `{$NET.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface link is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface link status was up to "1" sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of `diff`.
                   manual_close: 'YES'
@@ -1311,7 +1314,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA) through updating the syntax of the IANAifType textual convention.
+                Additional values for `ifType` are assigned by the Internet Assigned Numbers Authority (IANA) through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'Interface Type'
               preprocessing:
@@ -1389,7 +1392,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$NET.IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'It recovers when it is below 80% of the `{&#36;NET.IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
+              description: 'It recovers when it is below 80% of the `{$NET.IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
                 - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -1449,7 +1452,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.1.6.7.9.1.1.1]'
           key: psu.discovery
           delay: 1h
-          description: 'Discovering power supply sensors from CHECKPOINT-MIB.'
+          description: 'For discovering power supply sensors from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 49b166c588354a00ad500c2181de2602
               name: 'PSU {#SNMPINDEX}: Power supply status'
@@ -1512,7 +1515,7 @@ zabbix_export:
                 value: '{$SW.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering software blades and features from CHECKPOINT-MIB.'
+          description: 'For discovering software blades and features from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 6024b29ddca34a99a052a4dc8961ca02
               name: '{#SW.NAME}: License expiration date'
@@ -1525,8 +1528,7 @@ zabbix_export:
               units: unixtime
               description: |
                 MIB: CHECKPOINT-MIB
-                Expiration date for the license of the "{#SW.NAME}" software blade.
-                (doesn't return value if the license doesn't have an expiration date)
+                Expiration date for the license of the software blade. Doesn't return a value if the license doesn't have an expiration date.
               preprocessing:
                 - type: NOT_MATCHES_REGEX
                   parameters:
@@ -1554,7 +1556,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the license expires soon.
-                    2. `{&#36;LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license expires.
+                    2. `{$LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine the context macro to "0", marking the current license as not important. No new trigger will be fired if this license expires.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1567,7 +1569,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the license has been expired.
-                    2. `{&#36;LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license is expired.
+                    2. `{$LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine the context macro to "0", marking the current license as not important. No new trigger will be fired if this license is expired.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1582,7 +1584,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: CHECKPOINT-MIB
-                Total quota amount for the license of "{#SW.NAME}" software blade.
+                Total quota amount for the license of the software blade.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1606,7 +1608,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: CHECKPOINT-MIB
-                Used quota amount for the license of "{#SW.NAME}" software blade.
+                Used quota amount for the license of the software blade.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1631,7 +1633,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: CHECKPOINT-MIB
-                Current license state of the "{#SW.NAME}" software blade.
+                Current license state of the software blade.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1655,7 +1657,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: CHECKPOINT-MIB
-                Current "{#SW.NAME}" software blade status.
+                Current software blade status.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1683,7 +1685,7 @@ zabbix_export:
                 value: '{$TEMP.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering temperature sensors from CHECKPOINT-MIB.'
+          description: 'For discovering temperature sensors from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: f78ffa1229b746d989899af95c5687b5
               name: '{#SENSOR.NAME}: Temperature'
@@ -1696,7 +1698,7 @@ zabbix_export:
               units: '!°C'
               description: |
                 MIB: CHECKPOINT-MIB
-                The current temperature reading in degrees celsius from this hardware component's temperature sensor. 
+                Current temperature reading in degrees Celsius from the hardware component's temperature sensor.
               tags:
                 - tag: component
                   value: temperature
@@ -1771,7 +1773,7 @@ zabbix_export:
                 value: '{$DISK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering storage disks from CHECKPOINT-MIB.'
+          description: 'For discovering storage disks from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 6a0fded5672b4863a273d39c93962c4e
               name: '{#DISK.NAME}: Available disk space'
@@ -1782,7 +1784,7 @@ zabbix_export:
               units: B
               description: |
                 MIB: CHECKPOINT-MIB
-                Available free disk in partition (not reserved by the OS) in bytes.
+                Available free disk (not reserved by the OS) in bytes.
               tags:
                 - tag: component
                   value: storage
@@ -1797,7 +1799,7 @@ zabbix_export:
               units: B
               description: |
                 MIB: CHECKPOINT-MIB
-                Free disk capacity in partition in bytes.
+                Free disk capacity in bytes.
               tags:
                 - tag: component
                   value: storage
@@ -1811,7 +1813,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'The space utilization calculated by free percentage (multiDiskFreeTotalPercent) metric, expressed in %'
+              description: 'Space utilization calculated by the free percentage metric `multiDiskFreeTotalPercent`, expressed in %'
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
@@ -1831,7 +1833,7 @@ zabbix_export:
               units: B
               description: |
                 MIB: CHECKPOINT-MIB
-                Total partition size in bytes.
+                Total disk size in bytes.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1850,7 +1852,7 @@ zabbix_export:
               units: B
               description: |
                 MIB: CHECKPOINT-MIB
-                Disk used in partition in bytes.
+                Amount of disk used in bytes.
               tags:
                 - tag: component
                   value: storage
@@ -1936,7 +1938,7 @@ zabbix_export:
                 value: '{$VOLT.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering voltage sensors from CHECKPOINT-MIB.'
+          description: 'For discovering voltage sensors from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: a302aefd0ea5499ea6d916929b4d45dc
               name: '{#SENSOR.NAME}: Voltage value'
@@ -1948,7 +1950,7 @@ zabbix_export:
               units: V
               description: |
                 MIB: CHECKPOINT-MIB
-                The most recent measurement obtained by the agent for this sensor.
+                Most recent measurement obtained by the agent for this sensor.
               tags:
                 - tag: component
                   value: sensor
@@ -1978,7 +1980,7 @@ zabbix_export:
                 value: '{$VPN.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering VPN tunnels from CHECKPOINT-MIB.'
+          description: 'For discovering VPN tunnels from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 35acb99d29714edb88df244b006e8cd3
               name: 'VPN {#VPN.NAME}: Community'
@@ -2156,7 +2158,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the current tunnel state is down.
-                    2. {&#36;VPN.STATE.CONTROL:"{#VPN.NAME}"}=1 - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this tunnel is down.
+                    2. `{$VPN.STATE.CONTROL:"{#VPN.NAME}"}=1` - a user can redefine the context macro to "0", marking this notification as not important. No new trigger will be fired if this tunnel is down.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2193,37 +2195,37 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'Threshold of CPU utilization for warning trigger in %.'
+          description: 'Threshold of CPU utilization for the Warning trigger in %.'
         - macro: '{$DISK.FREE.MIN.CRIT}'
           value: 5G
-          description: 'The critical threshold of the disk space utilization.'
+          description: 'Critical threshold of disk space usage.'
         - macro: '{$DISK.FREE.MIN.WARN}'
           value: 10G
-          description: 'The warning threshold of the disk space utilization.'
+          description: 'Warning threshold of disk space usage.'
         - macro: '{$DISK.NAME.MATCHES}'
           value: .+
-          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Storage discovery. Can be overridden on the host or linked template level.'
         - macro: '{$DISK.NAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Storage discovery. Can be overridden on the host or linked template level.'
         - macro: '{$DISK.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'Critical threshold of disk usage for trigger in %.'
+          description: 'Disk utilization threshold for Critical trigger in %.'
         - macro: '{$DISK.PUSED.MAX.WARN}'
           value: '80'
-          description: 'Warning threshold of disk usage for trigger in %.'
+          description: 'Disk utilization threshold for Warning trigger in %.'
         - macro: '{$FW.DROPPED.PACKETS.TH}'
           value: '0'
-          description: 'This macro is used in Firewall discovery.'
+          description: 'Used in Firewall discovery.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
-          description: 'Threshold of ICMP packets loss for warning trigger in %.'
+          description: 'Threshold of ICMP packet loss for the Warning trigger in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
-          description: 'Threshold of average ICMP response time for warning trigger in seconds.'
+          description: 'Threshold of average ICMP response time for the Warning trigger in seconds.'
         - macro: '{$LICENSE.CONTROL}'
           value: '1'
-          description: 'This macro is used in Software blades discovery. Can be used with interface name as context.'
+          description: 'Used in Software blade discovery. Can be overridden on the host or linked template level.'
         - macro: '{$LICENSE.EXPIRY.WARN}'
           value: '7'
           description: 'Number of days until the license expires.'
@@ -2232,91 +2234,91 @@ zabbix_export:
           description: 'Load per CPU considered sustainable. Change if needed.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
-          description: 'The warning threshold of the "Physical memory: Memory utilization" item.'
+          description: 'Warning threshold for the item "Physical memory: Memory utilization".'
         - macro: '{$NET.IF.CONTROL}'
           value: '1'
-          description: 'Macro for operational state of the interface for "Link down" trigger. Can be used with interface name as context.'
+          description: 'Macro for the interface operational state for the "Link down" trigger. Can be used with the interface name as context.'
         - macro: '{$NET.IF.ERRORS.WARN}'
           value: '2'
-          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
+          description: 'Threshold of error packet rate for the Warning trigger. Can be used with the interface name as context.'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.UTIL.MAX}'
           value: '95'
-          description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
+          description: 'Threshold of interface bandwidth utilization for the Warning trigger in %. Can be used with interface name as context.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
-          description: 'The time interval for SNMP availability trigger.'
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$SW.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Software blades discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Software blade discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SW.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Software blades discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Software blade discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Temperature discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Temperature discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.VALUE.CRIT}'
           value: '75'
-          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Temperature discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.VALUE.LOW}'
           value: '5'
-          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Temperature discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.VALUE.WARN}'
           value: '65'
-          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Temperature discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VOLT.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Voltage discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Voltage discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VOLT.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Voltage discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Voltage discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in VPN discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in VPN discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in VPN discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in VPN discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.STATE.CONTROL}'
           value: '1'
-          description: 'This macro is used in "Tunnel down" trigger. Can be used with interface name as context.'
+          description: 'Used in the "Tunnel down" trigger. Can be used with the interface name as context.'
       dashboards:
         - uuid: 8291aa73acc04ffe9832e02164531a6c
           name: 'Check Point: General'
@@ -3435,7 +3437,7 @@ zabbix_export:
         - color: 199C0D
           item:
             host: 'Check Point Next Generation Firewall by SNMP'
-            key: system.cpu.usage
+            key: system.cpu.util
     - uuid: 0fe8af91daf1483d84650141a28d9748
       name: 'Check Point: Memory usage'
       graph_items:
