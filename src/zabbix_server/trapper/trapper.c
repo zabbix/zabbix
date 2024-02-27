@@ -745,6 +745,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
 	int				i;
+
 	zbx_status_counters_init();
 
 	/* get status information */
