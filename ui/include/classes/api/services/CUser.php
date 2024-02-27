@@ -2873,11 +2873,30 @@ class CUser extends CApiService {
 		self::addRoleType($users, $db_roles, $db_users);
 
 		if (array_key_exists('medias', $user)) {
-			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
+			$idp_medias = $this->sanitizeUserMedia($user['medias']);
+			$idp_medias = array_column($idp_medias, null, 'userdirectory_mediaid');
 			$db_users[$userid]['medias'] = DB::select('media', [
-				'output' => ['mediatypeid', 'mediaid', 'sendto', 'userdirectory_mediaid'],
-				'filter' => ['userid' => $userid]
+				'output' => ['mediatypeid', 'mediaid', 'sendto', 'active', 'severity', 'period',
+					'userdirectory_mediaid'
+				],
+				'filter' => ['userid' => $userid],
+				'preservekeys' => true
 			]);
+			$users[$userid]['medias'] = [];
+
+			foreach ($db_users[$userid]['medias'] as $db_media) {
+				if (!$db_media['userdirectory_mediaid']) {
+					$db_media['sendto'] = [$db_media['sendto']];
+					$users[$userid]['medias'][] = $db_media;
+				}
+				else if (array_key_exists($db_media['userdirectory_mediaid'], $idp_medias)) {
+					$db_media['sendto'] = $idp_medias[$db_media['userdirectory_mediaid']]['sendto'];
+					$users[$userid]['medias'][] = $db_media;
+					unset($idp_medias[$db_media['userdirectory_mediaid']]);
+				}
+			}
+
+			$users[$userid]['medias'] = array_merge($users[$userid]['medias'], $idp_medias);
 		}
 
 		if (array_key_exists('usrgrps', $user)) {
@@ -3091,6 +3110,7 @@ class CUser extends CApiService {
 	 *
 	 * @param array $medias
 	 * @param array $medias[]['mediatypeid']
+	 * @param array $medias[]['sendto']
 	 */
 	protected function sanitizeUserMedia(array $medias): array {
 		if (!$medias) {
@@ -3124,10 +3144,8 @@ class CUser extends CApiService {
 			}
 
 			if ($sendto) {
-				$user_medias[] = [
-					'mediatypeid' => $media['mediatypeid'],
-					'sendto' => $sendto
-				];
+				$media['sendto'] = $sendto;
+				$user_medias[] = $media;
 			}
 		}
 

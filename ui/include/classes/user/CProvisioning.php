@@ -73,7 +73,9 @@ class CProvisioning {
 				'group_filter', 'group_membership'
 			],
 			'userdirectoryids' => [$userdirectoryid],
-			'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
+			'selectProvisionMedia' => ['userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active',
+				'severity', 'period'
+			],
 			'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 		]);
 		$userdirectory = reset($userdirectories);
@@ -217,9 +219,14 @@ class CProvisioning {
 	 * @param array $idp_user        User data from external source, LDAP/SAML.
 	 * @param bool  $case_sensitive  How IdP attributes should be matched.
 	 *
-	 * @return array
+	 * @return array of medias, media properties
+	 *         []['name']
 	 *         []['mediatypeid']
 	 *         []['sendto']
+	 *         []['active']
+	 *         []['severity']
+	 *         []['period']
+	 *         []['userdirectory_mediaid']
 	 */
 	public function getUserMedias(array $idp_user, bool $case_sensitive = true): array {
 		$user_medias = [];
@@ -238,7 +245,11 @@ class CProvisioning {
 				$user_medias[] = [
 					'name' => $idp_attributes['name'],
 					'mediatypeid' => $idp_attributes['mediatypeid'],
-					'sendto' =>	[$idp_user[$idp_field]]
+					'sendto' =>	[$idp_user[$idp_field]],
+					'active' => $idp_attributes['active'],
+					'severity' => $idp_attributes['severity'],
+					'period' => $idp_attributes['period'],
+					'userdirectory_mediaid' => $idp_attributes['userdirectory_mediaid']
 				];
 
 				continue;
@@ -250,7 +261,11 @@ class CProvisioning {
 				$user_medias[] = [
 					'name' => $idp_attributes['name'],
 					'mediatypeid' => $idp_attributes['mediatypeid'],
-					'sendto' =>	[$idp_user_lowercased[$idp_field]]
+					'sendto' =>	[$idp_user_lowercased[$idp_field]],
+					'active' => $idp_attributes['active'],
+					'severity' => $idp_attributes['severity'],
+					'period' => $idp_attributes['period'],
+					'userdirectory_mediaid' => $idp_attributes['userdirectory_mediaid']
 				];
 			}
 		}
