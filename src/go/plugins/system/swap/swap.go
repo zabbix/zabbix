@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 
-	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
@@ -32,16 +31,6 @@ var impl Plugin
 // Plugin -
 type Plugin struct {
 	plugin.Base
-}
-
-func init() {
-	err := plugin.RegisterMetrics(
-		&impl, "Swap",
-		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
-	)
-	if err != nil {
-		panic(errs.Wrap(err, "failed to register metrics"))
-	}
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {

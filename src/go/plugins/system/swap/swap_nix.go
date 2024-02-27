@@ -32,6 +32,7 @@ import (
 	"strings"
 	"syscall"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/unix"
 )
@@ -42,6 +43,17 @@ const (
 	swapLocation     = "/proc/swaps"
 	vmstatLocation   = "/proc/vmstat"
 )
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Swap",
+		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
+		"system.swap.in", "Swap in (from device into memory) statistics.",
+		"system.swap.out", "Swap out (from memory onto device) statistics.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func getSwapSize() (uint64, uint64, error) {
 	info := &syscall.Sysinfo_t{}
@@ -197,7 +209,7 @@ func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, 
 func getSwapStatsIn(swapdev string) (io uint64, sect uint64, pag uint64, err error) {
 	var gotData bool
 	if io, sect, pag, gotData = getSwapStats(swapdev, false); !gotData {
-		err = errors.New("Failed to get swap information.")
+		err = errors.New("Cannot obtain swap information.")
 	}
 
 	return
@@ -206,15 +218,8 @@ func getSwapStatsIn(swapdev string) (io uint64, sect uint64, pag uint64, err err
 func getSwapStatsOut(swapdev string) (io uint64, sect uint64, pag uint64, err error) {
 	var gotData bool
 	if io, sect, pag, gotData = getSwapStats(swapdev, true); !gotData {
-		err = errors.New("Failed to get swap information.")
+		err = errors.New("Cannot obtain swap information.")
 	}
 
 	return
-}
-func init() {
-	plugin.RegisterMetrics(&impl, "Swap",
-		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
-		"system.swap.in", "Swap in (from device into memory) statistics.",
-		"system.swap.out", "Swap out (from memory onto device) statistics.",
-	)
 }
