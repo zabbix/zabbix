@@ -53,6 +53,11 @@ class testPagePrototypes extends CWebTest {
 	public $tag;
 
 	/**
+	 * XPath of the that represents the prototype list.
+	 */
+	protected $table_xpath = 'xpath://form/table[@class="list-table"]';
+
+	/**
 	 * Layouts of prototype pages.
 	 */
 	protected $layout_data = [
@@ -108,7 +113,7 @@ class testPagePrototypes extends CWebTest {
 		$this->page->assertTitle('Configuration of '.$this->source.' prototypes');
 		$page_header = ucfirst($this->source).' prototypes';
 		$this->page->assertHeader($page_header);
-		$table = $this->query('xpath://form/table[@class="list-table"]')->asTable()->one();
+		$table = $this->query($this->table_xpath)->asTable()->one();
 		$this->assertSame($this->layout_data[$this->source]['headers'], $table->getHeadersText());
 		$this->assertTableStats(self::$entity_count);
 
@@ -142,7 +147,7 @@ class testPagePrototypes extends CWebTest {
 			case 'graph':
 				// Check Width and Height columns for graph prototype page.
 				foreach (['Width', 'Height'] as $column) {
-					$this->assertTableDataColumn([100, 200, 300, 400], $column, 'xpath://form/table[@class="list-table"]');
+					$this->assertTableDataColumn([100, 200, 300, 400], $column, $this->table_xpath);
 				}
 				break;
 
@@ -184,7 +189,7 @@ class testPagePrototypes extends CWebTest {
 					'{$TEST}',
 					'🙂🙃'
 				];
-				$this->assertTableDataColumn($opdata, 'Operational data', 'xpath://form/table[@class="list-table"]');
+				$this->assertTableDataColumn($opdata, 'Operational data', $this->table_xpath);
 				$trigger_row = $table->getRow(0);
 
 				$expression = ($template) ? 'Template' : 'Host';
@@ -503,11 +508,11 @@ class testPagePrototypes extends CWebTest {
 	 * @param array $data		data from data provider
 	 */
 	public function executeSorting($data) {
-		$table = $this->query('xpath://form/table[@class="list-table"]')->asTable()->one();
+		$table = $this->query($this->table_xpath)->asTable()->one();
 		foreach (['desc', 'asc'] as $sorting) {
 			$table->query('link', $data['sort_by'])->one()->click();
 			$expected = ($sorting === 'asc') ? $data['result'] : array_reverse($data['result']);
-			$this->assertEquals($expected, $this->getTableColumnData($data['sort_by'], 'xpath://form/table[@class="list-table"]'));
+			$this->assertEquals($expected, $this->getTableColumnData($data['sort_by'], $this->table_xpath));
 		}
 	}
 
@@ -783,7 +788,7 @@ class testPagePrototypes extends CWebTest {
 	 * @param array $data		data from data provider
 	 */
 	public function checkTableAction($data) {
-		$table = $this->query('xpath://form/table[@class="list-table"]')->asTable()->one();
+		$table = $this->query($this->table_xpath)->asTable()->one();
 
 		// Find prototype in table by name and check column data before update.
 		if (array_key_exists('name', $data)) {
@@ -795,7 +800,7 @@ class testPagePrototypes extends CWebTest {
 		if (array_key_exists('button', $data)) {
 			// If there is no prototype name in data provider, then select all prototypes that exist in table.
 			$selected = (array_key_exists('name', $data)) ? $data['name'] : null;
-			$this->selectTableRows($selected, 'Name', 'xpath://form/table[@class="list-table"]');
+			$this->selectTableRows($selected, 'Name', $this->table_xpath);
 			$this->query('button', $data['button'])->one()->click();
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
@@ -813,7 +818,7 @@ class testPagePrototypes extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ucfirst($this->source).' prototypes updated');
-			$this->assertTableDataColumn($data['after'], $data['column_check'], 'xpath://form/table[@class="list-table"]');
+			$this->assertTableDataColumn($data['after'], $data['column_check'], $this->table_xpath);
 		}
 	}
 
@@ -953,13 +958,13 @@ class testPagePrototypes extends CWebTest {
 	 */
 	public function checkDelete($data, $ids) {
 		// Check that prototype exists and displayed in prototype table.
-		$prototype_names = $this->getTableColumnData('Name', 'xpath://form/table[@class="list-table"]');
+		$prototype_names = $this->getTableColumnData('Name', $this->table_xpath);
 		foreach ($data['name'] as $name) {
 			$this->assertTrue(in_array($name, $prototype_names));
 		}
 
 		// Select prototype and click on Delete button.
-		$this->selectTableRows($data['name'], 'Name', 'xpath://form/table[@class="list-table"]');
+		$this->selectTableRows($data['name'], 'Name', $this->table_xpath);
 		$this->query('button:Delete')->one()->click();
 
 		// Check that after canceling Delete, prototype still exists in DB and displayed in table.
@@ -976,7 +981,7 @@ class testPagePrototypes extends CWebTest {
 
 			// Check that prototype doesn't exist and not displayed in prototype table.
 			foreach ($data['name'] as $name) {
-				$this->assertFalse(in_array($name, $this->getTableColumnData('Name', 'xpath://form/table[@class="list-table"]')));
+				$this->assertFalse(in_array($name, $this->getTableColumnData('Name', $this->table_xpath)));
 			}
 		}
 
@@ -1091,7 +1096,7 @@ class testPagePrototypes extends CWebTest {
 		$form->fill($data['fields']);
 
 		if (array_key_exists('master_item', $data)) {
-			$form->query('xpath://div[@id="js-item-master-item-field"]/button[text()="Select"]')->one()->click();
+			$form->query('xpath:.//div[@id="js-item-master-item-field"]/button[text()="Select"]')->one()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$dialog->query('link', $data['master_item'])->one()->click();
 			$dialog->ensureNotPresent();
@@ -1100,7 +1105,7 @@ class testPagePrototypes extends CWebTest {
 		$form->submit()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 
-		$table = $this->query('xpath://form/table[@class="list-table"]')->asTable()->one();
+		$table = $this->query($this->table_xpath)->asTable()->one();
 		$template_row = $table->findRow('Key', $data['fields']['Key']);
 		$template_row->assertValues($data['check']);
 	}
