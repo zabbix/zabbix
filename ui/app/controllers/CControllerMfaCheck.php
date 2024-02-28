@@ -30,7 +30,7 @@ class CControllerMfaCheck extends CController {
 		$fields = [
 			'mfaid' =>			'db mfa.mfaid',
 			'type' =>			'in '.MFA_TYPE_TOTP.','.MFA_TYPE_DUO,
-			'name' =>			'required|db mfa.name',
+			'name' =>			'required|db mfa.name|not_empty',
 			'hash_function' =>	'in '.TOTP_HASH_SHA1.','.TOTP_HASH_SHA256.','.TOTP_HASH_SHA512,
 			'code_length' =>	'in '.TOTP_CODE_LENGTH_6.','.TOTP_CODE_LENGTH_8,
 			'api_hostname' =>	'db mfa.api_hostname',
