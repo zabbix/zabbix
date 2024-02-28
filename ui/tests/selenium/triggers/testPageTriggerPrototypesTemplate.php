@@ -24,36 +24,28 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 /**
  * @backup hosts
  *
- * @onBefore prepareTriggerPrototypeData
+ * @onBefore prepareTriggerPrototypeTemplateData
  */
-class testPageTriggerPrototypes extends testPagePrototypes {
+class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 
 	public $source = 'trigger';
 	public $tag = 'a3 Trigger prototype monitored not discovered_{#KEY}';
 
-	protected $link = 'zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&';
+	protected $link = 'zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&';
 	protected static $prototype_triggerids;
-	protected static $host_druleids;
+	protected static $host_druleid;
 
-	public function prepareTriggerPrototypeData() {
-		$host_result = CDataHelper::createHosts([
+	public function prepareTriggerPrototypeTemplateData() {
+		$response = CDataHelper::createTemplates([
 			[
-				'host' => 'Host for prototype check',
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_SNMP,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '161',
-						'details' => [
-							'version' => 1,
-							'community' => 'test'
-						]
-					]
-				],
-				'groups' => [['groupid' => 4]], // Zabbix server
+				'host' => 'Template for host prototype',
+				'groups' => [
+					['groupid' => 1] // template group 'Templates'
+				]
+			],
+			[
+				'host' => 'Template for prototype check',
+				'groups' => [['groupid' => 1]], // template group 'Templates'
 				'discoveryrules' => [
 					[
 						'name' => 'Drule for prototype check',
@@ -64,15 +56,15 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		$hostids = $host_result['hostids']['Host for prototype check'];
-		self::$host_druleids = $host_result['discoveryruleids']['Host for prototype check:drule'];
+		$template_id = $response['templateids']['Template for prototype check'];
+		self::$host_druleid = $response['discoveryruleids']['Template for prototype check:drule'];
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for trigger',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => $hostids,
-				'ruleid' => self::$host_druleids,
+				'hostid' => $template_id,
+				'ruleid' => self::$host_druleid,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -83,20 +75,20 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 		CDataHelper::call('triggerprototype.create', [
 			[
 				'description' => '3a Trigger prototype monitored discovered_{#KEY}',
-				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '12345',
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => '15 Trigger prototype not monitored discovered_{#KEY}',
-				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'status' => TRIGGER_STATUS_DISABLED,
 				'opdata' => '{#PROT_MAC}',
 				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => '33b4 Trigger prototype not monitored not discovered_{#KEY}',
-				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'status' => TRIGGER_STATUS_DISABLED,
 				'discover' => TRIGGER_NO_DISCOVER,
 				'opdata' => 'test',
@@ -104,7 +96,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 			],
 			[
 				'description' => 'a3 Trigger prototype monitored not discovered_{#KEY}',
-				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'discover' => TRIGGER_NO_DISCOVER,
 				'tags' => [
 					[
@@ -121,24 +113,25 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 			],
 			[
 				'description' => 'oO75 Trigger prototype for high severity_{#KEY}',
-				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '{$TEST}',
 				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => 'Yw Trigger prototype for disaster severity_{#KEY}',
-				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '🙂🙃',
 				'priority' => TRIGGER_SEVERITY_DISASTER
+
 			]
 		]);
 		self::$prototype_triggerids = CDataHelper::getIds('description');
 		self::$entity_count = count(self::$prototype_triggerids);
 	}
 
-	public function testPageTriggerPrototypes_Layout() {
-		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
-		$this->checkLayout();
+	public function testPageTriggerPrototypesTemplate_Layout() {
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
+		$this->checkLayout(true);
 	}
 
 	/**
@@ -146,9 +139,9 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 *
 	 * @dataProvider getTriggerPrototypesSortingData
 	 */
-	public function testPageTriggerPrototypes_Sorting($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+	public function testPageTriggerPrototypesTemplate_Sorting($data) {
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort='.$data['sort'].'&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -157,8 +150,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 *
 	 * @dataProvider getTriggerPrototypesButtonLinkData
 	 */
-	public function testPageTriggerPrototypes_ButtonLink($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+	public function testPageTriggerPrototypesTemplate_ButtonLink($data) {
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -167,8 +160,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 *
 	 * @dataProvider getTriggerPrototypesDeleteData
 	 */
-	public function testPageTriggerPrototypes_Delete($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+	public function testPageTriggerPrototypesTemplate_Delete($data) {
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
