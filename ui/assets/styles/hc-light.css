@@ -5599,7 +5599,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .qr-code {
   height: 190px;
   width: 190px;
-  margin: 8px auto;
+  margin: 20px auto;
   color: #000000;
   background-color: #ffffff; }
 
