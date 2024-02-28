@@ -770,7 +770,7 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: gets the number of rows                                           *
  *                                                                            *
- * Parameters: sync - [IN] the changeset                                      *
+ * Parameters: sync - [IN] changeset                                          *
  *                                                                            *
  * Return value: number of rows to sync                                       *
  *                                                                            *
@@ -1603,8 +1603,8 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
  *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: sync - [IN] the changeset                                       *
- *            row  - [IN] the row to preprocess                                *
+ * Parameter: sync - [IN] changeset                                           *
+ *            row  - [IN] row to preprocess                                   *
  *                                                                            *
  * Return value: the preprocessed row                                         *
  *                                                                            *
