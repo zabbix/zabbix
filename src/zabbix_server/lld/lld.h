@@ -27,6 +27,15 @@
 
 typedef struct
 {
+	zbx_uint64_t	itemid;
+	unsigned char	flags;
+}
+zbx_lld_item_t;
+
+ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
+
+typedef struct
+{
 	zbx_uint64_t	parent_itemid;
 	zbx_uint64_t	itemid;		/* the item, created by the item prototype */
 }

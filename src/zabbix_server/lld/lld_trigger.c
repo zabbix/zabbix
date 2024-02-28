@@ -178,6 +178,8 @@ zbx_lld_trigger_prototype_t;
 ZBX_PTR_VECTOR_DECL(lld_trigger_prototype_ptr, zbx_lld_trigger_prototype_t*)
 ZBX_PTR_VECTOR_IMPL(lld_trigger_prototype_ptr, zbx_lld_trigger_prototype_t*)
 
+ZBX_PTR_VECTOR_IMPL(lld_dependency_ptr, zbx_lld_dependency_t*)
+
 typedef struct
 {
 	zbx_uint64_t		parent_triggerid;
@@ -185,16 +187,6 @@ typedef struct
 	zbx_lld_trigger_t	*trigger;
 }
 zbx_lld_item_trigger_t;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	unsigned char	flags;
-}
-zbx_lld_item_t;
-
-ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
-ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 
 /* a reference to trigger which could be either existing trigger in database or */
 /* a just discovered trigger stored in memory                                   */
@@ -1268,7 +1260,7 @@ clean:
 	return ret;
 }
 
-static void	lld_functions_delete(zbx_vector_ptr_t *functions)
+static void	lld_functions_delete(zbx_vector_lld_function_ptr_t *functions)
 {
 	int	i;
 
@@ -1397,8 +1389,9 @@ out:
  * Purpose: create a trigger based on lld rule and add it to the list         *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype, zbx_vector_ptr_t *triggers,
-		const zbx_vector_ptr_t *items, zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
+static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
+		zbx_vector_lld_trigger_ptr_t *triggers, const zbx_vector_lld_item_ptr_t *items,
+		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	zbx_lld_trigger_t		*trigger;
@@ -1605,14 +1598,14 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_substitute_lld_macros(&trigger->event_name, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(trigger->event_name, ZBX_WHITESPACE);
 
-		zbx_vector_ptr_create(&trigger->functions);
-		zbx_vector_ptr_create(&trigger->dependencies);
-		zbx_vector_ptr_create(&trigger->dependents);
+		zbx_vector_lld_function_ptr_create(&trigger->functions);
+		zbx_vector_lld_dependency_ptr_create(&trigger->dependencies);
+		zbx_vector_lld_trigger_ptr_create(&trigger->dependents);
 		zbx_vector_db_tag_ptr_create(&trigger->tags);
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
-		zbx_vector_ptr_append(triggers, trigger);
+		zbx_vector_lld_trigger_ptr_append(triggers, trigger);
 	}
 
 	func_num = trigger->functions.values_num;

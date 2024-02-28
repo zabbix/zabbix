@@ -125,16 +125,6 @@ zbx_lld_graph_t;
 ZBX_PTR_VECTOR_DECL(lld_graph_ptr, zbx_lld_graph_t*)
 ZBX_PTR_VECTOR_IMPL(lld_graph_ptr, zbx_lld_graph_t*)
 
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	unsigned char	flags;
-}
-zbx_lld_item_t;
-
-ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
-ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
-
 static void	lld_item_free(zbx_lld_item_t *item)
 {
 	zbx_free(item);

@@ -32,6 +32,7 @@ ZBX_PTR_VECTOR_IMPL(lld_condition_ptr, lld_condition_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
 ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 
 /******************************************************************************
  *                                                                            *
