@@ -520,7 +520,7 @@ zabbix_export:
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
-              name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+              name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               type: DEPENDENT
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
               delay: '0'
@@ -548,7 +548,7 @@ zabbix_export:
                   value: '{#AWS.BILLING.SERVICE.NAME}'
           graph_prototypes:
             - uuid: b267e0ae08d34a7dae730848577aea68
-              name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+              name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 2E7D32
@@ -586,7 +586,7 @@ zabbix_export:
           description: 'Discovery of daily blended costs by services.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
-              name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+              name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               type: DEPENDENT
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
               delay: '0'
@@ -608,7 +608,7 @@ zabbix_export:
                   value: '{#AWS.BILLING.SERVICE.NAME}'
           graph_prototypes:
             - uuid: 71646982ab55405dbc10f200e8050c93
-              name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+              name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 2E7D32
@@ -634,7 +634,7 @@ zabbix_export:
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: aaf85a53d1804c858fc20189f0483bad
-              name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Blended cost per month'
+              name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Blended cost per month'
               type: DEPENDENT
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
               delay: '0'
@@ -659,7 +659,7 @@ zabbix_export:
                   value: '{#AWS.BILLING.MONTH}'
           graph_prototypes:
             - uuid: 3e01a98ed70149e3a6a083bb103aa496
-              name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+              name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Monthly blended cost'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 2E7D32
@@ -721,7 +721,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Cost Explorer by HTTP'
-                        name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+                        name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Monthly blended cost'
                     - type: STRING
                       name: reference
                       value: AAAAA
@@ -738,7 +738,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Cost Explorer by HTTP'
-                        name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+                        name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
                     - type: STRING
                       name: reference
                       value: AAAAB
@@ -755,7 +755,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Cost Explorer by HTTP'
-                        name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+                        name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
                     - type: STRING
                       name: reference
                       value: AAAAC
