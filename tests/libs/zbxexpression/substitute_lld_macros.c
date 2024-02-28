@@ -44,7 +44,7 @@ static void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros
 		macro = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
 		macro->lld_macro = zbx_strdup(NULL, zbx_mock_get_object_member_string(hmacro, "macro"));
 		macro->path = zbx_strdup(NULL, zbx_mock_get_object_member_string(hmacro, "path"));
-		zbx_vector_lld_macro_path_append(macros, macro);
+		zbx_vector_lld_macro_path_ptr_append(macros, macro);
 
 		macros_num++;
 	}
@@ -102,7 +102,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_lld_macro_path_create(&macros);
+	zbx_vector_lld_macro_path_ptr_create(&macros);
 	get_macros("in.macros", &macros);
 	flags = get_flags("in.flags");
 
@@ -121,6 +121,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
 
 	zbx_free(expression);
-	zbx_vector_lld_macro_path_clear_ext(&macros, zbx_lld_macro_path_free);
-	zbx_vector_lld_macro_path_destroy(&macros);
+	zbx_vector_lld_macro_path_ptr_clear_ext(&macros, zbx_lld_macro_path_free);
+	zbx_vector_lld_macro_path_ptr_destroy(&macros);
 }
