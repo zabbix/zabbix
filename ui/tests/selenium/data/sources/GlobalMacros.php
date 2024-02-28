@@ -28,7 +28,7 @@ class GlobalMacros {
 		CDataHelper::call('usermacro.createglobal', [
 			[
 				'macro' => '{$DEFAULT_DELAY}',
-				'value' => ''
+				'value' => '30'
 			],
 			[
 				'macro' => '{$LOCALIP}',

@@ -1887,7 +1887,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'link:Proxy for Actions'
+							'element' => 'link:Active proxy 1'
 						]
 					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'

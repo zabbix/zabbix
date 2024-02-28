@@ -237,15 +237,15 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 							'IPMI' => '0'
 						],
 						'Unknown' => [
+							'Total Hosts' => '3',
+							'SNMP' => '3',
+							'JMX' => '3',
+							'IPMI' => '3'
+						],
+						'Total' => [
 							'Total Hosts' => '5',
 							'SNMP' => '5',
 							'JMX' => '5',
-							'IPMI' => '4'
-						],
-						'Total' => [
-							'Total Hosts' => '7',
-							'SNMP' => '6',
-							'JMX' => '7',
 							'IPMI' => '5'
 						]
 					]
