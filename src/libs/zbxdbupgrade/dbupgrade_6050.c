@@ -3384,8 +3384,8 @@ static int	DBpatch_6050228(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	/* set DISCOVERY_STATUS_LOST */
-	if (ZBX_DB_OK > zbx_db_execute("update host_discovery set status=1 where ts_delete<>0"))
+	/* set LIFETIME_TYPE_NEVER for existing LLD rules */
+	if (ZBX_DB_OK > zbx_db_execute("update items set enabled_lifetime_type=1 where flags=1"))
 		return FAIL;
 
 	return SUCCEED;
@@ -3397,7 +3397,7 @@ static int	DBpatch_6050229(void)
 		return SUCCEED;
 
 	/* set DISCOVERY_STATUS_LOST */
-	if (ZBX_DB_OK > zbx_db_execute("update item_discovery set status=1 where ts_delete<>0"))
+	if (ZBX_DB_OK > zbx_db_execute("update host_discovery set status=1 where ts_delete<>0"))
 		return FAIL;
 
 	return SUCCEED;
@@ -3409,7 +3409,7 @@ static int	DBpatch_6050230(void)
 		return SUCCEED;
 
 	/* set DISCOVERY_STATUS_LOST */
-	if (ZBX_DB_OK > zbx_db_execute("update trigger_discovery set status=1 where ts_delete<>0"))
+	if (ZBX_DB_OK > zbx_db_execute("update item_discovery set status=1 where ts_delete<>0"))
 		return FAIL;
 
 	return SUCCEED;
@@ -3421,13 +3421,25 @@ static int	DBpatch_6050231(void)
 		return SUCCEED;
 
 	/* set DISCOVERY_STATUS_LOST */
-	if (ZBX_DB_OK > zbx_db_execute("update graph_discovery set status=1 where ts_delete<>0"))
+	if (ZBX_DB_OK > zbx_db_execute("update trigger_discovery set status=1 where ts_delete<>0"))
 		return FAIL;
 
 	return SUCCEED;
 }
 
 static int	DBpatch_6050232(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update graph_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050233(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3675,5 +3687,6 @@ DBPATCH_ADD(6050229, 0, 1)
 DBPATCH_ADD(6050230, 0, 1)
 DBPATCH_ADD(6050231, 0, 1)
 DBPATCH_ADD(6050232, 0, 1)
+DBPATCH_ADD(6050233, 0, 1)
 
 DBPATCH_END()
