@@ -350,13 +350,16 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_g
 		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
 			continue;
 
+		/* proxies not exceeding balance limits could still have hosts taken   */
+		/* to balance proxies with host deficit - so sort potential candidates */
+		if (proxy->hosts.values_num > limit)
+			zbx_vector_pg_host_ptr_sort(&proxy->hosts, pg_host_compare_by_revision);
+
 		if (PG_GROUP_UNBALANCE_LIMIT > proxy->hosts.values_num - limit)
 			continue;
 
 		if (PG_GROUP_UNBALANCE_FACTOR > proxy->hosts.values_num / limit)
 			continue;
-
-		zbx_vector_pg_host_ptr_sort(&proxy->hosts, pg_host_compare_by_revision);
 
 		while (proxy->hosts.values_num > limit)
 			pg_cache_proxy_unassign_last_host(cache, group, proxy);
