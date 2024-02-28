@@ -238,7 +238,7 @@ foreach ($data['graphs'] as $graph) {
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
 	elseif (array_key_exists('status', $graph['graphDiscovery'])
-			&&$graph['graphDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			&& $graph['graphDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
 	}
 
