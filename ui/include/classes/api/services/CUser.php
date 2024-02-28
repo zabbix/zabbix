@@ -3443,6 +3443,9 @@ class CUser extends CApiService {
 
 			if ($valid_code) {
 				if (!$db_user_secrets) {
+					// Delete any previously saved totp_secret for this specific user.
+					DB::delete('mfa_totp_secret', ['userid' => $userid]);
+
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $mfa['mfaid'],
 						'userid' => $userid,
