@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-22T10:49:06Z'
+  date: '2024-02-28T12:13:42Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -9580,6 +9580,10 @@ zabbix_export:
               path: $.name
             - lld_macro: '{#STATE}'
               path: $.state
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: cloud
@@ -9630,8 +9634,8 @@ zabbix_export:
               display_period: '60'
               widgets:
                 - type: ITEM
-                  name: Availability
-                  width: '14'
+                  name: State
+                  width: '9'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -9641,11 +9645,23 @@ zabbix_export:
                     - type: STRING
                       name: bg_color
                       value: 6C00D9
+                    - type: STRING
+                      name: description
+                      value: 'Current State'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'Oracle Cloud Compute by HTTPS'
                         key: oci.compute.availability.get
+                    - type: INTEGER
+                      name: show
+                      value: '1'
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -9837,6 +9853,48 @@ zabbix_export:
                     - type: STRING
                       name: value_color
                       value: FFFFFF
+                - type: ITEM
+                  name: Availability
+                  x: '9'
+                  width: '5'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: STRING
+                      name: bg_color
+                      value: 6C00D9
+                    - type: STRING
+                      name: description
+                      value: Availability
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Oracle Cloud Compute by HTTPS'
+                        key: oci.compute.availability.get
+                    - type: INTEGER
+                      name: show
+                      value: '1'
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
                 - type: ITEM
                   name: 'Net bytes in'
                   x: '10'
@@ -11383,6 +11441,10 @@ zabbix_export:
               path: $.name
             - lld_macro: '{#STATE}'
               path: $.state
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: cloud

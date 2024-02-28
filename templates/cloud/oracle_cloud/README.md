@@ -335,7 +335,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|VNIC discovery|<p>Discover compute instance VNICs (Virtual Network Interface Cards).</p>|Dependent item|oci.compute.vnic.discovery|
+|VNIC discovery|<p>Discover compute instance VNICs (Virtual Network Interface Cards).</p>|Dependent item|oci.compute.vnic.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for VNIC discovery
 
@@ -755,7 +755,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Subnet discovery|<p>Discover subnets linked to the particular VNC.</p>|Dependent item|oci.vcn.subnet.discovery|
+|Subnet discovery|<p>Discover subnets linked to the particular VNC.</p>|Dependent item|oci.vcn.subnet.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Subnet discovery
 
