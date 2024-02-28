@@ -1,1 +1,1 @@
-.......PS. [ZBX-23667] added vmware datastore uuid to *discovery items (MVekslers)
+.......PS. [ZBX-23667] added VMware datastore UUID to *discovery items, added datastore selection by UUID to vmware.hv.datastore* items (MVekslers)

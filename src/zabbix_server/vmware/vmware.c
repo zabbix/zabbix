@@ -3924,7 +3924,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort Datastore names vector by name           *
+ * Purpose: comparison function to sort Datastore names vector by name        *
  *                                                                            *
  ******************************************************************************/
 int	vmware_dsname_compare(const void *d1, const void *d2)
@@ -3937,7 +3937,7 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort Datastore names vector by name           *
+ * Purpose: comparison function to sort Datastore names vector by UUID        *
  *                                                                            *
  ******************************************************************************/
 int	vmware_dsname_compare_uuid(const void *d1, const void *d2)

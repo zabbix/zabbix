@@ -84,14 +84,14 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to Datastore data from vector with id              *
+ * Purpose: gets pointer to Datastore data in vector by UUID                  *
  *                                                                            *
- * Parameters: dss     - [IN] the vector with all Datastores                  *
- *             ds_uuid - [IN] the id of Datastore                             *
+ * Parameters: dss     - [IN] vector with all Datastores                      *
+ *             ds_uuid - [IN] UUID of Datastore                               *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_datastore_t* - the operation has completed successfully  *
- *        NULL                    - the operation has failed                  *
+ *        zbx_vmware_datastore_t* - operation has completed successfully      *
+ *        NULL                    - operation has failed                      *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, const char *ds_uuid)
@@ -109,17 +109,17 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return id of dsname data from vector with uuid or name            *
+ * Purpose: gets index of dsname data in vector by datastore UUID or name     *
  *                                                                            *
  * Parameters: hv_dsnames   - [IN] vector with all hv Datastores              *
- *             uuid_or_name - [IN] name or uuid of Datastore                  *
+ *             uuid_or_name - [IN] name or UUID of Datastore                  *
  *                                                                            *
  * Return value:                                                              *
- *        id   - the operation has completed successfully                     *
- *        FAIL - the operation has failed                                     *
+ *        index - operation has completed successfully                        *
+ *        FAIL  - operation has failed                                        *
  *                                                                            *
  ******************************************************************************/
-static int	dsnameid_get(const zbx_vector_vmware_dsname_t *hv_dsnames, const char *uuid_or_name)
+static int	dsname_idx_get(const zbx_vector_vmware_dsname_t *hv_dsnames, const char *uuid_or_name)
 {
 	int			i;
 	zbx_vmware_dsname_t	dsname_cmp;
@@ -1667,7 +1667,7 @@ out:
 int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*url, *uuid;
+	const char		*url, *hv_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	struct zbx_json		json_data;
@@ -1682,14 +1682,14 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
+	hv_uuid = get_rparam(request, 1);
 
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
@@ -1732,7 +1732,7 @@ out:
 static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
 		const char *perfcounter, zbx_uint64_t access_filter, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *uuid, *name;
+	const char		*url, *mode, *hv_uuid, *ds_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
@@ -1748,8 +1748,8 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	hv_uuid = get_rparam(request, 1);
+	ds_uuid = get_rparam(request, 2);
 	mode = get_rparam(request, 3);
 
 	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
@@ -1763,15 +1763,15 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
-	if (FAIL == (i = dsnameid_get(&hv->dsnames, name)))
+	if (FAIL == (i = dsname_idx_get(&hv->dsnames, ds_uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", name));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", ds_uuid));
 		goto unlock;
 	}
 
@@ -1904,7 +1904,7 @@ static int	check_vcenter_ds_param(const char *param, int *mode)
 	return SUCCEED;
 }
 
-static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *name, const int mode,
+static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *ds_uuid, const int mode,
 		const char *username, const char *password, AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
@@ -1930,10 +1930,10 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 
-		if (FAIL == (i = dsnameid_get(&hv->dsnames, name)))
+		if (FAIL == (i = dsname_idx_get(&hv->dsnames, ds_uuid)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
-					name));
+					ds_uuid));
 			goto unlock;
 		}
 
@@ -1943,14 +1943,15 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 	}
-	else if (NULL == (datastore = ds_get(&service->data->datastores, name)))
+	/* allow passing ds uuid or name for backwards compatibility */
+	else if (NULL == (datastore = ds_get(&service->data->datastores, ds_uuid)))
 	{
-		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)name};
+		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_uuid};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 			goto unlock;
 		}
 
@@ -2052,7 +2053,7 @@ unlock:
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*url, *uuid, *name, *param;
+	const char	*url, *hv_uuid, *ds_uuid, *param;
 	int		ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2064,12 +2065,12 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	hv_uuid = get_rparam(request, 1);
+	ds_uuid = get_rparam(request, 2);
 	param = get_rparam(request, 3);
 
 	if (SUCCEED == check_vcenter_ds_param(param, &mode))
-		ret = check_vcenter_ds_size(url, uuid, name, mode, username, password, result);
+		ret = check_vcenter_ds_size(url, hv_uuid, ds_uuid, mode, username, password, result);
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 out:
@@ -2256,7 +2257,7 @@ out:
 int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*url, *hv_uuid, *ds_name, *partition;
+	const char		*url, *hv_uuid, *ds_uuid, *partition;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_dsname_t	*dsname;
@@ -2273,7 +2274,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 	url = get_rparam(request, 0);
 	hv_uuid = get_rparam(request, 1);
-	ds_name = get_rparam(request, 2);
+	ds_uuid = get_rparam(request, 2);
 	partition = get_rparam(request, 3);
 
 	if ('\0' == *hv_uuid)
@@ -2284,7 +2285,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 	if (NULL != partition && '\0' != *partition)
 	{
-		if (NULL == ds_name || '\0' == *ds_name)
+		if (NULL == ds_uuid || '\0' == *ds_uuid)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto out;
@@ -2304,17 +2305,14 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		goto unlock;
 	}
 
-	if (NULL != ds_name && '\0' != *ds_name)
+	if (NULL != ds_uuid && '\0' != *ds_uuid)
 	{
-		zbx_vmware_dsname_t	dsname_cmp;
 		zbx_vmware_hvdisk_t	hvdisk_cmp;
 
-		dsname_cmp.name = (char *)ds_name;
-
-		if (FAIL == (i = dsnameid_get(&hv->dsnames, ds_name)))
+		if (FAIL == (i = dsname_idx_get(&hv->dsnames, ds_uuid)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
-					ds_name));
+					ds_uuid));
 			goto unlock;
 		}
 
@@ -2435,7 +2433,7 @@ out:
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*url, *name, *param;
+	const char	*url, *ds_uuid, *param;
 	int		ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2447,11 +2445,11 @@ int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, c
 	}
 
 	url = get_rparam(request, 0);
-	name = get_rparam(request, 1);
+	ds_uuid = get_rparam(request, 1);
 	param = get_rparam(request, 2);
 
 	if (SUCCEED == check_vcenter_ds_param(param, &mode))
-		ret = check_vcenter_ds_size(url, NULL, name, mode, username, password, result);
+		ret = check_vcenter_ds_size(url, NULL, ds_uuid, mode, username, password, result);
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 out:
