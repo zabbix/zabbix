@@ -353,7 +353,6 @@ class CUser extends CApiService {
 		self::checkRoles($users, $db_roles);
 		self::addRoleType($users, $db_roles);
 
-		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -550,7 +549,6 @@ class CUser extends CApiService {
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 
-		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -762,36 +760,6 @@ class CUser extends CApiService {
 					_s('Incorrect value for field "%1$s": %2$s.', $path, _('cannot delete provisioned media')
 				));
 			}
-		}
-	}
-
-	/**
-	 * Check user directories, used in users data, exist.
-	 *
-	 * @param array $users
-	 * @param int   $users[]['userdirectoryid']  (optional)
-	 *
-	 * @throws APIException  if user directory do not exists.
-	 */
-	private function checkUserdirectories(array $users) {
-		$userdirectoryids = array_column($users, 'userdirectoryid', 'userdirectoryid');
-		unset($userdirectoryids[0]);
-
-		if (!$userdirectoryids) {
-			return;
-		}
-
-		$db_userdirectoryids = API::UserDirectory()->get([
-			'output' => [],
-			'userdirectoryids' => $userdirectoryids,
-			'preservekeys' => true
-		]);
-		$ids = array_diff_key($userdirectoryids, $db_userdirectoryids);
-
-		if ($ids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User directory with ID "%1$s" is not available.', reset($ids))
-			);
 		}
 	}
 
