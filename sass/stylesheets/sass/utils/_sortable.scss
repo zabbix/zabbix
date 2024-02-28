@@ -3,7 +3,7 @@
 		position: relative;
 
 		@if $ui-transitions {
-			transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
+			transition: transform $ui-controls-transition-duration;
 		}
 	}
 
@@ -14,7 +14,7 @@
 			&.sortable-item-dragging {
 				opacity: 0.6;
 				z-index: 1;
-				transition: left 0s, top 0s;
+				transition: transform 0s;
 			}
 		}
 	}
@@ -22,7 +22,7 @@
 	&.sortable-transitions-disabled {
 		.sortable-item {
 			@if $ui-transitions {
-				transition: left 0s, top 0s;
+				transition: transform 0s;
 			}
 		}
 	}

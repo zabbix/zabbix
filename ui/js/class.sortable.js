@@ -151,14 +151,14 @@ class CSortable {
 	/**
 	 * Create CSortable instance.
 	 *
-	 * @param {HTMLElement} target                Sortable container.
-	 * @param {boolean}     is_horizontal         Whether sorting is horizontally oriented.
-	 * @param {string}      selector_span         Selector for matching first child element of multi-element items.
-	 * @param {string}      selector_handle       Selector for matching a drag handle.
-	 * @param {number}      freeze_start          Number of items to freeze at the start.
-	 * @param {number}      freeze_end            Number of items to freeze at the end.
-	 * @param {boolean}     enable                Whether to enable the instance initially.
-	 * @param {boolean}     enable_sorting        Whether to enable sorting initially (or just scrolling).
+	 * @param {HTMLElement} target             Sortable container.
+	 * @param {boolean}     is_horizontal      Whether sorting is horizontally oriented.
+	 * @param {string}      selector_span      Selector for matching first child element of multi-element items.
+	 * @param {string}      selector_handle    Selector for matching a drag handle.
+	 * @param {number}      freeze_start       Number of items to freeze at the start.
+	 * @param {number}      freeze_end         Number of items to freeze at the end.
+	 * @param {boolean}     enable             Whether to enable the instance initially.
+	 * @param {boolean}     enable_sorting     Whether to enable sorting initially (or just scrolling).
 	 *
 	 * @returns {CSortable}
 	 */
@@ -192,7 +192,7 @@ class CSortable {
 		this.#mutation_observer = new MutationObserver(this.#listeners.mutation);
 		this.#intersection_observer = new IntersectionObserver(this.#listeners.intersection);
 
-		this.#is_visible = this.#getTargetLoc().dim > 0;
+		this.#is_visible = this.#target.children.length === 0 || this.#getTargetLoc().dim > 0;
 
 		if (enable) {
 			this.enable();
@@ -228,8 +228,10 @@ class CSortable {
 			this.#observeResize();
 			this.#observeMutations();
 			this.#observeIntersection();
-			this.#updateItems();
-			this.#render();
+
+			const has_new_elements = this.#updateItems();
+
+			this.#render({with_transitions: !has_new_elements});
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
@@ -273,6 +275,8 @@ class CSortable {
 	 * @param {boolean}     immediate
 	 */
 	scrollIntoView(element, {immediate = false} = {}) {
+		console.log(immediate);
+
 		if (this.#is_dragging || this.#drag_item !== null) {
 			return;
 		}
@@ -296,6 +300,8 @@ class CSortable {
 	 * @returns {boolean}
 	 */
 	isScrollable() {
+		this.#update();
+
 		return this.#getScrollMax() > 0;
 	}
 
@@ -351,15 +357,18 @@ class CSortable {
 	#update() {
 		this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 		this.#cancelDragging();
-		this.#updateItems();
-		this.#render();
+
+		const has_new_elements = this.#updateItems();
+
+		this.#render({with_transitions: !has_new_elements});
+
 		this.#updateTargetDisabled();
 	}
 
 	#updateItems() {
 		this.#items = [];
 
-		for (const element of this.#target.querySelectorAll(':scope > *')) {
+		for (const element of this.#target.children) {
 			if (this.#selector_span === '' || element.matches(this.#selector_span)) {
 				this.#items.push({
 					elements: [],
@@ -377,9 +386,13 @@ class CSortable {
 			item.elements_live = this.#getLiveElements(item.elements);
 		}
 
+		let has_new_elements = false;
+
 		this.mutate(() => {
 			for (const [index, item] of this.#items.entries()) {
 				for (const element of item.elements_live) {
+					has_new_elements = has_new_elements || !element.classList.contains(CSortable.ZBX_STYLE_ITEM);
+
 					element.classList.add(CSortable.ZBX_STYLE_ITEM);
 					element.classList.toggle(CSortable.ZBX_STYLE_ITEM_FROZEN,
 						index < this.#freeze_start || index > this.#items.length - 1 - this.#freeze_end
@@ -389,6 +402,8 @@ class CSortable {
 		});
 
 		this.#updateItemsLoc();
+
+		return has_new_elements;
 	}
 
 	#updateTargetDisabled() {
@@ -412,7 +427,7 @@ class CSortable {
 		for (const item of this.#items) {
 			const loc = this.#getItemLoc(item);
 
-			item.pos = this.#scroll_pos + loc.pos - target_pos;
+			item.pos = loc.pos - target_pos;
 			item.dim = loc.dim;
 		}
 	}
@@ -447,14 +462,10 @@ class CSortable {
 
 		for (const element of item.elements_live) {
 			const rect = element.getBoundingClientRect();
-			const computed_style = getComputedStyle(element);
-			const element_style_pos = this.#is_horizontal ? element.style.left : element.style.top;
-			const computed_style_pos = this.#is_horizontal ? computed_style.left : computed_style.top;
+			const offset = new DOMMatrix(getComputedStyle(element).transform)[this.#is_horizontal ? 'e' : 'f'];
 
 			const loc = {
-				pos: (this.#is_horizontal ? rect.x : rect.y)
-					+ (element_style_pos === 'auto' ? 0 : parseFloat(element_style_pos || '0'))
-					- (computed_style_pos === 'auto' ? 0 : parseFloat(computed_style_pos || '0')),
+				pos: (this.#is_horizontal ? rect.x : rect.y) - offset,
 				dim: this.#is_horizontal ? rect.width : rect.height
 			};
 
@@ -478,8 +489,8 @@ class CSortable {
 		this.#target.classList.toggle(CSortable.ZBX_STYLE_TRANSITIONS_DISABLED, !enable);
 	}
 
-	#render() {
-		this.#enableTransitions();
+	#render({with_transitions = true} = {}) {
+		this.#enableTransitions(with_transitions);
 
 		for (const item of this.#items) {
 			if (!this.#is_dragging || item !== this.#drag_item) {
@@ -585,12 +596,13 @@ class CSortable {
 
 		const item = this.#items[this.#freeze_start > 0 ? 0 : this.#items.length - 1];
 
-		const pos_delta = this.#scroll_pos + this.#getItemLoc(item).pos - item.pos - this.#getTargetLoc().pos;
+		const pos_delta = this.#scroll_pos
+			+ new DOMMatrix(getComputedStyle(item.elements_live[0]).transform)[this.#is_horizontal ? 'e' : 'f'];
 
-		constraints.min += pos_delta;
-		constraints.max += pos_delta;
-
-		return constraints;
+		return {
+			min: constraints.min + pos_delta,
+			max: constraints.max + pos_delta
+		};
 	}
 
 	#constrainDragRel(rel, constraints) {
@@ -615,19 +627,18 @@ class CSortable {
 
 	#applyRel(item, rel) {
 		for (const element of item.elements_live) {
-			element.style[this.#is_horizontal ? 'left' : 'top'] = `${rel}px`;
+			element.style.transform = this.#is_horizontal ? `translateX(${rel}px)` : `translateY(${rel}px)`;
 		}
 	}
 
 	#getScrollMax() {
-		this.#target.style.overflow = 'hidden';
+		if (this.#items.length === 0) {
+			return 0;
+		}
 
-		const scroll_max =
-			(this.#is_horizontal ? this.#target.scrollWidth : this.#target.scrollHeight) - this.#getTargetLoc().dim;
+		const scroll_max = this.#items.at(-1).pos + this.#items.at(-1).dim - this.#getTargetLoc().dim;
 
-		this.#target.style.overflow = '';
-
-		return scroll_max >= 0.5 ? scroll_max : 0;
+		return scroll_max >= 0.1 ? scroll_max : 0;
 	}
 
 	#scrollTo(pos) {
@@ -1098,7 +1109,7 @@ class CSortable {
 		transitionRun: (e) => {
 			if (e.target.closest(`.${CSortable.ZBX_STYLE_CLASS}`) === this.#target
 					&& e.target.classList.contains(CSortable.ZBX_STYLE_ITEM)
-					&& e.propertyName === (this.#is_horizontal ? 'left' : 'top')) {
+					&& e.propertyName === 'transform') {
 				this.#transitions.set(e.target,
 					this.#transitions.has(e.target) ? this.#transitions.get(e.target) + 1 : 1
 				);
@@ -1108,7 +1119,7 @@ class CSortable {
 		transitionEnd: (e) => {
 			if (e.target.closest(`.${CSortable.ZBX_STYLE_CLASS}`) === this.#target
 					&& e.target.classList.contains(CSortable.ZBX_STYLE_ITEM)
-					&& e.propertyName === (this.#is_horizontal ? 'left' : 'top')) {
+					&& e.propertyName === 'transform') {
 				const count = this.#transitions.has(e.target) ? this.#transitions.get(e.target) - 1 : 0;
 
 				if (count > 0) {
