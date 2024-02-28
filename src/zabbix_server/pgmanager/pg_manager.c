@@ -325,6 +325,9 @@ static void	pgm_update_state(zbx_pg_cache_t *cache)
 			group->state_time = now;
 			group->flags |= ZBX_PG_GROUP_UPDATE_STATE;
 		}
+
+		if (ZBX_PG_GROUP_STATE_ONLINE == group->state)
+			pg_cache_clear_offline_proxies(cache, group);
 	}
 
 	pg_cache_unlock(cache);

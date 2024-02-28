@@ -545,16 +545,7 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
 		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state)
-		{
 			online_num++;
-		}
-		else if (0 != proxy->hosts.values_num)
-		{
-			for (int j = 0; j < proxy->hosts.values_num; j++)
-				zbx_vector_uint64_append(&group->unassigned_hostids, proxy->hosts.values[j]->hostid);
-
-			zbx_vector_pg_host_ptr_clear(&proxy->hosts);
-		}
 	}
 
 	int	hosts_avg = group->hostids.values_num / online_num, hosts_required = 0;
@@ -938,6 +929,30 @@ void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t
 
 		if (NULL != (pg = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &groupids->values[i])))
 			pg->hostmap_revision = cache->hostmap_revision;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unassign hosts from offline proxies in a group                    *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
+{
+	for (int i = 0; i < group->proxies.values_num; i++)
+	{
+		zbx_pg_proxy_t 	*proxy = group->proxies.values[i];
+
+		if (ZBX_PG_PROXY_STATE_OFFLINE != proxy->state || 0 == proxy->hosts.values_num)
+			continue;
+
+		for (int j = 0; j < proxy->hosts.values_num; j++)
+		{
+			zbx_vector_uint64_append(&group->unassigned_hostids, proxy->hosts.values[j]->hostid);
+			pg_cache_set_host_proxy(cache, proxy->hosts.values[j]->hostid, 0);
+		}
+
+		zbx_vector_pg_host_ptr_clear(&proxy->hosts);
 	}
 }
 
