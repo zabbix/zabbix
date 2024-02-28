@@ -111,7 +111,7 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_active'],
-				'userdirectoryid' => self::$data['userdirectoryid']['saml'],
+				'passwd' => base_convert((string) microtime(), 10, 32),
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
@@ -121,12 +121,26 @@ class testScimUser extends CAPIScimTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userid']['saml_user_active'] = $user['userids'][0];
+		$userdirectory = CDataHelper::call('userdirectory.get', [
+			'output' => ['userdirectoryid'],
+			'selectProvisionMedia' => ['userdirectory_mediaid', 'mediatypeid'],
+			'userdirectoryids' => [self::$data['userdirectoryid']['saml']]
+		])[0];
+		$userdirectory_mediaids = array_column($userdirectory['provision_media'], 'userdirectory_mediaid', 'mediatypeid');
+		DB::update('media', [
+			'values' => ['userdirectory_mediaid' => $userdirectory_mediaids[self::$data['mediatypeid']]],
+			'where' => ['userid' => $user['userids'][0], 'mediatypeid' => self::$data['mediatypeid']]
+		]);
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create inactive user with newly created userdirectoryid for SAML.
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_inactive'],
-				'userdirectoryid' => self::$data['userdirectoryid']['saml'],
+				'passwd' => base_convert((string) microtime(), 10, 32),
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
@@ -136,18 +150,26 @@ class testScimUser extends CAPIScimTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userid']['saml_user_inactive'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create user with only username with newly created userdirectoryid for SAML.
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_only_username'],
-				'userdirectoryid' => self::$data['userdirectoryid']['saml'],
+				'passwd' => base_convert((string) microtime(), 10, 32),
 				'usrgrps' => [['usrgrpid' => 9]],
 				'roleid' => 1
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userid']['saml_user_only_username'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create userdirectory for LDAP.
 		$userdirectory_ldap = CDataHelper::call('userdirectory.create', [
@@ -165,11 +187,15 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['ldap_user'],
-				'userdirectoryid' => self::$data['userdirectoryid']['ldap']
+				'passwd' => base_convert((string) microtime(), 10, 32)
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userid']['ldap_user'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['ldap']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create SCIM group and add a members to it.
 		$group_w_members = DB::insert('scim_group', [['name' => 'group_w_members']]);
