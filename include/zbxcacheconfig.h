@@ -1436,10 +1436,12 @@ struct zbx_pg_group
 	zbx_uint64_t			sync_revision;
 	int				state;
 	int				state_time;
+	int				unbalanced;
+	int				balance_time;
 	zbx_uint32_t			flags;
 	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
 	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */
-	zbx_vector_uint64_t		new_hostids;		/* hostids to be assigned to proxies */
+	zbx_vector_uint64_t		unassigned_hostids;	/* hostids to be assigned to proxies */
 };
 
 ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)

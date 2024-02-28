@@ -146,10 +146,11 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		for (int i = 0; i < group->hostids.values_num; i++)
 		{
 			if (NULL == zbx_hashset_search(&cache->hostmap, &group->hostids.values[i]))
-				zbx_vector_uint64_append(&group->new_hostids, group->hostids.values[i]);
+				zbx_vector_uint64_append(&group->unassigned_hostids, group->hostids.values[i]);
 		}
 	}
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -174,7 +175,7 @@ static void	pgm_update_state(zbx_pg_cache_t *cache)
 
 	now = (int)time(NULL);
 
-	/* update proxy online/offline states based on their firtaccess/lastaccess times */
+	/* update proxy online/offline states based on their firstaccess/lastaccess times */
 
 	zbx_hashset_iter_reset(&cache->groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
@@ -600,6 +601,7 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_pg_host_t	hosts_new, hosts_mod, hosts_del;
 	zbx_vector_uint64_t	groupids;
 	zbx_uint64_t		hostmap_revision;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -610,10 +612,14 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_pg_host_create(&hosts_del);
 	zbx_vector_uint64_create(&groupids);
 
+	um_handle = zbx_dc_open_user_macros();
+
 	pg_cache_lock(cache);
 	hostmap_revision = cache->hostmap_revision;
-	pg_cache_get_updates(cache, &groups, &proxies, &hosts_new, &hosts_mod, &hosts_del, &groupids);
+	pg_cache_get_updates(cache, um_handle, &groups, &proxies, &hosts_new, &hosts_mod, &hosts_del, &groupids);
 	pg_cache_unlock(cache);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	if (0 != groups.values_num || 0 != proxies.values_num || 0 != hosts_new.values_num ||
 			0 != hosts_mod.values_num || 0 != hosts_del.values_num)
