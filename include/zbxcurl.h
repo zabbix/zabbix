@@ -29,14 +29,6 @@
 /* Currently required cURL library version is 7.19.1 (see configure.ac). When */
 /* it is increased there all the following functionality must be revised.     */
 
-/* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
-#if LIBCURL_VERSION_NUM < 0x071304
-#	define CURLPROTO_HTTP		(1<<0)
-#	define CURLPROTO_HTTPS		(1<<1)
-#	define CURLPROTO_SMTP   	(1<<16)
-#	define CURLPROTO_SMTPS  	(1<<17)
-#endif
-
 /* added in 7.20.0 (0x071400) */
 #if LIBCURL_VERSION_NUM < 0x071400
 #	define CURLOPT_MAIL_FROM	186L
@@ -74,11 +66,6 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds);
 /* added in 7.61.0 (0x073d00) */
 #if LIBCURL_VERSION_NUM < 0x073d00
 #	define CURLAUTH_BEARER		(((unsigned long)1)<<6)
-#endif
-
-/* added in 7.85.0 (0x075500) */
-#if LIBCURL_VERSION_NUM < 0x075500
-#	define CURLOPT_PROTOCOLS_STR	318L
 #endif
 
 int	zbx_curl_protocol(const char *protocol, char **error);

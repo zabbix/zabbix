@@ -20,6 +20,12 @@
 #include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
+
+/* added in 7.85.0 (0x075500) */
+#if LIBCURL_VERSION_NUM < 0x075500
+#	define CURLOPT_PROTOCOLS_STR	318L
+#endif
+
 static unsigned int	libcurl_version_num(void)
 {
 	return curl_version_info(CURLVERSION_NOW)->version_num;
@@ -114,6 +120,14 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 {
 	int		ret = SUCCEED;
 	CURLcode	err;
+
+/* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
+#if LIBCURL_VERSION_NUM < 0x071304
+#	define CURLPROTO_HTTP		(1<<0)
+#	define CURLPROTO_HTTPS		(1<<1)
+#	define CURLPROTO_SMTP   	(1<<16)
+#	define CURLPROTO_SMTPS  	(1<<17)
+#endif
 
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
 	if (libcurl_version_num() >= 0x071304)
