@@ -961,10 +961,7 @@ void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	{
 		zbx_pg_proxy_t 	*proxy = group->proxies.values[i];
 
-		if (0 == proxy->hosts.values_num)
-			continue;
-
-		if (ZBX_PG_PROXY_STATE_OFFLINE != proxy->state || proxy->version != cache->supported_version)
+		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state || 0 == proxy->hosts.values_num)
 			continue;
 
 		for (int j = 0; j < proxy->hosts.values_num; j++)

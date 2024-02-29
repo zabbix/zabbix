@@ -259,6 +259,13 @@ static void	pgm_update_state(zbx_pg_cache_t *cache)
 
 		for (int j = 0; j < group->proxies.values_num; j++)
 		{
+			/* treat old version proxies as offline when calculating groups state */
+			if (group->proxies.values[j]->version != cache->supported_version)
+			{
+				offline++;
+				continue;
+			}
+
 			switch (group->proxies.values[j]->state)
 			{
 				case ZBX_PG_PROXY_STATE_ONLINE:
