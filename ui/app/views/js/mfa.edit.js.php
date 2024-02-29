@@ -114,13 +114,7 @@ window.mfa_edit = new class {
 
 		this.#overlay.setLoading();
 
-		const fields = getFormFields(this.#form);
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
-			}
-		}
+		const fields = this.#getFormFields();
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'mfa.check');
@@ -191,5 +185,17 @@ window.mfa_edit = new class {
 		}
 
 		return false;
+	}
+
+	#getFormFields() {
+		const fields = getFormFields(this.#form);
+
+		for (let key in fields) {
+			if (typeof fields[key] === 'string' && key !== 'confirmation') {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		return fields;
 	}
 }
