@@ -27,7 +27,8 @@
 
 #include "zbxsysinfo.h"
 
-int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssh_key_location,
+		AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
@@ -83,7 +84,7 @@ int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_R
 	ssh_options = get_rparam(&request, 4);
 
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options), item->timeout,
-			config_source_ip);
+			config_source_ip, config_ssh_key_location);
 out:
 	zbx_free_agent_request(&request);
 

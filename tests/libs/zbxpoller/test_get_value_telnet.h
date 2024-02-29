@@ -22,6 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, char **error);
+int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, const char *config_ssh_key_location, char **error);
 
 #endif /*POLLER_GET_VALUE_TELNET_TEST_H*/

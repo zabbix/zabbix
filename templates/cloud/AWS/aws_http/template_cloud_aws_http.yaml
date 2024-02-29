@@ -329,7 +329,7 @@ zabbix_export:
               custom_interfaces: 'YES'
               interfaces:
                 - ip: '{#AWS.EC2.INSTANCE.ID}'
-          timeout: 60s
+          timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
@@ -647,7 +647,7 @@ zabbix_export:
                   description: 'ECS cluster name.'
                 - macro: '{$AWS.REGION}'
                   value: '{#AWS.ECS.CLUSTER.REGION}'
-                  description: 'ECS cluster name.'
+                  description: 'ECS cluster region.'
               tags:
                 - tag: name
                   value: '{#AWS.ECS.CLUSTER.NAME}'
@@ -655,7 +655,7 @@ zabbix_export:
                   value: '{#AWS.ECS.CLUSTER.REGION}'
                 - tag: service
                   value: ecs
-          timeout: 15s
+          timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
@@ -664,9 +664,9 @@ zabbix_export:
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
-              value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
+              value: '{$AWS.ECS.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
-              value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
+              value: '{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
@@ -971,7 +971,7 @@ zabbix_export:
               custom_interfaces: 'YES'
               interfaces:
                 - ip: '{#AWS.RDS.INSTANCE.ID}'
-          timeout: 15s
+          timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
@@ -1219,7 +1219,7 @@ zabbix_export:
               custom_interfaces: 'YES'
               interfaces:
                 - ip: '{#AWS.S3.NAME}'
-          timeout: 15s
+          timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
@@ -1243,6 +1243,9 @@ zabbix_export:
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
+        - macro: '{$AWS.DATA.TIMEOUT}'
+          value: 60s
+          description: 'A response timeout for an API.'
         - macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable EC2 instances by namespace.'

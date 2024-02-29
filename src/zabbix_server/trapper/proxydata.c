@@ -82,9 +82,9 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the 'proxy data' packet has historical data              *
+ * Purpose: checks if 'proxy data' packet has historical data                 *
  *                                                                            *
- * Return value: SUCCEED - the 'proxy data' contains no historical records    *
+ * Return value: SUCCEED - 'proxy data' contains no historical records        *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -109,7 +109,7 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: receive 'proxy data' request from proxy                           *
+ * Purpose: receives 'proxy data' request from proxy                          *
  *                                                                            *
  * Parameters: sock                - [IN] connection socket                   *
  *             jp                  - [IN] received JSON data                  *

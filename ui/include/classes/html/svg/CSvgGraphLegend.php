@@ -30,6 +30,7 @@ class CSvgGraphLegend extends CDiv {
 	private const ZBX_STYLE_GRAPH_LEGEND_HEADER = 'svg-graph-legend-header';
 	private const ZBX_STYLE_GRAPH_LEGEND_ITEM = 'svg-graph-legend-item';
 	private const ZBX_STYLE_GRAPH_LEGEND_NO_DATA = 'svg-graph-legend-no-data';
+	private const ZBX_STYLE_GRAPH_LEGEND_VALUE = 'svg-graph-legend-value';
 
 	private $legend_items;
 
@@ -94,21 +95,21 @@ class CSvgGraphLegend extends CDiv {
 			if ($this->show_statistic) {
 				if (array_key_exists('units', $item)) {
 					$this->addItem([
-						new CDiv(convertUnits([
+						(new CDiv(convertUnits([
 							'value' => $item['min'],
 							'units' => $item['units'],
 							'convert' => ITEM_CONVERT_NO_UNITS
-						])),
-						new CDiv(convertUnits([
+						])))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_VALUE),
+						(new CDiv(convertUnits([
 							'value' => $item['avg'],
 							'units' => $item['units'],
 							'convert' => ITEM_CONVERT_NO_UNITS
-						])),
-						new CDiv(convertUnits([
+						])))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_VALUE),
+						(new CDiv(convertUnits([
 							'value' => $item['max'],
 							'units' => $item['units'],
 							'convert' => ITEM_CONVERT_NO_UNITS
-						]))
+						])))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_VALUE)
 					]);
 				}
 				else {

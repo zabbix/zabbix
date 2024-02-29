@@ -342,8 +342,6 @@ static int	DBpatch_6050026(void)
 	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBdrop_field_autoincrement("proxy_history", &field);
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6050027(void)
@@ -351,8 +349,6 @@ static int	DBpatch_6050027(void)
 	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBdrop_field_autoincrement("proxy_dhistory", &field);
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6050028(void)
@@ -360,8 +356,6 @@ static int	DBpatch_6050028(void)
 	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBdrop_field_autoincrement("proxy_autoreg_host", &field);
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6050029(void)

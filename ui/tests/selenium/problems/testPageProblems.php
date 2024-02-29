@@ -1529,6 +1529,7 @@ class testPageProblems extends CWebTest {
 			$this->query('button:Apply')->one()->click();
 		}
 
+		$this->page->waitUntilReady();
 		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
