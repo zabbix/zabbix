@@ -61,17 +61,21 @@ function getMessageSettings() {
 		'sounds.'.TRIGGER_SEVERITY_AVERAGE => 'alarm_average.mp3',
 		'sounds.'.TRIGGER_SEVERITY_HIGH => 'alarm_high.mp3',
 		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.mp3',
-		'show_suppressed' => 0
+		'show_suppressed' => 0,
+		'snoozed.eventid' => 0
 	];
 
 	$dbProfiles = DBselect(
-		'SELECT p.idx,p.source,p.value_str'.
+		'SELECT p.idx,p.source,p.value_id,p.value_str,type'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
 			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
+
 	while ($profile = DBfetch($dbProfiles)) {
-		$messages[$profile['source']] = $profile['value_str'];
+		$messages[$profile['source']] = $profile['type'] == PROFILE_TYPE_ID
+			? $profile['value_id']
+			: $profile['value_str'];
 	}
 
 	if ($messages['triggers.severities'] === null) {
@@ -95,13 +99,14 @@ function updateMessageSettings($messages) {
 	}
 
 	$dbProfiles = DBselect(
-		'SELECT p.profileid,p.idx,p.source,p.value_str'.
+		'SELECT p.profileid,p.idx,p.source,p.value_id,p.value_str,type'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
 			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
+
 	while ($profile = DBfetch($dbProfiles)) {
-		$profile['value'] = $profile['value_str'];
+		$profile['value'] = $profile['type'] == PROFILE_TYPE_ID ? $profile['value_id'] : $profile['value_str'];
 		$dbMessages[$profile['source']] = $profile;
 	}
 
@@ -119,9 +124,15 @@ function updateMessageSettings($messages) {
 			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
 			'source' => $key,
-			'value_str' =>  $value,
-			'type' => PROFILE_TYPE_STR
+			'type' => $key === 'snoozed.eventid' ? PROFILE_TYPE_ID : PROFILE_TYPE_STR
 		];
+
+		if ($values['type'] == PROFILE_TYPE_ID) {
+			$values['value_id'] = $value;
+		}
+		else {
+			$values['value_str'] = $value;
+		}
 
 		if (!isset($dbMessages[$key])) {
 			$inserts[] = $values;

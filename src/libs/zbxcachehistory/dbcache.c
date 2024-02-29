@@ -342,6 +342,24 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 	return (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
 }
 
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids)
+{
+	int	i, hour, now = time(NULL);
+
+	hour = now - now % SEC_PER_HOUR;
+
+	LOCK_TRENDS;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		ZBX_DC_TREND	trend = {.itemid = itemids->values[i], .disable_from = hour};
+
+		(void)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
+	}
+
+	UNLOCK_TRENDS;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: apply disable_from changes to cache                               *
@@ -871,7 +889,7 @@ static void	DCmass_update_trends(const zbx_dc_history_t *history, int history_nu
 				continue;
 
 			/* discard trend items that are older than compression age */
-			if (0 != compression_age && trend->clock < compression_age)
+			if (0 != compression_age && trend->clock < compression_age && 0 != trend->clock)
 			{
 				if (SEC_PER_HOUR < (ts.sec - last_trend_discard)) /* log once per hour */
 				{
@@ -880,14 +898,20 @@ static void	DCmass_update_trends(const zbx_dc_history_t *history, int history_nu
 					last_trend_discard = ts.sec;
 				}
 
-				zbx_hashset_iter_remove(&iter);
+				trend->clock = 0;
+				trend->num = 0;
+				memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
+				memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
+				memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
 			}
 			else
 			{
 				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
-				zbx_vector_uint64_append(&del_itemids, trend->itemid);
+				/* trend is missing an hour, check if it should be cleared from cache */
+				if (0 != trend->disable_from && trend->disable_from < hour - SEC_PER_HOUR)
+					zbx_vector_uint64_append(&del_itemids, trend->itemid);
 			}
 		}
 
@@ -3790,13 +3814,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	if (NULL == result)
 		return;
 
-	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
-	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) &&
-			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		return;
-	}
-
 	value_flags = 0;
 
 	if (!ZBX_ISSET_VALUE(result))
@@ -3806,7 +3823,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		value_flags |= ZBX_DC_FLAG_META;
 
 	/* Add data to the local history cache if:                                           */
-	/*   1) the NOVALUE flag is set (data contains either meta information or timestamp) */
+	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
@@ -4383,17 +4400,19 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		/* a record with metadata and no value can be dropped if  */
 		/* the metadata update is copied to the last queued value */
-		if (NULL != (item = hc_get_item(item_value->itemid)) &&
-				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
-				0 != (item_value->flags & ZBX_DC_FLAG_META))
+		if (NULL != (item = hc_get_item(item_value->itemid)) && 0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 		{
 			/* skip metadata updates when only one value is queued, */
 			/* because the item might be already being processed    */
 			if (item->head != item->tail)
 			{
-				item->head->lastlogsize = item_value->lastlogsize;
-				item->head->mtime = item_value->mtime;
-				item->head->flags |= ZBX_DC_FLAG_META;
+				if (0 != (item_value->flags & ZBX_DC_FLAG_META))
+				{
+					item->head->lastlogsize = item_value->lastlogsize;
+					item->head->mtime = item_value->mtime;
+					item->head->flags |= ZBX_DC_FLAG_META;
+				}
+
 				continue;
 			}
 		}

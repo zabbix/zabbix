@@ -230,17 +230,15 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
  * Parameters: url                   - [IN] vmware service url                *
- *             is_new_api            - [IN] flag to use new api version       *
- *                                          syntax                            *
+ *             is_new_api            - [IN]                                   *
  *             config_source_ip      - [IN]                                   *
  *             config_vmware_timeout - [IN]                                   *
  *             easyhandle            - [OUT] cURL handle                      *
  *             page                  - [OUT] response buffer for cURL         *
  *             headers               - [OUT] request headers for cURL         *
- *             error                 - [OUT] error message in the case of     *
- *                                           failure                          *
+ *             error                 - [OUT] error message in case of failure *
  *                                                                            *
- * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
+ * Return value: SUCCEED if cURL prepared, FAIL otherwise                     *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_curl_init(const char *url, unsigned char is_new_api, const char *config_source_ip,
@@ -321,13 +319,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: open the json document and check the errors                       *
+ * Purpose: opens json document and checks errors                             *
  *                                                                            *
- * Parameters: data  - [IN] the json data                                     *
- *             jp    - [OUT] the prepared json document (optional)            *
- *             error - [OUT] the error message in the case of failure         *
+ * Parameters: data  - [IN] json data                                         *
+ *             jp    - [OUT] prepared json document (optional)                *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
- * Return value: SUCCEED if the json prepared, FAIL otherwise                 *
+ * Return value: SUCCEED if json prepared, FAIL otherwise                     *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp, char **error)
@@ -401,16 +399,14 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
 
 /******************************************************************************
  *                                                                            *
- * Purpose: authenticate rest service                                         *
- *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             is_new_api - [IN] flag to use new api version syntax           *
+ * Parameters: service    - [IN] vmware service                               *
+ *             is_new_api - [IN]                                              *
  *             easyhandle - [IN/OUT] cURL handle                              *
- *             headers    - [IN/OUT] the request headers for cURL             *
- *             page       - [IN/OUT] the response buffer for cURL             *
- *             error      - [OUT] the error message in the case of failure    *
+ *             headers    - [IN/OUT] request headers for cURL                 *
+ *             page       - [IN/OUT] response buffer for cURL                 *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED if the rest authenticated, FAIL otherwise            *
+ * Return value: SUCCEED if rest authenticated, FAIL otherwise                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service, unsigned char is_new_api,
@@ -494,10 +490,8 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: logout rest service                                               *
- *                                                                            *
  * Parameters: easyhandle - [IN/OUT] cURL handle                              *
- *             page       - [IN/OUT] the response buffer for cURL             *
+ *             page       - [IN/OUT] response buffer for cURL                 *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE_REST *page)
@@ -528,14 +522,15 @@ static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE_REST *page
  *                                                                            *
  * Purpose: unification of vmware web service call with REST error validation *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name                     *
- *             easyhandle - [IN] the CURL handle                              *
- *             url_suffix - [IN] the second part of url request               *
- *             jp         - [OUT] the json response document                  *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: fn_parent  - [IN] parent function name                         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             url_suffix - [IN] second part of url request                   *
+ *             jp         - [OUT] json response document                      *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the REST request was completed successfully        *
- *               FAIL    - the REST request has failed                        *
+ * Return value: SUCCEED - REST request was completed successfully            *
+ *               FAIL    - REST request has failed                            *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const char *url_suffix,
 		struct zbx_json_parse *jp, char **error)
@@ -582,15 +577,16 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
  *                                                                            *
  * Purpose: vmware web service GET call with REST error validation            *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
- *             url_suffix - [IN] the second part of url request               *
- *             param      - [IN] the url parameter                            *
- *             jp         - [OUT] the json document response                  *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: fn_parent  - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             url_suffix - [IN] second part of url request                   *
+ *             param      - [IN] url parameter                                *
+ *             jp         - [OUT] json document response                      *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the SOAP request was completed successfully        *
- *               FAIL    - the SOAP request has failed                        *
+ * Return value: SUCCEED - SOAP request was completed successfully            *
+ *               FAIL    - SOAP request has failed                            *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_rest_get(const char *fn_parent, CURL *easyhandle, const char *url_suffix, const char *param,
 		struct zbx_json_parse *jp, char **error)
@@ -614,14 +610,16 @@ static int	vmware_rest_get(const char *fn_parent, CURL *easyhandle, const char *
  *                                                                            *
  * Purpose: vmware web service POST call with REST error validation           *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
- *             request    - [IN] the http request                             *
- *             jdoc       - [OUT] the json document response                  *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: fn_parent  - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             url_suffix - [IN]                                              *
+ *             request    - [IN] http request                                 *
+ *             jp         - [OUT]                                             *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the POST rest request was completed successfully   *
- *               FAIL    - the POST rest request has failed                   *
+ * Return value: SUCCEED - POST rest request was completed successfully       *
+ *               FAIL    - POST rest request has failed                       *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char *url_suffix, const char *request,
 		struct zbx_json_parse *jp, char **error)
@@ -651,15 +649,15 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get list of tags linked with object                               *
+ * Purpose: gets list of tags linked with object                              *
  *                                                                            *
- * Parameters: obj_id     - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
+ * Parameters: obj_id     - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
  *             is_new_api - [IN] flag to use new api version syntax           *
- *             ids        - [OUT] the vector with tags id                     *
- *             error      - [OUT] the error message in the case of failure    *
+ *             ids        - [OUT] vector with tags id                         *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED if the receive list of tags id, FAIL otherwise       *
+ * Return value: SUCCEED if receive list of tags id, FAIL otherwise           *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, unsigned char is_new_api,
@@ -706,10 +704,10 @@ out:
  *                                                                            *
  * Parameters: tag_id     - [IN]                                              *
  *             easyhandle - [IN] CURL handle                                  *
- *             is_new_api - [IN] flag to use new api version syntax           *
- *             tags       - [OUT] vector with tags info                       *
- *             categories - [OUT] vector with categories info                 *
- *             error      - [OUT] error message in the case of failure        *
+ *             is_new_api - [IN]                                              *
+ *             tags       - [OUT]                                             *
+ *             categories - [OUT]                                             *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED if received tag details, FAIL otherwise              *
  *                                                                            *
@@ -816,13 +814,13 @@ json_err:
  *                                                                            *
  * Purpose: creates vector with tags details                                  *
  *                                                                            *
- * Parameters: is_new_api  - [IN] flag to use new api version syntax          *
- *             entity_tags - [IN/OUT] tag entity                              *
- *             tags        - [IN/OUT] vector with tags info                   *
- *             categories  - [IN/OUT] vector with categories info             *
+ * Parameters: is_new_api  - [IN]                                             *
+ *             entity_tags - [IN/OUT]                                         *
+ *             tags        - [IN/OUT]                                         *
+ *             categories  - [IN/OUT]                                         *
  *             easyhandle  - [IN/OUT] CURL handle                             *
  *                                                                            *
- * Return value: SUCCEED if the create tags vector, FAIL otherwise            *
+ * Return value: SUCCEED if create tags vector, FAIL otherwise                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *entity_tags,
