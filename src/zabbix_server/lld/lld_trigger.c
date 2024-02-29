@@ -128,6 +128,8 @@ struct zbx_lld_trigger_s
 
 ZBX_PTR_VECTOR_FUNC_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
 
+ZBX_PTR_VECTOR_IMPL(lld_trigger_ptr, zbx_lld_trigger_t*)
+
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger);
 
 struct zbx_lld_dependency_s
@@ -208,6 +210,9 @@ typedef struct
 }
 zbx_lld_trigger_ref_t;
 
+ZBX_PTR_VECTOR_DECL(lld_trigger_ref_ptr, zbx_lld_trigger_ref_t*)
+ZBX_PTR_VECTOR_IMPL(lld_trigger_ref_ptr, zbx_lld_trigger_ref_t*)
+
 /* a trigger node used to build trigger tree for dependency validation */
 typedef struct
 {
@@ -221,7 +226,7 @@ typedef struct
 	int			parents;
 
 	/* trigger dependency list */
-	zbx_vector_lld_dependency_ptr_t	dependencies;
+	zbx_vector_lld_trigger_ref_ptr_t	dependencies;
 }
 zbx_lld_trigger_node_t;
 
@@ -3145,7 +3150,7 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
 	node_local.iter_num = 0;
 	node_local.parents = 0;
 
-	zbx_vector_lld_dependency_ptr_create(&node_local.dependencies);
+	zbx_vector_lld_trigger_ref_ptr_create(&node_local.dependencies);
 
 	return (zbx_lld_trigger_node_t *)zbx_hashset_insert(cache, &node_local, sizeof(node_local));
 }
@@ -3193,7 +3198,7 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 		trigger_ref->flags = (0 == dependency->triggerdepid ? ZBX_LLD_TRIGGER_DEPENDENCY_NEW :
 				ZBX_LLD_TRIGGER_DEPENDENCY_NORMAL);
 
-		zbx_vector_lld_dependency_ptr_append(&trigger_node->dependencies, trigger_ref);
+		zbx_vector_lld_trigger_ref_ptr_append(&trigger_node->dependencies, trigger_ref);
 
 		if (NULL == trigger_ref->trigger)
 		{
@@ -3428,8 +3433,8 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
 	zbx_hashset_iter_reset(cache, &iter);
 	while (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_lld_dependency_ptr_clear_ext(&trigger_node->dependencies, lld_dependency_free);
-		zbx_vector_lld_dependency_ptr_destroy(&trigger_node->dependencies);
+		zbx_vector_lld_trigger_ref_ptr_clear_ext(&trigger_node->dependencies, lld_dependency_free);
+		zbx_vector_lld_trigger_ref_ptr_destroy(&trigger_node->dependencies);
 	}
 
 	zbx_hashset_destroy(cache);
