@@ -30,9 +30,13 @@ window.mfa_edit = new class {
 		this.overlay = null;
 		this.dialogue = null;
 		this.form = null;
+		this.mfaid = null;
+		this.change_sensitive_data = null;
 	}
 
-	init() {
+	init({mfaid, change_sensitive_data}) {
+		this.mfaid = mfaid;
+		this.change_sensitive_data = change_sensitive_data;
 		this.overlay = overlays_stack.getById('mfa_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -95,6 +99,12 @@ window.mfa_edit = new class {
 	}
 
 	submit() {
+		if (this.mfaid !== null && this.#isSensitiveDataModified() && !this.#confirmSubmit()) {
+			this.overlay.unsetLoading();
+
+			return;
+		}
+
 		this.overlay.setLoading();
 
 		const fields = this.#getFormFields();
@@ -154,5 +164,29 @@ window.mfa_edit = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	#confirmSubmit() {
+		return window.confirm(<?= json_encode(
+			_('After this change users, that have already enrolled to this MFA method, will have to do the enrollment process again, because TOTP secrets will be reset.')
+		) ?>);
+	}
+
+	#isSensitiveDataModified() {
+		if (this.change_sensitive_data.type == MFA_TYPE_DUO) {
+			return false;
+		}
+
+		const form_fields = this.#getFormFields();
+
+		for (const key in this.change_sensitive_data) {
+			if (form_fields.hasOwnProperty(key)) {
+				if (this.change_sensitive_data[key] !== form_fields[key]) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }

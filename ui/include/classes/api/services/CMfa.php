@@ -277,6 +277,13 @@ class CMfa extends CApiService {
 		}
 
 		DB::update('mfa', $upd_mfas);
+
+		$delete_secrets_mfaids = self::changedTotpMfaids($upd_mfas);
+
+		if ($delete_secrets_mfaids) {
+			DB::delete('mfa_totp_secret', ['mfaid' => $delete_secrets_mfaids]);
+		}
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MFA, $mfas, $db_mfas);
 
 		return ['mfaids' => array_column($mfas, 'mfaid')];
@@ -350,6 +357,25 @@ class CMfa extends CApiService {
 		}
 
 		self::checkDuplicates($mfas, $db_mfas);
+	}
+
+	private static function changedTotpMfaids(array $upd_mfas): array {
+		$mfaids = [];
+
+		foreach ($upd_mfas as $upd_mfa) {
+			$changed_sensitive_data = array_intersect(
+				array_keys($upd_mfa['values']), ['type', 'hash_function', 'code_length']
+			);
+
+			if (!$changed_sensitive_data || (array_key_exists('type', $changed_sensitive_data)
+					&& $upd_mfas['values']['type'] == MFA_TYPE_TOTP)) {
+				continue;
+			}
+
+			$mfaids[] = $upd_mfa['where']['mfaid'];
+		}
+
+		return $mfaids;
 	}
 
 	public function delete(array $mfaids): array {
