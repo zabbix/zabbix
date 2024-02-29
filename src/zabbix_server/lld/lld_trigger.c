@@ -210,6 +210,12 @@ typedef struct
 }
 zbx_lld_trigger_ref_t;
 
+static void	lld_trigger_ref_free(zbx_lld_trigger_ref_t *lld_trigger_ref)
+{
+	zbx_free(lld_trigger_ref->trigger);
+	zbx_free(lld_trigger_ref);
+}
+
 ZBX_PTR_VECTOR_DECL(lld_trigger_ref_ptr, zbx_lld_trigger_ref_t*)
 ZBX_PTR_VECTOR_IMPL(lld_trigger_ref_ptr, zbx_lld_trigger_ref_t*)
 
@@ -3433,7 +3439,7 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
 	zbx_hashset_iter_reset(cache, &iter);
 	while (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_lld_trigger_ref_ptr_clear_ext(&trigger_node->dependencies, lld_dependency_free);
+		zbx_vector_lld_trigger_ref_ptr_clear_ext(&trigger_node->dependencies, lld_trigger_ref_free);
 		zbx_vector_lld_trigger_ref_ptr_destroy(&trigger_node->dependencies);
 	}
 
