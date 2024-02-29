@@ -12859,7 +12859,6 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	zbx_hashset_iter_t	iter;
 
 	config->status->sync_ts = config->sync_ts;
-	config->status->last_update = time(NULL);
 
 	zbx_hashset_iter_reset(&config->proxies, &iter);
 
@@ -12904,6 +12903,8 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->items_active_normal = diff->items_active_normal;
 	config->status->items_active_notsupported = diff->items_active_notsupported;
 	config->status->items_disabled = diff->items_disabled;
+
+	config->status->last_update = time(NULL);
 }
 
 static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
