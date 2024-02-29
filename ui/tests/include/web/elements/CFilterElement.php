@@ -162,9 +162,8 @@ class CFilterElement extends CElement {
 	 * @return array
 	 */
 	public function getTabsText() {
-		// TODO: temporary FIX. Check later and uncomment.
-		//$tabs = $this->query('xpath:.//a[@class="tabfilter-item-link"]')->all();
-		$tabs = $this->query('xpath:.//li[not(@data-target="tabfilter_timeselector")]/a[contains(@class, "tabfilter-item-link") and not(@aria-label="Home")]')->all();
+		$tabs = $this->query('xpath:.//li[not(@data-target="tabfilter_timeselector")]/a[contains(@class, '.
+				'"tabfilter-item-link") and not(@aria-label="Home")]')->all();
 		if ($tabs->count() > 0) {
 			return $tabs->asText();
 		}
