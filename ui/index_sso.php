@@ -41,7 +41,7 @@ if (hasRequest('request')) {
 	}
 }
 
-if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
+if (CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
 	CSessionHelper::unset(['request']);
 
 	redirect($redirect_to->toString());
@@ -72,7 +72,7 @@ $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 $provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 $provisioning_enabled = ($provisioning->isProvisioningEnabled()
-	&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
+	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
 );
 
 if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
@@ -277,7 +277,7 @@ try {
 			$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
 			$db_users = CUser::findUsersByUsername($saml_data['username_attribute'],
-				CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
+				CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
 			);
 
 			if (!$db_users && $saml_data['provisioned_user']['roleid']) {
@@ -311,7 +311,7 @@ try {
 		}
 
 		CWebUser::$data = CUser::loginByUsername($saml_data['username_attribute'],
-			CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
+			CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
 		);
 		API::setWrapper($wrapper);
 
