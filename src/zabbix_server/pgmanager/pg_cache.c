@@ -19,6 +19,7 @@
 
 #include "pg_cache.h"
 #include "zbxcacheconfig.h"
+#include "version.h"
 
 #define PG_GROUP_UNBALANCE_FACTOR	2
 #define PG_GROUP_UNBALANCE_LIMIT	10
@@ -94,6 +95,7 @@ void	pg_cache_add_standalone_proxy_group(zbx_pg_cache_t *cache)
 	zbx_vector_uint64_create(&group->unassigned_hostids);
 	group->state = ZBX_PG_GROUP_STATE_DISABLED;
 	group->min_online = zbx_strdup(NULL, "0");
+	group->name = zbx_strdup(NULL, "<standalone proxies>");
 	group->failover_delay = zbx_dsprintf(NULL, ZBX_PG_DEFAULT_FAILOVER_DELAY_STR);
 }
 
@@ -107,6 +109,7 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 	zbx_hashset_create(&cache->groups, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	cache->group_revision = 0;
 	cache->proxy_revision = 0;
+	cache->supported_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR, 0);
 
 	zbx_vector_pg_group_ptr_create(&cache->group_updates);
 
@@ -347,7 +350,7 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_g
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		/* proxies not exceeding balance limits could still have hosts taken   */
@@ -376,7 +379,7 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_g
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		zbx_vector_pg_proxy_ptr_append(&proxies, proxy);
@@ -424,7 +427,7 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		zbx_vector_pg_proxy_ptr_append(&proxies, proxy);
@@ -471,18 +474,19 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
  *             factor of 2.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	pg_cache_group_is_balanced(zbx_pg_group_t *group)
+static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle,
+		zbx_pg_group_t *group)
 {
 	if (0 != group->unassigned_hostids.values_num)
 		return FAIL;
 
-	int	 hosts_num = 0, proxies_num;
+	int	 hosts_num = 0, proxies_num = 0;
 
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		if (0 == proxy->hosts.values_num && group->hostids.values_num > group->proxies.values_num)
@@ -492,12 +496,19 @@ static int	pg_cache_group_is_balanced(zbx_pg_group_t *group)
 		proxies_num++;
 	}
 
-	if (0 == proxies_num)
+	int	min_online;
+	char	*tmp;
+
+	tmp = zbx_strdup(NULL, group->min_online);
+	(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
+	if (0 == (min_online = atoi(tmp)))
+		min_online = 1;
+	zbx_free(tmp);
+
+	if (proxies_num < min_online)
 	{
-		/* this function must be called only for online groups,  */
-		/* and online groups will have at least one online proxy */
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
+		/* no enough online proxies with supported version - treat the group as balanced */
+		return SUCCEED;
 	}
 
 	int	avg = hosts_num / proxies_num;
@@ -535,7 +546,7 @@ static int	pg_cache_group_is_balanced(zbx_pg_group_t *group)
  ******************************************************************************/
 static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
 {
-	int	online_num = 0;
+	int	online_num = 0, hosts_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name, cache->group_updates.values_num);
 
@@ -544,18 +555,24 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state && proxy->version == cache->supported_version)
+		{
 			online_num++;
+			hosts_num += proxy->hosts.values_num;
+		}
 	}
 
-	int	hosts_avg = group->hostids.values_num / online_num, hosts_required = 0;
+	if (0 == online_num)
+		goto out;
+
+	int	hosts_avg = hosts_num / online_num, hosts_required = 0;
 
 	/* calculate how many hosts are needed to balance groups with deficit hosts */
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		if (0 != proxy->hosts.values_num || group->hostids.values_num < proxy->hosts.values_num)
@@ -572,7 +589,7 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 
 	pg_cache_group_unassign_excess_hosts(cache, group, hosts_avg, hosts_required);
 	pg_cache_group_distribute_hosts(cache, group);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -610,7 +627,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 
 		if (ZBX_PG_GROUP_STATE_ONLINE == group->state)
 		{
-			if (SUCCEED != pg_cache_group_is_balanced(group))
+			if (SUCCEED != pg_cache_is_group_balanced(cache, um_handle, group))
 			{
 				group->unbalanced = PG_GROUP_UNBALANCED_YES;
 
@@ -943,7 +960,10 @@ void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	{
 		zbx_pg_proxy_t 	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_OFFLINE != proxy->state || 0 == proxy->hosts.values_num)
+		if (0 == proxy->hosts.values_num)
+			continue;
+
+		if (ZBX_PG_PROXY_STATE_OFFLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		for (int j = 0; j < proxy->hosts.values_num; j++)
@@ -986,8 +1006,8 @@ static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 	if (NULL != proxy->group)
 		groupid = proxy->group->proxy_groupid;
 
-	zabbix_log(LOG_LEVEL_TRACE, "    state:%d lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
-			proxy->state, proxy->lastaccess, proxy->firstaccess, groupid);
+	zabbix_log(LOG_LEVEL_TRACE, "    state:%d version:%x lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
+			proxy->state, proxy->version, proxy->lastaccess, proxy->firstaccess, groupid);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    hostids:");
 	for (int i = 0; i < proxy->hosts.values_num; i++)

@@ -32,7 +32,7 @@
 #define ZBX_IPC_PGM_PROXY_SYNC_DATA		3
 #define ZBX_IPC_PGM_GET_STATS			4
 #define ZBX_IPC_PGM_STATS			5
-#define ZBX_IPC_PGM_PROXY_LASTACCESS		6
+#define ZBX_IPC_PGM_PROXY_RTDATA		6
 #define ZBX_IPC_PGM_STOP			100
 
 #define ZBX_PROXY_SYNC_NONE	0
@@ -62,6 +62,6 @@ zbx_pg_stats_t;
 
 void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *updates);
 int	zbx_pg_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error);
-void	zbx_pg_update_proxy_lastaccess(zbx_uint64_t proxyid, int lastaccess);
+void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int version);
 
 #endif

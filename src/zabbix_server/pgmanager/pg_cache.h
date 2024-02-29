@@ -38,6 +38,7 @@
 typedef struct
 {
 	int				startup_time;
+	int				supported_version;
 
 	zbx_hashset_t			groups;
 	zbx_vector_pg_group_ptr_t	group_updates;

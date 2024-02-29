@@ -1403,6 +1403,7 @@ typedef struct
 	zbx_uint64_t			revision;
 	char				*name;
 	int				state;
+	int				version;
 	int				lastaccess;
 	int				firstaccess;
 	int				sync_time;	/* sync_time is used to stop collecting potentially infinite */

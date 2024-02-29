@@ -234,6 +234,7 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 		}
 
 		proxy->lastaccess = dc_proxy->lastaccess;
+		proxy->version = ZBX_COMPONENT_VERSION_WITHOUT_PATCH(dc_proxy->version_int);
 		proxy->revision = *revision;
 
 		if (NULL == proxy->name || 0 != strcmp(proxy->name, dc_proxy->name))

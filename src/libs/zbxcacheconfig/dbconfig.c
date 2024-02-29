@@ -15008,7 +15008,7 @@ void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions)
 void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 {
 	ZBX_DC_PROXY	*proxy;
-	int		lastaccess = 0;
+	int		lastaccess = 0, version = 0;
 
 	WRLOCK_CACHE;
 
@@ -15049,6 +15049,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			{
 				proxy->version_int = diff->version_int;
 				proxy->compatibility = diff->compatibility;
+				version = proxy->version_int;
 			}
 			else
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION);
@@ -15087,8 +15088,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 	UNLOCK_CACHE;
 
-	if (0 != lastaccess)
-		zbx_pg_update_proxy_lastaccess(diff->hostid, lastaccess);
+	if (0 != lastaccess || 0 != version)
+		zbx_pg_update_proxy_rtdata(diff->hostid, lastaccess, version);
 }
 
 /******************************************************************************

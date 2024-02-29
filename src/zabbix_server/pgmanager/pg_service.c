@@ -78,23 +78,30 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
  *            message - [IN] IPC message with proxy last access               *
  *                                                                            *
  ******************************************************************************/
-static void	pg_update_proxy_lastaccess(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
+static void	pg_update_proxy_rtdata(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
 {
 	unsigned char	*ptr = message->data;
 	zbx_uint64_t	proxyid;
-	int		lastaccess;
+	int		lastaccess, version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ptr += zbx_deserialize_value(ptr, &proxyid);
 	ptr += zbx_deserialize_value(ptr, &lastaccess);
+	ptr += zbx_deserialize_value(ptr, &version);
 
 	pg_cache_lock(pgs->cache);
 
 	zbx_pg_proxy_t 	*proxy;
 
 	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)))
-		proxy->lastaccess = lastaccess;
+	{
+		if (0 != lastaccess)
+			proxy->lastaccess = lastaccess;
+
+		if (0 != version)
+			proxy->version = ZBX_COMPONENT_VERSION_WITHOUT_PATCH(version);
+	}
 
 	pg_cache_unlock(pgs->cache);
 
@@ -283,8 +290,8 @@ static void	*pg_service_entry(void *data)
 				case ZBX_IPC_PGM_GET_STATS:
 					pg_get_proxy_group_stats(pgs, client, message);
 					break;
-				case ZBX_IPC_PGM_PROXY_LASTACCESS:
-					pg_update_proxy_lastaccess(pgs, message);
+				case ZBX_IPC_PGM_PROXY_RTDATA:
+					pg_update_proxy_rtdata(pgs, message);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;

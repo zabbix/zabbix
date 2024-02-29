@@ -70,10 +70,10 @@ void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *u
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update proxy last access                                          *
+ * Purpose: update proxy runtime data                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pg_update_proxy_lastaccess(zbx_uint64_t proxyid, int lastaccess)
+void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int version)
 {
 	if (0 == pgservice_sock.fd)
 	{
@@ -88,12 +88,13 @@ void	zbx_pg_update_proxy_lastaccess(zbx_uint64_t proxyid, int lastaccess)
 		}
 	}
 
-	unsigned char	data[sizeof(proxyid) + sizeof(lastaccess)], *ptr = data;
+	unsigned char	data[sizeof(proxyid) + sizeof(lastaccess) + sizeof(version)], *ptr = data;
 
 	ptr += zbx_serialize_value(ptr, proxyid);
 	ptr += zbx_serialize_value(ptr, lastaccess);
+	ptr += zbx_serialize_value(ptr, version);
 
-	if (FAIL == zbx_ipc_socket_write(&pgservice_sock, ZBX_IPC_PGM_PROXY_LASTACCESS, data,
+	if (FAIL == zbx_ipc_socket_write(&pgservice_sock, ZBX_IPC_PGM_PROXY_RTDATA, data,
 			(zbx_uint32_t)(ptr - data)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot send data to proxy group manager service");
