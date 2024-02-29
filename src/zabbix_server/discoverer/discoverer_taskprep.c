@@ -132,7 +132,10 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	tasks_ptr = (0 == drule->concurrency_max && SUCCEED == dcheck_is_async(dcheck) && SVC_SNMPv3 != dcheck->type) ?
 			tasks_local : tasks;
 
-	if (NULL != (task = zbx_hashset_search(tasks_ptr, &task_local)))
+	/* The net-snmplib limitation associated with the internal EnginID cache requires that the net-snmplib cache */
+	/* be reset after each dcheck. That's why we put each snmpv3 dcheck into a separate task */
+
+	if (SVC_SNMPv3 != dcheck->type && NULL != (task = zbx_hashset_search(tasks_ptr, &task_local)))
 	{
 		zbx_vector_dc_dcheck_ptr_destroy(&task_local.dchecks);
 
@@ -145,6 +148,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	else
 	{
 		memset(&task_local.range, 0, sizeof(zbx_task_range_t));
+		task_local.range.id = SVC_SNMPv3 == dcheck->type? dcheck->dcheckid : 0;
 		task_local.range.ipranges = ipranges;
 		task_local.range.state.checks_per_ip = checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;

@@ -921,7 +921,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 			{
 				if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
-					zbx_clear_cache_snmp(process_type, process_num, poller_get_progname()());
+					zbx_clear_cache_snmp(process_type, process_num);
 			}
 #endif
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)

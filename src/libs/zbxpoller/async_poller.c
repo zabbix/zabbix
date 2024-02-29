@@ -235,7 +235,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		else
 		{
 			zbx_unset_snmp_bulkwalk_options();
-			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num, zbx_progname);
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options(zbx_progname);
 			poller_config->clear_cache = 0;
 		}

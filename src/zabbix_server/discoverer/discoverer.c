@@ -1360,7 +1360,7 @@ static void	discoverer_libs_destroy(void)
 }
 
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread_discoverer_args *args_in,
-		char **error)
+		const zbx_thread_info_t *info, char **error)
 {
 #	define SNMPV3_WORKERS_MAX	1
 
@@ -1372,6 +1372,8 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	manager->config_timeout = args_in->config_timeout;
 	manager->source_ip = args_in->config_source_ip;
 	manager->progname = args_in->zbx_get_progname_cb_arg();
+	manager->process_num = info->process_num;
+	manager->process_type = info->process_type;
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
@@ -1521,8 +1523,8 @@ static void	discoverer_reply_usage_stats(zbx_discoverer_manager_t *manager, zbx_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
-	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
-							(((zbx_thread_args_t *)args)->args);
+	zbx_thread_discoverer_args		*discoverer_args_in = (zbx_thread_discoverer_args *)
+								(((zbx_thread_args_t *)args)->args);
 	double					sec;
 	int					nextcheck = 0;
 	zbx_ipc_service_t			ipc_service;
@@ -1530,9 +1532,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_ipc_message_t			*message;
 	zbx_timespec_t				sleeptime = { .sec = DISCOVERER_DELAY, .ns = 0 };
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char					*error = NULL;
 	zbx_vector_uint64_pair_t		revisions;
 	zbx_vector_uint64_t			del_druleids, del_jobs;
@@ -1542,7 +1541,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_uint64_t				rev_last = 0;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
-			server_num, get_process_type_string(process_type), process_num);
+			info->server_num, get_process_type_string(info->process_type), info->process_num);
 	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
 	zbx_get_program_type_cb = discoverer_args_in->zbx_get_program_type_cb_arg;
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -1551,7 +1550,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
-	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(info->process_type),
+			info->process_num);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -1562,7 +1562,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in, &error))
+	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in, info, &error))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager: %s", error);
 		zbx_free(error);
@@ -1580,7 +1580,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_hashset_create(&incomplete_druleids, 1, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_discoverer_drule_error_create(&drule_errors);
 
-	zbx_setproctitle("%s #%d [started]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [started]", get_process_type_string(info->process_type), info->process_num);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1588,7 +1588,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		zbx_uint64_t	unsaved_checks;
 
 		sec = zbx_time();
-		zbx_update_env(get_process_type_string(process_type), sec);
+		zbx_update_env(get_process_type_string(info->process_type), sec);
 
 		/* update local drules revisions */
 
@@ -1642,7 +1642,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		process_job_finalize(&del_jobs, &drule_errors, &incomplete_druleids);
 
 		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_UI64 " unsaved checks]",
-				get_process_type_string(process_type), process_num, processing_rules_num, unsaved_checks);
+				get_process_type_string(info->process_type), info->process_num, processing_rules_num,
+				unsaved_checks);
 
 		/* process discovery rules and create net check jobs */
 
@@ -1728,7 +1729,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					break;
 #ifdef HAVE_NETSNMP
 				case ZBX_RTC_SNMP_CACHE_RELOAD:
-					zbx_clear_cache_snmp(process_type, process_num, zbx_get_progname_cb());
+					zbx_clear_cache_snmp(info->process_type, info->process_num);
 					break;
 #endif
 				case ZBX_RTC_SHUTDOWN:
@@ -1745,7 +1746,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		zbx_timekeeper_collect(dmanager.timekeeper);
 	}
 out:
-	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(info->process_type), info->process_num);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);

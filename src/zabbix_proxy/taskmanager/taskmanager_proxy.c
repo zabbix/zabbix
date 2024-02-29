@@ -509,7 +509,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		{
 #ifdef HAVE_NETSNMP
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
-				zbx_clear_cache_snmp(process_type, process_num, taskmanager_args_in->progname);
+				zbx_clear_cache_snmp(process_type, process_num);
 #endif
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd &&
 					ZBX_PROXYMODE_PASSIVE == taskmanager_args_in->config_comms->proxymode)

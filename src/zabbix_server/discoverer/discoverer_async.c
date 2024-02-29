@@ -33,6 +33,7 @@
 #include "zbxdbhigh.h"
 #include "zbxip.h"
 #include "zbxstr.h"
+#include "zbxpoller.h"
 
 static ZBX_THREAD_LOCAL int log_worker_id;
 
@@ -630,50 +631,50 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 
 		switch (dcheck->type)
 		{
-		case SVC_SNMPv1:
-		case SVC_SNMPv2c:
-		case SVC_SNMPv3:
+			case SVC_SNMPv1:
+			case SVC_SNMPv2c:
+			case SVC_SNMPv3:
 #ifdef HAVE_NETSNMP
-			ret = discovery_snmp(&poller_config, dcheck, ip,
-					(unsigned short)task->range.state.port, result, error);
+				ret = discovery_snmp(&poller_config, dcheck, ip,
+						(unsigned short)task->range.state.port, result, error);
 #else
-			ret = FAIL;
-			*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
+				ret = FAIL;
+				*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
 #endif
-			break;
-		case SVC_AGENT:
-			ret = discovery_agent(&poller_config, dcheck, ip,
-					(unsigned short)task->range.state.port, result, error);
-			break;
-		case SVC_HTTPS:
+				break;
+			case SVC_AGENT:
+				ret = discovery_agent(&poller_config, dcheck, ip,
+						(unsigned short)task->range.state.port, result, error);
+				break;
+			case SVC_HTTPS:
 #ifdef HAVE_LIBCURL
-		case SVC_HTTP:
-			ret = discovery_http(&poller_config, http_config, dcheck,
-					(unsigned short)task->range.state.port, result, error);
-			break;
+			case SVC_HTTP:
+				ret = discovery_http(&poller_config, http_config, dcheck,
+						(unsigned short)task->range.state.port, result, error);
+				break;
 #else
-			ret = FAIL;
-			*error = zbx_strdup(*error, "Support for HTTPS checks was not compiled in.");
-			break;
-		case SVC_HTTP:
+				ret = FAIL;
+				*error = zbx_strdup(*error, "Support for HTTPS checks was not compiled in.");
+				break;
+			case SVC_HTTP:
 #endif
-		case SVC_SSH:
-		case SVC_SMTP:
-		case SVC_FTP:
-		case SVC_POP:
-		case SVC_NNTP:
-		case SVC_IMAP:
-		case SVC_TCP:
-			ret = discovery_tcpsvc(&poller_config, dcheck, ip,
-					(unsigned short)task->range.state.port, result, error);
-			break;
-		case SVC_TELNET:
-			ret = discovery_telnet(&poller_config, dcheck, ip,
-					(unsigned short)task->range.state.port, result);
-			break;
-		default:
-			ret = FAIL;
-			*error = zbx_dsprintf(*error, "Unsupported check type %u.", dcheck->type);
+			case SVC_SSH:
+			case SVC_SMTP:
+			case SVC_FTP:
+			case SVC_POP:
+			case SVC_NNTP:
+			case SVC_IMAP:
+			case SVC_TCP:
+				ret = discovery_tcpsvc(&poller_config, dcheck, ip,
+						(unsigned short)task->range.state.port, result, error);
+				break;
+			case SVC_TELNET:
+				ret = discovery_telnet(&poller_config, dcheck, ip,
+						(unsigned short)task->range.state.port, result);
+				break;
+			default:
+				ret = FAIL;
+				*error = zbx_dsprintf(*error, "Unsupported check type %u.", dcheck->type);
 		}
 
 		if (FAIL == ret)
@@ -703,6 +704,11 @@ out:
 	}
 #endif
 	discovery_async_poller_destroy(&poller_config);
+
+	/* we must clear the EnginID cache before the next snmpv3 dcheck and */
+	/* remove unused collected values in any case */
+	if (SVC_SNMPv3 == GET_DTYPE(task))
+		zbx_clear_cache_snmp(dmanager->process_type, dmanager->process_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
 			" last ip:%s", log_worker_id, __func__, druleid,

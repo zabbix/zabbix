@@ -3737,10 +3737,9 @@ out:
  *                                                                            *
  * Parameters: process_type - [IN]                                            *
  *             process_num  - [IN] unique id of process                       *
- *             progname     - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname)
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
 			get_process_type_string(process_type), process_num);
@@ -3750,10 +3749,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 
 	SNMP_MT_INITLOCK;
 
-	zbx_shutdown_snmp(progname);
-
-	if (0 != snmp_rwlock_init_done)
-		zbx_init_library_mt_snmp(progname);
+	shutdown_usm();
 
 	if (ZBX_PROCESS_TYPE_SNMP_POLLER == process_type)
 		zbx_clear_snmp_engineid_cache();
