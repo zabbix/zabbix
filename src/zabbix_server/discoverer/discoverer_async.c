@@ -581,8 +581,21 @@ static void	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager,
 	last = now;
 }
 
+static int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,
+		zbx_uint64_t total, int dec_counter)
+{
+	if (0 != total && 0 != total % worker_max)
+		return FAIL;
+
+	discoverer_queue_lock(queue);
+	queue->pending_checks_count -= dec_counter;
+	discoverer_queue_unlock(queue);
+
+	return SUCCEED;
+}
+
 int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
-		zbx_discoverer_manager_t *dmanager, int worker_id, char **error)
+		zbx_discoverer_manager_t *dmanager, int worker_id, zbx_discoverer_queue_t *queue, char **error)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
 	discovery_poller_config_t		poller_config;
@@ -590,7 +603,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	zbx_asynchttppoller_config		*http_config = NULL;
 #endif
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX], first_ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int					ret = FAIL;
+	int					ret = FAIL, dec_counter = 0;
 
 	if (0 == log_worker_id)
 		log_worker_id = worker_id;
@@ -684,8 +697,16 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			event_base_loop(poller_config.base, EVLOOP_ONCE);
 
 		discovery_net_check_result_flush(dmanager, task, &results, 0);
+
+		if (SUCCEED == discovery_pending_checks_count_decrease(queue, worker_max, task->range.state.count,
+				++dec_counter))
+		{
+			dec_counter = 0;
+		}
 	}
 	while (0 == *stop && SUCCEED == discoverer_range_check_iter(task));
+
+	task->range.state.count--;
 out:
 	while (0 != poller_config.processing)	/* try to close all handles if they are exhausted */
 	{
@@ -704,6 +725,7 @@ out:
 	}
 #endif
 	discovery_async_poller_destroy(&poller_config);
+	(void)discovery_pending_checks_count_decrease(queue, worker_max, task->range.state.count, dec_counter);
 
 	/* we must clear the EnginID cache before the next snmpv3 dcheck and */
 	/* remove unused collected values in any case */

@@ -1194,8 +1194,6 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (FAIL == dcheck_is_async(task->dchecks.values[0]))
 				queue->pending_checks_count--;
-			else
-				queue->pending_checks_count -= discoverer_task_check_count_get(task);
 
 			job->workers_used++;
 
@@ -1227,7 +1225,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			else
 			{
 				ret = discovery_net_check_range(druleid, task, worker_max, &worker->stop,
-						&dmanager, log_worker_id, &error);
+						&dmanager, log_worker_id, queue, &error);
 			}
 
 			if (FAIL == ret)
