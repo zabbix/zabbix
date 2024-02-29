@@ -644,9 +644,6 @@ typedef struct
 	double		required_performance;		/* required performance of server (values per second) */
 	time_t		last_update;
 	int		sync_ts;
-
-	zbx_hashset_t	hosts;
-	zbx_hashset_t	proxies;
 }
 ZBX_DC_STATUS;
 
