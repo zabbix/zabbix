@@ -70,10 +70,10 @@ class CSvgGraphLegend extends CDiv {
 			return $this->lines_count;
 		}
 
-		return min($this->lines_count, $this->show_statistic
+		return max(Widget::LEGEND_LINES_MIN, min($this->lines_count, $this->show_statistic
 			? count($this->legend_items)
 			: ceil(count($this->legend_items) / $this->columns_count)
-		);
+		));
 	}
 
 	public function setLinesCount(int $lines_count): self {

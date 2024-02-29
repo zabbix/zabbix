@@ -62,7 +62,13 @@ window.widget_pie_chart_form = new class {
 
 		jQuery(`#${form_tabs_id}`)
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', () => this.#updateForm());
+			.on('change', 'input, z-select, .multiselect', (e) => {
+				this.#updateForm();
+
+				if (e.target.getAttribute('name') === 'legend_lines_mode') {
+					e.target.closest('.form-grid').resizeHandler();
+				}
+			});
 
 		this.#datasetTabInit();
 		this.#displayingOptionsTabInit();

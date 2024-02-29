@@ -397,7 +397,7 @@ function PopUp(action, parameters, {
 				});
 
 				for (const grid of overlay.$dialogue.$body[0].querySelectorAll('form .form-grid')) {
-					new ResizeObserver(() => {
+					grid.resizeHandler = () => {
 						for (const label of grid.querySelectorAll(':scope > label')) {
 							const rect = label.getBoundingClientRect();
 
@@ -409,7 +409,9 @@ function PopUp(action, parameters, {
 								break;
 							}
 						}
-					}).observe(grid);
+					}
+
+					new ResizeObserver(grid.resizeHandler).observe(grid);
 				}
 			}
 

@@ -56,7 +56,13 @@ window.widget_svggraph_form = new class {
 
 		jQuery(`#${form_tabs_id}`)
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', (e) => this.onGraphConfigChange(e));
+			.on('change', 'input, z-select, .multiselect', (e) => {
+				this.onGraphConfigChange(e);
+
+				if (e.target.getAttribute('name') === 'legend_lines_mode') {
+					e.target.closest('.form-grid').resizeHandler();
+				}
+			});
 
 		this._datasetTabInit();
 		this._problemsTabInit();
