@@ -641,6 +641,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		result = discoverer_result_create(druleid, task->unique_dcheckid);
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
+		task->range.state.count--;
 
 		switch (dcheck->type)
 		{
@@ -705,8 +706,6 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		}
 	}
 	while (0 == *stop && SUCCEED == discoverer_range_check_iter(task));
-
-	task->range.state.count--;
 out:
 	while (0 != poller_config.processing)	/* try to close all handles if they are exhausted */
 	{
