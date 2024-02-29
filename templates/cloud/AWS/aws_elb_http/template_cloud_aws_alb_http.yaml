@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-20T15:23:41Z'
+  date: '2024-03-01T15:12:01Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -9,7 +9,7 @@ zabbix_export:
       template: 'AWS ELB Application Load Balancer by HTTP'
       name: 'AWS ELB Application Load Balancer by HTTP'
       description: |
-        The template gets AWS ELB Application Load Balancer metrics and uses the script item to make HTTP requests to the CloudWatch API.
+        The template is designed to monitor AWS ELB Application Load Balancer by HTTP via Zabbix, and it works without any external scripts.
         Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -24,7 +24,7 @@ zabbix_export:
           key: aws.elb.alb.active_connection_count
           delay: '0'
           history: 7d
-          description: 'The total number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.'
+          description: 'The total number of active concurrent TCP connections from clients to the load balancer and from the load balancer to targets.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -43,7 +43,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Check result of the alarm data has been got correctly.'
+          description: 'Check that the alarm data has been received correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -74,7 +74,7 @@ zabbix_export:
           key: aws.elb.alb.auth_error
           delay: '0'
           history: 7d
-          description: 'The number of user authentications that could not be completed because an authenticate action was misconfigured, the load balancer couldn''t establish a connection with the IdP, or the load balancer couldn''t complete the authentication flow due to an internal error.'
+          description: 'The number of user authentications that could not be completed because an authenticate action was misconfigured, the load balancer could not establish a connection with the IdP, or the load balancer could not complete the authentication flow due to an internal error.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -175,7 +175,7 @@ zabbix_export:
           description: |
             The number of load balancer capacity units (LCU) used by your load balancer.
             You pay for the number of LCUs that you use per hour.
-            For more information, see Elastic Load Balancing pricing: https://aws.amazon.com/elasticloadbalancing/pricing/.
+            More information on Elastic Load Balancing pricing here: https://aws.amazon.com/elasticloadbalancing/pricing/
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -433,12 +433,12 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
-          description: 'DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html'
+          description: '`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
-          timeout: 15s
+          timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
@@ -689,8 +689,8 @@ zabbix_export:
             	return JSON.stringify({ 'error': error });
             }
           description: |
-            Get ELB Application Load balancer metrics.
-            Full metrics list related to Application Load balancer: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
+            Get ELB Application Load Balancer metrics.
+            Full metrics list related to Application Load Balancer: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -911,8 +911,8 @@ zabbix_export:
             	return JSON.stringify({ 'error': error });
             }
           description: |
-            Get ELB Target group.
-            DescribeTargetGroups: https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html
+            Get ELB target group.
+            `DescribeTargetGroups` API method: https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -963,10 +963,7 @@ zabbix_export:
           history: 7d
           description: |
             The number of HTTP 4XX client error codes that originate from the load balancer.
-            This count does not include response codes generated by targets.
-            
-            Client errors are generated when requests are malformed or incomplete.
-            These requests were not received by the target, other than in the case where the load balancer returns an HTTP 460 error code.
+            Client errors are generated when requests are malformed or incomplete. These requests were not received by the target, other than in the case where the load balancer returns an HTTP 460 error code.
             This count does not include any response codes generated by the targets.
           preprocessing:
             - type: JSONPATH
@@ -1147,7 +1144,7 @@ zabbix_export:
           key: aws.elb.alb.http_redirect_url_limit_exceeded_count
           delay: '0'
           history: 7d
-          description: 'The number of redirect actions that couldn''t be completed because the URL in the response location header is larger than 8K Bytes.'
+          description: 'The number of redirect actions that could not be completed because the URL in the response location header is larger than 8K bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1166,7 +1163,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Check result of the Application Load Balancer metric data has been got correctly.'
+          description: 'Check that the Application Load Balancer metrics data has been received correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1329,7 +1326,7 @@ zabbix_export:
           units: s
           description: |
             The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received.
-            This is equivalent to the target_processing_time field in the access logs.
+            This is equivalent to the `target_processing_time` field in the access logs.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1361,7 +1358,7 @@ zabbix_export:
               value: errors
       discovery_rules:
         - uuid: 065ef42ebea5448896db5fcc5baa2f81
-          name: 'Load Balancer alarms discovery'
+          name: 'Load Balancer alarm discovery'
           type: DEPENDENT
           key: aws.elb.alb.alarms.discovery
           delay: '0'
@@ -1382,7 +1379,7 @@ zabbix_export:
                 value: '{$AWS.ELB.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Discovery instance alarms.'
+          description: 'Discovery of alarm balancers.'
           item_prototypes:
             - uuid: fca522690827426bb63f93e90d98aa54
               name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: Get metrics'
@@ -1392,7 +1389,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get alarm metrics about the state and its reason.'
+              description: 'Get metrics about the alarm state and its reason.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1410,9 +1407,9 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
+                The value of the alarm state. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
-                {#ALARM_DESCRIPTION}
+                `{#ALARM_DESCRIPTION}`
               valuemap:
                 name: 'Alarm state'
               preprocessing:
@@ -1439,7 +1436,7 @@ zabbix_export:
                   event_name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
-                  description: 'The alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1452,9 +1449,9 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               description: |
-                An explanation for the alarm state, in text format.
+                An explanation for the alarm state reason in text format.
                 Alarm description:
-                {#ALARM_DESCRIPTION}
+                `{#ALARM_DESCRIPTION}`
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1476,8 +1473,8 @@ zabbix_export:
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: |
-                Alarm "{#ALARM_NAME}" has 'Alarm' state. 
-                Reason: {ITEM.LASTVALUE2}
+                The alarm `{#ALARM_NAME}` is in the ALARM state.
+                Reason: `{ITEM.LASTVALUE2}`
               tags:
                 - tag: scope
                   value: availability
@@ -1520,7 +1517,7 @@ zabbix_export:
                 value: '{$AWS.ELB.LLD.FILTER.TARGET.GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery {$AWS.ELB.TARGET.GROUP.NAME} target groups.'
+          description: 'Discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
           item_prototypes:
             - uuid: 21d1830526e14fb99b2288d79747d472
               name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Anomalous Host Count'
@@ -1770,13 +1767,13 @@ zabbix_export:
                 	return JSON.stringify({ 'error': error });
                 }
               description: |
-                Get metrics of ELB [{#AWS.ELB.TARGET.GROUP.NAME}] target group.
-                Full metrics list related to AWS ELB: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html#user-authentication-metric-table
+                Get the metrics of the ELB target group `{#AWS.ELB.TARGET.GROUP.NAME}`.
+                Full list of metrics related to AWS ELB here: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html#user-authentication-metric-table
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - ''
-              timeout: 15s
+              timeout: '{$AWS.DATA.TIMEOUT}'
               parameters:
                 - name: AccessKeyId
                   value: '{$AWS.ACCESS.KEY.ID}'
@@ -2248,12 +2245,12 @@ zabbix_export:
           description: 'Access key ID.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: role_base, access_key.'
+          description: 'Authorization method. Possible values: `role_base`, `access_key`.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for an API.'
+          description: 'API response timeout.'
         - macro: '{$AWS.ELB.ARN}'
-          description: 'The Amazon Resource Names (ARN) of the load balancer.'
+          description: 'Amazon Resource Names (ARN) of the load balancer.'
         - macro: '{$AWS.ELB.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by name.'
@@ -2274,15 +2271,15 @@ zabbix_export:
           description: 'Filter to exclude discovered target groups by name.'
         - macro: '{$AWS.HTTP.4XX.FAIL.MAX.WARN}'
           value: '5'
-          description: 'The maximum number of HTTP request failures for a trigger expression.'
+          description: 'Maximum number of HTTP request failures for a trigger expression.'
         - macro: '{$AWS.HTTP.5XX.FAIL.MAX.WARN}'
           value: '5'
-          description: 'The maximum number of HTTP request failures for a trigger expression.'
+          description: 'Maximum number of HTTP request failures for a trigger expression.'
         - macro: '{$AWS.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets the HTTP proxy value. If this macro is empty, no proxy is used.'
         - macro: '{$AWS.REGION}'
           value: us-west-1
-          description: 'AWS Application Load balancer Region code.'
+          description: 'AWS Application Load Balancer region code.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           description: 'Secret access key.'
       dashboards:

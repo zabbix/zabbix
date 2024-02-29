@@ -89,7 +89,7 @@ class testPageReportsAudit extends CWebTest {
 		$this->assertEquals($filter_actions, $this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText());
 
 		// Check that table stats are present.
-		$this->assertTableStats($table->getRows()->count());
+		$this->assertTableStats(0);
 
 		// Resource name with checkboxes that are enabled.
 		$resource_actions =[

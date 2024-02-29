@@ -2866,21 +2866,22 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 
 		for (i = 0; i < items->values_num; i++)
 		{
-			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i].first))
-				continue;
-
-			zbx_vc_item_t	item_local = {
-					.itemid = items->values[i].first,
-					.value_type = (unsigned char)items->values[i].second,
-					.status = ZBX_ITEM_STATUS_CACHED_ALL,
-					.last_accessed = (int)time(NULL)
-
-			};
-
-			if (NULL == zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local)))
+			if (NULL == zbx_hashset_search(&vc_cache->items, &items->values[i].first))
 			{
-				/* out of memory - cache will switch to low memory mode on next caching request */
-				break;
+				zbx_vc_item_t	item_local = {
+						.itemid = items->values[i].first,
+						.value_type = (unsigned char)items->values[i].second,
+						.status = ZBX_ITEM_STATUS_CACHED_ALL,
+						.last_accessed = (int)time(NULL)
+
+				};
+
+				if (NULL == zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local)))
+				{
+					/* out of memory - cache will switch to low memory mode */
+					/* on next caching request                              */
+					break;
+				}
 			}
 		}
 	}

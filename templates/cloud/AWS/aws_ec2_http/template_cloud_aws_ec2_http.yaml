@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-20T15:22:36Z'
+  date: '2024-02-27T08:35:39Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -455,12 +455,15 @@ zabbix_export:
             var AWS = {
             	params: {},
             
-            	getField: function (data, path) {
+            	getField: function (data, path, val) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+            				if (typeof val === 'undefined') {
+            					throw 'Required field was not found: ' + path;
+            				}
+            				return val
             			}
             
             			data = data[step];
@@ -616,6 +619,7 @@ zabbix_export:
             
             		return response;
             	},
+            
             	getVolumes: function () {
             		var payload = {
             			'Action': 'DescribeVolumes',
@@ -624,22 +628,23 @@ zabbix_export:
             			'Filter.1.Name': 'attachment.instance-id',
             			'Filter.1.Value': AWS.params.instance_id
             		},
-            			result = [];
+            			value = [],
+            			volumes = [],
+            			volumes_list = [];
             
-            		while (payload.nextToken !== '') {
-            			var volumes = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse');
-            			payload.nextToken = volumes.nextToken || '';
-            			volumes_item = AWS.getField(volumes, 'volumeSet.item');
+            		while (payload.NextToken !== '') {
+            			var result = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse');
+            			payload.NextToken = result.nextToken || '';
+            			volumes = AWS.getField(result, 'volumeSet.item', value);
+            			volumes_list.push(Array.isArray(volumes) ? volumes : [volumes])
             
-            			if (!Array.isArray(volumes_item))
-            				volumes_item = [volumes_item]
-            			volumes_item.forEach(function (volume) {
-            				result.push(volume.volumeId)
-            			});
             		}
-            
-            		return result;
+            		var flattenedData = volumes_list.reduce(function (acc, val) {
+            			return acc.concat(val);
+            		}, []);
+            		return flattenedData;
             	},
+            
             	getAlarms: function () {
             		var payload = {
             			'Action': 'DescribeAlarms',
@@ -649,9 +654,9 @@ zabbix_export:
             			result = [],
             			volumes = AWS.getVolumes()
             
-            		while (payload.nextToken !== '') {
+            		while (payload.NextToken !== '') {
             			var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
-            			payload.nextToken = alarms.nextToken || '';
+            			payload.NextToken = alarms.NextToken || '';
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
@@ -1039,14 +1044,16 @@ zabbix_export:
             	params: {},
             	request_period: 600,
             
-            	getField: function (data, path) {
+            	getField: function (data, path, val) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+            				if (typeof val === 'undefined') {
+            					throw 'Required field was not found: ' + path;
+            				}
+            				return val
             			}
-            
             			data = data[step];
             		}
             
@@ -1193,31 +1200,28 @@ zabbix_export:
             		return response;
             	},
             
-            
             	getVolumesData: function () {
-            		payload = {
+            		var payload = {
             			'Action': 'DescribeVolumes',
             			'Version': '2016-11-15',
             			'Filter.1.Name': 'attachment.instance-id',
-            			'Filter.1.Value': AWS.params.instance_id
-            		};
-            		volumes_list = [],
-            			result = [];
+            			'Filter.1.Value': AWS.params.instance_id,
+            			'MaxResults': 100
+            		},
+            			value = [],
+            			volumes_list = [];
             
-            		while (payload.nextToken !== '') {
-            			var result = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse');
-            			payload.nextToken = result.nextToken || '';
-            			volumes_list = AWS.getField(result, 'volumeSet.item');
-            
-            			if (typeof volumes_list === 'object'
-            				&& volumes_list !== null
-            				&& !Array.isArray(volumes_list)) {
-            				volumes_list = [volumes_list];
-            			}
-            
+            		while (payload.NextToken !== '') {
+            			var result = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse'),
+            				volumes_set = AWS.getField(result, 'volumeSet'),
+            				volumes = AWS.getField(volumes_set, 'item', value);
+            			volumes_list.push(Array.isArray(volumes) ? volumes : [volumes]);
+            			payload.NextToken = result.nextToken || '';
             		}
-            
-            		return volumes_list;
+            		var flattenedData = volumes_list.reduce(function (acc, val) {
+            			return acc.concat(val);
+            		}, []);
+            		return flattenedData;
             	}
             };
             
