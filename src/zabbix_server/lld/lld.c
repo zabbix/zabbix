@@ -275,7 +275,7 @@ static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const st
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		condition = (lld_condition_t *)filter->conditions.values[i];
+		condition = filter->conditions.values[i];
 
 		switch (filter->evaltype)
 		{
@@ -383,7 +383,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		const lld_condition_t	*condition = filter->conditions.values[i];
 
 		if (SUCCEED == filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg))
 		{

@@ -56,8 +56,8 @@ ZBX_PTR_VECTOR_IMPL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
 ZBX_PTR_VECTOR_IMPL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
 
-static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, zbx_uint64_t flags,
-		int step, int type, const char *params, int error_handler, const char *error_handler_params)
+static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_preprocid, zbx_uint64_t flags, int step,
+		int type, const char *params, int error_handler, const char *error_handler_params)
 
 {
 	zbx_lld_item_preproc_t	*preproc_op;

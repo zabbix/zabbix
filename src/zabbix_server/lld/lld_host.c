@@ -1494,7 +1494,8 @@ static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 
 			ZBX_STR2UINT64(hgsetid, row[0]);
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3377,8 +3378,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0,
-				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0, new_host_hgsets = 0,
-				upd_host_hgsets = 0;
+				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0,
+				new_host_hgsets = 0, upd_host_hgsets = 0;
 	zbx_uint64_t		hosttagid = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;

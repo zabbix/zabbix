@@ -674,9 +674,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
-		zbx_vector_lld_item_ptr_t *items,
-		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		unsigned char discover_proto, const zbx_lld_row_t *lld_row,
+		zbx_vector_lld_item_ptr_t *items, const char *name_proto, zbx_uint64_t ymin_itemid_proto,
+		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, const zbx_lld_row_t *lld_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	zbx_lld_graph_t			*graph = NULL;

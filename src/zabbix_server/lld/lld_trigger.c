@@ -125,9 +125,7 @@ struct zbx_lld_trigger_s
 	unsigned char		type_orig;
 };
 
-
 ZBX_PTR_VECTOR_FUNC_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
-
 ZBX_PTR_VECTOR_IMPL(lld_trigger_ptr, zbx_lld_trigger_t*)
 
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger);
@@ -576,7 +574,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 	{
 		for (i = 0; i < trigger_prototypes->values_num; i++)
 		{
-			trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[i];
+			trigger_prototype = trigger_prototypes->values[i];
 
 			zbx_vector_uint64_append(&triggerids, trigger_prototype->triggerid);
 		}
@@ -584,7 +582,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
-		trigger = (zbx_lld_trigger_t *)triggers->values[i];
+		trigger = triggers->values[i];
 
 		zbx_vector_uint64_append(&triggerids, trigger->triggerid);
 	}
@@ -3701,7 +3699,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 		goto out;
 
 	zbx_vector_lld_trigger_ptr_create(&triggers);	/* list of triggers which were created or will be created or */
-						/* updated by the trigger prototype */
+							/* updated by the trigger prototype */
 	zbx_vector_lld_item_ptr_create(&items);		/* list of items which are related to the trigger prototypes */
 
 	lld_triggers_get(&trigger_prototypes, &triggers);
