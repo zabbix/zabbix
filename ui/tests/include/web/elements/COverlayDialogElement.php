@@ -37,7 +37,9 @@ class COverlayDialogElement extends CElement {
 	 */
 	public static function find($index = null) {
 		$suffix = ($index !== null) ? '['.($index + 1).']' : '';
-		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'.$suffix))->asOverlayDialog();
+
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'.
+				$suffix))->asOverlayDialog();
 	}
 
 	/**
