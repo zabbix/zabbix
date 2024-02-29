@@ -32,7 +32,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand discovery macro in expression.                             *
+ * Purpose: expands discovery macro in expression                             *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression containing lld macro     *
  *             token           - [IN/OUT] token with lld macro location data  *
@@ -161,7 +161,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand discovery macro in user macro context.                     *
+ * Purpose: expands discovery macro in user macro context                     *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression containing lld macro     *
  *             token           - [IN/OUT] token with user macro location data *
@@ -214,14 +214,14 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute lld macros in calculated item query filter.            *
+ * Purpose: substitutes lld macros in calculated item query filter            *
  *                                                                            *
- * Parameters: filter          - [IN/OUT] the filter                          *
+ * Parameters: filter          - [IN/OUT]                                     *
  *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT]                                        *
  *                                                                            *
- *  Return value: SUCCEED - the macros were expanded successfully             *
+ *  Return value: SUCCEED - macros were expanded successfully                 *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
@@ -281,7 +281,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute lld macros in history function item query argument     *
+ * Purpose: substitutes lld macros in history function item query argument    *
  *          /host/key?[filter].                                               *
  *                                                                            *
  * Parameters: ctx             - [IN] calculated item formula                 *
@@ -291,7 +291,7 @@ out:
  *             itemquery       - [OUT] item query with expanded macros        *
  *             error           - [OUT] error message                          *
  *                                                                            *
- *  Return value: SUCCEED - the macros were expanded successfully.            *
+ *  Return value: SUCCEED - macros were expanded successfully.                *
  *                FAIL    - otherwise.                                        *
  *                                                                            *
  ******************************************************************************/
@@ -337,11 +337,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitutes lld macros in an expression.                          *
+ * Purpose: substitutes lld macros in expression                              *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression                          *
  *             rules           - [IN] parsing rules                           *
- *             jp_row          - [IN] the lld data row                        *
+ *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT]                                        *
  *                                                                            *
@@ -413,14 +413,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand discovery macro in expression macro.                       *
+ * Purpose: expands discovery macro in expression macro.                      *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression containing macro         *
  *             token           - [IN/OUT] macro token                         *
  *             jp_row          - [IN] discovery data                          *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT] error message                          *
- *             max_error_len   - [IN] size of error buffer                    *
+ *             error_len       - [IN] size of error buffer                    *
  *                                                                            *
  ******************************************************************************/
 static int	process_expression_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
@@ -451,11 +451,11 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token, const
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute lld macros in function macro parameters.               *
+ * Purpose: substitutes lld macros in function macro parameters               *
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to a buffer                 *
- *             token           - [IN/OUT] the token with function macro       *
- *                                        location data                       *
+ * Parameters: data            - [IN/OUT] pointer to buffer                   *
+ *             token           - [IN/OUT] token with function macro location  *
+ *                                        data                                *
  *             jp_row          - [IN] discovery data                          *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT] error buffer                           *
@@ -504,18 +504,18 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 
 /******************************************************************************
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to a buffer                 *
+ * Parameters: data            - [IN/OUT] pointer to buffer                   *
  *             jp_row          - [IN] discovery data                          *
  *             lld_macro_paths - [IN]                                         *
  *             flags           - [IN] ZBX_MACRO_ANY - all LLD macros will be  *
  *                                    resolved without validation of the      *
- *                                    value type                              *
+ *                                    value type.                             *
  *                                    ZBX_MACRO_NUMERIC - values for LLD      *
  *                                    macros should be numeric                *
  *                                    ZBX_MACRO_FUNC - function macros will   *
  *                                    be skipped (lld macros inside function  *
  *                                    macros will be ignored) for macros      *
- *                                    specified in func_macros array          *
+ *                                    specified in func_macros array.         *
  *             error           - [OUT] should be not NULL if                  *
  *                                     ZBX_MACRO_NUMERIC flag is set          *
  *             max_error_len   - [IN] size of error buffer                    *
@@ -598,23 +598,23 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 
 /********************************************************************************
  *                                                                              *
- * Purpose: substitute lld macros in function parameters.                       *
+ * Purpose: substitutes lld macros in function parameters.                      *
  *                                                                              *
  * Parameters: e               - [IN] function parameter list without           *
  *                                    enclosing parentheses:                    *
  *                                       <p1>, <p2>, ...<pN>                    *
  *             len             - [IN] length of function parameter list         *
- *             key_in_param    - [IN] 1 - the first parameter must be host:key  *
+ *             key_in_param    - [IN] 1 - first parameter must be host:key      *
  *                                    0 - otherwise                             *
  *             exp             - [IN/OUT] output buffer                         *
  *             exp_alloc       - [IN/OUT] size of output buffer                 *
- *             exp_offset      - [IN/OUT] the current position in output buffer *
+ *             exp_offset      - [IN/OUT] current position in output buffer     *
  *             jp_row          - [IN] discovery data                            *
  *             lld_macro_paths - [IN]                                           *
  *             error           - [OUT] error message                            *
  *             max_error_len   - [IN] size of error buffer                      *
  *                                                                              *
- * Return value: SUCCEED - the lld macros were resolved successfully            *
+ * Return value: SUCCEED - lld macros were resolved successfully                *
  *               FAIL - otherwise                                               *
  *                                                                              *
  ********************************************************************************/

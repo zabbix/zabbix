@@ -3025,16 +3025,15 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const s
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
- *          a node or in CDATA section, validate XML.                         *
+ * Purpose: Substitutes simple or LLD macros in XML text nodes, attributes of *
+ *          a node or in CDATA section, validates XML.                        *
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to a buffer that contains   *
- *                                    XML                                     *
+ * Parameters: data            - [IN/OUT] pointer to buffer that contains xml *
  *             item            - [IN] item for simple macro substitution      *
- *             jp_row          - [IN] discovery data for LLD macro            *
+ *             jp_row          - [IN] discovery data for lld macro            *
  *                                    substitution                            *
  *             lld_macro_paths - [IN] lld macro paths                         *
- *             error           - [OUT] reason for XML parsing failure         *
+ *             error           - [OUT] reason for xml parsing failure         *
  *             maxerrlen       - [IN] size of error buffer                    *
  *                                                                            *
  * Return value: SUCCEED or FAIL if XML validation has failed.                *

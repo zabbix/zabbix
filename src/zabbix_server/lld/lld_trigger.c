@@ -466,7 +466,6 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
 
 		ZBX_STR2UINT64(parent_triggerid, row[0]);
 
-
 		zbx_lld_trigger_prototype_t	cmp = {.triggerid = parent_triggerid};
 
 		if (FAIL == (index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes, &cmp,
@@ -741,17 +740,17 @@ static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger
 		dependency->trigger_up = NULL;
 		dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_UNSET;
 
-		zbx_lld_trigger_prototype_t	cmp = {.triggerid = triggerid_down};
-		zbx_lld_trigger_t		cmp2 = {.triggerid = triggerid_down};
+		zbx_lld_trigger_prototype_t	lld_trigger_prototype_cmp = {.triggerid = triggerid_down};
+		zbx_lld_trigger_t		lld_trigger_cmp = {.triggerid = triggerid_down};
 
-		if (FAIL != (index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes, &cmp,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL != (index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes,
+				&lld_trigger_prototype_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			trigger_prototype = trigger_prototypes->values[index];
 
 			zbx_vector_lld_dependency_ptr_append(&trigger_prototype->dependencies, dependency);
 		}
-		else if (FAIL != (index = zbx_vector_lld_trigger_ptr_bsearch(triggers, &cmp2,
+		else if (FAIL != (index = zbx_vector_lld_trigger_ptr_bsearch(triggers, &lld_trigger_cmp,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			trigger = triggers->values[index];
@@ -1223,8 +1222,7 @@ static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_p
 
 static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vector_lld_function_ptr_t *functions,
 		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macros,
-		char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	int			i, ret, function_found = 0;
 	zbx_lld_function_t	*function = NULL;
