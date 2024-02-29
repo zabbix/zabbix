@@ -35,8 +35,6 @@
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
-extern char	*CONFIG_SSH_KEY_LOCATION;
-
 static ZBX_THREAD_LOCAL const char	*password;
 
 #ifndef HAVE_NO_LIBSSH2_METHODS
@@ -94,11 +92,11 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 {
 	int	ret = SUCCEED;
 	char	opt_copy[1024] = {0};
-	char	*line, *saveptr;
+	char	*saveptr;
 
 	zbx_strscpy(opt_copy, options);
 
-	for (line = strtok_r(opt_copy, ";", &saveptr); NULL != line; line = strtok_r(NULL, ";", &saveptr))
+	for (char *line = strtok_r(opt_copy, ";", &saveptr); NULL != line; line = strtok_r(NULL, ";", &saveptr))
 	{
 		char	*eq_str = strchr(line, '=');
 
@@ -249,7 +247,7 @@ static int	ssh_nonblocking_error(zbx_socket_t *s, LIBSSH2_SESSION *session, int 
 
 /* example ssh.run["ls /"] */
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssh_key_location)
 {
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
@@ -368,7 +366,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		case ITEM_AUTHTYPE_PUBLICKEY:
 			if (auth_pw & 4)
 			{
-				if (NULL == CONFIG_SSH_KEY_LOCATION)
+				if (NULL == config_ssh_key_location)
 				{
 					SET_MSG_RESULT(result, zbx_strdup(NULL, "Authentication by public key failed."
 							" SSHKeyLocation option is not set"));
@@ -376,8 +374,8 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 				}
 
 				/* or by public key */
-				publickey = zbx_dsprintf(publickey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->publickey);
-				privatekey = zbx_dsprintf(privatekey, "%s/%s", CONFIG_SSH_KEY_LOCATION,
+				publickey = zbx_dsprintf(publickey, "%s/%s", config_ssh_key_location, item->publickey);
+				privatekey = zbx_dsprintf(privatekey, "%s/%s", config_ssh_key_location,
 						item->privatekey);
 
 				if (SUCCEED != zbx_is_regular_file(publickey))

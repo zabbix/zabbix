@@ -684,9 +684,12 @@ window.widget_pie_chart_form = new class {
 
 		// Legend tab changes.
 		const is_legend_visible = document.getElementById('legend').checked;
+		const legend_value = document.getElementById('legend_value');
 
 		jQuery('#legend_lines').rangeControl(is_legend_visible ? 'enable' : 'disable');
-		jQuery('#legend_columns').rangeControl(is_legend_visible ? 'enable' : 'disable');
+		jQuery('#legend_columns').rangeControl(is_legend_visible && !legend_value.checked ? 'enable' : 'disable');
+
+		legend_value.disabled = !is_legend_visible;
 		document.getElementById('legend_aggregation').disabled = !is_legend_visible;
 
 		// Trigger event to update tab indicators.

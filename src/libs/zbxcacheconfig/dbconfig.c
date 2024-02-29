@@ -101,6 +101,12 @@ ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
 ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
+ZBX_PTR_VECTOR_IMPL(proxy_counter_ptr, zbx_proxy_counter_t *)
+
+void     zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
+{
+	zbx_free(proxy_counter);
+}
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
@@ -12700,16 +12706,14 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 
 /********************************************************************************
  *                                                                              *
- * Purpose: frees the item queue data vector created by zbx_dc_get_item_queue() *
+ * Purpose: frees item queue data vector created by zbx_dc_get_item_queue()     *
  *                                                                              *
- * Parameters: queue - [IN] the item queue data vector to free                  *
+ * Parameters: queue - [IN] item queue data vector to free                      *
  *                                                                              *
  *******************************************************************************/
-void	zbx_dc_free_item_queue(zbx_vector_ptr_t *queue)
+void	zbx_dc_free_item_queue(zbx_vector_queue_item_ptr_t *queue)
 {
-	int	i;
-
-	for (i = 0; i < queue->values_num; i++)
+	for (int i = 0; i < queue->values_num; i++)
 		zbx_free(queue->values[i]);
 }
 
@@ -12717,15 +12721,15 @@ void	zbx_dc_free_item_queue(zbx_vector_ptr_t *queue)
  *                                                                            *
  * Purpose: retrieves vector of delayed items                                 *
  *                                                                            *
- * Parameters: queue - [OUT] the vector of delayed items (optional)           *
- *             from  - [IN] the minimum delay time in seconds (non-negative)  *
- *             to    - [IN] the maximum delay time in seconds or              *
+ * Parameters: queue - [OUT] vector of delayed items (optional)               *
+ *             from  - [IN] minimum delay time in seconds (non-negative)      *
+ *             to    - [IN] maximum delay time in seconds or                  *
  *                          ZBX_QUEUE_TO_INFINITY if there is no limit        *
  *                                                                            *
- * Return value: the number of delayed items                                  *
+ * Return value: number of delayed items                                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to)
+int	zbx_dc_get_item_queue(zbx_vector_queue_item_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
@@ -12741,13 +12745,12 @@ int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (dc_host = (const ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		int			i;
 		const ZBX_DC_INTERFACE	*dc_interface = NULL;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		for (i = 0; i < dc_host->items.values_num; i++)
+		for (int i = 0; i < dc_host->items.values_num; i++)
 		{
 			char			*delay_s;
 			int			ret;
@@ -12815,7 +12818,7 @@ int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				queue_item->nextcheck = dc_item->nextcheck;
 				queue_item->proxyid = dc_host->proxyid;
 
-				zbx_vector_ptr_append(queue, queue_item);
+				zbx_vector_queue_item_ptr_append(queue, queue_item);
 			}
 			nitems++;
 		}
@@ -13305,31 +13308,34 @@ void	zbx_dc_get_count_stats_all(zbx_config_cache_info_t *stats)
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
-static void	proxy_counter_ui64_push(zbx_vector_ptr_t *vector, zbx_uint64_t proxyid, zbx_uint64_t counter)
+static void	proxy_counter_ui64_push(zbx_vector_proxy_counter_ptr_t *v, zbx_uint64_t proxyid, zbx_uint64_t counter)
 {
 	zbx_proxy_counter_t	*proxy_counter;
 
 	proxy_counter = (zbx_proxy_counter_t *)zbx_malloc(NULL, sizeof(zbx_proxy_counter_t));
 	proxy_counter->proxyid = proxyid;
 	proxy_counter->counter_value.ui64 = counter;
-	zbx_vector_ptr_append(vector, proxy_counter);
+	zbx_vector_proxy_counter_ptr_append(v, proxy_counter);
 }
 
-static void	proxy_counter_dbl_push(zbx_vector_ptr_t *vector, zbx_uint64_t proxyid, double counter)
+static void	proxy_counter_dbl_push(zbx_vector_proxy_counter_ptr_t *v, zbx_uint64_t proxyid, double counter)
 {
 	zbx_proxy_counter_t	*proxy_counter;
 
 	proxy_counter = (zbx_proxy_counter_t *)zbx_malloc(NULL, sizeof(zbx_proxy_counter_t));
 	proxy_counter->proxyid = proxyid;
 	proxy_counter->counter_value.dbl = counter;
-	zbx_vector_ptr_append(vector, proxy_counter);
+	zbx_vector_proxy_counter_ptr_append(v, proxy_counter);
 }
 
-void	zbx_dc_get_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not_monitored,
-		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,
-		zbx_vector_ptr_t *items_disabled, zbx_uint64_t *triggers_enabled_ok,
+
+void	zbx_dc_get_status(zbx_vector_proxy_counter_ptr_t *hosts_monitored,
+		zbx_vector_proxy_counter_ptr_t *hosts_not_monitored,
+		zbx_vector_proxy_counter_ptr_t *items_active_normal,
+		zbx_vector_proxy_counter_ptr_t *items_active_notsupported,
+		zbx_vector_proxy_counter_ptr_t *items_disabled, uint64_t *triggers_enabled_ok,
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
-		zbx_vector_ptr_t *required_performance)
+		zbx_vector_proxy_counter_ptr_t *required_performance)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_PROXY	*dc_proxy;
@@ -13379,7 +13385,7 @@ void	zbx_dc_get_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *host
  ******************************************************************************/
 void	zbx_dc_get_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num)
 {
-	int			i, iname;
+	int			iname;
 	const ZBX_DC_EXPRESSION	*expression;
 	const ZBX_DC_REGEXP	*regexp;
 	ZBX_DC_REGEXP		search_regexp;
@@ -13392,7 +13398,7 @@ void	zbx_dc_get_expressions_by_names(zbx_vector_expression_t *expressions, const
 
 		if (NULL != (regexp = (const ZBX_DC_REGEXP *)zbx_hashset_search(&config->regexps, &search_regexp)))
 		{
-			for (i = 0; i < regexp->expressionids.values_num; i++)
+			for (int i = 0; i < regexp->expressionids.values_num; i++)
 			{
 				zbx_uint64_t		expressionid = regexp->expressionids.values[i];
 				zbx_expression_t	*rxp;

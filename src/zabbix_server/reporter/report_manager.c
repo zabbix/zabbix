@@ -26,6 +26,8 @@
 #include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
+#include "zbxcrypto.h"
+#include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
