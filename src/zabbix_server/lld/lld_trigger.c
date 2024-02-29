@@ -549,7 +549,7 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
  *          the trigger prototype                                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
+static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_lld_trigger_ptr_t *triggers)
 {
 	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
@@ -1743,7 +1743,10 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 	{
 		triggerid_up = (trigger_prototype->dependencies.values[i])->triggerid_up;
 
-		index = zbx_vector_ptr_bsearch(trigger_prototypes, &triggerid_up, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_lld_trigger_prototype_t	cmp = {.triggerid = triggerid_up};
+
+		index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes, &cmp,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		if (FAIL != index)
 		{
@@ -1841,7 +1844,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_prototypes,
+static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
 		zbx_vector_lld_trigger_ptr_t *triggers, const zbx_vector_lld_row_ptr_t *lld_rows, char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
@@ -2264,7 +2267,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 
 			zbx_vector_lld_function_ptr_create(&db_trigger->functions);
 			zbx_vector_lld_dependency_ptr_create(&db_trigger->dependencies);
-			zbx_vector_lld_trigge_ptr_create(&db_trigger->dependents);
+			zbx_vector_lld_trigger_ptr_create(&db_trigger->dependents);
 			zbx_vector_db_tag_ptr_create(&db_trigger->tags);
 			zbx_vector_db_tag_ptr_create(&db_trigger->override_tags);
 
@@ -3137,7 +3140,7 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
 	node_local.iter_num = 0;
 	node_local.parents = 0;
 
-	zbx_vector_ptr_create(&node_local.dependencies);
+	zbx_vector_lld_dependency_ptr_create(&node_local.dependencies);
 
 	return (zbx_lld_trigger_node_t *)zbx_hashset_insert(cache, &node_local, sizeof(node_local));
 }
