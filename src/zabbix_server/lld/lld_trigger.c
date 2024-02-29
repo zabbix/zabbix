@@ -549,7 +549,8 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
  *          the trigger prototype                                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_lld_trigger_ptr_t *triggers)
+static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
+		zbx_vector_lld_trigger_ptr_t *triggers)
 {
 	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
@@ -617,16 +618,18 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_l
 			function->parameter_orig = NULL;
 			function->flags = ZBX_FLAG_LLD_FUNCTION_UNSET;
 
-			zbx_lld_trigger_t	cmp = {.triggerid = triggerid};
+			zbx_lld_trigger_prototype_t	lld_trigger_prototype_cmp = {.triggerid = triggerid};
+			zbx_lld_trigger_t		lld_trigger_cmp = {.triggerid = triggerid};
 
-			if (NULL != trigger_prototypes && FAIL != (index = zbx_vector_ptr_bsearch(trigger_prototypes,
-					&cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (NULL != trigger_prototypes && FAIL != (index =
+					zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes,
+					&lld_trigger_prototype_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				trigger_prototype = trigger_prototypes->values[index];
 
 				zbx_vector_lld_function_ptr_append(&trigger_prototype->functions, function);
 			}
-			else if (FAIL != (index = zbx_vector_ptr_bsearch(triggers, &triggerid,
+			else if (FAIL != (index = zbx_vector_lld_trigger_ptr_bsearch(triggers, &lld_trigger_cmp,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				trigger = triggers->values[index];
@@ -777,7 +780,8 @@ static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger
  * Purpose: retrieve trigger tags                                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
+static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
+		zbx_vector_lld_trigger_ptr_t *triggers)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -792,14 +796,14 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 
 	for (i = 0; i < trigger_prototypes->values_num; i++)
 	{
-		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[i];
+		trigger_prototype = trigger_prototypes->values[i];
 
 		zbx_vector_uint64_append(&triggerids, trigger_prototype->triggerid);
 	}
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
-		trigger = (zbx_lld_trigger_t *)triggers->values[i];
+		trigger = triggers->values[i];
 
 		zbx_vector_uint64_append(&triggerids, trigger->triggerid);
 	}
@@ -830,16 +834,17 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 		tag = zbx_db_tag_create(row[2], row[3]);
 		ZBX_STR2UINT64(triggerid, row[1]);
 
-		zbx_lld_trigger_prototype_t	cmp = {.triggerid = triggerid};
+		zbx_lld_trigger_prototype_t	lld_trigger_prototype_cmp = {.triggerid = triggerid};
+		zbx_lld_trigger_t		lld_trigger_cmp = {.triggerid = triggerid};
 
-		if (FAIL != (index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes, &cmp,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL != (index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes,
+				&lld_trigger_prototype_cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			trigger_prototype = trigger_prototypes->values[index];
 
 			zbx_vector_db_tag_ptr_append(&trigger_prototype->tags, tag);
 		}
-		else if (FAIL != (index = zbx_vector_ptr_bsearch(triggers, &triggerid,
+		else if (FAIL != (index = zbx_vector_lld_trigger_ptr_bsearch(triggers, &lld_trigger_cmp,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			trigger = triggers->values[index];
