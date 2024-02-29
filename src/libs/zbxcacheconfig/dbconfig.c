@@ -569,7 +569,7 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	unsigned char	poller_type;
 	unsigned char	snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO; /* oid type is only used by ITEM_TYPE_SNMP*/
 
-	if (0 != dc_host->proxyid && SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
+	if ((0 != dc_host->proxyid || 0 != dc_host->proxy_groupid) && SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 	{
 		dc_item->poller_type = ZBX_NO_POLLER;
 		return;
@@ -9227,6 +9227,7 @@ static void	DCget_host(zbx_dc_host_t *dst_host, const ZBX_DC_HOST *src_host)
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxyid = src_host->proxyid;
+	dst_host->proxy_groupid = src_host->proxy_groupid;
 	dst_host->status = src_host->status;
 
 	zbx_strscpy(dst_host->host, src_host->host);
@@ -10439,7 +10440,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 				continue;
 			}
 
-			if (0 == dc_host->proxyid ||
+			if (0 == dc_host->proxyid || 0 == dc_host->proxy_groupid ||
 					SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 			{
 				dc_preproc_add_item_rec(dc_item, &items_sync);
@@ -11585,7 +11586,8 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
-		if (HOST_STATUS_MONITORED != dc_host->status || (0 != dc_host->proxyid &&
+		if (HOST_STATUS_MONITORED != dc_host->status ||
+				((0 != dc_host->proxyid || 0 != dc_host->proxy_groupid) &&
 				SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key)))
 		{
 			continue;
@@ -14936,7 +14938,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 
 			proxyid = 0;
 		}
-		else if (0 == (proxyid = dc_host->proxyid) ||
+		else if (0 == (proxyid = dc_host->proxyid) || 0 == dc_host->proxy_groupid ||
 				SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 		{
 			dc_requeue_item_at(dc_item, dc_host, nextcheck);
@@ -16123,8 +16125,11 @@ static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 	if (ZBX_LOC_NOWHERE != item->location)
 		return;
 
-	if (0 != host->proxyid && SUCCEED != zbx_is_item_processed_by_server(item->type, item->key))
+	if ((0 != host->proxyid || 0 != host->proxy_groupid) &&
+			SUCCEED != zbx_is_item_processed_by_server(item->type, item->key))
+	{
 		return;
+	}
 
 	if (NULL == zbx_hashset_search(activated_hosts, &host->hostid))
 		return;

@@ -652,6 +652,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 
 						failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 					}
+					zbx_free(tmp);
 
 					group->balance_time = now + failover_delay * PG_UNBALANCE_PERIOD_COEFF;
 				}

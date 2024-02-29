@@ -1353,7 +1353,7 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 	zbx_host_rights_t	*rights;
 	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-	if (0 != item->host.proxyid)
+	if (0 != item->host.proxyid || 0 != item->host.proxy_groupid)
 		return FAIL;
 
 	switch(item->type)
