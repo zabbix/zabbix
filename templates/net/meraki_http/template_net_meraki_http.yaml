@@ -241,6 +241,7 @@ zabbix_export:
           key: meraki.organization.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$MERAKI.ORGANIZATION.NAME.MATCHES}'

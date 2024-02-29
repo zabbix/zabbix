@@ -339,12 +339,12 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
  * Purpose: checks if process command line matches filter                     *
  *                                                                            *
  ******************************************************************************/
-static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdline)
+static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const zbx_regexp_t *cmdline)
 {
 	if (NULL == cmdline)
 		return SUCCEED;
 
-	if (NULL != proc->cmdline && NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
+	if (NULL != proc->cmdline && 0 == zbx_regexp_match_precompiled(proc->cmdline, cmdline))
 		return SUCCEED;
 
 	return FAIL;
@@ -374,7 +374,7 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo, const char *procname,
-		const char *cmdline)
+		const zbx_regexp_t *cmdline)
 {
 	if (SUCCEED != proc_match_user(proc, usrinfo))
 		return FAIL;
@@ -390,20 +390,22 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 
 int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *memtype = NULL;
+	char			*procname, *proccomm, *param, *memtype = NULL, *rxp_error = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0;
+	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0, ret = SYSINFO_RET_OK;
 	zbx_uint64_t		mem_size = 0, byte_value = 0;
 	double			pct_size = 0.0, pct_value = 0.0;
 	size_t			*p_value;
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
@@ -424,7 +426,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto clean;
 			}
 
 			invalid_user = 1;
@@ -446,11 +449,24 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+	{
 		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
+	}
 	else
 		proccomm = NULL;
 
@@ -471,7 +487,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
@@ -480,7 +497,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -490,7 +508,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm_rxp))
 		{
 			if (NULL != p_value)
 			{
@@ -549,26 +567,31 @@ out:
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
+clean:
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *zone_parameter;
+	char			*procname, *proccomm, *param, *zone_parameter, *rxp_error = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
+	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat, ret = SYSINFO_RET_OK;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
 	int			zoneflag;
 #endif
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
@@ -589,7 +612,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto clean;
 			}
 
 			invalid_user = 1;
@@ -611,11 +635,24 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+	{
 		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
+	}
 	else
 		proccomm = NULL;
 
@@ -635,7 +672,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 					" with agent running on a Solaris version with zone support, but compiled on"
 					" a Solaris version without zone support. Consider using \"all\" or install"
 					" agent with Solaris zone support."));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
 		}
 #endif
 	}
@@ -648,7 +686,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 #ifdef HAVE_ZONE_H
 	zoneid = getzoneid();
@@ -660,7 +699,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -671,7 +711,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm_rxp))
 		{
 #ifdef HAVE_ZONE_H
 			if (SUCCEED != proc_match_zone(&proc, zoneflag, zoneid))
@@ -697,8 +737,11 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
+clean:
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 /******************************************************************************

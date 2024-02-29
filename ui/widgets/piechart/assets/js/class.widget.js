@@ -25,6 +25,12 @@ class CWidgetPieChart extends CWidget {
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
 	static LEGEND_LINE_HEIGHT = 18;
+	static ZBX_STYLE_PIE_CHART_LEGEND = 'svg-pie-chart-legend';
+	static ZBX_STYLE_PIE_CHART_LEGEND_HEADER = 'svg-pie-chart-legend-header';
+	static ZBX_STYLE_PIE_CHART_LEGEND_ITEM = 'svg-pie-chart-legend-item';
+	static ZBX_STYLE_PIE_CHART_LEGEND_SHOW_VALUE = 'svg-pie-chart-legend-show-value';
+	static ZBX_STYLE_PIE_CHART_LEGEND_VALUE = 'svg-pie-chart-legend-value';
+	static ZBX_STYLE_PIE_CHART_LEGEND_NO_DATA = 'svg-pie-chart-legend-no-data';
 
 	static LEGEND_LINES_MODE_VARIABLE = 1;
 
@@ -63,12 +69,7 @@ class CWidgetPieChart extends CWidget {
 			this.#pie_chart = null;
 		}
 
-		let legend = this._body.querySelector('.svg-pie-chart-legend');
-
-		if (legend !== null) {
-			// Hide legend while widget is loading
-			legend.style.display = 'none';
-		}
+		this.#removeLegend();
 
 		super.updateProperties({name, view_mode, fields});
 	}
@@ -92,7 +93,7 @@ class CWidgetPieChart extends CWidget {
 			legend.data.push(total_item);
 		}
 
-		this.#setLegend(legend, total_item);
+		this.#showLegend(legend, total_item);
 
 		if (this.#pie_chart === null) {
 			const padding = {
@@ -113,63 +114,85 @@ class CWidgetPieChart extends CWidget {
 		});
 	}
 
-	#setLegend(legend, total_item) {
-		let container = this._body.querySelector('.svg-pie-chart-legend');
+	#showLegend(legend, total_item) {
+		this.#removeLegend();
 
-		if (container !== null) {
-			if (legend.show) {
-				container.innerHTML = '';
-			}
-			else {
-				container.remove();
-				return;
+		if (!legend.show || legend.data.length === 0) {
+			return;
+		}
+
+		if (total_item !== null) {
+			legend.data.pop();
+			legend.data.unshift(total_item);
+		}
+
+		const container = document.createElement('div');
+		container.classList.add(CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND);
+
+		const legend_columns = legend.value_show ? 1 : legend.columns;
+		const legend_lines = legend.lines_mode === CWidgetPieChart.LEGEND_LINES_MODE_VARIABLE
+			? Math.min(Math.ceil(legend.data.length / legend_columns), legend.lines)
+			: legend.lines;
+
+		if (legend.value_show) {
+			container.classList.add(CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND_SHOW_VALUE);
+			container.style.setProperty('--lines', legend_lines + 1);
+
+			const header = document.createElement('div');
+			header.textContent = t('Value');
+			header.classList.add(CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND_HEADER);
+
+			container.appendChild(header);
+		}
+		else {
+			container.style.setProperty('--lines', legend_lines);
+			container.style.setProperty('--columns', legend.columns);
+		}
+
+		for (const item of legend.data.slice(0, legend.lines * (legend.value_show ? 1 : legend.columns))) {
+			const item_name_column = document.createElement('div');
+			item_name_column.classList.add(CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND_ITEM);
+			item_name_column.style.setProperty('--color', item.color);
+
+			const name = document.createElement('span');
+			name.textContent = item.name;
+			item_name_column.append(name);
+
+			container.append(item_name_column);
+
+			if (legend.value_show) {
+				const value_column = document.createElement('div');
+
+				if (item.value !== null && item.value !== '') {
+					value_column.textContent = item.value;
+					value_column.className = CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND_VALUE;
+				}
+				else {
+					value_column.textContent = `[${t('no data')}]`;
+					value_column.className = CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND_NO_DATA;
+				}
+
+				container.append(value_column);
 			}
 		}
 
-		if (legend.show && legend.data.length > 0) {
-			if (container === null) {
-				container = document.createElement('div');
-				container.classList.add('svg-pie-chart-legend');
+		this._body.append(container);
+	}
 
-				this._body.append(container);
-			}
+	#removeLegend() {
+		const container = this._body.querySelector(`.${CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND}`);
 
-			container.style.setProperty('--lines', legend.lines_mode === CWidgetPieChart.LEGEND_LINES_MODE_VARIABLE
-				? Math.min(Math.ceil(legend.data.length / legend.columns), legend.lines)
-				: legend.lines
-			);
-
-			container.style.setProperty('--columns', legend.columns);
-
-			if (total_item !== null) {
-				legend.data.pop();
-				legend.data.unshift(total_item);
-			}
-
-			for (let i = 0; i < legend.data.length; i++) {
-				const item = document.createElement('div');
-				item.classList.add('svg-pie-chart-legend-item');
-				item.style.setProperty('--color', legend.data[i].color);
-
-				const name = document.createElement('span');
-				name.append(legend.data[i].name);
-
-				item.append(name);
-
-				container.append(item);
-			}
-
-			container.style.display = '';
+		if (container !== null) {
+			container.remove();
 		}
 	}
 
 	#getSize() {
 		const size = super._getContentsSize();
+		const container = this._body.querySelector(`.${CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND}`);
 
-		const legend = this._body.querySelector('.svg-pie-chart-legend');
-
-		if (legend !== null) {
-			const legend_lines = getComputedStyle(legend).getPropertyValue('--lines');
+		if (container !== null) {
+			const legend_lines = getComputedStyle(container).getPropertyValue('--lines');
 
 			let pie_chart_height = size.height
 				- (legend_lines * CWidgetPieChart.LEGEND_LINE_HEIGHT
@@ -215,7 +238,11 @@ class CWidgetPieChart extends CWidget {
 			label: t('Download image'),
 			disabled: this.#pie_chart === null,
 			clickCallback: () => {
-				downloadSvgImage(this.#pie_chart.getSVGElement(), 'image.png', '.svg-pie-chart-legend');
+				downloadSvgImage(
+					this.#pie_chart.getSVGElement(),
+					'image.png',
+					`.${CWidgetPieChart.ZBX_STYLE_PIE_CHART_LEGEND}`
+				);
 			}
 		});
 

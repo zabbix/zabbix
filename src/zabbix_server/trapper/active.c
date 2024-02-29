@@ -37,14 +37,15 @@
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: perform active agent auto registration                                *
+ * Purpose: performs active agent auto registration                               *
  *                                                                                *
- * Parameters: host            - [IN] name of the host to be added or updated     *
- *             ip              - [IN] IP address of the host                      *
- *             port            - [IN] port of the host                            *
+ * Parameters: host            - [IN] name of host to be added or updated         *
+ *             ip              - [IN] IP address of host                          *
+ *             port            - [IN] port of host                                *
  *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
  *                                    ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
- *             host_metadata   - [IN] host metadata                               *
+ *                                    flag                                        *
+ *             host_metadata   - [IN]                                             *
  *             flag            - [IN] flag describing interface type              *
  *             interface       - [IN] interface value if flag is not default      *
  *             events_cbs      - [IN]                                             *
@@ -57,10 +58,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout)
 {
-	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
-	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
-	const char	*p;
-	const char	*p_ip, *p_dns;
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX], ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
+	const char	*p, *p_ip, *p_dns;
 	int		now;
 
 	p_ip = ip;
@@ -142,23 +141,23 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: check for host name and return hostid                                *
+ * Purpose: checks for host name and returns hostid                              *
  *                                                                               *
  * Parameters: sock           - [IN] open socket of server-agent connection      *
  *             host           - [IN] host name                                   *
- *             ip             - [IN] IP address of the host                      *
- *             port           - [IN] port of the host                            *
- *             host_metadata  - [IN] host metadata                               *
+ *             ip             - [IN] IP address of host                          *
+ *             port           - [IN] port of host                                *
+ *             host_metadata  - [IN]                                             *
  *             flag           - [IN] flag describing interface type              *
  *             interface      - [IN] interface value if flag is not default      *
  *             events_cbs     - [IN]                                             *
  *             config_timeout - [IN]                                             *
- *             hostid         - [OUT] host ID                                    *
+ *             hostid         - [OUT]                                            *
  *             revision       - [OUT] host configuration revision                *
  *             error          - [OUT] error message (buffer provided by caller)  *
  *                                                                               *
  * Return value:  SUCCEED - host is found                                        *
- *                FAIL - an error occurred or host not found                     *
+ *                FAIL - error occurred or host not found                        *
  *                                                                               *
  * Comments: NB! adds host to the database if it does not exist or if it         *
  *           exists but metadata, interface, interface type or port has          *
@@ -201,8 +200,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		{
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
-				if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
-						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
+				if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
+						interface, (int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
 							interface, events_cbs, config_timeout);
@@ -221,8 +220,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
 			0 != zbx_dc_get_auto_registration_action_count())
 	{
-		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
-				heartbeat))
+		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
+				(int)time(NULL), heartbeat))
 		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
 					events_cbs, config_timeout);
@@ -232,21 +231,21 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-#undef PROXY_AUTO_REGISTRATION_HEARTBEAT
+#undef AUTO_REGISTRATION_HEARTBEAT
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send list of active checks to the host (older version agent)      *
+ * Purpose: sends list of active checks to host (older version agent)         *
  *                                                                            *
- * Parameters: sock           - open socket of server-agent connection        *
- *             request        - request buffer                                *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             request        - [IN] request buffer                           *
  *             events_cbs     - [IN]                                          *
  *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  * Comments: format of the request: ZBX_GET_ACTIVE_CHECKS\n<host name>\n      *
  *           format of the list: key:delay:last_log_size                      *
@@ -255,10 +254,10 @@ out:
 int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_events_funcs_t *events_cbs,
 		int config_timeout)
 {
-	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
-	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
-	int			ret = FAIL, i, num = 0;
-	zbx_uint64_t		hostid, revision;
+	char		*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
+	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
+	int		ret = FAIL, i, num = 0;
+	zbx_uint64_t	hostid, revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -354,10 +353,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: append non duplicate string to the string vector                  *
+ * Purpose: appends non duplicate string to string vector                     *
  *                                                                            *
- * Parameters: vector - [IN/OUT] the string vector                            *
- *             str    - [IN] the string to append                             *
+ * Parameters: vector - [IN/OUT] string vector                                *
+ *             str    - [IN] string to append                                 *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str)
@@ -368,28 +367,33 @@ static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extract global regular expression names from item key             *
+ * Purpose: extracts global regular expression names from item key            *
  *                                                                            *
- * Parameters: key     - [IN] the item key to parse                           *
- *             regexps - [OUT] the extracted regular expression names         *
+ * Parameters: key     - [IN] item key to parse                               *
+ *             regexps - [OUT] extracted regular expression names             *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t *regexps)
 {
 #define ZBX_KEY_LOG		1
 #define ZBX_KEY_EVENTLOG	2
-
 	AGENT_REQUEST	request;
 	int		item_key;
 	const char	*param;
 
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
+	{
 		item_key = ZBX_KEY_LOG;
+	}
 	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
+	{
 		item_key = ZBX_KEY_EVENTLOG;
+	}
 	else
+	{
 		return;
+	}
 
 	zbx_init_agent_request(&request);
 
@@ -416,14 +420,16 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	}
 out:
 	zbx_free_agent_request(&request);
+#undef ZBX_KEY_LOG
+#undef ZBX_KEY_EVENTLOG
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send list of active checks to the host                            *
+ * Purpose: sends list of active checks to host                               *
  *                                                                            *
- * Parameters: sock           - open socket of server-agent connection        *
- *             jp             - request buffer                                *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             jp             - [IN] request buffer                           *
  *             events_cbs     - [IN]                                          *
  *             config_timeout - [IN]                                          *
  *                                                                            *
@@ -437,11 +443,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL, i, version, num = 0;
+	int			ret = FAIL, version, num = 0;
 	zbx_uint64_t		hostid, revision, agent_config_revision;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
-	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
-	size_t			buffer_size, reserved = 0;
+	size_t			host_metadata_alloc = 1,	/* for at least NUL-terminated string */
+				interface_alloc = 1,		/* for at least NUL-terminated string */
+				buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
 	zbx_session_t		*session = NULL;
@@ -566,7 +572,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		um_handle = zbx_dc_open_user_macros();
 
-		for (i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
@@ -666,7 +672,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_REGEXP);
 
-		for (i = 0; i < regexps.values_num; i++)
+		for (int i = 0; i < regexps.values_num; i++)
 		{
 			zbx_expression_t	*regexp = regexps.values[i];
 
@@ -740,7 +746,7 @@ error:
 
 	zbx_json_free(&json);
 out:
-	for (i = 0; i < names.values_num; i++)
+	for (int i = 0; i < names.values_num; i++)
 		zbx_free(names.values[i]);
 
 	zbx_vector_str_destroy(&names);

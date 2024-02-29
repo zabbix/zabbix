@@ -3814,13 +3814,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	if (NULL == result)
 		return;
 
-	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
-	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) &&
-			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		return;
-	}
-
 	value_flags = 0;
 
 	if (!ZBX_ISSET_VALUE(result))
@@ -3830,7 +3823,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		value_flags |= ZBX_DC_FLAG_META;
 
 	/* Add data to the local history cache if:                                           */
-	/*   1) the NOVALUE flag is set (data contains either meta information or timestamp) */
+	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
@@ -4407,17 +4400,19 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 		/* a record with metadata and no value can be dropped if  */
 		/* the metadata update is copied to the last queued value */
-		if (NULL != (item = hc_get_item(item_value->itemid)) &&
-				0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE) &&
-				0 != (item_value->flags & ZBX_DC_FLAG_META))
+		if (NULL != (item = hc_get_item(item_value->itemid)) && 0 != (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 		{
 			/* skip metadata updates when only one value is queued, */
 			/* because the item might be already being processed    */
 			if (item->head != item->tail)
 			{
-				item->head->lastlogsize = item_value->lastlogsize;
-				item->head->mtime = item_value->mtime;
-				item->head->flags |= ZBX_DC_FLAG_META;
+				if (0 != (item_value->flags & ZBX_DC_FLAG_META))
+				{
+					item->head->lastlogsize = item_value->lastlogsize;
+					item->head->mtime = item_value->mtime;
+					item->head->flags |= ZBX_DC_FLAG_META;
+				}
+
 				continue;
 			}
 		}

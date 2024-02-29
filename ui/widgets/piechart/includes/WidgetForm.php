@@ -204,6 +204,10 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(self::LEGEND_ON)
 			)
 			->addField(
+				(new CWidgetFieldCheckBox('legend_value', _('Show value')))
+					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
 				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
