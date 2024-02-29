@@ -97,7 +97,7 @@ zbx_discoverer_results_t;
 ZBX_PTR_VECTOR_DECL(discoverer_results_ptr, zbx_discoverer_results_t*)
 
 zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid);
-void				discoverer_results_partrange_merge(zbx_hashset_t *hr_dst,
+int				discoverer_results_partrange_merge(zbx_hashset_t *hr_dst,
 					zbx_vector_discoverer_results_ptr_t *vr_src, zbx_discoverer_task_t *task,
 					int force);
 void				results_free(zbx_discoverer_results_t *result);

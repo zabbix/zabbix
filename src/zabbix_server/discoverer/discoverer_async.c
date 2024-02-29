@@ -561,34 +561,35 @@ static int	discovery_http(discovery_poller_config_t *poller_config, zbx_asynchtt
 }
 #endif
 
-static void	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, zbx_discoverer_task_t *task,
+static int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, zbx_discoverer_task_t *task,
 		zbx_vector_discoverer_results_ptr_t *results, int force)
 {
 	static ZBX_THREAD_LOCAL time_t	last;
 	time_t				now = time(NULL);
-	int				n = results->values_num;
+	int				ret = SUCCEED, n = results->values_num;
 
 	if (0 == force && now - last < DISCOVERER_DELAY)
-		return;
+		return ret;
 
 	pthread_mutex_lock(&dmanager->results_lock);
-	discoverer_results_partrange_merge(&dmanager->results, results, task, force);
+	ret = discoverer_results_partrange_merge(&dmanager->results, results, task, force);
 	pthread_mutex_unlock(&dmanager->results_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() results:%d saved:%d", log_worker_id, __func__, results->values_num,
 			n - results->values_num);
 
 	last = now;
+	return ret;
 }
 
-static int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,
-		zbx_uint64_t total, int dec_counter)
+int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,
+		zbx_uint64_t total, zbx_uint64_t dec_counter)
 {
 	if (0 != total && 0 != total % worker_max)
 		return FAIL;
 
 	discoverer_queue_lock(queue);
-	queue->pending_checks_count -= dec_counter;
+	queue->pending_checks_count -= 0 != dec_counter ? dec_counter : total;
 	discoverer_queue_unlock(queue);
 
 	return SUCCEED;
@@ -603,7 +604,8 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	zbx_asynchttppoller_config		*http_config = NULL;
 #endif
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX], first_ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int					ret = FAIL, dec_counter = 0;
+	int					ret = FAIL, abort = SUCCEED;
+	zbx_uint64_t				dec_counter = 0;
 
 	if (0 == log_worker_id)
 		log_worker_id = worker_id;
@@ -620,6 +622,8 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	discovery_async_poller_init(dmanager, &poller_config);
 	zbx_vector_discoverer_results_ptr_create(&results);
 	*first_ip = '\0';
+	task->range.state.count--;
+	dec_counter++;
 #ifdef HAVE_LIBCURL
 	if ((SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)) &&
 			NULL == (http_config = zbx_async_httpagent_create(poller_config.base, process_http_response,
@@ -641,7 +645,6 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		result = discoverer_result_create(druleid, task->unique_dcheckid);
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
-		task->range.state.count--;
 
 		switch (dcheck->type)
 		{
@@ -697,15 +700,15 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		while (worker_max == poller_config.processing)
 			event_base_loop(poller_config.base, EVLOOP_ONCE);
 
-		discovery_net_check_result_flush(dmanager, task, &results, 0);
+		abort = discovery_net_check_result_flush(dmanager, task, &results, 0);
 
 		if (SUCCEED == discovery_pending_checks_count_decrease(queue, worker_max, task->range.state.count,
-				++dec_counter))
+				dec_counter++))
 		{
 			dec_counter = 0;
 		}
 	}
-	while (0 == *stop && SUCCEED == discoverer_range_check_iter(task));
+	while (0 == *stop && SUCCEED == abort && SUCCEED == discoverer_range_check_iter(task));
 out:
 	while (0 != poller_config.processing)	/* try to close all handles if they are exhausted */
 	{
@@ -724,17 +727,17 @@ out:
 	}
 #endif
 	discovery_async_poller_destroy(&poller_config);
-	(void)discovery_pending_checks_count_decrease(queue, worker_max, task->range.state.count, dec_counter);
-
+	(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, task->range.state.count + dec_counter);
+#ifdef HAVE_NETSNMP
 	/* we must clear the EnginID cache before the next snmpv3 dcheck and */
 	/* remove unused collected values in any case */
 	if (SVC_SNMPv3 == GET_DTYPE(task))
 		zbx_clear_cache_snmp(dmanager->process_type, dmanager->process_num);
-
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
-			" last ip:%s", log_worker_id, __func__, druleid,
+			" last ip:%s abort:%d", log_worker_id, __func__, druleid,
 			task->dchecks.values[task->range.state.index_dcheck]->type,
-			task->range.state.count, first_ip, ip);
+			task->range.state.count, first_ip, ip, abort);
 
 	return ret;
 }
