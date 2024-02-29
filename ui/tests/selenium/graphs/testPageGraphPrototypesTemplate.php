@@ -24,35 +24,27 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 /**
  * @backup hosts
  *
- * @onBefore prepareGraphPrototypeData
+ * @onBefore prepareGraphPrototypeTemplateData
  */
-class testPageGraphPrototypes extends testPagePrototypes {
+class testPageGraphPrototypesTemplate extends testPagePrototypes {
 
 	public $source = 'graph';
 
-	protected $link = 'graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
+	protected $link = 'graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
 	protected static $host_druleids;
 
-	public function prepareGraphPrototypeData() {
-		$host_result = CDataHelper::createHosts([
+	public function prepareGraphPrototypeTemplateData() {
+		$response = CDataHelper::createTemplates([
 			[
-				'host' => 'Host for prototype check',
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_SNMP,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '161',
-						'details' => [
-							'version' => 1,
-							'community' => 'test'
-						]
-					]
-				],
-				'groups' => [['groupid' => 4]], // Zabbix server
+				'host' => 'Template for host prototype',
+				'groups' => [
+					['groupid' => 1] // template group 'Templates'
+				]
+			],
+			[
+				'host' => 'Template for prototype check',
+				'groups' => [['groupid' => 1]], // template group 'Templates'
 				'discoveryrules' => [
 					[
 						'name' => 'Drule for prototype check',
@@ -63,22 +55,21 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		$hostids = $host_result['hostids']['Host for prototype check'];
-		self::$host_druleids = $host_result['discoveryruleids']['Host for prototype check:drule'];
+		$template_id = $response['templateids'];
+		self::$host_druleids = $response['discoveryruleids'];
 
-		$item_prototype = CDataHelper::call('itemprototype.create', [
+		CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for graphs',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => $hostids,
-				'ruleid' => self::$host_druleids,
+				'hostid' => $template_id['Template for prototype check'],
+				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
 			]
 		]);
-		$this->assertArrayHasKey('itemids', $item_prototype );
-		$prototype_itemid = CDataHelper::getIds('name')['1 Item prototype for graphs'];;
+		$prototype_itemid = CDataHelper::getIds('name')['1 Item prototype for graphs'];
 
 		CDataHelper::call('graphprototype.create', [
 			[
@@ -136,9 +127,9 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		self::$entity_count = count(self::$prototype_graphids);
 	}
 
-	public function testPageGraphPrototypes_Layout() {
-		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
-		$this->checkLayout();
+	public function testPageGraphPrototypesTemplate_Layout() {
+		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->checkLayout(true);
 	}
 
 	/**
@@ -146,9 +137,9 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 *
 	 * @dataProvider getGraphPrototypesSortingData
 	 */
-	public function testPageGraphPrototypes_Sorting($data) {
-		$this->page->login()->open('graphs.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids)->waitUntilReady();
+	public function testPageGraphPrototypesTemplate_Sorting($data) {
+		$this->page->login()->open('graphs.php?context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -157,8 +148,8 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 *
 	 * @dataProvider getGraphPrototypesButtonLinkData
 	 */
-	public function testPageGraphPrototypes_ButtonLink($data) {
-		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+	public function testPageGraphPrototypesTemplate_ButtonLink($data) {
+		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -167,8 +158,8 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 *
 	 * @dataProvider getGraphPrototypesDeleteData
 	 */
-	public function testPageGraphPrototypes_Delete($data) {
-		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+	public function testPageGraphPrototypesTemplate_Delete($data) {
+		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

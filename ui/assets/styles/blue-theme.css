@@ -3473,7 +3473,7 @@ section {
   .svg-graph-legend .svg-graph-legend-header {
     color: #768d99; }
     .svg-graph-legend .svg-graph-legend-header:first-of-type {
-      grid-column: 2; }
+      grid-column-start: 2; }
   .svg-graph-legend .svg-graph-legend-item {
     min-width: 100%;
     overflow: hidden;
@@ -3491,11 +3491,15 @@ section {
   .svg-graph-legend .svg-graph-legend-no-data {
     grid-column: 2 / -1;
     color: #768d99; }
+  .svg-graph-legend .svg-graph-legend-header,
+  .svg-graph-legend .svg-graph-legend-no-data,
+  .svg-graph-legend .svg-graph-legend-value {
+    text-align: right; }
   .svg-graph-legend.svg-graph-legend-statistic {
     grid-template-columns: auto repeat(3, max-content);
     justify-content: stretch; }
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
-      grid-column: 1; }
+      grid-column-start: 1; }
 
 .svg-pie-chart {
   fill: #1f2c33; }
@@ -3543,6 +3547,21 @@ section {
       height: 4px;
       margin-right: 4px;
       background: var(--color); }
+  .svg-pie-chart-legend .svg-pie-chart-legend-header {
+    grid-column-start: 2;
+    color: #768d99; }
+  .svg-pie-chart-legend .svg-pie-chart-legend-no-data {
+    color: #768d99; }
+  .svg-pie-chart-legend .svg-pie-chart-legend-header,
+  .svg-pie-chart-legend .svg-pie-chart-legend-value,
+  .svg-pie-chart-legend .svg-pie-chart-legend-no-data {
+    text-align: right;
+    white-space: nowrap; }
+  .svg-pie-chart-legend.svg-pie-chart-legend-show-value {
+    grid-template-columns: auto max-content;
+    justify-content: stretch; }
+    .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-item {
+      grid-column-start: 1; }
 
 .svg-pie-chart-hintbox {
   display: flex;

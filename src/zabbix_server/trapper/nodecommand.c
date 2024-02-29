@@ -33,20 +33,21 @@
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: replace occurrence of macro in input string with value given in       *
+ * Purpose: replaces occurrence of macro in input string with value given in      *
  *          macrovalue, with memory management                                    *
  *                                                                                *
  * Parameters:  in               - [IN] input string to be processed              *
  *              macro            - [IN] macro to replace                          *
- *              macrovalue       - [IN] value to replace the macro with           *
- *              out              - [IN/OUT] pointer to memory holding the result  *
- *              out_alloc        - [IN/OUT] size of the memory holding the result *
+ *              macrovalue       - [IN] value to replace macro with               *
+ *              out              - [IN/OUT] pointer to memory holding result      *
+ *              out_alloc        - [IN/OUT] size of memory holding result         *
  *                                                                                *
- * Return value:  SUCCEED - the remote command was executed successfully          *
- *                FAIL    - an error occurred                                     *
+ * Return value:  SUCCEED - remote command was executed successfully              *
+ *                FAIL    - error occurred                                        *
  *                                                                                *
  **********************************************************************************/
-static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
+static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
+		size_t *out_alloc)
 {
 	zbx_token_t	token;
 	int		pos = 0;
@@ -70,16 +71,15 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute remote command and wait for the result                    *
+ * Purpose: executes remote command and waits for result                      *
  *                                                                            *
- * Return value:  SUCCEED - the remote command was executed successfully      *
- *                FAIL    - an error occurred                                 *
+ * Return value:  SUCCEED - remote command was executed successfully          *
+ *                FAIL    - error occurred                                    *
  *                                                                            *
  ******************************************************************************/
 static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host, char **info, char *error,
 		size_t max_error_len)
 {
-	int		time_start;
 	zbx_uint64_t	taskid;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
@@ -90,7 +90,7 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		return FAIL;
 	}
 
-	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
+	for (int time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
 	{
 		result = zbx_db_select(
 				"select tr.status,tr.info"
@@ -129,8 +129,8 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 	zbx_db_row_t	row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
-	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
-			",username,password,publickey,privatekey"
+	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port"
+			",authtype,username,password,publickey,privatekey"
 			",manualinput,manualinput_validator,manualinput_validator_type"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
@@ -232,14 +232,14 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the specified event id corresponds to a problem event    *
- *          caused by a trigger, find its recovery event (if it exists)       *
+ * Purpose: Checks if the specified event id corresponds to a problem event   *
+ *          caused by a trigger, finds its recovery event (if it exists).     *
  *                                                                            *
- * Parameters:  eventid       - [IN] the id of event                          *
- *              r_eventid     - [OUT] the id of recovery event (0 if there is *
- *                              no recovery event                             *
- *              error         - [OUT] the error message buffer                *
- *              error_len     - [IN] the size of error message buffer         *
+ * Parameters:  eventid   - [IN]                                              *
+ *              r_eventid - [OUT] id of recovery event (0 if there is no      *
+ *                                    recovery event)                         *
+ *              error     - [OUT] error message buffer                        *
+ *              error_len - [IN] size of error message buffer                 *
  *                                                                            *
  * Return value:  SUCCEED or FAIL (with 'error' message)                      *
  *                                                                            *
@@ -250,9 +250,11 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	zbx_db_result_t	db_result;
 	zbx_db_row_t	row;
 
-	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
+	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid=" ZBX_FS_UI64,
+			eventid)))
 	{
-		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.", error_len);
+		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.",
+				error_len);
 		return FAIL;
 	}
 
@@ -268,17 +270,18 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validates given user input with a validator of given type         *
+ * Purpose: validates given user input with validator of given type           *
  *                                                                            *
- * Parameters:  manualinput     - [IN] user provided input string             *
- *              validator       - [IN] string containing a validator          *
- *              validator_type  - [IN] indicator for how to interpret the     *
+ * Parameters:  manualinput    - [IN] user provided input string              *
+ *              validator      - [IN] string containing validator             *
+ *              validator_type - [IN] indicator for how to interpret          *
  *                                     validator string                       *
  *                                                                            *
  * Return value:  SUCCEED or FAIL                                             *
  *                                                                            *
  ******************************************************************************/
-static int validate_manualinput(const char *manualinput, const char *validator, const unsigned char validator_type)
+static int	validate_manualinput(const char *manualinput, const char *validator,
+		const unsigned char validator_type)
 {
 	int	ret = FAIL;
 
@@ -304,14 +307,14 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
 
 /**************************************************************************************
  *                                                                                    *
- * Purpose: executing command                                                         *
+ * Purpose: executes command                                                          *
  *                                                                                    *
  * Parameters:  scriptid                - [IN] id of script to be executed            *
- *              hostid                  - [IN] host the script will be executed on    *
+ *              hostid                  - [IN] host script will be executed on        *
  *              eventid                 - [IN]                                        *
  *              user                    - [IN] user who executes command              *
- *              clientip                - [IN] IP of client                           *
- *              manualinput             - [IN] user provided value to the script      *
+ *              clientip                - [IN]                                        *
+ *              manualinput             - [IN] user provided value to script          *
  *              config_timeout          - [IN]                                        *
  *              config_trapper_timeout  - [IN]                                        *
  *              config_source_ip        - [IN]                                        *
@@ -322,7 +325,7 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
  *              debug                   - [OUT] debug data (optional)                 *
  *                                                                                    *
  * Return value:  SUCCEED - processed successfully                                    *
- *                FAIL - an error occurred                                            *
+ *                FAIL - error occurred                                               *
  *                                                                                    *
  * Comments: either 'hostid' or 'eventid' must be > 0, but not both                   *
  *                                                                                    *
@@ -332,7 +335,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char *config_source_ip, const char *config_ssh_key_location,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0, i, n, macro_type;
+	int			ret = FAIL, scope = 0, macro_type;
 	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
@@ -500,7 +503,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator, script.manualinput_validator_type))
+		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator,
+				script.manualinput_validator_type))
 		{
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
 			goto fail;
@@ -515,7 +519,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
 		{
-			for (n = 0; n < webhook_params.values_num; n++)
+			for (int n = 0; n < webhook_params.values_num; n++)
 			{
 				char	*expanded_value = NULL;
 				size_t	expanded_value_size;
@@ -527,7 +531,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput,
 						&expanded_value, &expanded_value_size);
 
-				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second, expanded_value);
+				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second,
+						expanded_value);
 
 				zbx_free(expanded_value);
 			}
@@ -556,9 +561,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
-				NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
+				&host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type,
+				error, sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -566,7 +571,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
-		for (i = 0; i < webhook_params.values_num; i++)
+		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
@@ -620,7 +625,7 @@ fail:
 	zbx_free(webhook_params_json);
 	zbx_free(user_timezone);
 
-	for (i = 0; i < webhook_params.values_num; i++)
+	for (int i = 0; i < webhook_params.values_num; i++)
 	{
 		zbx_free(webhook_params.values[i].first);
 		zbx_free(webhook_params.values[i].second);
@@ -646,11 +651,11 @@ zbx_user_role_permission_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
+ * Purpose: Checks if the user has specific or default access for             *
+ *          administration actions.                                           *
  *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
+ * Return value:  SUCCEED - access is granted                                 *
+ *                FAIL    - access is denied                                  *
  *                                                                            *
  ******************************************************************************/
 static int	check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
@@ -693,7 +698,7 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process command received from frontend                            *
+ * Purpose: processes command received from frontend                          *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - error occurred                                       *

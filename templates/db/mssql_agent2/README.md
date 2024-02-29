@@ -1,9 +1,9 @@
 
-# MSSQL by ODBC
+# MSSQL by Zabbix agent 2
 
 ## Overview
 
-This template is designed for the effortless deployment of MSSQL monitoring by Zabbix via ODBC and doesn't require any external scripts.
+This template is designed for the effortless deployment of MSSQL monitoring by Zabbix via Zabbix agent 2 and doesn't require any external scripts.
 
 ## Requirements
 
@@ -20,7 +20,9 @@ This template has been tested on:
 
 ## Setup
 
-1. Create an MSSQL user for monitoring. For example, "zbx_monitor".
+1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with Zabbix versions 6.0.26 / 6.4.11
+
+2. Create an MSSQL user for monitoring. For example, "zbx_monitor".
 
 **View Server State** and **View Any Definition** permissions should be granted to the user.
 Grant this user read permissions to the `sysjobschedules`, `sysjobhistory`, and `sysjobs` tables.
@@ -42,17 +44,11 @@ For more information, see MSSQL documentation:
 
 [Configure a User to Create and Manage SQL Server Agent Jobs](https://docs.microsoft.com/en-us/sql/ssms/agent/configure-a-user-to-create-and-manage-sql-server-agent-jobs?view=sql-server-ver16)
 
-2. Set the username and password in the host macros `{$MSSQL.USER}` and `{$MSSQL.PASSWORD}`.
+3. Set the username and password in the host macros `{$MSSQL.USER}` and `{$MSSQL.PASSWORD}`.
 
-3. Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy and specify data source name in macro `{$MSSQL.DSN}`.
-
-See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16.
-
-**Note! Credentials in the `odbc.ini` do not work for MSSQL.**
+4. Set the connection string for the MSSQL instance in the `{$MSSQL.URI}` macro as a URI, such as `<protocol://host:port>`, or specify the named session - `<sessionname>`.
 
 The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance.
-
-If your instance uses a non-default TCP port, set the port in your section of `odbc.ini` in the line Server = IP or FQDN name, port.
 
 Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKUP_LOG.USED}`, and `{$MSSQL.BACKUP_DIFF.USED}` to disable backup age triggers for a certain database. If set to a value other than "1", the trigger expression for the backup age will not fire.
 
@@ -60,7 +56,7 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MSSQL.DSN}|<p>System data source name.</p>|`<Put your DSN here>`|
+|{$MSSQL.URI}|<p>Connection string.</p>|`<Put your URI here>`|
 |{$MSSQL.USER}|<p>MSSQL username.</p>|`<Put your username here>`|
 |{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>|`<Put your password here>`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
@@ -104,18 +100,18 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |MSSQL: Service's TCP port state|<p>Test the availability of MSSQL Server on a TCP port.</p>|Simple check|net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|MSSQL: Get last backup|<p>The item gets information about backup processes.</p>|Database monitor|db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]|
-|MSSQL: Get job status|<p>The item gets the SQL agent job status.</p>|Database monitor|db.odbc.get[get_job_status,"{$MSSQL.DSN}"]|
-|MSSQL: Get performance counters|<p>The item gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]|
-|MSSQL: Get availability groups|<p>The item gets availability group states - name, primary and secondary health, synchronization health.</p>|Database monitor|db.odbc.get[get_availability_group,"{$MSSQL.DSN}"]|
-|MSSQL: Get local DB|<p>Getting the states of the local availability database.</p>|Database monitor|db.odbc.get[get_local_db,"{$MSSQL.DSN}"]|
-|MSSQL: Get DB mirroring|<p>Getting DB mirroring.</p>|Database monitor|db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]|
-|MSSQL: Get non-local DB|<p>Getting the non-local availability database.</p>|Database monitor|db.odbc.get[get_non_local_db,"{$MSSQL.DSN}"]|
-|MSSQL: Get replica|<p>Getting the database replica.</p>|Database monitor|db.odbc.get[get_replica","{$MSSQL.DSN}"]|
-|MSSQL: Get quorum|<p>Getting quorum - cluster name, type, and state.</p>|Database monitor|db.odbc.get[get_quorum,{$MSSQL.DSN}]|
-|MSSQL: Get quorum member|<p>Getting quorum members - member name, type, state, and number of quorum votes.</p>|Database monitor|db.odbc.get[get_quorum_member,{$MSSQL.DSN}]|
-|MSSQL: Get database|<p>Getting databases - database name and recovery model.</p>|Database monitor|db.odbc.get[get_database,{$MSSQL.DSN}]|
-|MSSQL: Version|<p>MSSQL Server version.</p>|Dependent item|mssql.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.counter_name=='Version')].instance_name.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|MSSQL: Get last backup|<p>The item gets information about backup processes.</p>|Zabbix agent|mssql.last.backup.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get job status|<p>The item gets the SQL agent job status.</p>|Zabbix agent|mssql.job.status.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get performance counters|<p>The item gets server global status information.</p>|Zabbix agent|mssql.perfcounter.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get availability groups|<p>The item gets availability group states - name, primary and secondary health, synchronization health.</p>|Zabbix agent|mssql.availability.group.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get local DB|<p>Getting the states of the local availability database.</p>|Zabbix agent|mssql.local.db.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get DB mirroring|<p>Getting DB mirroring.</p>|Zabbix agent|mssql.mirroring.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get non-local DB|<p>Getting the non-local availability database.</p>|Zabbix agent|mssql.nonlocal.db.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get replica|<p>Getting the database replica.</p>|Zabbix agent|mssql.replica.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get quorum|<p>Getting quorum - cluster name, type, and state.</p>|Zabbix agent|mssql.quorum.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get quorum member|<p>Getting quorum members - member name, type, state, and number of quorum votes.</p>|Zabbix agent|mssql.quorum.member.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Get database|<p>Getting databases - database name and recovery model.</p>|Zabbix agent|mssql.db.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]|
+|MSSQL: Version|<p>MSSQL Server version.</p>|Zabbix agent|mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |MSSQL: Uptime|<p>MSSQL Server uptime in the format "N days, hh:mm:ss".</p>|Dependent item|mssql.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.counter_name=='Uptime')].cntr_value.first()`</p></li></ul>|
 |MSSQL: Get Access Methods counters|<p>The item gets server information about access methods.</p>|Dependent item|mssql.access_methods.raw<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.object_name=~'.*Access Methods')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |MSSQL: Forwarded records per second|<p>Number of records per second fetched through forwarded record pointers.</p>|Dependent item|mssql.forwarded_records_sec.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
@@ -198,30 +194,30 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL: Service is unavailable|<p>The TCP port of the MSSQL Server service is currently unavailable.</p>|`last(/MSSQL by ODBC/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0`|Disaster||
-|MSSQL: Version has changed|<p>MSSQL version has changed. Acknowledge to close the problem manually.</p>|`last(/MSSQL by ODBC/mssql.version,#1)<>last(/MSSQL by ODBC/mssql.version,#2) and length(last(/MSSQL by ODBC/mssql.version))>0`|Info|**Manual close**: Yes|
-|MSSQL: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MSSQL by ODBC/mssql.uptime)<10m`|Info|**Manual close**: Yes|
-|MSSQL: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MSSQL by ODBC/mssql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>MSSQL: Service is unavailable</li></ul>|
-|MSSQL: Too frequently using pointers|<p>Rows with VARCHAR columns can experience expansion when VARCHAR values are updated with a longer string. In the case where the row cannot fit in the existing page, the row migrates, and access to the row will traverse a pointer. This only happens on heaps (tables without clustered indexes). In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</p>|`last(/MSSQL by ODBC/mssql.forwarded_records_sec.rate) * 100 > 10 * last(/MSSQL by ODBC/mssql.batch_requests_sec.rate)`|Warning||
-|MSSQL: Number of work files created per second is high|<p>Too many work files created per second to store temporary results for hash joins and hash aggregates.</p>|`min(/MSSQL by ODBC/mssql.workfiles_created_sec.rate,5m)>{$MSSQL.WORK_FILES.MAX}`|Average||
-|MSSQL: Number of work tables created per second is high|<p>Too many work tables created per second to store temporary results for query spool, LOB variables, XML variables, and cursors.</p>|`min(/MSSQL by ODBC/mssql.worktables_created_sec.rate,5m)>{$MSSQL.WORK_TABLES.MAX}`|Average||
-|MSSQL: Percentage of work tables available from the work table cache is low|<p>A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or, on 32-bit systems, may indicate the need for an upgrade to a 64-bit system.</p>|`max(/MSSQL by ODBC/mssql.worktables_from_cache_ratio,5m)<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}`|High||
-|MSSQL: Percentage of the buffer cache efficiency is low|<p>Too low buffer cache hit ratio.</p>|`max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}`|High||
-|MSSQL: Percentage of the buffer cache efficiency is low|<p>Low buffer cache hit ratio.</p>|`max(/MSSQL by ODBC/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>MSSQL: Percentage of the buffer cache efficiency is low</li></ul>|
-|MSSQL: Number of rps waiting for a free page is high|<p>Some requests have to wait for a free page.</p>|`min(/MSSQL by ODBC/mssql.free_list_stalls_sec.rate,5m)>{$MSSQL.FREE_LIST_STALLS.MAX}`|Warning||
-|MSSQL: Number of buffers written per second by the lazy writer is high|<p>The number of buffers written per second by the buffer manager's lazy writer exceeds the threshold.</p>|`min(/MSSQL by ODBC/mssql.lazy_writes_sec.rate,5m)>{$MSSQL.LAZY_WRITES.MAX}`|Warning||
-|MSSQL: Page life expectancy is low|<p>The page stays in the buffer pool without references for less time than the threshold value.</p>|`max(/MSSQL by ODBC/mssql.page_life_expectancy,15m)<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}`|High||
-|MSSQL: Number of physical database page reads per second is high|<p>The physical database page reads are issued too frequently.</p>|`min(/MSSQL by ODBC/mssql.page_reads_sec.rate,5m)>{$MSSQL.PAGE_READS.MAX}`|Warning||
-|MSSQL: Number of physical database page writes per second is high|<p>The physical database page writes are issued too frequently.</p>|`min(/MSSQL by ODBC/mssql.page_writes_sec.rate,5m)>{$MSSQL.PAGE_WRITES.MAX}`|Warning||
-|MSSQL: Too many physical reads occurring|<p>If this value makes up even a sizeable minority of the total "Page Reads/sec" (say, greater than 20% of the total page reads), you may have too many physical reads occurring.</p>|`last(/MSSQL by ODBC/mssql.readahead_pages_sec.rate) > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * last(/MSSQL by ODBC/mssql.page_reads_sec.rate)`|Warning||
-|MSSQL: Total average wait time for locks is high|<p>An average wait time longer than 500 ms may indicate excessive blocking. This value should generally correlate to "Lock Waits/sec" and move up or down with it accordingly.</p>|`min(/MSSQL by ODBC/mssql.average_wait_time,5m)>{$MSSQL.AVERAGE_WAIT_TIME.MAX}`|Warning||
-|MSSQL: Total number of locks per second is high|<p>Number of new locks and lock conversions per second requested from the lock manager is high.</p>|`min(/MSSQL by ODBC/mssql.lock_requests_sec.rate,5m)>{$MSSQL.LOCK_REQUESTS.MAX}`|Warning||
-|MSSQL: Total lock requests per second that timed out is high|<p>The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.</p>|`min(/MSSQL by ODBC/mssql.lock_timeouts_sec.rate,5m)>{$MSSQL.LOCK_TIMEOUTS.MAX}`|Warning||
-|MSSQL: Some blocking is occurring for 5m|<p>Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.</p>|`min(/MSSQL by ODBC/mssql.lock_waits_sec.rate,5m)>0`|Average||
-|MSSQL: Number of deadlocks is high|<p>Too many deadlocks are occurring currently.</p>|`min(/MSSQL by ODBC/mssql.number_deadlocks_sec.rate,5m)>{$MSSQL.DEADLOCKS.MAX}`|Average||
-|MSSQL: Percent of ad hoc queries running is high|<p>The lower this value is, the better. High values often indicate excessive ad hoc querying and should be as low as possible. If excessive ad hoc querying is happening, try rewriting the queries as procedures or invoke the queries using `sp_executeSQL`. When rewriting isn't possible, consider using a plan guide or setting the database to parameterization forced mode.</p>|`min(/MSSQL by ODBC/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}`|Warning||
-|MSSQL: Percent of times statement recompiles is high|<p>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter's value should follow in proportion to "Batch Requests/sec" and "SQL Compilations/sec".</p>|`min(/MSSQL by ODBC/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}`|Warning||
-|MSSQL: Number of index and table scans exceeds index searches in the last 15m|<p>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</p>|`min(/MSSQL by ODBC/mssql.scan_to_search,15m) > 0.001`|Warning||
+|MSSQL: Service is unavailable|<p>The TCP port of the MSSQL Server service is currently unavailable.</p>|`last(/MSSQL by Zabbix agent 2/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0`|Disaster||
+|MSSQL: Version has changed|<p>MSSQL version has changed. Acknowledge to close the problem manually.</p>|`last(/MSSQL by Zabbix agent 2/mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"],#1)<>last(/MSSQL by Zabbix agent 2/mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"],#2) and length(last(/MSSQL by Zabbix agent 2/mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]))>0`|Info|**Manual close**: Yes|
+|MSSQL: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MSSQL by Zabbix agent 2/mssql.uptime)<10m`|Info|**Manual close**: Yes|
+|MSSQL: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MSSQL by Zabbix agent 2/mssql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>MSSQL: Service is unavailable</li></ul>|
+|MSSQL: Too frequently using pointers|<p>Rows with VARCHAR columns can experience expansion when VARCHAR values are updated with a longer string. In the case where the row cannot fit in the existing page, the row migrates, and access to the row will traverse a pointer. This only happens on heaps (tables without clustered indexes). In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</p>|`last(/MSSQL by Zabbix agent 2/mssql.forwarded_records_sec.rate) * 100 > 10 * last(/MSSQL by Zabbix agent 2/mssql.batch_requests_sec.rate)`|Warning||
+|MSSQL: Number of work files created per second is high|<p>Too many work files created per second to store temporary results for hash joins and hash aggregates.</p>|`min(/MSSQL by Zabbix agent 2/mssql.workfiles_created_sec.rate,5m)>{$MSSQL.WORK_FILES.MAX}`|Average||
+|MSSQL: Number of work tables created per second is high|<p>Too many work tables created per second to store temporary results for query spool, LOB variables, XML variables, and cursors.</p>|`min(/MSSQL by Zabbix agent 2/mssql.worktables_created_sec.rate,5m)>{$MSSQL.WORK_TABLES.MAX}`|Average||
+|MSSQL: Percentage of work tables available from the work table cache is low|<p>A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or, on 32-bit systems, may indicate the need for an upgrade to a 64-bit system.</p>|`max(/MSSQL by Zabbix agent 2/mssql.worktables_from_cache_ratio,5m)<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}`|High||
+|MSSQL: Percentage of the buffer cache efficiency is low|<p>Too low buffer cache hit ratio.</p>|`max(/MSSQL by Zabbix agent 2/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}`|High||
+|MSSQL: Percentage of the buffer cache efficiency is low|<p>Low buffer cache hit ratio.</p>|`max(/MSSQL by Zabbix agent 2/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>MSSQL: Percentage of the buffer cache efficiency is low</li></ul>|
+|MSSQL: Number of rps waiting for a free page is high|<p>Some requests have to wait for a free page.</p>|`min(/MSSQL by Zabbix agent 2/mssql.free_list_stalls_sec.rate,5m)>{$MSSQL.FREE_LIST_STALLS.MAX}`|Warning||
+|MSSQL: Number of buffers written per second by the lazy writer is high|<p>The number of buffers written per second by the buffer manager's lazy writer exceeds the threshold.</p>|`min(/MSSQL by Zabbix agent 2/mssql.lazy_writes_sec.rate,5m)>{$MSSQL.LAZY_WRITES.MAX}`|Warning||
+|MSSQL: Page life expectancy is low|<p>The page stays in the buffer pool without references for less time than the threshold value.</p>|`max(/MSSQL by Zabbix agent 2/mssql.page_life_expectancy,15m)<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}`|High||
+|MSSQL: Number of physical database page reads per second is high|<p>The physical database page reads are issued too frequently.</p>|`min(/MSSQL by Zabbix agent 2/mssql.page_reads_sec.rate,5m)>{$MSSQL.PAGE_READS.MAX}`|Warning||
+|MSSQL: Number of physical database page writes per second is high|<p>The physical database page writes are issued too frequently.</p>|`min(/MSSQL by Zabbix agent 2/mssql.page_writes_sec.rate,5m)>{$MSSQL.PAGE_WRITES.MAX}`|Warning||
+|MSSQL: Too many physical reads occurring|<p>If this value makes up even a sizeable minority of the total "Page Reads/sec" (say, greater than 20% of the total page reads), you may have too many physical reads occurring.</p>|`last(/MSSQL by Zabbix agent 2/mssql.readahead_pages_sec.rate) > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * last(/MSSQL by Zabbix agent 2/mssql.page_reads_sec.rate)`|Warning||
+|MSSQL: Total average wait time for locks is high|<p>An average wait time longer than 500 ms may indicate excessive blocking. This value should generally correlate to "Lock Waits/sec" and move up or down with it accordingly.</p>|`min(/MSSQL by Zabbix agent 2/mssql.average_wait_time,5m)>{$MSSQL.AVERAGE_WAIT_TIME.MAX}`|Warning||
+|MSSQL: Total number of locks per second is high|<p>Number of new locks and lock conversions per second requested from the lock manager is high.</p>|`min(/MSSQL by Zabbix agent 2/mssql.lock_requests_sec.rate,5m)>{$MSSQL.LOCK_REQUESTS.MAX}`|Warning||
+|MSSQL: Total lock requests per second that timed out is high|<p>The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.</p>|`min(/MSSQL by Zabbix agent 2/mssql.lock_timeouts_sec.rate,5m)>{$MSSQL.LOCK_TIMEOUTS.MAX}`|Warning||
+|MSSQL: Some blocking is occurring for 5m|<p>Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.</p>|`min(/MSSQL by Zabbix agent 2/mssql.lock_waits_sec.rate,5m)>0`|Average||
+|MSSQL: Number of deadlocks is high|<p>Too many deadlocks are occurring currently.</p>|`min(/MSSQL by Zabbix agent 2/mssql.number_deadlocks_sec.rate,5m)>{$MSSQL.DEADLOCKS.MAX}`|Average||
+|MSSQL: Percent of ad hoc queries running is high|<p>The lower this value is, the better. High values often indicate excessive ad hoc querying and should be as low as possible. If excessive ad hoc querying is happening, try rewriting the queries as procedures or invoke the queries using `sp_executeSQL`. When rewriting isn't possible, consider using a plan guide or setting the database to parameterization forced mode.</p>|`min(/MSSQL by Zabbix agent 2/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}`|Warning||
+|MSSQL: Percent of times statement recompiles is high|<p>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter's value should follow in proportion to "Batch Requests/sec" and "SQL Compilations/sec".</p>|`min(/MSSQL by Zabbix agent 2/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}`|Warning||
+|MSSQL: Number of index and table scans exceeds index searches in the last 15m|<p>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</p>|`min(/MSSQL by Zabbix agent 2/mssql.scan_to_search,15m) > 0.001`|Warning||
 
 ### LLD rule Database discovery
 
@@ -261,16 +257,16 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL DB '{#DBNAME}': State is {ITEM.VALUE}|<p>The DB has a non-working state.</p>|`last(/MSSQL by ODBC/mssql.db.state["{#DBNAME}"])>1`|High||
-|MSSQL DB '{#DBNAME}': Number of commits waiting for the log flush is high|<p>Too many commits are waiting for the log flush.</p>|`min(/MSSQL by ODBC/mssql.db.log_flush_waits_sec.rate["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}`|Warning||
-|MSSQL DB '{#DBNAME}': Total wait time to flush the log is high|<p>The wait time to flush the log is too long.</p>|`min(/MSSQL by ODBC/mssql.db.log_flush_wait_time["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}`|Warning||
-|MSSQL DB '{#DBNAME}': Percent of log usage is high|<p>There's not enough space left in the log.</p>|`min(/MSSQL by ODBC/mssql.db.percent_log_used["{#DBNAME}"],5m)>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}`|Warning||
-|MSSQL DB '{#DBNAME}': Diff backup is old|<p>The differential backup has not been executed for a long time.</p>|`last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"} and {$MSSQL.BACKUP_DIFF.USED:"{#DBNAME}"}=1`|High|**Manual close**: Yes|
-|MSSQL DB '{#DBNAME}': Diff backup is old|<p>The differential backup has not been executed for a long time.</p>|`last(/MSSQL by ODBC/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"} and {$MSSQL.BACKUP_DIFF.USED:"{#DBNAME}"}=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MSSQL DB '{#DBNAME}': Diff backup is old</li></ul>|
-|MSSQL DB '{#DBNAME}': Full backup is old|<p>The full backup has not been executed for a long time.</p>|`last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"} and {$MSSQL.BACKUP_FULL.USED:"{#DBNAME}"}=1`|High|**Manual close**: Yes|
-|MSSQL DB '{#DBNAME}': Full backup is old|<p>The full backup has not been executed for a long time.</p>|`last(/MSSQL by ODBC/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"} and {$MSSQL.BACKUP_FULL.USED:"{#DBNAME}"}=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MSSQL DB '{#DBNAME}': Full backup is old</li></ul>|
-|MSSQL DB '{#DBNAME}': Log backup is old|<p>The log backup has not been executed for a long time.</p>|`last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"} and {$MSSQL.BACKUP_LOG.USED:"{#DBNAME}"}=1 and last(/MSSQL by ODBC/mssql.backup.recovery_model["{#DBNAME}"])<>3`|High|**Manual close**: Yes|
-|MSSQL DB '{#DBNAME}': Log backup is old|<p>The log backup has not been executed for a long time.</p>|`last(/MSSQL by ODBC/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"} and {$MSSQL.BACKUP_LOG.USED:"{#DBNAME}"}=1 and last(/MSSQL by ODBC/mssql.backup.recovery_model["{#DBNAME}"])<>3`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MSSQL DB '{#DBNAME}': Log backup is old</li></ul>|
+|MSSQL DB '{#DBNAME}': State is {ITEM.VALUE}|<p>The DB has a non-working state.</p>|`last(/MSSQL by Zabbix agent 2/mssql.db.state["{#DBNAME}"])>1`|High||
+|MSSQL DB '{#DBNAME}': Number of commits waiting for the log flush is high|<p>Too many commits are waiting for the log flush.</p>|`min(/MSSQL by Zabbix agent 2/mssql.db.log_flush_waits_sec.rate["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}`|Warning||
+|MSSQL DB '{#DBNAME}': Total wait time to flush the log is high|<p>The wait time to flush the log is too long.</p>|`min(/MSSQL by Zabbix agent 2/mssql.db.log_flush_wait_time["{#DBNAME}"],5m)>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}`|Warning||
+|MSSQL DB '{#DBNAME}': Percent of log usage is high|<p>There's not enough space left in the log.</p>|`min(/MSSQL by Zabbix agent 2/mssql.db.percent_log_used["{#DBNAME}"],5m)>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}`|Warning||
+|MSSQL DB '{#DBNAME}': Diff backup is old|<p>The differential backup has not been executed for a long time.</p>|`last(/MSSQL by Zabbix agent 2/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.CRIT:"{#DBNAME}"} and {$MSSQL.BACKUP_DIFF.USED:"{#DBNAME}"}=1`|High|**Manual close**: Yes|
+|MSSQL DB '{#DBNAME}': Diff backup is old|<p>The differential backup has not been executed for a long time.</p>|`last(/MSSQL by Zabbix agent 2/mssql.backup.diff["{#DBNAME}"])>{$MSSQL.BACKUP_DIFF.WARN:"{#DBNAME}"} and {$MSSQL.BACKUP_DIFF.USED:"{#DBNAME}"}=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MSSQL DB '{#DBNAME}': Diff backup is old</li></ul>|
+|MSSQL DB '{#DBNAME}': Full backup is old|<p>The full backup has not been executed for a long time.</p>|`last(/MSSQL by Zabbix agent 2/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.CRIT:"{#DBNAME}"} and {$MSSQL.BACKUP_FULL.USED:"{#DBNAME}"}=1`|High|**Manual close**: Yes|
+|MSSQL DB '{#DBNAME}': Full backup is old|<p>The full backup has not been executed for a long time.</p>|`last(/MSSQL by Zabbix agent 2/mssql.backup.full["{#DBNAME}"])>{$MSSQL.BACKUP_FULL.WARN:"{#DBNAME}"} and {$MSSQL.BACKUP_FULL.USED:"{#DBNAME}"}=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MSSQL DB '{#DBNAME}': Full backup is old</li></ul>|
+|MSSQL DB '{#DBNAME}': Log backup is old|<p>The log backup has not been executed for a long time.</p>|`last(/MSSQL by Zabbix agent 2/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.CRIT:"{#DBNAME}"} and {$MSSQL.BACKUP_LOG.USED:"{#DBNAME}"}=1 and last(/MSSQL by Zabbix agent 2/mssql.backup.recovery_model["{#DBNAME}"])<>3`|High|**Manual close**: Yes|
+|MSSQL DB '{#DBNAME}': Log backup is old|<p>The log backup has not been executed for a long time.</p>|`last(/MSSQL by Zabbix agent 2/mssql.backup.log["{#DBNAME}"])>{$MSSQL.BACKUP_LOG.WARN:"{#DBNAME}"} and {$MSSQL.BACKUP_LOG.USED:"{#DBNAME}"}=1 and last(/MSSQL by Zabbix agent 2/mssql.backup.recovery_model["{#DBNAME}"])<>3`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MSSQL DB '{#DBNAME}': Log backup is old</li></ul>|
 
 ### LLD rule Availability group discovery
 
@@ -291,10 +287,10 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL AG '{#GROUP_NAME}': Primary replica recovery health in progress|<p>The primary replica is in the synchronization process.</p>|`last(/MSSQL by ODBC/mssql.primary_recovery_health["{#GROUP_NAME}"])=0`|Warning||
-|MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health in progress|<p>The secondary replica is in the synchronization process.</p>|`last(/MSSQL by ODBC/mssql.secondary_recovery_health["{#GROUP_NAME}"])=0`|Warning||
-|MSSQL AG '{#GROUP_NAME}': All replicas unhealthy|<p>None of the availability replicas have a healthy synchronization.</p>|`last(/MSSQL by ODBC/mssql.synchronization_health["{#GROUP_NAME}"])=0`|Disaster||
-|MSSQL AG '{#GROUP_NAME}': Some replicas unhealthy|<p>The synchronization health of some, but not all, availability replicas is healthy.</p>|`last(/MSSQL by ODBC/mssql.synchronization_health["{#GROUP_NAME}"])=1`|High||
+|MSSQL AG '{#GROUP_NAME}': Primary replica recovery health in progress|<p>The primary replica is in the synchronization process.</p>|`last(/MSSQL by Zabbix agent 2/mssql.primary_recovery_health["{#GROUP_NAME}"])=0`|Warning||
+|MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health in progress|<p>The secondary replica is in the synchronization process.</p>|`last(/MSSQL by Zabbix agent 2/mssql.secondary_recovery_health["{#GROUP_NAME}"])=0`|Warning||
+|MSSQL AG '{#GROUP_NAME}': All replicas unhealthy|<p>None of the availability replicas have a healthy synchronization.</p>|`last(/MSSQL by Zabbix agent 2/mssql.synchronization_health["{#GROUP_NAME}"])=0`|Disaster||
+|MSSQL AG '{#GROUP_NAME}': Some replicas unhealthy|<p>The synchronization health of some, but not all, availability replicas is healthy.</p>|`last(/MSSQL by Zabbix agent 2/mssql.synchronization_health["{#GROUP_NAME}"])=1`|High||
 
 ### LLD rule Local database discovery
 
@@ -314,9 +310,9 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The local availability database has a non-working state.</p>|`last(/MSSQL by ODBC/mssql.local_db.state["{#DBNAME}"])>0`|Warning||
-|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Not healthy|<p>The synchronization state of the local availability database is "Not synchronizing".</p>|`last(/MSSQL by ODBC/mssql.local_db.synchronization_health["{#DBNAME}"])=0`|High||
-|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Partially healthy|<p>A database on a synchronous-commit availability replica is considered partially healthy if synchronization state is "Synchronizing".</p>|`last(/MSSQL by ODBC/mssql.local_db.synchronization_health["{#DBNAME}"])=1`|Average||
+|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The local availability database has a non-working state.</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.state["{#DBNAME}"])>0`|Warning||
+|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Not healthy|<p>The synchronization state of the local availability database is "Not synchronizing".</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=0`|High||
+|MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Partially healthy|<p>A database on a synchronous-commit availability replica is considered partially healthy if synchronization state is "Synchronizing".</p>|`last(/MSSQL by Zabbix agent 2/mssql.local_db.synchronization_health["{#DBNAME}"])=1`|Average||
 
 ### LLD rule Non-local database discovery
 
@@ -335,8 +331,8 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Log queue size is growing|<p>The log records of the primary database are not sent to the secondary databases.</p>|`last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#1)>last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2) and last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2)>last(/MSSQL by ODBC/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#3)`|High||
-|MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Redo log queue size is growing|<p>The log records in the log files of the secondary replica have not yet been redone.</p>|`last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#1)>last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2) and last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2)>last(/MSSQL by ODBC/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#3)`|High||
+|MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Log queue size is growing|<p>The log records of the primary database are not sent to the secondary databases.</p>|`last(/MSSQL by Zabbix agent 2/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#1)>last(/MSSQL by Zabbix agent 2/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2) and last(/MSSQL by Zabbix agent 2/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2)>last(/MSSQL by Zabbix agent 2/mssql.non-local_db.log_send_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#3)`|High||
+|MSSQL AG '{#GROUP_NAME}' Non-Local DB '*{#REPLICA_NAME}*{#DBNAME}': Redo log queue size is growing|<p>The log records in the log files of the secondary replica have not yet been redone.</p>|`last(/MSSQL by Zabbix agent 2/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#1)>last(/MSSQL by Zabbix agent 2/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2) and last(/MSSQL by Zabbix agent 2/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#2)>last(/MSSQL by Zabbix agent 2/mssql.non-local_db.redo_queue_size["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}"],#3)`|High||
 
 ### LLD rule Quorum discovery
 
@@ -387,13 +383,13 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is disconnected|<p>The response of an availability replica to the "Disconnected" state depends on its role:<br>On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as "Not synchronized" on the primary replica, which waits for the secondary to reconnect;<br>On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.</p>|`last(/MSSQL by ODBC/mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 and last(/MSSQL by ODBC/mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"])=2`|Warning||
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Pending" or "Offline".</p>|`last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 or last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=1 or last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=3`|Warning||
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Failed".</p>|`last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=4`|Average||
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Failed, no quorum".</p>|`last(/MSSQL by ODBC/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=5`|High||
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} Recovery in progress|<p>At least one joined database has a database state other than "Online".</p>|`last(/MSSQL by ODBC/mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=0`|Info||
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is Not healthy|<p>At least one joined database is in the "Not synchronizing" state.</p>|`last(/MSSQL by ODBC/mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=0`|Average||
-|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is Partially healthy|<p>Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.</p>|`last(/MSSQL by ODBC/mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=1`|Warning||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is disconnected|<p>The response of an availability replica to the "Disconnected" state depends on its role:<br>On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as "Not synchronized" on the primary replica, which waits for the secondary to reconnect;<br>On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 and last(/MSSQL by Zabbix agent 2/mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"])=2`|Warning||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Pending" or "Offline".</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=0 or last(/MSSQL by Zabbix agent 2/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=1 or last(/MSSQL by Zabbix agent 2/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=3`|Warning||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Failed".</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=4`|Average||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}|<p>The operational state of the replica in a given availability group is "Failed, no quorum".</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"])=5`|High||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} Recovery in progress|<p>At least one joined database has a database state other than "Online".</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=0`|Info||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is Not healthy|<p>At least one joined database is in the "Not synchronizing" state.</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=0`|Average||
+|MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is Partially healthy|<p>Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.</p>|`last(/MSSQL by Zabbix agent 2/mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"])=1`|Warning||
 
 ### LLD rule Mirroring discovery
 
@@ -415,10 +411,10 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The state of the mirror database and of the database mirroring session is "Suspended", "Disconnected from the other partner", or "Synchronizing".</p>|`last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])>=0 and last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])<=2`|Info||
-|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The state of the mirror database and of the database mirroring session is "Pending failover".</p>|`last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])=3`|Warning||
-|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.</p>|`last(/MSSQL by ODBC/mssql.mirroring.state["{#DBNAME}"])=5`|High||
-|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" Witness is disconnected|<p>The state of the witness in the database mirroring session of the database is "Disconnected".</p>|`last(/MSSQL by ODBC/mssql.mirroring.witness_state["{#DBNAME}"])=2`|Warning||
+|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The state of the mirror database and of the database mirroring session is "Suspended", "Disconnected from the other partner", or "Synchronizing".</p>|`last(/MSSQL by Zabbix agent 2/mssql.mirroring.state["{#DBNAME}"])>=0 and last(/MSSQL by Zabbix agent 2/mssql.mirroring.state["{#DBNAME}"])<=2`|Info||
+|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The state of the mirror database and of the database mirroring session is "Pending failover".</p>|`last(/MSSQL by Zabbix agent 2/mssql.mirroring.state["{#DBNAME}"])=3`|Warning||
+|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}|<p>The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.</p>|`last(/MSSQL by Zabbix agent 2/mssql.mirroring.state["{#DBNAME}"])=5`|High||
+|MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" Witness is disconnected|<p>The state of the witness in the database mirroring session of the database is "Disconnected".</p>|`last(/MSSQL by Zabbix agent 2/mssql.mirroring.witness_state["{#DBNAME}"])=2`|Warning||
 
 ### LLD rule Job discovery
 
@@ -442,8 +438,8 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL Job '{#JOBNAME}': Failed to run|<p>The last run of the job has failed.</p>|`last(/MSSQL by ODBC/mssql.job.runstatus["{#JOBNAME}"])=0`|Warning|**Manual close**: Yes|
-|MSSQL Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
+|MSSQL Job '{#JOBNAME}': Failed to run|<p>The last run of the job has failed.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.runstatus["{#JOBNAME}"])=0`|Warning|**Manual close**: Yes|
+|MSSQL Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
 
 ## Feedback
 
