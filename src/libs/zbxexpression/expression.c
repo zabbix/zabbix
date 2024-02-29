@@ -2888,8 +2888,8 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	replace_key_param_data_t	replace_key_param_data;
 	int				key_type, ret;
@@ -3171,8 +3171,8 @@ int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, c
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	return substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
 }
@@ -3183,8 +3183,8 @@ int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;

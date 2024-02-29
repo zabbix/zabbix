@@ -241,21 +241,37 @@ typedef struct
 	int				lastcheck;
 	int				ts_delete;
 
-#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or added */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and host_discovery.host fields should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_NAME			__UINT64_C(0x00000004)	/* hosts.name field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxyid field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field should be updated */
+#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or */
+										/* added */
+#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and */
+										/* host_discovery.host fields should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_NAME			__UINT64_C(0x00000004)	/* hosts.name field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxyid field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field */
+										/* should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field */
+										/* should be updated */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
