@@ -313,9 +313,7 @@ class CControllerAuthenticationUpdate extends CController {
 						$result = false;
 					}
 					else {
-						$mfaid = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
-							? $mfaids[$this->getInput('mfa_default_row_index')]
-							: 0;
+						$mfaid = $mfaids[$this->getInput('mfa_default_row_index', 0)];
 					}
 				}
 			}
