@@ -12906,8 +12906,8 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->items_disabled = diff->items_disabled;
 }
 
-static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy,
-		zbx_dc_status_diff_host_t *host_diff, zbx_dc_status_diff_host_t *proxy_diff, zbx_dc_status_diff_t *diff)
+static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
+		zbx_dc_status_diff_host_t *proxy_diff, zbx_dc_status_diff_t *diff)
 {
 	int			i;
 	const ZBX_DC_ITEM	*dc_item;
@@ -12938,7 +12938,7 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy,
 						{
 							diff->required_performance += 1.0 / delay;
 
-							if (NULL != dc_proxy && NULL != proxy_diff)
+							if (NULL != proxy_diff)
 								proxy_diff->required_performance += 1.0 / delay;
 						}
 
@@ -12950,13 +12950,13 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy,
 						case ITEM_STATE_NORMAL:
 							diff->items_active_normal++;
 							host_diff->items_active_normal++;
-							if (NULL != dc_proxy && NULL != proxy_diff)
+							if (NULL != proxy_diff)
 								proxy_diff->items_active_normal++;
 							break;
 						case ITEM_STATE_NOTSUPPORTED:
 							diff->items_active_notsupported++;
 							host_diff->items_active_notsupported++;
-							if (NULL != dc_proxy && NULL != proxy_diff)
+							if (NULL != proxy_diff)
 								proxy_diff->items_active_notsupported++;
 							break;
 						default:
@@ -12968,7 +12968,7 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy,
 				ZBX_FALLTHROUGH;
 			case ITEM_STATUS_DISABLED:
 				diff->items_disabled++;
-				if (NULL != dc_proxy && NULL != proxy_diff)
+				if (NULL != proxy_diff)
 					proxy_diff->items_disabled++;
 				break;
 			default:
@@ -13109,7 +13109,7 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 				break;
 		}
 
-		get_host_statistics(dc_host, dc_proxy, &host_local, proxy_p, diff);
+		get_host_statistics(dc_host, &host_local, proxy_p, diff);
 		zbx_hashset_insert(&diff->hosts, &host_local, sizeof(host_local));
 	}
 
