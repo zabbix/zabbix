@@ -21,7 +21,6 @@
 #define ZABBIX_IP_H
 
 #include "zbxtypes.h"
-#include "zbxalgo.h"
 
 int	zbx_is_ip4(const char *ip);
 int	zbx_is_ip6(const char *ip);
