@@ -57,7 +57,8 @@ if (array_key_exists('qr_code_url', $data) && $data['qr_code_url']) {
 		->addVar('qr_code_url', $data['qr_code_url'])
 		->addVar('hash_function', $data['mfa']['hash_function'])
 		->addItem([
-			(new CDiv(_('Scan this QR code')))->setAttribute('style', 'text-align: center; font-size: 20px'),
+			(new CDiv(_('Scan this QR code')))
+				->setAttribute('style', 'text-align: center; font-size: 20px; margin: 10px auto;'),
 			new CDiv(_('Please scan and get your verification code displayed in your authenticator app.')),
 			(new CDiv())->addClass('qr-code'),
 			new CDiv(
