@@ -26,72 +26,79 @@
 
 window.mfa_edit = new class {
 
-	constructor() {
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
-		this.mfaid = null;
-		this.change_sensitive_data = null;
-	}
+	/**
+	 * @var {Overlay}
+	 */
+	#overlay;
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#dialogue;
+
+	/**
+	 * @type {HTMLFormElement}
+	 */
+	#form;
+
+	/**
+	 * @type {string | null}
+	 */
+	#mfaid;
+
+	/**
+	 * @type {Object}
+	 */
+	#change_sensitive_data;
 
 	init({mfaid, change_sensitive_data}) {
-		this.mfaid = mfaid;
-		this.change_sensitive_data = change_sensitive_data;
-		this.overlay = overlays_stack.getById('mfa_edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.type = this.form.querySelector('[name="type"]');
+		this.#overlay = overlays_stack.getById('mfa_edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
 
-		this.#toggleMfaType(this.type.value);
+		this.#mfaid = mfaid;
+		this.#change_sensitive_data = change_sensitive_data;
+
 		this.#addEventListeners();
+		this.#updateForm();
 	}
 
 	#addEventListeners() {
-		this.form.addEventListener('change', (e) => {
-			if (e.target.name === 'type') {
-				this.#toggleMfaType(e.target.value);
+		this.#form.querySelector('[name=type]').addEventListener('change', () => {
+			this.#updateForm();
+		});
+
+		const client_secret_button = document.getElementById('client-secret-btn');
+
+		if (client_secret_button !== null) {
+			client_secret_button.addEventListener('click', this.#showClientSecretField);
+		}
+	}
+
+	#updateForm() {
+		const type = this.#form.querySelector('[name="type"]').value;
+
+		for (const element_class of ['js-hash-function', 'js-code-length']) {
+			for (const element of this.#form.querySelectorAll(`.${element_class}`)) {
+				element.style.display = type == MFA_TYPE_TOTP ? '' : 'none';
 			}
-		})
-
-		if (document.getElementById('client-secret-btn') !== null) {
-			document.getElementById('client-secret-btn').addEventListener('click', this.#showClientSecretField);
 		}
-	}
 
-	#toggleMfaType(type) {
-		let totp_fields = ['hash_function', 'code_length'];
-		let duo_fields = ['api_hostname', 'clientid', 'client_secret'];
-
-		switch (parseInt(type)) {
-			case MFA_TYPE_TOTP:
-				this.#toggleFields(duo_fields, totp_fields);
-				break;
-
-			case MFA_TYPE_DUO:
-				this.#toggleFields(totp_fields, duo_fields);
-				break;
+		for (const element_class of ['js-api-hostname', 'js-clientid', 'js-client-secret']) {
+			for (const element of this.#form.querySelectorAll(`.${element_class}`)) {
+				element.style.display = type == MFA_TYPE_DUO ? '' : 'none';
+			}
 		}
-	}
-
-	#toggleFields(fields_to_hide, fields_to_show) {
-		fields_to_hide.forEach((field_to_hide) => {
-			this.form.querySelector('#' + field_to_hide).style.display = 'none';
-			this.form.querySelector('label[for="' + field_to_hide + '"]').style.display = 'none';
-		});
-		fields_to_show.forEach((field_to_show) => {
-			this.form.querySelector('#' + field_to_show).style.display = '';
-			this.form.querySelector('label[for="' + field_to_show + '"]').style.display = '';
-		});
 	}
 
 	#showClientSecretField(e) {
 		const form_field = e.target.parentNode;
-		const client_secret_field = form_field.querySelector('[name="client_secret"][type="password"]');
-		const client_secret_var = form_field.querySelector('[name="client_secret"][type="hidden"]');
 
+		const client_secret_field = form_field.querySelector('[name="client_secret"][type="password"]');
 		client_secret_field.style.display = '';
 		client_secret_field.disabled = false;
 
+		const client_secret_var = form_field.querySelector('[name="client_secret"][type="hidden"]');
 		if (client_secret_var !== null) {
 			form_field.removeChild(client_secret_var);
 		}
@@ -99,22 +106,15 @@ window.mfa_edit = new class {
 	}
 
 	submit() {
-		if (this.mfaid !== null && this.#isSensitiveDataModified() && !this.#confirmSubmit()) {
-			this.overlay.unsetLoading();
+		if (this.#mfaid !== null && this.#isSensitiveDataModified() && !this.#confirmSubmit()) {
+			this.#overlay.unsetLoading();
 
 			return;
 		}
 
-		this.overlay.setLoading();
+		this.#overlay.setLoading();
 
-		const fields = this.#getFormFields();
-		const curl = new Curl(this.form.getAttribute('action'));
-
-		this.#post(curl.getUrl(), fields);
-	}
-
-	#getFormFields() {
-		const fields = getFormFields(this.form);
+		const fields = getFormFields(this.#form);
 
 		for (let key in fields) {
 			if (typeof fields[key] === 'string' && key !== 'confirmation') {
@@ -122,7 +122,10 @@ window.mfa_edit = new class {
 			}
 		}
 
-		return fields;
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'mfa.check');
+
+		this.#post(curl.getUrl(), fields);
 	}
 
 	#post(url, data) {
@@ -136,12 +139,12 @@ window.mfa_edit = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				overlayDialogueDestroy(this.overlay.dialogueid);
+				overlayDialogueDestroy(this.#overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.#form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -159,10 +162,10 @@ window.mfa_edit = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.#form.parentNode.insertBefore(message_box, this.#form);
 			})
 			.finally(() => {
-				this.overlay.unsetLoading();
+				this.#overlay.unsetLoading();
 			});
 	}
 
@@ -173,15 +176,15 @@ window.mfa_edit = new class {
 	}
 
 	#isSensitiveDataModified() {
-		if (this.change_sensitive_data.type == MFA_TYPE_DUO) {
+		if (this.#change_sensitive_data.type == MFA_TYPE_DUO) {
 			return false;
 		}
 
 		const form_fields = this.#getFormFields();
 
-		for (const key in this.change_sensitive_data) {
+		for (const key in this.#change_sensitive_data) {
 			if (form_fields.hasOwnProperty(key)) {
-				if (this.change_sensitive_data[key] !== form_fields[key]) {
+				if (this.#change_sensitive_data[key] !== form_fields[key]) {
 					return true;
 				}
 			}

@@ -74,7 +74,7 @@ $form
 			)
 		])
 		->addItem([
-			(new CLabel(_('Hash function'), 'hash_function')),
+			(new CLabel(_('Hash function'), 'hash_function'))->addClass('js-hash-function'),
 			(new CFormField(
 				(new CSelect('hash_function'))
 					->setFocusableElementId('hash_function')
@@ -84,10 +84,10 @@ $form
 						TOTP_HASH_SHA256 => 'SHA-256',
 						TOTP_HASH_SHA512 => 'SHA-512'
 					]))
-			))->setId('hash_function')
+			))->addClass('js-hash-function')
 		])
 		->addItem([
-			(new CLabel(_('Code length'), 'code_length')),
+			(new CLabel(_('Code length'), 'code_length'))->addClass('js-code-length'),
 			(new CFormField(
 				(new CSelect('code_length'))
 					->setFocusableElementId('code_length')
@@ -96,24 +96,30 @@ $form
 						TOTP_CODE_LENGTH_6 => '6',
 						TOTP_CODE_LENGTH_8 => '8'
 					]))
-			))->setId('code_length')
+			))->addClass('js-code-length')
 		])
 		->addItem([
-			(new CLabel(_('API hostname'), 'api_hostname'))->setAsteriskMark(),
+			(new CLabel(_('API hostname'), 'api_hostname'))
+				->addClass('js-api-hostname')
+				->setAsteriskMark(),
 			(new CFormField(
 				(new CTextBox('api_hostname', $data['api_hostname'], false, DB::getFieldLength('mfa', 'api_hostname')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			))->setId('api_hostname')
+			))->addClass('js-api-hostname')
 		])
 		->addItem([
-			(new CLabel(_('Client ID'), 'clientid'))->setAsteriskMark(),
+			(new CLabel(_('Client ID'), 'clientid'))
+				->addClass('js-clientid')
+				->setAsteriskMark(),
 			(new CFormField(
 				(new CTextBox('clientid', $data['clientid'], false, DB::getFieldLength('mfa', 'clientid')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			))->setId('clientid')
+			))->addClass('js-clientid')
 		])
 		->addItem([
-			(new CLabel(_('Client secret'), 'client_secret'))->setAsteriskMark(),
+			(new CLabel(_('Client secret'), 'client_secret'))
+				->addClass('js-client-secret')
+				->setAsteriskMark(),
 			(new CFormField($data['add_mfa_method'] == 0 && $data['type'] == MFA_TYPE_DUO
 				? [
 					array_key_exists('client_secret', $data)
@@ -129,7 +135,7 @@ $form
 				]
 				: (new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			))->setId('client_secret')
+			))->addClass('js-client-secret')
 		])
 		->addItem((new CScriptTag('mfa_edit.init('.json_encode([
 				'mfaid' => array_key_exists('mfaid', $data) ? $data['mfaid'] : null,

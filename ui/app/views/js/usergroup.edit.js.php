@@ -125,7 +125,8 @@
 			if (!groups.length) {
 				if (group_type === 'templategroup') {
 					this.#setMultiselectDisabling('ms_templategroup');
-				} else if (group_type === 'hostgroup') {
+				}
+				else if (group_type === 'hostgroup') {
 					this.#setMultiselectDisabling('ms_hostgroup');
 				}
 			}
@@ -136,9 +137,10 @@
 							'id': groups[id]['groupid'],
 							'name': groups[id]['name']
 						};
-					$(ms).multiSelect('addData', [group]);
 
-					disable_groupids.push(group['id']);
+						$(ms).multiSelect('addData', [group]);
+
+						disable_groupids.push(group['id']);
 					}
 				}
 

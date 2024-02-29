@@ -27,12 +27,6 @@
 <script>
 	const view = new class {
 
-		constructor() {
-			this.form = null;
-			this.db_authentication_type = null;
-			this.allow_jit = null;
-		}
-
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
 				saml_provision_media, templates, mfa_methods, mfa_default_row_index
 		}) {
@@ -684,7 +678,7 @@
 
 			for (const field of optional_fields) {
 				if (!(field in mfa)) {
-					row.querySelector('input[name="mfa_methods[' + mfa.row_index + '][' + field + ']"]').remove();
+					row.querySelector(`input[name="mfa_methods[${mfa.row_index}][${field}]"]`).remove();
 				}
 			}
 
@@ -737,11 +731,11 @@
 			);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const mfa = {...e.detail, ...{row_index: row_index}};
+				const mfa = {...e.detail, row_index};
 
 				if (row === null) {
 					mfa.is_default = document.getElementById('mfa-methods')
-						.querySelector('input[name="mfa_default_row_index"]:checked') === null;
+						.querySelector('[name="mfa_default_row_index"]:checked') === null;
 					mfa.usrgrps = 0;
 
 					this.mfa_table
@@ -749,7 +743,7 @@
 						.appendChild(this._prepareMfaRow(mfa));
 				}
 				else {
-					mfa.is_default = row.querySelector('input[name="mfa_default_row_index"]').checked === true;
+					mfa.is_default = row.querySelector('[name="mfa_default_row_index"]').checked === true;
 					mfa.usrgrps = row.querySelector('.js-mfa-usergroups').textContent;
 
 					row.parentNode.insertBefore(this._prepareMfaRow(mfa), row);
