@@ -96,7 +96,8 @@ zabbix_export:
             		/* The anatomy is roughly this; prefix/key: value
             		 *
             		 * The 1st capture group captures all characters allowed in prefix/key,
-            		 * which is limited to `a-zA-Z0-9_`, `.`, `-` and `/`.
+            		 * which is limited to `a-zA-Z0-9_`, `.`, `-` and `/`. We're also capturing
+            		 * `!` which we use to invert the filter.
             		 *
             		 * We're not inserting data, so there's no need to verify its validity
             		 * beyond this. We're filtering on already verified data, and if the
@@ -104,7 +105,7 @@ zabbix_export:
             		 *
             		 * The 2nd capture group is whatever follows after `:` and whitespace.
             		 */
-            		const filterCapture = /([\w\.-\/]+)\s*:\s*(.*)/;
+            		const filterCapture = /([!\w\.-\/]+)\s*:\s*(.*)/;
             		const onComma = /\s*,\s*/;
             
             		csv.split(onComma).forEach(function (kv) {
