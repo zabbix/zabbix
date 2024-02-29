@@ -82,7 +82,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		self::$dashboard_id = $dashboards['dashboardids'][0];
 
 		// Create a host for Pie chart testing.
-		CDataHelper::createHosts([
+		$response = CDataHelper::createHosts([
 			[
 				'host' => self::HOST_NAME_ITEM_LIST,
 				'groups' => [['groupid' => 6]], // "Virtual machines"
@@ -100,8 +100,39 @@ class testDashboardPieChartWidget extends CWebTest {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
+			],
+			[
+				'host' => self::HOST_NAME_SCREENSHOTS,
+				'groups' => [['groupid' => 6]], // Virtual machines.
+				'items' => [
+					[
+						'name' => 'item-1',
+						'key_' => 'item-1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'item-2',
+						'key_' => 'item-2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'item-3',
+						'key_' => 'item-3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'item-4',
+						'key_' => 'item-4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
 			]
 		]);
+		self::$item_ids = $response['itemids'];
 	}
 
 	/**
@@ -924,261 +955,46 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Prepare a dashboard with widgets for the Pie chart display scenario.
+	 * Prepare a dashboard with widget for the Pie chart display scenario.
 	 */
 	public function preparePieChartDisplayData() {
-		// Create a host for Pie chart testing.
-		$host_item_params = [
-			'one-item' => ['count' => 1, 'type' => ITEM_VALUE_TYPE_UINT64],
-			'two-items' => ['count' => 2, 'type' => ITEM_VALUE_TYPE_FLOAT],
-			'four-items' => ['count' => 4, 'type' => ITEM_VALUE_TYPE_FLOAT],
-			'doughnut' => ['count' => 4, 'type' => ITEM_VALUE_TYPE_UINT64],
-		];
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
 
-		// Host data array for API call.
-		$hosts = [];
-
-		foreach ($host_item_params as $host => $item_params) {
-			// For all items of this host.
-			$items = [];
-
-			// Generate items for this host.
-			for ($i = 1; $i <= $item_params['count']; $i++) {
-				$items[] = [
-					'name' => 'item-'.$i,
-					'key_' => 'item-'.$i,
-					'type' => ITEM_TYPE_TRAPPER,
-					'value_type' => $item_params['type']
-				];
-			}
-
-			// Add this host to all host array.
-			$hosts[] = [
-				'host' => self::HOST_NAME_SCREENSHOTS.$host,
-				'groups' => [['groupid' => 6]], // "Virtual machines"
-				'items' => $items
-			];
+		// Delete item history in DB.
+		foreach ([1, 2, 3, 4] as $id) {
+			CDataHelper::removeItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':item-'.$id]);
 		}
 
-		// Create hosts with API and save item IDs for later.
-		self::$item_ids = CDataHelper::createHosts($hosts)['itemids'];
+		// Minus 10 seconds for safety.
+		$time = time() - 10;
 
-		// Item history data.
-		$item_data = [
-			'one-item' => [
-				'item-1' => 99
-			],
-			'two-items' => [
-				'item-1' => 0.00000000000000003,
-				'item-2' => 0.00000000000000002,
-			],
-			'four-items' => [
-				'item-1' => 1,
-				'item-2' => 2,
-				'item-3' => 3.0,
-				'item-4' => 4.4
-			],
-			'doughnut' => [
-				'item-1' => 100,
-				'item-2' => 41,
-				'item-3' => 4,
-				'item-4' => 5
-			]
-		];
+		// Set item history.
+		foreach($data['item_data'] as $key => $value) {
+			CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$key], $value, $time);
+		}
 
-		// Set item history data - for each host.
-		foreach($item_data as $host => $items) {
-			// For each item.
-			foreach ($items as $item_key => $item_value) {
-				// Minus 10 seconds for safety.
-				$time = time() - 10;
-				// Set item data.
-				CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.$host.':'.$item_key],
-						$item_value, $time
-				);
+		// Fill in Item ids (this only applies to Item list data sets).
+		foreach ($data['widget_fields'] as $id => $field) {
+			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
+				$field['value'] = self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$field['value']];
+				$data['widget_fields'][$id] = $field;
 			}
 		}
 
-		// Create a dashboard with widgets for the display test.
+		// Create a dashboard with widget for the display test.
 		$response = CDataHelper::call('dashboard.create', [
-			'name' => 'Pie chart display dashboard',
+			'name' => self::HOST_NAME_SCREENSHOTS.$data['widget_name'],
 			'pages' => [
 				[
 					'widgets' => [
 						[
-							'name' => 'no-data',
-							'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
+							'name' => $data['widget_name'],
+							'view_mode' => CTestArrayHelper::get($data, 'view_mode', 0),
 							'type' => 'piechart',
 							'width' => 12,
 							'height' => 8,
-							'fields' => [
-								[
-									'name' => 'ds.0.hosts.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => self::HOST_NAME_SCREENSHOTS
-								],
-								[
-									'name' => 'ds.0.items.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'item-1'
-								]
-							]
-						],
-						[
-							'name' => 'one-item',
-							'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
-							'type' => 'piechart',
-							'width' => 12,
-							'height' => 8,
-							'x' => 12,
-							'y' => 0,
-							'fields' => [
-								[
-									'name' => 'ds.0.hosts.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => self::HOST_NAME_SCREENSHOTS.'one-item'
-								],
-								[
-									'name' => 'ds.0.items.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'item-1'
-								],
-								[
-									'name' => 'ds.0.data_set_label',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'TEST SET ☺'
-								],
-								[
-									'name' => 'ds.0.dataset_aggregation',
-									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-									'value' => 2
-								]
-							]
-						],
-						[
-							'name' => 'two-items',
-							'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
-							'type' => 'piechart',
-							'width' => 12,
-							'height' => 8,
-							'x' => 0,
-							'y' => 8,
-							'fields' => [
-								[
-									'name' => 'ds.0.hosts.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => self::HOST_NAME_SCREENSHOTS.'two-items'
-								],
-								[
-									'name' => 'ds.0.items.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'item-1'
-								],
-								[
-									'name' => 'ds.0.items.1',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'item-2'
-								],
-								[
-									'name' => 'ds.0.aggregate_function',
-									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-									'value' => 2
-								],
-								[
-									'name' => 'legend_aggregation',
-									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-									'value' => 1
-								]
-							]
-						],
-						[
-							'name' => 'four-items',
-							'view_mode' => ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
-							'type' => 'piechart',
-							'width' => 12,
-							'height' => 8,
-							'x' => 12,
-							'y' => 8,
-							'fields' => [
-								[
-									'name' => 'ds.0.hosts.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => self::HOST_NAME_SCREENSHOTS.'four-*'
-								],
-								[
-									'name' => 'ds.0.items.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'item-*'
-								],
-								[
-									'name' => 'ds.0.color',
-									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-									'value' => 'FFA726'
-								],
-								[
-									'name' => 'legend',
-									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-									'value' => 0
-								]
-							]
-						],
-						[
-							'name' => 'doughnut',
-							'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
-							'type' => 'piechart',
-							'width' => 12,
-							'height' => 8,
-							'x' => 0,
-							'y' => 16,
-							'fields' => [
-								// Items and their colors.
-								['name' => 'ds.0.dataset_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-								[
-									'name' => 'ds.0.itemids.0',
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'value' => self::$item_ids[self::HOST_NAME_SCREENSHOTS.'doughnut:item-1']
-								],
-								['name' => 'ds.0.type.0', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFEBEE'],
-								[
-									'name' => 'ds.0.itemids.1',
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'value' => self::$item_ids[self::HOST_NAME_SCREENSHOTS.'doughnut:item-2']
-								],
-								['name' => 'ds.0.type.1', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-								['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'E53935'],
-								[
-									'name' => 'ds.0.itemids.2',
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'value' => self::$item_ids[self::HOST_NAME_SCREENSHOTS.'doughnut:item-3']
-								],
-								['name' => 'ds.0.type.2', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-								['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546E7A'],
-								[
-									'name' => 'ds.0.itemids.3',
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'value' => self::$item_ids[self::HOST_NAME_SCREENSHOTS.'doughnut:item-4']
-								],
-								['name' => 'ds.0.type.3', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-								['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546EAA'],
-								// Drawing and total value options.
-								['name' => 'draw_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'width', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 50],
-								['name' => 'total_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'value_size_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'value_size', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 25],
-								['name' => 'decimal_places', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-								['name' => 'units_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '♥'],
-								['name' => 'value_bold', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'value_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '7CB342'],
-								['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
-								['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
-								['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'B71C1C'],
-								['name' => 'legend_lines', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
-								['name' => 'legend_columns', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
-							]
+							'fields' => $data['widget_fields']
 						]
 					]
 				]
@@ -1194,6 +1010,10 @@ class testDashboardPieChartWidget extends CWebTest {
 			[
 				[
 					'widget_name' => 'no-data',
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1']
+					],
 					'item_data' => []
 				]
 			],
@@ -1201,6 +1021,15 @@ class testDashboardPieChartWidget extends CWebTest {
 			[
 				[
 					'widget_name' => 'one-item',
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1'],
+						['name' => 'ds.0.data_set_label', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'TEST SET ☺'],
+						['name' => 'ds.0.dataset_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
+					],
+					'item_data' => [
+						'item-1' => 99
+					],
 					'expected_dataset_name' => 'TEST SET ☺',
 					'expected_sectors' => [
 						'item-1' => ['value' => '99', 'color' => 'rgb(255, 70, 92)']
@@ -1211,10 +1040,21 @@ class testDashboardPieChartWidget extends CWebTest {
 			[
 				[
 					'widget_name' => 'two-items',
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-3'],
+						['name' => 'ds.0.items.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-4'],
+						['name' => 'ds.0.aggregate_function', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'legend_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1]
+					],
+					'item_data' => [
+						'item-3' => 0.00000000000000003,
+						'item-4' => 0.00000000000000002
+					],
 					'expected_legend_function' => 'max',
 					'expected_sectors' => [
-						'item-1' => ['value' => '3E-17', 'color' => 'rgb(255, 70, 92)'],
-						'item-2' => ['value' => '2E-17', 'color' => 'rgb(255, 197, 219)']
+						'item-3' => ['value' => '3E-17', 'color' => 'rgb(255, 70, 92)'],
+						'item-4' => ['value' => '2E-17', 'color' => 'rgb(255, 197, 219)']
 					]
 				]
 			],
@@ -1223,6 +1063,18 @@ class testDashboardPieChartWidget extends CWebTest {
 				[
 					'widget_name' => 'four-items',
 					'view_mode' => 1,
+					'widget_fields' => [
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'pie-chart*'],
+						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-*'],
+						['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFA726'],
+						['name' => 'legend', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0]
+					],
+					'item_data' => [
+						'item-1' => 1,
+						'item-2' => 2,
+						'item-3' => 3.0,
+						'item-4' => 4.4
+					],
 					'expected_sectors' => [
 						'item-1' => ['value' => '1', 'color' => 'rgb(191, 103, 0)'],
 						'item-2' => ['value' => '2', 'color' => 'rgb(255, 167, 38)'],
@@ -1235,6 +1087,45 @@ class testDashboardPieChartWidget extends CWebTest {
 			[
 				[
 					'widget_name' => 'doughnut',
+					'widget_fields' => [
+						// Items and their colors.
+						['name' => 'ds.0.dataset_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.itemids.0', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-1'],
+						['name' => 'ds.0.type.0', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFEBEE'],
+						['name' => 'ds.0.itemids.1', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-2'],
+						['name' => 'ds.0.type.1', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'E53935'],
+						['name' => 'ds.0.itemids.2', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-3'],
+						['name' => 'ds.0.type.2', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546E7A'],
+						['name' => 'ds.0.itemids.3', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-4'],
+						['name' => 'ds.0.type.3', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546EAA'],
+						// Drawing and total value options.
+						['name' => 'draw_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'width', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 50],
+						['name' => 'total_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'value_size_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'value_size', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 25],
+						['name' => 'decimal_places', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'units_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '♥'],
+						['name' => 'value_bold', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'value_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '7CB342'],
+						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
+						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'B71C1C'],
+						['name' => 'legend_lines', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'legend_columns', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
+					],
+					'item_data' => [
+						'item-1' => 100,
+						'item-2' => 41,
+						'item-3' => 4,
+						'item-4' => 5
+					],
 					'expected_total' => '100 ♥',
 					'expected_sectors' => [
 						'item-1' => ['value' => '100 ♥', 'color' => 'rgb(255, 235, 238)'],
@@ -1249,12 +1140,12 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Generate different Pie charts and assert their display.
 	 *
-	 * @onBeforeOnce preparePieChartDisplayData
+	 * @onBefore preparePieChartDisplayData
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		$this->page->login()->
-				open('zabbix.php?action=dashboard.view&dashboardid='.self::$display_dashboard_id)->waitUntilReady();
+		$this->page->login()
+				->open('zabbix.php?action=dashboard.view&dashboardid='.self::$display_dashboard_id)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($data['widget_name']);
 
@@ -1269,7 +1160,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Assert Pie chart sectors.
 		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
 			// The name shown in the legend and in the hintbox.
-			$legend_name = self::HOST_NAME_SCREENSHOTS.$data['widget_name'].': '.$item_name;
+			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item_name;
 
 			// Special case - legend name includes aggregation function.
 			if (CTestArrayHelper::get($data, 'expected_legend_function')) {
@@ -1291,20 +1182,20 @@ class testDashboardPieChartWidget extends CWebTest {
 				// Check the correct sector by hintbox attribute.
 				if (strpos($sector->getAttribute('data-hintbox-contents'), $legend_name)) {
 					// Assert sector fill color.
-					$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
+			$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
 
-					// Open and assert the hintbox.
-					$sector->click();
-					$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
-					$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
-					$this->assertEquals('background-color: '.$expected_sector['color'].';',
-							$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
-					);
-					$hintbox->close();
+			// Open and assert the hintbox.
+			$sector->click();
+			$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
+			$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
+			$this->assertEquals('background-color: '.$expected_sector['color'].';',
+					$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
+			);
+			$hintbox->close();
 
 					// Assertion successful, continue to the next expected sector.
 					continue 2;
-				}
+		}
 			}
 
 			// Fail test if no match found.
