@@ -48,10 +48,12 @@
 #	define CURLOPT_ACCEPT_ENCODING	CURLOPT_ENCODING
 #endif
 
-/* added in 7.28.0 (0x071c00) */
-#if LIBCURL_VERSION_NUM < 0x071c00
-CURLMcode	curl_multi_wait(CURLM *multi_handle, void *, unsigned int extra_nfds, int timeout_ms, int *numfds);
-#endif
+/* curl_multi_wait() was added in cURL 7.28.0 (0x071c00). Since we support cURL library >= 7.19.1  */
+/* we want to be able to compile against older cURL library. This is a wrapper that detects if the */
+/* function is available at runtime. It should never be called for older library versions because  */
+/* detect the version before. When cURL library requirement goes to >= 7.28.0 this function should */
+/* be removed and curl_multi_wait() be used directly.                                              */
+CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds);
 
 /* added in 7.33.0 (0x072100) */
 #if LIBCURL_VERSION_NUM < 0x072100

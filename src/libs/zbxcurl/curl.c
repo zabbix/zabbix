@@ -35,6 +35,51 @@ static const char	*libcurl_ssl_version(void)
 	return curl_version_info(CURLVERSION_NOW)->ssl_version;
 }
 
+/* curl_multi_wait() was added in cURL 7.28.0 (0x071c00). Since we support cURL library >= 7.19.1  */
+/* we want to be able to compile against older cURL library. This is a wrapper that detects if the */
+/* function is available at runtime. It should never be called for older library versions because  */
+/* detect the version before. When cURL library requirement goes to >= 7.28.0 this function and    */
+/* the structure declaration should be removed and curl_multi_wait() be used directly.             */
+#if LIBCURL_VERSION_NUM < 0x071c00
+struct curl_waitfd
+{
+	curl_socket_t	fd;
+	short		events;
+	short		revents;
+};
+#endif
+CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
+{
+	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
+
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL library"
+				" <= 7.28.0 (using version %s)", libcurl_version_str());
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL == fptr)
+	{
+		void	*handle;
+
+		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD | RTLD_GLOBAL)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
+			exit(EXIT_FAILURE);
+		}
+
+		if (NULL == (fptr = dlsym(handle, "curl_multi_wait")))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_multi_wait(): %s", dlerror());
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return fptr(multi_handle, NULL, 0, timeout_ms, numfds);
+}
+
 int	zbx_curl_protocol(const char *protocol, char **error)
 {
 	curl_version_info_data	*ver;
@@ -146,7 +191,7 @@ int	zbx_curl_has_bearer(char **error)
 
 int	zbx_curl_good_for_elasticsearch(char **error)
 {
-	/* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
+	/* Elasticsearch needs curl_multi_wait() which was added in 7.28.0 (0x071c00) */
 	if (libcurl_version_num() < 0x071c00)
 	{
 		if (NULL != error)

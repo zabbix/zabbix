@@ -495,7 +495,7 @@ try_again:
 			break;
 		}
 
-		if (CURLM_OK != (code = curl_multi_wait(writer.handle, NULL, 0, ZBX_HISTORY_STORAGE_DOWN, &fds)))
+		if (CURLM_OK != (code = zbx_curl_multi_wait(writer.handle, ZBX_HISTORY_STORAGE_DOWN, &fds)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot wait on curl multi handle: %s", curl_multi_strerror(code));
 			break;
