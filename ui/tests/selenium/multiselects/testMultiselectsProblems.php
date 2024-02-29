@@ -86,23 +86,23 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 	public static function prepareTriggerData() {
 		// Create host groups.
 		CDataHelper::call('hostgroup.create', [
-			['name' => 'ZBX6648 All Triggers'],
-			['name' => 'ZBX6648 Enabled Triggers'],
-			['name' => 'ZBX6648 Disabled Triggers'],
-			['name' => 'ZBX6648 Group No Hosts']
+			['name' => 'All Triggers'],
+			['name' => 'Enabled Triggers'],
+			['name' => 'Disabled Triggers'],
+			['name' => 'Group No Hosts']
 		]);
 		$groupids = CDataHelper::getIds('name');
 
 		CDataHelper::createHosts([
 			// Host without triggers.
 			[
-				'host' => 'ZBX6648 No Triggers Host',
+				'host' => 'No Triggers Host',
 				'groups' => ['groupid' => 4],
 				'status' => HOST_STATUS_MONITORED,
 				'items' => [
 					[
-						'name' => 'zbx6648 no triggers',
-						'key_' => 'zbx6648-no-triggers',
+						'name' => 'no triggers',
+						'key_' => 'no-triggers',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
@@ -110,19 +110,19 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 			],
 			// Host with one enabled trigger and one disabled trigger.
 			[
-				'host' => 'ZBX6648 All Triggers Host',
-				'groups' => ['groupid' => $groupids['ZBX6648 All Triggers']],
+				'host' => 'All Triggers Host',
+				'groups' => ['groupid' => $groupids['All Triggers']],
 				'status' => HOST_STATUS_MONITORED,
 				'items' => [
 					[
-						'name' => 'zbx6648 item all',
-						'key_' => 'zbx6648-item-all',
+						'name' => 'item all triggers',
+						'key_' => 'item-all-triggers',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
-						'name' => 'zbx6648 item all disabled',
-						'key_' => 'zbx6648-item-all-disabled',
+						'name' => 'item all triggers disabled',
+						'key_' => 'item-all-triggers-disabled',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'status' => ITEM_STATUS_DISABLED
@@ -131,22 +131,22 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 			],
 			// Host with disabled trigger and with disabled item that belongs to enabled trigger.
 			[
-				'host' => 'ZBX6648 Disabled Triggers Host',
+				'host' => 'Disabled Triggers Host',
 				'groups' => [
-					'groupid' => $groupids['ZBX6648 Disabled Triggers'],
+					'groupid' => $groupids['Disabled Triggers'],
 					'groupid' => 4
 				],
 				'status' => HOST_STATUS_MONITORED,
 				'items' => [
 					[
-						'name' => 'zbx6648 item for disabled trigger',
-						'key_' => 'zbx6648-item-for-disabled-trigger',
+						'name' => 'item for disabled trigger',
+						'key_' => 'item-for-disabled-trigger',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
-						'name' => 'zbx6648 item disabled',
-						'key_' => 'zbx6648-item-disabled',
+						'name' => 'item disabled',
+						'key_' => 'item-disabled',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'status' => ITEM_STATUS_DISABLED
@@ -155,13 +155,13 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 			],
 			// Host with one enabled trigger.
 			[
-				'host' => 'ZBX6648 Enabled Triggers Host',
-				'groups' => ['groupid' => $groupids['ZBX6648 Enabled Triggers']],
+				'host' => 'Enabled Triggers Host',
+				'groups' => ['groupid' => $groupids['Enabled Triggers']],
 				'status' => HOST_STATUS_MONITORED,
 				'items' => [
 					[
-						'name' => 'zbx6648 item enabled',
-						'key_' => 'zbx6648-item-enabled',
+						'name' => 'item enabled',
+						'key_' => 'item-enabled',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
@@ -172,30 +172,30 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 		// Create host triggers.
 		CDataHelper::call('trigger.create', [
 			[
-				'description' => 'zbx6648 trigger disabled',
-				'expression' => 'last(/ZBX6648 Disabled Triggers Host/zbx6648-item-for-disabled-trigger)=0',
+				'description' => 'trigger disabled',
+				'expression' => 'last(/Disabled Triggers Host/item-for-disabled-trigger)=0',
 				'status' => TRIGGER_STATUS_DISABLED
 			],
 			[
-				'description' => 'zbx6648 item disabled for enabled trigger',
-				'expression' => 'last(/ZBX6648 Disabled Triggers Host/zbx6648-item-disabled)=0'
+				'description' => 'item disabled for enabled trigger',
+				'expression' => 'last(/Disabled Triggers Host/item-disabled)=0'
 			],
 			[
-				'description' => 'zbx6648 trigger enabled',
-				'expression' => 'last(/ZBX6648 Enabled Triggers Host/zbx6648-item-enabled)=0'
+				'description' => 'trigger enabled',
+				'expression' => 'last(/Enabled Triggers Host/item-enabled)=0'
 			],
 			[
-				'description' => 'zbx6648 trigger all enabled',
-				'expression' => 'last(/ZBX6648 All Triggers Host/zbx6648-item-all)=0'
+				'description' => 'trigger all enabled',
+				'expression' => 'last(/All Triggers Host/item-all-triggers)=0'
 			],
 			[
-				'description' => 'zbx6648 trigger all disabled',
-				'expression' => 'last(/ZBX6648 All Triggers Host/zbx6648-item-all)=0',
+				'description' => 'trigger all disabled',
+				'expression' => 'last(/All Triggers Host/item-all-triggers)=0',
 				'status' => TRIGGER_STATUS_DISABLED
 			],
 			[
-				'description' => 'zbx6648 trigger all disabled item',
-				'expression' => 'last(/ZBX6648 All Triggers Host/zbx6648-item-all-disabled)=0'
+				'description' => 'trigger all disabled item',
+				'expression' => 'last(/All Triggers Host/item-all-triggers-disabled)=0'
 			]
 		]);
 	}
@@ -204,17 +204,17 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 		return [
 			[
 				[
-					'hostgroup' => 'ZBX6648 All Triggers',
-					'host' => 'ZBX6648 All Triggers Host',
-					'triggers' => ['zbx6648 trigger all enabled'],
+					'hostgroup' => 'All Triggers',
+					'host' => 'All Triggers Host',
+					'triggers' => ['trigger all enabled'],
 					'overlay' => 'triggers'
 				]
 			],
 			[
 				[
-					'hostgroup' => 'ZBX6648 Enabled Triggers',
-					'host' => 'ZBX6648 Enabled Triggers Host',
-					'triggers' => ['zbx6648 trigger enabled'],
+					'hostgroup' => 'Enabled Triggers',
+					'host' => 'Enabled Triggers Host',
+					'triggers' => ['trigger enabled'],
 					'overlay' => 'triggers'
 				]
 			],
@@ -222,14 +222,14 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 			[
 				[
 					'hostgroup' => 'Zabbix servers',
-					'host' => ['ZBX6648 No Triggers Host', 'ZBX6648 Disabled Triggers Host'],
+					'host' => ['No Triggers Host', 'Disabled Triggers Host'],
 					'overlay' => 'hosts'
 				]
 			],
-			// Trigger is disabbled on the host and there are no hosts in the group.
+			// Trigger is disabled on the host and there are no hosts in the group.
 			[
 				[
-					'hostgroup' => ['ZBX6648 Disabled Triggers', 'ZBX6648 Group No Hosts'],
+					'hostgroup' => ['Disabled Triggers', 'Group No Hosts'],
 					'overlay' => 'host groups'
 				]
 			]
@@ -238,6 +238,7 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 
 	/**
 	 * Check that disabled triggers and host without triggers are not visible in the Triggers field overlay dialogs.
+	 * The original issue was firstly represented by ticket number ZBX-6648.
 	 *
 	 * @dataProvider getTriggerData
 	 */
@@ -259,12 +260,14 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 				$this->assertTrue($trigger_overlay->query('link', $data['triggers'])->exists());
 				$this->assertEquals(count($data['triggers']), $trigger_overlay->asTable()->getRows()->count());
 				break;
+
 			case 'hosts':
 				$host_overlay = $trigger_overlay->asForm(['normalized' => true])->getField('Host')->edit();
 				$host_overlay->setDataContext($data['hostgroup']);
 				$this->assertEquals('Hosts', $host_overlay->getTitle());
 				$this->assertFalse($host_overlay->query('link', $data['host'])->exists());
 				break;
+
 			case 'host groups':
 				$host_overlay = $trigger_overlay->asForm(['normalized' => true])->getField('Host')->edit();
 				$group_overlay = $host_overlay->asForm(['normalized' => true])->getField('Host group')->edit();
