@@ -1450,9 +1450,14 @@ out:
 }
 
 static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, const char **name)
+		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
+		unsigned char *disable_source, char **name)
 {
 	const zbx_lld_graph_t	*graph;
+
+	ZBX_UNUSED(ts_disable);
+	ZBX_UNUSED(object_status);
+	ZBX_UNUSED(disable_source);
 
 	graph = (const zbx_lld_graph_t *)object;
 
@@ -1544,9 +1549,9 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
-
-		lld_remove_lost_objects("graph_discovery", "graphid", (zbx_vector_ptr_t *)&graphs, lifetime,
-				lastcheck, zbx_db_delete_graphs, get_graph_info, NULL, zbx_audit_graph_create_entry);
+		lld_process_lost_objects("graph_discovery", NULL, "graphid", (zbx_vector_ptr_t *)&graphs, lifetime,
+				NULL, lastcheck, zbx_db_delete_graphs, get_graph_info, NULL,
+				zbx_audit_graph_create_entry, NULL);
 
 		lld_items_free(&items);
 		lld_gitems_free(&gitems_proto);

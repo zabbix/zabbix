@@ -35,6 +35,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 	const DRULE_LIFETIME_NEVER = '2_drule_never';
 	const DRULE_LIFETIME_DELETE = '3_drule_delete';
 	const DRULE_LIFETIME_DISABLE_AFTER = '4_drule_disable_after';
+	const DRULE_LIFETIME_DELETE_DISABLED = '5_drule_test_delete_disabled';
 	const HOSTNAME_LIFETIME = 'lifetime';
 	const LLD_DATA_MACRO = '{#DISC.ID}';
 	const LLD_DATA_MACRO_VALUE = '01';
@@ -46,6 +47,9 @@ class testLowLevelDiscovery extends CIntegrationTest {
 	private static $disable_itemid;
 	private static $disable_triggerid;
 	private static $disable_hostid;
+	private static $delete_disabled_itemid;
+	private static $delete_disabled_triggerid;
+	private static $delete_disabled_hostid;
 
 	/**
 	 * @inheritdoc
@@ -151,6 +155,8 @@ class testLowLevelDiscovery extends CIntegrationTest {
 					'enabled_lifetime' => '1h'
 				],
 				$hostgroupid);
+
+		$this->createLowLevelDiscoveryRule(self::DRULE_LIFETIME_DELETE_DISABLED, ['lifetime_type' => 2], $hostgroupid);
 
 		return true;
 	}
@@ -412,6 +418,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_NEVER, ['data' => $lld_data]);
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DELETE, ['data' => $lld_data]);
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DISABLE_AFTER, ['data' => $lld_data]);
+		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DELETE_DISABLED, ['data' => $lld_data]);
 
 		// Check items
 
@@ -420,7 +427,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['name', 'status', 'itemid'],
 			'sortfield'	=> 'name'
 		]);
-		$this->assertCount(4, $response['result']);
+		$this->assertCount(5, $response['result']);
 
 		$item = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_i_'.self::LLD_DATA_MACRO_VALUE, $item['name']);
@@ -439,6 +446,11 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$this->assertEquals(ITEM_STATUS_ACTIVE, $item['status']);
 		self::$disable_itemid = $item['itemid'];
 
+		$item = $response['result'][4];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_i_'.self::LLD_DATA_MACRO_VALUE, $item['name']);
+		$this->assertEquals(ITEM_STATUS_ACTIVE, $item['status']);
+		self::$delete_disabled_itemid = $item['itemid'];
+
 		// Check triggers
 
 		$response = $this->call('trigger.get', [
@@ -446,7 +458,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['description', 'status'],
 			'sortfield'	=> 'description'
 		]);
-		$this->assertCount(4, $response['result']);
+		$this->assertCount(5, $response['result']);
 
 		$trigger = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_t_'.self::LLD_DATA_MACRO_VALUE, $trigger['description']);
@@ -465,6 +477,11 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
 		self::$disable_triggerid = $trigger['triggerid'];
 
+		$trigger = $response['result'][4];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_t_'.self::LLD_DATA_MACRO_VALUE, $trigger['description']);
+		$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
+		self::$delete_disabled_triggerid = $trigger['triggerid'];
+
 		// Check graphs
 
 		$response = $this->call('graph.get', [
@@ -472,7 +489,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['name'],
 			'sortfield'	=> 'name'
 		]);
-		$this->assertCount(4, $response['result']);
+		$this->assertCount(5, $response['result']);
 
 		$graph = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
@@ -486,6 +503,9 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$graph = $response['result'][3];
 		$this->assertEquals(self::DRULE_LIFETIME_DISABLE_AFTER.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
 
+		$graph = $response['result'][4];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
+
 		// Check hosts
 
 		$response = $this->call('host.get', [
@@ -495,14 +515,16 @@ class testLowLevelDiscovery extends CIntegrationTest {
 						self::DRULE_LIFETIME_DEFAULT.'_h_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_NEVER.'_h_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_DELETE.'_h_'.self::LLD_DATA_MACRO_VALUE,
-						self::DRULE_LIFETIME_DISABLE_AFTER.'_h_'.self::LLD_DATA_MACRO_VALUE
+						self::DRULE_LIFETIME_DISABLE_AFTER.'_h_'.self::LLD_DATA_MACRO_VALUE,
+						self::DRULE_LIFETIME_DELETE_DISABLED.'_h_'.self::LLD_DATA_MACRO_VALUE
 				],
 				'status' => HOST_STATUS_MONITORED
 			]
 		]);
-		$this->assertCount(4, $response['result']);
+		$this->assertCount(5, $response['result']);
 
 		self::$disable_hostid = $response['result'][3]['hostid'];
+		self::$delete_disabled_hostid = $response['result'][4]['hostid'];
 
 		// Check host groups
 		$response = $this->call('hostgroup.get', [
@@ -512,11 +534,12 @@ class testLowLevelDiscovery extends CIntegrationTest {
 						self::DRULE_LIFETIME_DEFAULT.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_NEVER.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_DELETE.'_hg_'.self::LLD_DATA_MACRO_VALUE,
-						self::DRULE_LIFETIME_DISABLE_AFTER.'_hg_'.self::LLD_DATA_MACRO_VALUE
+						self::DRULE_LIFETIME_DISABLE_AFTER.'_hg_'.self::LLD_DATA_MACRO_VALUE,
+						self::DRULE_LIFETIME_DELETE_DISABLED.'_hg_'.self::LLD_DATA_MACRO_VALUE
 				]
 			]
 		]);
-		$this->assertCount(4, $response['result']);
+		$this->assertCount(5, $response['result']);
 	}
 
 	/**
@@ -525,10 +548,33 @@ class testLowLevelDiscovery extends CIntegrationTest {
 	 * @depends testLowLevelDiscovery_DiscoverObjects
 	 */
 	public function testLowLevelDiscovery_LooseObjects() {
+		// Disable item, trigger and host to verify that disabled objects are deleted
+
+		$response = $this->call('item.update', [
+			'itemid'	=> self::$delete_disabled_itemid,
+			'status'	=> ITEM_STATUS_DISABLED
+		]);
+		$this->assertEquals(self::$delete_disabled_itemid, $response['result']['itemids'][0]);
+
+		$response = $this->call('trigger.update', [
+			'triggerid'	=> self::$delete_disabled_triggerid,
+			'status'	=> TRIGGER_STATUS_DISABLED
+		]);
+		$this->assertEquals(self::$delete_disabled_triggerid, $response['result']['triggerids'][0]);
+
+		$response = $this->call('host.update', [
+			'hostid'	=> self::$delete_disabled_hostid,
+			'status'	=> HOST_STATUS_NOT_MONITORED
+		]);
+		$this->assertEquals(self::$delete_disabled_hostid, $response['result']['hostids'][0]);
+
+		$this->reloadConfigurationCache();
+
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DEFAULT, ['data' => []]);
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_NEVER, ['data' => []]);
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DELETE, ['data' => []]);
 		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DISABLE_AFTER, ['data' => []]);
+		$this->sendSenderValue(self::HOSTNAME_LIFETIME, self::DRULE_LIFETIME_DELETE_DISABLED, ['data' => []]);
 
 		// Check items
 
@@ -537,7 +583,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['name', 'status'],
 			'sortfield'	=> 'name'
 		]);
-		$this->assertCount(3, $response['result']);
+		$this->assertCount(4, $response['result']);
 
 		$item = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_i_'.self::LLD_DATA_MACRO_VALUE, $item['name']);
@@ -551,6 +597,10 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$this->assertEquals(self::DRULE_LIFETIME_DISABLE_AFTER.'_i_'.self::LLD_DATA_MACRO_VALUE, $item['name']);
 		$this->assertEquals(ITEM_STATUS_ACTIVE, $item['status']);
 
+		$item = $response['result'][3];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_i_'.self::LLD_DATA_MACRO_VALUE, $item['name']);
+		$this->assertEquals(ITEM_STATUS_DISABLED, $item['status']);
+
 		// Check triggers (deleted due to item deletion)
 
 		$response = $this->call('trigger.get', [
@@ -558,7 +608,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['description', 'status'],
 			'sortfield'	=> 'description'
 		]);
-		$this->assertCount(3, $response['result']);
+		$this->assertCount(4, $response['result']);
 
 		$trigger = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_t_'.self::LLD_DATA_MACRO_VALUE, $trigger['description']);
@@ -572,6 +622,10 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$this->assertEquals(self::DRULE_LIFETIME_DISABLE_AFTER.'_t_'.self::LLD_DATA_MACRO_VALUE, $trigger['description']);
 		$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
 
+		$trigger = $response['result'][3];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_t_'.self::LLD_DATA_MACRO_VALUE, $trigger['description']);
+		$this->assertEquals(TRIGGER_STATUS_DISABLED, $trigger['status']);
+
 		// Check graphs (deleted due to item deletion)
 
 		$response = $this->call('graph.get', [
@@ -579,7 +633,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['name'],
 			'sortfield'	=> 'name'
 		]);
-		$this->assertCount(3, $response['result']);
+		$this->assertCount(4, $response['result']);
 
 		$graph = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
@@ -590,6 +644,9 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$graph = $response['result'][2];
 		$this->assertEquals(self::DRULE_LIFETIME_DISABLE_AFTER.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
 
+		$graph = $response['result'][3];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
+
 		// Check hosts
 
 		$response = $this->call('host.get', [
@@ -599,11 +656,12 @@ class testLowLevelDiscovery extends CIntegrationTest {
 						self::DRULE_LIFETIME_DEFAULT.'_h_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_NEVER.'_h_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_DELETE.'_h_'.self::LLD_DATA_MACRO_VALUE,
-						self::DRULE_LIFETIME_DISABLE_AFTER.'_h_'.self::LLD_DATA_MACRO_VALUE
+						self::DRULE_LIFETIME_DISABLE_AFTER.'_h_'.self::LLD_DATA_MACRO_VALUE,
+						self::DRULE_LIFETIME_DELETE_DISABLED.'_h_'.self::LLD_DATA_MACRO_VALUE
 				]
 			]
 		]);
-		$this->assertCount(3, $response['result']);
+		$this->assertCount(4, $response['result']);
 
 		$host = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_h_'.self::LLD_DATA_MACRO_VALUE, $host['host']);
@@ -616,6 +674,10 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		$host = $response['result'][2];
 		$this->assertEquals(self::DRULE_LIFETIME_DISABLE_AFTER.'_h_'.self::LLD_DATA_MACRO_VALUE, $host['host']);
 		$this->assertEquals(HOST_STATUS_MONITORED, $host['status']);
+
+		$host = $response['result'][3];
+		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_h_'.self::LLD_DATA_MACRO_VALUE, $host['host']);
+		$this->assertEquals(HOST_STATUS_NOT_MONITORED, $host['status']);
 
 		// Check host groups
 		$response = $this->call('hostgroup.get', [

@@ -4425,13 +4425,13 @@ static int	lld_host_disable_validate(zbx_uint64_t hostid)
 	int		ret;
 	char		*sql;
 	zbx_db_result_t	result;
-	zbx_db_row_t	row;
 
-	sql = zbx_dsprintf(NULL, "select status from hosts where hostid=" ZBX_FS_UI64, hostid);
+	sql = zbx_dsprintf(NULL, "select null from hosts where status=%d and hostid=" ZBX_FS_UI64,
+			HOST_STATUS_MONITORED, hostid);
 	result = zbx_db_select_n(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = zbx_db_fetch(result)) && HOST_STATUS_MONITORED == atoi(row[0]))
+	if (NULL != zbx_db_fetch(result))
 		ret = SUCCEED;
 	else
 		ret = FAIL;
@@ -4443,28 +4443,52 @@ static int	lld_host_disable_validate(zbx_uint64_t hostid)
 
 static int	lld_host_enable_validate(zbx_uint64_t hostid)
 {
-	int		ret = FAIL;
+	int		ret;
 	char		*sql;
 	zbx_db_result_t	result;
-	zbx_db_row_t	row;
 
-	sql = zbx_dsprintf(NULL, "select h.status,d.disable_source"
+	sql = zbx_dsprintf(NULL, "select null"
 			" from hosts h"
 			" join host_discovery d on h.hostid=d.hostid"
-			" where h.hostid=" ZBX_FS_UI64, hostid);
+			" where h.status=%d"
+				" and d.disable_source=%d"
+				" and h.hostid=" ZBX_FS_UI64,
+				HOST_STATUS_NOT_MONITORED, ZBX_DISABLE_SOURCE_LLD_LOST, hostid);
 
 	result = zbx_db_select_n(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = zbx_db_fetch(result)) && HOST_STATUS_NOT_MONITORED == atoi(row[0]))
-	{
-		unsigned char	disable_source;
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
 
-		ZBX_STR2UCHAR(disable_source, row[1]);
+	zbx_db_free_result(result);
 
-		if (ZBX_DISABLE_SOURCE_LLD_LOST == disable_source)
-			ret = SUCCEED;
-	}
+	return ret;
+}
+
+static int	lld_host_delete_validate(zbx_uint64_t hostid)
+{
+	int		ret;
+	char		*sql;
+	zbx_db_result_t	result;
+
+	sql = zbx_dsprintf(NULL, "select null"
+			" from hosts h"
+			" join host_discovery d on h.hostid=d.hostid"
+			" where h.hostid=" ZBX_FS_UI64
+				" and (h.status=%d or d.disable_source=%d)",
+				hostid, HOST_STATUS_MONITORED, ZBX_DISABLE_SOURCE_LLD_LOST);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
 	zbx_db_free_result(result);
 
 	return ret;
@@ -4524,10 +4548,14 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 					(ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type && lastcheck > (ts_delete =
 					lld_end_of_life(host->lastcheck, lifetime->duration))))
 			{
-				zbx_vector_uint64_append(&del_hostids, host->hostid);
-				local_id_name_pair.id = host->hostid;
-				local_id_name_pair.name = zbx_strdup(NULL, host->host);
-				zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
+				if (SUCCEED == lld_host_delete_validate(host->hostid))
+				{
+					zbx_vector_uint64_append(&del_hostids, host->hostid);
+					local_id_name_pair.id = host->hostid;
+					local_id_name_pair.name = zbx_strdup(NULL, host->host);
+					zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
+				}
+
 				continue;
 			}
 
