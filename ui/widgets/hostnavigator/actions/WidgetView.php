@@ -181,7 +181,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				// Count the number of problems (as value) per severity (as key).
-				for ($severity = TRIGGER_SEVERITY_INFORMATION; $severity <= TRIGGER_SEVERITY_DISASTER; $severity++) {
+				for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity <= TRIGGER_SEVERITY_DISASTER; $severity++) {
 					$host['problem_count'][$severity] = array_key_exists($severity, $host_problems[$host['hostid']])
 						? count($host_problems[$host['hostid']][$severity])
 						: 0;
