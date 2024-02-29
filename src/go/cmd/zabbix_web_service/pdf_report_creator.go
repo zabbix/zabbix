@@ -229,10 +229,10 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 }
 
 func waitForDashboardReady(ctx context.Context, url string) error {
-	const wrapperIsReady = ".wrapper.is-ready"
+	const dashboardIsReady = ".dashboard.is-ready"
 	const timeout = time.Minute
 
-	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
+	expression := fmt.Sprintf("document.querySelector('%s') !== null", dashboardIsReady)
 	var isReady bool
 
 	err := chromedp.Run(ctx, chromedp.Poll(expression, &isReady, chromedp.WithPollingTimeout(timeout)))
