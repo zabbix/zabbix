@@ -228,10 +228,8 @@ class CSortable {
 			this.#observeResize();
 			this.#observeMutations();
 			this.#observeIntersection();
-
-			const has_new_elements = this.#updateItems();
-
-			this.#render({with_transitions: !has_new_elements});
+			this.#updateItems();
+			this.#render();
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
@@ -275,8 +273,6 @@ class CSortable {
 	 * @param {boolean}     immediate
 	 */
 	scrollIntoView(element, {immediate = false} = {}) {
-		console.log(immediate);
-
 		if (this.#is_dragging || this.#drag_item !== null) {
 			return;
 		}
@@ -357,11 +353,8 @@ class CSortable {
 	#update() {
 		this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 		this.#cancelDragging();
-
-		const has_new_elements = this.#updateItems();
-
-		this.#render({with_transitions: !has_new_elements});
-
+		this.#updateItems();
+		this.#render();
 		this.#updateTargetDisabled();
 	}
 
@@ -386,13 +379,9 @@ class CSortable {
 			item.elements_live = this.#getLiveElements(item.elements);
 		}
 
-		let has_new_elements = false;
-
 		this.mutate(() => {
 			for (const [index, item] of this.#items.entries()) {
 				for (const element of item.elements_live) {
-					has_new_elements = has_new_elements || !element.classList.contains(CSortable.ZBX_STYLE_ITEM);
-
 					element.classList.add(CSortable.ZBX_STYLE_ITEM);
 					element.classList.toggle(CSortable.ZBX_STYLE_ITEM_FROZEN,
 						index < this.#freeze_start || index > this.#items.length - 1 - this.#freeze_end
@@ -402,8 +391,6 @@ class CSortable {
 		});
 
 		this.#updateItemsLoc();
-
-		return has_new_elements;
 	}
 
 	#updateTargetDisabled() {
@@ -457,15 +444,16 @@ class CSortable {
 	}
 
 	#getItemLoc(item) {
+		const transitional_offset = this.#getItemTransitionalOffset(item);
+
 		let pos = 0;
 		let pos_to = 0;
 
 		for (const element of item.elements_live) {
 			const rect = element.getBoundingClientRect();
-			const offset = new DOMMatrix(getComputedStyle(element).transform)[this.#is_horizontal ? 'e' : 'f'];
 
 			const loc = {
-				pos: (this.#is_horizontal ? rect.x : rect.y) - offset,
+				pos: this.#scroll_pos + (this.#is_horizontal ? rect.x : rect.y) - transitional_offset,
 				dim: this.#is_horizontal ? rect.width : rect.height
 			};
 
@@ -485,12 +473,19 @@ class CSortable {
 		};
 	}
 
+	#getItemTransitionalOffset(item) {
+		const computed_style = getComputedStyle(item.elements_live[0]);
+		const computed_style_pos = this.#is_horizontal ? computed_style.left : computed_style.top;
+
+		return this.#scroll_pos + (computed_style_pos === 'auto' ? 0 : parseFloat(computed_style_pos || '0'));
+	}
+
 	#enableTransitions(enable = true) {
 		this.#target.classList.toggle(CSortable.ZBX_STYLE_TRANSITIONS_DISABLED, !enable);
 	}
 
-	#render({with_transitions = true} = {}) {
-		this.#enableTransitions(with_transitions);
+	#render() {
+		this.#enableTransitions();
 
 		for (const item of this.#items) {
 			if (!this.#is_dragging || item !== this.#drag_item) {
@@ -594,14 +589,13 @@ class CSortable {
 			return constraints;
 		}
 
-		const item = this.#items[this.#freeze_start > 0 ? 0 : this.#items.length - 1];
-
-		const pos_delta = this.#scroll_pos
-			+ new DOMMatrix(getComputedStyle(item.elements_live[0]).transform)[this.#is_horizontal ? 'e' : 'f'];
+		const transitional_offset = this.#getItemTransitionalOffset(
+			this.#items[this.#freeze_start > 0 ? 0 : this.#items.length - 1]
+		);
 
 		return {
-			min: constraints.min + pos_delta,
-			max: constraints.max + pos_delta
+			min: constraints.min + transitional_offset,
+			max: constraints.max + transitional_offset
 		};
 	}
 
@@ -627,7 +621,7 @@ class CSortable {
 
 	#applyRel(item, rel) {
 		for (const element of item.elements_live) {
-			element.style.transform = this.#is_horizontal ? `translateX(${rel}px)` : `translateY(${rel}px)`;
+			element.style[this.#is_horizontal ? 'left' : 'top'] = `${rel}px`;
 		}
 	}
 
@@ -1109,7 +1103,7 @@ class CSortable {
 		transitionRun: (e) => {
 			if (e.target.closest(`.${CSortable.ZBX_STYLE_CLASS}`) === this.#target
 					&& e.target.classList.contains(CSortable.ZBX_STYLE_ITEM)
-					&& e.propertyName === 'transform') {
+					&& e.propertyName === (this.#is_horizontal ? 'left' : 'top')) {
 				this.#transitions.set(e.target,
 					this.#transitions.has(e.target) ? this.#transitions.get(e.target) + 1 : 1
 				);
@@ -1119,7 +1113,7 @@ class CSortable {
 		transitionEnd: (e) => {
 			if (e.target.closest(`.${CSortable.ZBX_STYLE_CLASS}`) === this.#target
 					&& e.target.classList.contains(CSortable.ZBX_STYLE_ITEM)
-					&& e.propertyName === 'transform') {
+					&& e.propertyName === (this.#is_horizontal ? 'left' : 'top')) {
 				const count = this.#transitions.has(e.target) ? this.#transitions.get(e.target) - 1 : 0;
 
 				if (count > 0) {

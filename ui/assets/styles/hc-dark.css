@@ -703,7 +703,7 @@ svg a {
   .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
     opacity: 0.6;
     z-index: 1;
-    transition: transform 0s; }
+    transition: left 0s, top 0s; }
 
 html,
 body {

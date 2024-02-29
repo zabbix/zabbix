@@ -708,15 +708,15 @@ svg a {
 
 .sortable .sortable-item {
   position: relative;
-  transition: transform 0.2s; }
+  transition: left 0.2s, top 0.2s; }
 .sortable.sortable-dragging {
   isolation: isolate; }
   .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
     opacity: 0.6;
     z-index: 1;
-    transition: transform 0s; }
+    transition: left 0s, top 0s; }
 .sortable.sortable-transitions-disabled .sortable-item {
-  transition: transform 0s; }
+  transition: left 0s, top 0s; }
 
 html,
 body {
