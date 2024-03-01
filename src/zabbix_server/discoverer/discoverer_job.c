@@ -41,7 +41,8 @@ int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 	if (SUCCEED == ret)
 	{
 		task->range.state.count--;
-		return SUCCEED;
+
+		return 0 == task->range.state.count ? FAIL : SUCCEED;
 	}
 
 	task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
@@ -57,6 +58,8 @@ int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 	{
 		return discoverer_range_check_iter(task);
 	}
+	else
+		task->range.state.count--;
 
 	return FAIL;
 }

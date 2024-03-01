@@ -575,8 +575,8 @@ static int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, 
 	ret = discoverer_results_partrange_merge(&dmanager->results, results, task, force);
 	pthread_mutex_unlock(&dmanager->results_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() results:%d saved:%d", log_worker_id, __func__, results->values_num,
-			n - results->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() results:%d saved:%d ret:%d", log_worker_id, __func__,
+			results->values_num, n - results->values_num, ret);
 
 	last = now;
 	return ret;
@@ -585,12 +585,15 @@ static int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, 
 int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,
 		zbx_uint64_t total, zbx_uint64_t dec_counter)
 {
-	if (0 != total && 0 != total % worker_max)
+	if ((0 != total && 0 != total % worker_max) || total == (zbx_uint64_t)worker_max)
 		return FAIL;
 
-	discoverer_queue_lock(queue);
-	queue->pending_checks_count -= 0 != dec_counter ? dec_counter : total;
-	discoverer_queue_unlock(queue);
+	if (0 != dec_counter)
+	{
+		discoverer_queue_lock(queue);
+		queue->pending_checks_count -= dec_counter;
+		discoverer_queue_unlock(queue);
+	}
 
 	return SUCCEED;
 }
@@ -622,8 +625,6 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	discovery_async_poller_init(dmanager, &poller_config);
 	zbx_vector_discoverer_results_ptr_create(&results);
 	*first_ip = '\0';
-	task->range.state.count--;
-	dec_counter++;
 #ifdef HAVE_LIBCURL
 	if ((SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)) &&
 			NULL == (http_config = zbx_async_httpagent_create(poller_config.base, process_http_response,
@@ -703,12 +704,12 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		abort = discovery_net_check_result_flush(dmanager, task, &results, 0);
 
 		if (SUCCEED == discovery_pending_checks_count_decrease(queue, worker_max, task->range.state.count,
-				dec_counter++))
+				++dec_counter))
 		{
 			dec_counter = 0;
 		}
-	}
-	while (0 == *stop && SUCCEED == abort && SUCCEED == discoverer_range_check_iter(task));
+	}			/* we have to decrease range.state.count before exit by abort*/
+	while (0 == *stop && SUCCEED == discoverer_range_check_iter(task) && SUCCEED == abort);
 out:
 	while (0 != poller_config.processing)	/* try to close all handles if they are exhausted */
 	{

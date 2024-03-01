@@ -1031,7 +1031,14 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() src:%d dst:%d", log_worker_id, __func__, vr_src->values_num,
 			hr_dst->num_data);
 
-	for (i = vr_src->values_num - 1; i >= 0; i--)
+	if (0 == force && 0 != vr_src->values_num)	/* checking that config revision id was changed */
+	{
+		zbx_discoverer_results_t	*src = vr_src->values[0];
+
+		ret = discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, src->ip, 0);
+	}
+
+	for (i = vr_src->values_num - 1; i >= 0 && SUCCEED == ret; i--)
 	{
 		zbx_discoverer_results_t	*src = vr_src->values[i];
 
@@ -1041,7 +1048,7 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 		if (FAIL == (ret = discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
 				src->ip, src->processed_checks_per_ip)))
 		{
-			continue;	/* config revision id was changed */
+			break;	/* config revision id was changed */
 		}
 
 		discoverer_results_move_value(src, hr_dst);
