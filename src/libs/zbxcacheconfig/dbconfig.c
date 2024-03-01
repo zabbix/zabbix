@@ -13075,7 +13075,7 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 		proxy_diff_local.items_active_normal_old = dc_proxy->items_active_normal;
 		proxy_diff_local.items_active_notsupported_old = dc_proxy->items_active_notsupported;
 		proxy_diff_local.items_disabled_old = dc_proxy->items_disabled;
-		proxy_diff_local.hosts_monitored_old = dc_proxy->hosts_not_monitored;
+		proxy_diff_local.hosts_monitored_old = dc_proxy->hosts_monitored;
 		proxy_diff_local.hosts_not_monitored_old = dc_proxy->hosts_not_monitored;
 		proxy_diff_local.required_performance_old = dc_proxy->required_performance;
 
