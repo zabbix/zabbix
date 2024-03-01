@@ -55,6 +55,7 @@ $this->addJsFile('class.widget.problems.js');
 $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
+$this->addJsFile('class.widget.url.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.sortable.js');
 
