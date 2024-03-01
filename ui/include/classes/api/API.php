@@ -352,6 +352,7 @@ class API {
 	public static function ProxyGroup() {
 		return self::getApi('proxygroup');
 	}
+
 	/**
 	 * @return CReport
 	 */
