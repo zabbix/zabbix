@@ -24,7 +24,7 @@ This template has been tested on:
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
 2. Copy the `template_db_mysql.conf` file with user parameters into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget to restart Zabbix agent.
-3. Create the MySQL user that will be used for monitoring (`<password>` at your discretion) For example:
+3. Create the MySQL user that will be used for monitoring (`<password>` at your discretion). For example:
 
 ```text
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
@@ -33,7 +33,7 @@ GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor
 
 For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/grant.html).
 
-4. Create .my.cnf configuration file in the home directory of Zabbix agent for Linux distributions (/var/lib/zabbix by default) or my.cnf in c:\ for Windows. For example:
+4. Create `.my.cnf` configuration file in the home directory of Zabbix agent for Linux distributions (/var/lib/zabbix by default) or `my.cnf` in c:\ for Windows. For example:
 
 ```text
 [client]
@@ -42,11 +42,11 @@ user='zbx_monitor'
 password='<password>'
 ```
 
-For more information please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/option-files.html).
+For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/option-files.html).
 
 NOTE: Linux distributions that use SELinux may require additional steps for access configuration.
 
-For example the following rule could be added to the SELinux policy:
+For example, the following rule could be added to the SELinux policy:
 
 ```text
 # cat <<EOF > zabbix_home.te
