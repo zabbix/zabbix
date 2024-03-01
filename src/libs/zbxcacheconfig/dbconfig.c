@@ -146,7 +146,6 @@ typedef struct
 	zbx_uint64_t	id;
 	uint64_t	items_active_normal;
 	uint64_t	items_active_notsupported;
-	uint64_t	items_disabled;
 }
 zbx_dc_status_diff_host_t;
 
@@ -12906,7 +12905,6 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 
 		dc_host->items_active_normal = diff->hosts.values[i].items_active_normal;
 		dc_host->items_active_notsupported = diff->hosts.values[i].items_active_notsupported;
-		dc_host->items_disabled = diff->hosts.values[i].items_disabled;
 	}
 
 	config->status->required_performance = diff->required_performance;
@@ -13129,7 +13127,7 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 				if (NULL != (proxy_status_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
 						&dc_proxy->proxyid)))
 				{
-					proxy_status_diff->hosts_monitored++;
+					proxy_status_diff->hosts_not_monitored++;
 				}
 				break;
 		}
@@ -13137,8 +13135,7 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 		get_host_statistics(dc_host, &host_diff_local, proxy_status_diff, diff);
 
 		if (dc_host->items_active_normal == host_diff_local.items_active_normal &&
-			dc_host->items_active_notsupported == host_diff_local.items_active_notsupported &&
-			dc_host->items_disabled == host_diff_local.items_disabled)
+			dc_host->items_active_notsupported == host_diff_local.items_active_notsupported)
 		{
 			continue;
 		}
