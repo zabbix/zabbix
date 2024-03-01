@@ -39,7 +39,7 @@ class CMfa extends CApiService {
 	 */
 	public const OUTPUT_FIELDS = ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid'];
 
-	public function get(array $options): array|string {
+	public function get(array $options) {
 		self::validateGet($options);
 
 		if (!$options['countOutput']) {
@@ -361,13 +361,12 @@ class CMfa extends CApiService {
 
 	private static function changedTotpMfaids(array $upd_mfas): array {
 		$mfaids = [];
+		$sensitive_fields = array_flip(['type', 'hash_function', 'code_length']);
 
 		foreach ($upd_mfas as $upd_mfa) {
-			$changed_sensitive_data = array_intersect(
-				array_keys($upd_mfa['values']), ['type', 'hash_function', 'code_length']
-			);
+			$sensitive_changes = array_intersect_key($upd_mfa['values'], $sensitive_fields);
 
-			if (!$changed_sensitive_data || (array_key_exists('type', $changed_sensitive_data)
+			if (!$sensitive_changes || (array_key_exists('type', $sensitive_changes)
 					&& $upd_mfas['values']['type'] == MFA_TYPE_TOTP)) {
 				continue;
 			}
