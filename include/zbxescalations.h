@@ -17,20 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DBSYNCER_H
-#define ZABBIX_DBSYNCER_H
+#ifndef ZABBIX_ESCALATIONS_H
+#define ZABBIX_ESCALATIONS_H
 
-#include "zbxthreads.h"
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxipcservice.h"
 
-typedef struct
-{
-	const zbx_events_funcs_t	*events_cbs;
-	int				config_histsyncer_frequency;
-	int				config_timeout;
-}
-zbx_thread_dbsyncer_args;
-
-ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args);
+void	zbx_init_escalations(int escalators_num);
+int	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new_ptr_t *escalations);
 
 #endif

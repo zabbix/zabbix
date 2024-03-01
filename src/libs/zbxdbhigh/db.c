@@ -64,6 +64,7 @@
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
+ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 
 static int	connection_failure;
 

@@ -967,7 +967,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 					host_status, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
-				events_cbs->process_events_cb(NULL, NULL);
+				events_cbs->process_events_cb(NULL, NULL, NULL);
 
 			if (NULL != events_cbs->clean_events_cb)
 				events_cbs->clean_events_cb();

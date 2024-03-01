@@ -2084,6 +2084,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
+	src/libs/zbxescalations/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile

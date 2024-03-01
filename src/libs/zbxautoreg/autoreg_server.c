@@ -274,7 +274,7 @@ void	zbx_autoreg_flush_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy
 	}
 
 	if (NULL != events_cbs->process_events_cb)
-		events_cbs->process_events_cb(NULL, NULL);
+		events_cbs->process_events_cb(NULL, NULL, NULL);
 
 	if (NULL != events_cbs->clean_events_cb)
 		events_cbs->clean_events_cb();

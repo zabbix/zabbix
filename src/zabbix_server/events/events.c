@@ -37,6 +37,7 @@
 #include "zbxvariant.h"
 #include "zbxconnector.h"
 #include "zbxtagfilter.h"
+#include "zbxescalations.h"
 
 /* event recovery data */
 typedef struct
@@ -2152,7 +2153,7 @@ out:
  * Purpose: flushes local event cache to database                             *
  *                                                                            *
  ******************************************************************************/
-static int	flush_events(void)
+static int	flush_events(zbx_vector_escalation_new_ptr_t *escalations)
 {
 	int				ret;
 	zbx_event_recovery_t		*recovery;
@@ -2176,7 +2177,7 @@ static int	flush_events(void)
 
 	zbx_vector_uint64_pair_sort(&closed_events, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	process_actions(&events, &closed_events);
+	process_actions(&events, &closed_events, escalations);
 	zbx_vector_uint64_pair_destroy(&closed_events);
 
 	return ret;
@@ -2788,11 +2789,13 @@ static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_
  *                               vector.                                      *
  *                               Can be NULL when processing events from      *
  *                               non trigger sources                          *
+ *             escalations     - [OUT]                                        *
  *                                                                            *
  * Return value: number of processed events                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
+		zbx_vector_escalation_new_ptr_t *escalations)
 {
 	int			i, processed_num = 0;
 	zbx_uint64_t		eventid;
@@ -2873,7 +2876,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 			flush_correlation_queue(trigger_diff, triggerids_lock);
 		}
 
-		processed_num = flush_events();
+		processed_num = flush_events(escalations);
 
 		if (0 != trigger_events.values_num)
 			update_trigger_changes(trigger_diff);
@@ -2896,18 +2899,22 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
  * Parameters: triggerid - [IN] source trigger id                             *
  *             eventid   - [IN] event to close                                *
  *             userid    - [IN] user closing the event                        *
+ *             rtc       - [IN] RTC socket                                    *
  *                                                                            *
  * Return value: SUCCEED - the problem was closed                             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid)
+int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid,
+		zbx_ipc_async_socket_t *rtc)
 {
-	zbx_dc_trigger_t	trigger;
-	int			errcode, processed_num = 0;
-	zbx_timespec_t		ts;
-	zbx_db_event		*r_event;
+	zbx_dc_trigger_t		trigger;
+	int				errcode, processed_num = 0;
+	zbx_timespec_t			ts;
+	zbx_db_event			*r_event;
+	zbx_vector_escalation_new_ptr_t	escalations;
 
+	zbx_vector_escalation_new_ptr_create(&escalations);
 	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
 
 	if (SUCCEED == errcode)
@@ -2930,7 +2937,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		r_event->eventid = zbx_db_get_maxid_num("events", 1);
 
-		processed_num = flush_events();
+		processed_num = flush_events(&escalations);
 		update_trigger_changes(&trigger_diff);
 		zbx_db_save_trigger_changes(&trigger_diff);
 
@@ -2940,6 +2947,8 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 			zbx_vector_connector_filter_t	connector_filters_events;
 			unsigned char			*data = NULL;
 			size_t				data_alloc = 0, data_offset = 0;
+
+			zbx_start_escalations(rtc, &escalations);
 
 			zbx_dc_config_triggers_apply_changes(&trigger_diff);
 
@@ -2971,9 +2980,17 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		zbx_clean_events();
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		zbx_vector_ptr_destroy(&trigger_diff);
+
+		for (int i = 0; i < escalations.values_num; i++)
+		{
+			zbx_escalation_new_t	*escalation = escalations.values[i];
+
+			zbx_free(escalation);
+		}
 	}
 
 	zbx_dc_config_clean_triggers(&trigger, &errcode, 1);
+	zbx_vector_escalation_new_ptr_destroy(&escalations);
 
 	return (0 == processed_num ? FAIL : SUCCEED);
 }
