@@ -15639,11 +15639,11 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 
 	proxy_discovery_get_timeouts(dc_proxy, json);
 
+	int	failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
+
 	if (0 != dc_proxy->proxy_groupid)
 	{
 		zbx_dc_proxy_group_t	*pg;
-		char			*status;
-		int			failover_delay;
 
 		pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
 				&dc_proxy->proxy_groupid);
@@ -15658,13 +15658,12 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 					&ptr);
 		}
 
-		if (FAIL == zbx_is_time_suffix(ptr, &failover_delay, ZBX_LENGTH_UNLIMITED))
-			failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
-
-		status = (now - dc_proxy->lastaccess >= failover_delay ? "offline" : "online");
-
-		zbx_json_addstring(json, "status", status, ZBX_JSON_TYPE_STRING);
+		(void)zbx_is_time_suffix(ptr, &failover_delay, ZBX_LENGTH_UNLIMITED);
 	}
+
+	const char	*state = (now - dc_proxy->lastaccess >= failover_delay ? "offline" : "online");
+
+	zbx_json_addstring(json, ZBX_PROTO_TAG_STATE, state, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(json);
 }
