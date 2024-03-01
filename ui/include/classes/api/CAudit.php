@@ -89,6 +89,7 @@ class CAudit {
 	public const RESOURCE_CONNECTOR = 51;
 	public const RESOURCE_LLD_RULE = 52;
 	public const RESOURCE_HISTORY = 53;
+	public const RESOURCE_PROXY_GROUP = 54;
 
 	/**
 	 * Audit details actions.
@@ -135,6 +136,7 @@ class CAudit {
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
+		self::RESOURCE_PROXY_GROUP => 'proxy_group',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -189,6 +191,7 @@ class CAudit {
 		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'name',
+		self::RESOURCE_PROXY_GROUP => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
