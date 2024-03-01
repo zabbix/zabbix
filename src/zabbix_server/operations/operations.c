@@ -301,11 +301,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							" and h.status in (%d,%d)"
 							" and h.flags<>%d"
 							" and h.proxyid%s"
+							" and h.proxy_groupid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
 						" order by h.hostid",
 						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						zbx_db_sql_id_cmp(proxyid), dhostid);
+						zbx_db_sql_id_cmp(new_proxyid), zbx_db_sql_id_cmp(new_proxy_groupid),
+						dhostid);
 
 				if (NULL != (row2 = zbx_db_fetch(result2)))
 				{
