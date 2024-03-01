@@ -510,6 +510,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 
 		$response = $this->call('host.get', [
 			'output' => ['host', 'hostid'],
+			'sortfield' => 'host',
 			'filter' => [
 				'host' => [
 						self::DRULE_LIFETIME_DEFAULT.'_h_'.self::LLD_DATA_MACRO_VALUE,
@@ -648,6 +649,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 
 		$response = $this->call('host.get', [
 			'output' => ['host', 'status'],
+			'sortfield' => 'host',
 			'filter' => [
 				'host' => [
 						self::DRULE_LIFETIME_DEFAULT.'_h_'.self::LLD_DATA_MACRO_VALUE,
@@ -679,6 +681,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 		// Check host groups
 		$response = $this->call('hostgroup.get', [
 			'output' => ['name'],
+			'sortfield' => 'name',
 			'filter' => [
 				'name' => [
 						self::DRULE_LIFETIME_DEFAULT.'_hg_'.self::LLD_DATA_MACRO_VALUE,
@@ -784,6 +787,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 
 		$response = $this->call('host.get', [
 			'output' => ['host', 'status'],
+			'sortfield' => 'host',
 			'filter' => [
 				'host' => [
 						self::DRULE_LIFETIME_DEFAULT.'_h_'.self::LLD_DATA_MACRO_VALUE,
