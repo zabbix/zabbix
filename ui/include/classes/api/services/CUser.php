@@ -2478,13 +2478,13 @@ class CUser extends CApiService {
 	}
 
 	private static function checkLoginTemporarilyBlocked(array $db_user): void {
-		if ($db_user['attempt_failed'] < CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
+		if ($db_user['attempt_failed'] < CSettingsHelper::getPublic(CSettingsHelper::LOGIN_ATTEMPTS)) {
 			return;
 		}
 
 		$blocked_duration = time() - $db_user['attempt_clock'];
 
-		if ($blocked_duration < timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))) {
+		if ($blocked_duration < timeUnitToSeconds(CSettingsHelper::getPublic(CSettingsHelper::LOGIN_BLOCK))) {
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);

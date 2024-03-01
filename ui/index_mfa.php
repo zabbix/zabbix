@@ -50,30 +50,41 @@ if ($request != '') {
 	$redirect_to->setArgument('request', $request);
 }
 
-$session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
+try {
+	$session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 
-// If MFA is not required - redirect to the main login page.
-if (!array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
-	redirect($redirect_to->toString());
-}
+	if (!array_key_exists('sign', $session_data)) {
+		throw new Exception(_('Session initialization error.'));
+	}
 
-if ($request != '') {
-	CSessionHelper::set('request', $request);
-}
+	$session_data_sign = $session_data['sign'];
+	$session_data_sign_check = CEncryptHelper::sign(json_encode(array_diff_key($session_data, array_flip(['sign']))));
 
-$duo_redirect_uri = ((new CUrl($_SERVER['REQUEST_URI']))
-	->removeArgument('state')
-	->removeArgument('duo_code'))
-	->setArgument('request', $request)
-	->toString();
+	if (!CEncryptHelper::checkSign($session_data_sign, $session_data_sign_check)) {
+		throw new Exception(_('Session initialization error.'));
+	}
 
-$full_duo_redirect_url = implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri]);
-$session_data_required = array_intersect_key($session_data, array_flip(['sessionid', 'mfaid']));
+	// If MFA is not required - redirect to the main login page.
+	if (!array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
+		redirect($redirect_to->toString());
+	}
 
-$error = null;
+	if ($request != '') {
+		CSessionHelper::set('request', $request);
+	}
 
-if (!CSessionHelper::has('state') && !hasRequest('enter')) {
-	try {
+	$duo_redirect_uri = ((new CUrl($_SERVER['REQUEST_URI']))
+		->removeArgument('state')
+		->removeArgument('duo_code'))
+		->setArgument('request', $request)
+		->toString();
+
+	$full_duo_redirect_url = implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri]);
+	$session_data_required = array_intersect_key($session_data, array_flip(['sessionid', 'mfaid']));
+
+	$error = null;
+
+	if (!CSessionHelper::has('state') && !hasRequest('enter')) {
 		$data = CUser::getConfirmData($session_data_required + ['redirect_uri' => $full_duo_redirect_url]);
 
 		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
@@ -89,23 +100,18 @@ if (!CSessionHelper::has('state') && !hasRequest('enter')) {
 			redirect($data['prompt_uri']);
 		}
 	}
-	catch (Exception $e) {
-		$error['error']['message'] = $e->getMessage();
-	}
-}
-else {
-	$data = $session_data_required;
-	$data['redirect_uri'] = $full_duo_redirect_url;
-	$data['mfa_response_data'] = [
-		'verification_code' => getRequest('verification_code', ''),
-		'totp_secret' => getRequest('totp_secret'),
-		'duo_code' => getRequest('duo_code'),
-		'duo_state' => getRequest('state'),
-		'state' => array_key_exists('state', $session_data) ? $session_data['state'] : '',
-		'username' => array_key_exists('username', $session_data) ? $session_data['username'] : ''
-	];
+	else {
+		$data = $session_data_required;
+		$data['redirect_uri'] = $full_duo_redirect_url;
+		$data['mfa_response_data'] = [
+			'verification_code' => getRequest('verification_code', ''),
+			'totp_secret' => getRequest('totp_secret'),
+			'duo_code' => getRequest('duo_code'),
+			'duo_state' => getRequest('state'),
+			'state' => array_key_exists('state', $session_data) ? $session_data['state'] : '',
+			'username' => array_key_exists('username', $session_data) ? $session_data['username'] : ''
+		];
 
-	try {
 		$confirm = CUser::confirm($data);
 
 		if ($confirm) {
@@ -122,21 +128,21 @@ else {
 			redirect(reset($redirect));
 		}
 	}
-	catch (Exception $e) {
-		$error['error']['message'] = $e->getMessage();
+}
+catch (Exception $e) {
+	$error['error']['message'] = $e->getMessage();
 
-		CMessageHelper::clear();
+	CMessageHelper::clear();
 
-		if ($error['error'] && $error['error']['message'] ==
-			_('The verification code was incorrect, please try again.')
-		) {
-			$data['qr_code_url'] = getRequest('qr_code_url');
-			$data['totp_secret'] = getRequest('totp_secret');
-			$data['mfa']['hash_function'] = getRequest('hash_function');
+	if ($error['error'] && $error['error']['message'] ==
+		_('The verification code was incorrect, please try again.')
+	) {
+		$data['qr_code_url'] = getRequest('qr_code_url');
+		$data['totp_secret'] = getRequest('totp_secret');
+		$data['mfa']['hash_function'] = getRequest('hash_function');
 
-			echo (new CView('mfa.login', $data + $error))->getOutput();
-			exit;
-		}
+		echo (new CView('mfa.login', $data + $error))->getOutput();
+		exit;
 	}
 }
 
