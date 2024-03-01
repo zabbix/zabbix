@@ -44,15 +44,26 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldTimePeriod
 };
 
-use Widgets\SvgGraph\Widget;
-
 /**
  * Graph widget form view.
  */
 class WidgetForm extends CWidgetForm {
 
-	private const PERCENTILE_MIN = 1;
-	private const PERCENTILE_MAX = 100;
+	public const LEGEND_ON = 1;
+	public const LEGEND_STATISTIC_ON = 1;
+	public const LEGEND_AGGREGATION_ON = 1;
+
+	public const LEGEND_LINES_MODE_FIXED = 0;
+	public const LEGEND_LINES_MODE_VARIABLE = 1;
+
+	public const LEGEND_LINES_MIN = 1;
+	public const LEGEND_LINES_MAX = 10;
+
+	public const LEGEND_COLUMNS_MIN = 1;
+	public const LEGEND_COLUMNS_MAX = 4;
+
+	public const PERCENTILE_MIN = 1;
+	public const PERCENTILE_MAX = 100;
 
 	private bool $percentile_left_on = false;
 	private bool $percentile_right_on = false;
@@ -200,11 +211,11 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		if (array_key_exists('legend', $values)) {
-			$this->legend_on = $values['legend'] == Widget::LEGEND_ON;
+			$this->legend_on = $values['legend'] == self::LEGEND_ON;
 		}
 
 		if (array_key_exists('legend_statistic', $values)) {
-			$this->legend_statistic_on = $values['legend_statistic'] == Widget::LEGEND_STATISTIC_ON;
+			$this->legend_statistic_on = $values['legend_statistic'] == self::LEGEND_STATISTIC_ON;
 		}
 
 		if (array_key_exists('show_problems', $values)) {
@@ -347,7 +358,7 @@ class WidgetForm extends CWidgetForm {
 	private function initLegendFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(Widget::LEGEND_ON)
+				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(self::LEGEND_ON)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('legend_statistic', _('Display min/avg/max')))
@@ -359,24 +370,24 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('legend_lines_mode', _('Rows'), [
-					Widget::LEGEND_LINES_MODE_FIXED => _('Fixed'),
-					Widget::LEGEND_LINES_MODE_VARIABLE => _('Variable')
+					self::LEGEND_LINES_MODE_FIXED => _('Fixed'),
+					self::LEGEND_LINES_MODE_VARIABLE => _('Variable')
 				]))
-					->setDefault(Widget::LEGEND_LINES_MODE_FIXED)
+					->setDefault(self::LEGEND_LINES_MODE_FIXED)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('legend_lines',  _('Number of rows'),
-					Widget::LEGEND_LINES_MIN, Widget::LEGEND_LINES_MAX
+					self::LEGEND_LINES_MIN, self::LEGEND_LINES_MAX
 				))
-					->setDefault(Widget::LEGEND_LINES_MIN)
+					->setDefault(self::LEGEND_LINES_MIN)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('legend_columns', _('Number of columns'),
-					Widget::LEGEND_COLUMNS_MIN, Widget::LEGEND_COLUMNS_MAX
+					self::LEGEND_COLUMNS_MIN, self::LEGEND_COLUMNS_MAX
 				))
-					->setDefault(Widget::LEGEND_COLUMNS_MAX)
+					->setDefault(self::LEGEND_COLUMNS_MAX)
 					->setFlags(!$this->legend_on || $this->legend_statistic_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			);
 	}

@@ -23,8 +23,6 @@ namespace Widgets\SvgGraph\Includes;
 use CDiv,
 	CSpan;
 
-use Widgets\SvgGraph\Widget;
-
 class CSvgGraphLegend extends CDiv {
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
@@ -67,11 +65,11 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	private function getLinesCount(): int {
-		if ($this->lines_mode == Widget::LEGEND_LINES_MODE_FIXED) {
+		if ($this->lines_mode == WidgetForm::LEGEND_LINES_MODE_FIXED) {
 			return $this->lines_count;
 		}
 
-		return max(Widget::LEGEND_LINES_MIN, min($this->lines_count, $this->show_statistic
+		return max(WidgetForm::LEGEND_LINES_MIN, min($this->lines_count, $this->show_statistic
 			? count($this->legend_items)
 			: ceil(count($this->legend_items) / $this->columns_count)
 		));
@@ -94,7 +92,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	public function showStatistic(int $show_statistic): self {
-		$this->show_statistic = ($show_statistic == Widget::LEGEND_STATISTIC_ON);
+		$this->show_statistic = ($show_statistic == WidgetForm::LEGEND_STATISTIC_ON);
 
 		return $this;
 	}

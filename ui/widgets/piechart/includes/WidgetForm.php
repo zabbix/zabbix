@@ -49,36 +49,39 @@ class WidgetForm extends CWidgetForm {
 	public const DATA_SOURCE_TRENDS = 2;
 
 	public const DRAW_TYPE_DOUGHNUT = 1;
-	private const DRAW_TYPE_PIE = 0;
+	public const DRAW_TYPE_PIE = 0;
 
 	public const LEGEND_ON = 1;
-	private const LEGEND_COLUMNS_MAX = 4;
-	private const LEGEND_COLUMNS_MIN = 1;
-	private const LEGEND_LINES_MAX = 10;
-	private const LEGEND_LINES_MIN = 1;
-	private const LEGEND_LINES_MODE_FIXED = 0;
+
+	public const LEGEND_COLUMNS_MAX = 4;
+	public const LEGEND_COLUMNS_MIN = 1;
+
+	public const LEGEND_LINES_MAX = 10;
+	public const LEGEND_LINES_MIN = 1;
+
+	public const LEGEND_LINES_MODE_FIXED = 0;
 	public const LEGEND_LINES_MODE_VARIABLE = 1;
 
-	private const MERGE_PERCENT_MAX = 10;
-	private const MERGE_PERCENT_MIN = 1;
+	public const MERGE_PERCENT_MAX = 10;
+	public const MERGE_PERCENT_MIN = 1;
 
-	private const SPACE_DEFAULT = 1;
-	private const SPACE_MAX = 10;
-	private const SPACE_MIN = 0;
+	public const SPACE_DEFAULT = 1;
+	public const SPACE_MAX = 10;
+	public const SPACE_MIN = 0;
 
-	private const VALUE_DECIMALS_DEFAULT = 2;
-	private const VALUE_DECIMALS_MAX = 6;
-	private const VALUE_DECIMALS_MIN = 0;
+	public const VALUE_DECIMALS_DEFAULT = 2;
+	public const VALUE_DECIMALS_MAX = 6;
+	public const VALUE_DECIMALS_MIN = 0;
 
 	public const VALUE_SIZE_CUSTOM = 1;
-	private const VALUE_SIZE_AUTO = 0;
-	private const VALUE_SIZE_DEFAULT = 20;
-	private const VALUE_SIZE_MAX = 100;
-	private const VALUE_SIZE_MIN = 1;
+	public const VALUE_SIZE_AUTO = 0;
+	public const VALUE_SIZE_DEFAULT = 20;
+	public const VALUE_SIZE_MAX = 100;
+	public const VALUE_SIZE_MIN = 1;
 
-	private const WIDTH_DEFAULT = 50;
-	private const WIDTH_MIN = 20;
-	private const WIDTH_STEP = 10;
+	public const WIDTH_DEFAULT = 50;
+	public const WIDTH_MIN = 20;
+	public const WIDTH_STEP = 10;
 
 	private bool $legend_on = true;
 

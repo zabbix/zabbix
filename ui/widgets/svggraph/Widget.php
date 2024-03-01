@@ -21,24 +21,9 @@
 
 namespace Widgets\SvgGraph;
 
-use Widgets\SvgGraph\Includes\WidgetForm;
-
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
-
-	public const LEGEND_ON = 1;
-	public const LEGEND_STATISTIC_ON = 1;
-	public const LEGEND_AGGREGATION_ON = 1;
-
-	public const LEGEND_LINES_MODE_FIXED = 0;
-	public const LEGEND_LINES_MODE_VARIABLE = 1;
-
-	public const LEGEND_LINES_MIN = 1;
-	public const LEGEND_LINES_MAX = 10;
-
-	public const LEGEND_COLUMNS_MIN = 1;
-	public const LEGEND_COLUMNS_MAX = 4;
 
 	public function getDefaultName(): string {
 		return _('Graph');

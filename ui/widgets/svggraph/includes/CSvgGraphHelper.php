@@ -35,8 +35,6 @@ use API,
 	Exception,
 	Manager;
 
-use Widgets\SvgGraph\Widget;
-
 /**
  * Class calculates graph data and makes SVG graph.
  */
@@ -87,11 +85,7 @@ class CSvgGraphHelper {
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
-		$svg_height = $height - ($legend !== null ? $legend->getHeight() : 0);
-
-		if (0 > $svg_height) {
-			$svg_height = 0;
-		}
+		$svg_height = max(0, $height - ($legend !== null ? $legend->getHeight() : 0));
 
 		$graph = (new CSvgGraph([
 			'displaying' => $options['displaying'],
@@ -776,7 +770,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getLegend(array $metrics, array $legend_options): ?CSvgGraphLegend {
-		if ($legend_options['show_legend'] != Widget::LEGEND_ON) {
+		if ($legend_options['show_legend'] != WidgetForm::LEGEND_ON) {
 			return null;
 		}
 

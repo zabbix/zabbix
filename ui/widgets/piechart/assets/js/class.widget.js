@@ -23,14 +23,15 @@ class CWidgetPieChart extends CWidget {
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V = 8;
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H = 10;
 
-	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
-	static LEGEND_LINE_HEIGHT = 18;
 	static ZBX_STYLE_PIE_CHART_LEGEND = 'svg-pie-chart-legend';
 	static ZBX_STYLE_PIE_CHART_LEGEND_HEADER = 'svg-pie-chart-legend-header';
 	static ZBX_STYLE_PIE_CHART_LEGEND_ITEM = 'svg-pie-chart-legend-item';
 	static ZBX_STYLE_PIE_CHART_LEGEND_SHOW_VALUE = 'svg-pie-chart-legend-show-value';
 	static ZBX_STYLE_PIE_CHART_LEGEND_VALUE = 'svg-pie-chart-legend-value';
 	static ZBX_STYLE_PIE_CHART_LEGEND_NO_DATA = 'svg-pie-chart-legend-no-data';
+
+	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
+	static LEGEND_LINE_HEIGHT = 18;
 
 	static LEGEND_LINES_MODE_VARIABLE = 1;
 
