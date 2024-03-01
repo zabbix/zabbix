@@ -74,6 +74,7 @@ DIST_SUBDIRS = \
 	zbxthreads \
 	zbxtime \
 	zbxtimekeeper \
+	zbxtrapper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -134,6 +135,7 @@ SERVER_SUBDIRS = \
 	zbxtime \
 	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
@@ -190,6 +192,7 @@ PROXY_SUBDIRS = \
 	zbxtime \
 	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
@@ -238,6 +241,7 @@ SUBDIRS = \
 	zbxthreads \
 	zbxtime \
 	zbxvariant \
+	zbxtrapper \
 	zbxversion \
 	zbxvmware \
 	zbxxml \
