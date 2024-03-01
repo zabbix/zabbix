@@ -143,19 +143,31 @@ static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint64_t revision);
 
 typedef struct
 {
-	int		reset;
-	zbx_uint64_t	hosts_monitored;
-	zbx_uint64_t	hosts_not_monitored;
-	zbx_uint64_t	items_active_normal;
-	zbx_uint64_t	items_active_notsupported;
-	zbx_uint64_t	items_disabled;
-	zbx_uint64_t	triggers_enabled_ok;
-	zbx_uint64_t	triggers_enabled_problem;
-	zbx_uint64_t	triggers_disabled;
-	double		required_performance;
+	zbx_uint64_t	id;
+	uint64_t	items_active_normal;
+	uint64_t	items_active_notsupported;
+	uint64_t	items_disabled;
+}
+zbx_dc_status_diff_host_t;
 
-	zbx_hashset_t	hosts;
-	zbx_hashset_t	proxies;
+ZBX_VECTOR_DECL(status_diff_host, zbx_dc_status_diff_host_t)
+ZBX_VECTOR_IMPL(status_diff_host, zbx_dc_status_diff_host_t)
+
+typedef struct
+{
+	int				reset;
+	zbx_uint64_t			hosts_monitored;
+	zbx_uint64_t			hosts_not_monitored;
+	zbx_uint64_t			items_active_normal;
+	zbx_uint64_t			items_active_notsupported;
+	zbx_uint64_t			items_disabled;
+	zbx_uint64_t			triggers_enabled_ok;
+	zbx_uint64_t			triggers_enabled_problem;
+	zbx_uint64_t			triggers_disabled;
+	double				required_performance;
+
+	zbx_vector_status_diff_host_t	hosts;
+	zbx_hashset_t			proxies;
 
 }
 zbx_dc_status_diff_t;
@@ -12833,23 +12845,34 @@ typedef struct
 {
 	zbx_uint64_t	id;
 	uint64_t	items_active_normal;
+	uint64_t	items_active_normal_old;
 	uint64_t	items_active_notsupported;
+	uint64_t	items_active_notsupported_old;
 	uint64_t	items_disabled;
+	uint64_t	items_disabled_old;
 	zbx_uint64_t	hosts_monitored;
+	zbx_uint64_t	hosts_monitored_old;
 	zbx_uint64_t	hosts_not_monitored;
+	zbx_uint64_t	hosts_not_monitored_old;
 	double		required_performance;
+	double		required_performance_old;
 }
-zbx_dc_status_diff_host_t;
+zbx_dc_status_diff_proxy_t;
 
 static void	dc_status_diff_init(zbx_dc_status_diff_t *diff)
 {
 	memset(diff, 0, sizeof(zbx_dc_status_diff_t));
 
-	zbx_hashset_create(&diff->hosts, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_status_diff_host_create(&diff->hosts);
 
 	zbx_hashset_create(&diff->proxies, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void	dc_status_diff_destroy(zbx_dc_status_diff_t *diff)
+{
+	zbx_vector_status_diff_host_destroy(&diff->hosts);
+	zbx_hashset_destroy(&diff->proxies);
 }
 
 static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
@@ -12864,34 +12887,32 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 
 	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_dc_status_diff_host_t	*proxy_p;
+		zbx_dc_status_diff_proxy_t	*proxy_diff;
 
-		if (NULL == (proxy_p = (zbx_dc_status_diff_host_t *)zbx_hashset_search(&diff->proxies,
+		if (NULL == (proxy_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
 				&dc_proxy->proxyid)))
 		{
 			continue;
 		}
 
-		dc_proxy->hosts_monitored = proxy_p->hosts_monitored;
-		dc_proxy->hosts_not_monitored = proxy_p->hosts_not_monitored;
-		dc_proxy->required_performance = proxy_p->required_performance;
-		dc_proxy->items_active_normal = proxy_p->items_active_normal;
-		dc_proxy->items_active_notsupported = proxy_p->items_active_notsupported;
-		dc_proxy->items_disabled = proxy_p->items_disabled;
+		dc_proxy->hosts_monitored = proxy_diff->hosts_monitored;
+		dc_proxy->hosts_not_monitored = proxy_diff->hosts_not_monitored;
+		dc_proxy->required_performance = proxy_diff->required_performance;
+		dc_proxy->items_active_normal = proxy_diff->items_active_normal;
+		dc_proxy->items_active_notsupported = proxy_diff->items_active_notsupported;
+		dc_proxy->items_disabled = proxy_diff->items_disabled;
 	}
 
-	zbx_hashset_iter_reset(&config->hosts, &iter);
-
-	while (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	for (int i = 0; i < diff->hosts.values_num; i++)
 	{
-		zbx_dc_status_diff_host_t	*host_p;
+		zbx_uint64_t	hostid = diff->hosts.values[i].id;
 
-		if (NULL == (host_p = (zbx_dc_status_diff_host_t *)zbx_hashset_search(&diff->hosts, &dc_host->hostid)))
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
 
-		dc_host->items_active_normal = host_p->items_active_normal;
-		dc_host->items_active_notsupported = host_p->items_active_notsupported;
-		dc_host->items_disabled = host_p->items_disabled;
+		dc_host->items_active_normal = diff->hosts.values[i].items_active_normal;
+		dc_host->items_active_notsupported = diff->hosts.values[i].items_active_notsupported;
+		dc_host->items_disabled = diff->hosts.values[i].items_disabled;
 	}
 
 	config->status->required_performance = diff->required_performance;
@@ -12908,7 +12929,7 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 }
 
 static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
-		zbx_dc_status_diff_host_t *proxy_diff, zbx_dc_status_diff_t *diff)
+		zbx_dc_status_diff_proxy_t *proxy_diff, zbx_dc_status_diff_t *diff)
 {
 	int			i;
 	const ZBX_DC_ITEM	*dc_item;
@@ -13049,13 +13070,23 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 
 	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_dc_status_diff_host_t	proxy_local;
+		zbx_dc_status_diff_proxy_t	proxy_diff_local;
 
-		memset(&proxy_local, 0, sizeof(zbx_dc_status_diff_host_t));
+		memset(&proxy_diff_local, 0, sizeof(zbx_dc_status_diff_proxy_t));
 
-		proxy_local.id = dc_proxy->proxyid;
+		proxy_diff_local.id = dc_proxy->proxyid;
 
-		zbx_hashset_insert(&diff->proxies, &proxy_local, sizeof(proxy_local));
+		proxy_diff_local.items_active_normal_old = dc_proxy->items_active_normal;
+		proxy_diff_local.items_active_notsupported_old = dc_proxy->items_active_notsupported;
+		proxy_diff_local.items_disabled_old = dc_proxy->items_disabled;
+		proxy_diff_local.hosts_monitored_old = dc_proxy->hosts_not_monitored;
+		proxy_diff_local.hosts_not_monitored_old = dc_proxy->hosts_not_monitored;
+		proxy_diff_local.required_performance_old = dc_proxy->required_performance;
+
+		if (SUCCEED != diff->reset)
+			proxy_diff_local.required_performance = dc_proxy->required_performance;
+
+		zbx_hashset_insert(&diff->proxies, &proxy_diff_local, sizeof(proxy_diff_local));
 	}
 
 	/* loop over hosts */
@@ -13065,11 +13096,11 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 
 	while (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_dc_status_diff_host_t	host_local;
-		zbx_dc_status_diff_host_t	*proxy_p = NULL;
+		zbx_dc_status_diff_host_t	host_diff_local;
+		zbx_dc_status_diff_proxy_t	*proxy_status_diff = NULL;
 
-		memset(&host_local, 0, sizeof(zbx_dc_status_diff_host_t));
-		host_local.id = dc_host->hostid;
+		memset(&host_diff_local, 0, sizeof(zbx_dc_status_diff_host_t));
+		host_diff_local.id = dc_host->hostid;
 
 		/* gather per-proxy statistics of enabled and disabled hosts */
 		switch (dc_host->status)
@@ -13085,10 +13116,10 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 					break;
 				}
 
-				if (NULL != (proxy_p = (zbx_dc_status_diff_host_t *)zbx_hashset_search(&diff->proxies,
+				if (NULL != (proxy_status_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
 						&dc_proxy->proxyid)))
 				{
-					proxy_p->hosts_monitored++;
+					proxy_status_diff->hosts_monitored++;
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
@@ -13102,22 +13133,58 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 					break;
 				}
 
-				if (NULL != (proxy_p = (zbx_dc_status_diff_host_t *)zbx_hashset_search(&diff->proxies,
+				if (NULL != (proxy_status_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
 						&dc_proxy->proxyid)))
 				{
-					proxy_p->hosts_monitored++;
+					proxy_status_diff->hosts_monitored++;
 				}
 				break;
 		}
 
-		get_host_statistics(dc_host, &host_local, proxy_p, diff);
-		zbx_hashset_insert(&diff->hosts, &host_local, sizeof(host_local));
+		get_host_statistics(dc_host, &host_diff_local, proxy_status_diff, diff);
+
+		if (dc_host->items_active_normal == host_diff_local.items_active_normal &&
+			dc_host->items_active_notsupported == host_diff_local.items_active_notsupported &&
+			dc_host->items_disabled == host_diff_local.items_disabled)
+		{
+			continue;
+		}
+
+		zbx_vector_status_diff_host_append(&diff->hosts, host_diff_local);
 	}
 
 	get_trigger_statistics(&config->triggers, diff);
 
 	return SUCCEED;
 #undef ZBX_STATUS_LIFETIME
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove unchanged proxy entries from status update diff            *
+ *                                                                            *
+ * Parameters: diff - [OUT]                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_status_update_remove_unchanged_proxies(zbx_dc_status_diff_t *diff)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_dc_status_diff_proxy_t	*proxy_diff;
+
+	zbx_hashset_iter_reset(&diff->proxies, &iter);
+
+	while (NULL != (proxy_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (proxy_diff->hosts_monitored_old == proxy_diff->hosts_monitored &&
+			proxy_diff->hosts_not_monitored_old == proxy_diff->hosts_not_monitored &&
+			proxy_diff->items_active_normal_old == proxy_diff->items_active_normal &&
+			proxy_diff->items_active_notsupported_old == proxy_diff->items_active_notsupported &&
+			proxy_diff->items_disabled_old == proxy_diff->items_disabled)
+		{
+			zbx_hashset_iter_remove(&iter);
+		}
+	}
+
 }
 
 /******************************************************************************
@@ -13163,6 +13230,8 @@ static void	dc_status_update(void)
 
 	if (SUCCEED == diff_updated)
 	{
+		dc_status_update_remove_unchanged_proxies(&diff);
+
 		WRLOCK_CACHE;
 
 		dc_status_update_apply_diff(&diff);
@@ -13170,8 +13239,7 @@ static void	dc_status_update(void)
 		UNLOCK_CACHE;
 	}
 
-	zbx_hashset_destroy(&diff.hosts);
-	zbx_hashset_destroy(&diff.proxies);
+	dc_status_diff_destroy(&diff);
 }
 
 /******************************************************************************
