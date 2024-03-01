@@ -128,6 +128,11 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
 	return SUCCEED;
 }
 
+static int	discoverer_drule_check(zbx_hashset_t *check_counts, zbx_uint64_t druleid, const char *ip)
+{
+	return discoverer_check_count_decrease(check_counts, druleid, ip, 0);
+}
+
 static int	dcheck_get_timeout(unsigned char type, int *timeout_sec, char *error_val, size_t error_len)
 {
 	char	*tmt;
@@ -907,26 +912,13 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 
 	zbx_vector_fping_host_reserve(&hosts, (size_t)hosts.values_num + (size_t)count);
 
-	TASK_IP2STR(task, ip);
-	task->range.state.count--;
-	memset(&host, 0, sizeof(host));
-	host.addr = zbx_strdup(NULL, ip);
-	zbx_vector_fping_host_append(&hosts, host);
-
-	while (0 == *stop && SUCCEED == abort && 0 != task->range.state.count &&
-			SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
-			&task->range.state.index_ip, task->range.state.ipaddress))
+	do
 	{
-		int	dec_count;
-
-		if (worker_max > hosts.values_num)
-		{
-			memset(&host, 0, sizeof(host));
-			TASK_IP2STR(task, ip);
-			task->range.state.count--;
-			host.addr = zbx_strdup(NULL, ip);
-			zbx_vector_fping_host_append(&hosts, host);
-		}
+		memset(&host, 0, sizeof(host));
+		TASK_IP2STR(task, ip);
+		task->range.state.count--;
+		host.addr = zbx_strdup(NULL, ip);
+		zbx_vector_fping_host_append(&hosts, host);
 
 		if (worker_max > hosts.values_num)
 			continue;
@@ -941,7 +933,6 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		}
 		else
 		{
-
 			pthread_mutex_lock(&dmanager.results_lock);
 			abort = discoverer_icmp_result_merge(&dmanager.incomplete_checks_count, &dmanager.results,
 					druleid, dcheck->dcheckid, task->unique_dcheckid, &hosts);
@@ -954,12 +945,12 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 			zbx_str_free(hosts.values[i].dnsname);
 		}
 
-		dec_count = hosts.values_num;
+		(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, hosts.values_num);
 		zbx_vector_fping_host_clear(&hosts);
-
-		if (SUCCEED == discovery_pending_checks_count_decrease(queue, worker_max, 0, dec_count))
-			break;
 	}
+	while (0 == *stop && SUCCEED == abort && 0 != task->range.state.count &&
+			SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
+			&task->range.state.index_ip, task->range.state.ipaddress));
 
 	if (0 == *stop && 0 != hosts.values_num && ret == SUCCEED)
 	{
@@ -1035,7 +1026,7 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 	{
 		zbx_discoverer_results_t	*src = vr_src->values[0];
 
-		ret = discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, src->ip, 0);
+		ret = discoverer_drule_check(&dmanager.incomplete_checks_count, druleid, src->ip);
 	}
 
 	for (i = vr_src->values_num - 1; i >= 0 && SUCCEED == ret; i--)
@@ -1390,7 +1381,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	manager->config_timeout = args_in->config_timeout;
 	manager->source_ip = args_in->config_source_ip;
 	manager->progname = args_in->zbx_get_progname_cb_arg();
-	manager->process_num = info->process_num;
 	manager->process_type = info->process_type;
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
