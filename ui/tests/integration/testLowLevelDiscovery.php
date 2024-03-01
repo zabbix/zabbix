@@ -633,7 +633,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 			'output'	=> ['name'],
 			'sortfield'	=> 'name'
 		]);
-		$this->assertCount(4, $response['result']);
+		$this->assertCount(3, $response['result']);
 
 		$graph = $response['result'][0];
 		$this->assertEquals(self::DRULE_LIFETIME_DEFAULT.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
@@ -643,9 +643,6 @@ class testLowLevelDiscovery extends CIntegrationTest {
 
 		$graph = $response['result'][2];
 		$this->assertEquals(self::DRULE_LIFETIME_DISABLE_AFTER.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
-
-		$graph = $response['result'][3];
-		$this->assertEquals(self::DRULE_LIFETIME_DELETE_DISABLED.'_g_'.self::LLD_DATA_MACRO_VALUE, $graph['name']);
 
 		// Check hosts
 
@@ -687,7 +684,8 @@ class testLowLevelDiscovery extends CIntegrationTest {
 						self::DRULE_LIFETIME_DEFAULT.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_NEVER.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_DELETE.'_hg_'.self::LLD_DATA_MACRO_VALUE,
-						self::DRULE_LIFETIME_DISABLE_AFTER.'_hg_'.self::LLD_DATA_MACRO_VALUE
+						self::DRULE_LIFETIME_DISABLE_AFTER.'_hg_'.self::LLD_DATA_MACRO_VALUE,
+						self::DRULE_LIFETIME_DELETE_DISABLED.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 				]
 			]
 		]);

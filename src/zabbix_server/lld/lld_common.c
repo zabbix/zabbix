@@ -187,7 +187,14 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 		else
 			elapsed = SUCCEED;
 
-		if (SUCCEED == elapsed && (ZBX_LLD_OBJECT_STATUS_ENABLED == object_status ||
+		if (NULL == enabled_lifetime)
+		{
+			if (SUCCEED == elapsed)
+				zbx_vector_uint64_append(&del_ids, id);
+
+			continue;
+		}
+		else if (SUCCEED == elapsed && (ZBX_LLD_OBJECT_STATUS_ENABLED == object_status ||
 				ZBX_DISABLE_SOURCE_LLD_LOST == disable_source))
 		{
 			zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
@@ -196,9 +203,6 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 			zbx_vector_uint64_append(&upd_ids, id);
 			continue;
 		}
-
-		if (NULL == enabled_lifetime)
-			continue;
 
 		if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type)
 		{
@@ -222,7 +226,7 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 
 	if (0 == lc_ids.values_num && 0 == discovery_ts.values_num && 0 == dis_discovery_ts.values_num &&
 			0 == ts_ids.values_num && 0 == dis_ts_ids.values_num && 0 == upd_ids.values_num &&
-			0 == lost_ids.values_num && 0 == discovered_ids.values_num)
+			0 == lost_ids.values_num && 0 == discovered_ids.values_num && 0 == del_ids.values_num)
 	{
 		goto clean;
 	}
