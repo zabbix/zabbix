@@ -347,6 +347,12 @@ class API {
 	}
 
 	/**
+	 * @return CProxyGroup
+	 */
+	public static function ProxyGroup() {
+		return self::getApi('proxygroup');
+	}
+	/**
 	 * @return CReport
 	 */
 	public static function Report() {
