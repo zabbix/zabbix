@@ -1786,6 +1786,12 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
+		const legend_value = document.getElementById('legend_value');
+
+		if (legend_value !== null && legend_value.checked) {
+			return true;
+		}
+
 		const legend_aggregation = document.getElementById('legend_aggregation');
 
 		if (legend_aggregation !== null && legend_aggregation.checked) {

@@ -32,6 +32,7 @@
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 ZBX_PTR_VECTOR_IMPL(action_eval_ptr, zbx_action_eval_t *)
+ZBX_PTR_VECTOR_IMPL(queue_item_ptr, zbx_queue_item_t *)
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)

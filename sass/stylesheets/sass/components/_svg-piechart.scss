@@ -65,6 +65,31 @@
 			background: var(--color);
 		}
 	}
+
+	.svg-pie-chart-legend-header {
+		grid-column-start: 2;
+		color: $font-alt-color;
+	}
+
+	.svg-pie-chart-legend-no-data {
+		color: $font-alt-color;
+	}
+
+	.svg-pie-chart-legend-header,
+	.svg-pie-chart-legend-value,
+	.svg-pie-chart-legend-no-data {
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	&.svg-pie-chart-legend-show-value {
+		grid-template-columns: auto max-content;
+		justify-content: stretch;
+
+		.svg-pie-chart-legend-item {
+			grid-column-start: 1;
+		}
+	}
 }
 
 .svg-pie-chart-hintbox {

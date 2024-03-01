@@ -37,7 +37,7 @@ struct zbx_async_manager
 zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t finished_cb,
 		void *finished_data, zbx_thread_poller_args *poller_args_in, char **error)
 {
-	int			i, ret = FAIL, started_num = 0;
+	int			ret = FAIL, started_num = 0;
 	time_t			time_start;
 	struct timespec		poll_delay = {0, 1e8};
 	zbx_async_manager_t	*manager;
@@ -53,7 +53,7 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_async_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_async_worker_t));
 
-	for (i = 0; i < workers_num; i++)
+	for (int i = 0; i < workers_num; i++)
 	{
 		if (SUCCEED != async_worker_init(&manager->workers[i], &manager->queue,
 				poller_args_in->zbx_get_progname_cb_arg(), error))
@@ -90,7 +90,7 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 out:
 	if (FAIL == ret)
 	{
-		for (i = 0; i < manager->workers_num; i++)
+		for (int i = 0; i < manager->workers_num; i++)
 			async_worker_stop(&manager->workers[i]);
 
 		async_task_queue_destroy(&manager->queue);
@@ -107,16 +107,15 @@ out:
 
 void	zbx_async_manager_free(zbx_async_manager_t *manager)
 {
-	int	i;
-
 	async_task_queue_lock(&manager->queue);
-	for (i = 0; i < manager->workers_num; i++)
+
+	for (int i = 0; i < manager->workers_num; i++)
 		async_worker_stop(&manager->workers[i]);
 
 	async_task_queue_notify(&manager->queue);
 	async_task_queue_unlock(&manager->queue);
 
-	for (i = 0; i < manager->workers_num; i++)
+	for (int i = 0; i < manager->workers_num; i++)
 		async_worker_destroy(&manager->workers[i]);
 
 	zbx_free(manager->workers);

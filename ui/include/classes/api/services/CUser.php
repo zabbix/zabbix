@@ -2323,7 +2323,7 @@ class CUser extends CApiService {
 			return ZBX_AUTH_LDAP;
 		}
 
-		return CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
+		return CAuthenticationHelper::getPublic(CAuthenticationHelper::AUTHENTICATION_TYPE);
 	}
 
 	private function tryToCreateLdapProvisionedUser(array $data, array &$db_users): bool {
@@ -2400,7 +2400,7 @@ class CUser extends CApiService {
 				' AND '.dbConditionId('ug.userid', [$db_user['userid']])
 		);
 
-		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+		$deprovision_groupid = CAuthenticationHelper::getPublic(CAuthenticationHelper::DISABLED_USER_GROUPID);
 		$mfa_status = CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS);
 		$default_mfaid = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
 
@@ -2605,11 +2605,11 @@ class CUser extends CApiService {
 		$db_user['userip'] = CWebUser::getIp();
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
-			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
+			$db_user['lang'] = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_LANG);
 		}
 
 		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
-			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
+			$db_user['timezone'] = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_TIMEZONE);
 		}
 	}
 

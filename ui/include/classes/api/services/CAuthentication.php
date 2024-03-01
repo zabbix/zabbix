@@ -73,6 +73,18 @@ class CAuthentication extends CApiService {
 	}
 
 	/**
+	 * Get the fields of the Authentication API object that are used by parts of the UI where authentication is not
+	 * required.
+	 */
+	public static function getPublic(): array {
+		$output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
+			'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status', 'disabled_usrgrpid'
+		];
+
+		return DB::select('config', ['output' => $output_fields])[0];
+	}
+
+	/**
 	 * @param array $auth
 	 *
 	 * @throws APIException if the input is invalid.
