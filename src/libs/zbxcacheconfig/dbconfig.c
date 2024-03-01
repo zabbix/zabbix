@@ -12873,20 +12873,18 @@ static void	dc_status_diff_destroy(zbx_dc_status_diff_t *diff)
 
 static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 {
-	ZBX_DC_PROXY		*dc_proxy;
-	ZBX_DC_HOST		*dc_host;
-	zbx_hashset_iter_t	iter;
+	ZBX_DC_PROXY			*dc_proxy;
+	ZBX_DC_HOST			*dc_host;
+	zbx_dc_status_diff_proxy_t	*proxy_diff;
+	zbx_hashset_iter_t		iter;
 
 	config->status->sync_ts = config->sync_ts;
 
-	zbx_hashset_iter_reset(&config->proxies, &iter);
+	zbx_hashset_iter_reset(&diff->proxies, &iter);
 
-	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (proxy_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_dc_status_diff_proxy_t	*proxy_diff;
-
-		if (NULL == (proxy_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
-				&dc_proxy->proxyid)))
+		if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_diff->id)))
 		{
 			continue;
 		}
@@ -13174,7 +13172,8 @@ static void	dc_status_update_remove_unchanged_proxies(zbx_dc_status_diff_t *diff
 			proxy_diff->hosts_not_monitored_old == proxy_diff->hosts_not_monitored &&
 			proxy_diff->items_active_normal_old == proxy_diff->items_active_normal &&
 			proxy_diff->items_active_notsupported_old == proxy_diff->items_active_notsupported &&
-			proxy_diff->items_disabled_old == proxy_diff->items_disabled)
+			proxy_diff->items_disabled_old == proxy_diff->items_disabled &&
+			proxy_diff->required_performance_old == proxy_diff->required_performance)
 		{
 			zbx_hashset_iter_remove(&iter);
 		}
