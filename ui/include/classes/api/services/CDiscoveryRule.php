@@ -996,30 +996,22 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array $items
 	 */
 	private static function validateLifetimeFields(array $items): void {
-		$resolved_items = [];
-
 		foreach ($items as $index => $item) {
-			if(array_key_exists('enabled_lifetime', $item) && array_key_exists('lifetime', $item)) {
-				$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros([$item], [
-					'lifetime', 'enabled_lifetime'
-				]);
-			}
-		}
-
-		foreach ($resolved_items as $item) {
-			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
-			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
-
-			if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
-					&& $item['lifetime'] < $item['enabled_lifetime']
+			if ($item['lifetime_type'] == ZBX_LLD_DELETE_AFTER
 					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
-						_s('"%1$s" value must be greater than "%2$s" value', 'Delete lost resources',
-							'Disable lost resources'
+				$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
+				$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+
+				if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
+						&& $item['lifetime'] < $item['enabled_lifetime']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
+							_s('"%1$s" value must be greater than "%2$s" value', _('Delete lost resources'),
+								_('Disable lost resources')
+							)
 						)
-					)
-				);
+					);
+				}
 			}
 		}
 	}

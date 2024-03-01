@@ -570,51 +570,32 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = true;
 
-		$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros([$input], ['lifetime', 'enabled_lifetime']);
+		if (hasRequest('add')) {
+			$item = ['hostid' => $hostid];
 
-		foreach ($resolved_items as $item) {
-			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
-			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+			$item += getSanitizedItemFields($input + [
+					'templateid' => 0,
+					'flags' => ZBX_FLAG_DISCOVERY_RULE,
+					'hosts' => $hosts
+				]);
 
-			if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
-					&& $item['lifetime'] < $item['enabled_lifetime']
-					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
-				$result = false;
+			$response = API::DiscoveryRule()->create($item);
 
-				error(_s(
-					'"%1$s" value must be greater than "%2$s" value.', 'Delete lost resources', 'Disable lost resources'
-				));
+			if ($response === false) {
+				throw new Exception();
 			}
 		}
 
-		if (!hasErrorMessages()) {
-			if (hasRequest('add')) {
-				$item = ['hostid' => $hostid];
+		if (hasRequest('update')) {
+			$item = getSanitizedItemFields($input + $db_item + [
+					'flags' => ZBX_FLAG_DISCOVERY_RULE,
+					'hosts' => $hosts
+				]);
 
-				$item += getSanitizedItemFields($input + [
-						'templateid' => 0,
-						'flags' => ZBX_FLAG_DISCOVERY_RULE,
-						'hosts' => $hosts
-					]);
+			$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
 
-				$response = API::DiscoveryRule()->create($item);
-
-				if ($response === false) {
-					throw new Exception();
-				}
-			}
-
-			if (hasRequest('update')) {
-				$item = getSanitizedItemFields($input + $db_item + [
-						'flags' => ZBX_FLAG_DISCOVERY_RULE,
-						'hosts' => $hosts
-					]);
-
-				$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
-
-				if ($response === false) {
-					throw new Exception();
-				}
+			if ($response === false) {
+				throw new Exception();
 			}
 		}
 	}
