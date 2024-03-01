@@ -732,7 +732,7 @@ out:
 	/* we must clear the EnginID cache before the next snmpv3 dcheck and */
 	/* remove unused collected values in any case */
 	if (SVC_SNMPv3 == GET_DTYPE(task))
-		zbx_clear_cache_snmp(dmanager->process_type, dmanager->process_num);
+		zbx_clear_cache_snmp(dmanager->process_type, FAIL);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
 			" last ip:%s abort:%d", log_worker_id, __func__, druleid,

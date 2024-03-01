@@ -3741,8 +3741,11 @@ out:
  ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
-			get_process_type_string(process_type), process_num);
+	if (FAIL != process_num)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
+				get_process_type_string(process_type), process_num);
+	}
 
 	if (0 == zbx_snmp_init_done)
 		return;

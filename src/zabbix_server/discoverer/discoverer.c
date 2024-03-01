@@ -1067,6 +1067,9 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 		zbx_iprange_first(task->range.ipranges->values, task->range.state.ipaddress);
 	}
 
+	if (FAIL == ret)
+		(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, task->range.state.count);
+
 	return ret;
 }
 
