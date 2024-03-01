@@ -50,14 +50,15 @@
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
-			this._setTableVisiblityState(this.ldap_servers_table, ldap_disabled);
-			this._disableRemoveLdapServersWithUserGroups();
+			this.#setTableVisiblityState(this.ldap_servers_table, ldap_disabled);
+			this.#disableRemoveLinksWithUserGroups(this.ldap_servers_table);
 			this._renderProvisionGroups(saml_provision_groups);
-			this._setTableVisiblityState(this.saml_provision_groups_table, saml_readonly);
+			this.#setTableVisiblityState(this.saml_provision_groups_table, saml_readonly);
 			this._renderProvisionMedia(saml_provision_media);
-			this._setTableVisiblityState(this.saml_media_type_mapping_table, saml_readonly)
-			this._addMfaMethods(mfa_methods, mfa_default_row_index);
-			this._setTableVisiblityState(this.mfa_table, mfa_readonly);
+			this.#setTableVisiblityState(this.saml_media_type_mapping_table, saml_readonly)
+			this.#addMfaMethods(mfa_methods, mfa_default_row_index);
+			this.#setTableVisiblityState(this.mfa_table, mfa_readonly);
+			this.#disableRemoveLinksWithUserGroups(this.mfa_table);
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
 		}
@@ -116,8 +117,8 @@
 					field.toggleAttribute('disabled', is_readonly);
 					field.setAttribute('tabindex', is_readonly ? -1 : 0);
 				});
-				this._setTableVisiblityState(this.saml_provision_groups_table, is_readonly);
-				this._setTableVisiblityState(this.saml_media_type_mapping_table, is_readonly);
+				this.#setTableVisiblityState(this.saml_provision_groups_table, is_readonly);
+				this.#setTableVisiblityState(this.saml_media_type_mapping_table, is_readonly);
 			});
 
 			this.saml_provision_status.addEventListener('change', (e) => {
@@ -203,9 +204,8 @@
 				const default_index = this.form.querySelector('input[name="mfa_default_row_index"]:checked');
 				const default_index_hidden = this.form.querySelector('[type="hidden"][name="mfa_default_row_index"]');
 
-				this._setTableVisiblityState(this.mfa_table, is_readonly);
-
-				this.form.querySelectorAll('[data-disable_remove] .js-remove').forEach(field => field.disabled = true);
+				this.#setTableVisiblityState(this.mfa_table, is_readonly);
+				this.#disableRemoveLinksWithUserGroups(this.mfa_table);
 
 				if (is_readonly && default_index) {
 					default_index_hidden.value = default_index.value;
@@ -262,7 +262,7 @@
 			const provision_disabled = ldap_disabled || !this.ldap_jit_status.checked;
 
 			this.ldap_provisioning_fields.forEach(field => field.toggleAttribute('disabled', ldap_disabled));
-			this._setTableVisiblityState(this.ldap_servers_table, ldap_disabled);
+			this.#setTableVisiblityState(this.ldap_servers_table, ldap_disabled);
 			this._disableRemoveLdapServersWithUserGroups();
 			this.jit_provision_interval.toggleAttribute('disabled', provision_disabled);
 		}
@@ -295,8 +295,8 @@
 			}
 		}
 
-		_disableRemoveLdapServersWithUserGroups() {
-			this.form.querySelectorAll('[data-disable_remove] .js-remove').forEach(field => field.disabled = true);
+		#disableRemoveLinksWithUserGroups(table) {
+			table.querySelectorAll('[data-disable_remove] .js-remove').forEach(field => field.disabled = true);
 		}
 
 		_renderProvisionGroups(saml_provision_groups) {
@@ -319,7 +319,7 @@
 			}
 		}
 
-		_setTableVisiblityState(table, readonly) {
+		#setTableVisiblityState(table, readonly) {
 			table.classList.toggle('disabled', readonly);
 			table.querySelectorAll('a,input:not([type="hidden"]),button').forEach(node => {
 				node.toggleAttribute('disabled', readonly);
@@ -653,18 +653,18 @@
 			return template.content.firstChild;
 		}
 
-		_addMfaMethods(mfa_methods, mfa_default_row_index) {
+		#addMfaMethods(mfa_methods, mfa_default_row_index) {
 			for (const [row_index, mfa] of Object.entries(mfa_methods)) {
 				mfa.row_index = row_index;
 				mfa.is_default = (mfa.row_index == mfa_default_row_index) ? 'checked' : '';
 
 				this.mfa_table
 					.querySelector('tbody')
-					.appendChild(this._prepareMfaRow(mfa));
+					.appendChild(this.#prepareMfaRow(mfa));
 			}
 		}
 
-		_prepareMfaRow(mfa) {
+		#prepareMfaRow(mfa) {
 			const template_mfa_methods_row = new Template(this.templates.mfa_methods_row);
 			const template = document.createElement('template');
 			template.innerHTML = template_mfa_methods_row.evaluate(mfa).trim();
@@ -740,13 +740,13 @@
 
 					this.mfa_table
 						.querySelector('tbody')
-						.appendChild(this._prepareMfaRow(mfa));
+						.appendChild(this.#prepareMfaRow(mfa));
 				}
 				else {
 					mfa.is_default = row.querySelector('[name="mfa_default_row_index"]').checked === true;
 					mfa.usrgrps = row.querySelector('.js-mfa-usergroups').textContent;
 
-					row.parentNode.insertBefore(this._prepareMfaRow(mfa), row);
+					row.parentNode.insertBefore(this.#prepareMfaRow(mfa), row);
 					row.remove();
 				}
 			});
