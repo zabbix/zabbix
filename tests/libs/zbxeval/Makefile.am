@@ -30,7 +30,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
 	$(top_srcdir)/src/zabbix_server/housekeeper/libzbxhousekeeper.a \
 	$(top_srcdir)/src/zabbix_server/timer/libzbxtimer.a \
-	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
+	#$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \

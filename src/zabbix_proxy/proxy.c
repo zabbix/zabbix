@@ -45,8 +45,8 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller_proxy.h"
 
-//#include "../zabbix_server/trapper/trapper.h"
-//#include "../zabbix_server/trapper/trapper_request.h"
+//#include "trapper/trapper_server.h"
+#include "trapper/trapper_proxy.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
@@ -1438,7 +1438,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_java_gateway, config_java_gateway_port,
 								config_externalscripts,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location};
+								config_ssh_key_location, trapper_process_request_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};

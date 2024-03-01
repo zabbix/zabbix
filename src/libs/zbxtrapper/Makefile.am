@@ -6,7 +6,6 @@ libzbxtrapper_a_SOURCES = \
 	active.c \
 	active.h \
 	trapper_auth.c \
-	trapper_auth.h \
 	nodecommand.c \
 	nodecommand.h \
 	trapper_preproc.c \
@@ -15,8 +14,7 @@ libzbxtrapper_a_SOURCES = \
 	trapper_expressions_evaluate.h \
 	trapper_item_test.c \
 	trapper_item_test.h \
-	trapper.c \
-	trapper_request.h
+	trapper.c
 
 libzbxtrapper_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \

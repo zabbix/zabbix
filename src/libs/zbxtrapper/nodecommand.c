@@ -19,8 +19,10 @@
 
 #include "nodecommand.h"
 
+#include "zbxtrapper.h"
+
 #include "zbxexpression.h"
-#include "trapper_auth.h"
+//#include "trapper_auth.h"
 
 #include "zbxscripts.h"
 #include "audit/zbxaudit.h"

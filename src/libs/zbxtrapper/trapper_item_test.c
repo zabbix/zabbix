@@ -20,6 +20,7 @@
 #include "trapper_item_test.h"
 #include "zbxexpression.h"
 
+#include "zbxtrapper.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
@@ -35,7 +36,7 @@
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-#include "trapper_auth.h"
+//#include "trapper_auth.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
 {
