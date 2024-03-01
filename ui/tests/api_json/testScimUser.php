@@ -38,6 +38,7 @@ class testScimUser extends CAPIScimTest {
 			'saml_user_active' => null,
 			'saml_user_inactive' => null,
 			'saml_user_only_username' => null,
+			'saml_user_with_media' => null,
 			'admin' => null,
 			'user' => null,
 			'guest_user' => null
@@ -46,7 +47,8 @@ class testScimUser extends CAPIScimTest {
 			'ldap_user' => 'dwight.schrute@office.com',
 			'saml_user_active' => 'jim.halpert@office.com',
 			'saml_user_inactive' => 'pam.beesly@office.com',
-			'saml_user_only_username' => 'andy.bernard@office.com'
+			'saml_user_only_username' => 'andy.bernard@office.com',
+			'saml_user_with_media' => 'bob.schrute@office.com'
 		],
 		'tokenids' => [
 			'superadmin' => null,
@@ -60,7 +62,10 @@ class testScimUser extends CAPIScimTest {
 			'guest_user' => null,
 			'no_token' => null
 		],
-		'mediatypeid' => '3',
+		'mediatypeid' => [
+			'SMS' => '3',
+			'Email' => '1'
+		],
 		'scim_groupids' => [
 			'group_w_members' => null
 		],
@@ -84,8 +89,13 @@ class testScimUser extends CAPIScimTest {
 			'provision_media' => [
 				[
 					'name' => 'SMS',
-					'mediatypeid' => self::$data['mediatypeid'],
+					'mediatypeid' => self::$data['mediatypeid']['SMS'],
 					'attribute' => 'user_mobile'
+				],
+				[
+					'name' => 'Email',
+					'mediatypeid' => self::$data['mediatypeid']['Email'],
+					'attribute' => 'user_email'
 				]
 			],
 			'provision_groups' => [
@@ -115,7 +125,7 @@ class testScimUser extends CAPIScimTest {
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
-				'medias' => [['mediatypeid' => self::$data['mediatypeid'], 'sendto' => '123456789']],
+				'medias' => [['mediatypeid' => self::$data['mediatypeid']['SMS'], 'sendto' => '123456789']],
 				'roleid' => 1
 			]
 		]);
@@ -128,8 +138,8 @@ class testScimUser extends CAPIScimTest {
 		])[0];
 		$userdirectory_mediaids = array_column($userdirectory['provision_media'], 'userdirectory_mediaid', 'mediatypeid');
 		DB::update('media', [
-			'values' => ['userdirectory_mediaid' => $userdirectory_mediaids[self::$data['mediatypeid']]],
-			'where' => ['userid' => $user['userids'][0], 'mediatypeid' => self::$data['mediatypeid']]
+			'values' => ['userdirectory_mediaid' => $userdirectory_mediaids[self::$data['mediatypeid']['SMS']]],
+			'where' => ['userid' => $user['userids'][0], 'mediatypeid' => self::$data['mediatypeid']['SMS']]
 		]);
 		DB::update('users', [
 			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['saml']],
@@ -144,7 +154,7 @@ class testScimUser extends CAPIScimTest {
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
-				'medias' => [['mediatypeid' => self::$data['mediatypeid'], 'sendto' => '987654321']],
+				'medias' => [['mediatypeid' => self::$data['mediatypeid']['SMS'], 'sendto' => '987654321']],
 				'roleid' => 1
 			]
 		]);
@@ -169,6 +179,31 @@ class testScimUser extends CAPIScimTest {
 		DB::update('users', [
 			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['saml']],
 			'where' => ['userid' => $user['userids'][0]]
+		]);
+
+		// Create SAML provisioned user with not provisioned media.
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => self::$data['username']['saml_user_with_media'],
+				'passwd' => base_convert((string) microtime(), 10, 32),
+				'medias' => [
+					['mediatypeid' => self::$data['mediatypeid']['Email'], 'sendto' => ['example@example.com']],
+					['mediatypeid' => self::$data['mediatypeid']['SMS'], 'sendto' => '987654321'],
+					['mediatypeid' => self::$data['mediatypeid']['SMS'], 'sendto' => 'provisioned']
+				],
+				'usrgrps' => [['usrgrpid' => 9]],
+				'roleid' => 1
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userid']['saml_user_with_media'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryid']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
+		DB::update('media', [
+			'values' => ['userdirectory_mediaid' => $userdirectory_mediaids[self::$data['mediatypeid']['SMS']]],
+			'where' => ['userid' => $user['userids'][0], 'sendto' => 'provisioned']
 		]);
 
 		// Create userdirectory for LDAP.
@@ -348,9 +383,9 @@ class testScimUser extends CAPIScimTest {
 				'user' => [],
 				'expected_result' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
-					'totalResults' => 3,
+					'totalResults' => 4,
 					'startIndex' => 1,
-					'itemsPerPage' => 3,
+					'itemsPerPage' => 4,
 					'Resources' => [
 						[
 							'id' 		=> 'saml_user_active',
@@ -367,6 +402,12 @@ class testScimUser extends CAPIScimTest {
 						[
 							'id' 		=> 'saml_user_only_username',
 							'userName'	=> 'saml_user_only_username',
+							'active'	=> true,
+							'name' => ['givenName' => '', 'familyName' => '']
+						],
+						[
+							'id' 		=> 'saml_user_with_media',
+							'userName'	=> 'saml_user_with_media',
 							'active'	=> true,
 							'name' => ['givenName' => '', 'familyName' => '']
 						]
@@ -620,7 +661,7 @@ class testScimUser extends CAPIScimTest {
 		$db_result_user_media = DBfetch($db_result_user_media_data);
 
 		$this->assertEquals($user['user_mobile'], $db_result_user_media['sendto']);
-		$this->assertEquals(self::$data['mediatypeid'], $db_result_user_media['mediatypeid']);
+		$this->assertEquals(self::$data['mediatypeid']['SMS'], $db_result_user_media['mediatypeid']);
 	}
 
 	public function createInvalidPutRequest() {
@@ -863,7 +904,7 @@ class testScimUser extends CAPIScimTest {
 		$db_result_user_media = DBfetch($db_result_user_media_data);
 
 		$this->assertEquals($user['user_mobile'], $db_result_user_media['sendto']);
-		$this->assertEquals(self::$data['mediatypeid'], $db_result_user_media['mediatypeid']);
+		$this->assertEquals(self::$data['mediatypeid']['SMS'], $db_result_user_media['mediatypeid']);
 
 		// Check group mappings when user 'active' attribute is changed.
 		if ($user['active'] === false || array_key_exists('update', $user)) {
@@ -1084,7 +1125,7 @@ class testScimUser extends CAPIScimTest {
 
 	public function createValidPatchRequest(): array {
 		return [
-			'Patch request to add user name, user mobile, user lastname' => [
+			'Patch request to add user name, user lastname' => [
 				'user' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
 					'id' => 'saml_user_only_username',
@@ -1150,6 +1191,73 @@ class testScimUser extends CAPIScimTest {
 					'active' => true,
 					'name' => ['givenName' => '', 'familyName' => '']
 				]
+			],
+			'Patch request to add new user media to user already existing media' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_with_media',
+					'userName' => 'saml_user_with_media',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_mobile',
+							'value' => '123456789'
+						],
+						[
+							'op' => 'Add',
+							'path'=> 'user_email',
+							'value' => 'updated.email@example.com'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_with_media',
+					'id' => 'saml_user_with_media',
+					'active' => true,
+					'name' => ['givenName' => '', 'familyName' => '']
+				]
+			],
+			'Patch request to update one user media added on previous step' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_with_media',
+					'userName' => 'saml_user_with_media',
+					'Operations' => [
+						[
+							'op' => 'Replace',
+							'path' => 'user_mobile',
+							'value' => '555'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_with_media',
+					'id' => 'saml_user_with_media',
+					'active' => true,
+					'name' => ['givenName' => '', 'familyName' => '']
+				]
+			],
+			'Patch request to remove user media updated on previous step' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_with_media',
+					'userName' => 'saml_user_with_media',
+					'Operations' => [
+						[
+							'op' => 'Remove',
+							'path' => 'user_mobile'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_with_media',
+					'id' => 'saml_user_with_media',
+					'active' => true,
+					'name' => ['givenName' => '', 'familyName' => '']
+				]
 			]
 		];
 	}
@@ -1160,6 +1268,13 @@ class testScimUser extends CAPIScimTest {
 	public function testScimUser_PatchValid(array $user, array $expected_result): void {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
+		$not_provisioned_medias = DBfetchArray(DBselect(
+			'SELECT mediaid,sendto'.
+			' FROM media m'.
+			' WHERE '.dbConditionId('m.userid', [$user['id']]).
+				' AND userdirectory_mediaid IS NULL'
+		));
+		$not_provisioned_medias = array_column($not_provisioned_medias, 'sendto', 'mediaid');
 
 		$result = $this->call('users.patch', $user);
 
@@ -1171,11 +1286,18 @@ class testScimUser extends CAPIScimTest {
 
 		// Check that user data in the database is correct.
 		$db_result_user_data = DBSelect('SELECT username, name, surname, userdirectoryid FROM users WHERE userid='.
-			zbx_dbstr(self::$data['userid']['saml_user_only_username'])
+			$user['id']
 		);
 		$db_result_user = DBFetch($db_result_user_data);
-
+		$db_medias = DBfetchArray(DBselect(
+			'SELECT m.mediaid,m.sendto,mp.attribute'.
+			' FROM media m'.
+			' LEFT JOIN userdirectory_media mp ON mp.userdirectory_mediaid=m.userdirectory_mediaid'.
+			' WHERE '.dbConditionId('m.userid', [$user['id']])
+		));
+		$updated_medias = $db_medias;
 		$active = [];
+
 		foreach ($user['Operations'] as $operation) {
 			switch ($operation['path']) {
 				case 'userName':
@@ -1193,9 +1315,38 @@ class testScimUser extends CAPIScimTest {
 				case 'active':
 					$active = $operation;
 					break;
+
+				case 'user_mobile':
+				case 'user_email':
+					$op = strtolower($operation['op']);
+
+					foreach ($updated_medias as $i => $updated_media) {
+						if ($updated_media['attribute'] !== $operation['path']) {
+							continue;
+						}
+
+						if ($op === 'replace' || $op === 'add') {
+							$updated_medias[$i]['sendto'] = $operation['value'];
+						}
+						else {
+							unset($updated_medias[$i]);
+						}
+					}
+
+					break;
 			}
 		}
 
+		foreach ($db_medias as $db_media) {
+			// Database field null value is converted to string '0'.
+			if ($db_media['attribute'] === '0' && array_key_exists($db_media['mediaid'], $not_provisioned_medias)
+					&& $db_media['sendto'] === $not_provisioned_medias[$db_media['mediaid']]) {
+				unset($not_provisioned_medias[$db_media['mediaid']]);
+			}
+		}
+
+		$this->assertEquals([], $not_provisioned_medias);
+		$this->assertEquals($db_medias, $updated_medias);
 		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
 
 		// Check group mappings when user 'active' attribute is changed.
@@ -1303,6 +1454,11 @@ class testScimUser extends CAPIScimTest {
 		);
 		$db_result_user_groups = DBfetch($db_result_user_groups_data);
 		$this->assertEquals('9', $db_result_user_groups['usrgrpid']);
+
+		$db_media = DBselect('SELECT mediaid FROM media WHERE '
+			.dbConditionId('userid', [self::$data['userid']['new_user']])
+		);
+		$this->assertCount(0, $db_media, 'User should not have any media');
 	}
 
 	public function createInvalidGetAuthentication() {
