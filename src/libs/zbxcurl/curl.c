@@ -54,23 +54,25 @@ struct curl_waitfd
 	short		revents;
 };
 #endif
+
 CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 {
 	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
-
-	if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL library"
-				" <= 7.28.0 (using version %s)", libcurl_version_str());
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
 
 	if (NULL == fptr)
 	{
 		void	*handle;
 
-		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD | RTLD_GLOBAL)))
+		/* this check must be performed before calling this function */
+		if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL library"
+					" <= 7.28.0 (using version %s)", libcurl_version_str());
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
 			exit(EXIT_FAILURE);
