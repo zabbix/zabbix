@@ -1878,7 +1878,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null"
 			" from items i"
 			" join item_rtdata ir on i.itemid=ir.itemid");
-	
+
 	if (ZBX_DBSYNC_INIT != sync->mode)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
