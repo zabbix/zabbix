@@ -539,10 +539,6 @@ static void	pgm_db_flush_host_proxy_insert_batch(zbx_pg_host_t *hosts, int hosts
 static void	pgm_db_flush_host_proxy_inserts(zbx_vector_pg_host_t *hosts)
 {
 #define PGM_INSERT_BATCH_SIZE	1000
-	zbx_db_insert_t	db_insert;
-
-	zbx_db_insert_prepare(&db_insert, "host_proxy", "hostproxyid", "hostid", "proxyid", "revision", NULL);
-
 	for (int i = 0; i < hosts->values_num; i += PGM_INSERT_BATCH_SIZE)
 	{
 		int	size = hosts->values_num - i;
@@ -555,11 +551,6 @@ static void	pgm_db_flush_host_proxy_inserts(zbx_vector_pg_host_t *hosts)
 		zabbix_log(LOG_LEVEL_DEBUG, "assigned hostid " ZBX_FS_UI64 " to proxyid " ZBX_FS_UI64,
 				hosts->values[i].hostid, hosts->values[i].proxyid);
 	}
-
-	zbx_db_insert_autoincrement(&db_insert, "hostproxyid");
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
 #undef PGM_INSERT_BATCH_SIZE
 }
 
