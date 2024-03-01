@@ -4544,18 +4544,15 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 		{
 			int	ts_delete, ts_disable;
 
-			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type ||
+			if ((ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type ||
 					(ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type && lastcheck > (ts_delete =
-					lld_end_of_life(host->lastcheck, lifetime->duration))))
+					lld_end_of_life(host->lastcheck, lifetime->duration)))) &&
+					SUCCEED == lld_host_delete_validate(host->hostid))
 			{
-				if (SUCCEED == lld_host_delete_validate(host->hostid))
-				{
-					zbx_vector_uint64_append(&del_hostids, host->hostid);
-					local_id_name_pair.id = host->hostid;
-					local_id_name_pair.name = zbx_strdup(NULL, host->host);
-					zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
-				}
-
+				zbx_vector_uint64_append(&del_hostids, host->hostid);
+				local_id_name_pair.id = host->hostid;
+				local_id_name_pair.name = zbx_strdup(NULL, host->host);
+				zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
 				continue;
 			}
 
@@ -4564,9 +4561,10 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == lifetime->type)
 				ts_delete = 0;
+			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type)
+				ts_delete = 1;
 
-			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != lifetime->type &&
-					host->ts_delete != ts_delete)
+			if (host->ts_delete != ts_delete)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update host_discovery"
@@ -4577,11 +4575,12 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
 				ts_disable = 0;
+			else if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type)
+				ts_disable = 1;
 			else if (ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type)
 				ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration);
 
-			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type &&
-					host->ts_disable != ts_disable)
+			if (host->ts_disable != ts_disable)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update host_discovery"
