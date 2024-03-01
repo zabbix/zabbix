@@ -218,13 +218,11 @@
 		}
 
 		.form_row,
-		.sortable-item:not(.sortable-item-frozen) {
-			td {
+		td.sortable-item {
+			&:not(.sortable-item-frozen) {
 				line-height: 24px;
 			}
-		}
 
-		.sortable-item td {
 			&.td-drag-icon {
 				line-height: inherit;
 			}

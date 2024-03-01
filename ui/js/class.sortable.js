@@ -420,10 +420,12 @@ class CSortable {
 	}
 
 	#getLiveElements(elements) {
+		const walk_through = ['contents', 'table-row-group', 'table-row', 'table-column-group', 'table-column'];
+
 		let live_elements = [];
 
 		for (const element of elements) {
-			if (getComputedStyle(element).display === 'contents') {
+			if (walk_through.includes(getComputedStyle(element).display)) {
 				live_elements = [...live_elements, ...this.#getLiveElements(element.children)];
 			}
 			else {
