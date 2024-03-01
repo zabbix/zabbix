@@ -32,9 +32,6 @@
 #define HAVE_NO_LIBSSH2_METHODS	1
 #endif
 
-/* the size of temporary buffer used to read from data channel */
-#define DATA_BUFFER_SIZE	4096
-
 static ZBX_THREAD_LOCAL const char	*password;
 
 #ifndef HAVE_NO_LIBSSH2_METHODS
@@ -249,6 +246,8 @@ static int	ssh_nonblocking_error(zbx_socket_t *s, LIBSSH2_SESSION *session, int 
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
 		const char *config_source_ip, const char *config_ssh_key_location)
 {
+/* the size of temporary buffer used to read from data channel */
+#define DATA_BUFFER_SIZE	4096
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
@@ -529,4 +528,5 @@ ret_label:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef DATA_BUFFER_SIZE
 }
