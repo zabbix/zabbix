@@ -23,7 +23,7 @@ SUBDIRS = \
 	lld \
 	reporter \
 	service \
-	trapper_server \
+	trapper \
 	rtc \
 	ha \
 	proxyconfigread

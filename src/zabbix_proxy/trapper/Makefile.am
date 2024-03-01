@@ -4,8 +4,7 @@ noinst_LIBRARIES = libzbxtrapper_proxy.a
 
 libzbxtrapper_proxy_a_SOURCES = \
 	trapper_proxy.c \
-	trapper_request.h
+	trapper_proxy.h
 
 libzbxtrapper_proxy_a_CFLAGS = \
-	-I$(top_srcdir)/src/zabbix_proxy \
 	$(TLS_CFLAGS)

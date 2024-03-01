@@ -19,7 +19,7 @@
 
 #include "active.h"
 
-#include "trapper.h"
+#include "zbxtrapper.h"
 
 #include "zbxexpression.h"
 #include "zbxregexp.h"

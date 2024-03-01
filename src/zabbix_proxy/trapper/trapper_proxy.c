@@ -19,7 +19,7 @@
 
 #include "trapper_request.h"
 
-#include "trapper.h"
+#include "zbxtrapper.h"
 
 #include "zbxcommshigh.h"
 #include "../taskmanager/taskmanager_server.h"
