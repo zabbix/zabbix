@@ -20,6 +20,12 @@
 #ifndef ZABBIX_TRAPPER_PROXY_H
 #define ZABBIX_TRAPPER_PROXY_H
 
+#include "zbxcomms.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
+#include "zbxvault.h"
+#include "zbxjson.h"
+
 int	init_proxy_history_lock(unsigned char program_type, char **error);
 
 void	free_proxy_history_lock(unsigned char program_type);

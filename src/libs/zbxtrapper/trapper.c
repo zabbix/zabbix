@@ -34,7 +34,6 @@
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
 #include "zbxpoller.h"
-//#include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
@@ -50,6 +49,11 @@
 #include "zbx_item_constants.h"
 #include "version.h"
 #include "zbxscripts.h"
+#include "zbxcomms.h"
+#include "zbxdbhigh.h"
+#include "zbxthreads.h"
+#include "zbxtypes.h"
+#include "zbxvault.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"

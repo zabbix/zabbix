@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxtrapper.h"
 #include "trapper_proxy.h"
 
 #include "../../zabbix_server/taskmanager/taskmanager_server.h"
@@ -29,6 +28,8 @@
 #include "zbxdbwrap.h"
 #include "zbxproxybuffer.h"
 #include "zbxcompress.h"
+#include "zbxcacheconfig.h"
+#include "zbxjson.h"
 
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)

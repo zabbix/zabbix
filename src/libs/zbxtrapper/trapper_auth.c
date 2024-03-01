@@ -19,6 +19,7 @@
 
 #include "zbxtrapper.h"
 
+#include "zbxjson.h"
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
 

@@ -22,6 +22,9 @@
 
 #include "zbxvault.h"
 #include "zbxdbhigh.h"
+#include "zbxcomms.h"
+#include "zbxtime.h"
+#include "zbxjson.h"
 
 int	trapper_process_request_server(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
