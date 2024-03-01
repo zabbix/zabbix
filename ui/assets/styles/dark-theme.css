@@ -7299,7 +7299,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .list-table.sticky-footer tfoot tr:first-of-type td {
   border-color: #404040; }
 
-.dashboard-navigation-tabs .csortable > .csortable-item > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
+.dashboard-navigation-tabs .sortable li div:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div:hover,
+.dashboard-navigation-tabs .sortable li.sortable-item-dragging div,
+.host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li.sortable-item-dragging div {
   border: 1px solid transparent; }
 
 .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {

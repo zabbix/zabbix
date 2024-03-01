@@ -7274,12 +7274,10 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
   .form-search .btn-icon:focus:hover {
     color: #000000; }
 
-.dashboard-navigation-tabs .sortable-list > .sortable-item:focus:not(:active) > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item:focus:not(:active) > div {
-  box-shadow: 0 0 0 2px #ffffff; }
-.dashboard-navigation-tabs .sortable > .sortable-item > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable > .sortable-item > div, .dashboard-navigation-tabs .sortable-list > .sortable-item > div:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item > div:hover {
+.dashboard-navigation-tabs .sortable li div:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div:hover,
+.dashboard-navigation-tabs .sortable li.sortable-item-dragging div,
+.host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li.sortable-item-dragging div {
   border: 1px solid transparent; }
-.dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span, .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
-  color: #000000 !important; }
 
 .dashboard-widget-placeholder .dashboard-widget-placeholder-box {
   box-shadow: none;
