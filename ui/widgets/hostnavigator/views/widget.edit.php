@@ -66,7 +66,6 @@ $form
 		new CWidgetFieldSeveritiesView($data['fields']['severities'])
 	)
 	->addField(
-		new CWidgetFieldIntegerBoxView($data['fields']['limit'])
+		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
-	->includeJsFile('widget.edit.js.php')
 	->show();

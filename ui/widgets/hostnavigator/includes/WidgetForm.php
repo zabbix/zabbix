@@ -94,7 +94,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('limit', _('Host limit'), 1, 9999))
+				(new CWidgetFieldIntegerBox('show_lines', _('Host limit'), 1, 9999))
 					->setDefault(100)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY |CWidgetField::FLAG_LABEL_ASTERISK)
 			)

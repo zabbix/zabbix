@@ -104,7 +104,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'selectTags' => ['tag', 'value'],
 				'sortfield' => 'name',
 				// Request more than the set limit to distinguish if there are even more hosts available
-				'limit' => $this->fields_values['limit'] + 1
+				'limit' => $this->fields_values['show_lines'] + 1
 			]);
 		}
 		else {
@@ -133,7 +133,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$is_limit_exceeded = false;
 
-		if (count($hosts) > $this->fields_values['limit']) {
+		if (count($hosts) > $this->fields_values['show_lines']) {
 			$is_limit_exceeded = true;
 			array_pop($hosts);
 		}
