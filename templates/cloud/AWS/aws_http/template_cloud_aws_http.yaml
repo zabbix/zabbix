@@ -15,7 +15,7 @@ zabbix_export:
       template: 'AWS by HTTP'
       name: 'AWS by HTTP'
       description: |
-        Get AWS EC2, RDS and S3 instances, AWS ECS clusters. Don't forget to read the README.md for the correct setup of the template.
+        Get AWS EC2, RDS and S3 instances, AWS ECS clusters, AWS Elastic Load Balancing. Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -703,6 +703,331 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     - name: 'AWS ECS Cluster by HTTP'
+        - uuid: e7ac860c53bf403f9aee8cdd4b099c05
+          name: 'ELB load balancers discovery'
+          type: SCRIPT
+          key: aws.elb.discovery
+          delay: 12h
+          params: |
+            var AWS = {
+                params: {},
+            
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
+            
+                        data = data[step];
+                    }
+            
+                    return data;
+                },
+            
+                setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
+                    switch (AWS.getField(params, 'auth_type')) {
+                        case 'role_base':
+                            AWS.params['auth_type'] = 'role_base';
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            
+                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+                                throw 'Error getting security credentials from instance metadata. Role not found.';
+                            }
+            
+                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+                                throw 'Error getting security credentials from instance metadata.';
+                            }
+            
+                            try {
+                                credentials = JSON.parse(credentials);
+                            }
+                            catch (error) {
+                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+                            }
+            
+                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                                    throw 'Required credentials is not set: "' + field + '".';
+                                };
+                                AWS.params[field] = credentials[field];
+                            });
+                            break;
+                        case 'access_key':
+                        default:
+                            AWS.params['auth_type'] = 'access_key';
+                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                    throw 'Required param is not set: "' + field + '".';
+                                }
+                                AWS.params[field] = params[field];
+                            });
+                    }
+                    ['region_match', 'region_not_match'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                        AWS.params[field] = params[field];
+                    });
+                },
+            
+                sign: function (key, message) {
+                    var hex = hmac('sha256', key, message);
+            
+                    if ((hex.length % 2) === 1) {
+                        throw 'Invalid length of a hex string!';
+                    }
+            
+                    var result = new Int8Array(hex.length / 2);
+                    for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+                        result[b] = parseInt(hex.substring(i, i + 2), 16);
+                    }
+            
+                    return result;
+                },
+            
+                prepareParams: function (params) {
+                    var result = [];
+            
+                    Object.keys(params).sort().forEach(function (key) {
+                        if (typeof params[key] !== 'object') {
+                            result.push(key + '=' + encodeURIComponent(params[key]));
+                        }
+                        else {
+                            result.push(prepareObject(key, params[key]));
+                        }
+                    });
+            
+                    return result.join('&');
+                },
+            
+                request: function (get, method, region, service, host, params, data, uri) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+                        date = amzdate.replace(/T\d+Z/, ''),
+            
+                        canonical_uri = '/' + uri,
+                        canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+                        signed_headers = 'content-encoding;host;x-amz-date',
+                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+                        credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+                        request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
+            
+                    key = AWS.sign(key, region);
+                    key = AWS.sign(key, service);
+                    key = AWS.sign(key, 'aws4_request');
+            
+                    var request = new HttpRequest(),
+                        url = 'https://' + host + canonical_uri + '?' + params;
+            
+                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                        request.setProxy(AWS.params.proxy);
+                    }
+                    request.addHeader('x-amz-date: ' + amzdate);
+                    request.addHeader('x-amz-content-sha256:' + sha256(data));
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Content-Encoding: amz-1.0');
+                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                    if (AWS.params.auth_type === 'role_base')
+                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            
+                    switch (get) {
+                        case 'regions':
+                            Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
+                            response = request.post(url, data);
+                            Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
+                            if (request.getStatus() !== 200) {
+                                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                            }
+                            try {
+                                response = XML.toJson(response);
+                            } catch (error) {
+                                throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                            }
+                            break;
+            
+                        case 'balancer':
+                            Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
+                            response = request.get(url);
+                            Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
+                            if (request.getStatus() !== 200) {
+                                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                            }
+                            break;
+            
+                        default:
+                            throw 'Error: Invalid option "get" for request function';
+                    }
+            
+                    return JSON.parse(response);
+                },
+            
+                listRegions: function () {
+                    var payload = {
+                        'Action': 'DescribeRegions',
+                        'Version': '2016-11-15'
+                    };
+            
+                    regions = AWS.getField(AWS.request('regions', 'POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            
+                    if (!Array.isArray(regions))
+                        regions = [regions]
+                    return regions
+                },
+            
+                listLoadBalancers: function () {
+                    var lld_array = [],
+                        regions = AWS.listRegions(),
+                        payload = {
+                            'Action': 'DescribeLoadBalancers',
+                            'Version': '2015-12-01'
+                        };
+            
+                    regions.forEach(function (region) {
+                        var region_name = AWS.getField(region, 'regionName');
+                        if (region_name.match(AWS.params.region_match) === null ||
+                            region_name.match(AWS.params.region_not_match) !== null)
+                            return;
+                        elb = AWS.getField(AWS.request('balancer', 'GET', region_name, 'elasticloadbalancing', 'elasticloadbalancing.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeLoadBalancersResponse.DescribeLoadBalancersResult.LoadBalancers');
+                        if (!Array.isArray(elb))
+                            elb = [elb]
+            
+                        elb.forEach(function (elb) {
+                            lld_array.push(
+                                {
+                                    name: AWS.getField(elb, 'LoadBalancerName'),
+                                    arn: AWS.getField(elb, 'LoadBalancerArn'),
+                                    type: AWS.getField(elb, 'Type'),
+                                    state: AWS.getField(elb, 'State.Code'),
+                                    dns_name: AWS.getField(elb, 'DNSName'),
+                                    region: region_name
+                                }
+                            )
+                        });
+                    });
+            
+                    return lld_array;
+                }
+            };
+            
+            try {
+                AWS.setParams(JSON.parse(value));
+            
+                return JSON.stringify(AWS.listLoadBalancers());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ AWS ELB ] ERROR: ' + error);
+                return JSON.stringify({ 'error': error });
+            }
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#AWS.ELB.NAME}'
+                value: '{$AWS.ELB.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#AWS.ELB.NAME}'
+                value: '{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#AWS.ELB.REGION}'
+                value: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
+              - macro: '{#AWS.ELB.REGION}'
+                value: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#AWS.ELB.STATE}'
+                value: '{$AWS.ELB.LLD.FILTER.STATE.MATCHES}'
+                formulaid: E
+              - macro: '{#AWS.ELB.STATE}'
+                value: '{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+          description: 'Get ELB load balancers.'
+          host_prototypes:
+            - uuid: 2c31bc79209e41978f76315406339769
+              host: '{#AWS.ELB.NAME}'
+              name: '{#AWS.ELB.NAME}'
+              group_links:
+                - group:
+                    name: Applications
+              templates:
+                - name: 'AWS ELB Application Load Balancer by HTTP'
+              macros:
+                - macro: '{$AWS.ELB.ARN}'
+                  value: '{#AWS.ELB.ARN}'
+                  description: 'The Amazon Resource Names (ARN) of the load balancers.'
+                - macro: '{$AWS.ELB.NAME}'
+                  value: '{#AWS.ELB.NAME}'
+                  description: 'ELB load balancer name.'
+                - macro: '{$AWS.REGION}'
+                  value: '{#AWS.ELB.REGION}'
+                  description: 'ELB load balancer region.'
+              tags:
+                - tag: dns-name
+                  value: '{#AWS.ELB.DNS.NAME}'
+                - tag: name
+                  value: '{#AWS.ELB.NAME}'
+                - tag: region
+                  value: '{#AWS.ELB.REGION}'
+                - tag: service
+                  value: elb
+                - tag: type
+                  value: '{#AWS.ELB.TYPE}'
+          timeout: '{$AWS.DATA.TIMEOUT}'
+          parameters:
+            - name: AccessKeyId
+              value: '{$AWS.ACCESS.KEY.ID}'
+            - name: auth_type
+              value: '{$AWS.AUTH_TYPE}'
+            - name: proxy
+              value: '{$AWS.PROXY}'
+            - name: region_match
+              value: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
+            - name: region_not_match
+              value: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
+          lld_macro_paths:
+            - lld_macro: '{#AWS.ELB.ARN}'
+              path: $.arn
+            - lld_macro: '{#AWS.ELB.DNS.NAME}'
+              path: $.dns_name
+            - lld_macro: '{#AWS.ELB.NAME}'
+              path: $.name
+            - lld_macro: '{#AWS.ELB.REGION}'
+              path: $.region
+            - lld_macro: '{#AWS.ELB.STATE}'
+              path: $.state
+            - lld_macro: '{#AWS.ELB.TYPE}'
+              path: $.type
+          overrides:
+            - name: 'Application Load Balancers'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#AWS.ELB.TYPE}'
+                    value: ^application$
+                    formulaid: A
+              operations:
+                - operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    - name: 'AWS ELB Application Load Balancer by HTTP'
         - uuid: c1127e674b7548b2802cd8771f3a4768
           name: 'RDS instances discovery'
           type: SCRIPT
@@ -1276,6 +1601,24 @@ zabbix_export:
         - macro: '{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered ECS clusters by status.'
+        - macro: '{$AWS.ELB.LLD.FILTER.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable ELB load balancer by name.'
+        - macro: '{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered ELB load balancer by name.'
+        - macro: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable ELB load balancer by region.'
+        - macro: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered ELB load balancer by region.'
+        - macro: '{$AWS.ELB.LLD.FILTER.STATE.MATCHES}'
+          value: active
+          description: 'Filter of discoverable ELB load balancer by status.'
+        - macro: '{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered ELB load balancer by status.'
         - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
