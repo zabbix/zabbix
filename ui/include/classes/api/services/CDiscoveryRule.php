@@ -993,10 +993,21 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $items
+	 * @param array      $items
+	 * @param array|null $db_items
 	 */
-	private static function validateLifetimeFields(array $items): void {
+	private static function validateLifetimeFields(array $items, ?array $db_items = null): void {
 		foreach ($items as $index => $item) {
+			if ($db_items) {
+				$itemid = $item['itemid'];
+
+				$db_item = array_intersect_key($db_items[$itemid],
+					array_flip( ['lifetime', 'lifetime_type', 'enabled_lifetime', 'enabled_lifetime_type'])
+				);
+
+				$item += $db_item;
+			}
+
 			if ($item['lifetime_type'] == ZBX_LLD_DELETE_AFTER
 					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
 				$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
@@ -1155,7 +1166,7 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
-		self::validateLifetimeFields($items);
+		self::validateLifetimeFields($items, $db_items);
 	}
 
 	/**
