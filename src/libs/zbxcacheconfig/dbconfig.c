@@ -168,12 +168,8 @@ typedef struct
 
 	zbx_vector_status_diff_host_t	hosts;
 	zbx_hashset_t			proxies;
-
 }
 zbx_dc_status_diff_t;
-
-static void	dc_status_update(void);
-static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff);
 
 /******************************************************************************
  *                                                                            *
@@ -13092,7 +13088,6 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 	/* loop over hosts */
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
-	dc_proxy = NULL;
 
 	while (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
