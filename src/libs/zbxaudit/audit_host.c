@@ -123,14 +123,17 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
-void	zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(int audit_context_mode,
-		zbx_uint64_t hostid, zbx_uint64_t proxyid, const char *hostname, int inventory_mode)
+void	zbx_audit_host_update_json_add_proxy_and_hostname_and_inventory_mode(int audit_context_mode,
+		zbx_uint64_t hostid, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, const char *hostname,
+		int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 #define	AUDIT_TABLE_NAME	"hosts"
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
 			proxyid, AUDIT_TABLE_NAME, "proxyid");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_groupid",
+			proxy_groupid, AUDIT_TABLE_NAME, "proxy_groupid");
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname,
 			AUDIT_TABLE_NAME, "host");
 
