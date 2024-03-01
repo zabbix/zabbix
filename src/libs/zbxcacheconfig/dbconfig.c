@@ -12877,6 +12877,9 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	zbx_dc_status_diff_proxy_t	*proxy_diff;
 	zbx_hashset_iter_t		iter;
 
+	if (0 != config->status->last_update && config->status->last_update + ZBX_STATUS_LIFETIME > time(NULL))
+		return FAIL;
+
 	config->status->sync_ts = config->sync_ts;
 
 	zbx_hashset_iter_reset(&diff->proxies, &iter);
