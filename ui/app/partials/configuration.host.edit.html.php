@@ -175,8 +175,7 @@ $templates_field_items[] = (new CMultiSelect([
 	]
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$disabled_by_lld_icon = $data['host']['status'] == HOST_STATUS_NOT_MONITORED
-		&& array_key_exists('hostDiscovery', $data['host'])
+$disabled_by_lld_icon = $data['host']['status'] == HOST_STATUS_NOT_MONITORED && $data['host']['hostDiscovery']
 		&& $data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 	? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))->addClass('js-disabled-by-lld')
 	: null;
