@@ -8666,6 +8666,127 @@ class CApiInputValidatorTest extends TestCase {
 				'\n\n\n\ ',
 				'/',
 				'Invalid parameter "/": value contains unescaped character at position 7.'
+			],
+			[
+				['type' => API_NUMBER],
+				'',
+				'/1/number',
+				'Invalid parameter "/1/number": cannot be empty.'
+			],
+			[
+				['type' => API_NUMBER],
+				[],
+				'/1/number',
+				'Invalid parameter "/1/number": a number is expected.'
+			],
+			[
+				['type' => API_NUMBER],
+				true,
+				'/1/number',
+				'Invalid parameter "/1/number": a number is expected.'
+			],
+			[
+				['type' => API_NUMBER],
+				null,
+				'/1/number',
+				'Invalid parameter "/1/number": a number is expected.'
+			],
+			[
+				['type' => API_NUMBER],
+				'abc',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "abc".'
+			],
+			[
+				['type' => API_NUMBER],
+				123,
+				'/1/number',
+				'123'
+			],
+			[
+				['type' => API_NUMBER],
+				'456',
+				'/1/number',
+				'456'
+			],
+			[
+				['type' => API_NUMBER],
+				'1.5',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "1.5".'
+			],
+			[
+				['type' => API_NUMBER, 'in' => '1:100'],
+				'-1',
+				'/1/number',
+				'Invalid parameter "/1/number": value must be one of 1-100.'
+			],
+			[
+				['type' => API_NUMBER, 'in' => '1:100'],
+				'999',
+				'/1/number',
+				'Invalid parameter "/1/number": value must be one of 1-100.'
+			],
+			[
+				['type' => API_NUMBER],
+				'{$}',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "}".'
+			],
+			[
+				['type' => API_NUMBER],
+				'{$MACRO}',
+				'/1/number',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_NUMBER, 'length' => 8],
+				'{$MACRO}',
+				'/1/number',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_NUMBER, 'length' => 7],
+				'{$MACRO}',
+				'/1/number',
+				'Invalid parameter "/1/number": value is too long.'
+			],
+			[
+				['type' => API_NUMBER],
+				'{$MACRO1}{$MACRO2}',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "{$MACRO2}".'
+			],
+			[
+				['type' => API_NUMBER],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/number',
+				'Invalid parameter "/1/number": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_NUMBER],
+				'{$MACRO: "context"}',
+				'/1/number',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_NUMBER],
+				'{{$MACRO}.func()}',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "{$MACRO}.func()}".'
+			],
+			[
+				['type' => API_NUMBER],
+				'{#}',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "#}".'
+			],
+			[
+				['type' => API_NUMBER],
+				'{#MACRO}',
+				'/1/number',
+				'Invalid parameter "/1/number": incorrect syntax near "#MACRO}".'
 			]
 		];
 	}

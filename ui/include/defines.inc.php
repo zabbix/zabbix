@@ -1562,6 +1562,7 @@ define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
 define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
+define('API_NUMBER',				71);
 
 // flags
 define('API_REQUIRED',					0x00001);
