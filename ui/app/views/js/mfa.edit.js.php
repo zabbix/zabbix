@@ -165,7 +165,7 @@ window.mfa_edit = new class {
 
 	#confirmSubmit() {
 		return window.confirm(<?= json_encode(
-			_('After this change users, that have already enrolled to this MFA method, will have to do the enrollment process again, because TOTP secrets will be reset.')
+			_('After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset.')
 		) ?>);
 	}
 
