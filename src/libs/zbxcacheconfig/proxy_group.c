@@ -378,7 +378,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			ZBX_STR2UCHAR(hp->tls_accept, row[6]);
 			dc_strpool_replace(found, &hp->tls_issuer, row[7]);
 			dc_strpool_replace(found, &hp->tls_subject, row[8]);
-			hp->tls_dc_psk = dc_psk_sync(row[9], row[10], hp->host, found, NULL, hp->tls_dc_psk);
+			hp->tls_dc_psk = dc_psk_sync(row[9], row[10], hp->host, found, &psk_owners, hp->tls_dc_psk);
 #endif
 		}
 
