@@ -620,7 +620,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			worker_max);
 
 	if (0 == worker_max)
-		worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
+		worker_max = queue->checks_per_worker_max;
 
 	discovery_async_poller_init(dmanager, &poller_config);
 	zbx_vector_discoverer_results_ptr_create(&results);

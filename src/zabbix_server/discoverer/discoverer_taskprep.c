@@ -196,7 +196,7 @@ static void	process_rangetask_copy(zbx_discoverer_task_t *task, zbx_task_range_t
 }
 
 static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vector_portrange_t *port_ranges,
-		int *total, zbx_hashset_t *tasks_dst)
+		int *total, zbx_hashset_t *tasks_dst, int checks_per_worker_max)
 {
 	zbx_task_range_t	range;
 
@@ -219,7 +219,7 @@ static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vect
 			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges->values, port_ranges->values_num,
 					&task->range.state.index_port, &task->range.state.port))
 			{
-				if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
+				if ((zbx_uint64_t)checks_per_worker_max == range.state.count)
 				{
 					process_rangetask_copy(task, &range, tasks_dst);
 					range = task->range;
@@ -240,7 +240,8 @@ static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vect
 		process_rangetask_copy(task, &range, tasks_dst);
 }
 
-static void	process_task_range_split_icmp(zbx_discoverer_task_t *task, int *total, zbx_hashset_t *tasks_dst)
+static void	process_task_range_split_icmp(zbx_discoverer_task_t *task, int *total, zbx_hashset_t *tasks_dst,
+		int checks_per_worker_max)
 {
 	zbx_task_range_t	range;
 
@@ -254,7 +255,7 @@ static void	process_task_range_split_icmp(zbx_discoverer_task_t *task, int *tota
 		while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
 				&task->range.state.index_ip, task->range.state.ipaddress))
 		{
-			if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
+			if ((zbx_uint64_t)checks_per_worker_max == range.state.count)
 			{
 				process_rangetask_copy(task, &range, tasks_dst);
 				range = task->range;
@@ -269,7 +270,7 @@ static void	process_task_range_split_icmp(zbx_discoverer_task_t *task, int *tota
 		process_rangetask_copy(task, &range, tasks_dst);
 }
 
-static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *tasks_dst)
+static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *tasks_dst, int checks_per_worker_max)
 {
 	zbx_discoverer_task_t	*task;
 	zbx_hashset_iter_t	iter;
@@ -284,9 +285,9 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 	{
 		if (SVC_ICMPPING == GET_DTYPE(task))
-			process_task_range_split_icmp(task, &total, tasks_dst);
+			process_task_range_split_icmp(task, &total, tasks_dst, checks_per_worker_max);
 		else
-			process_task_range_split_async(task, &port_ranges, &total, tasks_dst);
+			process_task_range_split_async(task, &port_ranges, &total, tasks_dst, checks_per_worker_max);
 
 		discoverer_task_clear(task);
 		zbx_hashset_iter_remove(&iter);
@@ -320,7 +321,7 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
  *                                                                            *
  ******************************************************************************/
 void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
-		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
+		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges, int checks_per_worker_max)
 {
 	zbx_hashset_t	tasks_local;
 	zbx_uint64_t	checks_count = 0;
@@ -402,7 +403,7 @@ next:
 	process_task_range_count(tasks, uniq_ips_num);
 
 	if (0 != tasks_local.num_data)
-		process_task_range_split(&tasks_local, tasks);
+		process_task_range_split(&tasks_local, tasks, checks_per_worker_max);
 out:
 	if (0 != tasks_local.num_data)
 	{

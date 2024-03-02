@@ -25,6 +25,6 @@
 #include "zbxcacheconfig.h"
 
 void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
-		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges);
+		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges, int checks_per_worker_max);
 
 #endif /* ZABBIX_DISCOVERER_TASKPREP_H_ */

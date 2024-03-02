@@ -749,7 +749,8 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		ipranges = (zbx_vector_iprange_t *)zbx_malloc(NULL, sizeof(zbx_vector_iprange_t));
 		zbx_vector_iprange_create(ipranges);
 
-		process_rule(drule, &tasks, check_counts, dchecks_common, ipranges);
+		process_rule(drule, &tasks, check_counts, dchecks_common, ipranges,
+				dmanager.queue.checks_per_worker_max);
 
 		job = discoverer_job_create(drule, dchecks_common, ipranges);
 		zbx_hashset_iter_reset(&tasks, &iter);
@@ -905,7 +906,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	zbx_vector_fping_host_create(&hosts);
 
 	if (0 == worker_max)
-		worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
+		worker_max = queue->checks_per_worker_max;
 
 	for (i = 0; i < task->range.ipranges->values_num; i++)
 		count += zbx_iprange_volume(&task->range.ipranges->values[i]);
@@ -1373,15 +1374,40 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 {
 #	define SNMPV3_WORKERS_MAX	1
 
-	int		i, err, ret = FAIL, started_num = 0;
+	int		i, err, ret = FAIL, started_num = 0, checks_per_worker_max;
 	time_t		time_start;
 	struct timespec	poll_delay = {0, 1e8};
-
+#ifdef	HAVE_GETRLIMIT
+	struct rlimit	rlim;
+#endif
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
 	manager->config_timeout = args_in->config_timeout;
 	manager->source_ip = args_in->config_source_ip;
 	manager->progname = args_in->zbx_get_progname_cb_arg();
 	manager->process_type = info->process_type;
+#ifdef	HAVE_GETRLIMIT
+	if (0 == getrlimit(RLIMIT_NOFILE, &rlim))
+	{						/* we will consume not more than 2/3 of all FD */
+		checks_per_worker_max = ((int)rlim.rlim_cur / 3 * 2) / args_in->workers_num;
+
+		if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX > checks_per_worker_max)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "for a discovery process with %d workers, the user limit of %d"
+					" file descriptors is insufficient. The maximum number of concurrent checks"
+					" per worker has been reduced to %d", args_in->workers_num,
+					(int)rlim.rlim_cur, checks_per_worker_max);
+		}
+	}
+	else
+#endif
+		checks_per_worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
+
+	if (0 == checks_per_worker_max)
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize maximum number of concurrent checks per worker,"
+				" user limit of file descriptors is insufficient");
+		return FAIL;
+	}
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
@@ -1389,7 +1415,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 		return FAIL;
 	}
 
-	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMPV3_WORKERS_MAX, error))
+	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMPV3_WORKERS_MAX, checks_per_worker_max, error))
 	{
 		pthread_mutex_destroy(&manager->results_lock);
 		return FAIL;

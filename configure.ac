@@ -846,6 +846,14 @@ clock_gettime(CLOCK_REALTIME, &tp);
 ]])],[AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,Define to 1 if function 'clock_gettime' exists.)
 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
+AC_MSG_CHECKING(for function getrlimit in resource.h)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <sys/resource.h>
+]], [[struct rlimit rlim;
+getrlimit(RLIMIT_NOFILE, &rlim);
+]])],[AC_DEFINE(HAVE_GETRLIMIT,1,Define to 1 if function 'getrlimit' exists.)
+AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                      Checks for macros                        *

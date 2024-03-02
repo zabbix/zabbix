@@ -248,13 +248,15 @@ int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_workers, char **error)
+int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_workers, int checks_per_worker_max,
+		char **error)
 {
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
 	queue->pending_checks_count = 0;
 	queue->snmpv3_allowed_workers = snmpv3_allowed_workers;
+	queue->checks_per_worker_max = checks_per_worker_max;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 	zbx_vector_discoverer_drule_error_create(&queue->errors);
 	zbx_vector_uint64_create(&queue->del_jobs);
