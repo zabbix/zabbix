@@ -23,27 +23,30 @@ This template has been tested on:
 ## Setup
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
-2. Copy `template_db_mysql.conf` into the folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart Zabbix agent.
-3. Create a MySQL user for monitoring (`<password>` at your discretion):
+2. Copy the `template_db_mysql.conf` file with user parameters into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget to restart Zabbix agent.
+3. Create the MySQL user that will be used for monitoring (`<password>` at your discretion). For example:
 
 ```text
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
 
-For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
+For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/grant.html).
 
-4. Create `.my.cnf` in the home directory of Zabbix agent for Linux (`/var/lib/zabbix` by default ) or `my.cnf` in c:\ for Windows. The file must have three strings:
+4. Create `.my.cnf` configuration file in the home directory of Zabbix agent for Linux distributions (/var/lib/zabbix by default) or `my.cnf` in c:\ for Windows. For example:
 
 ```text
 [client]
+protocol=tcp
 user='zbx_monitor'
 password='<password>'
 ```
-NOTE: Use systemd to start Zabbix agent on Linux OS.
-For example, in Centos use "systemctl edit zabbix-agent.service" to set the required user to start the Zabbix agent.
 
-Add the rule to the SELinux policy (example for Centos):
+For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/option-files.html).
+
+NOTE: Linux distributions that use SELinux may require additional steps for access configuration.
+
+For example, the following rule could be added to the SELinux policy:
 
 ```text
 # cat <<EOF > zabbix_home.te

@@ -39,7 +39,7 @@ abstract class CControllerUserEditGeneral extends CController {
 	protected function init(): void {
 		$this->disableSIDValidation();
 
-		$timezone = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);
+		$timezone = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_TIMEZONE);
 
 		if ($timezone === ZBX_DEFAULT_TIMEZONE || $timezone === TIMEZONE_DEFAULT) {
 			$timezone = CTimezoneHelper::getSystemTimezone();

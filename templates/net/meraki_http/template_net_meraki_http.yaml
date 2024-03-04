@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:39:20Z'
+  date: '2024-02-16T10:23:18Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -236,6 +236,7 @@ zabbix_export:
           key: meraki.organization.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$MERAKI.ORGANIZATION.NAME.MATCHES}'

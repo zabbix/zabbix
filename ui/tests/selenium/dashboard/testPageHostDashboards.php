@@ -243,8 +243,9 @@ class testPageHostDashboards extends CWebTest {
 				[
 					'fields' => ['id:from' => 'now-3y', 'id:to' => 'now'],
 					'error' => [
-						'from' => 'Maximum time period to display is 730 days.'
-					]
+						'from' => 'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			]
 		];
@@ -271,11 +272,13 @@ class testPageHostDashboards extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'error', false)) {
-			// If error expected.
-
-			// Assert error text.
+		// Check error message if such is expected.
+		if (CTestArrayHelper::get($data, 'error')) {
 			foreach ($data['error'] as $field => $text) {
+				// Count of days mentioned in error depends ot presence of leap year february in selected period.
+				if (CTestArrayHelper::get($data, 'days_count')) {
+					$text = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $text);
+				}
 				$message = $this->query('xpath://ul[@data-error-for='.CXPathHelper::escapeQuotes($field).']//li')->one();
 				$this->assertEquals($text, $message->getText());
 			}
