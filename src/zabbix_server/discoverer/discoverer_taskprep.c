@@ -336,6 +336,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 	for (i = 1; NULL != (start = strchr(start, ',')); i++, start++);
 
 	zbx_vector_iprange_reserve(ipranges, (size_t)i);
+	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{
@@ -353,7 +354,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 			zbx_snprintf(err, sizeof(err), "wrong format of IP range \"%s\"", start);
 			discoverer_queue_append_error(drule_errors, drule->druleid, err);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			goto next;
+			goto out;
 		}
 
 		if (ZBX_DISCOVERER_IPRANGE_LIMIT < zbx_iprange_volume(&ipr))
@@ -364,7 +365,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 					ZBX_DISCOVERER_IPRANGE_LIMIT);
 			discoverer_queue_append_error(drule_errors, drule->druleid, err);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			goto next;
+			goto out;
 		}
 #ifndef HAVE_IPV6
 		if (ZBX_IPRANGE_V6 == ipr.type)
@@ -375,11 +376,11 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 					" but IPv6 support not compiled in", start);
 			discoverer_queue_append_error(drule_errors, drule->druleid, err);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			goto next;
+			goto out;
 		}
 #endif
 		zbx_vector_iprange_append(ipranges, ipr);
-next:
+
 		if (NULL != comma)
 		{
 			*comma = ',';
@@ -388,11 +389,6 @@ next:
 		else
 			break;
 	}
-
-	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
-
-	if (0 == ipranges->values_num)
-		goto out;
 
 	if (0 != drule->unique_dcheckid)
 		checks_count = process_checks(drule, 1, tasks, &tasks_local, dchecks_common, ipranges);
