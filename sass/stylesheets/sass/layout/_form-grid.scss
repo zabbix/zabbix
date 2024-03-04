@@ -239,6 +239,10 @@
 		.icon {
 			@extend %button-size-medium;
 		}
+
+		.btn-icon.btn-small {
+			@extend %button-size-small;
+		}
 	}
 
 	th {
