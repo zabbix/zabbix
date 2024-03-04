@@ -1401,17 +1401,17 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 					" per worker has been reduced to %d", args_in->workers_num,
 					(int)rlim.rlim_cur, checks_per_worker_max);
 		}
+
+		if (0 == checks_per_worker_max)
+		{
+			*error = zbx_dsprintf(NULL, "cannot initialize maximum number of concurrent checks per worker,"
+					" user limit of file descriptors is insufficient");
+			return FAIL;
+		}
 	}
 	else
 #endif
 		checks_per_worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
-
-	if (0 == checks_per_worker_max)
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize maximum number of concurrent checks per worker,"
-				" user limit of file descriptors is insufficient");
-		return FAIL;
-	}
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
