@@ -503,9 +503,12 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	redirect->reset = 0;
 
 	unsigned char	tls_accept;
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*tls_issuer;
 	const char	*tls_subject;
 	ZBX_DC_PSK	*dc_psk = NULL;
+#endif
 
 	if (NULL != config->proxy_hostname)
 	{
@@ -544,9 +547,9 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 		return FAIL;
 	}
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*msg;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (FAIL == zbx_tls_validate_attr(attr, tls_issuer, tls_subject,
 			NULL == dc_psk ? NULL : dc_psk->tls_psk_identity, &msg))
 	{

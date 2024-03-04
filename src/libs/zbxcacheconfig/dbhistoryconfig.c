@@ -1083,8 +1083,9 @@ static int	dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock
 {
 	const ZBX_DC_HOST	*dc_host = NULL;
 	int			ret = FAIL;
-	char			*error = NULL;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
+	char			*error = NULL;
 
 	if (FAIL == zbx_tls_get_attr(sock, &attr, &error))
 	{
@@ -1092,7 +1093,12 @@ static int	dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock
 		zbx_free(error);
 		return FAIL;
 	}
+#else
+	zbx_tls_conn_attr_t	attr = {.connection_type = ZBX_TCP_SEC_UNENCRYPTED};
 
+	ZBX_UNUSED(sock);
+
+#endif
 	RDLOCK_CACHE;
 
 	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, &attr, redirect))

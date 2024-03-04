@@ -9327,12 +9327,13 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
-	const char		*msg;
 
 	if (FAIL == zbx_tls_get_attr(sock, &attr, error))
 		return FAIL;
-#endif
+#else
+	zbx_tls_conn_attr_t	attr = {.connection_type = ZBX_TCP_SEC_UNENCRYPTED};
 
+#endif
 	RDLOCK_CACHE;
 
 	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, &attr, redirect))
@@ -9369,6 +9370,8 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 		return FAIL;
 	}
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*msg;
+
 	if (FAIL == zbx_tls_validate_attr(&attr, dc_host->tls_issuer, dc_host->tls_subject,
 			NULL == dc_host->tls_dc_psk ? NULL : dc_host->tls_dc_psk->tls_psk_identity, &msg))
 	{

@@ -85,7 +85,7 @@ void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
  * Purpose: add proxy group for standalone proxies                            *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_add_standalone_proxy_group(zbx_pg_cache_t *cache)
+static void	pg_cache_add_standalone_proxy_group(zbx_pg_cache_t *cache)
 {
 	zbx_pg_group_t	*group, group_local = {.proxy_groupid = 0};
 

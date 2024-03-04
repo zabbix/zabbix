@@ -1441,7 +1441,7 @@ struct zbx_pg_group
 	int				state;
 	int				state_time;
 	int				unbalanced;
-	int				balance_time;
+	time_t				balance_time;
 	zbx_uint32_t			flags;
 	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
 	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */
