@@ -774,6 +774,27 @@ if (hasRequest('form')) {
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
+
+		if (timeUnitToSeconds($data['lifetime']) == 0) {
+			$data['lifetime_type'] = ZBX_LLD_DELETE_IMMEDIATELY;
+		}
+
+		if (timeUnitToSeconds($data['enabled_lifetime']) == 0) {
+			$data['enabled_lifetime_type'] = ZBX_LLD_DISABLE_IMMEDIATELY;
+		}
+
+		if ($data['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$data['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		// Reset the values to default.
+		if ($data['lifetime_type'] != ZBX_LLD_DELETE_AFTER) {
+			$data['lifetime'] = DB::getDefault('items', 'lifetime');
+		}
+
+		if ($data['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER) {
+			$data['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
+		}
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
