@@ -98,6 +98,7 @@
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
 #include "zbxpoller.h"
+#include "zbxescalations.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
