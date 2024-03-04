@@ -527,9 +527,13 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 
 static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num, int process_type)
 {
+
+	int			ping_result, first_index = 0;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;
+	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -545,10 +549,6 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 				items[i].timeout != items[i + 1].timeout ||
 				items[i].allow_redirect != items[i + 1].allow_redirect)
 		{
-			int		ping_result, first_index = 0;
-			char		error[ZBX_ITEM_ERROR_LEN_MAX];
-			zbx_timespec_t	ts;
-
 			zbx_setproctitle("%s #%d [pinging hosts]", get_process_type_string(process_type), process_num);
 
 			zbx_timespec(&ts);
