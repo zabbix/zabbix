@@ -438,8 +438,6 @@ void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *f
 	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
 	int		num_data = hashset->num_data;
 
-	*found = 0;
-
 	buffer[0] = id;
 
 	ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
