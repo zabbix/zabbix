@@ -22,7 +22,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
-	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
 	$(top_srcdir)/src/zabbix_server/housekeeper/libzbxhousekeeper.a \
 	$(top_srcdir)/src/zabbix_server/timer/libzbxtimer.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \

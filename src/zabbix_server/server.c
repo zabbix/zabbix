@@ -28,7 +28,6 @@
 #include "discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
-#include "pinger/pinger.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
@@ -55,6 +54,7 @@
 #include "zbxself.h"
 
 #include "cfg.h"
+#include "zbxpinger.h"
 #include "zbxdbupgrade.h"
 #include "zbxlog.h"
 #include "zbxgetopt.h"
