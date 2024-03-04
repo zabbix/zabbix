@@ -29,8 +29,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
-	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
-	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -78,7 +76,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
