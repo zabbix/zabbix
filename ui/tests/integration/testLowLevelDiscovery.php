@@ -688,7 +688,7 @@ class testLowLevelDiscovery extends CIntegrationTest {
 						self::DRULE_LIFETIME_NEVER.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_DELETE.'_hg_'.self::LLD_DATA_MACRO_VALUE,
 						self::DRULE_LIFETIME_DISABLE_AFTER.'_hg_'.self::LLD_DATA_MACRO_VALUE,
-						self::DRULE_LIFETIME_DELETE_DISABLED.'_hg_'.self::LLD_DATA_MACRO_VALUE,
+						self::DRULE_LIFETIME_DELETE_DISABLED.'_hg_'.self::LLD_DATA_MACRO_VALUE
 				]
 			]
 		]);
