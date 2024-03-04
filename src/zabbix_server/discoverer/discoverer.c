@@ -770,6 +770,14 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 
 			zbx_vector_discoverer_jobs_ptr_append(jobs, job);
 		}
+		else
+		{
+			zbx_vector_dc_dcheck_ptr_clear_ext(dchecks_common, zbx_discovery_dcheck_free);
+			zbx_vector_dc_dcheck_ptr_destroy(dchecks_common);
+			zbx_free(dchecks_common);
+			zbx_vector_iprange_destroy(ipranges);
+			zbx_free(ipranges);
+		}
 
 		zbx_hashset_destroy(&tasks);
 		rule_count++;
