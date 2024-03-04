@@ -546,7 +546,7 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
  ******************************************************************************/
 static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
 {
-	int	online_num = 0, hosts_num = 0;
+	int	online_num = 0, hosts_num = 0, hosts_avg, hosts_required;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name, cache->group_updates.values_num);
 
@@ -565,7 +565,8 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	if (0 == online_num)
 		goto out;
 
-	int	hosts_avg = hosts_num / online_num, hosts_required = 0;
+	hosts_avg = hosts_num / online_num;
+	hosts_required = 0;
 
 	/* calculate how many hosts are needed to balance groups with deficit hosts */
 	for (int i = 0; i < group->proxies.values_num; i++)

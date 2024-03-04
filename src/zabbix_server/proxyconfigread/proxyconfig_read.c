@@ -1466,11 +1466,11 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		const char *config_ssl_key_location, char **error)
 {
 	int			ret = FAIL;
-	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
-	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision;
+	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1], *failover_delay = NULL;
+	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision, hostmap_revision;
 	zbx_dc_revision_t	dc_revision;
-	char			*failover_delay = NULL;
 	zbx_vector_uint64_t	del_hostproxyids;
+	unsigned char		hostmap_sync;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:" ZBX_FS_UI64, __func__, proxy->proxyid);
 
@@ -1518,8 +1518,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 				__func__, proxy_config_revision, dc_revision.config);
 	}
 
-	unsigned char		hostmap_sync = ZBX_PROXY_SYNC_NONE;
-	zbx_uint64_t		hostmap_revision = proxy_hostmap_revision;
+	hostmap_sync = ZBX_PROXY_SYNC_NONE;
+	hostmap_revision = proxy_hostmap_revision;
 
 	if (0 != proxy->proxy_groupid)
 	{
