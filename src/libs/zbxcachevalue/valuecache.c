@@ -980,7 +980,7 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 
 	while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
 			REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE, REFCOUNT_FIELD_SIZE + len,
-			ZBX_UNIQ_FALSE)))
+			ZBX_HASHSET_UNIQ_FALSE)))
 	{
 		/* If there is not enough space - free enough to store string + hashset entry overhead */
 		/* and try inserting one more time. If it fails again, then fail the function.         */

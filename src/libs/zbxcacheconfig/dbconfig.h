@@ -1035,7 +1035,7 @@ void	DCdump_configuration(void);
 
 /* utility functions */
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
-void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq);
+void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, zbx_hashset_uniq_t uniq);
 
 /* string pool */
 const char	*dc_strpool_intern(const char *str);
