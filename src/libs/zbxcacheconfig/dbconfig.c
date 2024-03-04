@@ -12880,7 +12880,7 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	zbx_hashset_iter_t		iter;
 
 	if (0 != config->status->last_update && config->status->last_update + ZBX_STATUS_LIFETIME > time(NULL))
-		return FAIL;
+		return;
 
 	config->status->sync_ts = config->sync_ts;
 
