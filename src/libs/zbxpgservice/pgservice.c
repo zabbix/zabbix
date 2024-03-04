@@ -29,6 +29,8 @@ ZBX_VECTOR_IMPL(objmove, zbx_objmove_t)
  *                                                                            *
  * Purpose: send object relocation updates to proxy group service             *
  *                                                                            *
+ * Comments: used only by server                                              *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *updates)
 {
@@ -72,6 +74,8 @@ void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *u
  *                                                                            *
  * Purpose: update proxy runtime data                                         *
  *                                                                            *
+ * Comments: used only by server                                              *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int version)
 {
@@ -105,6 +109,8 @@ void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int versio
 /******************************************************************************
  *                                                                            *
  * Purpose: get proxy group statistics                                        *
+ *                                                                            *
+ * Comments: used only by server                                              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_pg_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error)

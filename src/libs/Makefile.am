@@ -174,6 +174,7 @@ PROXY_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpgservice \
 	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
