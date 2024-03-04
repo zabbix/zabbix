@@ -850,7 +850,7 @@ ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
 ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
 
 static int	discoverer_icmp_result_merge(zbx_hashset_t *incomplete_checks_count, zbx_hashset_t *results,
-		const zbx_uint64_t druleid, const int dcheckid, const zbx_uint64_t unique_dcheckid,
+		const zbx_uint64_t druleid, const zbx_uint64_t dcheckid, const zbx_uint64_t unique_dcheckid,
 		const zbx_vector_fping_host_t *hosts)
 {
 	int	i;
