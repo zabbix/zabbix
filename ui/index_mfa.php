@@ -53,16 +53,16 @@ if ($request != '') {
 try {
 	$session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 
+	// If no session data or MFA is not required - redirect to the main login page.
+	if (!$session_data || !array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
+		redirect($redirect_to->toString());
+	}
+
 	$session_data_sign = CSessionHelper::get('sign');
 	$session_data_sign_check = CEncryptHelper::sign(json_encode(array_diff_key($session_data, array_flip(['sign']))));
 
 	if (!$session_data_sign || !CEncryptHelper::checkSign($session_data_sign, $session_data_sign_check)) {
 		throw new Exception(_('Session initialization error.'));
-	}
-
-	// If MFA is not required - redirect to the main login page.
-	if (!array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
-		redirect($redirect_to->toString());
 	}
 
 	if ($request != '') {
