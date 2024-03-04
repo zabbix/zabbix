@@ -1,1 +1,1 @@
-...G...... [ZBX-23888] added setting items to unsupported stated when regex with lookbehind or lookahead is supplied (dgoloscapov)
+...G...... [ZBX-23888] added setting items to unsupported stated when invalid regexp is supplied (dgoloscapov)
