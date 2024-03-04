@@ -30,6 +30,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldHostPatternSelect,
 	CWidgetFieldIntegerBox,
+	CWidgetFieldGrouping,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
@@ -49,6 +50,10 @@ class WidgetForm extends CWidgetForm {
 	public const PROBLEMS_ALL = 0;
 	public const PROBLEMS_UNSUPPRESSED = 1;
 	public const PROBLEMS_NONE = 2;
+
+	public const GROUP_BY_HOST_GROUP = 0;
+	public const GROUP_BY_TAG_VALUE = 1;
+	public const GROUP_BY_SEVERITY = 2;
 
 	public function addFields(): self {
 		return $this
@@ -94,9 +99,16 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
+				new CWidgetFieldGrouping('group_by', _('Group by'), [
+					self::GROUP_BY_HOST_GROUP => _('Host group'),
+					self::GROUP_BY_TAG_VALUE => _('Tag value'),
+					self::GROUP_BY_SEVERITY => _('Severity')
+				], [self::GROUP_BY_TAG_VALUE])
+			)
+			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Host limit'), 1, 9999))
-					->setDefault(100)
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY |CWidgetField::FLAG_LABEL_ASTERISK)
+					->setDefault(ZBX_MAX_WIDGET_LINES)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()

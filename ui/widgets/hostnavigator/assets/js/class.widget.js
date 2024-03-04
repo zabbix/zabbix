@@ -21,6 +21,7 @@
 class CWidgetHostNavigator extends CWidget {
 
 	#host_list = null;
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),

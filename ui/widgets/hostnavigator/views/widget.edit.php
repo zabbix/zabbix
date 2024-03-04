@@ -66,6 +66,9 @@ $form
 		new CWidgetFieldSeveritiesView($data['fields']['severities'])
 	)
 	->addField(
+		new CWidgetFieldGroupingView($data['fields']['group_by'])
+	)
+	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
 	->show();

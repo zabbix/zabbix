@@ -25,12 +25,11 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData;
 
+use Widgets\HostNavigator\Includes\WidgetForm;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const SHOW_IN_MAINTENANCE_ON = 1;
-	private const HOST_STATUS_ANY = 0;
-	private const SHOW_PROBLEMS_UNSUPPRESSED = 1;
-	private const SHOW_PROBLEMS_OFF = 2;
 
 	protected function init(): void {
 		parent::init();
@@ -77,6 +76,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? ['hostid', 'name', 'maintenanceid', 'maintenance_status']
 			: ['hostid', 'name'];
 
+		$group_by_tags = false;
+		$group_by_host_groups = false;
+		$tags_to_keep = [];
+
+		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
+			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_TAG_VALUE) {
+				$group_by_tags = true;
+				$tags_to_keep[] = $group_by_attribute['tag_name'];
+			}
+
+			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_HOST_GROUP) {
+				$group_by_host_groups = true;
+			}
+		}
+
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
 			// Get hosts based on filter configurations
 			$hosts = API::Host()->get([
@@ -93,15 +107,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'searchByAny' => true,
 				'severities' => $this->fields_values['severities'] ?: null,
 				'filter' => [
-					'status' => $this->fields_values['status'] == self::HOST_STATUS_ANY
+					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
 						: $this->fields_values['status'],
 					'maintenance_status' => $this->fields_values['maintenance'] != self::SHOW_IN_MAINTENANCE_ON
 						? HOST_MAINTENANCE_STATUS_OFF
 						: null
 				],
-				'selectHostGroups' => ['groupid', 'name'],
-				'selectTags' => ['tag', 'value'],
+				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
+				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
 				'sortfield' => 'name',
 				// Request more than the set limit to distinguish if there are even more hosts available
 				'limit' => $this->fields_values['show_lines'] + 1
@@ -115,15 +129,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => [$hostid],
 				'severities' => $this->fields_values['severities'] ?: null,
 				'filter' => [
-					'status' => $this->fields_values['status'] == self::HOST_STATUS_ANY
+					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
 						: $this->fields_values['status'],
 					'maintenance_status' => $this->fields_values['maintenance'] != self::SHOW_IN_MAINTENANCE_ON
 						? HOST_MAINTENANCE_STATUS_OFF
 						: null
 				],
-				'selectHostGroups' => ['groupid', 'name'],
-				'selectTags' => ['tag', 'value']
+				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
+				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
 			]);
 		}
 
@@ -138,7 +152,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			array_pop($hosts);
 		}
 
-		if ($this->fields_values['problems'] != self::SHOW_PROBLEMS_OFF) {
+		if ($group_by_tags) {
+			foreach ($hosts as &$host) {
+				$host['tags'] = array_filter($host['tags'], function($tag) use ($tags_to_keep) {
+					return in_array($tag['tag'], $tags_to_keep);
+				});
+
+				// Reset array keys
+				$host['tags'] = array_values($host['tags']);
+			}
+			unset($host);
+		}
+
+		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
 			$hostids = [];
 
 			foreach ($hosts as $host) {
@@ -160,7 +186,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'objectids' => array_keys($triggers),
-				'suppressed' => ($this->fields_values['problems'] == self::SHOW_PROBLEMS_UNSUPPRESSED) ? false : null,
+				'suppressed' => $this->fields_values['problems'] == WidgetForm::PROBLEMS_UNSUPPRESSED ? false : null,
 				'severities' => $this->fields_values['severities'] ?: null,
 				'symptom' => false
 			]);
@@ -237,8 +263,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
 				TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG
 			],
-			'show_problems' => $this->fields_values['problems'] != self::SHOW_PROBLEMS_OFF,
-			'group_by' => []
+			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
+			'group_by' => $this->fields_values['group_by']
 		];
 
 		return $config;
