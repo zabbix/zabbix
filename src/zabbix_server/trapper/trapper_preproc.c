@@ -32,19 +32,19 @@
  *                                                                            *
  * Purpose: parses preprocessing test request                                 *
  *                                                                            *
- * Parameters: jp           - [IN] the request                                *
- *             values       - [OUT] the values to test optional               *
+ * Parameters: jp           - [IN] request                                    *
+ *             values       - [OUT] values to test, optional                  *
  *                                  (history + current)                       *
  *             ts           - [OUT] value timestamps                          *
- *             values_num   - [OUT] the number of values                      *
- *             value_type   - [OUT] the value type                            *
- *             steps        - [OUT] the preprocessing steps                   *
- *             single     - [OUT] is preproc step single                      *
- *             state        - [OUT] the item state                            *
- *             bypass_first - [OUT] the flag to bypass first step             *
- *             error      - [OUT] the error message                           *
+ *             values_num   - [OUT]                                           *
+ *             value_type   - [OUT]                                           *
+ *             steps        - [OUT] preprocessing steps                       *
+ *             single       - [OUT] is preproc step single                    *
+ *             state        - [OUT] item state                                *
+ *             bypass_first - [OUT] flag to bypass first step                 *
+ *             error        - [OUT] error message                             *
  *                                                                            *
- * Return value: SUCCEED - the request was parsed successfully                *
+ * Return value: SUCCEED - request was parsed successfully                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -87,10 +87,12 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		*single = (0 == strcmp(buffer, "true") ? 1 : 0);
 
 	*state = 0;
+
 	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
 		*state = atoi(buffer);
 
 	zbx_timespec(&ts_now);
+
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_HISTORY, &jp_history))
 	{
 		size = 0;
@@ -232,11 +234,11 @@ out:
  *                                                                            *
  * Purpose: executes preprocessing test request                               *
  *                                                                            *
- * Parameters: jp    - [IN] the request                                       *
- *             json  - [OUT] the output json                                  *
- *             error - [OUT] the error message                                *
+ * Parameters: jp    - [IN] request                                           *
+ *             json  - [OUT] output json                                      *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the request was executed successfully              *
+ * Return value: SUCCEED - request was executed successfully                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if the request format is not valid or    *
@@ -411,11 +413,11 @@ out:
  *                                                                            *
  * Purpose: processes preprocessing test request                              *
  *                                                                            *
- * Parameters: sock           - [IN] the request source socket (frontend)     *
- *             jp             - [IN] the request                              *
+ * Parameters: sock           - [IN] request source socket (frontend)         *
+ *             jp             - [IN] request                                  *
  *             config_timeout - [IN]                                          *
  *                                                                            *
- * Return value: SUCCEED - the request was processed successfully             *
+ * Return value: SUCCEED - request was processed successfully                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will send proper (success/fail) response to the    *

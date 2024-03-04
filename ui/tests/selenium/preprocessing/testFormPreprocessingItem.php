@@ -242,4 +242,11 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 			$this->assertEquals('test', $form->getField($fields['value'])->getValue());
 		}
 	}
+
+	/**
+	 * @dataProvider getItemsParametersData
+	 */
+	public function testFormPreprocessingItem_CheckParametersPlaceholders($data) {
+		$this->checkParameters($data);
+	}
 }

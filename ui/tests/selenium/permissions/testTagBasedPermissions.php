@@ -186,7 +186,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', self::USER);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-settings']", 'title', self::USER);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
@@ -295,7 +295,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', self::USER);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-settings']", 'title', self::USER);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
@@ -399,7 +399,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', self::USER);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-settings']", 'title', self::USER);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);

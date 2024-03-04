@@ -20,7 +20,13 @@
 #include "trapper_item_test.h"
 #include "zbxexpression.h"
 
-#include "../poller/poller.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxeval.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxpoller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
 #include "zbxversion.h"
@@ -143,7 +149,8 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
-		int config_java_gateway_port, const char *config_externalscripts)
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -220,7 +227,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	item.headers = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
 
-	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items, "ssl_cert_file");
+	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items,
+			"ssl_cert_file");
 	item.ssl_key_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
 	item.ssl_key_password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
@@ -257,8 +265,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	}
 	else
 	{
-		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns", item.interface.dns_orig,
-				sizeof(item.interface.dns_orig));
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns",
+				item.interface.dns_orig, sizeof(item.interface.dns_orig));
 		item.interface.addr = item.interface.dns_orig;
 	}
 
@@ -275,9 +283,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		table_interface_snmp = zbx_db_get_table("interface_snmp");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_VERSION, table_interface_snmp, "version", &item.snmp_version);
-	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp, "community");
-	item.snmpv3_securityname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_SECURITYNAME, table_interface_snmp,
-			"securityname");
+	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp,
+			"community");
+	item.snmpv3_securityname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_SECURITYNAME,
+			table_interface_snmp, "securityname");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_SECURITYLEVEL, table_interface_snmp, "securitylevel",
 			&item.snmpv3_securitylevel);
@@ -366,9 +375,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	}
 	else
 	{
-		zbx_vector_ptr_t	add_results;
+		zbx_vector_agent_result_ptr_t	add_results;
 
-		zbx_vector_ptr_create(&add_results);
+		zbx_vector_agent_result_ptr_create(&add_results);
 
 		zbx_prepare_items(&item, &errcode, 1, &result, ZBX_MACRO_EXPAND_NO);
 
@@ -380,7 +389,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			zbx_eval_context_t	ctx;
 			char			*error = NULL;
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION,
+					&error))
 			{
 				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 				zbx_free(error);
@@ -392,7 +402,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
-				config_java_gateway_port, config_externalscripts);
+				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
+				config_ssh_key_location);
 
 		switch (errcode)
 		{
@@ -414,8 +425,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 					*info = zbx_strdup(NULL, *pvalue);
 		}
 
-		zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
-		zbx_vector_ptr_destroy(&add_results);
+		zbx_vector_agent_result_ptr_clear_ext(&add_results, zbx_free_agent_result_ptr);
+		zbx_vector_agent_result_ptr_destroy(&add_results);
 	}
 
 	zbx_clean_items(&item, 1, &result);
@@ -453,7 +464,8 @@ out:
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
-		int config_java_gateway_port, const char *config_externalscripts)
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
@@ -492,7 +504,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
-			config_externalscripts);
+			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);

@@ -325,6 +325,10 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 					zbx_rtrim(result.msg, "\r\n");
 					printf("%s: %s\n", ZBX_NOTSUPPORTED, result.msg);
 				}
+				else if (0 == ZBX_ISSET_VALUE(&result))
+				{
+					puts(ZBX_NODATA ": No value was received.");
+				}
 				else
 				{
 					zbx_rtrim(result.text, "\r\n");

@@ -29,7 +29,7 @@ $inline_js = getPagePostJs().$this->readJsFile('correlation.condition.edit.js.ph
 $form = (new CForm())
 	->setId('correlation-condition-form')
 	->setName('conditions')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('conditiontype', $data['conditiontype'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
