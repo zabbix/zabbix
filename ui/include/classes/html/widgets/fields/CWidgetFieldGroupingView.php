@@ -35,7 +35,9 @@ class CWidgetFieldGroupingView extends CWidgetFieldView {
 			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setFooter(new CRow(
 				new CCol(
-					(new CButtonLink(_('Add')))->addClass('element-table-add')
+					(new CButtonLink(_('Add')))
+						->setId('add-row')
+						->addClass('element-table-add')
 				)
 			));
 
@@ -49,10 +51,34 @@ class CWidgetFieldGroupingView extends CWidgetFieldView {
 	}
 
 	public function getJavaScript(): string {
-		return '
-			jQuery("#'.$this->field->getName().'-table")
-				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true});
-		';
+		$field_name = $this->field->getName();
+		$tag_fields_json = json_encode($this->field->tag_fields);
+
+		return "
+			function updateVisibility(row) {
+				const attribute = row.querySelector(`z-select`);
+				const tag_name_input = row.querySelector('input[id^=\"".$field_name."_\"][id$=\"_tag_name\"]');
+				const tag_fields = $tag_fields_json;
+
+				tag_name_input.style.display = tag_fields.includes(Number(attribute.value)) ? '' : 'none';
+			}
+
+			jQuery('#".$field_name."-table').dynamicRows({template:'#".$field_name."-row-tmpl', allow_empty: true});
+
+			document.querySelector('#".$field_name."-table').addEventListener('click', e => {
+				if (e.target.classList.contains('element-table-add')) {
+					const new_row = e.target.closest('tr').previousElementSibling;
+
+					updateVisibility(new_row);
+
+					new_row.querySelector(`z-select`).addEventListener('change', e => {
+						updateVisibility(e.target.closest('tr'));
+					})
+				}
+			});
+
+			document.querySelectorAll('#".$field_name."-table .form_row').forEach(updateVisibility);
+		";
 	}
 
 	public function getTemplates(): array {
