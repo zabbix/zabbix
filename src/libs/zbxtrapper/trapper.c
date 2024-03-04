@@ -52,7 +52,6 @@
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
-#include "zbxtypes.h"
 #include "zbxvault.h"
 
 #ifdef HAVE_NETSNMP

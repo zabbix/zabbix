@@ -22,7 +22,6 @@
 #include "zbxtrapper.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
-//#include "trapper_auth.h"
 #include "zbxcommshigh.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"

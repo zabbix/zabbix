@@ -31,7 +31,6 @@
 #include "pinger/pinger.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
-//#include "trapper/trapper.h"
 #include "trapper/trapper_server.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"

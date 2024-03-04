@@ -44,12 +44,11 @@
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller_proxy.h"
-
-//#include "trapper/trapper_server.h"
 #include "trapper/trapper_proxy.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
+
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"

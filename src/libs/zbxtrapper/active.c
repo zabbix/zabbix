@@ -36,7 +36,7 @@
 #include "zbxscripts.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxexpr.h".
+#include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 

@@ -36,7 +36,6 @@
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-//#include "trapper_auth.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
 {
