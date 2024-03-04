@@ -803,7 +803,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
 						'Time period' => 'Custom',
-						'id:time_period_from' => 'now-63158401' // 2 years and 2 seconds.
+						'id:time_period_from' => 'now-63158401' // 731 days and 1 second.
 					],
 					'item' => [
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
