@@ -3465,7 +3465,7 @@ class CUser extends CApiService {
 					throw $e;
 				}
 
-				self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+				self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PARAMETERS,
 					_('The verification code was incorrect, please try again.')
 				);
 			}

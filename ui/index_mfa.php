@@ -22,6 +22,7 @@
 require_once __DIR__.'/include/classes/user/CWebUser.php';
 require_once __DIR__.'/include/config.inc.php';
 
+// Clear 'Session terminated, re-login, please' message.
 CMessageHelper::clear();
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -54,7 +55,7 @@ try {
 	$session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 
 	// If no session data or MFA is not required - redirect to the main login page.
-	if (!$session_data || !array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
+	if (!$session_data || !array_key_exists('mfaid', $session_data)) {
 		redirect($redirect_to->toString());
 	}
 
@@ -76,14 +77,20 @@ try {
 		->toString();
 
 	$full_duo_redirect_url = implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri]);
-	$session_data_required = array_intersect_key($session_data, array_flip(['sessionid', 'mfaid']));
+
+	$confirm_data = [
+		'sessionid' => CSessionHelper::get('confirmid'),
+		'mfaid' => CSessionHelper::get('mfaid'),
+		'redirect_uri' => implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri])
+	];
 
 	$error = null;
 
 	if (!CSessionHelper::has('state') && !hasRequest('enter')) {
-		$data = CUser::getConfirmData($session_data_required + ['redirect_uri' => $full_duo_redirect_url]);
+		$data = CUser::getConfirmData($confirm_data);
 
 		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
+			session_write_close();
 			echo (new CView('mfa.login', $data))->getOutput();
 			exit;
 		}
@@ -97,23 +104,21 @@ try {
 		}
 	}
 	else {
-		$data = $session_data_required;
-		$data['redirect_uri'] = $full_duo_redirect_url;
 		$data['mfa_response_data'] = [
 			'verification_code' => getRequest('verification_code', ''),
 			'totp_secret' => getRequest('totp_secret'),
 			'duo_code' => getRequest('duo_code'),
 			'duo_state' => getRequest('state'),
-			'state' => array_key_exists('state', $session_data) ? $session_data['state'] : '',
-			'username' => array_key_exists('username', $session_data) ? $session_data['username'] : ''
+			'state' => CSessionHelper::get('state'),
+			'username' => CSessionHelper::get('username')
 		];
 
-		$confirm = CUser::confirm($data);
+		$confirm = CUser::confirm($confirm_data + $data);
 
 		if ($confirm) {
 			CWebUser::checkAuthentication($confirm['sessionid']);
 			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-			CSessionHelper::unset(['mfaid', 'state', 'username']);
+			CSessionHelper::unset(['mfaid', 'state', 'username', 'confirmid']);
 
 			API::getWrapper()->auth = [
 				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
@@ -130,13 +135,12 @@ catch (Exception $e) {
 
 	CMessageHelper::clear();
 
-	if ($error['error'] && $error['error']['message'] ==
-		_('The verification code was incorrect, please try again.')
-	) {
+	if ($e->getCode() == ZBX_API_ERROR_PARAMETERS) {
 		$data['qr_code_url'] = getRequest('qr_code_url');
 		$data['totp_secret'] = getRequest('totp_secret');
 		$data['mfa']['hash_function'] = getRequest('hash_function');
 
+		session_write_close();
 		echo (new CView('mfa.login', $data + $error))->getOutput();
 		exit;
 	}
