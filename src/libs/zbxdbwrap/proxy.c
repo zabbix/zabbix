@@ -1559,7 +1559,6 @@ static int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, s
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
 	zbx_comms_redirect_t	redirect;
-	zbx_uint64_t		hostid;
 	struct zbx_json_parse	jp_data;
 	int			ret = FAIL, version;
 	char			*token = NULL;
@@ -1642,7 +1641,7 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 		if (NULL == token)
 			session = NULL;
 		else
-			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
+			session = zbx_dc_get_or_create_session(host.hostid, token, ZBX_SESSION_TYPE_DATA);
 
 		ret = process_history_data_by_itemids(sock, agent_item_validator, NULL, &jp_data, session, NULL,
 				info, ZBX_ITEM_GET_DEFAULT);
