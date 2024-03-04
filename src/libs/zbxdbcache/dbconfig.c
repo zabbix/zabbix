@@ -426,39 +426,35 @@ static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
  *     size    - [IN] size of element to search for                           *
  *     found   - [OUT flag. 0 - element did not exist, it was created.        *
  *                          1 - existing element was found.                   *
- *     uniq   - [IN] flag.  ZBX_UNIQ_FALSE - search if already exists.        *
- *                          ZBX_UNIQ_TRUE  - skip search if already searched. *
+ *     uniq    - [IN] flag.  ZBX_HASHSET_UNIQ_FALSE - search before insert.   *
+ *                           ZBX_HASHSET_UNIQ_TRUE  - skip search.            *
  *                                                                            *
  * Return value: pointer to the found or created element                      *
  *                                                                            *
  ******************************************************************************/
-void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq)
+void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, zbx_hashset_uniq_t uniq)
 {
 	void		*ptr = NULL;
 	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
+	int		num_data = hashset->num_data;
 
-	if (ZBX_UNIQ_TRUE == uniq || NULL == (ptr = zbx_hashset_search(hashset, &id)))
-	{
+	*found = 0;
+
+	buffer[0] = id;
+
+	ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
+
+	if (num_data != hashset->num_data)
 		*found = 0;
-
-		buffer[0] = id;
-
-		if (NULL == ptr)
-			uniq = ZBX_UNIQ_TRUE;
-
-		ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
-	}
 	else
-	{
 		*found = 1;
-	}
 
 	return ptr;
 }
 
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
-	return DCfind_id_ext(hashset, id, size, found, 0);
+	return DCfind_id_ext(hashset, id, size, found, ZBX_HASHSET_UNIQ_FALSE);
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
@@ -528,7 +524,7 @@ static const char	*zbx_strpool_intern(const char *str)
 	zbx_uint32_t	*refcount;
 
 	record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
-			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_FALSE);
+			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_HASHSET_UNIQ_FALSE);
 
 	refcount = (zbx_uint32_t *)record;
 	(*refcount)++;
@@ -3136,7 +3132,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
-	int			found, ret, i, old_nextcheck, uniq = ZBX_UNIQ_FALSE;
+	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
+	int			found, ret, i, old_nextcheck;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 	zbx_item_value_type_t	old_value_type;
@@ -3154,7 +3151,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		zbx_hashset_reserve(&config->items, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->items_hk, MAX(row_num, 100));
-		uniq = ZBX_UNIQ_TRUE;
+		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -3474,7 +3471,8 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
-	int			ret, found, uniq = ZBX_UNIQ_FALSE;
+	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
+	int			ret, found;
 	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3484,7 +3482,7 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->item_discovery, MAX(row_num, 100));
-		uniq = ZBX_UNIQ_TRUE;
+		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -3590,14 +3588,15 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 
 static void	DCsync_triggers(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
 
-	ZBX_DC_TRIGGER	*trigger;
+	ZBX_DC_TRIGGER		*trigger;
 
-	int		found, ret, uniq = ZBX_UNIQ_FALSE;
-	zbx_uint64_t	triggerid;
+	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
+	int			found, ret;
+	zbx_uint64_t		triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3606,7 +3605,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->triggers, MAX(row_num, 100));
-		uniq = ZBX_UNIQ_TRUE;
+		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -4153,15 +4152,16 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 
 static void	DCsync_functions(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
 
-	ZBX_DC_ITEM	*item;
-	ZBX_DC_FUNCTION	*function;
+	ZBX_DC_ITEM		*item;
+	ZBX_DC_FUNCTION		*function;
 
-	int		found, ret, uniq = ZBX_UNIQ_FALSE;
-	zbx_uint64_t	itemid, functionid, triggerid;
+	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
+	int			found, ret;
+	zbx_uint64_t		itemid, functionid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4170,7 +4170,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->functions, MAX(row_num, 100));
-		uniq = ZBX_UNIQ_TRUE;
+		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -5131,7 +5131,8 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	int			found, ret, index, uniq = ZBX_UNIQ_FALSE;
+	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
+	int			found, ret, index;
 	zbx_uint64_t		itemid, itemtagid;
 	ZBX_DC_ITEM		*item;
 	zbx_dc_item_tag_t	*item_tag;
@@ -5143,7 +5144,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->item_tags, MAX(row_num, 100));
-		uniq = ZBX_UNIQ_TRUE;
+		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -5359,7 +5360,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 	zbx_uint64_t		item_preprocid, itemid;
-	int			found, ret, i, index, uniq = ZBX_UNIQ_FALSE;
+	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
+	int			found, ret, i, index;
 	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
@@ -5374,7 +5376,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		zbx_hashset_reserve(&config->preprocitems, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->preprocops, MAX(row_num, 100));
-		uniq = ZBX_UNIQ_TRUE;
+		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -5394,7 +5396,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 				preprocitem_local.itemid = itemid;
 
 				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert_ext(&config->preprocitems,
-						&preprocitem_local, sizeof(preprocitem_local), 0, ZBX_UNIQ_TRUE);
+						&preprocitem_local, sizeof(preprocitem_local), 0,
+						ZBX_HASHSET_UNIQ_TRUE);
 
 				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);

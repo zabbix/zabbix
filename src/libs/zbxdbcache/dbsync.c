@@ -53,7 +53,7 @@ static char	*dbsync_strdup(const char *str)
 	void	*ptr;
 
 	ptr = zbx_hashset_insert_ext(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE,
-			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_FALSE);
+			REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_HASHSET_UNIQ_FALSE);
 
 	(*(zbx_uint32_t *)ptr)++;
 
