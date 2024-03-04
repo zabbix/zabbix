@@ -150,7 +150,7 @@ $filter_column2 = (new CFormList())
 	->addRow(
 		new CLabel(_('Delete lost resources'), 'filter_lifetime'),
 		new CFormField([
-			(new CRadioButtonList('filter_lifetime_type',(int) $data['filter']['lifetime_type']))
+			(new CRadioButtonList('filter_lifetime_type', (int) $data['filter']['lifetime_type']))
 				->addValue(_('All'), -1)
 				->addValue(_('Never'), ZBX_LLD_DELETE_NEVER)
 				->addValue(_('Immediately'), ZBX_LLD_DELETE_IMMEDIATELY)

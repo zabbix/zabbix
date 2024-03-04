@@ -195,19 +195,21 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			const enabled_lifetime_type = document.querySelector('[name="enabled_lifetime_type"]:checked').value;
 			const delete_immediately = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
 
-			document.querySelectorAll('[name="enabled_lifetime_type"]').forEach(radio => {
-				radio.style.display = delete_immediately ? 'none' : '';
-			});
-
-			document.getElementById('lifetime').style.display = lifetime_type == <?= ZBX_LLD_DELETE_AFTER ?>
-				? ''
-				: 'none';
-			document.getElementById('enabled_lifetime').style.display = (delete_immediately
-					|| enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>)
-				? 'none'
-				: '';
-			document.getElementById('js-item-disable-resources-field').style.display = delete_immediately ? 'none' : '';
-			document.getElementById('js-item-disable-resources-label').style.display = delete_immediately ? 'none' : '';
+			document.getElementById('enabled_lifetime_type').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
+			document.getElementById('lifetime').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				lifetime_type != <?= ZBX_LLD_DELETE_AFTER ?>
+			);
+			document.getElementById('enabled_lifetime').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately || enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
+			);
+			document.getElementById('js-item-disable-resources-field').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
+			document.getElementById('js-item-disable-resources-label').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
 		},
 
 		updateExpression() {

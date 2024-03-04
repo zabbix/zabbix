@@ -384,14 +384,14 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	$disable_source = $host['status'] == HOST_STATUS_NOT_MONITORED
-			&& array_key_exists('disable_source', $host['hostDiscovery'])
+	$disable_source = $host['status'] == HOST_STATUS_NOT_MONITORED && $host['hostDiscovery']
 		? $host['hostDiscovery']['disable_source']
 		: '';
 
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 		$info_icons[] = getLldLostEntityIndicator($current_time, $host['hostDiscovery']['ts_delete'],
-			$host['hostDiscovery']['ts_disable'], $disable_source, $host['status'] == HOST_STATUS_NOT_MONITORED, 'host'
+			$host['hostDiscovery']['ts_disable'], $disable_source, $host['status'] == HOST_STATUS_NOT_MONITORED,
+			_('host')
 		);
 	}
 
@@ -451,9 +451,7 @@ foreach ($data['hosts'] as $host) {
 			: '';
 	}
 
-	$disabled_by_lld = $host['status'] == HOST_STATUS_NOT_MONITORED
-		&& array_key_exists('disable_source', $host['hostDiscovery'])
-		&& $host['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD;
+	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),

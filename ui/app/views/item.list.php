@@ -154,8 +154,7 @@ foreach ($data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
-	$disable_source = $item['status'] == ITEM_STATUS_DISABLED
-			&& array_key_exists('disable_source', $item['itemDiscovery'])
+	$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['itemDiscovery']
 		? $item['itemDiscovery']['disable_source']
 		: '';
 
@@ -172,7 +171,8 @@ foreach ($data['items'] as $item) {
 
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 			$info_cell[] = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
-				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED, 'item'
+				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
+				_('item')
 			);
 		}
 
@@ -188,9 +188,7 @@ foreach ($data['items'] as $item) {
 		->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
 		->setAttribute('data-itemid', $item['itemid']);
 
-	$disabled_by_lld = $item['status'] == ITEM_STATUS_DISABLED
-		&& (array_key_exists('disable_source', $item['itemDiscovery'])
-		&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD);
+	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))

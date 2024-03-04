@@ -332,12 +332,12 @@ if (hasRequest('filter_set')) {
 	CProfile::update($prefix.'host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
-	CProfile::update($prefix.'host_discovery.filter.lifetime_type', getRequest('filter_lifetime_type', ''),
+	CProfile::update($prefix.'host_discovery.filter.lifetime_type', getRequest('filter_lifetime_type', -1),
 		PROFILE_TYPE_INT
 	);
 	CProfile::update($prefix.'host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime_type',
-		getRequest('filter_enabled_lifetime_type', ''), PROFILE_TYPE_INT
+		getRequest('filter_enabled_lifetime_type', -1), PROFILE_TYPE_INT
 	);
 	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime', getRequest('filter_enabled_lifetime', ''),
 		PROFILE_TYPE_STR
@@ -540,11 +540,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
 
 		// Set the radio-button to Immediately, if value is '0'.
-		if ($lifetime == 0) {
+		if (timeUnitToSeconds($lifetime) == 0) {
 			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
 		}
 
-		if ($enabled_lifetime == 0) {
+		if (timeUnitToSeconds($enabled_lifetime) == 0) {
 			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
 		}
 
@@ -722,12 +722,6 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item);
 
-	$data['lifetime_type'] = getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type'));
-	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
-	$data['enabled_lifetime_type'] = getRequest('enabled_lifetime_type',
-		DB::getDefault('items', 'enabled_lifetime_type')
-	);
-	$data['enabled_lifetime'] = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
