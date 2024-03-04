@@ -20,16 +20,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
-	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
-	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
-	$(top_srcdir)/src/zabbix_server/housekeeper/libzbxhousekeeper.a \
-	$(top_srcdir)/src/zabbix_server/timer/libzbxtimer.a \
-	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
-	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
-	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
-	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
