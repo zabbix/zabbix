@@ -592,6 +592,10 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 	if (0 == del_jobs->values_num)
 		return;
 
+	/* multiple errors can duplicate druleid */
+	zbx_vector_uint64_sort(del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	now = time(NULL);
 	handle = zbx_discovery_open();
 

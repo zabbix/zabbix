@@ -391,6 +391,9 @@ next:
 
 	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
 
+	if (0 == ipranges->values_num)
+		goto out;
+
 	if (0 != drule->unique_dcheckid)
 		checks_count = process_checks(drule, 1, tasks, &tasks_local, dchecks_common, ipranges);
 
