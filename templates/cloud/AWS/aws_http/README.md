@@ -41,7 +41,10 @@ Add the following required permissions to your Zabbix IAM policy in order to col
                 "ecs:ListTasks",
                 "ecs:ListClusters",
                 "s3:ListAllMyBuckets",
-                "s3:GetBucketLocation"
+                "s3:GetBucketLocation",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "ec2:DescribeSecurityGroups"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -77,7 +80,10 @@ If you are using role-based authorization, add the appropriate permissions:
                 "s3:ListAllMyBuckets",
                 "s3:GetBucketLocation",
                 "ec2:AssociateIamInstanceProfile",
-                "ec2:ReplaceIamInstanceProfileAssociation"
+                "ec2:ReplaceIamInstanceProfileAssociation",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "ec2:DescribeSecurityGroups"
             ],
             "Resource": "*"
         }
@@ -101,9 +107,11 @@ Additional information about the metrics and used API methods:
 * [Full metrics list related to Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances)
 * [Full metrics list related to S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html)
 * [Full metrics list related to ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html)
+* [Full metrics list related to ELB ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 * [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
+* [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
 
 
 ### Macros used
@@ -131,6 +139,12 @@ Additional information about the metrics and used API methods:
 |{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered RDS instances by region.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.ECS.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable ECS clusters by region.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ECS clusters by region.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ELB.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ELB load balancer by name.</p>|`.*`|
+|{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ELB.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable ELB load balancer by region.</p>|`.*`|
+|{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by region.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ELB.LLD.FILTER.STATE.MATCHES}|<p>Filter of discoverable ELB load balancer by status.</p>|`active`|
+|{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by status.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule S3 buckets discovery
 
@@ -155,6 +169,12 @@ Additional information about the metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |ECS clusters discovery|<p>Get ECS clusters.</p>|Script|aws.ecs.discovery|
+
+### LLD rule ELB load balancers discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|ELB load balancers discovery|<p>Get ELB load balancers.</p>|Script|aws.elb.discovery|
 
 ## Feedback
 
