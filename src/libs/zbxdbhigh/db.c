@@ -24,8 +24,10 @@
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
-#include "zbx_trigger_constants.h"
-#include "zbx_dbversion_constants.h"
+
+#ifdef HAVE_POSTGRESQL
+#	include "zbx_dbversion_constants.h"
+#endif
 
 #define ZBX_DB_WAIT_DOWN	10
 

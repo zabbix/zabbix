@@ -23,15 +23,17 @@
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"
-#include "zbxnum.h"
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager_proxy.h"
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
+#include "version.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxtypes.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002

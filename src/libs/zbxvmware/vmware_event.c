@@ -32,17 +32,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
-#define ZBX_HOSTINFO_NODES_COMPRES		0x02
-#define ZBX_HOSTINFO_NODES_HOST			0x04
-#define ZBX_HOSTINFO_NODES_VM			0x08
-#define ZBX_HOSTINFO_NODES_DS			0x10
-#define ZBX_HOSTINFO_NODES_NET			0x20
-#define ZBX_HOSTINFO_NODES_DVS			0x40
-#define ZBX_HOSTINFO_NODES_MASK_ALL									\
-		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST | \
-		ZBX_HOSTINFO_NODES_VM | ZBX_HOSTINFO_NODES_DS | ZBX_HOSTINFO_NODES_NET | ZBX_HOSTINFO_NODES_DVS)
-
 typedef struct
 {
 	zbx_uint64_t	id;
@@ -66,7 +55,7 @@ event_hostinfo_node_t;
  *                                                                            *
  * Purpose: frees resources allocated to store vmware event                   *
  *                                                                            *
- * Parameters: event - [IN] the vmware event                                  *
+ * Parameters: event - [IN] vmware event                                      *
  *                                                                            *
  ******************************************************************************/
 void	vmware_event_free(zbx_vmware_event_t *event)
@@ -179,20 +168,20 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() evt_severities:%d", __func__, evt_severities->values_num);
 
 	return ret;
-#undef ZBX_POST_VMWARE_GET_EVT_SEVERITY
+#	undef ZBX_POST_VMWARE_GET_EVT_SEVERITY
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves event session name                                      *
  *                                                                            *
- * Parameters: service        - [IN] the vmware service                       *
- *             easyhandle     - [IN] the CURL handle                          *
- *             event_session  - [OUT] a pointer to the output variable        *
- *             error          - [OUT] the error message in the case of failure*
+ * Parameters: service       - [IN] vmware service                            *
+ *             easyhandle    - [IN] CURL handle                               *
+ *             event_session - [OUT] pointer to output variable               *
+ *             error         - [OUT] error message in case of failure         *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
@@ -254,15 +243,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resets "scrollable view" to the latest events                     *
+ * Purpose: resets "scrollable view" to latest events                         *
  *                                                                            *
- * Parameters: easyhandle     - [IN] the CURL handle                          *
- *             event_session  - [IN] event session (EventHistoryCollector)    *
- *                                   identifier                               *
- *             error          - [OUT] the error message in the case of failure*
+ * Parameters: easyhandle    - [IN] CURL handle                               *
+ *             event_session - [IN] event session (EventHistoryCollector)     *
+ *                                  identifier                                *
+ *             error         - [OUT] error message in case of failure         *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const char *event_session, char **error)
@@ -301,15 +290,15 @@ out:
  *                                                                            *
  * Purpose: reads events from "scrollable view" and moves it back in time     *
  *                                                                            *
- * Parameters: easyhandle     - [IN] the CURL handle                          *
- *             event_session  - [IN] event session (EventHistoryCollector)    *
- *                                   identifier                               *
- *             soap_count     - [IN] max count of events in response          *
- *             xdoc           - [OUT] the result as xml document              *
- *             error          - [OUT] the error message in the case of failure*
+ * Parameters: easyhandle    - [IN] CURL handle                               *
+ *             event_session - [IN] event session (EventHistoryCollector)     *
+ *                                  identifier                                *
+ *             soap_count    - [IN] max count of events in response           *
+ *             xdoc          - [OUT] result as xml document                   *
+ *             error         - [OUT] error message in case of failure         *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_read_previous_events(CURL *easyhandle, const char *event_session, int soap_count,
@@ -342,21 +331,22 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef	ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: reads events from "latest page" and moves it back in time         *
  *                                                                            *
- * Parameters: service        - [IN] the vmware service                       *
- *             easyhandle     - [IN] the CURL handle                          *
- *             event_session  - [IN] event session (EventHistoryCollector)    *
- *                                   identifier                               *
- *             xdoc           - [OUT] the result as xml document              *
- *             error          - [OUT] the error message in the case of failure*
+ * Parameters: service       - [IN] vmware service                            *
+ *             easyhandle    - [IN] CURL handle                               *
+ *             event_session - [IN] event session (EventHistoryCollector)     *
+ *                                  identifier                                *
+ *             xdoc          - [OUT] result as xml document                   *
+ *             error         - [OUT] error message in case of failure         *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_latestpage(const zbx_vmware_service_t *service, CURL *easyhandle,
@@ -405,15 +395,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: destroys event session                                            *
+ * Parameters: easyhandle    - [IN] CURL handle                               *
+ *             event_session - [IN] event session (EventHistoryCollector)     *
+ *                                  identifier                                *
+ *             error         - [OUT] error message in case of failure         *
  *                                                                            *
- * Parameters: easyhandle     - [IN] the CURL handle                          *
- *             event_session  - [IN] event session (EventHistoryCollector)    *
- *                                   identifier                               *
- *             error          - [OUT] the error message in the case of failure*
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *event_session, char **error)
@@ -444,15 +432,16 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads event data by id from XML and put to array of events        *
+ * Purpose: reads event data by id from xml and puts it to array of events    *
  *                                                                            *
  * Parameters: events         - [IN/OUT] array of parsed events               *
- *             xml_event      - [IN] XML node and id of parsed event          *
- *             xdoc           - [IN] XML document with eventlog records       *
+ *             xml_event      - [IN] xml node and id of parsed event          *
+ *             xdoc           - [IN] xml document with eventlog records       *
  *             evt_severities - [IN] dictionary of severity for event types   *
  *             alloc_sz       - [OUT] allocated memory size for events        *
  *                                                                            *
@@ -463,7 +452,18 @@ out:
 static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_id_xmlnode_t xml_event,
 		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz)
 {
-#	define	ZBX_XPATH_EVT_INFO(param)									\
+#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
+#define ZBX_HOSTINFO_NODES_COMPRES		0x02
+#define ZBX_HOSTINFO_NODES_HOST			0x04
+#define ZBX_HOSTINFO_NODES_VM			0x08
+#define ZBX_HOSTINFO_NODES_DS			0x10
+#define ZBX_HOSTINFO_NODES_NET			0x20
+#define ZBX_HOSTINFO_NODES_DVS			0x40
+#define ZBX_HOSTINFO_NODES_MASK_ALL									\
+		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST | \
+		ZBX_HOSTINFO_NODES_VM | ZBX_HOSTINFO_NODES_DS | ZBX_HOSTINFO_NODES_NET | ZBX_HOSTINFO_NODES_DVS)
+
+#	define	ZBX_XPATH_EVT_INFO(param)				\
 		"*[local-name()='" param "']/*[local-name()='name']"
 #	define	ZBX_XPATH_EVT_ARGUMENT(key)									\
 		"*[local-name()='arguments'][*[local-name()='key'][text()='" key "']]/*[local-name()='value']"
@@ -597,6 +597,14 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 		*alloc_sz += zbx_shmem_required_chunk_size(sz);
 
 	return SUCCEED;
+#undef ZBX_HOSTINFO_NODES_DATACENTER
+#undef ZBX_HOSTINFO_NODES_COMPRES
+#undef ZBX_HOSTINFO_NODES_HOST
+#undef ZBX_HOSTINFO_NODES_VM
+#undef ZBX_HOSTINFO_NODES_DS
+#undef ZBX_HOSTINFO_NODES_NET
+#undef ZBX_HOSTINFO_NODES_DVS
+#undef ZBX_HOSTINFO_NODES_MASK_ALL
 
 #	undef	ZBX_XPATH_EVT_INFO
 #	undef	ZBX_XPATH_EVT_ARGUMENT
@@ -606,13 +614,13 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
  *                                                                            *
  * Purpose: parses multiple events data                                       *
  *                                                                            *
- * Parameters: events         - [IN/OUT] array of parsed events               *
- *             last_key       - [IN] key of last parsed event                 *
- *             is_prop        - [IN] read events from RetrieveProperties XML  *
- *             xdoc           - [IN] XML document with eventlog records       *
- *             eventlog       - [IN] VMware event log state                   *
- *             alloc_sz       - [OUT] allocated memory size for events        *
- *             node_count     - [OUT] count of XML event nodes                *
+ * Parameters: events     - [IN/OUT] array of parsed events                   *
+ *             last_key   - [IN] key of last parsed event                     *
+ *             is_prop    - [IN] read events from RetrieveProperties xml      *
+ *             xdoc       - [IN] xml document with eventlog records           *
+ *             eventlog   - [IN] VMware event log state                       *
+ *             alloc_sz   - [OUT] allocated memory size for events            *
+ *             node_count - [OUT] count of xml event nodes                    *
  *                                                                            *
  * Return value: count of events successfully parsed                          *
  *                                                                            *
@@ -749,14 +757,12 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves event data                                              *
- *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             last_key     - [IN] ID of last processed event                 *
- *             events       - [OUT] pointer to the output variable            *
- *             alloc_sz     - [OUT] allocated memory size for events          *
- *             error        - [OUT] error message in the case of failure      *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             last_key   - [IN] ID of last processed event                   *
+ *             events     - [OUT] pointer to output variable                  *
+ *             alloc_sz   - [OUT] allocated memory size for events            *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -865,8 +871,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: retrieves only last event data                                    *
  *                                                                            *
  * Parameters: service    - [IN] vmware service                               *
  *             easyhandle - [IN] CURL handle                                  *

@@ -30,7 +30,7 @@ class CEncryptedCookieSession extends CCookieSession {
 	 * @return string|null
 	 */
 	public function extractSessionId(): ?string {
-		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
+		if (CSettingsHelper::getPrivate(CSettingsHelper::SESSION_KEY) === '') {
 			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
 		}
 

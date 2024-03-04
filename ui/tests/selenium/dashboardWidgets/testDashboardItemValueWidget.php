@@ -803,14 +803,15 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
 						'Time period' => 'Custom',
-						'id:time_period_from' => 'now-63072002' // 2 years and 2 seconds.
+						'id:time_period_from' => 'now-63158401' // 731 days and 1 second.
 					],
 					'item' => [
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #20.
@@ -882,8 +883,9 @@ class testDashboardItemValueWidget extends testWidgets {
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #24.
@@ -1454,6 +1456,11 @@ class testDashboardItemValueWidget extends testWidgets {
 		}
 
 		if ($expected === TEST_BAD) {
+			// Count of days mentioned in error depends ot presence of leap year february in selected period.
+			if (CTestArrayHelper::get($data, 'days_count')) {
+				$data['error'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error']);
+			}
+
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}

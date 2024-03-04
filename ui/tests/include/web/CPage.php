@@ -210,8 +210,8 @@ class CPage {
 
 		if (!$session) {
 			$secret = bin2hex(random_bytes(16));
-			DBexecute('INSERT INTO sessions (sessionid,userid,secret)'.
-				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.zbx_dbstr($secret).')'
+			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,secret)'.
+				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.zbx_dbstr($secret).')'
 			);
 		}
 		elseif ($session['status'] != 0) {	/* ZBX_SESSION_ACTIVE */

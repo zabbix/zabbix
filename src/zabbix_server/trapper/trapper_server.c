@@ -70,10 +70,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process alert send request that is used to test media types       *
+ * Purpose: processes alert send request that is used to test media types     *
  *                                                                            *
- * Parameters:  sock  - [IN] the request socket                               *
- *              jp    - [IN] the request data                                 *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              jp             - [IN] request data                            *
+ *              config_timeout - [IN]                                         *
  *                                                                            *
  ******************************************************************************/
 static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)

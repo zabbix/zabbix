@@ -280,24 +280,18 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-static char	*config_server		= NULL;
+static char	*config_server			= NULL;
 static int	config_server_port;
-static char	*config_hostname	= NULL;
-static char	*config_hostname_item	= NULL;
-
+static char	*config_hostname		= NULL;
+static char	*config_hostname_item		= NULL;
 static char	*zbx_config_snmptrap_file	= NULL;
-
-static char	*config_java_gateway	= NULL;
+static char	*config_java_gateway		= NULL;
 static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
-
-char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
-static int	config_log_slow_queries	= 0;	/* ms; 0 - disable */
-
-static char	*config_load_module_path= NULL;
-static char	**config_load_module	= NULL;
-
-static char	*config_user		= NULL;
+static char	*config_ssh_key_location	 = NULL;
+static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
+static char	*config_load_module_path	= NULL;
+static char	**config_load_module		= NULL;
+static char	*config_user			= NULL;
 
 /* web monitoring */
 static char	*config_ssl_ca_location = NULL;
@@ -964,7 +958,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBTLSCipher13",		&(zbx_config_dbhigh->config_db_tls_cipher_13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
+		{"SSHKeyLocation",		&config_ssh_key_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogSlowQueries",		&config_log_slow_queries,		TYPE_INT,
 			PARM_OPT,	0,			3600000},
@@ -1411,7 +1405,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_max_concurrent_checks_per_poller,
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
-								zbx_get_value_internal_ext_proxy};
+								zbx_get_value_internal_ext_proxy,
+								config_ssh_key_location};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1426,7 +1421,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname,
 								get_config_forks, config_java_gateway,
-								config_java_gateway_port, config_externalscripts};
+								config_java_gateway_port, config_externalscripts,
+								config_ssh_key_location};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1439,7 +1435,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_stats_allowed_ip,
 								config_java_gateway, config_java_gateway_port,
 								config_externalscripts,
-								zbx_get_value_internal_ext_proxy};
+								zbx_get_value_internal_ext_proxy,
+								config_ssh_key_location};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};

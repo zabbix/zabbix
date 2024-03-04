@@ -1957,12 +1957,12 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => 'now-1d-1w-1y',
+						'From' => 'now-1y-1w-1d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'From' => 'today - 1 day - 1 week - 1 year'
+						'From' => 'today - 1 year - 1 week - 1 day'
 					]
 				]
 			],
@@ -2037,12 +2037,12 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => 'now-1d-1w-1y',
+						'To' => 'now-1y-1w-1d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'To' => 'now - 1 day - 1 week - 1 year'
+						'To' => 'now - 1 year - 1 week - 1 day'
 					]
 				]
 			],
