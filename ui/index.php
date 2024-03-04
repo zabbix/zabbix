@@ -86,7 +86,13 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 			CSessionHelper::unset(['state', 'username']);
 		}
 
-		redirect((new CUrl('index_mfa.php'))->setArgument('request', $request)->toString());
+		$mfa_url = (new CUrl('index_mfa.php'));
+
+		if ($request !== '') {
+			$mfa_url->setArgument('request', $request);
+		}
+
+		redirect($mfa_url->toString());
 	}
 
 	$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
