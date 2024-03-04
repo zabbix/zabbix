@@ -583,7 +583,7 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 		int check_response_code)
 {
 	CURLcode	err;
-	char	status_codes[] = "200,400,401,403,404,405,415,422";
+	char	status_codes[] = "200,201,400,401,403,404,405,415,422";
 	long	response_code;
 
 	/* try to retrieve page several times depending on number of retries */

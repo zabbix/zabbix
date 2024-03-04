@@ -29,8 +29,8 @@
  *                                                                            *
  * Purpose: retrieves data from database                                      *
  *                                                                            *
- * Parameters: item           - [IN] item we are interested in                *
- *             result         - [OUT] check result                            *
+ * Parameters: item   - [IN] item we are interested in                        *
+ *             result - [OUT] check result                                    *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *

@@ -111,7 +111,7 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_ptr_t *d
 
 	ds_cmp.uuid = (char *)ds_uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, vmware_ds_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, zbx_vmware_ds_uuid_compare)))
 		return NULL;
 
 	return dss->values[i];
@@ -136,7 +136,7 @@ static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_ptr_t *dv
 
 	dvs_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_dvswitch_ptr_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dvswitch_ptr_bsearch(dvss, &dvs_cmp, zbx_vmware_dvs_uuid_compare)))
 		return NULL;
 
 	return dvss->values[i];
@@ -161,7 +161,7 @@ static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_ptr_t 
 
 	cmp.id = (char *)id;
 
-	if (FAIL == (i = zbx_vector_vmware_datacenter_ptr_bsearch(dcs, &cmp, vmware_dc_id_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datacenter_ptr_bsearch(dcs, &cmp, zbx_vmware_dc_id_compare)))
 		return NULL;
 
 	return dcs->values[i];
@@ -262,7 +262,7 @@ out:
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
  *               SYSINFO_RET_OK, result has no value - performance counter    *
- *                               was found without a value                    *
+ *                               was found without value                      *
  *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
  *                                                                            *
  * Comments: There can be situation when performance counter is configured    *
@@ -420,7 +420,7 @@ out:
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
  *               SYSINFO_RET_OK, result has no value - performance counter    *
- *                               was found without a value                    *
+ *                               was found without value                      *
  *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
  *                                                                            *
  * Comments: There can be situation when performance counter is configured    *
@@ -530,12 +530,11 @@ out:
  * Purpose: retrieves data from virtual machine details                       *
  *                                                                            *
  * Parameters: request   - [IN] The original request. The first parameter is  *
- *                              vmware service URL and the second parameter.  *
+ *                              vmware service URL and the second parameter   *
  *                              is virtual machine uuid.                      *
  *             username  - [IN] vmware service user name                      *
  *             password  - [IN] vmware service password                       *
  *             propid    - [IN]                                               *
- *             xpath     - [IN] xpath describing data to retrieve             *
  *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
@@ -1102,7 +1101,7 @@ static int	severity_to_mask(const char *level, unsigned char *severity_mask)
  * Parameters: severity - [IN] event severity value from item parameter,      *
  *                             which might contain multiple severity levels   *
  *             mask     - [OUT] result of conversion                          *
- *             error    - [OUT] error message in case of an error             *
+ *             error    - [OUT] error message in case of error                *
  *                                                                            *
  * Return value: SUCCEED - if no errors were detected                         *
  *               FAIL    - otherwise                                          *
@@ -2358,7 +2357,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	nic_cmp.name = (char *)if_name;
 
-	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
+	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, zbx_vmware_pnic_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
 		goto out;
@@ -2624,7 +2623,7 @@ static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char
 
 	dsname_cmp.name = (char *)ds_name;
 
-	if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, zbx_vmware_dsname_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", ds_name));
 		goto unlock;
@@ -2752,7 +2751,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_name};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
@@ -3007,7 +3006,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 		}
 
 		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp,
-				vmware_dsname_compare)))
+				zbx_vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					name));
@@ -3025,7 +3024,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)name};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
@@ -3390,7 +3389,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		dsname_cmp.name = (char *)ds_name;
 
 		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp,
-				vmware_dsname_compare)))
+				zbx_vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					ds_name));
@@ -3470,7 +3469,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 		zbx_vmware_datastore_t	ds_cmp =  {.name = (char *)ds_name};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
@@ -3613,7 +3612,7 @@ int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *usernam
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)uuid};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
