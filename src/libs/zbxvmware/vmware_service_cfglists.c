@@ -36,7 +36,7 @@
  * Parameters:                                                                *
  *             service      - [IN]                                            *
  *             easyhandle   - [IN]                                            *
- *             doc          - [IN] XML document                               *
+ *             doc          - [IN] xml document                               *
  *             alarms_data  - [IN]                                            *
  *             datacenters  - [OUT] list of vmware datacenters                *
  *                                                                            *
@@ -52,7 +52,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 	xmlNodeSetPtr		nodeset;
 	char			*id, *name;
 	zbx_vmware_datacenter_t	*datacenter;
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 
 	if (NULL == doc)
 		return ret;
@@ -74,7 +74,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 	nodeset = xpathObj->nodesetval;
 	zbx_vector_vmware_datacenter_ptr_reserve(datacenters, (size_t)nodeset->nodeNr);
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		char	*error = NULL;
 
@@ -84,7 +84,8 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 			continue;
 		}
 
-		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("name"))))
+		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i],
+				ZBX_XPATH_PROP_NAME_NODE("name"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter name for id: %s.", __func__, id);
 			zbx_free(id);
@@ -108,7 +109,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 		zbx_vector_vmware_datacenter_ptr_append(datacenters, datacenter);
 	}
 
-	zbx_vector_vmware_datacenter_ptr_sort(datacenters, vmware_dc_id_compare);
+	zbx_vector_vmware_datacenter_ptr_sort(datacenters, zbx_vmware_dc_id_compare);
 
 	ret = SUCCEED;
 	xmlXPathFreeObject(xpathObj);
@@ -122,7 +123,7 @@ out:
  *                                                                            *
  * Purpose: retrieves list of vmware service DVSwitch                         *
  *                                                                            *
- * Parameters: doc         - [IN] XML document                                *
+ * Parameters: doc         - [IN] xml document                                *
  *             dvswitches  - [OUT] list of vmware DVSwitch                    *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
@@ -442,15 +443,12 @@ out:
 #	undef ZBX_POST_VCENTER_HV_DS_LIST
 }
 
-#define ZBX_XPATH_DS_INFO_EXTENT()									\
-		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves list of vmware service datastore diskextents            *
  *                                                                            *
- * Parameters: doc          - [IN] XML document                               *
- *             diskextents  - [OUT] list of vmware diskextents                *
+ * Parameters: doc         - [IN] xml document                                *
+ *             diskextents - [OUT] list of vmware diskextents                 *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -458,6 +456,9 @@ out:
  ******************************************************************************/
 int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_ptr_t *diskextents)
 {
+#	define ZBX_XPATH_DS_INFO_EXTENT()								\
+		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
+
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
@@ -510,5 +511,7 @@ out:
 	xmlXPathFreeContext(xpathCtx);
 
 	return ret;
+
+#	undef ZBX_XPATH_DS_INFO_EXTENT
 }
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

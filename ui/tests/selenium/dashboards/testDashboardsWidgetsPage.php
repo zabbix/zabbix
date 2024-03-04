@@ -151,10 +151,9 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 19,
-			'ZBX6648 All Triggers'				=> 1,
-			'ZBX6648 Disabled Triggers'			=> 1,
-			'ZBX6648 Enabled Triggers'			=> 1
+			'Zabbix servers'					=> 20,
+			'Inheritance test'					=> 1,
+			'Host group for suppression'		=> 1
 		];
 
 		/*

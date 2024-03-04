@@ -712,35 +712,6 @@ INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (934,102
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (935,102,400360,1);
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (936,102,400370,2);
 
--- testZBX6648.eventsFilter
-INSERT INTO hstgrp (groupid,name,type) VALUES (50000,'ZBX6648 Group No Hosts',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50001,'ZBX6648 Disabled Triggers',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50002,'ZBX6648 Enabled Triggers',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50003,'ZBX6648 All Triggers',0);
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50003, 'ZBX6648 Disabled Triggers Host', 'ZBX6648 Disabled Triggers Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50004, 'ZBX6648 Enabled Triggers Host', 'ZBX6648 Enabled Triggers Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50005, 'ZBX6648 All Triggers Host', 'ZBX6648 All Triggers Host', 0, '');
-INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50003,50003,50001);
-INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50004,50004,50002);
-INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50005,50005,50003);
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50016,50003,1,1,1,'127.0.7.1','','10071');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50017,50004,1,1,1,'127.0.7.1','','10071');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50018,50005,1,1,1,'127.0.7.1','','10071');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400550,0,50003,'zbx6648 item disabled','zbx6648-item-disabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50016,'',0,'','30','','');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400550, 'zbx6648 item disabled', 'ZBX6648 ITEM DISABLED');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400560,0,50004,'zbx6648 item enabled','zbx6648-item-enabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50017,'',0,'','30','','');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400560, 'zbx6648 item enabled', 'ZBX6648 ITEM ENABLED');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400570,0,50005,'zbx6648 item all','zbx6648-item-all','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50018,'',0,'','30','','');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400570, 'zbx6648 item all', 'ZBX6648 ITEM ALL');
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100018,'{100018}=0','zbx6648 trigger disabled','',1,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100019,'{100019}=0','zbx6648 trigger enabled','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100020,'{100020}=0','zbx6648 trigger all enabled','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100021,'{100021}=0','zbx6648 trigger all disabled','',1,0,0,0,'','',NULL,0,0,0);
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100018,400550,100018,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100019,400560,100019,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100020,400570,100020,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100021,400570,100021,'last','$,#1');
-
 -- testPageItems, testPageTriggers, testPageDiscoveryRules, testPageItemPrototype, testPageTriggerPrototype
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50006, 'Template-layout-test-001', 'Template-layout-test-001', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50006, 50006, 1);

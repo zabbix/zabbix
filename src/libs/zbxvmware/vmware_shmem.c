@@ -56,7 +56,7 @@ VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_pe
  * Purpose: frees shared resources allocated to store performance counter     *
  *          data                                                              *
  *                                                                            *
- * Parameters: counter - [IN] the performance counter data                    *
+ * Parameters: counter - [IN] performance counter data                        *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_perf_counter_free(zbx_vmware_perf_counter_t *counter)
@@ -104,7 +104,7 @@ void	vmware_perf_counters_vector_ptr_create_ext(zbx_vmware_perf_entity_t *pentit
  *                                                                            *
  * Purpose: frees shared resources allocated to store diskextent data         *
  *                                                                            *
- * Parameters: diskextent   - [IN] the diskextent                             *
+ * Parameters: diskextent - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_diskextent_free(zbx_vmware_diskextent_t *diskextent)
@@ -117,7 +117,7 @@ void	vmware_shmem_diskextent_free(zbx_vmware_diskextent_t *diskextent)
  *                                                                            *
  * Purpose: frees shared resources allocated to store datastore data          *
  *                                                                            *
- * Parameters: datastore   - [IN] the datastore                               *
+ * Parameters: datastore - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_free_datastore(zbx_vmware_datastore_t *datastore)
@@ -129,7 +129,7 @@ void	vmware_shmem_free_datastore(zbx_vmware_datastore_t *datastore)
  *                                                                            *
  * Purpose: frees shared resources allocated to store datacenter data         *
  *                                                                            *
- * Parameters: datacenter   - [IN] the datacenter                             *
+ * Parameters: datacenter - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_datacenter_free(zbx_vmware_datacenter_t *datacenter)
@@ -146,7 +146,7 @@ void	vmware_shmem_datacenter_free(zbx_vmware_datacenter_t *datacenter)
  *                                                                            *
  * Purpose: frees shared resources allocated to store resourcepool data       *
  *                                                                            *
- * Parameters: resourcepool   - [IN] the resourcepool                         *
+ * Parameters: resourcepool - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
@@ -162,7 +162,7 @@ void	vmware_shmem_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
  *                                                                            *
  * Purpose: frees shared resources allocated to store dvswitch data           *
  *                                                                            *
- * Parameters: dvswitch - [IN] the dvswitch                                   *
+ * Parameters: dvswitch - [IN]                                                *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_dvswitch_free(zbx_vmware_dvswitch_t *dvswitch)
@@ -178,18 +178,16 @@ void	vmware_shmem_dvswitch_free(zbx_vmware_dvswitch_t *dvswitch)
  *                                                                            *
  * Purpose: frees shared resources allocated to store properties list         *
  *                                                                            *
- * Parameters: props     - [IN] the properties list                           *
- *             props_num - [IN] the number of properties in the list          *
+ * Parameters: props     - [IN] properties list                               *
+ *             props_num - [IN] number of properties in list                  *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_props_free(char **props, int props_num)
 {
-	int	i;
-
 	if (NULL == props)
 		return;
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 	{
 		if (NULL != props[i])
 			vmware_shared_strfree(props[i]);
@@ -202,7 +200,7 @@ void	vmware_shmem_props_free(char **props, int props_num)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vm device data          *
  *                                                                            *
- * Parameters: dev   - [IN] the vm device                                     *
+ * Parameters: dev - [IN] vm device                                           *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_dev_free(zbx_vmware_dev_t *dev)
@@ -222,7 +220,7 @@ void	vmware_shmem_dev_free(zbx_vmware_dev_t *dev)
  *                                                                            *
  * Purpose: frees shared resources allocated to store file system object      *
  *                                                                            *
- * Parameters: fs   - [IN] the file system                                    *
+ * Parameters: fs - [IN] file system                                          *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_fs_free(zbx_vmware_fs_t *fs)
@@ -237,7 +235,7 @@ void	vmware_shmem_fs_free(zbx_vmware_fs_t *fs)
  *                                                                            *
  * Purpose: frees shared resources allocated to store attributes object       *
  *                                                                            *
- * Parameters: custom_attr   - [IN] the custom attributes object              *
+ * Parameters: custom_attr - [IN] custom attributes object                    *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_custom_attr_free(zbx_vmware_custom_attr_t *custom_attr)
@@ -255,7 +253,7 @@ void	vmware_shmem_custom_attr_free(zbx_vmware_custom_attr_t *custom_attr)
  *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
- * Parameters: vm   - [IN] the virtual machine                                *
+ * Parameters: vm - [IN] virtual machine                                      *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_vm_free(zbx_vmware_vm_t *vm)
@@ -267,7 +265,7 @@ void	vmware_shmem_vm_free(zbx_vmware_vm_t *vm)
  *                                                                            *
  * Purpose: frees shared resources allocated to store datastore names data    *
  *                                                                            *
- * Parameters: dsname  - [IN] the datastore name                              *
+ * Parameters: dsname - [IN] datastore name                                   *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_dsname_free(zbx_vmware_dsname_t *dsname)
@@ -283,7 +281,7 @@ void	vmware_shmem_dsname_free(zbx_vmware_dsname_t *dsname)
  *                                                                            *
  * Purpose: frees shared resources allocated to store physical NIC data       *
  *                                                                            *
- * Parameters: nic - [IN] the physical NIC of hv                              *
+ * Parameters: nic - [IN] physical NIC of hv                                  *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_pnic_free(zbx_vmware_pnic_t *nic)
@@ -299,7 +297,7 @@ void	vmware_shmem_pnic_free(zbx_vmware_pnic_t *nic)
  *                                                                            *
  * Purpose: frees shared resources allocated to store alarm data              *
  *                                                                            *
- * Parameters: alarm - [IN] the alarm object                                  *
+ * Parameters: alarm - [IN] alarm object                                      *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_alarm_free(zbx_vmware_alarm_t *alarm)
@@ -318,7 +316,7 @@ void	vmware_shmem_alarm_free(zbx_vmware_alarm_t *alarm)
  *                                                                            *
  * Purpose: frees shared resources allocated to store disk info data          *
  *                                                                            *
- * Parameters: di - [IN] the disk info object                                 *
+ * Parameters: di - [IN] disk info object                                     *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_diskinfo_free(zbx_vmware_diskinfo_t *di)
@@ -351,7 +349,7 @@ void	vmware_shmem_cluster_free(zbx_vmware_cluster_t *cluster)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware event            *
  *                                                                            *
- * Parameters: event - [IN] the vmware event                                  *
+ * Parameters: event - [IN] vmware event                                      *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_event_free(zbx_vmware_event_t *event)
@@ -371,7 +369,7 @@ void	vmware_shmem_data_free(zbx_vmware_data_t *data)
  *                                                                            *
  * Purpose: cleans resources allocated by vmware custom query in vmware       *
  *                                                                            *
- * Parameters: cust_query - [IN] the entity to free                           *
+ * Parameters: cust_query - [IN] entity to free                               *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_cust_query_clean(zbx_vmware_cust_query_t *cust_query)
@@ -400,7 +398,7 @@ void	vmware_shared_entity_tags_free(zbx_vmware_entity_tags_t *value)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service          *
  *                                                                            *
- * Parameters: data   - [IN] the vmware service data                          *
+ * Parameters: data - [IN] vmware service data                                *
  *                                                                            *
  ******************************************************************************/
 void	vmware_shmem_service_free(zbx_vmware_service_t *service)
@@ -412,9 +410,9 @@ void	vmware_shmem_service_free(zbx_vmware_service_t *service)
  *                                                                            *
  * Purpose: copies vmware event object into shared memory                     *
  *                                                                            *
- * Parameters: src - [IN] the vmware event object                             *
+ * Parameters: src - [IN] vmware event object                                 *
  *                                                                            *
- * Return value: a copied vmware event object                                 *
+ * Return value: copied vmware event object                                   *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_event_t	*vmware_shmem_event_dup(const zbx_vmware_event_t *src)
@@ -433,9 +431,9 @@ zbx_vmware_event_t	*vmware_shmem_event_dup(const zbx_vmware_event_t *src)
  *                                                                            *
  * Purpose: copies vmware hypervisor diskextent object into shared memory     *
  *                                                                            *
- * Parameters: src   - [IN] the vmware diskextent object                      *
+ * Parameters: src - [IN] vmware diskextent object                            *
  *                                                                            *
- * Return value: a duplicated vmware diskextent object                        *
+ * Return value: duplicated vmware diskextent object                          *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_diskextent_t	*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent_t *src)
@@ -453,9 +451,9 @@ zbx_vmware_diskextent_t	*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent
  *                                                                            *
  * Purpose: copies vmware resourcepool object into shared memory              *
  *                                                                            *
- * Parameters: src   - [IN] the vmware resourcepool object                    *
+ * Parameters: src - [IN] vmware resourcepool object                          *
  *                                                                            *
- * Return value: a duplicated vmware resourcepool object                      *
+ * Return value: duplicated vmware resourcepool object                        *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_resourcepool_t	*vmware_shmem_resourcepool_dup(const zbx_vmware_resourcepool_t *src)
@@ -475,9 +473,9 @@ zbx_vmware_resourcepool_t	*vmware_shmem_resourcepool_dup(const zbx_vmware_resour
  *                                                                            *
  * Purpose: copies vmware dvswitch object into shared memory                  *
  *                                                                            *
- * Parameters: src - [IN] the vmware dvswitch object                          *
+ * Parameters: src - [IN] vmware dvswitch object                              *
  *                                                                            *
- * Return value: a duplicated vmware dvswitch object                          *
+ * Return value: duplicated vmware dvswitch object                            *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_dvswitch_t	*vmware_shmem_dvswitch_dup(const zbx_vmware_dvswitch_t *src)
@@ -497,9 +495,9 @@ zbx_vmware_dvswitch_t	*vmware_shmem_dvswitch_dup(const zbx_vmware_dvswitch_t *sr
  * Purpose: copies vmware virtual machine file system object into shared      *
  *          memory                                                            *
  *                                                                            *
- * Parameters: src   - [IN] the vmware device object                          *
+ * Parameters: src - [IN] vmware file system object                           *
  *                                                                            *
- * Return value: a duplicated vmware device object                            *
+ * Return value: duplicated vmware file system object                         *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_fs_t	*vmware_shmem_fs_dup(const zbx_vmware_fs_t *src)
@@ -519,9 +517,9 @@ zbx_vmware_fs_t	*vmware_shmem_fs_dup(const zbx_vmware_fs_t *src)
  * Purpose: copies vmware virtual machine custom attribute object into shared *
  *          memory                                                            *
  *                                                                            *
- * Parameters: src   - [IN] the vmware custom attribute object                *
+ * Parameters: src - [IN] vmware custom attribute object                      *
  *                                                                            *
- * Return value: a duplicated vmware custom attribute object                  *
+ * Return value: duplicated vmware custom attribute object                    *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_custom_attr_t	*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t *src)
@@ -539,23 +537,20 @@ zbx_vmware_custom_attr_t	*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t *
  *                                                                            *
  * Purpose: copies object properties list into shared memory                  *
  *                                                                            *
- * Parameters: src       - [IN] the properties list                           *
- *             props_num - [IN] the number of properties in the list          *
+ * Parameters: src       - [IN] properties list                               *
+ *             props_num - [IN] number of properties in list                  *
  *                                                                            *
- * Return value: a duplicated object properties list                          *
+ * Return value: duplicated object properties list                            *
  *                                                                            *
  ******************************************************************************/
 static char	**vmware_props_shared_dup(char ** const src, int props_num)
 {
-	char	**props;
-	int	i;
-
 	if (NULL == src)
 		return NULL;
 
-	props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
+	char	**props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 		props[i] = vmware_shared_strdup(src[i]);
 
 	return props;
@@ -565,9 +560,9 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
  *                                                                            *
  * Purpose: copies vmware virtual machine device object into shared memory    *
  *                                                                            *
- * Parameters: src   - [IN] the vmware device object                          *
+ * Parameters: src - [IN] vmware device object                                *
  *                                                                            *
- * Return value: a duplicated vmware device object                            *
+ * Return value: duplicated vmware device object                              *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_dev_t	*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src)
@@ -632,15 +627,14 @@ zbx_vmware_vm_t	*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src)
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore name object into shared memory *
  *                                                                            *
- * Parameters: src   - [IN] the vmware datastore name object                  *
+ * Parameters: src - [IN] vmware datastore name object                        *
  *                                                                            *
- * Return value: a duplicated vmware datastore name object                    *
+ * Return value: duplicated vmware datastore name object                      *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *src)
 {
 	zbx_vmware_dsname_t	*dsname;
-	int	i;
 
 	dsname = (zbx_vmware_dsname_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
 
@@ -650,7 +644,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	VMWARE_VECTOR_CREATE(&dsname->hvdisks, vmware_hvdisk);
 	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, (size_t)src->hvdisks.values_num);
 
-	for (i = 0; i < src->hvdisks.values_num; i++)
+	for (int i = 0; i < src->hvdisks.values_num; i++)
 	{
 		zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, src->hvdisks.values[i]);
 	}
@@ -662,9 +656,9 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
  *                                                                            *
  * Purpose: copies vmware physical NIC object into shared memory              *
  *                                                                            *
- * Parameters: src   - [IN] the vmware physical NIC object                    *
+ * Parameters: src - [IN] vmware physical NIC object                          *
  *                                                                            *
- * Return value: a duplicated vmware physical NIC object                      *
+ * Return value: duplicated vmware physical NIC object                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_pnic_t	*vmware_pnic_shared_dup(const zbx_vmware_pnic_t *src)
@@ -685,9 +679,9 @@ static zbx_vmware_pnic_t	*vmware_pnic_shared_dup(const zbx_vmware_pnic_t *src)
  *                                                                            *
  * Purpose: copies vmware hypervisor disks object into shared memory          *
  *                                                                            *
- * Parameters: src   - [IN] the vmware disk info object                       *
+ * Parameters: src - [IN] vmware disk info object                             *
  *                                                                            *
- * Return value: a duplicated vmware disk info object                         *
+ * Return value: duplicated vmware disk info object                           *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_diskinfo_t	*vmware_diskinfo_shared_dup(const zbx_vmware_diskinfo_t *src)
@@ -774,9 +768,9 @@ static void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
  *                                                                            *
  * Purpose: copies vmware alarm object into shared memory                     *
  *                                                                            *
- * Parameters: src   - [IN] the vmware alarm object                           *
+ * Parameters: src - [IN] vmware alarm object                                 *
  *                                                                            *
- * Return value: a duplicated vmware alarm object                             *
+ * Return value: duplicated vmware alarm object                               *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src)
@@ -795,19 +789,19 @@ static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src
 
 	return alarm;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: copies vmware datacenter object into shared memory                *
  *                                                                            *
- * Parameters: src   - [IN] the vmware datacenter object                      *
+ * Parameters: src - [IN] vmware datacenter object                            *
  *                                                                            *
- * Return value: a duplicated vmware datacenter object                        *
+ * Return value: duplicated vmware datacenter object                          *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_datacenter_t *src)
 {
 	zbx_vmware_datacenter_t	*datacenter;
-	int			i;
 
 	datacenter = (zbx_vmware_datacenter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
 	datacenter->name = vmware_shared_strdup(src->name);
@@ -815,7 +809,7 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 	vmware_shmem_vector_str_create_ext(&datacenter->alarm_ids);
 	zbx_vector_str_reserve(&datacenter->alarm_ids, (size_t)src->alarm_ids.values_num);
 
-	for (i = 0; i < src->alarm_ids.values_num; i++)
+	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&datacenter->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
 	return datacenter;
@@ -825,15 +819,14 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
  *                                                                            *
  * Purpose: copies vmware cluster object into shared memory                   *
  *                                                                            *
- * Parameters: src   - [IN] the vmware cluster object                         *
+ * Parameters: src - [IN] vmware cluster object                               *
  *                                                                            *
- * Return value: a copied vmware cluster object                               *
+ * Return value: copied vmware cluster object                                 *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_t *src)
 {
 	zbx_vmware_cluster_t	*cluster;
-	int			i;
 
 	cluster = (zbx_vmware_cluster_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
 	cluster->id = vmware_shared_strdup(src->id);
@@ -844,10 +837,10 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 	vmware_shmem_vector_str_create_ext(&cluster->alarm_ids);
 	zbx_vector_str_reserve(&cluster->alarm_ids, (size_t)src->alarm_ids.values_num);
 
-	for (i = 0; i < src->dss_uuid.values_num; i++)
+	for (int i = 0; i < src->dss_uuid.values_num; i++)
 		zbx_vector_str_append(&cluster->dss_uuid, vmware_shared_strdup(src->dss_uuid.values[i]));
 
-	for (i = 0; i < src->alarm_ids.values_num; i++)
+	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&cluster->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
 	return cluster;
@@ -861,7 +854,6 @@ static int	vmware_vm_compare(const void *d1, const void *d2)
 	return strcmp(vmi1->vm->uuid, vmi2->vm->uuid);
 }
 
-
 /* virtual machine index support */
 static zbx_hash_t	vmware_vm_hash(const void *data)
 {
@@ -874,7 +866,7 @@ static zbx_hash_t	vmware_vm_hash(const void *data)
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore object into shared memory      *
  *                                                                            *
- * Parameters: src   - [IN] vmware datastore object                           *
+ * Parameters: src - [IN] vmware datastore object                             *
  *                                                                            *
  * Return value: duplicated vmware datastore object                           *
  *                                                                            *
@@ -926,7 +918,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
  *                                                                            *
  * Purpose: copies vmware data object into shared memory                      *
  *                                                                            *
- * Parameters: src   - [IN] vmware data object                                *
+ * Parameters: src - [IN] vmware data object                                  *
  *                                                                            *
  * Return value: duplicated vmware data object                                *
  *                                                                            *
@@ -1061,7 +1053,8 @@ static zbx_hash_t	vmware_cust_query_hash_func(const void *data)
 	zbx_hash_t			seed;
 	const zbx_vmware_cust_query_t	*cust_query = (const zbx_vmware_cust_query_t *)data;
 
-	seed = ZBX_DEFAULT_STRING_HASH_ALGO(cust_query->soap_type, strlen(cust_query->soap_type), ZBX_DEFAULT_HASH_SEED);
+	seed = ZBX_DEFAULT_STRING_HASH_ALGO(cust_query->soap_type, strlen(cust_query->soap_type),
+			ZBX_DEFAULT_HASH_SEED);
 	seed = ZBX_DEFAULT_STRING_HASH_ALGO(cust_query->id, strlen(cust_query->id), seed);
 	seed = ZBX_DEFAULT_STRING_HASH_ALGO(cust_query->key, strlen(cust_query->key), seed);
 	seed = ZBX_DEFAULT_STRING_HASH_ALGO(cust_query->mode, strlen(cust_query->mode), seed);
@@ -1151,15 +1144,13 @@ zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
  ******************************************************************************/
 void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src)
 {
-	int	i;
-
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < src->values_num; i++)
+	for (int i = 0; i < src->values_num; i++)
 	{
 		zbx_vmware_key_value_t	*es_dst, *es_src = &src->values[i];
 
