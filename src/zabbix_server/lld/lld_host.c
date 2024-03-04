@@ -4577,7 +4577,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 				ts_disable = 0;
 			else if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type)
 				ts_disable = 1;
-			else if (ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type)
+			else
 				ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration);
 
 			if (host->ts_disable != ts_disable)

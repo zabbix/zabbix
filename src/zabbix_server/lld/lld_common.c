@@ -59,37 +59,53 @@ int	lld_end_of_life(int lastcheck, int lifetime)
 	return ZBX_JAN_2038 - lastcheck > lifetime ? lastcheck + lifetime : ZBX_JAN_2038;
 }
 
-static int	lld_get_lifetime_ts(zbx_uint64_t id, int obj_lastcheck, int obj_ts, zbx_lld_lifetime_t *lifetime,
-		zbx_vector_uint64_t *reset_ts_ids, zbx_vector_uint64_pair_t *discovery_ts)
+static int	lld_get_lifetime_ts(int obj_lastcheck, zbx_lld_lifetime_t *lifetime)
 {
 	int	ts;
 
-	if (ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type &&
-			obj_ts != (ts = lld_end_of_life(obj_lastcheck, lifetime->duration)))
+	if (ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type)
+		ts = lld_end_of_life(obj_lastcheck, lifetime->duration);
+	else if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type)
+		ts = 1;
+	else
+		ts = 0;
+
+	return ts;
+}
+
+static int	lld_check_lifetime_elapsed(int lastcheck, int ts)
+{
+	if (0 == ts || lastcheck <= ts)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static void	lld_prepare_ts_update(zbx_uint64_t id, int ts, int obj_ts, zbx_vector_uint64_t *reset_ts_ids,
+		zbx_vector_uint64_t *imm_ts_ids, zbx_vector_uint64_pair_t *discovery_ts)
+{
+	if (ts == obj_ts)
+		return;
+
+	if (0 == ts)
+	{
+		zbx_vector_uint64_append(reset_ts_ids, id);
+	}
+	else if (1 == ts)
+	{
+		zbx_vector_uint64_append(imm_ts_ids, id);
+	}
+	else
 	{
 		zbx_uint64_pair_t	pair = {.first = id, .second = (zbx_uint64_t)ts};
 
 		zbx_vector_uint64_pair_append(discovery_ts, pair);
 	}
-	else
-	{
-		ts = 0;
-		zbx_vector_uint64_append(reset_ts_ids, id);
-	}
-
-	return ts;
 }
 
-static int	lld_check_lifetime_elapsed(int lastcheck, zbx_lld_lifetime_t *lifetime, int ts)
-{
-	if (ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type && lastcheck > ts)
-		return SUCCEED;
-
-	return FAIL;
-}
-
-static void	lld_prepare_object_delete(zbx_uint64_t id, zbx_vector_uint64_t *del_ids, zbx_vector_uint64_t *ts_ids,
-		zbx_vector_uint64_pair_t *discovery_ts, zbx_vector_uint64_t *imm_ids)
+static void	lld_prepare_object_delete(zbx_uint64_t id, const char *name, zbx_vector_uint64_t *del_ids,
+		zbx_vector_uint64_t *ts_ids, zbx_vector_uint64_pair_t *discovery_ts, zbx_vector_uint64_t *imm_ids,
+		object_audit_entry_create_f cb_audit_create)
 {
 	int			i;
 	zbx_uint64_pair_t	dts = {.first = id};
@@ -102,6 +118,8 @@ static void	lld_prepare_object_delete(zbx_uint64_t id, zbx_vector_uint64_t *del_
 		zbx_vector_uint64_pair_remove(discovery_ts, i);
 	else if (FAIL != (i = zbx_vector_uint64_bsearch(imm_ids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		zbx_vector_uint64_remove(imm_ids, i);
+
+	cb_audit_create(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_DELETE, id, name, (int)ZBX_FLAG_DISCOVERY_CREATED);
 }
 
 /******************************************************************************
@@ -148,8 +166,8 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 	for (i = 0; i < objects->values_num; i++)
 	{
 		zbx_uint64_t	id;
-		int		discovery_flag, elapsed, object_lastcheck, object_ts_delete, object_ts_disable;
-		unsigned char	discovery_status, object_status, disable_source;
+		int		discovery_flag, object_lastcheck, object_ts_delete, object_ts_disable, ts;
+		unsigned char	discovery_status, object_status, disable_source, pending_del = 0;
 		char		*name;
 
 		cb_info(objects->values[i], &id, &discovery_flag, &object_lastcheck, &discovery_status,
@@ -178,57 +196,41 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 			continue;
 		}
 
+		ts = lld_get_lifetime_ts(object_lastcheck, lifetime);
+
+		if (SUCCEED == lld_check_lifetime_elapsed(lastcheck, ts))
+		{
+			if (NULL == enabled_lifetime)
+			{
+				zbx_vector_uint64_append(&del_ids, id);
+				continue;
+			}
+
+			if (ZBX_LLD_OBJECT_STATUS_ENABLED == object_status ||
+					ZBX_DISABLE_SOURCE_LLD_LOST == disable_source)
+			{
+				zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
+
+				zbx_vector_id_name_pair_append(&del_objs, id_name_pair);
+				zbx_vector_uint64_append(&upd_ids, id);
+				pending_del = 1;
+			}
+		}
+
 		if (ZBX_LLD_DISCOVERY_STATUS_LOST != discovery_status)
 			zbx_vector_uint64_append(&lost_ids, id);
 
-		if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != lifetime->type)
-		{
-			int	ts_delete = lld_get_lifetime_ts(id, object_lastcheck, object_ts_delete, lifetime,
-					&ts_ids, &discovery_ts);
-
-			elapsed = lld_check_lifetime_elapsed(lastcheck, lifetime, ts_delete);
-		}
-		else
-		{
-			if (1 != object_ts_delete)
-				zbx_vector_uint64_append(&imm_ids, id);
-
-			elapsed = SUCCEED;
-		}
+		lld_prepare_ts_update(id, ts, object_ts_delete, &ts_ids, &imm_ids, &discovery_ts);
 
 		if (NULL == enabled_lifetime)
-		{
-			if (SUCCEED == elapsed)
-				zbx_vector_uint64_append(&del_ids, id);
-
 			continue;
-		}
-		else if (SUCCEED == elapsed && (ZBX_LLD_OBJECT_STATUS_ENABLED == object_status ||
-				ZBX_DISABLE_SOURCE_LLD_LOST == disable_source))
-		{
-			zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
 
-			zbx_vector_id_name_pair_append(&del_objs, id_name_pair);
-			zbx_vector_uint64_append(&upd_ids, id);
-			continue;
-		}
+		ts = lld_get_lifetime_ts(object_lastcheck, enabled_lifetime);
 
-		if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type)
-		{
-			int	ts_disable = lld_get_lifetime_ts(id, object_lastcheck, object_ts_disable,
-					enabled_lifetime, &dis_ts_ids, &dis_discovery_ts);
+		lld_prepare_ts_update(id, ts, object_ts_disable, &dis_ts_ids, &dis_imm_ids, &dis_discovery_ts);
 
-			elapsed = lld_check_lifetime_elapsed(lastcheck, enabled_lifetime, ts_disable);
-		}
-		else
-		{
-			if (1 != object_ts_disable)
-				zbx_vector_uint64_append(&dis_imm_ids, id);
-
-			elapsed = SUCCEED;
-		}
-
-		if (SUCCEED == elapsed && ZBX_LLD_OBJECT_STATUS_ENABLED == object_status)
+		if (0 == pending_del && ZBX_LLD_OBJECT_STATUS_ENABLED == object_status &&
+				SUCCEED == lld_check_lifetime_elapsed(lastcheck, ts))
 		{
 			zbx_id_name_pair_t	id_name_pair = {.id = id, .name = name};
 
@@ -293,11 +295,8 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 				else if (FAIL != (i = zbx_vector_id_name_pair_bsearch(&del_objs, id_name_pair,
 						lld_ids_names_compare_func)))
 				{
-					lld_prepare_object_delete(del_objs.values[i].id, &del_ids, &ts_ids,
-							&discovery_ts, &imm_ids);
-					cb_audit_create(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_DELETE,
-							del_objs.values[i].id, del_objs.values[i].name,
-							(int)ZBX_FLAG_DISCOVERY_CREATED);
+					lld_prepare_object_delete(del_objs.values[i].id, del_objs.values[i].name,
+							&del_ids, &ts_ids, &discovery_ts, &imm_ids, cb_audit_create);
 				}
 
 				continue;
@@ -322,11 +321,8 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 				else if (FAIL != (i = zbx_vector_id_name_pair_bsearch(&del_objs, id_name_pair,
 						lld_ids_names_compare_func)))
 				{
-					lld_prepare_object_delete(del_objs.values[i].id, &del_ids, &ts_ids,
-							&discovery_ts, &imm_ids);
-					cb_audit_create(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_DELETE,
-							del_objs.values[i].id, del_objs.values[i].name,
-							(int)ZBX_FLAG_DISCOVERY_CREATED);
+					lld_prepare_object_delete(del_objs.values[i].id, del_objs.values[i].name,
+							&del_ids, &ts_ids, &discovery_ts, &imm_ids, cb_audit_create);
 				}
 			}
 		}
