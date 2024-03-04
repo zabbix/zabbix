@@ -478,6 +478,10 @@ class CSortable {
 	}
 
 	#getItemTransitionalOffset(item) {
+		if (item.elements_live.length === 0) {
+			return 0;
+		}
+
 		const computed_style = getComputedStyle(item.elements_live[0]);
 		const computed_style_pos = this.#is_horizontal ? computed_style.left : computed_style.top;
 
