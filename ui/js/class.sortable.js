@@ -125,6 +125,8 @@ class CSortable {
 
 	#scroll_pos = 0;
 
+	#mouse_down_pos = 0;
+
 	#is_dragging = false;
 	#drag_item = null;
 	#drag_item_rendering_animation_frame = null;
@@ -923,7 +925,9 @@ class CSortable {
 				return;
 			}
 
-			const pos = this.#scroll_pos - this.#getTargetLoc().pos + (this.#is_horizontal ? e.clientX : e.clientY);
+			this.#mouse_down_pos = this.#is_horizontal ? e.clientX : e.clientY;
+
+			const pos = this.#scroll_pos + this.#mouse_down_pos - this.#getTargetLoc().pos;
 
 			for (let index = 0; index < this.#items.length; index++) {
 				const item = this.#items[index];
@@ -960,16 +964,14 @@ class CSortable {
 		},
 
 		mouseMove: (e) => {
-			const client_pos = this.#is_horizontal ? e.clientX : e.clientY;
-
 			if (!this.#is_dragging) {
-				this.#startDragging(client_pos);
+				this.#startDragging(this.#mouse_down_pos);
 				this.#doDragItemRendering();
 			}
 
 			const rel_old = this.#drag_item.rel;
 
-			this.#drag_item.rel = this.#drag_delta + client_pos;
+			this.#drag_item.rel = this.#drag_delta + (this.#is_horizontal ? e.clientX : e.clientY);
 
 			const constraints_by_target = this.#getDragRelConstraintsByTarget();
 			const constraints_by_freeze = this.#getDragRelConstraintsByFreeze();
@@ -1016,9 +1018,7 @@ class CSortable {
 
 		wheel: (e) => {
 			if (!this.#is_dragging && this.#drag_item !== null) {
-				const client_pos = this.#is_horizontal ? e.clientX : e.clientY;
-
-				this.#startDragging(client_pos);
+				this.#startDragging(this.#mouse_down_pos);
 				this.#doDragItemRendering();
 			}
 
