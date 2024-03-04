@@ -321,7 +321,8 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
  *                                                                            *
  ******************************************************************************/
 void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
-		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges, int checks_per_worker_max)
+		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges, int checks_per_worker_max,
+		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids)
 {
 	zbx_hashset_t	tasks_local;
 	zbx_uint64_t	checks_count = 0;
@@ -347,22 +348,33 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 
 		if (SUCCEED != zbx_iprange_parse(&ipr, start))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
-					drule->name, start);
+			char	err[MAX_STRING_LEN];
+
+			zbx_snprintf(err, sizeof(err), "wrong format of IP range \"%s\"", start);
+			discoverer_queue_append_error(drule_errors, drule->druleid, err);
+			zbx_vector_uint64_append(err_druleids, drule->druleid);
 			goto next;
 		}
 
 		if (ZBX_DISCOVERER_IPRANGE_LIMIT < zbx_iprange_volume(&ipr))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range \"%s\" exceeds %d address limit",
-					drule->name, start, ZBX_DISCOVERER_IPRANGE_LIMIT);
+			char	err[MAX_STRING_LEN];
+
+			zbx_snprintf(err, sizeof(err), "IP range \"%s\" exceeds %d address limit", start,
+					ZBX_DISCOVERER_IPRANGE_LIMIT);
+			discoverer_queue_append_error(drule_errors, drule->druleid, err);
+			zbx_vector_uint64_append(err_druleids, drule->druleid);
 			goto next;
 		}
 #ifndef HAVE_IPV6
 		if (ZBX_IPRANGE_V6 == ipr.type)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": encountered IP range \"%s\","
-					" but IPv6 support not compiled in", drule->name, start);
+			char	err[MAX_STRING_LEN];
+
+			zbx_snprintf(err, sizeof(err), "encountered IP range \"%s\","
+					" but IPv6 support not compiled in", start);
+			discoverer_queue_append_error(drule_errors, drule->druleid, err);
+			zbx_vector_uint64_append(err_druleids, drule->druleid);
 			goto next;
 		}
 #endif

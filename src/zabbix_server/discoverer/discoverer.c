@@ -750,7 +750,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_iprange_create(ipranges);
 
 		process_rule(drule, &tasks, check_counts, dchecks_common, ipranges,
-				dmanager.queue.checks_per_worker_max);
+				dmanager.queue.checks_per_worker_max, drule_errors, err_druleids);
 
 		job = discoverer_job_create(drule, dchecks_common, ipranges);
 		zbx_hashset_iter_reset(&tasks, &iter);
