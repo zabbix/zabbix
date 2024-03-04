@@ -756,18 +756,22 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		process_rule(drule, &tasks, check_counts, dchecks_common, ipranges,
 				dmanager.queue.checks_per_worker_max, drule_errors, err_druleids);
 
-		job = discoverer_job_create(drule, dchecks_common, ipranges);
-		zbx_hashset_iter_reset(&tasks, &iter);
-
-		while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+		if (0 != tasks.num_data)
 		{
-			task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
-			memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
-			(void)zbx_list_append(&job->tasks, task_out, NULL);
+			job = discoverer_job_create(drule, dchecks_common, ipranges);
+			zbx_hashset_iter_reset(&tasks, &iter);
+
+			while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+			{
+				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
+				memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
+				(void)zbx_list_append(&job->tasks, task_out, NULL);
+			}
+
+			zbx_vector_discoverer_jobs_ptr_append(jobs, job);
 		}
 
 		zbx_hashset_destroy(&tasks);
-		zbx_vector_discoverer_jobs_ptr_append(jobs, job);
 		rule_count++;
 next:
 		if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
