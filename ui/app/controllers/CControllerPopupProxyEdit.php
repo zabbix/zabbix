@@ -60,11 +60,13 @@ class CControllerPopupProxyEdit extends CController {
 
 		if ($this->hasInput('proxyid')) {
 			$db_proxies = API::Proxy()->get([
-				'output' => ['name', 'operating_mode', 'allowed_addresses', 'description', 'tls_connect', 'tls_accept',
-					'tls_issuer', 'tls_subject', 'address', 'port', 'custom_timeouts', 'timeout_zabbix_agent',
-					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'compatibility'
+				'output' => ['proxyid', 'name', 'local_address', 'local_port', 'operating_mode', 'allowed_addresses',
+					'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
+					'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+					'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+					'timeout_telnet_agent', 'timeout_script', 'compatibility'
 				],
+				'selectProxyGroup' => ['proxy_groupid', 'name'],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
 			]);
@@ -82,11 +84,16 @@ class CControllerPopupProxyEdit extends CController {
 	protected function doAction(): void {
 		if ($this->proxy !== null) {
 			$data = [
-				'proxyid' => $this->getInput('proxyid'),
+				'proxyid' => $this->proxy['proxyid'],
+				'ms_proxy_group' => $this->proxy['proxyGroup']
+					? [CArrayHelper::renameKeys($this->proxy['proxyGroup'], ['proxy_groupid' => 'id'])]
+					: [],
 				'version_mismatch' => $this->proxy['compatibility'] == ZBX_PROXY_VERSION_OUTDATED
 					|| $this->proxy['compatibility'] == ZBX_PROXY_VERSION_UNSUPPORTED,
 				'form' => [
 					'name' => $this->proxy['name'],
+					'local_address' => $this->proxy['local_address'],
+					'local_port' => $this->proxy['local_port'],
 					'operating_mode' => (int) $this->proxy['operating_mode'],
 					'address' => $this->proxy['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE
 						? $this->proxy['address']
@@ -133,9 +140,12 @@ class CControllerPopupProxyEdit extends CController {
 		else {
 			$data = [
 				'proxyid' => null,
+				'ms_proxy_group' => [],
 				'version_mismatch' => false,
 				'form' => [
 					'name' => DB::getDefault('proxy', 'name'),
+					'local_address' => DB::getDefault('proxy', 'local_address'),
+					'local_port' => DB::getDefault('proxy', 'local_port'),
 					'operating_mode' => (int) DB::getDefault('proxy', 'operating_mode'),
 					'allowed_addresses' => DB::getDefault('proxy', 'allowed_addresses'),
 					'address' => DB::getDefault('proxy', 'address'),

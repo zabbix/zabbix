@@ -371,6 +371,24 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'proxy_groups':
+				$db_proxy_groups = API::ProxyGroup()->get([
+					'output' => ['proxy_groupid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($db_proxy_groups) {
+					CArrayHelper::sort($db_proxy_groups, ['name']);
+
+					if (array_key_exists('limit', $data)) {
+						$db_proxy_groups = array_slice($db_proxy_groups, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($db_proxy_groups, ['proxy_groupid' => 'id']);
+				}
+				break;
+
 			case 'triggers':
 				$host_fields = ['name'];
 				if (array_key_exists('real_hosts', $data) && $data['real_hosts']) {

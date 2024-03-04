@@ -48,6 +48,8 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
+		jQuery('#proxy_groupid').on('change', () => this._update());
+
 		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
 				'custom_timeouts']) {
 			document
@@ -78,6 +80,12 @@ window.proxy_edit_popup = new class {
 	}
 
 	_update() {
+		const $proxy_group = jQuery('#proxy_groupid').multiSelect('getData');
+
+		for (const element of this.form.querySelectorAll('.js-local-address')) {
+			element.style.display = $proxy_group.length ? '' : 'none';
+		}
+
 		const operating_mode_active =
 			document.querySelector('#operating_mode input:checked').value == <?= PROXY_OPERATING_MODE_ACTIVE ?>;
 
@@ -203,10 +211,10 @@ window.proxy_edit_popup = new class {
 			fields.clone_psk = false;
 		}
 
-		for (const name of ['name', 'allowed_addresses', 'address', 'port', 'description', 'tls_psk_identity',
-				'tls_psk', 'tls_issuer', 'tls_subject', 'timeout_zabbix_agent', 'timeout_simple_check',
-				'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script']) {
+		for (const name of ['name', 'local_address', 'local_port', 'allowed_addresses', 'address', 'port',
+				'description', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'timeout_zabbix_agent',
+				'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
+				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script']) {
 			if (name in fields) {
 				fields[name] = fields[name].trim();
 			}
