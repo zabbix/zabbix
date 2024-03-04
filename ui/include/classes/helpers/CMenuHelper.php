@@ -374,6 +374,11 @@ class CMenuHelper {
 				? (new CMenuItem(_('Housekeeping')))
 					->setAction('housekeeping.edit')
 				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
+				? (new CMenuItem(_('Proxy groups')))
+					->setAction('proxygroup.list')
+					->setAliases(['proxygroup.edit'])
+				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				? (new CMenuItem(_('Proxies')))
 					->setAction('proxy.list')
