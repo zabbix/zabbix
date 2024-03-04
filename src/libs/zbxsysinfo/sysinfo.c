@@ -299,19 +299,34 @@ void	zbx_set_metrics(zbx_metric_t *metrics)
 }
 #endif
 
-#define GET_CONFIG_VAR(type, varname) \
-type	sysinfo_get_config_##varname(void) \
-{ \
-	return get_config_##varname##_cb(); \
+#define GET_CONFIG_VAR(varname)			\
+{						\
+	return get_config_##varname##_cb();	\
 }
-GET_CONFIG_VAR(int, timeout)
-GET_CONFIG_VAR(int, log_remote_commands)
-GET_CONFIG_VAR(int, unsafe_user_parameters)
-GET_CONFIG_VAR(const char *, source_ip)
-GET_CONFIG_VAR(const char *, hostname)
-GET_CONFIG_VAR(const char *, hostnames)
-GET_CONFIG_VAR(const char *, host_metadata)
-GET_CONFIG_VAR(const char *, host_metadata_item)
+
+int	sysinfo_get_config_timeout(void)
+GET_CONFIG_VAR(timeout)
+
+int	sysinfo_get_config_log_remote_commands(void)
+GET_CONFIG_VAR(log_remote_commands)
+
+int	sysinfo_get_config_unsafe_user_parameters(void)
+GET_CONFIG_VAR(unsafe_user_parameters)
+
+const char	*sysinfo_get_config_source_ip(void)
+GET_CONFIG_VAR(source_ip)
+
+const char	*sysinfo_get_config_hostname(void)
+GET_CONFIG_VAR(hostname)
+
+const char	*sysinfo_get_config_hostnames(void)
+GET_CONFIG_VAR(hostnames)
+
+const char	*sysinfo_get_config_host_metadata(void)
+GET_CONFIG_VAR(host_metadata)
+
+const char	*sysinfo_get_config_host_metadata_item(void)
+GET_CONFIG_VAR(host_metadata_item)
 #undef GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
