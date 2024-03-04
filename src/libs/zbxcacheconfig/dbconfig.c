@@ -84,6 +84,8 @@ int	sync_in_progress = 0;
 
 #define ZBX_TRIGGER_POLL_INTERVAL		(SEC_PER_MIN * 10)
 
+#define ZBX_STATUS_LIFETIME		SEC_PER_MIN
+
 /* shorthand macro for calling zbx_in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		zbx_in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -12929,6 +12931,8 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 	int			i;
 	const ZBX_DC_ITEM	*dc_item;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	/* loop over items to gather per-host and per-proxy statistics */
 	for (i = 0; i < dc_host->items.values_num; i++)
 	{
@@ -12977,7 +12981,9 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 								proxy_diff->items_active_notsupported++;
 							break;
 						default:
-							THIS_SHOULD_NEVER_HAPPEN;
+							zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to count statistics "
+									"for itemid " ZBX_FS_UI64, __func__,
+									dc_item->itemid);
 					}
 
 					break;
@@ -12989,15 +12995,20 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 					proxy_diff->items_disabled++;
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to count statistics for "
+						"itemid " ZBX_FS_UI64, __func__, dc_item->itemid);
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t *diff)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TRIGGER		*dc_trigger;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(triggers, &iter);
 	/* loop over triggers to gather enabled and disabled trigger statistics */
@@ -13020,7 +13031,9 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
 							diff->triggers_enabled_problem++;
 							break;
 						default:
-							THIS_SHOULD_NEVER_HAPPEN;
+							zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to count statistics "
+									"for triggerid " ZBX_FS_UI64, __func__,
+									dc_trigger->triggerid);
 					}
 
 					break;
@@ -13030,9 +13043,12 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
 				diff->triggers_disabled++;
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to count statistics for "
+						"triggerid " ZBX_FS_UI64, __func__, dc_trigger->triggerid);
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -13045,7 +13061,6 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
  ******************************************************************************/
 static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 {
-#define ZBX_STATUS_LIFETIME	SEC_PER_MIN
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_HOST		*dc_host;
 	ZBX_DC_PROXY		*dc_proxy;
@@ -13149,7 +13164,6 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 	get_trigger_statistics(&config->triggers, diff);
 
 	return SUCCEED;
-#undef ZBX_STATUS_LIFETIME
 }
 
 /******************************************************************************
@@ -13252,7 +13266,7 @@ zbx_uint64_t	zbx_dc_get_item_count(zbx_uint64_t hostid)
 
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 
 	if (0 == hostid)
 		count = config->status->items_active_normal + config->status->items_active_notsupported;
@@ -13261,7 +13275,7 @@ zbx_uint64_t	zbx_dc_get_item_count(zbx_uint64_t hostid)
 	else
 		count = 0;
 
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 
 	return count;
 }
@@ -13282,7 +13296,7 @@ zbx_uint64_t	zbx_dc_get_item_unsupported_count(zbx_uint64_t hostid)
 
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 
 	if (0 == hostid)
 		count = config->status->items_active_notsupported;
@@ -13291,7 +13305,7 @@ zbx_uint64_t	zbx_dc_get_item_unsupported_count(zbx_uint64_t hostid)
 	else
 		count = 0;
 
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 
 	return count;
 }
@@ -13307,9 +13321,9 @@ zbx_uint64_t	zbx_dc_get_trigger_count(void)
 
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 	count = config->status->triggers_enabled_ok + config->status->triggers_enabled_problem;
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 
 	return count;
 }
@@ -13325,9 +13339,9 @@ zbx_uint64_t	zbx_dc_get_host_count(void)
 
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 	nhosts = config->status->hosts_monitored;
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 
 	return nhosts;
 }
@@ -13343,9 +13357,9 @@ double	zbx_dc_get_required_performance(void)
 
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 	nvps = config->status->required_performance;
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 
 	return nvps;
 }
@@ -13361,14 +13375,14 @@ void	zbx_dc_get_count_stats_all(zbx_config_cache_info_t *stats)
 {
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 
 	stats->hosts = config->status->hosts_monitored;
 	stats->items = config->status->items_active_normal + config->status->items_active_notsupported;
 	stats->items_unsupported = config->status->items_active_notsupported;
 	stats->requiredperformance = config->status->required_performance;
 
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 }
 
 static void	proxy_counter_ui64_push(zbx_vector_proxy_counter_ptr_t *v, zbx_uint64_t proxyid, zbx_uint64_t counter)
