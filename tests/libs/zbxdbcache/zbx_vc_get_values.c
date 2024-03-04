@@ -29,6 +29,24 @@
 
 #include "zbx_vc_common.h"
 
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	ZBX_UNUSED(local_server_num);
+	ZBX_UNUSED(local_process_type);
+	ZBX_UNUSED(local_process_num);
+
+	return 0;
+}
+
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	ZBX_UNUSED(flags);
+
+	return 0;
+}
+
 void	zbx_vc_test_get_values_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 				zbx_vector_history_record_t *returned, int *seconds, int *count)

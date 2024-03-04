@@ -27,6 +27,23 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	ZBX_UNUSED(local_server_num);
+	ZBX_UNUSED(local_process_type);
+	ZBX_UNUSED(local_process_num);
+
+	return 0;
+}
+
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	ZBX_UNUSED(flags);
+
+	return 0;
+}
 
 static void	get_macros(const char *path, zbx_vector_lld_macro_path_t *macros)
 {

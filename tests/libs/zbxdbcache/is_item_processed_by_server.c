@@ -25,6 +25,24 @@
 #include "zbxcommon.h"
 #include "zbxcacheconfig.h"
 
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	ZBX_UNUSED(local_server_num);
+	ZBX_UNUSED(local_process_type);
+	ZBX_UNUSED(local_process_num);
+
+	return 0;
+}
+
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	ZBX_UNUSED(flags);
+
+	return 0;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	int		type, expected_result;

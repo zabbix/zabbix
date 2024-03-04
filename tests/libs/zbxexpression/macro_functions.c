@@ -23,6 +23,24 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
+
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	ZBX_UNUSED(local_server_num);
+	ZBX_UNUSED(local_process_type);
+	ZBX_UNUSED(local_process_num);
+
+	return 0;
+}
+
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	ZBX_UNUSED(flags);
+
+	return 0;
+}
+
 zbx_vector_uint64_t	test_hostids;
 
 int	__wrap_expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
