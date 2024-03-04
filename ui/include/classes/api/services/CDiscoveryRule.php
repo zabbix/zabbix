@@ -940,6 +940,7 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
 		self::addHostStatus($items, $db_hosts, $db_templates);
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_RULE);
+		self::updateLifetimeFields($items);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
 			'host_status' =>			['type' => API_ANY],
@@ -1134,6 +1135,7 @@ class CDiscoveryRule extends CItemGeneral {
 		]);
 
 		self::addInternalFields($db_items);
+		self::updateLifetimeFields($items);
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
@@ -1824,6 +1826,7 @@ class CDiscoveryRule extends CItemGeneral {
 		self::updateLldMacroPaths($items, $db_items, $upd_itemids);
 		self::updateItemFilters($items, $db_items, $upd_itemids);
 		self::updateOverrides($items, $db_items, $upd_itemids);
+		self::updateLifetimeFields($items);
 
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
@@ -2282,6 +2285,41 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$upd_itemids += $_upd_itemids;
 		}
+	}
+
+	/**
+	 * Normalize values of lifetime fields.
+	 *
+	 * @param array  $items
+	 *
+	 * @return void
+	 */
+	private static function updateLifetimeFields(array &$items): void {
+		foreach ($items as &$item) {
+			if (array_key_exists('lifetime', $item) && timeUnitToSeconds($item['lifetime']) == 0) {
+				$item['lifetime_type'] = ZBX_LLD_DELETE_IMMEDIATELY;
+			}
+
+			if (array_key_exists('enabled_lifetime', $item) && timeUnitToSeconds($item['enabled_lifetime']) == 0) {
+				$item['enabled_lifetime_type'] = ZBX_LLD_DISABLE_IMMEDIATELY;
+			}
+
+			if (array_key_exists('lifetime_type', $item)) {
+				if ($item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
+					$item['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
+				}
+
+				if ($item['lifetime_type'] != ZBX_LLD_DELETE_AFTER) {
+					$item['lifetime'] = DB::getDefault('items', 'lifetime');
+				}
+			}
+
+			if (array_key_exists('enabled_lifetime_type', $item)
+					&& $item['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER) {
+				$item['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
+			}
+		}
+		unset($item);
 	}
 
 	/**
