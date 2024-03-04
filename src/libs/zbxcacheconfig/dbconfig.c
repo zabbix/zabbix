@@ -12931,8 +12931,6 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 	int			i;
 	const ZBX_DC_ITEM	*dc_item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	/* loop over items to gather per-host and per-proxy statistics */
 	for (i = 0; i < dc_host->items.values_num; i++)
 	{
@@ -12999,16 +12997,12 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 						"itemid " ZBX_FS_UI64, __func__, dc_item->itemid);
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t *diff)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TRIGGER		*dc_trigger;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(triggers, &iter);
 	/* loop over triggers to gather enabled and disabled trigger statistics */
@@ -13047,8 +13041,6 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
 						"triggerid " ZBX_FS_UI64, __func__, dc_trigger->triggerid);
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -13419,7 +13411,7 @@ void	zbx_dc_get_status(zbx_vector_proxy_counter_ptr_t *hosts_monitored,
 
 	dc_status_update();
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	RDLOCK_CACHE;
 
 	proxy_counter_ui64_push(hosts_monitored, 0, config->status->hosts_monitored);
 	proxy_counter_ui64_push(hosts_not_monitored, 0, config->status->hosts_not_monitored);
@@ -13445,7 +13437,7 @@ void	zbx_dc_get_status(zbx_vector_proxy_counter_ptr_t *hosts_monitored,
 		proxy_counter_dbl_push(required_performance, dc_proxy->proxyid, dc_proxy->required_performance);
 	}
 
-	UNLOCK_CACHE_CONFIG_HISTORY;
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
