@@ -803,14 +803,15 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max',
 						'Time period' => 'Custom',
-						'id:time_period_from' => 'now-63072002' // 2 years and 2 seconds.
+						'id:time_period_from' => 'now-63158401' // 2 years and 2 seconds.
 					],
 					'item' => [
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
 					],
 					'error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #20.

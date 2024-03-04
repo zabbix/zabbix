@@ -918,7 +918,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item' => 'Available memory',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-3y-1s',
+							'id:time_period_from' => 'now-3y-25h',
 							'id:time_period_to' => 'now-1y'
 						]
 					],
