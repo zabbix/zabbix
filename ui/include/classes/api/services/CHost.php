@@ -1096,6 +1096,19 @@ class CHost extends CHostGeneral {
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
 			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
+		$discovered_hosts = [];
+
+		$host_data = API::Host()->get([
+			'output' => ['flags'],
+			'hostids' => $hostids
+		]);
+
+		foreach ($host_data as $host) {
+			if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$discovered_hosts[] = $host['hostid'];
+			}
+		}
+
 		if ($data) {
 			DB::update('hosts', [
 				'values' => $data,
@@ -1103,11 +1116,10 @@ class CHost extends CHostGeneral {
 			]);
 
 			// Update disable_source in host_discovery table when discovered host status is changed to disabled.
-			if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED && array_key_exists('status', $data)
-					&& $data['status'] == HOST_STATUS_NOT_MONITORED) {
+			if (array_key_exists('status', $data) && $data['status'] == HOST_STATUS_NOT_MONITORED) {
 				DB::update('host_discovery', [
 					'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
-					'where' => ['hostid' => $hostids]
+					'where' => ['hostid' => $discovered_hosts]
 				]);
 			}
 		}
