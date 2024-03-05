@@ -143,6 +143,10 @@ static int	config_timeout = 3;
 
 static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 
+#define ZBX_SERVICE_NAME_LEN    64
+char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#undef ZBX_SERVICE_NAME_LEN
+
 #define CONFIG_SENDER_TIMEOUT_MIN	1
 #define CONFIG_SENDER_TIMEOUT_MAX	300
 #define CONFIG_SENDER_TIMEOUT_MIN_STR	ZBX_STR(CONFIG_SENDER_TIMEOUT_MIN)
@@ -1521,7 +1525,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, NULL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);

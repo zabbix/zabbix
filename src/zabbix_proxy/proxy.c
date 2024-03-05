@@ -1477,7 +1477,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, NULL, &error))
 	{
 		zbx_error("cannot open log:%s", error);
 		zbx_free(error);

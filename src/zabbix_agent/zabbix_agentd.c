@@ -59,12 +59,12 @@ static char	*config_user_parameter_dir = NULL;
 #if defined(_WINDOWS)
 static char	**config_perf_counters = NULL;
 static char	**config_perf_counters_en = NULL;
+#endif
 
-#define	ZBX_SERVICE_NAME_LEN	64
+#define ZBX_SERVICE_NAME_LEN    64
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-#undef	ZBX_SERVICE_NAME_LEN
-#endif
+#undef ZBX_SERVICE_NAME_LEN
 
 static char	*config_user = NULL;
 
@@ -1206,7 +1206,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, ZABBIX_EVENT_SOURCE, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1487,7 +1487,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, ZABBIX_EVENT_SOURCE, NULL);
 	}
 #endif
 

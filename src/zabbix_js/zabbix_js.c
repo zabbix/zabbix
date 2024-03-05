@@ -35,6 +35,10 @@ static const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
+#define ZBX_SERVICE_NAME_LEN    64
+char    ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#undef ZBX_SERVICE_NAME_LEN
+
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
 #define JS_TIMEOUT_DEF		ZBX_ES_TIMEOUT
@@ -190,7 +194,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, syslog_app_name, ZABBIX_EVENT_SOURCE, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;
