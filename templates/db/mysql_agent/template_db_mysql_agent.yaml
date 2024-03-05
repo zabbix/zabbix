@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-01T07:35:24Z'
+  date: '2024-03-05T13:40:18Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1240,9 +1240,9 @@ zabbix_export:
           description: 'If "show slave status" returns Master_Host, "Replication: *" items are created.'
           item_prototypes:
             - uuid: 48555d71074f4cd4a61dca6187c8b29a
-              name: 'MySQL: Replication Seconds Behind Master {#MASTERHOST}'
+              name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
               type: DEPENDENT
-              key: 'mysql.seconds_behind_master["{#MASTERHOST}"]'
+              key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
               delay: '0'
               history: 7d
               units: s
@@ -1263,13 +1263,13 @@ zabbix_export:
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Replication is not performed.'
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               tags:
                 - tag: component
                   value: replication
               trigger_prototypes:
                 - uuid: a5c91da088414d279f5ea3cd59093ce9
-                  expression: 'min(/MySQL by Zabbix agent/mysql.seconds_behind_master["{#MASTERHOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
+                  expression: 'min(/MySQL by Zabbix agent/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
                   name: 'MySQL: Replication lag is too high'
                   event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
@@ -1277,9 +1277,9 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 1c075f4785604d92a33a868e213070d8
-              name: 'MySQL: Replication Slave IO Running {#MASTERHOST}'
+              name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
               type: DEPENDENT
-              key: 'mysql.slave_io_running["{#MASTERHOST}"]'
+              key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1296,23 +1296,23 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               tags:
                 - tag: component
                   value: replication
               trigger_prototypes:
                 - uuid: 8ee45932311443cb906306b1d2c99b19
-                  expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTERHOST}"],#1,"ne","Yes")=1'
+                  expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
                   name: 'MySQL: The slave I/O thread is not connected to a replication master'
                   priority: WARNING
                   dependencies:
                     - name: 'MySQL: The slave I/O thread is not running'
-                      expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTERHOST}"],#1,"eq","No")=1'
+                      expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   tags:
                     - tag: scope
                       value: availability
                 - uuid: 4c8ca45f26254d9a9a1c9248f1fa1537
-                  expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTERHOST}"],#1,"eq","No")=1'
+                  expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The slave I/O thread is not running'
                   priority: AVERAGE
                   description: 'Whether the I/O thread for reading the master''s binary log is running.'
@@ -1320,9 +1320,9 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 967c6fd13cc04562a9fea174bd90b8c4
-              name: 'MySQL: Replication Slave SQL Running {#MASTERHOST}'
+              name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
               type: DEPENDENT
-              key: 'mysql.slave_sql_running["{#MASTERHOST}"]'
+              key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1338,19 +1338,19 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               tags:
                 - tag: component
                   value: replication
               trigger_prototypes:
                 - uuid: bd0d20c05e3b46b6a7c341e5d122208b
-                  expression: 'count(/MySQL by Zabbix agent/mysql.slave_sql_running["{#MASTERHOST}"],#1,"eq","No")=1'
+                  expression: 'count(/MySQL by Zabbix agent/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The SQL thread is not running'
                   priority: WARNING
                   description: 'Whether the SQL thread for executing events in the relay log is running.'
                   dependencies:
                     - name: 'MySQL: The slave I/O thread is not running'
-                      expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTERHOST}"],#1,"eq","No")=1'
+                      expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   tags:
                     - tag: scope
                       value: notice
@@ -1371,13 +1371,13 @@ zabbix_export:
                   parameters:
                     - 6h
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               tags:
                 - tag: component
                   value: replication
             - uuid: d87c7c03e5884a43912f60ad91c3b46f
-              name: 'MySQL: Replication Slave status {#MASTERHOST}'
-              key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]'
+              name: 'MySQL: Replication Slave status {#MASTER_HOST}'
+              key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               history: '0'
               trends: '0'
               value_type: TEXT
@@ -1391,7 +1391,7 @@ zabbix_export:
                 - |
                   var matches = value.match(/Master_Host.*>(.*)<.*/);
                   if (matches) {
-                      return JSON.stringify([{"{#MASTERHOST}": matches[1]}]);
+                      return JSON.stringify([{"{#MASTER_HOST}": matches[1]}]);
                   }
                   
                   return '[]';
