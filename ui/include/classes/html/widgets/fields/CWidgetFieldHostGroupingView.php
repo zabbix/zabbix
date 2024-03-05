@@ -87,38 +87,36 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 
 	public function getTemplates(): array {
 		return [
-			new CTemplateTag($this->field->getName().'-row-tmpl', $this->getRowTemplate())
+			new CTemplateTag($this->field->getName().'-row-tmpl',
+				(new CRow([
+					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CSpan(':'))->addClass('list-numbered-item'),
+					(new CDiv(
+						(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
+							->addOptions(CSelect::createOptionsFromArray([
+								WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
+								WidgetForm::GROUP_BY_TAG_VALUE => _('Tag value'),
+								WidgetForm::GROUP_BY_SEVERITY => _('Severity')
+							]))
+							->setValue('#{attribute}')
+							->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
+							->setId($this->field->getName().'_#{rowNum}_attribute')
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					)),
+					(new CDiv(
+						(new CTextBox($this->field->getName().'[#{rowNum}][tag_name]', '#{tag_name}', false))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAriaRequired($this->isRequired())
+							->setId($this->field->getName().'_#{rowNum}_tag_name')
+							->setAttribute('placeholder', _('tag'))
+					)),
+					(new CDiv(
+						(new CButton($this->field->getName().'[#{rowNum}][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+					))
+				]))->addClass('form_row')
+			)
 		];
-	}
-
-	private function getRowTemplate($attribute = '#{attribute}', $tag_name = '#{tag_name}'): CRow {
-		return (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan(':'))->addClass('list-numbered-item'),
-			(new CDiv(
-				(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
-					->addOptions(CSelect::createOptionsFromArray([
-						WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
-						WidgetForm::GROUP_BY_TAG_VALUE => _('Tag value'),
-						WidgetForm::GROUP_BY_SEVERITY => _('Severity')
-					]))
-					->setValue($attribute)
-					->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
-					->setId($this->field->getName().'_#{rowNum}_attribute')
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			)),
-			(new CDiv(
-				(new CTextBox($this->field->getName().'[#{rowNum}][tag_name]', $tag_name, false))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setAriaRequired($this->isRequired())
-					->setId($this->field->getName().'_#{rowNum}_tag_name')
-					->setAttribute('placeholder', _('tag'))
-			)),
-			(new CDiv(
-				(new CButton($this->field->getName().'[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))
-		]))->addClass('form_row');
 	}
 }
