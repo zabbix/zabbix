@@ -403,6 +403,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'proxy_group',
 				'ref_field' => 'proxy_groupid'
+			],
+			'monitored_by' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],

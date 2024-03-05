@@ -3403,10 +3403,26 @@ static int	DBpatch_6050231(void)
 
 static int	DBpatch_6050232(void)
 {
+	const zbx_db_field_t	field = {"monitored_by", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050233(void)
+{
 	const zbx_db_field_t	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy_rtdata", &field);
 }
+
+static int	DBpatch_6050234(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update hosts set monitored_by=1 where proxyid is not null"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3644,5 +3660,7 @@ DBPATCH_ADD(6050229, 0, 1)
 DBPATCH_ADD(6050230, 0, 1)
 DBPATCH_ADD(6050231, 0, 1)
 DBPATCH_ADD(6050232, 0, 1)
+DBPATCH_ADD(6050233, 0, 1)
+DBPATCH_ADD(6050234, 0, 1)
 
 DBPATCH_END()
