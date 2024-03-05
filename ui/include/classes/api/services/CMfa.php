@@ -246,10 +246,11 @@ class CMfa extends CApiService {
 	}
 
 	private static function setDefaultMfaid(array $mfaids): void {
-		if (self::checkOtherMfaExists($mfaids)) {
+		if (!self::checkOtherMfaExists($mfaids)) {
 			API::Authentication()->update(['mfaid' => reset($mfaids)]);
 		}
 	}
+
 	private static function checkOtherMfaExists(array $mfaids) {
 		return DBfetch(DBselect(
 			'SELECT m.mfaid'.
@@ -406,15 +407,15 @@ class CMfa extends CApiService {
 		self::validateDelete($mfaids, $db_mfaids, $auth);
 
 		// If last (default) is removed, reset default mfaid to prevent from foreign key constraint.
-		if (in_array($auth['mfaid'], $mfaids)) {
+		if (array_key_exists($auth['mfaid'], $db_mfaids)) {
 			API::Authentication()->update(['mfaid' => 0]);
 		}
 
-		DB::delete('mfa', ['mfaid' => $mfaids]);
+		DB::delete('mfa', ['mfaid' => array_keys($db_mfaids)]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfaids);
 
-		return ['mfaids' => $mfaids];
+		return ['mfaids' => array_keys($db_mfaids)];
 	}
 
 	private static function validateDelete(array $mfaids, ?array &$db_mfas, array $auth): void {
