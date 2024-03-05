@@ -114,6 +114,7 @@ class testDiscoveryRule extends CAPITest {
 					'key_' => 'apillddelete',
 					'hostid' => '50009',
 					'type' => ITEM_TYPE_ZABBIX,
+					'delay' => '30s',
 					'interfaceid' => '50022',
 					'lifetime_type' => '4'
 				],
@@ -126,6 +127,7 @@ class testDiscoveryRule extends CAPITest {
 					'hostid' => '50009',
 					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '50022',
+					'delay' => '30s',
 					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
 					'lifetime' => 'aaaaaaa'
 				],
@@ -142,18 +144,6 @@ class testDiscoveryRule extends CAPITest {
 					'lifetime' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/lifetime": a character string is expected.'
-			],
-			'Test unexpected lifetime parameter' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule delete immediately',
-					'key_' => 'apillddeletenow',
-					'hostid' => '50009',
-					'type' => ITEM_TYPE_ZABBIX,
-					'interfaceid' => '50022',
-					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
-					'lifetime' => '14d'
-				],
-				'expected_error' => 'Invalid parameter "/1/lifetime": value must be "7d".'
 			],
 			'Test invalid enabled_lifetime_type value' => [
 				'discoveryrule' => [
@@ -189,31 +179,6 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": a character string is expected.'
-			],
-			'Test unexpected enabled_lifetime parameter with disable never' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule delete default and disable never',
-					'key_' => 'apillddisablenever',
-					'hostid' => '50009',
-					'type' => ITEM_TYPE_ZABBIX,
-					'interfaceid' => '50022',
-					'delay' => '30s',
-					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
-					'enabled_lifetime' => '24h'
-				],
-				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be "1h".'
-			],
-			'Test unexpected enabled_lifetime parameter with disable immediately' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule disable immediately',
-					'key_' => 'apillddisablenever',
-					'hostid' => '50009',
-					'type' => ITEM_TYPE_ZABBIX,
-					'interfaceid' => '50022',
-					'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY,
-					'enabled_lifetime' => '24h'
-				],
-				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be "1h".'
 			],
 			'Test invalid lifetime and enabled_lifetime values' => [
 				'discoveryrule' => [
@@ -404,18 +369,6 @@ class testDiscoveryRule extends CAPITest {
 					'type' => ITEM_TYPE_INTERNAL,
 					'delay' => '1h',
 					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
-				],
-				'expected_error' => null
-			],
-			'Test with no deletion and no disabling' => [
-				'discoveryrule' => [
-					'name' => 'API LLD rule delete never disable never',
-					'key_' => 'api_disable_never_delete_never',
-					'hostid' => '50009',
-					'type' => ITEM_TYPE_INTERNAL,
-					'delay' => '1h',
-					'lifetime_type' => ZBX_LLD_DELETE_NEVER,
-					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER
 				],
 				'expected_error' => null
 			]

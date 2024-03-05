@@ -2296,22 +2296,19 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	private static function updateLifetimeFields(array &$items): void {
 		foreach ($items as &$item) {
-			if (array_key_exists('lifetime', $item) && timeUnitToSeconds($item['lifetime']) == 0) {
+			if (array_key_exists('lifetime', $item) && !is_array($item['lifetime'])
+					&& timeUnitToSeconds($item['lifetime']) == '0') {
 				$item['lifetime_type'] = ZBX_LLD_DELETE_IMMEDIATELY;
+				$item['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
 			}
 
-			if (array_key_exists('enabled_lifetime', $item) && timeUnitToSeconds($item['enabled_lifetime']) == 0) {
+			if (array_key_exists('enabled_lifetime', $item) && !is_array($item['enabled_lifetime'])
+					&& timeUnitToSeconds($item['enabled_lifetime']) == '0') {
 				$item['enabled_lifetime_type'] = ZBX_LLD_DISABLE_IMMEDIATELY;
 			}
 
-			if (array_key_exists('lifetime_type', $item)) {
-				if ($item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
-					$item['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
-				}
-
-				if ($item['lifetime_type'] != ZBX_LLD_DELETE_AFTER) {
-					$item['lifetime'] = DB::getDefault('items', 'lifetime');
-				}
+			if (array_key_exists('lifetime_type', $item) && $item['lifetime_type'] != ZBX_LLD_DELETE_AFTER) {
+				$item['lifetime'] = DB::getDefault('items', 'lifetime');
 			}
 
 			if (array_key_exists('enabled_lifetime_type', $item)
