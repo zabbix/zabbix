@@ -76,8 +76,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? ['hostid', 'name', 'maintenanceid', 'maintenance_status']
 			: ['hostid', 'name'];
 
-		$group_by_tags = false;
 		$group_by_host_groups = false;
+		$group_by_severity = false;
+		$group_by_tags = false;
 		$tags_to_keep = [];
 
 		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
@@ -88,6 +89,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_HOST_GROUP) {
 				$group_by_host_groups = true;
+			}
+
+			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_SEVERITY) {
+				$group_by_severity = true;
 			}
 		}
 
@@ -164,7 +169,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($host);
 		}
 
-		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
+		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE || $group_by_severity) {
 			$hostids = [];
 
 			foreach ($hosts as $host) {
@@ -254,7 +259,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getConfig(): array {
-		$config = [
+		return [
 			'severities' => [
 				TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG,
 				TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
@@ -266,7 +271,5 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
 			'group_by' => $this->fields_values['group_by']
 		];
-
-		return $config;
 	}
 }
