@@ -26,6 +26,7 @@
 #include "zbxnix.h"
 #include "zbxcacheconfig.h"
 #include "zbxpgservice.h"
+#include "zbx_host_constants.h"
 
 #define PGM_STATE_CHECK_INTERVAL	5
 
@@ -60,7 +61,8 @@ static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
 
-	result = zbx_db_select("select hostid,proxy_groupid from hosts where proxy_groupid is not null");
+	result = zbx_db_select("select hostid,proxy_groupid from hosts where monitored_by=%d",
+			HOST_MONITORED_BY_PROXY_GROUP);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
