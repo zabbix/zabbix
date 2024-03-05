@@ -527,7 +527,6 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 
 static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num, int process_type)
 {
-
 	int			ping_result, first_index = 0;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	static ZBX_FPING_HOST	*hosts = NULL;
