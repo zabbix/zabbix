@@ -32,7 +32,7 @@ $(() => {
 		VALUEMAP_MAPPING_TYPE_IN_RANGE => _('value'),
 		VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp')
 	]) ?>;
-	let table = document.querySelector('#mappings_table');
+	const table = document.getElementById('mappings-table');
 	let observer = new MutationObserver(mutationHandler);
 
 	// Observe changes for form fields: type, value.
@@ -72,6 +72,26 @@ $(() => {
 			updateOnTypeChange();
 		}
 	}
+
+	jQuery(table)
+		.dynamicRows({
+			template: '#mapping-row-tmpl',
+			rows: <?= json_encode($data['mappings']) ?>,
+			allow_empty: true,
+			sortable: true,
+			sortable_options: {
+				target: 'tbody',
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1
+			}
+		})
+		.on('tableupdate.dynamicRows', (e) => {
+			e.target.querySelectorAll('.form_row').forEach((row, index) => {
+				for (const field of row.querySelectorAll('[name^="mappings["]')) {
+					field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+				}
+			});
+		});
 });
 
 function submitValueMap(overlay) {

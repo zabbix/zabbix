@@ -690,7 +690,7 @@ class testDashboardsPages extends CWebTest {
 	 * @param integer $index		number of page that has duplicated name
 	 */
 	private function getPageMenu($page_name, $index = 1) {
-		$selector = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
+		$selector = '//div[@class="dashboard-navigation-tabs"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
 
 		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->waitUntilVisible()->one()->getAttribute('class');
 		if ($value !== 'selected-tab') {
