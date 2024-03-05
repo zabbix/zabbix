@@ -84,7 +84,7 @@ class testFormFilter extends CWebTest {
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, null, $data['error_message']);
 				$this->page->refresh()->waitUntilReady();
-				$this->assertEquals($this->query('xpath://li/ul[@class="ui-sortable-container ui-sortable"]/li')->count(), 1);
+				$this->assertEquals($this->query('xpath://li/ul[contains(@class, "tabfilter-tabs sortable")]/li')->count(), 1);
 				break;
 		}
 	}

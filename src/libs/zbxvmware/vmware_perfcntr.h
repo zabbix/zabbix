@@ -27,22 +27,35 @@
 
 #include "zbxalgo.h"
 
+/* performance counter value for a specific instance */
+typedef struct
+{
+	zbx_uint64_t	counterid;
+	char		*instance;
+	zbx_uint64_t	value;
+}
+zbx_vmware_perf_value_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_perf_value_ptr, zbx_vmware_perf_value_t *)
+
 /* performance data for a performance collector entity */
 typedef struct
 {
-	/* entity type: HostSystem, Datastore or VirtualMachine */
+	/* entity type: HostSystem, datastore or VirtualMachine */
 	char			*type;
 
 	/* entity id */
 	char			*id;
 
-	/* the performance counter values (see zbx_vmware_perfvalue_t) */
-	zbx_vector_ptr_t	values;
+	/* performance counter values */
+	zbx_vector_vmware_perf_value_ptr_t	values;
 
 	/* error information */
 	char			*error;
 }
 zbx_vmware_perf_data_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_perf_data_ptr, zbx_vmware_perf_data_t *)
 
 /* VMware performance counters available per object (information cache) */
 ZBX_VECTOR_DECL(uint16, uint16_t)
@@ -55,7 +68,7 @@ typedef struct
 }
 zbx_vmware_perf_available_t;
 
-ZBX_PTR_VECTOR_DECL(perf_available, zbx_vmware_perf_available_t *)
+ZBX_PTR_VECTOR_DECL(perf_available_ptr, zbx_vmware_perf_available_t *)
 
 /* mapping of performance counter group/key[rollup type] to its id (net/transmitted[average] -> <id>) */
 typedef struct
@@ -66,25 +79,19 @@ typedef struct
 }
 zbx_vmware_counter_t;
 
-/* performance counter value for a specific instance */
-typedef struct
-{
-	zbx_uint64_t	counterid;
-	char		*instance;
-	zbx_uint64_t	value;
-}
-zbx_vmware_perf_value_t;
+ZBX_PTR_VECTOR_DECL(vmware_counter_ptr, zbx_vmware_counter_t *)
 
 zbx_hash_t	vmware_counter_hash_func(const void *data);
 int	vmware_counter_compare_func(const void *d1, const void *d2);
 zbx_hash_t	vmware_perf_entity_hash_func(const void *data);
 int	vmware_perf_entity_compare_func(const void *d1, const void *d2);
-void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr_t *src);
+void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_vmware_counter_ptr_t *src);
 void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pairs);
 void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity);
 void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter);
 void	vmware_counter_free(zbx_vmware_counter_t *counter);
-int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle, zbx_vector_ptr_t *counters, char **error);
+int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vector_vmware_counter_ptr_t *counters, char **error);
 void	vmware_service_update_perf_entities(zbx_vmware_service_t *service);
 
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,

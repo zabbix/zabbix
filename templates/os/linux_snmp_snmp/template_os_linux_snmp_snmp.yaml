@@ -221,9 +221,7 @@ zabbix_export:
                 - '0'
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //count the number of cores
-                  return JSON.parse(value).length;
+                - 'return JSON.parse(value).length;'
           master_item:
             key: system.cpu.walk
           tags:
@@ -635,9 +633,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -664,9 +660,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -693,9 +687,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -722,9 +714,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -751,9 +741,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -780,9 +768,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -809,9 +795,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -838,9 +822,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -867,9 +849,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -896,9 +876,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               master_item:
                 key: system.cpu.walk
               tags:
@@ -916,9 +894,7 @@ zabbix_export:
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //Calculate utilization
-                      return (100 - value)
+                    - 'return (100 - value)'
               master_item:
                 key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
               tags:
@@ -1001,9 +977,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //count the number of CPU cores
-                  return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
+                - 'return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])'
         - uuid: c29a7bbfba3441b1b155e68cbe44a685
           name: 'Network interfaces discovery'
           type: DEPENDENT
@@ -1966,7 +1940,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'

@@ -26,26 +26,21 @@
  * @var array $data
  */
 
-if (array_key_exists('itemid', $data['fields'])) {
-	$field_itemid = (new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid']))
-		->setPopupParameter('numeric', true);
+$field_itemid = (new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid']))
+	->setPopupParameter('numeric', true);
 
-	if (!$data['fields']['itemid']->isTemplateDashboard()) {
-		$field_itemid->setPopupParameter('with_simple_graph_item_prototypes', true);
-	}
-}
-else {
-	$field_itemid = null;
+if (!$data['fields']['itemid']->isTemplateDashboard()) {
+	$field_itemid->setPopupParameter('with_simple_graph_item_prototypes', true);
 }
 
 (new CWidgetFormView($data))
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
-	->addField($field_itemid)
-	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid'])
-		: null
+	->addField($field_itemid->addRowClass('js-row-itemid'))
+	->addField(
+		(new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid']))
+			->addRowClass('js-row-graphid')
 	)
 	->addField(
 		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
@@ -66,4 +61,6 @@ else {
 		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_graph_prototype_form.init();')
 	->show();

@@ -41,8 +41,9 @@ typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t 
 		const zbx_timespec_t *, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
-typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
-		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid,
+		unsigned char item_value_type, unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts,
+		unsigned char state, char *error);
 typedef void (*zbx_preprocessor_flush_func_t)(void);
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
@@ -75,29 +76,36 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
-		zbx_host_template_link_type link_type, char **error);
+		zbx_host_template_link_type link_type, int audit_context_mode, char **error);
 int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
-		char **error);
+		int audit_context_mode, char **error);
 
-void	zbx_db_delete_items(zbx_vector_uint64_t *itemids);
-void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids);
-void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids);
+void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode);
+void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode);
+void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_mode);
 
-void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
-void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
+void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
+		int audit_context_mode);
+void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames,
+		int audit_context_mode);
 
-void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode);
-void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode);
+void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
+void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode, int audit_context_mode);
 
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
+void	zbx_host_groups_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids, int audit_context_mode);
+void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+
+void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
+
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
-		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags);
+		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags, int audit_context_mode);
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
 		const unsigned char bulk, const char *community, const char *securityname,
 		const unsigned char securitylevel, const char *authpassphrase, const char *privpassphrase,
 		const unsigned char authprotocol, const unsigned char privprotocol, const char *contextname,
-		const zbx_uint64_t hostid);
+		const zbx_uint64_t hostid, int audit_context_mode);
 
 /* event support */
 void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_event_t *events);
@@ -136,7 +144,6 @@ char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
 
 const char	*zbx_permission_string(int perm);
 int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
-int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids);
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 

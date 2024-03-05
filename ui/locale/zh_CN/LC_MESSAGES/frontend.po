@@ -8318,6 +8318,11 @@ msgstr "前端访问"
 msgid "Frontend messaging"
 msgstr "前端信息中"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -12131,6 +12136,10 @@ msgstr "位置经度"
 msgid "Log"
 msgstr "日志"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "日志文件监控与轮转服务。返回日志"
@@ -12138,6 +12147,10 @@ msgstr "日志文件监控与轮转服务。返回日志"
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "日志文件监控。返回日志"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -13163,6 +13176,11 @@ msgstr "多重问题事件"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "静音"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -18302,6 +18320,11 @@ msgstr "斯洛伐克(sk_SK)"
 msgid "Snooze"
 msgstr "Snooze"
 
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr ""
+
 #: include/hosts.inc.php:174
 msgid "Software"
 msgstr "软件"
@@ -20667,6 +20690,11 @@ msgstr "模板未链接"
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "取消静音"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr ""
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -24265,9 +24293,29 @@ msgstr "now() - UNIX 时间"
 msgid "number"
 msgstr "数字"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "对象不存在或属于另一个对象"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"

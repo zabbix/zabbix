@@ -37,14 +37,8 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 		return $this;
 	}
 
-	public function getLabel(): ?CLabel {
-		$label = parent::getLabel();
-
-		if ($label !== null) {
-			$label->setFor(zbx_formatDomId($this->field->getName().'[]').'_ms');
-		}
-
-		return $label;
+	public function getFocusableElementId(): string {
+		return zbx_formatDomId($this->field->getName().'[]').'_ms';
 	}
 
 	public function getView(): CPatternSelect {

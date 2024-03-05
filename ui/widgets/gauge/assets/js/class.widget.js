@@ -45,6 +45,16 @@ class CWidgetGauge extends CWidget {
 		super.updateProperties({name, view_mode, fields});
 	}
 
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		if (this.gauge !== null) {
+			readiness.push(this.gauge.promiseRendered());
+		}
+
+		return Promise.all(readiness);
+	}
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),

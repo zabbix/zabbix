@@ -30,6 +30,7 @@ typedef struct
 	int			config_timeout;
 	int			config_trapper_timeout;
 	const char		*config_source_ip;
+	const char		*config_ssh_key_location;
 	zbx_get_config_forks_f	get_process_forks_cb_arg;
 }
 zbx_thread_escalator_args;

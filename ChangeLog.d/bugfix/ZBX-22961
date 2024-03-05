@@ -1,1 +1,0 @@
-..F....... [ZBX-22961] fixed modal (popup) form resizing and visual glitch on initial load, and ResizeObserver observation error in Safari browser (ddauksa)

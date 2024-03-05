@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -582,7 +583,7 @@ CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *con
 		int check_response_code)
 {
 	CURLcode	err;
-	char	status_codes[] = "200,400,401,403,404,405,415,422";
+	char	status_codes[] = "200,201,400,401,403,404,405,415,422";
 	long	response_code;
 
 	/* try to retrieve page several times depending on number of retries */
@@ -624,7 +625,7 @@ next_attempt:
 		context->body.offset = 0;
 
 		if (0 != attempt_interval && 1 < context->max_attempts)
-			sleep((unsigned int)attempt_interval);
+			zbx_sleep((unsigned int)attempt_interval);
 	}
 	while (0 < --context->max_attempts);
 

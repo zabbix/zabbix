@@ -101,7 +101,7 @@ class testFormScheduledReport extends CWebTest {
 		$subscription_container = $form->getField('Subscriptions')->asTable();
 
 		// Report form fields maxlength attribute.
-		$maxlength_fields = ['Name' => 255, 'id:active_since' => 10, 'id:active_till' => 10, 'Subject' => 255,
+		$maxlength_fields = ['Name' => 255, 'id:active_since' => 255, 'id:active_till' => 255, 'Subject' => 255,
 			'Message' => 65535, 'Description' => 2048
 		];
 		foreach ($maxlength_fields as $field => $maxlength) {

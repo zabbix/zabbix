@@ -224,78 +224,52 @@ class CEvent extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				$sql_parts['where'][] = '1=0';
+			}
+			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-				// specific triggers
-				if ($options['objectids'] !== null) {
-					$options['objectids'] = array_keys(API::Trigger()->get([
-						'output' => [],
-						'triggerids' => $options['objectids'],
-						'editable' => $options['editable'],
-						'preservekeys' => true
-					]));
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
-				// all triggers
-				else {
-					$sql_parts['where'][] = 'NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f,items i,hosts_groups hgg'.
-							' LEFT JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE e.objectid=f.triggerid'.
-							' AND f.itemid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY i.hostid'.
-						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-							' OR MIN(permission) IS NULL'.
-							' OR MIN(permission)='.PERM_DENY.
-					')';
-				}
+
+				$sql_parts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f1'.
+					' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
+						' AND p1.ugsetid=p.ugsetid'.
+					' WHERE e.objectid=f1.triggerid'.
+						' AND p1.permission IS NULL'.
+				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
-					$sql_parts = self::addTagFilterSqlParts($user_groups, $sql_parts, $options['value'][0]);
+					$sql_parts = self::addTagFilterSqlParts(getUserGroupsByUserId(self::$userData['userid']),
+						$sql_parts, $options['value'][0]
+					);
 				}
 			}
-			// items and LLD rules
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				// specific items or LLD rules
-				if ($options['objectids'] !== null) {
-					if ($options['object'] == EVENT_OBJECT_ITEM) {
-						$options['objectids'] = array_keys(API::Item()->get([
-							'output' => [],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable'],
-							'preservekeys' => true
-						]));
-					}
-					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-						$options['objectids'] = array_keys(API::DiscoveryRule()->get([
-							'output' => [],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable'],
-							'preservekeys' => true
-						]));
-					}
-				}
-				// all items and LLD rules
-				else {
-					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-					$sql_parts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM items i,hosts_groups hgg'.
-							' JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE e.objectid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-					')';
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
 			}
 		}
@@ -1629,7 +1603,7 @@ class CEvent extends CApiService {
 		 *   - eventid for OK event
 		 *   - eventid with source, that is not trigger
 		 *   - no read rights for related trigger
-		 *   - unexisting eventid
+		 *   - nonexistent eventid
 		 */
 		if (count($eventids) != count($events)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

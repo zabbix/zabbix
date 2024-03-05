@@ -82,6 +82,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/zabbix_server/pinger/Makefile
 			tests/zabbix_server/service/Makefile
 			tests/zabbix_server/trapper/Makefile
+			tests/zabbix_server/lld/Makefile
 			tests/mocks/Makefile
 			tests/mocks/configcache/Makefile
 			tests/mocks/valuecache/Makefile
@@ -108,9 +109,6 @@ AC_DEFUN([CONF_TESTS],
 			;;
 		netbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/netbsd/Makefile])
-			;;
-		osf)
-			AC_CONFIG_FILES([tests/libs/zbxsysinfo/osf/Makefile])
 			;;
 		openbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/openbsd/Makefile])
