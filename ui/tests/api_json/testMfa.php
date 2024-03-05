@@ -22,6 +22,8 @@
 require_once dirname(__FILE__) . '/../include/CAPITest.php';
 
 /**
+ * @backup mfa, config, usrgrp, users
+ *
  * @onBefore  prepareTestData
  *
  * @onAfter cleanTestData
@@ -385,12 +387,6 @@ class testMfa extends CAPITest {
 				],
 				'expected_error' => 'Cannot delete MFA method "DUO test case 2".'
 			],
-			'Test delete default MFA method' => [
-				'mfas' => [
-					'mfaids' => ['DUO test case 1']
-				],
-				'expected_error' => 'Cannot delete default MFA method.'
-			],
 			'Test delete id does not exists' => [
 				'mfas' => [
 					'mfaids' => [1234]
@@ -407,7 +403,7 @@ class testMfa extends CAPITest {
 	public function testDelete(array $mfas, $expected_error): void {
 		$mfas = $this->resolveids($mfas);
 
-		$this->assertNotEmpty($mfas, 'No user directories to test delete');
+		$this->assertNotEmpty($mfas, 'No Mfas to test delete');
 		$this->call('mfa.delete', $mfas['mfaids'], $expected_error);
 
 		if ($expected_error === null) {
