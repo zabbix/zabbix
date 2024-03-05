@@ -146,22 +146,6 @@ typedef enum
 }
 zbx_item_type_t;
 
-typedef enum
-{
-	INTERFACE_TYPE_UNKNOWN = 0,
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_OPT = 254,
-	INTERFACE_TYPE_ANY = 255
-}
-zbx_interface_type_t;
-const char	*zbx_interface_type_string(zbx_interface_type_t type);
-
-#define INTERFACE_TYPE_COUNT	4	/* number of interface types */
-extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
-
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
 

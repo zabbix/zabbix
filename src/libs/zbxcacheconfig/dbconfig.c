@@ -16695,3 +16695,26 @@ zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_
 
 	return handle;
 }
+
+const char	*zbx_interface_type_string(zbx_interface_type_t type)
+{
+	switch (type)
+	{
+		case INTERFACE_TYPE_AGENT:
+			return "Zabbix agent";
+		case INTERFACE_TYPE_SNMP:
+			return "SNMP";
+		case INTERFACE_TYPE_IPMI:
+			return "IPMI";
+		case INTERFACE_TYPE_JMX:
+			return "JMX";
+		case INTERFACE_TYPE_OPT:
+			return "optional";
+		case INTERFACE_TYPE_ANY:
+			return "any";
+		case INTERFACE_TYPE_UNKNOWN:
+		default:
+			return "unknown";
+	}
+}
+
