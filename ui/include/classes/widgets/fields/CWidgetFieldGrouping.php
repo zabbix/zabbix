@@ -40,7 +40,7 @@ class CWidgetFieldGrouping extends CWidgetField {
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys($this->attributes))],
-				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => 255],
+				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()],
 				'tag_fields' => ['type' => API_INT32, 'in' => implode(',', array_keys($this->attributes))]
 			]]);
 	}
@@ -59,7 +59,8 @@ class CWidgetFieldGrouping extends CWidgetField {
 			$tag_name = $value['tag_name'] ?? null;
 
 			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
-				$errors[] = _s('Invalid parameter "%1$s": row #%2$s %3$s.', _('Group by'), $key + 1, _('not unique'));
+				$errors[] = _s('Invalid parameter "%1$s": row #%2$s %3$s.', _('Group by'), $key + 1,
+					_('is not unique'));
 			}
 			else {
 				$unique_groupings[$attribute] = $tag_name;
@@ -67,7 +68,7 @@ class CWidgetFieldGrouping extends CWidgetField {
 
 			if (in_array($attribute, $this->tag_fields) && $tag_name === '') {
 				$errors[] = _s('Invalid parameter "%1$s": row #%2$s %3$s.', _('Group by'), $key + 1,
-					_('tag name cannot be empty'));
+					_('tag cannot be empty'));
 			}
 		}
 

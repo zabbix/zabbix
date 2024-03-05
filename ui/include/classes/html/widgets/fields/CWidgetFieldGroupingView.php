@@ -43,7 +43,8 @@ class CWidgetFieldGroupingView extends CWidgetFieldView {
 
 		foreach ($list_items as $i => $list_item) {
 			$view->addItem(
-				$this->getRowTemplate($i, $list_item['attribute'], $list_item['tag_name'] ?: '')
+				$this->getRowTemplate($i, $list_item['attribute'],
+					array_key_exists('tag_name', $list_item) ? $list_item['tag_name'] : '')
 			);
 		}
 
@@ -61,6 +62,7 @@ class CWidgetFieldGroupingView extends CWidgetFieldView {
 				const tag_fields = $tag_fields_json;
 
 				tag_name_input.style.display = tag_fields.includes(Number(attribute.value)) ? '' : 'none';
+				tag_name_input.disabled = !tag_fields.includes(Number(attribute.value));
 			}
 
 			jQuery('#".$field_name."-table').dynamicRows({template:'#".$field_name."-row-tmpl', allow_empty: true});
@@ -90,7 +92,7 @@ class CWidgetFieldGroupingView extends CWidgetFieldView {
 	private function getRowTemplate($row_num = '#{rowNum}', $attribute = '#{attribute}', $tag = '#{tag_name}'): CRow {
 		return (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan(((int) $row_num + 1).':'))->addClass('rowNum'),
+			(new CSpan(((int) $row_num + 1).':')),
 			(new CDiv(
 				(new CSelect($this->field->getName().'['.$row_num.'][attribute]'))
 					->addOptions(CSelect::createOptionsFromArray($this->field->attributes))
