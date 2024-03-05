@@ -141,10 +141,10 @@ void	zbx_audit_host_hostgroup_delete(int audit_context_mode, zbx_uint64_t hostid
 		zbx_vector_uint64_t *hostgroupids, zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(int audit_context_mode, zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid, const char *host,
-		zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, int ipmi_authtype, int ipmi_privilege,
-		const char *ipmi_username, const char *ipmi_password, int status, int flags, int tls_connect,
-		int tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk_identity,
-		const char *tls_psk, int custom_interfaces, int inventory_mode);
+		unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, int ipmi_authtype,
+		int ipmi_privilege, const char *ipmi_username, const char *ipmi_password, int status, int flags,
+		int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
+		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode);
 void	zbx_audit_host_prototype_del(int audit_context_mode, zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_prototype_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid,
 		zbx_uint64_t templateid, const char *name, int status, int discover, int custom_interfaces,
