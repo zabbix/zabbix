@@ -368,14 +368,6 @@ static int	config_service_manager_sync_frequency = 60;
 static int	config_vps_limit		= 0;
 static int	config_vps_overcommit_limit	= 0;
 
-static const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
-{
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_IPMI
-};
-
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};

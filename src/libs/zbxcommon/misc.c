@@ -561,3 +561,39 @@ zbx_uint64_t	suffix2factor(char c)
 			return 1;
 	}
 }
+
+static const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
+{
+	INTERFACE_TYPE_AGENT,
+	INTERFACE_TYPE_SNMP,
+	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_IPMI
+};
+
+int	zbx_get_interface_type_priority(int n)
+{
+	return INTERFACE_TYPE_PRIORITY[n];
+}
+
+const char	*zbx_interface_type_string(zbx_interface_type_t type)
+{
+	switch (type)
+	{
+		case INTERFACE_TYPE_AGENT:
+			return "Zabbix agent";
+		case INTERFACE_TYPE_SNMP:
+			return "SNMP";
+		case INTERFACE_TYPE_IPMI:
+			return "IPMI";
+		case INTERFACE_TYPE_JMX:
+			return "JMX";
+		case INTERFACE_TYPE_OPT:
+			return "optional";
+		case INTERFACE_TYPE_ANY:
+			return "any";
+		case INTERFACE_TYPE_UNKNOWN:
+		default:
+			return "unknown";
+	}
+}
+

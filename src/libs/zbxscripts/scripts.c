@@ -545,7 +545,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	for (int i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
-				INTERFACE_TYPE_PRIORITY[i])))
+				zbx_get_interface_type_priority(i))))
 		{
 			break;
 		}

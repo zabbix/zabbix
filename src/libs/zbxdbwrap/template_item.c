@@ -265,10 +265,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			case INTERFACE_TYPE_ANY:
 				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 				{
-					if (0 != interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1])
+					if (0 != interfaceids[zbx_get_interface_type_priority(i) - 1])
 						break;
 				}
-				item->interfaceid = interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1];
+				item->interfaceid = interfaceids[zbx_get_interface_type_priority(i) - 1];
 				break;
 			default:
 				item->interfaceid = interfaceids[interface_type - 1];
