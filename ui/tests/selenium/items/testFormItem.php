@@ -690,7 +690,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
 
 		if (!isset($itemid)) {
-			$this->zbxTestAssertElementValue('history', '90d');
+			$this->zbxTestAssertElementValue('history', '31d');
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
