@@ -1427,7 +1427,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname,
 								get_config_forks, config_java_gateway,
-								config_java_gateway_port, config_externalscripts};
+								config_java_gateway_port, config_externalscripts,
+								.config_enable_global_scripts = 1};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,

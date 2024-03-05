@@ -887,9 +887,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					if (0 == config_enable_global_scripts &&
-							!(ZBX_SCRIPT_EXECUTE_ON_PROXY == script->execute_on &&
-							0 != host->proxyid))
+					if (0 == config_enable_global_scripts)
 					{
 						zbx_snprintf(error, max_error_len, "global scripts are disabled");
 						ret = FAIL;
