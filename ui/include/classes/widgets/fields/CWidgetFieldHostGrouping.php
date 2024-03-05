@@ -23,25 +23,21 @@ namespace Zabbix\Widgets\Fields;
 
 use Zabbix\Widgets\CWidgetField;
 
-class CWidgetFieldGrouping extends CWidgetField {
+use Widgets\HostNavigator\Includes\WidgetForm;
 
-	public const DEFAULT_VIEW = \CWidgetFieldGroupingView::class;
+class CWidgetFieldHostGrouping extends CWidgetField {
+
+	public const DEFAULT_VIEW = \CWidgetFieldHostGroupingView::class;
 	public const DEFAULT_VALUE = [];
-	public array $attributes;
-	public array $tag_fields;
 
-	public function __construct(string $name, string $label, array $attributes, ?array $tag_fields) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
-
-		$this->attributes = $attributes;
-		$this->tag_fields = $tag_fields;
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys($this->attributes))],
-				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()],
-				'tag_fields' => ['type' => API_INT32, 'in' => implode(',', array_keys($this->attributes))]
+				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_TAG_VALUE, WidgetForm::GROUP_BY_SEVERITY])],
+				'tag_name'	=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => $this->getMaxLength()],
 			]]);
 	}
 
@@ -56,19 +52,21 @@ class CWidgetFieldGrouping extends CWidgetField {
 
 		foreach ($this->getValue() as $key => $value) {
 			$attribute = $value['attribute'];
-			$tag_name = $value['tag_name'] ?? null;
+			$tag_name = $value['tag_name'];
 
 			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
-				$errors[] = _s('Invalid parameter "%1$s": row #%2$s %3$s.', _('Group by'), $key + 1,
-					_('is not unique'));
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
+					_s('row #%1$d is not unique', $key + 1)
+				);
 			}
 			else {
 				$unique_groupings[$attribute] = $tag_name;
 			}
 
-			if (in_array($attribute, $this->tag_fields) && $tag_name === '') {
-				$errors[] = _s('Invalid parameter "%1$s": row #%2$s %3$s.', _('Group by'), $key + 1,
-					_('tag cannot be empty'));
+			if ($attribute == WidgetForm::GROUP_BY_TAG_VALUE && $tag_name === '') {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
+					_s('row #%1$d tag cannot be empty', $key + 1)
+				);
 			}
 		}
 
@@ -87,7 +85,7 @@ class CWidgetFieldGrouping extends CWidgetField {
 				'value' => $value['attribute']
 			];
 
-			if (array_key_exists('tag_name', $value)) {
+			if ($value['attribute'] == WidgetForm::GROUP_BY_TAG_VALUE) {
 				$widget_fields[] = [
 					'type' => $this->save_type,
 					'name' => $this->name.'.'.$index.'.'.'tag_name',

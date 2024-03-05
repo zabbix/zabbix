@@ -30,7 +30,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldHostPatternSelect,
 	CWidgetFieldIntegerBox,
-	CWidgetFieldGrouping,
+	CWidgetFieldHostGrouping,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
@@ -99,11 +99,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
-				new CWidgetFieldGrouping('group_by', _('Group by'), [
-					self::GROUP_BY_HOST_GROUP => _('Host group'),
-					self::GROUP_BY_TAG_VALUE => _('Tag value'),
-					self::GROUP_BY_SEVERITY => _('Severity')
-				], [self::GROUP_BY_TAG_VALUE])
+				new CWidgetFieldHostGrouping('group_by', _('Group by'))
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Host limit'), 1, 9999))
