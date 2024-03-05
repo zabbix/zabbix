@@ -168,7 +168,8 @@ class testScriptManualInput extends CIntegrationTest {
 	public function serverConfigurationProvider(): array {
 		return [
 			self::COMPONENT_SERVER => [
-				'StartTrappers' => 1
+				'StartTrappers' => 1,
+				'EnableGlobalScripts' => 1
 			]
 		];
 	}
