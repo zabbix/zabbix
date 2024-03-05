@@ -66,7 +66,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	}
 
 	protected function validateMedias(): bool {
-		$media_fields = [
+		$validation_rules = [
 			'mediaid' =>		'id',
 			'mediatypeid' =>	'required|db media_type.mediatypeid',
 			'sendto' =>			'required',
@@ -76,7 +76,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		];
 
 		foreach ($this->getInput('medias', []) as $media) {
-			$validator = new CNewValidator($media, $media_fields);
+			$validator = new CNewValidator($media, $validation_rules);
 
 			if ($validator->isError()) {
 				return false;
@@ -89,8 +89,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			return true;
 		}
 
-		unset($media_fields['mediaid']);
-		$validator = new CNewValidator($new_media, $media_fields);
+		unset($validation_rules['mediaid']);
+		$validator = new CNewValidator($new_media, $validation_rules);
 
 		return !$validator->isError();
 	}

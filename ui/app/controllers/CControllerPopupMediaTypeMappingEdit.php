@@ -74,7 +74,8 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 			'attribute' => '',
 			'mediatypeid' => 0,
 			'period' => ZBX_DEFAULT_INTERVAL,
-			'severity' => $this->hasInput('add_media_type_mapping') ? pow(2, TRIGGER_SEVERITY_COUNT) - 1 : 0,
+			'severity' => $this->hasInput('add_media_type_mapping')
+				? DB::getDefault('userdirectory_media', 'severity') : 0,
 			'active' => MEDIA_STATUS_ACTIVE
 		];
 		$this->getInputs($data, array_keys($data));

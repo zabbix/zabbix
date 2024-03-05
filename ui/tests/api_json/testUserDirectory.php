@@ -731,8 +731,8 @@ class testUserDirectory extends CAPITest {
 	}
 
 	/**
-	 * Test userdirectory provision_media fields 'userdirectory_mediaid', when passed, allow to update media mapping
-	 * instead of delete + create operation.
+	 * Test userdirectory provision_media userdirectory_mediaid field changes.
+	 * For update operation value of userdirectory_mediaid should stay unchanged.
 	 */
 	public function testProvisionMediaUpdateFieldUserdirectoryMediaId() {
 		$userdirectory = [

@@ -698,7 +698,7 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Validate mediaid, userdirectory_mediaid, mediatypeid values.
+	 * Check provisioned user medias changes.
 	 *
 	 * @param array  $users[]
 	 * @param string $users[]['userdirectoryid']
