@@ -3404,7 +3404,7 @@ class CUser extends CApiService {
 		]);
 
 		if (!$userids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
 		$userid = $userids[0]['userid'];
@@ -3433,7 +3433,7 @@ class CUser extends CApiService {
 			if ($db_user_secrets && array_key_exists('totp_secret', $mfa_response)
 					&& $mfa_response['totp_secret'] != null
 					&& $db_user_secrets[0]['totp_secret'] !== $mfa_response['totp_secret']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 			}
 
 			$user_secret = $db_user_secrets ? $db_user_secrets[0]['totp_secret'] : $mfa_response['totp_secret'];
@@ -3473,11 +3473,11 @@ class CUser extends CApiService {
 
 		if ($mfa['type'] == MFA_TYPE_DUO) {
 			if (!array_key_exists('state', $mfa_response) || !array_key_exists('username', $mfa_response)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No saved state, please login again.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No saved state, please login again.'));
 			}
 
 			if ($mfa_response['duo_state'] != $mfa_response['state']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Duo state does not match saved state.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Duo state does not match saved state.'));
 			}
 
 			try {
