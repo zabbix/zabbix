@@ -31,13 +31,6 @@ const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
-#ifdef _WINDOWS
-
-char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-
-#endif
-
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
