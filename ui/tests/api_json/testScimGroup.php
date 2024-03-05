@@ -116,7 +116,7 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_active'],
-				'passwd' => base_convert((string) microtime(), 10, 32),
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
@@ -135,7 +135,7 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_inactive'],
-				'passwd' => base_convert((string) microtime(), 10, 32),
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
@@ -190,7 +190,7 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['ldap_user'],
-				'passwd' => base_convert((string) microtime(), 10, 32)
+				'passwd' => 'scimuserPassw0rd'
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);

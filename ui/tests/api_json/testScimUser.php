@@ -121,7 +121,7 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_active'],
-				'passwd' => base_convert((string) microtime(), 10, 32),
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
@@ -150,7 +150,7 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_inactive'],
-				'passwd' => base_convert((string) microtime(), 10, 32),
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
@@ -169,7 +169,7 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_only_username'],
-				'passwd' => base_convert((string) microtime(), 10, 32),
+				'passwd' => 'scimuserPassw0rd',
 				'usrgrps' => [['usrgrpid' => 9]],
 				'roleid' => 1
 			]
@@ -185,7 +185,7 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['saml_user_with_media'],
-				'passwd' => base_convert((string) microtime(), 10, 32),
+				'passwd' => 'scimuserPassw0rd',
 				'medias' => [
 					['mediatypeid' => self::$data['mediatypeid']['Email'], 'sendto' => ['example@example.com']],
 					['mediatypeid' => self::$data['mediatypeid']['SMS'], 'sendto' => '987654321'],
@@ -222,7 +222,7 @@ class testScimUser extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['username']['ldap_user'],
-				'passwd' => base_convert((string) microtime(), 10, 32)
+				'passwd' => 'scimuserPassw0rd'
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);
