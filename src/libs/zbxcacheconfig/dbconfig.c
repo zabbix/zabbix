@@ -14964,14 +14964,8 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextchec
 			dc_requeue_item_at(dc_item, dc_host, nextcheck);
 			proxyid = 0;
 		}
-		else if (HOST_MONITORED_BY_PROXY == dc_host->monitored_by)
-		{
+		else
 			proxyid = dc_host->proxyid;
-		}
-		else if (HOST_MONITORED_BY_PROXY_GROUP == dc_host->monitored_by)
-		{
-			proxyid = dc_get_proxyid_by_host(dc_host->host);
-		}
 
 		if (NULL != proxyids)
 			proxyids[i] = proxyid;

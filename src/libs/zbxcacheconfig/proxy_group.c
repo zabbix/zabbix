@@ -642,25 +642,6 @@ zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid)
  * Purpose: get proxy group by proxy id                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	dc_get_proxyid_by_host(const char *host)
-{
-	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
-	ZBX_DC_PROXY			*proxy;
-
-	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
-		return 0;
-
-	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hpi->host_proxy->proxyid)))
-		return 0;
-
-	return proxy->proxyid;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get proxy group by proxy id                                       *
- *                                                                            *
- ******************************************************************************/
 zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
 {
 	zbx_uint64_t	proxy_groupid = 0;

@@ -2716,8 +2716,8 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		DCinventory_value_add(inventory_values, item, h);
 
-		if ((0 != item->host.proxyid || 0 != item->host.proxy_groupid)
-				&& FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
+		if (HOST_MONITORED_BY_SERVER != item->host.monitored_by &&
+				FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
 		{
 			zbx_uint64_pair_t	p = {item->host.proxyid, h->ts.sec};
 
