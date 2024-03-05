@@ -123,13 +123,16 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
-void	zbx_audit_host_update_json_add_proxy_and_hostname_and_inventory_mode(int audit_context_mode,
-		zbx_uint64_t hostid, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, const char *hostname,
-		int inventory_mode)
+void	zbx_audit_host_update_json_add_monitoring_and_hostname_and_inventory_mode(int audit_context_mode,
+		zbx_uint64_t hostid, unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid,
+		const char *hostname, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 #define	AUDIT_TABLE_NAME	"hosts"
+
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.monitored_by",
+			(int)monitored_by, AUDIT_TABLE_NAME, "monitored_by");
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
 			proxyid, AUDIT_TABLE_NAME, "proxyid");
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_groupid",
@@ -313,6 +316,7 @@ PREPARE_AUDIT_HOST_UPDATE(host, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(name, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(proxyid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_HOST_UPDATE(proxy_groupid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE(monitored_by, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_authtype, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_privilege, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_username, const char*, string)
