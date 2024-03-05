@@ -59,6 +59,11 @@ static char	*config_user_parameter_dir = NULL;
 #if defined(_WINDOWS)
 static char	**config_perf_counters = NULL;
 static char	**config_perf_counters_en = NULL;
+
+#define	ZBX_SERVICE_NAME_LEN	64
+char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#undef	ZBX_SERVICE_NAME_LEN
 #endif
 
 static char	*config_user = NULL;
