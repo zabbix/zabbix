@@ -33,13 +33,14 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 		return (new CTable())
 			->setId($this->field->getName().'-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
+			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 			->addClass('list-numbered')
 			->setFooter(new CRow(
-				new CCol(
+				(new CCol(
 					(new CButtonLink(_('Add')))
 						->setId('add-row')
 						->addClass('element-table-add')
-				)
+				))->setColSpan(4)
 			));
 	}
 
@@ -61,7 +62,13 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 				.dynamicRows({
 					template: "#'.$field_name.'-row-tmpl",
 					allow_empty: true,
-					rows: '.json_encode($this->field->getValue()).'
+					rows: '.json_encode($this->field->getValue()).',
+					sortable: true,
+					sortable_options: {
+						target: "tbody",
+						selector_handle: ".'.ZBX_STYLE_DRAG_ICON.'",
+						freeze_end: 1
+					}
 				})
 				.on("afteradd.dynamicRows", e => {
 					updateRowFieldVisibility([...e.target.querySelectorAll(".form_row")].at(-1));
@@ -91,25 +98,22 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 				(new CRow([
 					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CSpan(':'))->addClass('list-numbered-item'),
-					(new CDiv(
-						(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
-							->addOptions(CSelect::createOptionsFromArray([
-								WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
-								WidgetForm::GROUP_BY_TAG_VALUE => _('Tag value'),
-								WidgetForm::GROUP_BY_SEVERITY => _('Severity')
-							]))
-							->setValue('#{attribute}')
-							->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
-							->setId($this->field->getName().'_#{rowNum}_attribute')
-							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					)),
-					(new CDiv(
+					(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
+							WidgetForm::GROUP_BY_TAG_VALUE => _('Tag value'),
+							WidgetForm::GROUP_BY_SEVERITY => _('Severity')
+						]))
+						->setValue('#{attribute}')
+						->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
+						->setId($this->field->getName().'_#{rowNum}_attribute')
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+					(new CCol(
 						(new CTextBox($this->field->getName().'[#{rowNum}][tag_name]', '#{tag_name}', false))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAriaRequired($this->isRequired())
 							->setId($this->field->getName().'_#{rowNum}_tag_name')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->setAttribute('placeholder', _('tag'))
-					)),
+					))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 					(new CDiv(
 						(new CButton($this->field->getName().'[#{rowNum}][remove]', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
