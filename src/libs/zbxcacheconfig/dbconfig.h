@@ -390,6 +390,7 @@ typedef struct
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	status;
+	unsigned char	monitored_by;
 
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;

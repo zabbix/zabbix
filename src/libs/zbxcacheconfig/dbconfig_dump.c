@@ -115,8 +115,8 @@ static void	DCdump_hosts(void)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u revision:" ZBX_FS_UI64,
 				host->hostid, host->host, host->name, host->status, host->revision);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  proxyid:" ZBX_FS_UI64 " proxy_groupid:" ZBX_FS_UI64,
-				host->proxyid, host->proxy_groupid);
+		zabbix_log(LOG_LEVEL_TRACE, "monitored_by:%u  proxyid:" ZBX_FS_UI64 " proxy_groupid:" ZBX_FS_UI64,
+				host->monitored_by, host->proxyid, host->proxy_groupid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  maintenanceid:" ZBX_FS_UI64 " maintenance_status:%u maintenance_type:%u"

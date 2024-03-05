@@ -518,9 +518,13 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 		unsigned int mode)
 {
 	dst_host->hostid = src_host->hostid;
-	dst_host->proxyid = src_host->proxyid;
-	dst_host->proxy_groupid = src_host->proxy_groupid;
+	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
+
+	if (HOST_MONITORED_BY_PROXY_GROUP == src_host->monitored_by)
+		dst_host->proxyid = dc_get_proxyid_by_host(src_host->host);
+	else
+		dst_host->proxyid = src_host->proxyid;
 
 	if (ZBX_ITEM_GET_HOST & mode)
 		zbx_strscpy(dst_host->host, src_host->host);

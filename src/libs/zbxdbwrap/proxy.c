@@ -607,7 +607,7 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
 static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT *result, zbx_timespec_t *ts,
 		int *h_num, char *error)
 {
-	if (0 == item->host.proxyid)
+	if (HOST_MONITORED_BY_SERVER == item->host.monitored_by)
 	{
 		preprocess_item_value_cb(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
 				item->state, error);
@@ -763,7 +763,7 @@ int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *
 			continue;
 		}
 
-		if (0 != items[i].host.proxyid && NULL != nodata_win &&
+		if (HOST_MONITORED_BY_SERVER != items[i].host.monitored_by && NULL != nodata_win &&
 				0 != (nodata_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) && 0 < history_num)
 		{
 			if (values[i].ts.sec <= nodata_win->period_end)
@@ -1353,7 +1353,7 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 	zbx_host_rights_t	*rights;
 	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-	if (0 != item->host.proxyid || 0 != item->host.proxy_groupid)
+	if (HOST_MONITORED_BY_SERVER != item->host.monitored_by)
 		return FAIL;
 
 	switch(item->type)

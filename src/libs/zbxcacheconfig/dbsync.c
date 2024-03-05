@@ -1017,12 +1017,12 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 			"select hostid,proxyid,host,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,"
 				"maintenance_status,maintenance_type,maintenance_from,status,name,tls_connect,"
 				"tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,maintenanceid,"
-				"proxy_groupid"
+				"proxy_groupid,monitored_by"
 			" from hosts"
 			" where status in (%d,%d) and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	dbsync_prepare(sync, 20, NULL);
+	dbsync_prepare(sync, 21, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
