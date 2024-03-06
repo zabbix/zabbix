@@ -1505,7 +1505,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Number of rows' => '5',
-						'Display min/max/avg' => true
+						'Display min/avg/max' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -1798,7 +1798,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Legend' => [
 						'Show legend' => true,
 						'Number of rows' => '5',
-						'Display min/max/avg' => true
+						'Display min/avg/max' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -2338,13 +2338,13 @@ class testDashboardGraphWidget extends testWidgets {
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
+		$fields = ['Number of rows', 'Display min/avg/max', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
 		$form->fill(['Show legend' => false]);
 		$this->assertEnabledFields($fields, false);
-		$form->fill(['Show legend' => true, 'Display min/max/avg' => true]);
+		$form->fill(['Show legend' => true, 'Display min/avg/max' => true]);
 		$this->assertEnabledFields('Number of columns', false);
 
 		foreach (['lines' => 2, 'columns' => 1] as $id => $maxlength) {
