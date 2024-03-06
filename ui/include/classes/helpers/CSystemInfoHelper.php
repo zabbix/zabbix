@@ -53,6 +53,8 @@ class CSystemInfoHelper {
 			}
 		}
 
+		$data['global_scripts'] = CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts'];
+
 		$housekeeper_warnings = CHousekeepingHelper::getWarnings($dbversion_status);
 
 		if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $housekeeper_warnings)

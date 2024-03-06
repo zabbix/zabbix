@@ -153,4 +153,23 @@ class CSettingsHelper extends CConfigGeneralHelper {
 
 		return $dbversion_status;
 	}
+
+	public static function getServerStatus(): array {
+		$server_status = json_decode((string) self::getGlobal(self::SERVER_STATUS), true);
+
+		if (!is_array($server_status)) {
+			$server_status = [];
+		}
+
+		$has_global_scripts_entry = array_key_exists('configuration', $server_status)
+			&& array_key_exists('enable_global_scipts', $server_status['configuration']);
+
+		return $has_global_scripts_entry
+			? $server_status
+			: $server_status + [
+				'configuration' => [
+					'enable_global_scipts' => true
+				]
+			];
+	}
 }
