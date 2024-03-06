@@ -446,7 +446,7 @@ class CApiTagHelperTest extends TestCase {
 							' e.eventid=event_tag.eventid'.
 							' AND event_tag.tag=\'tag1\''.
 							' AND (event_tag.value=\'val\''.
-								' OR UPPER(event_tag.value) '.
+								' OR UPPER(event_tag.value)'.
 								' LIKE \'%VALUE%\' ESCAPE \'!\''.
 							')'.
 					')'.
