@@ -652,7 +652,8 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
  *              history - [IN] history data vector (may have mixed value types)     *
  *                                                                                  *
  ************************************************************************************/
-static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
+static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history,
+		int config_history_storage_pipelines)
 {
 	int	i, h_num = 0;
 
