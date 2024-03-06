@@ -387,7 +387,7 @@ class CMfa extends CApiService {
 			$sensitive_changes = array_intersect_key($upd_mfa['values'], $sensitive_fields);
 
 			if (!$sensitive_changes || (array_key_exists('type', $sensitive_changes)
-					&& $upd_mfas['values']['type'] == MFA_TYPE_TOTP)) {
+					&& $upd_mfa['values']['type'] == MFA_TYPE_TOTP)) {
 				continue;
 			}
 
