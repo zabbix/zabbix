@@ -60,6 +60,27 @@
 	}
 })();
 
+// Headers.
+jQuery('#headers-table')
+	.dynamicRows({
+		template: '#item-header-row-tmpl',
+		rows: <?= json_encode($data['headers']) ?>,
+		allow_empty: true,
+		sortable: true,
+		sortable_options: {
+			target: 'tbody',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 1
+		}
+	})
+	.on('tableupdate.dynamicRows', (e) => {
+		e.target.querySelectorAll('.form_row').forEach((row, index) => {
+			for (const field of row.querySelectorAll('[name^="headers["]')) {
+				field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+			}
+		});
+	});
+
 // Timeout.
 (() => {
 	const custom_timeout = document.getElementById('custom_timeout');
@@ -172,7 +193,7 @@ document.querySelectorAll('[name="preprocessing_action"]').forEach((button) => b
 document.querySelector('#visible_preprocessing').addEventListener('change', () => {
 	const preprocessing = document.querySelector('#preprocessing');
 
-	if (preprocessing?.querySelectorAll('li.sortable').length == 0) {
+	if (preprocessing?.querySelectorAll('.preprocessing-list-item').length == 0) {
 		preprocessing.querySelector('.element-table-add')?.click();
 	}
 });
