@@ -92,7 +92,13 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 					beforeRow: ".overrides-foot",
 					remove: ".js-remove",
 					add: "#override-add",
-					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"
+					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",
+					sortable: true,
+					sortable_options: {
+						target: ".'.ZBX_STYLE_OVERRIDES_LIST.'",
+						selector_handle: ".'.ZBX_STYLE_DRAG_ICON.'",
+						freeze_end: 1
+					}
 				})
 				.bind("afteradd.dynamicRows", function(event, options) {
 					const container = jQuery(".overlay-dialogue-body");
@@ -112,15 +118,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 				})
 				.bind("tableupdate.dynamicRows", function(event, options) {
 					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					widget_svggraph_form.onGraphConfigChange();
+
 					initializeOverrides();
-					if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {
-						jQuery("#overrides .drag-icon").removeClass("disabled");
-						jQuery("#overrides").sortable("enable");
-					}
-					else {
-						jQuery("#overrides .drag-icon").addClass("disabled");
-						jQuery("#overrides").sortable("disable");
-					}
 				});
 
 			// Initialize overrides UI control.
@@ -128,32 +128,6 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 
 			// Initialize override pattern-selectors.
 			jQuery("#overrides .multiselect").multiSelect();
-
-			// Make overrides sortable.
-			if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {
-				jQuery("#overrides .drag-icon").addClass("disabled");
-			}
-
-			jQuery("#overrides").sortable({
-				items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",
-				containment: "parent",
-				handle: ".drag-icon",
-				tolerance: "pointer",
-				scroll: false,
-				cursor: "grabbing",
-				opacity: 0.6,
-				axis: "y",
-				disabled: function() {
-					return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;
-				}(),
-				start: function() { // Workaround to fix wrong scrolling at initial sort.
-					jQuery(this).sortable("refreshPositions");
-				},
-				stop: () => widget_svggraph_form.onGraphConfigChange(),
-				update: function() {
-					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
-				}
-			});
 		';
 	}
 

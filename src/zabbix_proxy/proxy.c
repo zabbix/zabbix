@@ -34,14 +34,15 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-
+#include "zbxpoller.h"
 #include "zbxvmware.h"
 #include "zbxdbsyncer.h"
+
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
-#include "../zabbix_server/poller/poller.h"
+#include "poller/poller_proxy.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "../zabbix_server/trapper/trapper_request.h"
 #include "proxyconfig/proxyconfig.h"
@@ -272,31 +273,25 @@ static int	config_max_concurrent_checks_per_poller	= 1000;
 
 static int	config_log_level		= LOG_LEVEL_WARNING;
 
-char	*config_externalscripts	= NULL;
-int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
+static char	*config_externalscripts		= NULL;
+static int	config_allow_unsupported_db_versions = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-static char	*config_server		= NULL;
+static char	*config_server			= NULL;
 static int	config_server_port;
-static char	*config_hostname	= NULL;
-static char	*config_hostname_item	= NULL;
-
-char	*zbx_config_snmptrap_file	= NULL;
-
-char	*config_java_gateway		= NULL;
-int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
-
-char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
-static int	config_log_slow_queries	= 0;	/* ms; 0 - disable */
-
-static char	*config_load_module_path= NULL;
-static char	**config_load_module	= NULL;
-
-static char	*config_user		= NULL;
+static char	*config_hostname		= NULL;
+static char	*config_hostname_item		= NULL;
+static char	*zbx_config_snmptrap_file	= NULL;
+static char	*config_java_gateway		= NULL;
+static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
+static char	*config_ssh_key_location	 = NULL;
+static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
+static char	*config_load_module_path	= NULL;
+static char	**config_load_module		= NULL;
+static char	*config_user			= NULL;
 
 /* web monitoring */
 static char	*config_ssl_ca_location = NULL;
@@ -949,7 +944,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPort",			&(zbx_config_dbhigh->config_dbport),	TYPE_INT,
 			PARM_OPT,	1024,			65535},
-		{"AllowUnsupportedDBVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
+		{"AllowUnsupportedDBVersions",	&config_allow_unsupported_db_versions,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"DBTLSConnect",		&(zbx_config_dbhigh->config_db_tls_connect),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -963,7 +958,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBTLSCipher13",		&(zbx_config_dbhigh->config_db_tls_cipher_13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
+		{"SSHKeyLocation",		&config_ssh_key_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogSlowQueries",		&config_log_slow_queries,		TYPE_INT,
 			PARM_OPT,	0,			3600000},
@@ -1178,11 +1173,23 @@ int	main(int argc, char **argv)
 
 	argv = zbx_setproctitle_init(argc, argv);
 	zbx_progname = get_program_name(argv[0]);
-
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
-	zbx_init_library_nix(get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
+
+	/* initialize libraries before using */
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
+	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
+	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_ipcservice(zbx_program_type);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
+			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
+	zbx_init_library_stats(get_zbx_program_type);
+	zbx_init_library_dbhigh(zbx_config_dbhigh);
+	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_progname);
+	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -1278,18 +1285,6 @@ int	main(int argc, char **argv)
 		exit(EXIT_SUCCESS);
 	}
 
-	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
-	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
-	zbx_init_library_icmpping(&config_icmpping);
-	zbx_init_library_ipcservice(zbx_program_type);
-	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
-			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
-	zbx_init_library_stats(get_zbx_program_type);
-	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_progname);
-	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
-
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
 		int	ret;
@@ -1319,7 +1314,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 
-	if (FAIL == zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, zbx_program_type))
+	if (FAIL == zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type))
 	{
 		zbx_free(db_version_info.friendly_current_version);
 		exit(EXIT_FAILURE);
@@ -1332,9 +1327,6 @@ static void	proxy_db_init(void)
 {
 	char		*error = NULL;
 	int		db_type, version_check;
-#ifdef HAVE_SQLITE3
-	zbx_stat_t	db_stat;
-#endif
 
 	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
 	{
@@ -1412,7 +1404,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_unreachable_delay,
 								config_max_concurrent_checks_per_poller,
 								get_config_forks, config_java_gateway,
-								config_java_gateway_port, config_externalscripts};
+								config_java_gateway_port, config_externalscripts,
+								zbx_get_value_internal_ext_proxy,
+								config_ssh_key_location};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1427,7 +1421,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname,
 								get_config_forks, config_java_gateway,
-								config_java_gateway_port, config_externalscripts};
+								config_java_gateway_port, config_externalscripts,
+								config_ssh_key_location};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1439,7 +1434,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, config_proxydata_frequency,
 								get_config_forks, config_stats_allowed_ip,
 								config_java_gateway, config_java_gateway_port,
-								config_externalscripts};
+								config_externalscripts,
+								zbx_get_value_internal_ext_proxy,
+								config_ssh_key_location};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};

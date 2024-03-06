@@ -129,7 +129,7 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_END_OF_VECTOR != error)
 		fail_msg("Cannot read \"hosts\" for input: %s", zbx_mock_error_string(error));
 
-	lld_hgsets_make(&hosts, &hgsets, &del_hgsetids_act);
+	lld_hgsets_make(0, &hosts, &hgsets, &del_hgsetids_act);
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("hgsets", &vector)))
 		fail_msg("Cannot get description of out.hgsets from test case data: %s", zbx_mock_error_string(error));
@@ -178,6 +178,8 @@ void	zbx_mock_test_entry(void **state)
 
 	while (ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(vector, &element)))
 	{
+		zbx_mock_handle_t	h;
+
 		if (param_num == hosts.values_num)
 			fail_msg("Not enough \"hosts\" entries, param_num: %d", param_num);
 
@@ -187,27 +189,43 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_uint64_eq("host hostid", zbx_mock_get_object_member_uint64(element, "hostid"),
 				host->hostid);
 
+		/* hgset_action */
+		if (ZBX_LLD_HOST_HGSET_ACTION_UPDATE == host->hgset_action)
+		{
+			zbx_mock_assert_str_eq("host hgset action",
+					zbx_mock_get_object_member_string(element, "host_hgset_action"), "update");
+		}
+		else if (ZBX_LLD_HOST_HGSET_ACTION_ADD == host->hgset_action)
+		{
+			zbx_mock_assert_str_eq("host hgset action",
+					zbx_mock_get_object_member_string(element, "host_hgset_action"), "add");
+		}
+		else
+		{
+			zbx_mock_assert_str_eq("host hgset action",
+					zbx_mock_get_object_member_string(element, "host_hgset_action"), "idle");
+		}
+
+		if (NULL == host->hgset)
+		{
+			if (ZBX_MOCK_SUCCESS != (zbx_mock_object_member(element, "hash_str", &h)))
+			{
+				param_num++;
+				continue;
+			}
+
+			fail_msg("Missing host hgset, param_num: %d", param_num);
+		}
+
 		/* hgsetid */
 		zbx_mock_assert_uint64_eq("host hgsetid", zbx_mock_get_object_member_uint64(element, "hgsetid"),
 				host->hgset->hgsetid);
 
-		/* hash_str (checked only if hgsetid==0) */
+		/* hash_str */
 		if (0 == host->hgset->hgsetid)
 		{
 			zbx_mock_assert_str_eq("host hash_str",
 					zbx_mock_get_object_member_string(element, "hash_str"), host->hgset->hash_str);
-		}
-
-		/* flag */
-		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HGSETID))
-		{
-			zbx_mock_assert_str_ne("host flags",
-					zbx_mock_get_object_member_string(element, "update_hgsetid"), "yes");
-		}
-		else
-		{
-			zbx_mock_assert_str_eq("host flags",
-					zbx_mock_get_object_member_string(element, "update_hgsetid"), "yes");
 		}
 
 		param_num++;

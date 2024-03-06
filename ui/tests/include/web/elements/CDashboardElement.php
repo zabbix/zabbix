@@ -304,7 +304,7 @@ class CDashboardElement extends CElement {
 	 * @param integer	$index		expected number of pages with the provided name
 	 */
 	public function selectPage($name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
+		$selection = '//div[@class="dashboard-navigation-tabs"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
 		$tab = $this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one();
 		$parent = $tab->parents()->one();
 

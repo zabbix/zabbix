@@ -20,14 +20,20 @@
 #include "trapper.h"
 #include "zbxdbwrap.h"
 
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"
-#include "proxydata.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
-#include "../poller/checks_snmp.h"
+#include "zbxpoller.h"
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
@@ -60,8 +66,6 @@ zbx_get_program_type_f	trapper_get_program_type(void)
 	return zbx_get_program_type_cb;
 }
 
-extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
-
 typedef struct
 {
 	zbx_counter_value_t	online;
@@ -71,8 +75,8 @@ zbx_user_stats_t;
 
 typedef union
 {
-	zbx_counter_value_t	counter;	/* single global counter */
-	zbx_vector_ptr_t	counters;	/* array of per proxy counters */
+	zbx_counter_value_t	counter;		/* single global counter */
+	zbx_vector_proxy_counter_ptr_t	counters;	/* array of per proxy counters */
 }
 zbx_entry_info_t;
 
@@ -118,7 +122,7 @@ zbx_status_section_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes the received values from active agents                  *
+ * Purpose: processes received values from active agents                      *
  *                                                                            *
  ******************************************************************************/
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
@@ -159,7 +163,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes the received values from senders                        *
+ * Purpose: processes received values from senders                            *
  *                                                                            *
  ******************************************************************************/
 static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
@@ -190,7 +194,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process heartbeat sent by proxy servers                           *
+ * Purpose: processes heartbeat sent by proxy servers                         *
  *                                                                            *
  ******************************************************************************/
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
@@ -242,10 +246,10 @@ zbx_queue_stats_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update queue stats with a new item delay                          *
+ * Purpose: updates queue stats with new item delay                           *
  *                                                                            *
- * Parameters: stats   - [IN] the queue stats                                 *
- *             delay   - [IN] the delay time of an delayed item               *
+ * Parameters: stats - [IN] queue stats                                       *
+ *             delay - [IN] delay time of delayed item                        *
  *                                                                            *
  ******************************************************************************/
 static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
@@ -266,11 +270,11 @@ static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: export queue stats to JSON format                                 *
+ * Purpose: exports queue stats to JSON format                                *
  *                                                                            *
- * Parameters: queue_stats - [IN] a hashset containing item stats             *
- *             id_name     - [IN] the name of stats id field                  *
- *             json        - [OUT] the output JSON                            *
+ * Parameters: queue_stats - [IN] hashset containing item stats               *
+ *             id_name     - [IN] name of stats id field                      *
+ *             json        - [OUT] output JSON                                *
  *                                                                            *
  ******************************************************************************/
 static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, struct zbx_json *json)
@@ -308,25 +312,25 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process queue request                                             *
+ * Purpose: processes queue request                                           *
  *                                                                            *
- * Parameters:  sock              - [IN] the request socket                   *
- *              jp                - [IN] the request data                     *
- *              config_timeout    - [IN]                                      *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              jp             - [IN] request data                            *
+ *              config_timeout - [IN]                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
 {
-	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
-	char			type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
-	zbx_user_t		user;
-	zbx_vector_ptr_t	queue;
-	struct zbx_json		json;
-	zbx_hashset_t		queue_stats;
-	zbx_queue_stats_t	*stats;
+	int				ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, limit;
+	char				type[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
+	zbx_user_t			user;
+	zbx_vector_queue_item_ptr_t	queue;
+	struct zbx_json			json;
+	zbx_hashset_t			queue_stats;
+	zbx_queue_stats_t		*stats;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -368,7 +372,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 	}
 
 	now = (int)time(NULL);
-	zbx_vector_ptr_create(&queue);
+	zbx_vector_queue_item_ptr_create(&queue);
 	zbx_dc_get_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -380,7 +384,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			/* gather queue stats by item type */
-			for (i = 0; i < queue.values_num; i++)
+			for (int i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = (zbx_uint64_t)item->type;
@@ -406,7 +410,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			/* gather queue stats by proxy hostid */
-			for (i = 0; i < queue.values_num; i++)
+			for (int i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = item->proxyid;
@@ -428,14 +432,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-			for (i = 0; i < queue.values_num && i < limit; i++)
+			for (int i = 0; i < queue.values_num && i < limit; i++)
 			{
-				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
+				zbx_queue_item_t	*item = queue.values[i];
 
 				zbx_json_addobject(&json, NULL);
 				zbx_json_adduint64(&json, "itemid", item->itemid);
@@ -454,7 +458,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_dc_free_item_queue(&queue);
-	zbx_vector_ptr_destroy(&queue);
+	zbx_vector_queue_item_ptr_destroy(&queue);
 
 	zbx_json_free(&json);
 
@@ -502,8 +506,8 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 	zbx_db_free_result(result);
 	now = (int)time(NULL);
 
-	if (NULL == (result = zbx_db_select("select max(lastaccess) from sessions where status=%d group by userid,status",
-			ZBX_SESSION_ACTIVE)))
+	if (NULL == (result = zbx_db_select("select max(lastaccess) from sessions where status=%d group by userid"
+			",status", ZBX_SESSION_ACTIVE)))
 	{
 		goto out;
 	}
@@ -540,29 +544,29 @@ static int		templates_res, users_res;
 
 static void	zbx_status_counters_init(void)
 {
-	zbx_vector_ptr_create(&hosts_monitored.counters);
-	zbx_vector_ptr_create(&hosts_not_monitored.counters);
-	zbx_vector_ptr_create(&items_active_normal.counters);
-	zbx_vector_ptr_create(&items_active_notsupported.counters);
-	zbx_vector_ptr_create(&items_disabled.counters);
-	zbx_vector_ptr_create(&required_performance.counters);
+	zbx_vector_proxy_counter_ptr_create(&hosts_monitored.counters);
+	zbx_vector_proxy_counter_ptr_create(&hosts_not_monitored.counters);
+	zbx_vector_proxy_counter_ptr_create(&items_active_normal.counters);
+	zbx_vector_proxy_counter_ptr_create(&items_active_notsupported.counters);
+	zbx_vector_proxy_counter_ptr_create(&items_disabled.counters);
+	zbx_vector_proxy_counter_ptr_create(&required_performance.counters);
 }
 
 static void	zbx_status_counters_free(void)
 {
-	zbx_vector_ptr_clear_ext(&hosts_monitored.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&hosts_not_monitored.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_normal.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_active_notsupported.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&items_disabled.counters, zbx_default_mem_free_func);
-	zbx_vector_ptr_clear_ext(&required_performance.counters, zbx_default_mem_free_func);
+	zbx_vector_proxy_counter_ptr_clear_ext(&hosts_monitored.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&hosts_not_monitored.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&items_active_normal.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&items_active_notsupported.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&items_disabled.counters, zbx_proxy_counter_ptr_free);
+	zbx_vector_proxy_counter_ptr_clear_ext(&required_performance.counters, zbx_proxy_counter_ptr_free);
 
-	zbx_vector_ptr_destroy(&hosts_monitored.counters);
-	zbx_vector_ptr_destroy(&hosts_not_monitored.counters);
-	zbx_vector_ptr_destroy(&items_active_normal.counters);
-	zbx_vector_ptr_destroy(&items_active_notsupported.counters);
-	zbx_vector_ptr_destroy(&items_disabled.counters);
-	zbx_vector_ptr_destroy(&required_performance.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&hosts_monitored.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&hosts_not_monitored.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&items_active_normal.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&items_active_notsupported.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&items_disabled.counters);
+	zbx_vector_proxy_counter_ptr_destroy(&required_performance.counters);
 }
 
 const zbx_status_section_t	status_sections[] = {
@@ -800,14 +804,14 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process status request                                            *
+ * Purpose: processes status request                                          *
  *                                                                            *
- * Parameters:  sock              - [IN] the request socket                   *
- *              jp                - [IN] the request data                     *
- *              config_timeout    - [IN]                                      *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              jp             - [IN] request data                            *
+ *              config_timeout - [IN]                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
@@ -1112,7 +1116,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
-		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	int	ret = SUCCEED;
 
@@ -1167,7 +1172,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						get_config_forks, zbx_get_program_type_cb());
+						config_ssh_key_location, get_config_forks, zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1201,7 +1206,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			{
 				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
 						zbx_get_program_type_cb(), progname, get_config_forks,
-						config_java_gateway, config_java_gateway_port, config_externalscripts);
+						config_java_gateway, config_java_gateway_port, config_externalscripts,
+						zbx_get_value_internal_ext_cb, config_ssh_key_location);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1302,7 +1308,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
-		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	ssize_t	bytes_received;
 
@@ -1311,7 +1318,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
-			config_java_gateway, config_java_gateway_port, config_externalscripts);
+			config_java_gateway, config_java_gateway_port, config_externalscripts,
+			zbx_get_value_internal_ext_cb, config_ssh_key_location);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1321,10 +1329,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					(((zbx_thread_args_t *)args)->args);
 	double			sec = 0.0;
 	zbx_socket_t		s;
-	int			ret;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int			ret, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 #ifdef HAVE_NETSNMP
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
@@ -1341,8 +1348,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb);
-	find_psk_in_cache = zbx_dc_get_psk_by_identity;
+	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb,
+			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -1412,7 +1419,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					trapper_args_in->config_stats_allowed_ip, trapper_args_in->progname,
 					trapper_args_in->config_java_gateway,
 					trapper_args_in->config_java_gateway_port,
-					trapper_args_in->config_externalscripts);
+					trapper_args_in->config_externalscripts,
+					trapper_args_in->zbx_get_value_internal_ext_cb,
+					trapper_args_in->config_ssh_key_location);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

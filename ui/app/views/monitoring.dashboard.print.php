@@ -36,7 +36,7 @@ if (array_key_exists('error', $data)) {
 	return;
 }
 
-$this->addJsFile('d3.v7.min.js');
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -55,11 +55,10 @@ $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.print.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $page_count = count($data['dashboard']['pages']);
 $page_styles = '';

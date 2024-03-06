@@ -20,14 +20,8 @@
 
 
 class CControllerPopupMedia extends CController {
-	private $severities = [];
-
 	protected function init() {
 		$this->disableCsrfValidation();
-
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$this->severities[$severity] = CSeverityHelper::getName($severity);
-		}
 	}
 
 	protected function checkInput() {
@@ -146,19 +140,25 @@ class CControllerPopupMedia extends CController {
 			);
 		}
 		else {
+			$severities = [];
+
+			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+				$severities[$severity] = CSeverityHelper::getName($severity);
+			}
+
 			// Prepare data for view.
 			if ($page_options['media'] != -1) {
 				$severity_request = $this->getInput('severity', 63);
 
 				$page_options['severities'] = [];
-				foreach ($this->severities as $severity => $foo) {
+				foreach ($severities as $severity => $foo) {
 					if ($severity_request & (1 << $severity)) {
 						$page_options['severities'][$severity] = $severity;
 					}
 				}
 			}
 			else {
-				$page_options['severities'] = $this->getInput('severity', array_keys($this->severities));
+				$page_options['severities'] = $this->getInput('severity', array_keys($severities));
 			}
 
 			$db_mediatypes = API::MediaType()->get([
@@ -177,7 +177,7 @@ class CControllerPopupMedia extends CController {
 				'options' => $page_options,
 				'db_mediatypes' => $db_mediatypes,
 				'mediatypes' => $mediatypes,
-				'severities' => $this->severities,
+				'severities' => $severities,
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

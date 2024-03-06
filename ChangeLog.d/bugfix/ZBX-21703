@@ -1,0 +1,1 @@
+...G...... [ZBX-21703] fixed possible mutual lock between exporter and collector in performance counters for Zabbix Agent 2 (akozlovs, MVekslers)

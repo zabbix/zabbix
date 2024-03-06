@@ -26,6 +26,8 @@
 #include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
+#include "zbxcrypto.h"
+#include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
@@ -181,12 +183,6 @@ static	zbx_rm_writer_t	*rm_get_writer(zbx_rm_t *manager, const zbx_ipc_client_t 
 	return NULL;
 }
 
-static void	rm_writer_free(zbx_rm_writer_t *writer)
-{
-	zbx_ipc_client_close(writer->client);
-	zbx_free(writer);
-}
-
 static int	rm_report_compare_nextcheck(const void *d1, const void *d2)
 {
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
@@ -298,40 +294,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: destroys report manager                                           *
- *                                                                            *
- * Parameters: manager - [IN] manager to destroy                              *
- *                                                                            *
- ******************************************************************************/
-static void	rm_destroy(zbx_rm_t *manager)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_rm_report_t		*report;
-	zbx_rm_job_t		*job;
-	zbx_rm_batch_t		*batch;
-
-	while (SUCCEED == zbx_list_pop(&manager->job_queue, (void **)&job))
-		rm_job_free(job);
-
-	zbx_hashset_iter_reset(&manager->reports, &iter);
-	while (NULL != (report = (zbx_rm_report_t *)zbx_hashset_iter_next(&iter)))
-		rm_report_clean(report);
-	zbx_hashset_destroy(&manager->reports);
-
-	zbx_hashset_iter_reset(&manager->batches, &iter);
-	while (NULL != (batch = (zbx_rm_batch_t *)zbx_hashset_iter_next(&iter)))
-		rm_batch_clean(batch);
-	zbx_hashset_destroy(&manager->batches);
-
-	zbx_vector_uint64_destroy(&manager->flush_queue);
-
-	zbx_queue_ptr_destroy(&manager->free_writers);
-	zbx_vector_ptr_clear_ext(&manager->writers, (zbx_mem_free_func_t)rm_writer_free);
-	zbx_vector_ptr_destroy(&manager->writers);
 }
 
 /******************************************************************************
@@ -2303,7 +2265,4 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&manager.ipc);
-	rm_destroy(&manager);
 }
