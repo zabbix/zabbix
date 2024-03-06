@@ -462,7 +462,7 @@ class CSortable {
 			};
 
 			if (loc.dim === 0) {
-				return;
+				continue;
 			}
 
 			if (pos === 0 && pos_to === 0) {
