@@ -1204,21 +1204,25 @@ zbx_uint32_t	zbx_elastic_version_get(void)
 	return ZBX_ELASTIC_SVERSION;
 }
 #else
-int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
+		const char *config_history_storage_url, char **error)
 {
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
+	ZBX_UNUSED(config_history_storage_url);
 
 	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
 
 	return FAIL;
 }
 
-void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions)
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
+		const char *config_history_storage_url)
 {
 	ZBX_UNUSED(json);
 	ZBX_UNUSED(result);
 	ZBX_UNUSED(config_allow_unsupported_db_versions);
+	ZBX_UNUSED(config_history_storage_url);
 }
 
 zbx_uint32_t	zbx_elastic_version_get(void)
