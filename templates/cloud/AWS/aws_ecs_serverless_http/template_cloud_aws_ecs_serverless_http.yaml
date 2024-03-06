@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-21T07:10:44Z'
+  date: '2024-03-06T08:27:45Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -177,6 +177,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -201,13 +202,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -427,6 +428,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
@@ -437,13 +439,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -693,6 +695,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
@@ -703,13 +706,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1447,6 +1450,7 @@ zabbix_export:
                 var AWS = {
                 	params: {},
                 	request_period: 600,
+                	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
                 
                 	setParams: function (params) {
                 		AWS.params['proxy'] = params.proxy;
@@ -1457,13 +1461,13 @@ zabbix_export:
                 				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 					request.setProxy(AWS.params.proxy);
                 				}
-                				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                				var IamRoleName = request.get(AWS.metadata);
                 
                 				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                 					throw 'Error getting security credentials from instance metadata. Role not found.';
                 				}
                 
-                				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+                				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
                 
                 				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
                 					throw 'Error getting security credentials from instance metadata.';
