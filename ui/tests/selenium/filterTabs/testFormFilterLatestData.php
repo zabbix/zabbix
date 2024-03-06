@@ -141,7 +141,7 @@ class testFormFilterLatestData extends testFormFilter {
 				[
 					'expected' => TEST_GOOD,
 					'filter_form' => [
-						'Host groups' => ['ZBX6648 All Triggers']
+						'Host groups' => ['Group to check triggers filtering']
 					],
 					'filter' => [
 						'Show number of records' => true

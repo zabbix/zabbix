@@ -25,74 +25,73 @@
 
 include __DIR__.'/common.item.edit.js.php';
 include __DIR__.'/item.preprocessing.js.php';
-include __DIR__.'/editabletable.js.php';
 include __DIR__.'/itemtest.js.php';
 include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<?=
-		(new CRow([[
-				new CSpan('#{formulaId}'),
-				new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
-			],
-			(new CTextBox('conditions[#{rowNum}][macro]', '', false, 64))
-				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->addClass(ZBX_STYLE_UPPERCASE)
-				->addClass('macro')
-				->setAttribute('placeholder', '{#MACRO}')
-				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CSelect('conditions[#{rowNum}][operator]'))
-				->setValue(CONDITION_OPERATOR_REGEXP)
-				->addClass('js-operator')
-				->addOptions(CSelect::createOptionsFromArray([
-					CONDITION_OPERATOR_REGEXP => _('matches'),
-					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
-					CONDITION_OPERATOR_EXISTS => _('exists'),
-					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
-				])),
-			(new CDiv(
-				(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
-					->addClass('js-value')
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setAttribute('placeholder', _('regular expression'))
-			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
-			(new CCol(
-				(new CButton('conditions_#{rowNum}_remove', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
+	(new CRow([[
+		new CSpan('#{formulaId}'),
+		new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
+	],
+		(new CTextBox('conditions[#{rowNum}][macro]', '', false, 64))
+			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+			->addClass(ZBX_STYLE_UPPERCASE)
+			->addClass('macro')
+			->setAttribute('placeholder', '{#MACRO}')
+			->setAttribute('data-formulaid', '#{formulaId}'),
+		(new CSelect('conditions[#{rowNum}][operator]'))
+			->setValue(CONDITION_OPERATOR_REGEXP)
+			->addClass('js-operator')
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_OPERATOR_REGEXP => _('matches'),
+				CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+				CONDITION_OPERATOR_EXISTS => _('exists'),
+				CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+			])),
+		(new CDiv(
+			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
+				->addClass('js-value')
+				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setAttribute('placeholder', _('regular expression'))
+		))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol(
+			(new CButton('conditions_#{rowNum}_remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('form_row')
+		->toString()
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="lld_macro_path-row">
 	<?= (new CRow([
-			(new CCol(
-				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '', [
-					'add_post_js' => false,
-					'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
-				]))
-					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->addClass(ZBX_STYLE_UPPERCASE)
-					->setAttribute('placeholder', '{#MACRO}')
-					->disableSpellcheck()
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol(
-				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
-					'add_post_js' => false,
-					'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
-				]))
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setAttribute('placeholder', _('$.path.to.node'))
-					->disableSpellcheck()
-			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))
-			->addClass('form_row')
-			->toString()
+		(new CCol(
+			(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '', [
+				'add_post_js' => false,
+				'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
+			]))
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->addClass(ZBX_STYLE_UPPERCASE)
+				->setAttribute('placeholder', '{#MACRO}')
+				->disableSpellcheck()
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol(
+			(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
+				'add_post_js' => false,
+				'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
+			]))
+				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setAttribute('placeholder', _('$.path.to.node'))
+				->disableSpellcheck()
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))
+		->addClass('form_row')
+		->toString()
 	?>
 </script>
 
@@ -101,7 +100,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
@@ -183,6 +182,44 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				button.addEventListener('click', e => this.executeNow(e.target));
 			}
 
+			const updateSortOrder = (table, field_name) => {
+				table.querySelectorAll('.form_row').forEach((row, index) => {
+					for (const field of row.querySelectorAll(`[name^="${field_name}["]`)) {
+						field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+					}
+				});
+			};
+
+			jQuery('#query-fields-table')
+				.dynamicRows({
+					template: '#query-field-row-tmpl',
+					rows: query_fields,
+					allow_empty: true,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1,
+						enable_sorting: !readonly
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'query_fields'));
+
+			jQuery('#headers-table')
+				.dynamicRows({
+					template: '#item-header-row-tmpl',
+					rows: headers,
+					allow_empty: true,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1,
+						enable_sorting: !readonly
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
+
 			document.querySelectorAll('#lifetime_type, #enabled_lifetime_type').forEach(element => {
 				element.addEventListener('change', () => this.updateLostResourcesFields());
 			});
@@ -231,7 +268,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		toggleConditionValue(event) {
 			const value = event.currentTarget.closest('.form_row').querySelector('.js-value');
 			const show_value = (event.currentTarget.value == <?= CONDITION_OPERATOR_REGEXP ?>
-					|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+				|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
 
 			value.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
 

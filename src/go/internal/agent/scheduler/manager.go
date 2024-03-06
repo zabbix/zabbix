@@ -120,7 +120,7 @@ type Scheduler interface {
 		key string,
 		timeout time.Duration,
 		clientID uint64,
-	) (result string, err error)
+	) (result *string, err error)
 	Query(command string) (status string)
 	QueryUserParams() (status string)
 }
@@ -831,7 +831,7 @@ func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
 	clientID uint64,
-) (string, error) {
+) (*string, error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -853,21 +853,8 @@ func (m *Manager) PerformTask(
 		time.Now(),
 	)
 
-	var result string
-
 	r := <-w
-	if r.Error == nil {
-		if r.Value != nil {
-			result = *r.Value
-		} else {
-			// single metric requests do not support empty values, return error instead
-			return "", errors.New("No values have been gathered yet.")
-		}
-	} else {
-		return "", r.Error
-	}
-
-	return result, nil
+	return r.Value, r.Error
 }
 
 func (m *Manager) FinishTask(task performer) {

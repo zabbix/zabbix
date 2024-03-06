@@ -273,15 +273,15 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						poller_config->config_ssl_key_location, poller_config->curl_handle);
 	#else
 				errcodes[i] = NOTSUPPORTED;
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled in:"
-						" missing cURL library"));
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled"
+						" in: missing cURL library"));
 	#endif
 			}
 			else if (ITEM_TYPE_ZABBIX == items[i].type)
 			{
 				errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
-						poller_config, poller_config, poller_config->base, poller_config->dnsbase,
-						poller_config->config_source_ip);
+						poller_config, poller_config, poller_config->base,
+						poller_config->dnsbase, poller_config->config_source_ip);
 			}
 			else
 			{
@@ -289,11 +289,12 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 				zbx_set_snmp_bulkwalk_options(zbx_progname);
 
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
-						poller_config, poller_config, poller_config->base, poller_config->dnsbase,
-						poller_config->config_source_ip);
+						poller_config, poller_config, poller_config->base,
+						poller_config->dnsbase, poller_config->config_source_ip);
 	#else
 				errcodes[i] = NOTSUPPORTED;
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled"
+						"in."));
 	#endif
 			}
 
@@ -373,7 +374,8 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unavailable_delay = poller_args_in->config_unavailable_delay;
 	poller_config->config_unreachable_delay = poller_args_in->config_unreachable_delay;
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
-	poller_config->config_max_concurrent_checks_per_poller = poller_args_in->config_max_concurrent_checks_per_poller;
+	poller_config->config_max_concurrent_checks_per_poller =
+			poller_args_in->config_max_concurrent_checks_per_poller;
 	poller_config->clear_cache = 0;
 	poller_config->process_num = process_num;
 

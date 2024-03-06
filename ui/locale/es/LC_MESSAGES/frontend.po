@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-28 21:34+0000\n"
+"PO-Revision-Date: 2024-02-17 14:49+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -8433,7 +8433,7 @@ msgstr "Mensajes de la interfaz web"
 #: app/views/administration.user.edit.php:731
 #: app/views/administration.user.edit.php:826
 msgid "Frontend notifications"
-msgstr ""
+msgstr "Notificaciones de la interfaz"
 
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
@@ -13328,7 +13328,7 @@ msgstr "Silenciar"
 #: jsLoader.php:286
 #, c-format
 msgid "Mute for %1$s"
-msgstr ""
+msgstr "Silenciar durante %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -18483,7 +18483,7 @@ msgstr "Posponer"
 #: jsLoader.php:291
 #, c-format
 msgid "Snooze for %1$s"
-msgstr ""
+msgstr "Posponer durante %1$s"
 
 #: include/hosts.inc.php:174
 msgid "Software"
@@ -20866,7 +20866,7 @@ msgstr "Dejar de silenciar"
 #: jsLoader.php:293
 #, c-format
 msgid "Unmute for %1$s"
-msgstr ""
+msgstr "No silenciar durante %1$s"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
