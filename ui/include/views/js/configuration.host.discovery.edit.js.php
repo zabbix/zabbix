@@ -30,68 +30,68 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<?=
-	(new CRow([[
-		new CSpan('#{formulaId}'),
-		new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
-	],
-		(new CTextBox('conditions[#{rowNum}][macro]', '', false, 64))
-			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-			->addClass(ZBX_STYLE_UPPERCASE)
-			->addClass('macro')
-			->setAttribute('placeholder', '{#MACRO}')
-			->setAttribute('data-formulaid', '#{formulaId}'),
-		(new CSelect('conditions[#{rowNum}][operator]'))
-			->setValue(CONDITION_OPERATOR_REGEXP)
-			->addClass('js-operator')
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_OPERATOR_REGEXP => _('matches'),
-				CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
-				CONDITION_OPERATOR_EXISTS => _('exists'),
-				CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
-			])),
-		(new CDiv(
-			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
-				->addClass('js-value')
-				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setAttribute('placeholder', _('regular expression'))
-		))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
-		(new CCol(
-			(new CButton('conditions_#{rowNum}_remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->addClass('form_row')
-		->toString()
+		(new CRow([[
+				new CSpan('#{formulaId}'),
+				new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
+			],
+			(new CTextBox('conditions[#{rowNum}][macro]', '', false, 64))
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->addClass(ZBX_STYLE_UPPERCASE)
+				->addClass('macro')
+				->setAttribute('placeholder', '{#MACRO}')
+				->setAttribute('data-formulaid', '#{formulaId}'),
+			(new CSelect('conditions[#{rowNum}][operator]'))
+				->setValue(CONDITION_OPERATOR_REGEXP)
+				->addClass('js-operator')
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_OPERATOR_REGEXP => _('matches'),
+					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+					CONDITION_OPERATOR_EXISTS => _('exists'),
+					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+				])),
+			(new CDiv(
+				(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
+					->addClass('js-value')
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('regular expression'))
+			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+			(new CCol(
+				(new CButton('conditions_#{rowNum}_remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+			->toString()
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="lld_macro_path-row">
 	<?= (new CRow([
-		(new CCol(
-			(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '', [
-				'add_post_js' => false,
-				'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
-			]))
-				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->addClass(ZBX_STYLE_UPPERCASE)
-				->setAttribute('placeholder', '{#MACRO}')
-				->disableSpellcheck()
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
-				'add_post_js' => false,
-				'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
-			]))
-				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setAttribute('placeholder', _('$.path.to.node'))
-				->disableSpellcheck()
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	]))
-		->addClass('form_row')
-		->toString()
+			(new CCol(
+				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '', [
+					'add_post_js' => false,
+					'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
+				]))
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->addClass(ZBX_STYLE_UPPERCASE)
+					->setAttribute('placeholder', '{#MACRO}')
+					->disableSpellcheck()
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
+					'add_post_js' => false,
+					'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
+				]))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('$.path.to.node'))
+					->disableSpellcheck()
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))
+			->addClass('form_row')
+			->toString()
 	?>
 </script>
 
