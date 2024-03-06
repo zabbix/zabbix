@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:50:10Z'
+  date: '2024-01-22T15:30:41Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -200,9 +200,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //count the number of cores
-                  return JSON.parse(value).length;
+                - 'return JSON.parse(value).length;'
           tags:
             - tag: component
               value: cpu
@@ -245,9 +243,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -268,9 +264,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -291,9 +285,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -314,9 +306,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -337,9 +327,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -360,9 +348,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -383,9 +369,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -406,9 +390,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -429,9 +411,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -452,9 +432,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -470,9 +448,7 @@ zabbix_export:
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //Calculate utilization
-                      return (100 - value)
+                    - 'return (100 - value)'
               master_item:
                 key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
               tags:
