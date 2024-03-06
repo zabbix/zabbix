@@ -439,7 +439,7 @@ class CApiTagHelperTest extends TestCase {
 							' e.eventid=event_tag.eventid'.
 							' AND event_tag.tag=\'tag1\''.
 					')'.
-					' OR NOT EXISTS ('.
+					' OR EXISTS ('.
 						'SELECT NULL'.
 						' FROM event_tag'.
 						' WHERE'.
