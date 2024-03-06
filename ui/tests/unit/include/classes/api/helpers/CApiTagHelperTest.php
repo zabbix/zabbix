@@ -432,7 +432,14 @@ class CApiTagHelperTest extends TestCase {
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
 				'('.
-					'EXISTS ('.
+					'NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM event_tag'.
+						' WHERE'.
+							' e.eventid=event_tag.eventid'.
+							' AND event_tag.tag=\'tag1\''.
+					')'.
+					' OR NOT EXISTS ('.
 						'SELECT NULL'.
 						' FROM event_tag'.
 						' WHERE'.
@@ -442,13 +449,6 @@ class CApiTagHelperTest extends TestCase {
 								' OR UPPER(event_tag.value) '.
 								' LIKE \'%VALUE%\' ESCAPE \'!\''.
 							')'.
-					')'.
-					' OR NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_tag'.
-						' WHERE'.
-							' e.eventid=event_tag.eventid'.
-							' AND event_tag.tag=\'tag1\''.
 					')'.
 				')'
 			]
