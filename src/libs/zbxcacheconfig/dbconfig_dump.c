@@ -656,8 +656,7 @@ static void	DCdump_items(void)
 			case ITEM_TYPE_EXTERNAL:
 				break;
 			case ITEM_TYPE_DB_MONITOR:
-				if (NULL != item->itemtype.dbitem)
-					DCdump_dbitem(item->itemtype.dbitem);
+				DCdump_dbitem(item->itemtype.dbitem);
 				break;
 			case ITEM_TYPE_IPMI:
 				DCdump_ipmiitem(item->itemtype.ipmiitem);
