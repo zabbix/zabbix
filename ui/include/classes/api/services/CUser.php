@@ -862,8 +862,7 @@ class CUser extends CApiService {
 
 			if ($db_users === null) {
 				if (!array_key_exists('passwd', $user)
-						&& (!array_key_exists('userdirectoryid', $user) || $user['userdirectoryid'] == 0)
-						&& (array_key_exists('usrgrps', $user) && $user['usrgrps'])) {
+						&& (!array_key_exists('userdirectoryid', $user) || $user['userdirectoryid'] == 0)) {
 					$check = true;
 				}
 			}
@@ -872,15 +871,16 @@ class CUser extends CApiService {
 
 				if (!array_key_exists('passwd', $user) && $db_user['passwd'] === ''
 						&& ((!array_key_exists('userdirectoryid', $user) && $db_user['userdirectoryid'] == 0)
-							|| $user['userdirectoryid'] == 0)
-						&& ((!array_key_exists('usrgrps', $user) && $db_user['usrgrps']) || $user['usrgrps'])) {
+							|| $user['userdirectoryid'] == 0)) {
 					$userdirectory_changed = array_key_exists('userdirectoryid', $user)
 						&& bccomp($user['userdirectoryid'], $db_user['userdirectoryid']) != 0;
 
 					$user_groups_changed = array_key_exists('usrgrps', $user)
 						&& self::userGroupsChanged($user, $db_user);
 
-					if (!$userdirectory_changed && !$user_groups_changed) {
+					$user_groups_empty = array_key_exists('usrgrps', $user) ? !$user['usrgrps'] : !$db_user['usrgrps'];
+
+					if (!$userdirectory_changed && !$user_groups_changed && !$user_groups_empty) {
 						continue;
 					}
 
@@ -898,19 +898,18 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $i => $user) {
-			$gui_access = null;
+			$gui_access = GROUP_GUI_ACCESS_SYSTEM;
 
 			if (array_key_exists('usrgrps', $user)) {
 				foreach ($user['usrgrps'] as $user_group) {
-					if ($gui_access === null
-							|| $db_user_groups[$user_group['usrgrpid']]['gui_access'] > $user['gui_access']) {
+					if ($db_user_groups[$user_group['usrgrpid']]['gui_access'] > $gui_access) {
 						$gui_access = $db_user_groups[$user_group['usrgrpid']]['gui_access'];
 					}
 				}
 			}
-			else {
+			elseif ($db_users !== null) {
 				foreach ($db_users[$user['userid']]['usrgrps'] as $db_user_group) {
-					if ($gui_access === null || $db_user_group['gui_access'] > $user['gui_access']) {
+					if ($db_user_group['gui_access'] > $gui_access) {
 						$gui_access = $db_user_group['gui_access'];
 					}
 				}
