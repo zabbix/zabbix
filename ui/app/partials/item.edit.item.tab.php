@@ -847,10 +847,9 @@ $formgrid
 		)
 	]);
 
-$disabled_by_lld_icon = array_key_exists('itemDiscovery', $item)
-		&& array_key_exists('disable_source', $item['itemDiscovery'])
-		&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-		&& $item['status'] == ITEM_STATUS_DISABLED
+
+$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED
+		&& $item['itemDiscovery'] && $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
 	: null;
 

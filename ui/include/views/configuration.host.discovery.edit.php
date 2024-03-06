@@ -726,7 +726,7 @@ $item_tab->addItem([
 	]))->setId('js-item-timeout-field')
 ]);
 
-$lld_lifetime_help_icons = makeHelpIcon([_('The value should be greater than LLD rule update interval.')]);
+$lld_lifetime_help_icons = makeHelpIcon(_('The value should be greater than LLD rule update interval.'));
 
 $item_tab
 	->addItem([
