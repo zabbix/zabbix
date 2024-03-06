@@ -749,6 +749,8 @@ class CUserGroup extends CApiService {
 	 * @param array $db_usrgrps
 	 */
 	public static function updateForce($usrgrps, $db_usrgrps): void {
+		self::addFieldDefaultsByType($usrgrps, $db_usrgrps);
+
 		$upd_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
@@ -773,6 +775,15 @@ class CUserGroup extends CApiService {
 		self::updateUsers($usrgrps, $db_usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+	}
+
+	private static function addFieldDefaultsByType(array &$usrgrps, array $db_usrgrps): void {
+		foreach ($usrgrps as &$usrgrp) {
+			if ($usrgrp['mfa_status'] == GROUP_MFA_DISABLED && $db_usrgrps[$usrgrp['usrgrpid']]['mfaid'] != '0') {
+				$usrgrp['mfaid'] = '0';
+			}
+		}
+		unset($usrgrp);
 	}
 
 	/**
