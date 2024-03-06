@@ -227,14 +227,20 @@ class testScriptManualInput extends CIntegrationTest {
 			'hostid' => self::$hostid
 		]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		sleep(2);
-
 		$response = $this->call('script.update', [
 			'scriptid' => self::$scriptids[0],
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY
 		]);
 		$this->assertArrayHasKey("scriptids", $response['result']);
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		sleep(2);
+
+		$this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+		$this->call('script.execute', [
+			'scriptid' => self::$scriptids[0],
+			'hostid' => self::$hostid
+		]);
 	}
 
 	/**
