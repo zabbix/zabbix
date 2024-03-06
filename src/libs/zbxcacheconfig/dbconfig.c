@@ -2952,7 +2952,7 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 	}
 }
 
-static void	dc_item_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
+static void	dc_item_type_update(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
 		zbx_vector_ptr_t *dep_items, char **row)
 {
 	if (1 == found && *old_type != item->type)
@@ -3188,7 +3188,7 @@ static void	dc_item_value_type_free(ZBX_DC_ITEM *item, zbx_item_value_type_t typ
 	}
 }
 
-static void	dc_item_value_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_value_type_t *old_value_type,
+static void	dc_item_value_type_update(unsigned char found, ZBX_DC_ITEM *item, zbx_item_value_type_t *old_value_type,
 		char **row)
 {
 	if (1 == found && *old_value_type != item->value_type)
@@ -3430,8 +3430,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		item->value_type = value_type;
 		item->interfaceid = interfaceid;
 
-		dc_item_value_type_add(found, item, &old_value_type, row);
-		dc_item_type_add(found, item, &old_type, &dep_items, row);
+		dc_item_value_type_update(found, item, &old_value_type, row);
+		dc_item_type_update(found, item, &old_type, &dep_items, row);
 
 		/* process item intervals and update item nextcheck */
 
