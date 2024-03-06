@@ -1002,7 +1002,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$itemid = $item['itemid'];
 
 				$db_item = array_intersect_key($db_items[$itemid],
-					array_flip( ['lifetime', 'lifetime_type', 'enabled_lifetime', 'enabled_lifetime_type'])
+					array_flip(['lifetime', 'lifetime_type', 'enabled_lifetime', 'enabled_lifetime_type'])
 				);
 
 				$item += $db_item;
