@@ -2338,7 +2338,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Number of rows', 'Display min/avg/max', 'Number of columns'];
+		$fields = ['Rows', 'Number of rows', 'Display min/avg/max', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
