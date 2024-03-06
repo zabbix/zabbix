@@ -2556,7 +2556,8 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values, int *ret_flush)
+static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values,
+		int *ret_flush, int config_history_storage_pipelines)
 {
 	int	i, ret = SUCCEED;
 
@@ -2571,7 +2572,7 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
 	}
 
 	if (0 != history_values->values_num)
-		ret = zbx_vc_add_values(history_values, ret_flush);
+		ret = zbx_vc_add_values(history_values, ret_flush, config_history_storage_pipelines);
 
 	return ret;
 }
@@ -2584,7 +2585,7 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
  *             history_num - number of history structures                     *
  *                                                                            *
  ******************************************************************************/
-static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
+static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int config_history_storage_pipelines)
 {
 	int			ret, ret_flush = FLUSH_SUCCEED, num;
 	zbx_vector_ptr_t	history_values;
@@ -2594,15 +2595,18 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
 
-	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush)) &&
-			FLUSH_DUPL_REJECTED == ret_flush)
+	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush,
+			config_history_storage_pipelines)) && FLUSH_DUPL_REJECTED == ret_flush)
 	{
 		num = history_values.values_num;
 		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
 
-		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush)))
+		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush,
+				config_history_storage_pipelines)))
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
+		}
 	}
 
 	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
@@ -2944,7 +2948,8 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more)
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		int config_history_storage_pipelines, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -3100,7 +3105,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					events_cbs->add_event_cb, &item_diff,
 					&inventory_values, compression_age, &proxy_subscriptions);
 
-			if (FAIL != (ret = DBmass_add_history(history, history_num)))
+			if (FAIL != (ret = DBmass_add_history(history, history_num, config_history_storage_pipelines)))
 			{
 				zbx_dc_config_items_apply_changes(&item_diff);
 				DCmass_update_trends(history, history_num, &trends, &trends_num, compression_age);
@@ -3388,7 +3393,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
+static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
 	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
@@ -3435,7 +3440,8 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 
 		do
 		{
-			sync_history_cb(&values_num, &triggers_num, events_cbs, &more);
+			sync_history_cb(&values_num, &triggers_num, events_cbs, config_history_storage_pipelines,
+					&more);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)values_num / (cache->history_num + values_num) * 100);
@@ -3513,14 +3519,15 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int *values_num, int *triggers_num, int *more)
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines,
+		int *values_num, int *triggers_num, int *more)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
 	*values_num = 0;
 	*triggers_num = 0;
 
-	sync_history_cb(values_num, triggers_num, events_cbs, more);
+	sync_history_cb(values_num, triggers_num, events_cbs, config_history_storage_pipelines, more);
 }
 
 /******************************************************************************
@@ -4772,11 +4779,11 @@ out:
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
+static void	DCsync_all(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	sync_history_cache_full(events_cbs);
+	sync_history_cache_full(events_cbs, config_history_storage_pipelines);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
@@ -4789,12 +4796,12 @@ static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-		DCsync_all(events_cbs);
+		DCsync_all(events_cbs, config_history_storage_pipelines);
 
 	cache = NULL;
 

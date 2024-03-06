@@ -52,21 +52,24 @@ typedef struct
 }
 zbx_wcache_info_t;
 
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int *values_num, int *triggers_num, int *more);
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines,
+		int *values_num, int *triggers_num, int *more);
 void	zbx_log_sync_history_cache_progress(void);
 
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
 
-typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
+typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		int config_history_storage_pipelines, int *more);
 
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history_sync_f sync_history,
-		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size,
+		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size,
 		char **error);
 
-void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines);
 
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		int config_history_storage_pipelines, int *more);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1

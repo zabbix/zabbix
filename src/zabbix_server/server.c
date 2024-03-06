@@ -354,9 +354,9 @@ char	*CONFIG_NODE_ADDRESS	= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
-char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
-int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
+char	*config_history_storage_url		= NULL;
+char	*config_history_storage_opts		= NULL;
+int	config_history_storage_pipelines	= 0;
 
 static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
@@ -641,8 +641,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == config_ssl_key_location)
 		config_ssl_key_location = zbx_strdup(config_ssl_key_location, DEFAULT_SSL_KEY_LOCATION);
 
-	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
-		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "uint,dbl,str,log,text");
+	if (NULL == config_history_storage_opts)
+		config_history_storage_opts = zbx_strdup(config_history_storage_opts, "uint,dbl,str,log,text");
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -748,9 +748,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", config_ssl_ca_location, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", config_ssl_cert_location, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", config_ssl_key_location, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("HistoryStorageURL", CONFIG_HISTORY_STORAGE_URL, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
-	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
+	err |= (FAIL == check_cfg_feature_str("HistoryStorageURL", config_history_storage_url, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", config_history_storage_opts, "cURL library"));
+	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", config_history_storage_pipelines,
 			"cURL library"));
 	err |= (FAIL == check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
@@ -1008,11 +1008,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			100},
 		{"StartPreprocessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"HistoryStorageURL",		&CONFIG_HISTORY_STORAGE_URL,		TYPE_STRING,
+		{"HistoryStorageURL",		&config_history_storage_url,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
+		{"HistoryStorageTypes",		&config_history_storage_opts,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
+		{"HistoryStorageDateIndex",	&config_history_storage_pipelines,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"ExportDir",			&(zbx_config_export.dir),			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1117,7 +1117,7 @@ static void	zbx_on_exit(int ret)
 		zbx_ipc_service_free_env();
 
 		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
+		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
 		zbx_db_close();
 
 		zbx_free_configuration_cache();
@@ -1375,7 +1375,10 @@ static void	zbx_check_db(void)
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == ret)
-			zbx_history_check_version(&db_version_json, &ret, config_allow_unsupported_db_versions);
+		{
+			zbx_history_check_version(&db_version_json, &ret, config_allow_unsupported_db_versions,
+					config_history_storage_url);
+		}
 
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
@@ -1493,7 +1496,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 								zbx_config_dbhigh, zbx_config_source_ip};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency,
+								config_history_storage_pipelines};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
@@ -1906,7 +1910,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vmware_destroy();
 	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
-	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
+	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
@@ -2171,7 +2175,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_history_init(&error))
+	if (SUCCEED != zbx_history_init(config_history_storage_url, config_history_storage_opts, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
 		zbx_free(error);

@@ -37,8 +37,8 @@
 
 const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
-extern char	*CONFIG_HISTORY_STORAGE_URL;
-extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
+//extern char	*CONFIG_HISTORY_STORAGE_URL;
+//extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -899,7 +899,8 @@ out:
  *              history - [IN] the history data vector (may have mixed value types) *
  *                                                                                  *
  ************************************************************************************/
-static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
+static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history,
+		int config_history_storage_pipelines)
 {
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	int			i, num = 0;
@@ -915,7 +916,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 	zbx_json_addobject(&json_idx, "index");
 	zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
 
-	if (1 == CONFIG_HISTORY_STORAGE_PIPELINES)
+	if (1 == config_history_storage_pipelines)
 	{
 		zbx_snprintf(pipeline, sizeof(pipeline), "%s-pipeline", value_type_str[hist->value_type]);
 		zbx_json_addstring(&json_idx, "pipeline", pipeline, ZBX_JSON_TYPE_STRING);
@@ -1004,7 +1005,8 @@ static int	elastic_flush(zbx_history_iface_t *hist)
  *               FAIL    - otherwise                                                *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
+		const char *config_history_storage_url, char **error)
 {
 	zbx_elastic_data_t	*data;
 
@@ -1016,7 +1018,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 
 	data = (zbx_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_elastic_data_t));
 	memset(data, 0, sizeof(zbx_elastic_data_t));
-	data->base_url = zbx_strdup(NULL, CONFIG_HISTORY_STORAGE_URL);
+	data->base_url = zbx_strdup(NULL, config_history_storage_url);
 	zbx_rtrim(data->base_url, "/");
 	data->buf = NULL;
 	data->post_url = NULL;
@@ -1039,7 +1041,8 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
  *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
-void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions)
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
+		const char *config_history_storage_url)
 {
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 	zbx_httppage_t			page;
@@ -1072,7 +1075,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_
 
 	curl_headers = curl_slist_append(NULL, "Content-Type: application/json");
 
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, CONFIG_HISTORY_STORAGE_URL)) ||
+	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, config_history_storage_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||

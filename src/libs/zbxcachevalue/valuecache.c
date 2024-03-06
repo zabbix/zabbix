@@ -2522,13 +2522,13 @@ void	zbx_vc_reset(void)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
+int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
 {
 	zbx_vc_item_t		*item;
 	int			i;
 	zbx_dc_history_t	*h;
 
-	if (SUCCEED != zbx_history_add_values(history, ret_flush))
+	if (SUCCEED != zbx_history_add_values(history, ret_flush, config_history_storage_pipelines))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)

@@ -359,7 +359,8 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	zbx_vector_uint64_destroy(&itemids);
 }
 
-void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more)
+void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		int config_history_storage_pipelines, int *more)
 {
 	ZBX_UNUSED(triggers_num);
 	ZBX_UNUSED(events_cbs);
@@ -370,6 +371,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	zbx_vector_ptr_t	item_diff;
 	zbx_dc_history_t	history[ZBX_HC_SYNC_MAX];
 
+	ZBX_UNUSED(config_history_storage_pipelines);
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 	zbx_vector_ptr_create(&item_diff);

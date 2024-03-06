@@ -304,9 +304,9 @@ static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL
 
 static char	*config_socket_path	= NULL;
 
-char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
-int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
+//static char	*config_history_storage_url		= NULL;
+//static char	*config_history_storage_opts		= NULL;
+static int	config_history_storage_pipelines	= 0;
 
 static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
@@ -1114,7 +1114,7 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
+	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
 	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
@@ -1448,7 +1448,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
 							.config_timeout = zbx_config_timeout,
 							zbx_config_source_ip};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency,
+							config_history_storage_pipelines};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_snmptrapper_args		snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
