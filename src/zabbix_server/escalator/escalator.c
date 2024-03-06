@@ -3628,7 +3628,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
 							(((zbx_thread_args_t *)args)->args);
 	int				sleeptime = -1, sleeptime_after_notify = 0, escalations_count = 0,
-					old_escalations_count = 0;
+					old_escalations_count = 0, notify = 0;
 	double				total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -3637,11 +3637,20 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type, *rtc_data = NULL;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_ESCALATOR_NOTIFY};
 	zbx_ipc_async_socket_t		rtc;
+	zbx_ipc_socket_t		alerter;
+	char				*error = NULL;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+	if (SUCCEED != zbx_ipc_socket_open(&alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(escalator_args_in->zbx_config_tls, escalator_args_in->zbx_get_program_type_cb_arg,
@@ -3657,7 +3666,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int			now, nextcheck, ret, notify = 0;
+		int			now, nextcheck, ret;
 		double			sec;
 		zbx_config_t		cfg;
 		zbx_uint32_t		rtc_cmd;
@@ -3725,6 +3734,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		zbx_vector_uint64_destroy(&escalationids);
 		zbx_vector_uint64_destroy(&triggerids);
 
+		if (0 != notify)
+			(void)zbx_ipc_socket_write(&alerter, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
+
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
 
@@ -3784,6 +3796,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 #		undef STAT_INTERVAL
 	}
 end_loop:
+	zbx_ipc_socket_close(&alerter);
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

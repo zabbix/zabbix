@@ -39,7 +39,7 @@
 typedef struct
 {
 	zbx_hashset_t		mediatypes;
-	zbx_ipc_socket_t	am;
+	zbx_ipc_async_socket_t	am;
 }
 zbx_am_db_t;
 
@@ -82,7 +82,7 @@ static int 	am_db_init(zbx_am_db_t *amdb, char **error)
 {
 	zbx_hashset_create(&amdb->mediatypes, 5, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (SUCCEED != zbx_ipc_socket_open(&amdb->am, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, error))
+	if (SUCCEED != zbx_ipc_async_socket_open(&amdb->am, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -415,7 +415,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 
 		data_len = zbx_alerter_serialize_mediatypes(&data, (zbx_am_db_mediatype_t **)mediatypes.values,
 				mediatypes.values_num);
-		zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
+		zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
 		zbx_free(data);
 	}
 
@@ -430,7 +430,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 			to = alerts.values_num;
 
 		data_len = zbx_alerter_serialize_alerts(&data, (zbx_am_db_alert_t **)&alerts.values[i], to - i);
-		zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_ALERTS, data, data_len);
+		zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_ALERTS, data, data_len);
 		zbx_free(data);
 	}
 #undef ZBX_ALERT_BATCH_SIZE
@@ -670,13 +670,13 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 {
 	int				results_num;
 	zbx_vector_events_tags_t	update_events_tags;
-	zbx_ipc_message_t		message;
+	zbx_ipc_message_t		*message;
 	zbx_am_result_t			**results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0);
-	if (SUCCEED != zbx_ipc_socket_read(&amdb->am, &message))
+	zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0);
+	if (SUCCEED != zbx_ipc_async_socket_recv(&amdb->am, 1, &message) || NULL == message)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve alert results");
 		return 0;
@@ -684,7 +684,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 	zbx_vector_events_tags_create(&update_events_tags);
 
-	zbx_alerter_deserialize_results(message.data, &results, &results_num);
+	zbx_alerter_deserialize_results(message->data, &results, &results_num);
 
 	if (0 != results_num)
 	{
@@ -777,7 +777,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 	zbx_vector_events_tags_clear_ext(&update_events_tags, event_tags_free);
 	zbx_vector_events_tags_destroy(&update_events_tags);
 	zbx_free(results);
-	zbx_ipc_message_clean(&message);
+	zbx_ipc_message_free(message);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
 
@@ -823,7 +823,7 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 		zbx_uint32_t	data_len;
 
 		data_len = zbx_alerter_serialize_ids(&data, dropids.values, dropids.values_num);
-		zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_DROP_MEDIATYPES, data, data_len);
+		zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_DROP_MEDIATYPES, data, data_len);
 		zbx_free(data);
 	}
 
@@ -895,13 +895,13 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 		{
 			data_len = zbx_alerter_serialize_mediatypes(&data, (zbx_am_db_mediatype_t **)mediatypes.values,
 					mediatypes.values_num);
-			zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
+			zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
 			zbx_free(data);
 		}
 	}
 
 	data_len = zbx_alerter_serialize_medias(&data, (zbx_am_media_t **)medias.values, medias.values_num);
-	zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_WATCHDOG, data, data_len);
+	zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_WATCHDOG, data, data_len);
 	zbx_free(data);
 
 	medias_num = medias.values_num;
@@ -914,12 +914,21 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, medias_num);
 }
 
+static void	alert_syncer_register(zbx_ipc_async_socket_t *socket)
+{
+	pid_t	ppid;
+
+	ppid = getppid();
+
+	zbx_ipc_async_socket_send(socket, ZBX_IPC_ALERT_SYNCER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
+}
+
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 {
 #define ZBX_POLL_INTERVAL		1
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime, freq_watchdog;
+	int				sleeptime, freq_watchdog, sleeptime_after_notify = 0;
 	zbx_am_db_t			amdb;
 	char				*error = NULL;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -941,6 +950,8 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
+	alert_syncer_register(&amdb.am);
+
 	sleeptime = ZBX_POLL_INTERVAL;
 
 	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
@@ -950,16 +961,31 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		double	sec1, sec2;
-		int	alerts_num, nextcheck, results_num;
+		double			sec1, sec2;
+		int			alerts_num, nextcheck, results_num;
+		time_t			wait_start_time = time(NULL);
+		zbx_ipc_message_t	*message;
 
-		zbx_sleep_loop(info, sleeptime);
+		do
+		{
+			if (0 == sleeptime_after_notify)
+				sleeptime_after_notify = sleeptime;
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+			(void)zbx_ipc_async_socket_recv(&amdb.am, sleeptime_after_notify, &message);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
+			if (0 > sleeptime_after_notify)
+				sleeptime_after_notify = 0;
+
+			if (NULL != message && ZBX_IPC_ALERTER_SYNC_ALERTS == message->code)
+				break;
+		}
+		while (0 != sleeptime_after_notify);
 
 		sec1 = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
-
 		alerts_num = am_db_queue_alerts(&amdb);
 		results_num = am_db_flush_results(&amdb);
 
@@ -981,6 +1007,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
+		zbx_ipc_message_free(message);
 
 		zbx_setproctitle("%s [queued %d alerts(s), flushed %d result(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), alerts_num, results_num, sec2 - sec1, sleeptime);

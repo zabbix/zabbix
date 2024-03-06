@@ -67,7 +67,7 @@ int	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new
 					2 * (size_t)escalations_per_process * sizeof(zbx_uint64_t));
 			unsigned char	*notify_data = zbx_malloc(NULL, notify_size), *ptr = notify_data;
 
-			ptr += zbx_serialize_value(ptr, notify_size);
+			ptr += zbx_serialize_value(ptr, escalations_per_process);
 			for (int j = 0; j < escalations_per_process; j++)
 			{
 				pair = trigger_escalations[i].values[j];
