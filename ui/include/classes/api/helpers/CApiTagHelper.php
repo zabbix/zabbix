@@ -115,16 +115,16 @@ class CApiTagHelper {
 					continue;
 				}
 
-				$sql_start_part = $prefix.' ('.
+				$statement_start = $prefix.' ('.
 					'SELECT NULL'.
 					' FROM '.$table.
 					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
 						' AND '.$table.'.tag='.zbx_dbstr($tag);
 
-				$sql_end_part = ')';
+				$statement_end = ')';
 
 				if ($prefix === 'NOT EXISTS' && array_key_exists('NOT EXISTS', $values)) {
-					$_where[] = $sql_start_part.$sql_end_part;
+					$_where[] = $statement_start.$statement_end;
 
 					unset($values['NOT EXISTS']);
 
@@ -134,12 +134,12 @@ class CApiTagHelper {
 				}
 
 				if ($values) {
-					$sql_start_part .= (count($values) === 1)
+					$statement_start .= (count($values) === 1)
 						? ' AND '.implode(' OR ', $values)
 						: ' AND ('.implode(' OR ', $values).')';
 				}
 
-				$_where[] = $sql_start_part.$sql_end_part;
+				$_where[] = $statement_start.$statement_end;
 			}
 
 			if (count($_where) == 1) {
