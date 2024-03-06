@@ -127,6 +127,10 @@ class CApiTagHelper {
 					$_where[] = $sql_start_part.$sql_end_part;
 
 					unset($values['NOT EXISTS']);
+
+					if (!$values) {
+						continue;
+					}
 				}
 
 				if ($values) {
