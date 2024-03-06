@@ -251,8 +251,8 @@ class CMfa extends CApiService {
 		}
 	}
 
-	private static function checkOtherMfaExists(array $mfaids) {
-		return DBfetch(DBselect(
+	private static function checkOtherMfaExists(array $mfaids): bool {
+		return (bool) DBfetch(DBselect(
 			'SELECT m.mfaid'.
 			' FROM mfa m'.
 			' WHERE '.dbConditionId('m.mfaid', array_keys($mfaids), true),
@@ -309,20 +309,7 @@ class CMfa extends CApiService {
 
 		$mfas = $this->extendObjectsByKey($mfas, $db_mfas, 'mfaid', ['type']);
 
-		foreach ($mfas as &$mfa) {
-			if ($mfa['type'] != $db_mfas[$mfa['mfaid']]['type']) {
-				if ($mfa['type'] == MFA_TYPE_TOTP) {
-					$mfa += array_intersect_key($db_mfas[$mfa['mfaid']], array_flip(['hash_function', 'code_length']));
-				}
-
-				if ($mfa['type'] == MFA_TYPE_DUO) {
-					$mfa += array_intersect_key($db_mfas[$mfa['mfaid']],
-						array_flip(['api_hostname', 'clientid', 'client_secret'])
-					);
-				}
-			}
-		}
-		unset($mfa);
+		self::addRequiredFieldsByType($mfas, $db_mfas);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'mfaid' =>			['type' => API_ANY],
@@ -355,6 +342,23 @@ class CMfa extends CApiService {
 		}
 
 		self::checkDuplicates($mfas, $db_mfas);
+	}
+
+	private static function addRequiredFieldsByType(array &$mfas, array $db_mfas): void {
+		foreach ($mfas as &$mfa) {
+			if ($mfa['type'] != $db_mfas[$mfa['mfaid']]['type']) {
+				if ($mfa['type'] == MFA_TYPE_TOTP) {
+					$mfa += array_intersect_key($db_mfas[$mfa['mfaid']], array_flip(['hash_function', 'code_length']));
+				}
+
+				if ($mfa['type'] == MFA_TYPE_DUO) {
+					$mfa += array_intersect_key($db_mfas[$mfa['mfaid']],
+						array_flip(['api_hostname', 'clientid', 'client_secret'])
+					);
+				}
+			}
+		}
+		unset($mfa);
 	}
 
 	private static function addFieldDefaultsByType(array &$mfas): void {
@@ -400,25 +404,21 @@ class CMfa extends CApiService {
 	}
 
 	public function delete(array $mfaids): array {
-		$auth = API::Authentication()->get([
-			'output' => ['mfa_status', 'mfaid']
-		]);
+		self::validateDelete($mfaids, $db_mfas);
 
-		self::validateDelete($mfaids, $db_mfaids, $auth);
-
-		// If last (default) is removed, reset default mfaid to prevent from foreign key constraint.
-		if (array_key_exists($auth['mfaid'], $db_mfaids)) {
+		if (array_key_exists(CAuthenticationHelper::get(CAuthenticationHelper::MFAID), $db_mfas)) {
 			API::Authentication()->update(['mfaid' => 0]);
 		}
 
-		DB::delete('mfa', ['mfaid' => array_keys($db_mfaids)]);
+		DB::delete('mfa_totp_secret', ['mfaid' => array_keys($db_mfas)]);
+		DB::delete('mfa', ['mfaid' => array_keys($db_mfas)]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfaids);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfas);
 
-		return ['mfaids' => array_keys($db_mfaids)];
+		return ['mfaids' => array_keys($db_mfas)];
 	}
 
-	private static function validateDelete(array $mfaids, ?array &$db_mfas, array $auth): void {
+	private static function validateDelete(array $mfaids, ?array &$db_mfas): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $mfaids, '/', $error)) {
@@ -435,28 +435,32 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkDeleteDefaultMfa($db_mfas, $auth, $mfaids);
+		self::checkDeleteDefaultMfa($db_mfas, $mfaids);
+		self::cehckMfaUsedByUserGroup($db_mfas);
+	}
 
+	private static function checkDeleteDefaultMfa(array $db_mfas, array $mfaids): void {
+		if (in_array(CAuthenticationHelper::get(CAuthenticationHelper::MFAID), $mfaids)
+				&& CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED
+				&& !self::checkOtherMfaExists($db_mfas)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
+		}
+	}
+
+	private static function cehckMfaUsedByUserGroup(array $db_mfas) {
 		$db_groups = API::UserGroup()->get([
-			'output' => ['mfaid'],
-			'mfaids' => $mfaids,
+			'output' => ['name', 'mfaid'],
+			'mfaids' => array_keys($db_mfas),
 			'limit' => 1
 		]);
 
 		if ($db_groups) {
-			$db_group = reset($db_groups);
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete MFA method "%1$s".',
-				$db_mfas[$db_group['mfaid']]['name'])
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot delete MFA method "%1$s", because it is used by user group "%2$s".',
+					$db_mfas[$db_groups[0]['mfaid']]['name'],
+					$db_groups[0]['name']
+				)
 			);
-		}
-	}
-
-	private static function checkDeleteDefaultMfa(array $db_mfas, array $auth, array $mfaids): void {
-		$mfas_left = self::checkOtherMfaExists($db_mfas);
-
-		if (in_array($auth['mfaid'], $mfaids) && $auth['mfa_status'] == MFA_ENABLED && !$mfas_left) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
 		}
 	}
 }
