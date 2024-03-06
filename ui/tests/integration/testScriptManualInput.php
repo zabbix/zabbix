@@ -175,6 +175,19 @@ class testScriptManualInput extends CIntegrationTest {
 	}
 
 	/**
+	 * Component configuration provider for server related tests.
+	 *
+	 * @return array
+	 */
+	public function disabledScriptsConfigurationProvider(): array {
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableGlobalScripts' => 0
+			]
+		];
+	}
+
+	/**
 	 * @dataProvider validRequestDataProvider
 	 *
 	 * @param array  $request_params   Parameters to the script.execute API call
@@ -197,6 +210,31 @@ class testScriptManualInput extends CIntegrationTest {
 	 */
 	public function testScriptManualInput_InvalidRequests(array $request_params, string $expected_result): void {
 		$response = $this->call('script.execute', $request_params, $expected_result);
+	}
+
+	/**
+	 * Test functionality of EnableGlobalScripts option
+	 *
+	 * @configurationDataProvider disabledScriptsConfigurationProvider
+	 * @backup scripts
+	 *
+	 */
+	public function testScriptManualInput_DisabledGlobalScripts() {
+		// CAPITest::call() has assertions for 'result' key in a response, these will throw an exception
+		$this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+		$this->call('script.execute', [
+			'scriptid' => self::$scriptids[0],
+			'hostid' => self::$hostid
+		]);
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		sleep(2);
+
+		$response = $this->call('script.update', [
+			'scriptid' => self::$scriptids[0],
+			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_PROXY
+		]);
+		$this->assertArrayHasKey("scriptids", $response['result']);
 	}
 
 	/**
