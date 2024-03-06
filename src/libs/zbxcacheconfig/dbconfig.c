@@ -9550,7 +9550,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.telnetitem->username);
 			zbx_strscpy(dst_item->password_orig, src_item->itemtype.telnetitem->password);
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.telnetitem->params);
-	
+
 			dst_item->username = NULL;
 			dst_item->password = NULL;
 			break;
