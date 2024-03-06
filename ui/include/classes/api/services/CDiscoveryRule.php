@@ -1229,6 +1229,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'overrides' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 		]];
 	}
+
 	/**
 	 * @return array
 	 */
