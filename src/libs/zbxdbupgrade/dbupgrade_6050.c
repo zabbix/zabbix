@@ -3423,6 +3423,15 @@ static int	DBpatch_6050234(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050235(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.hosts.filter_monitored_by'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
 #endif
 
 DBPATCH_START(6050)
@@ -3662,5 +3671,6 @@ DBPATCH_ADD(6050231, 0, 1)
 DBPATCH_ADD(6050232, 0, 1)
 DBPATCH_ADD(6050233, 0, 1)
 DBPATCH_ADD(6050234, 0, 1)
+DBPATCH_ADD(6050235, 0, 1)
 
 DBPATCH_END()
