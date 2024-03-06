@@ -127,6 +127,10 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 #if LIBCURL_VERSION_NUM < 0x071304
 #	define CURLPROTO_HTTP		(1<<0)
 #	define CURLPROTO_HTTPS		(1<<1)
+#endif
+
+/* added in 7.20.0 (0x071400), deprecated since 7.85.0 */
+#if LIBCURL_VERSION_NUM < 0x071400
 #	define CURLPROTO_SMTP   	(1<<16)
 #	define CURLPROTO_SMTPS  	(1<<17)
 #endif
