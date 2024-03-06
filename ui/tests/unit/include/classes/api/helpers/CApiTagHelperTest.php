@@ -369,6 +369,64 @@ class CApiTagHelperTest extends TestCase {
 						' AND event_tag.tag=\'OS\''.
 						' AND UPPER(event_tag.value) LIKE \'%WIN%\' ESCAPE \'!\''.
 				')'
+			],
+			[
+				[
+					[
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'val'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+						' AND (event_tag.value=\'val\''.
+							' OR UPPER(event_tag.value)'.
+							' LIKE \'%VALUE%\' ESCAPE \'!\''.
+						')'.
+				')'
+			],
+			[
+				[
+					[
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'val'],
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS]
+
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+						' AND (event_tag.value=\'val\''.
+							' OR UPPER(event_tag.value) '.
+							' LIKE \'%VALUE%\' ESCAPE \'!\''.
+						')'.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+				')'
 			]
 		];
 	}

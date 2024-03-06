@@ -86,8 +86,11 @@ class CApiTagHelper {
 					break;
 
 				case TAG_OPERATOR_EXISTS:
-				case TAG_OPERATOR_NOT_EXISTS:
 					$values_by_tag[$tag['tag']][$slot] = false;
+					break;
+
+				case TAG_OPERATOR_NOT_EXISTS:
+					$values_by_tag[$tag['tag']][$slot]['NOT EXISTS'] = true;
 					break;
 
 				case TAG_OPERATOR_EQUAL:
@@ -98,40 +101,48 @@ class CApiTagHelper {
 		}
 
 		$sql_where = [];
+
 		foreach ($values_by_tag as $tag => $filters) {
 			// Tag operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS are both canceling explicit values of same tag.
 			if ($filters['EXISTS'] === false) {
 				unset($filters['NOT EXISTS']);
 			}
-			elseif ($filters['NOT EXISTS'] === false) {
-				unset($filters['EXISTS']);
-			}
 
 			$_where = [];
+
 			foreach ($filters as $prefix => $values) {
 				if ($values === []) {
 					continue;
 				}
 
-				$statement = $table.'.tag='.zbx_dbstr($tag);
-				if ($values) {
-					$statement .= (count($values) == 1)
-						? ' AND '.implode(' OR ', $values)
-						: ' AND ('.implode(' OR ', $values).')';
-				}
-
-				$_where[] = $prefix.' ('.
+				$sql_start_part = $prefix.' ('.
 					'SELECT NULL'.
 					' FROM '.$table.
-					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.' AND '.$statement.
-				')';
+					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
+						' AND '.$table.'.tag='.zbx_dbstr($tag);
+
+				$sql_end_part = ')';
+
+				if ($prefix === 'NOT EXISTS' && array_key_exists('NOT EXISTS', $values)) {
+					$_where[] = $sql_start_part.$sql_end_part;
+
+					unset($values['NOT EXISTS']);
+				}
+
+				if ($values) {
+					$sql_tag_values = (count($values) === 1)
+						? ' AND '.$values[0]
+						: ' AND ('.implode(' OR ', $values).')';
+
+					$_where[] = $sql_start_part.$sql_tag_values.$sql_end_part;
+				}
 			}
 
 			if (count($_where) == 1) {
 				$sql_where[] = $_where[0];
 			}
 			else {
-				$sql_where[] = '('.$_where[0].' OR '.$_where[1].')';
+				$sql_where[] = '('.implode(' OR ', $_where).')';
 			}
 		}
 
