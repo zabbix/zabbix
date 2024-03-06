@@ -255,7 +255,7 @@ class CMfa extends CApiService {
 		return (bool) DBfetch(DBselect(
 			'SELECT m.mfaid'.
 			' FROM mfa m'.
-			' WHERE '.dbConditionId('m.mfaid', array_keys($mfaids), true),
+			' WHERE '.dbConditionId('m.mfaid', $mfaids, true),
 			1
 		));
 	}
@@ -439,10 +439,10 @@ class CMfa extends CApiService {
 		self::cehckMfaUsedByUserGroup($db_mfas);
 	}
 
-	private static function checkDeleteDefaultMfa(array $db_mfas, array $mfaids): void {
-		if (in_array(CAuthenticationHelper::get(CAuthenticationHelper::MFAID), $mfaids)
+	private static function checkDeleteDefaultMfa(array $db_mfas): void {
+		if (in_array(CAuthenticationHelper::get(CAuthenticationHelper::MFAID), array_keys($db_mfas))
 				&& CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED
-				&& !self::checkOtherMfaExists($db_mfas)) {
+				&& !self::checkOtherMfaExists(array_keys($db_mfas))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
 		}
 	}
