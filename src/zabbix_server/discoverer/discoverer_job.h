@@ -45,7 +45,7 @@ typedef struct
 	zbx_list_t			tasks;
 	zbx_uint64_t			drule_revision;
 	int				workers_used;
-	int				workers_max;
+	int				concurrency_max;
 	unsigned char			status;
 	zbx_vector_ds_dcheck_ptr_t	*ds_dchecks_common;
 	zbx_vector_iprange_t		*ipranges;

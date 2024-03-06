@@ -582,10 +582,10 @@ static int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, 
 	return ret;
 }
 
-int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,
+int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int concurrency_max,
 		zbx_uint64_t total, zbx_uint64_t dec_counter)
 {
-	if ((0 != total && 0 != total % worker_max) || total == (zbx_uint64_t)worker_max)
+	if ((0 != total && 0 != total % concurrency_max) || total == (zbx_uint64_t)concurrency_max)
 		return FAIL;
 
 	if (0 != dec_counter)
@@ -598,7 +598,7 @@ int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int w
 	return SUCCEED;
 }
 
-int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
+int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int concurrency_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, zbx_discoverer_queue_t *queue, char **error)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
@@ -617,10 +617,10 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			" checks per ip:%u dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
 			task->range.id, task->range.state.count, task->range.state.checks_per_ip,
 			task->ds_dchecks.values_num,
-			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, worker_max);
+			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, concurrency_max);
 
-	if (0 == worker_max)
-		worker_max = queue->checks_per_worker_max;
+	if (0 == concurrency_max)
+		concurrency_max = queue->checks_per_worker_max;
 
 	discovery_async_poller_init(dmanager, &poller_config);
 	zbx_vector_discoverer_results_ptr_create(&results);
@@ -699,12 +699,12 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		if (FAIL == ret)
 			goto out;
 
-		while (worker_max == poller_config.processing)
+		while (concurrency_max == poller_config.processing)
 			event_base_loop(poller_config.base, EVLOOP_ONCE);
 
 		abort = discovery_net_check_result_flush(dmanager, task, &results, 0);
 
-		if (SUCCEED == discovery_pending_checks_count_decrease(queue, worker_max, task->range.state.count,
+		if (SUCCEED == discovery_pending_checks_count_decrease(queue, concurrency_max, task->range.state.count,
 				++dec_counter))
 		{
 			dec_counter = 0;
@@ -729,7 +729,7 @@ out:
 	}
 #endif
 	discovery_async_poller_destroy(&poller_config);
-	(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, task->range.state.count + dec_counter);
+	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, task->range.state.count + dec_counter);
 #ifdef HAVE_NETSNMP
 	/* we must clear the EnginID cache before the next snmpv3 dcheck and */
 	/* remove unused collected values in any case */

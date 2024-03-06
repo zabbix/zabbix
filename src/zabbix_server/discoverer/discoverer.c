@@ -927,7 +927,7 @@ static int	discoverer_icmp_result_merge(zbx_hashset_t *incomplete_checks_count, 
 }
 
 static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *task,
-		const int dcheck_idx, int worker_max, int *stop, zbx_discoverer_queue_t *queue, char **error)
+		const int dcheck_idx, int concurrency_max, int *stop, zbx_discoverer_queue_t *queue, char **error)
 {
 	char				err[ZBX_ITEM_ERROR_LEN_MAX], ip[ZBX_INTERFACE_IP_LEN_MAX];
 	int				i, ret = SUCCEED, abort = SUCCEED;
@@ -941,8 +941,8 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 
 	zbx_vector_fping_host_create(&hosts);
 
-	if (0 == worker_max)
-		worker_max = queue->checks_per_worker_max;
+	if (0 == concurrency_max)
+		concurrency_max = queue->checks_per_worker_max;
 
 	for (i = 0; i < task->range.ipranges->values_num; i++)
 		count += zbx_iprange_volume(&task->range.ipranges->values[i]);
@@ -957,14 +957,14 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		host.addr = zbx_strdup(NULL, ip);
 		zbx_vector_fping_host_append(&hosts, host);
 
-		if (worker_max > hosts.values_num)
+		if (concurrency_max > hosts.values_num)
 			continue;
 
 		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout,
 				dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s",
-					log_worker_id, __func__, worker_max, err);
+					log_worker_id, __func__, concurrency_max, err);
 			*error = zbx_strdup(*error, err);
 			break;
 		}
@@ -982,7 +982,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 			zbx_str_free(hosts.values[i].dnsname);
 		}
 
-		(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, hosts.values_num);
+		(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, hosts.values_num);
 		zbx_vector_fping_host_clear(&hosts);
 	}
 	while (0 == *stop && SUCCEED == abort && 0 != task->range.state.count &&
@@ -995,7 +995,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 				dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s", log_worker_id,
-					__func__, worker_max, err);
+					__func__, concurrency_max, err);
 			*error = zbx_strdup(*error, err);
 		}
 		else
@@ -1013,7 +1013,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		zbx_str_free(hosts.values[i].dnsname);
 	}
 
-	(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, hosts.values_num);
+	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, hosts.values_num);
 	zbx_vector_fping_host_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:%d", log_worker_id, __func__,
@@ -1089,21 +1089,21 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 	return ret;
 }
 
-static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
-		zbx_discoverer_queue_t *queue, char **error)
+static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int concurrency_max,
+		int *stop, zbx_discoverer_queue_t *queue, char **error)
 {
 	int	i, ret = SUCCEED;
 
 	for (i = task->range.state.index_dcheck; i < task->ds_dchecks.values_num && SUCCEED == ret &&
 			0 != task->range.state.count; i++)
 	{
-		ret = discoverer_icmp(druleid, task, i, worker_max, stop, queue, error);
+		ret = discoverer_icmp(druleid, task, i, concurrency_max, stop, queue, error);
 		task->range.state.index_ip = 0;
 		zbx_iprange_first(task->range.ipranges->values, task->range.state.ipaddress);
 	}
 
 	if (FAIL == ret)
-		(void)discovery_pending_checks_count_decrease(queue, worker_max, 0, task->range.state.count);
+		(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, task->range.state.count);
 
 	return ret;
 }
@@ -1219,7 +1219,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 		if (NULL != (job = discoverer_queue_pop(queue)))
 		{
-			int			worker_max;
+			int			concurrency_max;
 			unsigned char		dcheck_type;
 			zbx_uint64_t		druleid;
 			zbx_discoverer_task_t	*task;
@@ -1242,7 +1242,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			job->workers_used++;
 
-			if (0 == job->workers_max || job->workers_used != job->workers_max)
+			if (0 == job->concurrency_max || job->workers_used != job->concurrency_max)
 			{
 				discoverer_queue_push(queue, job);
 				discoverer_queue_notify(queue);
@@ -1251,7 +1251,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				job->status = DISCOVERER_JOB_STATUS_WAITING;
 
 			druleid = job->druleid;
-			worker_max = job->workers_max;
+			concurrency_max = job->concurrency_max;
 
 			discoverer_queue_unlock(queue);
 
@@ -1265,12 +1265,12 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 			else if (SVC_ICMPPING == GET_DTYPE(task))
 			{
-				ret = discoverer_net_check_icmp(druleid, task, worker_max, &worker->stop, queue,
+				ret = discoverer_net_check_icmp(druleid, task, concurrency_max, &worker->stop, queue,
 						&error);
 			}
 			else
 			{
-				ret = discovery_net_check_range(druleid, task, worker_max, &worker->stop,
+				ret = discovery_net_check_range(druleid, task, concurrency_max, &worker->stop,
 						&dmanager, log_worker_id, queue, &error);
 			}
 

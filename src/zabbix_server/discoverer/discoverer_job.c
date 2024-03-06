@@ -168,7 +168,7 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_ds
 
 	job = (zbx_discoverer_job_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_job_t));
 	job->druleid = drule->druleid;
-	job->workers_max = drule->concurrency_max;
+	job->concurrency_max = drule->concurrency_max;
 	job->workers_used = 0;
 	job->drule_revision = drule->revision;
 	job->status = DISCOVERER_JOB_STATUS_QUEUED;
