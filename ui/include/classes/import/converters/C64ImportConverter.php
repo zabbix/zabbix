@@ -260,8 +260,12 @@ class C64ImportConverter extends CConverter {
 					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_AFTER;
 				}
 			}
+			else {
+				$discovery_rule['lifetime'] = '30d';
+			}
 
 			$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
+			$discovery_rule['enabled_lifetime'] = '0';
 		}
 		unset($discovery_rule);
 

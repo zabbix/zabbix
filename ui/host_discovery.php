@@ -539,6 +539,27 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$enabled_lifetime = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
 		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
 
+		if (timeUnitToSeconds($lifetime) == 0) {
+			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
+		}
+
+		if (timeUnitToSeconds($enabled_lifetime) == 0) {
+			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
+		}
+
+		if ($lifetime_type == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		// Set the values to '0', if 'immediately' or 'never' values are set to lifetime/enabled_lifetime types.
+		if ($lifetime_type != ZBX_LLD_DELETE_AFTER) {
+			$lifetime = '0';
+		}
+
+		if ($enabled_lifetime_type != ZBX_LLD_DISABLE_AFTER) {
+			$enabled_lifetime = '0';
+		}
+
 		$input += [
 			'lifetime_type' => $lifetime_type,
 			'lifetime' => $lifetime,
@@ -741,10 +762,13 @@ if (hasRequest('form')) {
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime_type'] = $item['lifetime_type'];
-		$data['lifetime'] = $item['lifetime'];
+		$data['lifetime'] = $item['lifetime_type'] == ZBX_LLD_DELETE_AFTER
+			? $item['lifetime']
+			: DB::getDefault('items', 'lifetime');
 		$data['enabled_lifetime_type'] = $item['enabled_lifetime_type'];
-		$data['enabled_lifetime'] = $item['enabled_lifetime'];
-
+		$data['enabled_lifetime'] = $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER
+			? $item['enabled_lifetime']
+			: DB::getDefault('items', 'enabled_lifetime');
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
