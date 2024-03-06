@@ -3645,7 +3645,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	if (SUCCEED != zbx_ipc_socket_open(&alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, error))
+	if (SUCCEED != zbx_ipc_socket_open(&alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 		zbx_free(error);
