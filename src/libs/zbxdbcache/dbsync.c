@@ -1409,20 +1409,11 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 {
 	ZBX_DC_NUMITEM		*numitem;
-	ZBX_DC_SNMPITEM		*snmpitem;
-	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_TRAPITEM		*trapitem;
 	ZBX_DC_LOGITEM		*logitem;
 	ZBX_DC_DBITEM		*dbitem;
-	ZBX_DC_SSHITEM		*sshitem;
-	ZBX_DC_TELNETITEM	*telnetitem;
-	ZBX_DC_SIMPLEITEM	*simpleitem;
-	ZBX_DC_JMXITEM		*jmxitem;
-	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
-	ZBX_DC_HTTPITEM		*httpitem;
-	ZBX_DC_SCRIPTITEM	*scriptitem;
 	unsigned char		value_type, type;
 	int			history_sec, trends_sec;
 
@@ -1501,19 +1492,13 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 
 	if (ITEM_TYPE_SNMP == type)
 	{
-		snmpitem = item->itemtype.snmpitem;
-
-		if (FAIL == dbsync_compare_str(dbrow[6], snmpitem->snmp_oid))
+		if (FAIL == dbsync_compare_str(dbrow[6], item->itemtype.snmpitem->snmp_oid))
 			return FAIL;
 	}
 
 	if (ITEM_TYPE_IPMI == item->type)
 	{
-		ipmiitem = item->itemtype.ipmiitem;
-		if (NULL == ipmiitem)
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[7], ipmiitem->ipmi_sensor))
+		if (FAIL == dbsync_compare_str(dbrow[7], item->itemtype.ipmiitem->ipmi_sensor))
 			return FAIL;
 	}
 
@@ -1574,99 +1559,73 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 
 	if (ITEM_TYPE_SSH == item->type)
 	{
-		sshitem = item->itemtype.sshitem;
-
-		if (NULL == sshitem)
+		if (FAIL == dbsync_compare_uchar(dbrow[13], item->itemtype.sshitem->authtype))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[13], sshitem->authtype))
+		if (FAIL == dbsync_compare_str(dbrow[14], item->itemtype.sshitem->username))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], sshitem->username))
+		if (FAIL == dbsync_compare_str(dbrow[15], item->itemtype.sshitem->password))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[15], sshitem->password))
+		if (FAIL == dbsync_compare_str(dbrow[16], item->itemtype.sshitem->publickey))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[16], sshitem->publickey))
+		if (FAIL == dbsync_compare_str(dbrow[17], item->itemtype.sshitem->privatekey))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[17], sshitem->privatekey))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[11], sshitem->params))
+		if (FAIL == dbsync_compare_str(dbrow[11], item->itemtype.sshitem->params))
 			return FAIL;
 	}
 
 	if (ITEM_TYPE_TELNET == item->type)
 	{
-		telnetitem = item->itemtype.telnetitem;
-
-		if (NULL == telnetitem)
+		if (FAIL == dbsync_compare_str(dbrow[14], item->itemtype.telnetitem->username))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], telnetitem->username))
+		if (FAIL == dbsync_compare_str(dbrow[15], item->itemtype.telnetitem->password))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[15], telnetitem->password))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[11], telnetitem->params))
+		if (FAIL == dbsync_compare_str(dbrow[11], item->itemtype.telnetitem->params))
 			return FAIL;
 	}
 
 	if (ITEM_TYPE_SCRIPT == item->type)
 	{
-		scriptitem = item->itemtype.scriptitem;
-		if (NULL == scriptitem)
+		if (FAIL == dbsync_compare_str(dbrow[30], item->itemtype.scriptitem->timeout))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[30], scriptitem->timeout))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[11], scriptitem->script))
+		if (FAIL == dbsync_compare_str(dbrow[11], item->itemtype.scriptitem->script))
 			return FAIL;
 	}
 
 	if (ITEM_TYPE_SIMPLE == item->type)
 	{
-		simpleitem = item->itemtype.simpleitem;
-
-		if (NULL == simpleitem)
+		if (FAIL == dbsync_compare_str(dbrow[14], item->itemtype.simpleitem->username))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], simpleitem->username))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[15], simpleitem->password))
+		if (FAIL == dbsync_compare_str(dbrow[15], item->itemtype.simpleitem->password))
 			return FAIL;
 	}
 
 	if (ITEM_TYPE_JMX == item->type)
 	{
-		jmxitem = item->itemtype.jmxitem;
-
-		if (NULL == jmxitem)
+		if (FAIL == dbsync_compare_str(dbrow[14], item->itemtype.jmxitem->username))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], jmxitem->username))
+		if (FAIL == dbsync_compare_str(dbrow[15], item->itemtype.jmxitem->password))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[15], jmxitem->password))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[28], jmxitem->jmx_endpoint))
+		if (FAIL == dbsync_compare_str(dbrow[28], item->itemtype.jmxitem->jmx_endpoint))
 			return FAIL;
 	}
 
 	if (ITEM_TYPE_CALCULATED == item->type)
 	{
-		calcitem = item->itemtype.calcitem;
-
-		if (FAIL == dbsync_compare_str(dbrow[11], calcitem->params))
+		if (FAIL == dbsync_compare_str(dbrow[11], item->itemtype.calcitem->params))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_serialized_expression(dbrow[49], calcitem->formula_bin))
+		if (FAIL == dbsync_compare_serialized_expression(dbrow[49], item->itemtype.calcitem->formula_bin))
 			return FAIL;
 	}
 
@@ -1682,75 +1641,70 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	{
 		zbx_trim_str_list(dbrow[9], ',');
 
-		httpitem = item->itemtype.httpitem;
-
-		if (NULL == httpitem)
+		if (FAIL == dbsync_compare_str(dbrow[30], item->itemtype.httpitem->timeout))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[30], httpitem->timeout))
+		if (FAIL == dbsync_compare_str(dbrow[31], item->itemtype.httpitem->url))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[31], httpitem->url))
+		if (FAIL == dbsync_compare_str(dbrow[32], item->itemtype.httpitem->query_fields))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[32], httpitem->query_fields))
+		if (FAIL == dbsync_compare_str(dbrow[33], item->itemtype.httpitem->posts))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[33], httpitem->posts))
+		if (FAIL == dbsync_compare_str(dbrow[34], item->itemtype.httpitem->status_codes))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[34], httpitem->status_codes))
+		if (FAIL == dbsync_compare_uchar(dbrow[35], item->itemtype.httpitem->follow_redirects))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[35], httpitem->follow_redirects))
+		if (FAIL == dbsync_compare_uchar(dbrow[36], item->itemtype.httpitem->post_type))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[36], httpitem->post_type))
+		if (FAIL == dbsync_compare_str(dbrow[37], item->itemtype.httpitem->http_proxy))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[37], httpitem->http_proxy))
+		if (FAIL == dbsync_compare_str(dbrow[38], item->itemtype.httpitem->headers))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[38], httpitem->headers))
+		if (FAIL == dbsync_compare_uchar(dbrow[39], item->itemtype.httpitem->retrieve_mode))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[39], httpitem->retrieve_mode))
+		if (FAIL == dbsync_compare_uchar(dbrow[40], item->itemtype.httpitem->request_method))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[40], httpitem->request_method))
+		if (FAIL == dbsync_compare_uchar(dbrow[41], item->itemtype.httpitem->output_format))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[41], httpitem->output_format))
+		if (FAIL == dbsync_compare_str(dbrow[42], item->itemtype.httpitem->ssl_cert_file))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[42], httpitem->ssl_cert_file))
+		if (FAIL == dbsync_compare_str(dbrow[43], item->itemtype.httpitem->ssl_key_file))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[43], httpitem->ssl_key_file))
+		if (FAIL == dbsync_compare_str(dbrow[44], item->itemtype.httpitem->ssl_key_password))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[44], httpitem->ssl_key_password))
+		if (FAIL == dbsync_compare_uchar(dbrow[45], item->itemtype.httpitem->verify_peer))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[45], httpitem->verify_peer))
+		if (FAIL == dbsync_compare_uchar(dbrow[46], item->itemtype.httpitem->verify_host))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[46], httpitem->verify_host))
+		if (FAIL == dbsync_compare_uchar(dbrow[13], item->itemtype.httpitem->authtype))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[13], httpitem->authtype))
+		if (FAIL == dbsync_compare_str(dbrow[14], item->itemtype.httpitem->username))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], httpitem->username))
+		if (FAIL == dbsync_compare_str(dbrow[15], item->itemtype.httpitem->password))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[15], httpitem->password))
+		if (FAIL == dbsync_compare_uchar(dbrow[47], item->itemtype.httpitem->allow_traps))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[47], httpitem->allow_traps))
-			return FAIL;
-
-		if (FAIL == dbsync_compare_str(dbrow[10], httpitem->trapper_hosts))
+		if (FAIL == dbsync_compare_str(dbrow[10], item->itemtype.httpitem->trapper_hosts))
 			return FAIL;
 	}
 
