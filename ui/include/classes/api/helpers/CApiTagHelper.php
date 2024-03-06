@@ -129,13 +129,15 @@ class CApiTagHelper {
 					unset($values['NOT EXISTS']);
 				}
 
+				$sql_tag_values = '';
+
 				if ($values) {
 					$sql_tag_values = (count($values) === 1)
 						? ' AND '.implode(' OR ', $values)
 						: ' AND ('.implode(' OR ', $values).')';
-
-					$_where[] = $sql_start_part.$sql_tag_values.$sql_end_part;
 				}
+
+				$_where[] = $sql_start_part.$sql_tag_values.$sql_end_part;
 			}
 
 			if (count($_where) == 1) {
