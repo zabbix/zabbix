@@ -1434,7 +1434,8 @@ class CUserDirectory extends CApiService {
 											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')],
 											'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), 'default' => DB::getDefault('userdirectory_media', 'active')],
 											'severity' =>		['type' => API_INT32, 'in' => '0:63', 'default' => DB::getDefault('userdirectory_media', 'severity')],
-											'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')]
+											'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')],
+											'userdirectory_mediaid' => ['type' => API_ID, 'in' => '0']
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -1472,8 +1473,8 @@ class CUserDirectory extends CApiService {
 			unset($field);
 
 			$api_input_rules['fields']['userdirectoryid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
-			$api_input_rules['fields']['provision_media']['rules'][0]['fields'] += [
-				'userdirectory_mediaid' => ['type' => API_ID]
+			$api_input_rules['fields']['provision_media']['rules'][0]['fields']['userdirectory_mediaid'] = [
+				'type' => API_ID
 			];
 		}
 
