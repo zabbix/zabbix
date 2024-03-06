@@ -131,7 +131,7 @@ class CApiTagHelper {
 
 				if ($values) {
 					$sql_tag_values = (count($values) === 1)
-						? ' AND '.$values[0]
+						? ' AND '.implode(' OR ', $values)
 						: ' AND ('.implode(' OR ', $values).')';
 
 					$_where[] = $sql_start_part.$sql_tag_values.$sql_end_part;
