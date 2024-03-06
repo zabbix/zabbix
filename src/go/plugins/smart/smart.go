@@ -21,7 +21,6 @@ package smart
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -170,15 +169,15 @@ func (p *Plugin) diskGet(params []string) ([]byte, error) {
 }
 
 func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
-	executable := path
+	args := []string{"-a", path, "-j"}
 
 	if raidType != "" {
-		executable = fmt.Sprintf("%s -d %s", executable, raidType)
+		args = []string{"-a", path, "-d", raidType, "-j"}
 	}
 
-	device, err := p.executeSingle(executable)
+	device, err := p.ctl.Execute(args...)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to execute smartctl")
 	}
 
 	out, err := setSingleDiskFields(device)
