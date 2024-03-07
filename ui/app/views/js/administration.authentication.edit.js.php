@@ -263,7 +263,7 @@
 
 			this.ldap_provisioning_fields.forEach(field => field.toggleAttribute('disabled', ldap_disabled));
 			this.#setTableVisiblityState(this.ldap_servers_table, ldap_disabled);
-			this._disableRemoveLdapServersWithUserGroups();
+			this.#disableRemoveLinksWithUserGroups(this.ldap_servers_table);
 			this.jit_provision_interval.toggleAttribute('disabled', provision_disabled);
 		}
 
