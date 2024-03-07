@@ -182,7 +182,7 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
-int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -233,7 +233,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 static int	get_config_forks(unsigned char process_type)
 {
 	if (ZBX_PROCESS_TYPE_COUNT > process_type)
-		return CONFIG_FORKS[process_type];
+		return config_forks[process_type];
 
 	return 0;
 }
@@ -347,127 +347,127 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_CONFSYNCER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_CONFSYNCER]))
 	{
 		/* make initial configuration sync before worker processes are forked on active Zabbix proxy */
 		*local_process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_CONFSYNCER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_CONFSYNCER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_TRAPPER]))
 	{
 		/* make initial configuration sync before worker processes are forked on passive Zabbix proxy */
 		*local_process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_TRAPPER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCMAN]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_PREPROCMAN]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PREPROCMAN;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCMAN];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_PREPROCMAN];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DATASENDER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_DATASENDER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DATASENDER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DATASENDER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_DATASENDER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_IPMIMANAGER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_IPMIMANAGER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_IPMIMANAGER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HOUSEKEEPER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_HOUSEKEEPER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HOUSEKEEPER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HOUSEKEEPER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_HTTPPOLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERYMANAGER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HISTSYNCER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HISTSYNCER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_JAVAPOLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_JAVAPOLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_SNMPTRAPPER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMPTRAPPER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_SNMPTRAPPER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SELFMON]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_SELFMON]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SELFMON;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SELFMON];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_SELFMON];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_VMWARE]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_VMWARE;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_VMWARE];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_TASKMANAGER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_TASKMANAGER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_TASKMANAGER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_TASKMANAGER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_TASKMANAGER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_POLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_POLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_UNREACHABLE]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_UNREACHABLE];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_PINGER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_PINGER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_AVAILMAN]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_AVAILMAN]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_AVAILMAN;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AVAILMAN];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_AVAILMAN];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_ODBCPOLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_ODBCPOLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_ODBCPOLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPAGENT_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_AGENT_POLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_AGENT_POLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_SNMP_POLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_SNMP_POLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_INTERNAL_POLLER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
 	else
 		return FAIL;
@@ -549,7 +549,7 @@ static void	zbx_set_defaults(void)
 #endif
 	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
 	{
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_DATASENDER] = 0;
+		config_forks[ZBX_PROCESS_TYPE_DATASENDER] = 0;
 		zbx_program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
 
@@ -559,11 +559,11 @@ static void	zbx_set_defaults(void)
 	if (NULL == config_socket_path)
 		config_socket_path = zbx_strdup(config_socket_path, "/tmp");
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
+	if (0 != config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER])
+		config_forks[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER])
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
+	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERER])
+		config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
 
 	if (NULL == zbx_config_vault.url)
 		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
@@ -610,8 +610,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE] &&
-			0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER] + CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
+	if (0 == config_forks[ZBX_PROCESS_TYPE_UNREACHABLE] &&
+			0 != config_forks[ZBX_PROCESS_TYPE_POLLER] + config_forks[ZBX_PROCESS_TYPE_JAVAPOLLER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"StartPollersUnreachable\" configuration parameter must not be 0"
 				" if regular or Java pollers are started");
@@ -619,7 +619,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	if ((NULL == config_java_gateway || '\0' == *config_java_gateway) &&
-			0 < CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
+			0 < config_forks[ZBX_PROCESS_TYPE_JAVAPOLLER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
 		err = 1;
@@ -666,7 +666,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
 #endif
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
-	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],
+	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", config_forks[ZBX_PROCESS_TYPE_VMWARE],
 			"VMware support"));
 
 	/* parameters VMwareFrequency, VMwarePerfFrequency, VMwareCacheSize, VMwareTimeout are not checked here */
@@ -709,7 +709,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 
 #if !defined(HAVE_OPENIPMI)
-	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],
+	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER],
 			"IPMI support"));
 #endif
 	if (0 != config_confsyncer_frequency)
@@ -838,23 +838,23 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&config_hostname_item,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"StartDBSyncers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER],		TYPE_INT,
+		{"StartDBSyncers",		&config_forks[ZBX_PROCESS_TYPE_HISTSYNCER],		TYPE_INT,
 			PARM_OPT,	1,			100},
-		{"StartDiscoverers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],		TYPE_INT,
+		{"StartDiscoverers",		&config_forks[ZBX_PROCESS_TYPE_DISCOVERER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartHTTPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER],		TYPE_INT,
+		{"StartHTTPPollers",		&config_forks[ZBX_PROCESS_TYPE_HTTPPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartPingers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER],			TYPE_INT,
+		{"StartPingers",		&config_forks[ZBX_PROCESS_TYPE_PINGER],			TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER],			TYPE_INT,
+		{"StartPollers",		&config_forks[ZBX_PROCESS_TYPE_POLLER],			TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartPollersUnreachable",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE],	TYPE_INT,
+		{"StartPollersUnreachable",	&config_forks[ZBX_PROCESS_TYPE_UNREACHABLE],	TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartIPMIPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],		TYPE_INT,
+		{"StartIPMIPollers",		&config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartTrappers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER],			TYPE_INT,
+		{"StartTrappers",		&config_forks[ZBX_PROCESS_TYPE_TRAPPER],			TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartJavaPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER],		TYPE_INT,
+		{"StartJavaPollers",		&config_forks[ZBX_PROCESS_TYPE_JAVAPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"JavaGateway",			&config_java_gateway,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -862,7 +862,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1024,			32767},
 		{"SNMPTrapperFile",		&zbx_config_snmptrap_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"StartSNMPTrapper",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER],		TYPE_INT,
+		{"StartSNMPTrapper",		&config_forks[ZBX_PROCESS_TYPE_SNMPTRAPPER],		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&config_conf_cache_size,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
@@ -966,7 +966,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&config_load_module,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"StartVMwareCollectors",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],			TYPE_INT,
+		{"StartVMwareCollectors",	&config_forks[ZBX_PROCESS_TYPE_VMWARE],			TYPE_INT,
 			PARM_OPT,	0,			250},
 		{"VMwareFrequency",		&config_vmware_frequency,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
@@ -1026,11 +1026,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"StatsAllowedIP",		&config_stats_allowed_ip,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"StartPreprocessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],		TYPE_INT,
+		{"StartPreprocessors",		&config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],		TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],	TYPE_INT,
+		{"StartODBCPollers",		&config_forks[ZBX_PROCESS_TYPE_ODBCPOLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"ProxyMemoryBufferSize",	&config_proxy_memory_buffer_size,	TYPE_UINT64,
 			PARM_OPT,	0,	__UINT64_C(2) * ZBX_GIBIBYTE},
@@ -1038,11 +1038,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,	SEC_PER_DAY * 10},
 		{"ProxyBufferMode",		&config_proxy_buffer_mode_str,		TYPE_STRING,
 			PARM_OPT,	0,	0},
-		{"StartHTTPAgentPollers",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
+		{"StartHTTPAgentPollers",	&config_forks[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
+		{"StartAgentPollers",		&config_forks[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartSNMPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
+		{"StartSNMPPollers",		&config_forks[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
@@ -1078,8 +1078,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_db_validate_config(zbx_config_dbhigh);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
-			CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_zbx_program_type);
+	zbx_tls_validate_config(zbx_config_tls, config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
+			config_forks[ZBX_PROCESS_TYPE_LISTENER], get_zbx_program_type);
 #endif
 }
 
@@ -1427,7 +1427,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
 								get_zbx_progname, zbx_config_timeout,
-								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
+								config_forks[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
@@ -1446,7 +1446,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks};
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args = {
-							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+							.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
 							.config_timeout = zbx_config_timeout,
 							zbx_config_source_ip};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency,
@@ -1601,7 +1601,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
+	if (0 != config_forks[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
 		zbx_free(error);
@@ -1643,7 +1643,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_pb_init();
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
+	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
@@ -1656,13 +1656,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				continue;
 		}
 
-		zbx_threads_num += CONFIG_FORKS[i];
+		zbx_threads_num += config_forks[i];
 	}
 
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
+	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, config_listen_ip, (unsigned short)config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))

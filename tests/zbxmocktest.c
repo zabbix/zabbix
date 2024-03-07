@@ -32,7 +32,7 @@ unsigned char	get_program_type(void)
 	return program_type;
 }
 
-static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -81,12 +81,12 @@ static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 
 int	get_config_forks(unsigned char process_type)
 {
-	return CONFIG_FORKS[process_type];
+	return config_forks[process_type];
 }
 
 void	set_config_forks(unsigned char process_type, int forks)
 {
-	CONFIG_FORKS[process_type] = forks;
+	config_forks[process_type] = forks;
 }
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
