@@ -616,8 +616,8 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
 			" checks per ip:%u dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
 			task->range.id, task->range.state.count, task->range.state.checks_per_ip,
-			task->dchecks.values_num, task->dchecks.values[task->range.state.index_dcheck]->type,
-			worker_max);
+			task->ds_dchecks.values_num,
+			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, worker_max);
 
 	if (0 == worker_max)
 		worker_max = queue->checks_per_worker_max;
@@ -636,7 +636,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	do
 	{
 		zbx_discoverer_results_t	*result;
-		zbx_dc_dcheck_t			*dcheck = task->dchecks.values[task->range.state.index_dcheck];
+		zbx_dc_dcheck_t			*dcheck;
 
 		TASK_IP2STR(task, ip);
 
@@ -646,6 +646,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		result = discoverer_result_create(druleid, task->unique_dcheckid);
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
+		dcheck = &task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck;
 
 		switch (dcheck->type)
 		{
@@ -737,7 +738,7 @@ out:
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
 			" last ip:%s abort:%d", log_worker_id, __func__, druleid,
-			task->dchecks.values[task->range.state.index_dcheck]->type,
+			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
 			task->range.state.count, first_ip, ip, abort);
 
 	return ret;

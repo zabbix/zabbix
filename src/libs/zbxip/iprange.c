@@ -348,10 +348,8 @@ check_fill:
  *             ip      - [IN/OUT] string with current address from IP range   *
  *             len     - [IN] size of string buffer for ip address            *
  *                                                                            *
- * Return value: SUCCEED                                                      *
- *                                                                            *
  ******************************************************************************/
-int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
+void	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
 {
 	if (ZBX_IPRANGE_V6 == type)
 	{
@@ -366,9 +364,8 @@ int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip,
 		zbx_snprintf(ip, len, "%u.%u.%u.%u", (unsigned int)ipaddress[0], (unsigned int)ipaddress[1],
 				(unsigned int)ipaddress[2], (unsigned int)ipaddress[3]);
 	}
-
-	return SUCCEED;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parses IP address (v4 or v6) into IP range structure              *
@@ -489,13 +486,17 @@ int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip
 	{
 		idx = 0;
 		zbx_iprange_first(&ipranges[idx], ipaddress);
-		return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+		zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+
+		return SUCCEED;
 	}
 
 	if (FAIL == zbx_iprange_uniq_iter(ipranges, num, &idx, ipaddress))
 		return FAIL;
 
-	return zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+	zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+
+	return SUCCEED;
 }
 
 /******************************************************************************

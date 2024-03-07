@@ -51,19 +51,24 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	}
 }
 
-static zbx_dc_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_dc_dcheck_ptr_t *dchecks_common)
+static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common)
 {
-	zbx_dc_dcheck_t	*dcheck_ptr, dcheck_cmp = {.dcheckid = dcheck->dcheckid};
+	zbx_ds_dcheck_t	*ds_dcheck, ds_dcheck_cmp = {.dcheck.dcheckid = dcheck->dcheckid};
+	zbx_dc_dcheck_t	*dcheck_ptr;
 	int		idx;
 
-	if (FAIL != (idx = zbx_vector_dc_dcheck_ptr_search(dchecks_common, &dcheck_cmp,
-							ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL != (idx = zbx_vector_ds_dcheck_ptr_search(ds_dchecks_common, &ds_dcheck_cmp,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
-		return dchecks_common->values[idx];
+		return ds_dchecks_common->values[idx];
 	}
 
-	dcheck_ptr = (zbx_dc_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
+	ds_dcheck = (zbx_ds_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_ds_dcheck_t));
+	dcheck_ptr = &ds_dcheck->dcheck;
 	dcheck_copy(dcheck, dcheck_ptr);
+
+	zbx_vector_portrange_create(&ds_dcheck->portranges);
+	dcheck_port_ranges_get(ds_dcheck->dcheck.ports, &ds_dcheck->portranges);
 
 	if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
 			SVC_SNMPv3 == dcheck_ptr->type)
@@ -95,60 +100,57 @@ static zbx_dc_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_dc_
 		}
 	}
 
-	zbx_vector_dc_dcheck_ptr_append(dchecks_common, dcheck_ptr);
+	zbx_vector_ds_dcheck_ptr_append(ds_dchecks_common, ds_dcheck);
 
-	return dcheck_ptr;
+	return ds_dcheck;
 }
 
-static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck,
+static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_ds_dcheck_t *ds_dcheck,
 		zbx_vector_iprange_t *ipranges, zbx_hashset_t *tasks, zbx_hashset_t *tasks_local)
 {
 	zbx_discoverer_task_t	task_local, *task;
-	zbx_vector_portrange_t	port_ranges;
 	zbx_hashset_t		*tasks_ptr;
 	int			port = ZBX_PORTRANGE_INIT_PORT;
 	unsigned int		checks_count = 0;
 
-	if (SVC_ICMPPING != dcheck->type)
+	if (SVC_ICMPPING != ds_dcheck->dcheck.type)
 	{
-		zbx_vector_portrange_create(&port_ranges);
-		dcheck_port_ranges_get(dcheck->ports, &port_ranges);
+		zbx_vector_portrange_t	*port_ranges = &ds_dcheck->portranges;
 
-		while (SUCCEED == zbx_portrange_uniq_next(port_ranges.values, port_ranges.values_num, &port))
+		while (SUCCEED == zbx_portrange_uniq_next(port_ranges->values, port_ranges->values_num, &port))
 			checks_count++;
 
-		if (0 != port_ranges.values_num)
-			port = port_ranges.values[0].from;	/* get value of first port in range */
-
-		zbx_vector_portrange_destroy(&port_ranges);
+		if (0 != port_ranges->values_num)
+			port = port_ranges->values[0].from;	/* get value of first port in range */
 	}
 	else
 		checks_count = 1;
 
 	task_local.range.id = 0;
-	zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
-	zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
+	zbx_vector_ds_dcheck_ptr_create(&task_local.ds_dchecks);
+	zbx_vector_ds_dcheck_ptr_append(&task_local.ds_dchecks, ds_dcheck);
 
-	tasks_ptr = (0 == drule->concurrency_max && SUCCEED == dcheck_is_async(dcheck) && SVC_SNMPv3 != dcheck->type) ?
-			tasks_local : tasks;
+	tasks_ptr = (0 == drule->concurrency_max && SUCCEED == dcheck_is_async(&ds_dcheck->dcheck) &&
+			SVC_SNMPv3 != ds_dcheck->dcheck.type) ? tasks_local : tasks;
 
 	/* The net-snmplib limitation associated with the internal EnginID cache requires that the net-snmplib cache */
-	/* be reset after each dcheck. That's why we put each snmpv3 dcheck into a separate task */
+	/* be reset after each dcheck. That's why we put each snmpv3 dcheck into a separate task. */
 
-	if (SVC_SNMPv3 != dcheck->type && NULL != (task = zbx_hashset_search(tasks_ptr, &task_local)))
+	if (SVC_SNMPv3 != ds_dcheck->dcheck.type && NULL != (task = zbx_hashset_search(tasks_ptr, &task_local)))
 	{
-		zbx_vector_dc_dcheck_ptr_destroy(&task_local.dchecks);
+		zbx_vector_ds_dcheck_ptr_destroy(&task_local.ds_dchecks);
 
-		if (FAIL == zbx_vector_dc_dcheck_ptr_search(&task->dchecks, dcheck, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+		if (FAIL == zbx_vector_ds_dcheck_ptr_search(&task->ds_dchecks, ds_dcheck,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 		{
-			zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
+			zbx_vector_ds_dcheck_ptr_append(&task->ds_dchecks, ds_dcheck);
 			task->range.state.checks_per_ip += checks_count;
 		}
 	}
 	else
 	{
 		memset(&task_local.range, 0, sizeof(zbx_task_range_t));
-		task_local.range.id = SVC_SNMPv3 == dcheck->type? dcheck->dcheckid : 0;
+		task_local.range.id = SVC_SNMPv3 == ds_dcheck->dcheck.type ? ds_dcheck->dcheck.dcheckid : 0;
 		task_local.range.ipranges = ipranges;
 		task_local.range.state.checks_per_ip = checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
@@ -162,14 +164,15 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 }
 
 static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_hashset_t *tasks,
-		zbx_hashset_t *tasks_local, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
+		zbx_hashset_t *tasks_local, zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common, zbx_vector_iprange_t *ipranges)
 {
 	int		i;
 	zbx_uint64_t	checks_count = 0;
 
 	for (i = 0; i < drule->dchecks.values_num; i++)
 	{
-		zbx_dc_dcheck_t	*dcheck_common, *dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
+		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
+		zbx_ds_dcheck_t	*ds_dcheck_common;
 
 		if (0 != drule->unique_dcheckid &&
 				((1 == unique && drule->unique_dcheckid != dcheck->dcheckid) ||
@@ -178,8 +181,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 			continue;
 		}
 
-		dcheck_common = dcheck_clone_get(dcheck, dchecks_common);
-		checks_count += process_check_range(drule, dcheck_common, ipranges, tasks, tasks_local);
+		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
+		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks, tasks_local);
 	}
 
 	return checks_count;
@@ -189,14 +192,15 @@ static void	process_rangetask_copy(zbx_discoverer_task_t *task, zbx_task_range_t
 {
 	zbx_discoverer_task_t	*task_out = zbx_hashset_insert(tasks, task, sizeof(zbx_discoverer_task_t));
 
-	zbx_vector_dc_dcheck_ptr_create(&task_out->dchecks);
-	zbx_vector_dc_dcheck_ptr_append_array(&task_out->dchecks, task->dchecks.values, task->dchecks.values_num);
+	zbx_vector_ds_dcheck_ptr_create(&task_out->ds_dchecks);
+	zbx_vector_ds_dcheck_ptr_append_array(&task_out->ds_dchecks, task->ds_dchecks.values,
+			task->ds_dchecks.values_num);
 	task_out->range = *range;
 	(task->range.id)++;
 }
 
-static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vector_portrange_t *port_ranges,
-		int *total, zbx_hashset_t *tasks_dst, int checks_per_worker_max)
+static void	process_task_range_split_async(zbx_discoverer_task_t *task, int *total, zbx_hashset_t *tasks_dst,
+		int checks_per_worker_max)
 {
 	zbx_task_range_t	range;
 
@@ -209,15 +213,14 @@ static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vect
 			task->range.ipranges->values_num, &task->range.state.index_ip,
 			task->range.state.ipaddress))
 	{
-		for (; task->range.state.index_dcheck < task->dchecks.values_num;
+		for (; task->range.state.index_dcheck < task->ds_dchecks.values_num;
 				task->range.state.index_dcheck++)
 		{
-			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.index_dcheck];
+			zbx_ds_dcheck_t	*dcheck = task->ds_dchecks.values[task->range.state.index_dcheck];
 
-			dcheck_port_ranges_get(dcheck->ports, port_ranges);
-
-			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges->values, port_ranges->values_num,
-					&task->range.state.index_port, &task->range.state.port))
+			while (SUCCEED == zbx_portrange_uniq_iter(dcheck->portranges.values,
+					dcheck->portranges.values_num, &task->range.state.index_port,
+					&task->range.state.port))
 			{
 				if ((zbx_uint64_t)checks_per_worker_max == range.state.count)
 				{
@@ -230,7 +233,6 @@ static void	process_task_range_split_async(zbx_discoverer_task_t *task, zbx_vect
 			}
 
 			task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
-			zbx_vector_portrange_clear(port_ranges);
 		}
 
 		task->range.state.index_dcheck = 0;
@@ -248,7 +250,7 @@ static void	process_task_range_split_icmp(zbx_discoverer_task_t *task, int *tota
 	task->range.state.count = 0;
 	range = task->range;
 
-	for (; task->range.state.index_dcheck < task->dchecks.values_num; task->range.state.index_dcheck++)
+	for (; task->range.state.index_dcheck < task->ds_dchecks.values_num; task->range.state.index_dcheck++)
 	{
 		memset(task->range.state.ipaddress, 0, sizeof(task->range.state.ipaddress));
 
@@ -274,12 +276,11 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 {
 	zbx_discoverer_task_t	*task;
 	zbx_hashset_iter_t	iter;
-	zbx_vector_portrange_t	port_ranges;
 	int			total = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_src:%d tasks_dst:%d", __func__, tasks_src->num_data, tasks_dst->num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_src:%d tasks_dst:%d", __func__, tasks_src->num_data,
+			tasks_dst->num_data);
 
-	zbx_vector_portrange_create(&port_ranges);
 	zbx_hashset_iter_reset(tasks_src, &iter);
 
 	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
@@ -287,13 +288,11 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 		if (SVC_ICMPPING == GET_DTYPE(task))
 			process_task_range_split_icmp(task, &total, tasks_dst, checks_per_worker_max);
 		else
-			process_task_range_split_async(task, &port_ranges, &total, tasks_dst, checks_per_worker_max);
+			process_task_range_split_async(task, &total, tasks_dst, checks_per_worker_max);
 
 		discoverer_task_clear(task);
 		zbx_hashset_iter_remove(&iter);
 	}
-
-	zbx_vector_portrange_destroy(&port_ranges);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() tasks_src:%d tasks_dst:%d total:%d", __func__, tasks_src->num_data,
 			tasks_dst->num_data, total);
@@ -321,8 +320,9 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
  *                                                                            *
  ******************************************************************************/
 void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
-		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges, int checks_per_worker_max,
-		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids)
+		zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common, zbx_vector_iprange_t *ipranges,
+		int checks_per_worker_max, zbx_vector_discoverer_drule_error_t *drule_errors,
+		zbx_vector_uint64_t *err_druleids)
 {
 	zbx_hashset_t	tasks_local;
 	zbx_uint64_t	checks_count = 0;
@@ -391,9 +391,9 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 	}
 
 	if (0 != drule->unique_dcheckid)
-		checks_count = process_checks(drule, 1, tasks, &tasks_local, dchecks_common, ipranges);
+		checks_count = process_checks(drule, 1, tasks, &tasks_local, ds_dchecks_common, ipranges);
 
-	checks_count += process_checks(drule, 0, tasks, &tasks_local, dchecks_common, ipranges);
+	checks_count += process_checks(drule, 0, tasks, &tasks_local, ds_dchecks_common, ipranges);
 
 	if (0 == checks_count)
 		goto out;

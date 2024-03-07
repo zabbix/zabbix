@@ -23,11 +23,21 @@
 #include "zbxdiscovery.h"
 #include "zbxip.h"
 
-ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
-
 #define DISCOVERER_JOB_STATUS_QUEUED	0
 #define DISCOVERER_JOB_STATUS_WAITING	1
 #define DISCOVERER_JOB_STATUS_REMOVING	2
+
+ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
+ZBX_VECTOR_DECL(portrange, zbx_range_t)
+
+typedef struct
+{
+	zbx_dc_dcheck_t		dcheck;
+	zbx_vector_portrange_t	portranges;
+}
+zbx_ds_dcheck_t;
+
+ZBX_PTR_VECTOR_DECL(ds_dcheck_ptr, zbx_ds_dcheck_t *)
 
 typedef struct
 {
@@ -37,7 +47,7 @@ typedef struct
 	int				workers_used;
 	int				workers_max;
 	unsigned char			status;
-	zbx_vector_dc_dcheck_ptr_t	*dchecks_common;
+	zbx_vector_ds_dcheck_ptr_t	*ds_dchecks_common;
 	zbx_vector_iprange_t		*ipranges;
 }
 zbx_discoverer_job_t;
@@ -64,13 +74,11 @@ zbx_task_range_t;
 
 typedef struct
 {
-	zbx_vector_dc_dcheck_ptr_t	dchecks;
+	zbx_vector_ds_dcheck_ptr_t	ds_dchecks;
 	zbx_task_range_t		range;
 	zbx_uint64_t			unique_dcheckid;
 }
 zbx_discoverer_task_t;
-
-ZBX_VECTOR_DECL(portrange, zbx_range_t)
 
 zbx_hash_t		discoverer_task_hash(const void *data);
 int			discoverer_task_compare(const void *d1, const void *d2);
@@ -80,12 +88,12 @@ zbx_uint64_t		discoverer_task_check_count_get(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_task_ip_check_count_get(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc_dcheck_ptr_t *dchecks_common,
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common,
 					zbx_vector_iprange_t *ipranges);
 void			discoverer_job_abort(zbx_discoverer_job_t *job, zbx_uint64_t *pending_checks_count,
 					zbx_vector_discoverer_drule_error_t *errors, char *error);
 zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job);
 int			discoverer_range_check_iter(zbx_discoverer_task_t *task);
-
+void			discoverer_ds_dcheck_free(zbx_ds_dcheck_t *ds_dcheck);
 
 #endif
