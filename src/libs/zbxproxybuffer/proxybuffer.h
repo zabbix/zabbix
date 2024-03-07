@@ -48,9 +48,6 @@ typedef enum
 }
 zbx_pb_state_t;
 
-//extern zbx_pb_state_t	pb_dst[];
-//extern zbx_pb_state_t	pb_src[];
-
 zbx_pb_state_t	get_pb_dst(int i);
 zbx_pb_state_t	get_pb_src(int i);
 
@@ -137,7 +134,6 @@ typedef struct
 }
 zbx_pb_t;
 
-//extern zbx_pb_t	*pb_data;
 zbx_pb_t	*get_pb_data(void);
 
 zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield);

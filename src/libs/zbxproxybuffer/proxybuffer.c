@@ -335,7 +335,7 @@ static void	pb_init_state(zbx_pb_t *pb)
 
 zbx_pb_t	*get_pb_data(void)
 {
-	return get_pb_data();
+	return pb_data;
 }
 
 zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield)
