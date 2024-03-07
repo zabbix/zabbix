@@ -49,6 +49,8 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options): array {
+		global $HTTP_AUTH_VISIBLE;
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
@@ -68,6 +70,10 @@ class CAuthentication extends CApiService {
 			$db_auth[] = $row;
 		}
 		$db_auth = $this->unsetExtraFields($db_auth, ['configid'], []);
+
+		if (!$HTTP_AUTH_VISIBLE) {
+			$db_auth[0]['http_auth_enabled'] = ZBX_AUTH_HTTP_DISABLED;
+		}
 
 		return $db_auth[0];
 	}
@@ -112,6 +118,8 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	protected function validateUpdate(array $auth): array {
+		global $HTTP_AUTH_VISIBLE;
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
 			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
@@ -133,6 +141,16 @@ class CAuthentication extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!$HTTP_AUTH_VISIBLE) {
+			foreach (['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'] as $field) {
+				if (array_key_exists($field, $auth)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $field,
+						_('cannot update parameter due to frontend configuration')
+					));
+				}
+			}
 		}
 
 		$output_fields = $this->output_fields;
