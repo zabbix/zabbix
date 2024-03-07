@@ -233,8 +233,8 @@ void	zbx_mock_test_entry(void **state)
 			int		found;
 			const char	*snmp_oid = test_config.snmp_oid;
 
-			ZBX_DC_SNMPITEM	*snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&config->snmpitems, item.itemid,
-					sizeof(ZBX_DC_SNMPITEM), &found);
+			ZBX_DC_SNMPITEM	*snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&(get_config())->snmpitems,
+					item.itemid, sizeof(ZBX_DC_SNMPITEM), &found);
 
 			if (0 == found)
 			{

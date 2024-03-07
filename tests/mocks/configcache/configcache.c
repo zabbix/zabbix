@@ -111,7 +111,7 @@ void	free_string(const char *str)
 void	mock_config_init(void)
 {
 	memset(&mock_config, 0, sizeof(mock_config));
-	config = &mock_config.dc;
+	set_config(&mock_config.dc);
 }
 
 void	mock_config_free(void)

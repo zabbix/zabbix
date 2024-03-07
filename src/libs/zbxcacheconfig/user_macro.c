@@ -412,8 +412,8 @@ static void	dc_kvs_path_remove(zbx_dc_kvs_path_t *kvs_path)
 
 	kvs_path_local.path = kvs_path->path;
 
-	if (FAIL != (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
-		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
+	if (FAIL != (i = zbx_vector_ptr_search(&(get_config())->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+		zbx_vector_ptr_remove_noorder(&(get_config())->kvs_paths, i);
 
 	zbx_hashset_destroy(&kvs_path->kvs);
 	dc_strpool_release(kvs_path->path);
@@ -462,7 +462,9 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location,
 	int			i;
 	zbx_uint64_pair_t	pair = {macro->hostid, macro->macroid};
 	char			*path, *key;
-	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
+	ZBX_DC_CONFIG		*config = get_config();
+	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv :
+				&(get_config())->hmacro_kv);
 	zbx_dc_macro_kv_t	*mkv;
 
 	zbx_strsplit_last(location, ':', &path, &key);
@@ -559,7 +561,7 @@ out:
  *********************************************************************************/
 static void	um_macro_deregister_kvs(zbx_um_macro_t *macro)
 {
-	zbx_hashset_t	*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
+	zbx_hashset_t	*macro_kv = (0 == macro->hostid ? &(get_config())->gmacro_kv : &(get_config())->hmacro_kv);
 
 	zbx_dc_macro_kv_t	*mkv;
 
@@ -577,6 +579,7 @@ static void	um_macro_deregister_kvs(zbx_um_macro_t *macro)
  *********************************************************************************/
 int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location)
 {
+	ZBX_DC_CONFIG		*config = get_config();
 	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
 	zbx_dc_macro_kv_t	*mkv;
 	char			*path, *key;
@@ -630,7 +633,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	zbx_vector_um_host_t	hosts;
 	zbx_hashset_t		*user_macros;
 
-	user_macros = (2 == offset ? &config->hmacros : &config->gmacros);
+	user_macros = (2 == offset ? &(get_config())->hmacros : &(get_config())->gmacros);
 
 	zbx_vector_um_host_create(&hosts);
 
@@ -1161,7 +1164,8 @@ zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, zbx_uint64_t
 	{
 		zbx_um_macro_t		**pmacro;
 		zbx_uint64_pair_t	*pair = &host_macro_ids->values[i];
-		zbx_hashset_t		*user_macros = (0 != pair->first ? &config->hmacros : &config->gmacros);
+		zbx_hashset_t		*user_macros = (0 != pair->first ? &(get_config())->hmacros :
+					&(get_config())->gmacros);
 		zbx_uint64_t		*pmacroid = &pair->second;
 		zbx_um_host_t		*host;
 

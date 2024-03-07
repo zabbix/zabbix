@@ -1015,19 +1015,26 @@ typedef struct
 }
 ZBX_DC_CONFIG;
 
-extern int	sync_in_progress;
-extern ZBX_DC_CONFIG	*config;
-extern zbx_rwlock_t	config_lock;
+ZBX_DC_CONFIG	*get_config(void);
 
-#define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
-#define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
-#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
+/* for cmocka */
+void	set_config(ZBX_DC_CONFIG *in);
 
-extern zbx_rwlock_t	config_history_lock;
+#define	RDLOCK_CACHE	rdlock_cache()
+#define	WRLOCK_CACHE	wrlock_cache()
+#define	UNLOCK_CACHE	unlock_cache()
 
-#define	RDLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_rdlock(config_history_lock)
-#define	WRLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_wrlock(config_history_lock)
-#define	UNLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_unlock(config_history_lock)
+void	rdlock_cache(void);
+void	wrlock_cache(void);
+void	unlock_cache(void);
+
+void	rdlock_cache_config_history(void);
+void	wrlock_cache_config_history(void);
+void	unlock_cache_config_history(void);
+
+#define	RDLOCK_CACHE_CONFIG_HISTORY	rdlock_cache_config_history()
+#define	WRLOCK_CACHE_CONFIG_HISTORY	wrlock_cache_config_history()
+#define	UNLOCK_CACHE_CONFIG_HISTORY	unlock_cache_config_history()
 
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2

@@ -125,9 +125,56 @@ static zbx_get_config_forks_f	get_config_forks_cb = NULL;
  ******************************************************************************/
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
-ZBX_DC_CONFIG		*config = NULL;
+ZBX_DC_CONFIG	*config = NULL;
+
+ZBX_DC_CONFIG	*get_config(void)
+{
+	return config;
+}
+
+void	set_config(ZBX_DC_CONFIG *in)
+{
+	config = in;
+}
+
+
 zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+
+void	rdlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_rdlock(config_lock);
+}
+
+void	wrlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_wrlock(config_lock);
+}
+
+void	unlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_unlock(config_lock);
+}
+
 zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
+
+void	rdlock_cache_config_history(void)
+{
+	zbx_rwlock_rdlock(config_history_lock);
+}
+
+void	wrlock_cache_config_history(void)
+{
+	zbx_rwlock_wrlock(config_history_lock);
+}
+
+void	unlock_cache_config_history(void)
+{
+	zbx_rwlock_unlock(config_history_lock);
+}
+
 static zbx_shmem_info_t	*config_mem;
 
 ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
