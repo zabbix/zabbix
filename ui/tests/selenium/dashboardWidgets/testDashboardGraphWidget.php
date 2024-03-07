@@ -1797,7 +1797,8 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Number of rows' => '5',
+						'Rows' => 'Variable',
+						'Maximum number of rows' => '5',
 						'Display min/avg/max' => true
 					],
 					'Problems' => [
@@ -2346,6 +2347,19 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->assertEnabledFields($fields, false);
 		$form->fill(['Show legend' => true, 'Display min/avg/max' => true]);
 		$this->assertEnabledFields('Number of columns', false);
+
+		// Check that the label "Number of rows" changes to "Maximum number of rows" when setting "Rows" to "Variable".
+		foreach (['Variable', 'Fixed'] as $rows_type) {
+			$form->fill(['Rows' => $rows_type]);
+
+			$visible_label = ($rows_type === 'Variable') ? 'Maximum number of rows' : 'Number of rows';
+			$removed_label = array_values(array_diff(['Number of rows', 'Maximum number of rows'], [$visible_label]))[0];
+
+			$this->assertTrue($form->getLabel($visible_label)->isValid());
+			$this->assertFalse($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($removed_label).']')
+					->one(false)->isValid()
+			);
+		}
 
 		foreach (['lines' => 2, 'columns' => 1] as $id => $maxlength) {
 			$this->assertEquals($maxlength, $form->getField('id:legend_'.$id)->getAttribute('maxlength'));
