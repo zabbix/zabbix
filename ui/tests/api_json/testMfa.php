@@ -211,8 +211,8 @@ class testMfa extends CAPITest {
 			],
 			'Non-default parameter api_hostname with TOTP method' => [
 				'mfas' => [
-					['type' => MFA_TYPE_TOTP, 'name' => 'TOTP 4', 'hash_function' => TOTP_HASH_SHA1, 'code_length' => TOTP_CODE_LENGTH_6,
-						'api_hostname' => 'api-999a9a99.duosecurity.com'
+					['type' => MFA_TYPE_TOTP, 'name' => 'TOTP 4', 'hash_function' => TOTP_HASH_SHA1,
+						'code_length' => TOTP_CODE_LENGTH_6, 'api_hostname' => 'api-999a9a99.duosecurity.com'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/api_hostname": value must be empty.'
@@ -221,7 +221,8 @@ class testMfa extends CAPITest {
 				'mfas' => [
 					['type' => MFA_TYPE_DUO, 'name' => 'DUO 4', 'api_hostname' => 'api-999a9a99.duosecurity.com',
 						'clientid' => 'AAA58NOODEGUA6ST7AAA',
-						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult', 'hash_function' => TOTP_HASH_SHA256
+						'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult',
+						'hash_function' => TOTP_HASH_SHA256
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/hash_function": value must be 1.'
@@ -385,7 +386,8 @@ class testMfa extends CAPITest {
 				'mfas' => [
 					'mfaids' => ['DUO test case 2']
 				],
-				'expected_error' => 'Cannot delete MFA method "DUO test case 2".'
+				'expected_error' =>
+					'Cannot delete MFA method "DUO test case 2", because it is used by user group "User group with MFA".'
 			],
 			'Test delete id does not exists' => [
 				'mfas' => [
@@ -414,6 +416,34 @@ class testMfa extends CAPITest {
 			$this->assertEmpty($mfa_totp_secrets, 'The entry in mfa_totp_secret has not been deleted.');
 			self::$data['mfaids'] = array_diff(self::$data['mfaids'], $mfas['mfaids']);
 		}
+	}
+
+	public static function deleteLastDefaultDataProvider(): array {
+		return [
+			'Test delete default MFA method' => [
+				'mfas' => [
+					'mfaids' => ['DUO test case 1']
+				],
+				'expected_error' => 'Cannot delete default MFA method.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider deleteLastDefaultDataProvider
+	 */
+	public function testDeleteLastDefaultMfa(array $mfas, $expected_error): void {
+		$mfas = $this->resolveids($mfas);
+
+		CDataHelper::call('usergroup.delete', array_values(self::$data['usrgrpids']));
+
+		// Remove other MFA methods to test deletion of the final default MFA method.
+		DBexecute(
+			'DELETE FROM mfa'.
+			' WHERE '.dbConditionId('mfaid', $mfas['mfaids'], true)
+		);
+
+		$this->call('mfa.delete', $mfas['mfaids'], $expected_error);
 	}
 
 	/**
