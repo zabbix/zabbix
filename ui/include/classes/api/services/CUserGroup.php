@@ -780,7 +780,8 @@ class CUserGroup extends CApiService {
 
 	private static function addFieldDefaultsByType(array &$usrgrps, array $db_usrgrps): void {
 		foreach ($usrgrps as &$usrgrp) {
-			if ($usrgrp['mfa_status'] == GROUP_MFA_DISABLED && $db_usrgrps[$usrgrp['usrgrpid']]['mfaid'] != '0') {
+			if (array_key_exists('mfa_status', $usrgrp) && $usrgrp['mfa_status'] == GROUP_MFA_DISABLED
+					&& $db_usrgrps[$usrgrp['usrgrpid']]['mfaid'] != '0') {
 				$usrgrp['mfaid'] = '0';
 			}
 		}
