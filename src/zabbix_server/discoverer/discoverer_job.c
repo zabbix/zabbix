@@ -123,23 +123,28 @@ static int	discoverer_task_icmp_shift(zbx_discoverer_task_t *task, int checks_pe
 
 	do
 	{
+		int	ret;
+
 		do
 		{
-			zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
-							&task->range.state.index_ip, task->range.state.ipaddress);
+			checks_per_worker_max--;
 			task->range.state.count--;
 		}
-		while (0 != --checks_per_worker_max);
+		while (SUCCEED == (ret = zbx_iprange_uniq_iter(task->range.ipranges->values,
+				task->range.ipranges->values_num,
+				&task->range.state.index_ip, task->range.state.ipaddress)) &&
+				0 != checks_per_worker_max);
 
-		if (0 == checks_per_worker_max)
-			return SUCCEED;
-
-		task->range.state.index_dcheck++;
-		memset(task->range.state.ipaddress, 0, sizeof(task->range.state.ipaddress));
+		if (FAIL == ret)
+		{
+			task->range.state.index_dcheck++;
+			task->range.state.index_ip = 0;
+			zbx_iprange_first(task->range.ipranges->values, task->range.state.ipaddress);
+		}
 	}
-	while (task->range.state.index_dcheck < task->ds_dchecks.values_num);
+	while (task->range.state.index_dcheck < task->ds_dchecks.values_num && 0 != checks_per_worker_max);
 
-	return FAIL;
+	return SUCCEED;
 }
 
 static int	discoverer_task_async_shift(zbx_discoverer_task_t *task, int checks_per_worker_max)

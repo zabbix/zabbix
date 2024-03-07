@@ -938,8 +938,9 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	const zbx_dc_dcheck_t		*dcheck = &task->ds_dchecks.values[dcheck_idx]->dcheck;
 	ZBX_FPING_HOST			host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d dcheck_idx:%d task state count:%d", log_worker_id,
-			__func__, task->range.ipranges->values_num, dcheck_idx, task->range.state.count);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d range id:%d dcheck_idx:%d task state count:%d",
+			log_worker_id, __func__, task->range.ipranges->values_num, task->range.id,
+			dcheck_idx, task->range.state.count);
 
 	zbx_vector_fping_host_create(&hosts);
 
