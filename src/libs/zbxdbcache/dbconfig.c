@@ -1542,6 +1542,9 @@ done:
 				proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 				proxy->nodata_win.values_num = 0;
 				proxy->nodata_win.period_end = 0;
+				proxy->hosts_monitored = 0;
+				proxy->hosts_not_monitored = 0;
+				proxy->required_performance = 0;
 			}
 
 			proxy->auto_compress = atoi(row[16 + ZBX_HOST_TLS_OFFSET]);
