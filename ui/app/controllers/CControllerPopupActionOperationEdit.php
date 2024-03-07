@@ -88,8 +88,15 @@ class CControllerPopupActionOperationEdit extends CController {
 		$recovery = (int) $this->getInput('recovery');
 		$operation_types = $this->popupConfigOperationTypes($eventsource, $recovery);
 
+		$enable_global_scripts = CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts'];
+		$warning_scripts = [];
+
 		foreach ($operation_types as $type) {
 			$operation_type[$type['value']] = $type['name'];
+
+			if (!$enable_global_scripts && array_key_exists('warning', $type) && $type['warning']) {
+				$warning_scripts[] = $type['value'];
+			}
 		}
 
 		$media_types = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
@@ -145,6 +152,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
+			'warning_scripts' => $warning_scripts,
 			'mediatype_options' => $media_types,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -317,9 +325,11 @@ class CControllerPopupActionOperationEdit extends CController {
 			];
 		}
 
+		$enable_global_scripts = CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts'];
+
 		if ($scripts_allowed) {
 			$db_scripts = API::Script()->get([
-				'output' => ['scriptid', 'name'],
+				'output' => ['scriptid', 'name', 'type', 'execute_on'],
 				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION]
 			]);
 
@@ -327,9 +337,14 @@ class CControllerPopupActionOperationEdit extends CController {
 				CArrayHelper::sort($db_scripts, ['name']);
 
 				foreach ($db_scripts as $db_script) {
+					$warning = !$enable_global_scripts && $db_script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+						&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
+							|| $db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY);
+
 					$operation_type_options[] = [
 						'value' => 'scriptid['.$db_script['scriptid'].']',
-						'name' => $db_script['name']
+						'name' => $db_script['name'],
+						'warning' => $warning
 					];
 				}
 			}

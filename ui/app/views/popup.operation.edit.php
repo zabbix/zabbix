@@ -57,6 +57,17 @@ else {
 			->setId('operation-type-select')
 	]))->setId('operation-type');
 }
+
+if ($data['warning_scripts']) {
+	$icon_visibility = in_array($operationtype_value, $data['warning_scripts']) ? 'visible' : 'hidden';
+
+	$select_operationtype->addItem(
+		makeWarningIcon('Global script execution on Zabbix server is disabled by server configuration')
+			->setId('js-global-scripts-warning-icon')
+			->addStyle('visibility: '.$icon_visibility.';')
+	);
+}
+
 $form_grid->addItem([
 	(new CLabel(_('Operation'), 'operationtype'))->setId('operation-type-label'),
 	$select_operationtype
@@ -503,6 +514,7 @@ $output = [
 			'eventsource' => $data['eventsource'],
 			'recovery_phase' => $data['recovery'],
 			'data' => $operation,
+			'warning_scripts' => $data['warning_scripts'],
 			'actionid' => $data['actionid']
 		]).');'
 ];

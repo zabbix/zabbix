@@ -22,7 +22,7 @@
 
 window.operation_popup = new class {
 
-	init({eventsource, recovery_phase, data, actionid}) {
+	init({eventsource, recovery_phase, data, warning_scripts, actionid}) {
 		this.recovery_phase = recovery_phase;
 		this.eventsource = eventsource;
 		this.overlay = overlays_stack.getById('operations');
@@ -31,6 +31,7 @@ window.operation_popup = new class {
 		this.actionid = actionid;
 		this.row_index = data.row_index;
 		this.data = data;
+		this.warning_scripts = warning_scripts;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -55,6 +56,13 @@ window.operation_popup = new class {
 
 		document.querySelector('#operation-type-select').onchange = () => {
 			const operation_type = document.getElementById('operation-type-select').value;
+
+			if (this.warning_scripts.length > 0) {
+				document.querySelector('#js-global-scripts-warning-icon')
+					.style.visibility = this.warning_scripts.includes(operation_type)
+						? 'visible'
+						: 'hidden';
+			}
 
 			this._removeAllFields();
 			this._changeView(operation_type);
