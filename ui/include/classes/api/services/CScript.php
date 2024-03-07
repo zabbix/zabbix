@@ -878,8 +878,6 @@ class CScript extends CApiService {
 			);
 		}
 
-		$db_hosts = [];
-
 		if (array_key_exists('eventid', $data)) {
 			$db_events = API::Event()->get([
 				'output' => [],
@@ -900,7 +898,7 @@ class CScript extends CApiService {
 			$is_event = false;
 		}
 
-		$db_hosts = $db_hosts ?: API::Host()->get([
+		$db_hosts = API::Host()->get([
 			'output' => ['proxyid'],
 			'hostids' => $hostids
 		]);
