@@ -256,6 +256,7 @@ class CScript extends CApiService {
 		}
 
 		self::checkUniqueness($scripts);
+		self::checkExecuteOnParameter($scripts);
 		$this->checkDuplicates($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -330,8 +331,12 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$extend_fields = CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts']
+			? ['name', 'type', 'scope']
+			: ['name', 'type', 'scope', 'execute_on'];
+
 		// Populate name, type and scope.
-		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
+		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', $extend_fields);
 		self::addDbFieldsByType($scripts, $db_scripts);
 
 		$api_input_rules = self::getValidationRules('update');
@@ -344,6 +349,7 @@ class CScript extends CApiService {
 
 		self::checkUniqueness($scripts, $db_scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
+		self::checkExecuteOnParameter($scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -872,6 +878,8 @@ class CScript extends CApiService {
 			);
 		}
 
+		$db_hosts = [];
+
 		if (array_key_exists('eventid', $data)) {
 			$db_events = API::Event()->get([
 				'output' => [],
@@ -890,26 +898,34 @@ class CScript extends CApiService {
 		else {
 			$hostids = $data['hostid'];
 			$is_event = false;
+		}
 
-			$db_hosts = API::Host()->get([
-				'output' => [],
-				'hostids' => $hostids
-			]);
-			if (!$db_hosts) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		$db_hosts = $db_hosts ?: API::Host()->get([
+			'output' => ['proxyid'],
+			'hostids' => $hostids
+		]);
+
+		if (!$is_event && !$db_hosts) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$db_scripts = $this->get([
-			'output' => ['type'],
+			'output' => ['type', 'execute_on'],
 			'hostids' => $hostids,
 			'scriptids' => $data['scriptid']
 		]);
 
 		if (!$db_scripts) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if (!CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts']
+				&& $db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+				&& ($db_scripts[0]['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
+					|| ($db_scripts[0]['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY && $db_hosts[0]['proxyid'] == 0))) {
+			self::exception(ZBX_API_ERROR_INTERNAL,
+				_('Global script execution on Zabbix server is disabled by server configuration')
+			);
 		}
 
 		if ($db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_URL) {
@@ -1825,6 +1841,21 @@ class CScript extends CApiService {
 							);
 						}
 					}
+				}
+			}
+		}
+	}
+
+	private static function checkExecuteOnParameter (array $scripts): void {
+		if (!CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts']) {
+			foreach ($scripts as $script) {
+				if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+						&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'execute_on',
+							_('global script execution on Zabbix server is disabled by server configuration')
+						)
+					);
 				}
 			}
 		}
