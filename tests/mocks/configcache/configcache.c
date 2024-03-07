@@ -20,7 +20,12 @@
 #include "configcache.h"
 #include "configcache_mock.h"
 
-zbx_mock_config_t	mock_config;
+static zbx_mock_config_t	mock_config;
+
+zbx_mock_config_t	*get_mock_config(void)
+{
+	return &mock_config;
+}
 
 void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 void	*__real_zbx_hashset_search(zbx_hashset_t *hs, const void *data);

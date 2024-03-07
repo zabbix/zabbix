@@ -89,8 +89,8 @@ static zbx_metric_t	parameters_specific[] =
 //	{"service.info",	CF_HAVEPARAMS,	get_service_info,	ZABBIX_SERVICE_NAME},
 //	{"service_state",	CF_HAVEPARAMS,	get_service_state,	ZABBIX_SERVICE_NAME},
 
-	parameters_specific[24].test_param = sysinfo_config_get_service_name();
-	parameters_specific[25].test_param = sysinfo_config_get_service_name();
+	parameters_specific[24].test_param = sysinfo_get_config_service_name();
+	parameters_specific[25].test_param = sysinfo_get_config_service_name();
 
 	return &parameters_specific;
 }

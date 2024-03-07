@@ -36,6 +36,8 @@ typedef struct
 }
 zbx_mock_config_t;
 
+zbx_mock_config_t	*get_mock_config(void);
+
 #define ZBX_MOCK_CONFIG_USERMACROS	0x0001
 #define ZBX_MOCK_CONFIG_HOSTS		0x0002
 
