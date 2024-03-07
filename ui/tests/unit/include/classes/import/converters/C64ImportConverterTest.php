@@ -88,7 +88,12 @@ class C64ImportConverterTest extends CImportConverterTest {
 		}
 		unset($lld_rule);
 
-		return [
+		foreach ($expected_items as &$item) {
+			$item['history'] = array_key_exists('history', $item) ? $item['history'] : '90d';
+		}
+		unset($item);
+
+		$result = [
 			[
 				[],
 				[]
@@ -124,6 +129,13 @@ class C64ImportConverterTest extends CImportConverterTest {
 				]
 			]
 		];
+
+		foreach ($expected_items as &$item) {
+			unset($item['history']);
+		}
+		unset($item);
+
+		return $result;
 	}
 
 	public function importConverterDataProviderExpressionHistoryFunction(): array {
@@ -191,7 +203,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 			[
 				'type' => CXmlConstantName::CALCULATED,
 				'params' => $expected_expression,
-				'triggers' => $expected_triggers
+				'triggers' => $expected_triggers,
+				'history' => '90d'
 			]
 		];
 
@@ -424,7 +437,9 @@ class C64ImportConverterTest extends CImportConverterTest {
 		foreach ($formulas as $formula) {
 			if (!$formula['prototype']) {
 				$source_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['source']];
-				$expected_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected']];
+				$expected_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected'],
+					'history' => '90d'
+				];
 			}
 			$source_item_prototypes[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['source']];
 			$expected_item_prototypes[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected']];
