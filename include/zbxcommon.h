@@ -799,7 +799,6 @@ zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);
 
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
-//extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 int	zbx_get_interface_type_priority(int n);
 
 #endif
