@@ -1669,7 +1669,6 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => NULL,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
 			]
@@ -3041,7 +3040,6 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => NULL,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
 			]

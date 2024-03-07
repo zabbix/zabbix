@@ -384,7 +384,7 @@ FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|userdirectoryid|t_id		|NULL	|NULL		|0			|2|userdirectory	|	|RESTRICT
 FIELD		|mfa_status	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|mfaid		|t_id	|NULL	|NULL	|0 |3|mfa	|	|RESTRICT
+FIELD		|mfaid		|t_id	|	|NULL	|0 |3|mfa	|	|RESTRICT
 UNIQUE		|1		|name
 INDEX		|2		|userdirectoryid
 INDEX		|3		|mfaid
@@ -663,7 +663,7 @@ FIELD		|timeout_telnet_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODA
 FIELD		|timeout_script		|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|auditlog_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|mfa_status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|mfaid			|t_id		|NULL	|NULL		|0		|5|mfa	|	|RESTRICT
+FIELD		|mfaid			|t_id		|	|NULL		|0		|5|mfa	|	|RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
