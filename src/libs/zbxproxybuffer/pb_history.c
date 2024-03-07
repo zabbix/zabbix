@@ -166,7 +166,7 @@ try_again:
 				zbx_db_free_result(result);
 
 				gapid = id;
-				pb_wait_handles(&pb_data->history_handleids);
+				pb_wait_handles(&get_pb_data()->history_handleids);
 
 				goto try_again;
 			}
@@ -540,7 +540,7 @@ static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 			if (0 == size)
 				size = pb_history_estimate_row_size(row->value, row->source);
 
-			if (FAIL == pb_free_space(pb_data, size))
+			if (FAIL == pb_free_space(get_pb_data(), size))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "history record with size " ZBX_FS_SIZE_T
 						" is too large for proxy memory buffer, discarding", size);
@@ -607,8 +607,8 @@ void	pb_history_flush(zbx_pb_t *pb)
 
 	pb_history_add_rows_db(&pb->history, NULL, &lastid);
 
-	if (pb_data->history_lastid_db < lastid)
-		pb_data->history_lastid_db = lastid;
+	if (get_pb_data()->history_lastid_db < lastid)
+		get_pb_data()->history_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -723,10 +723,10 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 
 	pb_lock();
 
-	data->handleid = pb_register_handle(pb_data, &pb_data->history_handleids);
+	data->handleid = pb_register_handle(get_pb_data(), &get_pb_data()->history_handleids);
 
-	if (PB_DATABASE == (data->state = pb_dst[pb_data->state]))
-		pb_data->db_handles_num++;
+	if (PB_DATABASE == (data->state = get_pb_dst(get_pb_data()->state)))
+		get_pb_data()->db_handles_num++;
 
 	pb_unlock();
 
@@ -736,7 +736,7 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 		data->rows_num = 0;
 	}
 
-	if (PB_DATABASE == pb_dst[data->state])
+	if (PB_DATABASE == get_pb_dst(data->state))
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
@@ -770,29 +770,29 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 
 		pb_history_set_row_ids(&data->rows, data->rows_num);
 
-		if (PB_MEMORY == pb_data->state && SUCCEED != pb_history_check_age(pb_data))
+		if (PB_MEMORY == get_pb_data()->state && SUCCEED != pb_history_check_age(get_pb_data()))
 		{
-			pd_fallback_to_database(pb_data, "cached records are too old");
+			pd_fallback_to_database(get_pb_data(), "cached records are too old");
 		}
-		else if (PB_MEMORY == pb_dst[pb_data->state])
+		else if (PB_MEMORY == get_pb_dst(get_pb_data()->state))
 		{
-			if (NULL == (next = pb_history_add_rows_mem(pb_data, &data->rows)))
+			if (NULL == (next = pb_history_add_rows_mem(get_pb_data(), &data->rows)))
 				goto out;
 
-			if (PB_DATABASE_MEMORY == pb_data->state)
+			if (PB_DATABASE_MEMORY == get_pb_data()->state)
 			{
-				pd_fallback_to_database(pb_data, "not enough space to complete transition to memory"
+				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to memory"
 						" mode");
 			}
 			else
 			{
 				/* initiate transition to database cache */
-				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(get_pb_data(), PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 
 		/* not all rows were added to memory cache - flush them to database */
-		pb_data->db_handles_num++;
+		get_pb_data()->db_handles_num++;
 		pb_unlock();
 
 		do
@@ -818,12 +818,12 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 
 	pb_lock();
 
-	if (pb_data->history_lastid_db < lastid)
-		pb_data->history_lastid_db = lastid;
+	if (get_pb_data()->history_lastid_db < lastid)
+		get_pb_data()->history_lastid_db = lastid;
 
-	pb_data->db_handles_num--;
+	get_pb_data()->db_handles_num--;
 out:
-	pb_deregister_handle(&pb_data->history_handleids, data->handleid);
+	pb_deregister_handle(&get_pb_data()->history_handleids, data->handleid);
 	pb_unlock();
 
 	pb_history_data_free(data);
@@ -868,8 +868,8 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 	pb_lock();
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
-		ret = pb_history_get_mem(pb_data, j, lastid, more);
+	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
+		ret = pb_history_get_mem(get_pb_data(), j, lastid, more);
 
 	pb_unlock();
 
@@ -894,10 +894,10 @@ void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 
 	pb_lock();
 
-	pb_data->history_lastid_sent = lastid;
+	get_pb_data()->history_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
-		pb_history_clear(pb_data, lastid);
+	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
+		pb_history_clear(get_pb_data(), lastid);
 
 	pb_unlock();
 
@@ -918,8 +918,8 @@ zbx_uint64_t	zbx_pb_history_get_unsent_num(void)
 
 	pb_lock();
 
-	lastid_sent = pb_data->history_lastid_sent;
-	lastid = MAX(pb_data->history_lastid_db, pb_data->history_lastid_mem);
+	lastid_sent = get_pb_data()->history_lastid_sent;
+	lastid = MAX(get_pb_data()->history_lastid_db, get_pb_data()->history_lastid_mem);
 
 	pb_unlock();
 
