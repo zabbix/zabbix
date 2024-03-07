@@ -435,7 +435,7 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkDeleteDefaultMfa($db_mfas, $mfaids);
+		self::checkDeleteDefaultMfa($db_mfas);
 		self::cehckMfaUsedByUserGroup($db_mfas);
 	}
 
