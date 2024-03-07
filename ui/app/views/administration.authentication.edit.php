@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+global $HTTP_AUTH_VISIBLE;
+
 $this->addJsFile('class.form.fieldset.collapsible.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
@@ -146,51 +148,53 @@ $auth_tab = (new CFormGrid())
 	]);
 
 // HTTP authentication fields.
-$http_tab = (new CFormGrid())
-	->addItem([
-		new CLabel([_('Enable HTTP authentication'),
-			makeHelpIcon(
-				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+if ($HTTP_AUTH_VISIBLE) {
+	$http_tab = (new CFormGrid())
+		->addItem([
+			new CLabel([_('Enable HTTP authentication'),
+				makeHelpIcon(
+					_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+				)
+			], 'http_auth_enabled'),
+			new CFormField(
+				(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
+					->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+					->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
 			)
-		], 'http_auth_enabled'),
-		new CFormField(
-			(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
-				->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
-		)
-	])
-	->addItem([
-		new CLabel(_('Default login form'), 'label-http-login-form'),
-		new CFormField(
-			(new CSelect('http_login_form'))
-				->setFocusableElementId('label-http-login-form')
-				->setValue($data['http_login_form'])
-				->addOptions(CSelect::createOptionsFromArray([
-					ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
-					ZBX_AUTH_FORM_HTTP => _('HTTP login form')
-				]))
-				->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
-		)
-	])
-	->addItem([
-		new CLabel(_('Remove domain name'), 'http_strip_domains'),
-		new CFormField(
-			(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
-				DB::getFieldLength('config', 'http_strip_domains')
-			))
-				->setEnabled($data['http_auth_enabled'])
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	])
-	->addItem([
-		new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
-		new CFormField(
-			(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
-				->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-				->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-		)
-	]);
+		])
+		->addItem([
+			new CLabel(_('Default login form'), 'label-http-login-form'),
+			new CFormField(
+				(new CSelect('http_login_form'))
+					->setFocusableElementId('label-http-login-form')
+					->setValue($data['http_login_form'])
+					->addOptions(CSelect::createOptionsFromArray([
+						ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
+						ZBX_AUTH_FORM_HTTP => _('HTTP login form')
+					]))
+					->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
+			)
+		])
+		->addItem([
+			new CLabel(_('Remove domain name'), 'http_strip_domains'),
+			new CFormField(
+				(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
+					DB::getFieldLength('config', 'http_strip_domains')
+				))
+					->setEnabled($data['http_auth_enabled'])
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+		])
+		->addItem([
+			new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
+			new CFormField(
+				(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+					->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+					->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+					->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+			)
+		]);
+}
 
 // LDAP authentication fields.
 $ldap_auth_enabled = $data['ldap_error'] === '' && $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED;
@@ -557,16 +561,22 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-provision-status')
 	]);
 
-	$form->addItem((new CTabView())
+	$tab_view = (new CTabView())
 		->setSelected($data['form_refresh'] != 0 ? null : 0)
-		->addTab('auth', _('Authentication'), $auth_tab)
-		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
+		->addTab('auth', _('Authentication'), $auth_tab);
+
+	if ($HTTP_AUTH_VISIBLE) {
+		$tab_view->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP);
+	}
+
+	$tab_view
 		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
 		->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
 		->setFooter(makeFormFooter(
 			(new CSubmit('update', _('Update')))
-		))
-	);
+		));
+
+	$form->addItem($tab_view);
 
 (new CHtmlPage())
 	->setTitle(_('Authentication'))
@@ -646,7 +656,8 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		'db_authentication_type' => $data['db_authentication_type'],
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media'],
-		'templates' => $templates
+		'templates' => $templates,
+		'http_tab_visible' => $HTTP_AUTH_VISIBLE
 	]).');'
 ))
 	->setOnDocumentReady()

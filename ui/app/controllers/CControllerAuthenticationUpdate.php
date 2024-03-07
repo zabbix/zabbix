@@ -38,11 +38,12 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function checkInput() {
+		global $HTTP_AUTH_VISIBLE;
+
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'disabled_usrgrpid' =>				'id',
-			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
@@ -50,9 +51,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_removed_userdirectoryids' =>	'array_id',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'jit_provision_interval' =>			'db config.jit_provision_interval|time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
-			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' =>				'db config.http_strip_domains',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
@@ -79,6 +77,15 @@ class CControllerAuthenticationUpdate extends CController {
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'array'
 		];
+
+		if ($HTTP_AUTH_VISIBLE) {
+			$fields += [
+				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+				'http_strip_domains' =>		'db config.http_strip_domains',
+				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			];
+		}
 
 		$ret = $this->validateInput($fields);
 
@@ -312,23 +319,50 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
+		global $HTTP_AUTH_VISIBLE;
+
+		$auth_params = [
+			CAuthenticationHelper::AUTHENTICATION_TYPE,
+			CAuthenticationHelper::DISABLED_USER_GROUPID,
+			CAuthenticationHelper::LDAP_AUTH_ENABLED,
+			CAuthenticationHelper::LDAP_USERDIRECTORYID,
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_JIT_STATUS,
+			CAuthenticationHelper::JIT_PROVISION_INTERVAL,
+			CAuthenticationHelper::SAML_AUTH_ENABLED,
+			CAuthenticationHelper::SAML_JIT_STATUS,
+			CAuthenticationHelper::SAML_CASE_SENSITIVE,
+			CAuthenticationHelper::PASSWD_MIN_LENGTH,
+			CAuthenticationHelper::PASSWD_CHECK_RULES
+		];
+
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'disabled_usrgrpid' => 0,
 			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
-			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
 			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
 		];
 
-		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
-			$fields += [
-				'http_case_sensitive' => 0,
-				'http_login_form' => 0,
-				'http_strip_domains' => ''
-			];
+		if ($HTTP_AUTH_VISIBLE) {
+			$auth_params = array_merge($auth_params, [
+				CAuthenticationHelper::HTTP_AUTH_ENABLED,
+				CAuthenticationHelper::HTTP_LOGIN_FORM,
+				CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+				CAuthenticationHelper::HTTP_CASE_SENSITIVE,
+			]);
+
+			$fields['http_auth_enabled'] = ZBX_AUTH_HTTP_DISABLED;
+
+			if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
+				$fields += [
+					'http_case_sensitive' => 0,
+					'http_login_form' => 0,
+					'http_strip_domains' => ''
+				];
+			}
 		}
 
 		if ($this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED) {
@@ -348,25 +382,6 @@ class CControllerAuthenticationUpdate extends CController {
 				'saml_jit_status' => JIT_PROVISIONING_DISABLED
 			];
 		}
-
-		$auth_params = [
-			CAuthenticationHelper::AUTHENTICATION_TYPE,
-			CAuthenticationHelper::DISABLED_USER_GROUPID,
-			CAuthenticationHelper::HTTP_AUTH_ENABLED,
-			CAuthenticationHelper::HTTP_LOGIN_FORM,
-			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_AUTH_ENABLED,
-			CAuthenticationHelper::LDAP_USERDIRECTORYID,
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_JIT_STATUS,
-			CAuthenticationHelper::JIT_PROVISION_INTERVAL,
-			CAuthenticationHelper::SAML_AUTH_ENABLED,
-			CAuthenticationHelper::SAML_JIT_STATUS,
-			CAuthenticationHelper::SAML_CASE_SENSITIVE,
-			CAuthenticationHelper::PASSWD_MIN_LENGTH,
-			CAuthenticationHelper::PASSWD_CHECK_RULES
-		];
 
 		$auth = [];
 		foreach ($auth_params as $param) {

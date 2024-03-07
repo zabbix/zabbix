@@ -31,14 +31,12 @@ class CControllerAuthenticationEdit extends CController {
 	 * @return bool
 	 */
 	protected function checkInput() {
+		global $HTTP_AUTH_VISIBLE;
+
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'disabled_usrgrpid' =>				'id',
-			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' =>				'db config.http_strip_domains',
-			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
@@ -73,6 +71,15 @@ class CControllerAuthenticationEdit extends CController {
 			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
 
+		if ($HTTP_AUTH_VISIBLE) {
+			$fields += [
+				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+				'http_strip_domains' =>		'db config.http_strip_domains',
+				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			];
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -92,6 +99,8 @@ class CControllerAuthenticationEdit extends CController {
 	}
 
 	protected function doAction() {
+		global $HTTP_AUTH_VISIBLE;
+
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
@@ -106,10 +115,6 @@ class CControllerAuthenticationEdit extends CController {
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::DISABLED_USER_GROUPID,
-			CAuthenticationHelper::HTTP_AUTH_ENABLED,
-			CAuthenticationHelper::HTTP_LOGIN_FORM,
-			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_AUTH_ENABLED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
@@ -121,6 +126,16 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
 			CAuthenticationHelper::PASSWD_CHECK_RULES
 		];
+
+		if ($HTTP_AUTH_VISIBLE) {
+			$auth_params = array_merge($auth_params, [
+				CAuthenticationHelper::HTTP_AUTH_ENABLED,
+				CAuthenticationHelper::HTTP_LOGIN_FORM,
+				CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+				CAuthenticationHelper::HTTP_CASE_SENSITIVE
+			]);
+		}
+
 		$auth = [];
 		foreach ($auth_params as $param) {
 			$auth[$param] = CAuthenticationHelper::get($param);
@@ -130,10 +145,6 @@ class CControllerAuthenticationEdit extends CController {
 			$config_fields = [
 				'authentication_type' => DB::getDefault('config', 'authentication_type'),
 				'disabled_usrgrpid' => 0,
-				'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
-				'http_login_form' => DB::getDefault('config', 'http_login_form'),
-				'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
-				'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 				'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 				'jit_provision_interval' => $auth[CAuthenticationHelper::JIT_PROVISION_INTERVAL],
@@ -161,6 +172,16 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_min_length' => '',
 				'passwd_check_rules' => 0
 			];
+
+			if ($HTTP_AUTH_VISIBLE) {
+				$config_fields += [
+					'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
+					'http_login_form' => DB::getDefault('config', 'http_login_form'),
+					'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
+					'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+				];
+			}
+
 			$this->getInputs($data, array_keys($config_fields));
 			$data += $config_fields;
 
