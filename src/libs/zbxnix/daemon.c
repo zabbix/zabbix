@@ -223,7 +223,7 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 	struct sigaction	phan;
 
 	signal_redirect_handler = signal_redirect_cb;
-	sig_parent_pid = (int)getpid();
+	set_sig_parent_pid((int)getpid());
 
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
