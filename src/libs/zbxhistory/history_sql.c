@@ -657,6 +657,8 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 {
 	int	i, h_num = 0;
 
+	ZBX_UNUSED(config_history_storage_pipelines);
+
 	for (i = 0; i < history->values_num; i++)
 	{
 		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
