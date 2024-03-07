@@ -28,85 +28,39 @@ require_once dirname(__FILE__) . '/../common/testFormMacros.php';
  */
 class testFormMacrosTemplate extends testFormMacros {
 
-	/**
-	 * Create new dashboards for autotest.
-	 */
-	public function prepareTemplateMacrosData() {
-		CDataHelper::call('template.update', [
-			[
-				'templateid' => 50002,
-				'macros' => [
-					'macro' => '{$NEWMACROS}',
-					'value' => 'something/value:key',
-					'type' => 2
-				]
-			]
-		]);
-	}
-
-	/**
-	 * The name of the template for updating macros, id=40000.
-	 *
-	 * @var string
-	 */
-	protected $template_name_update = 'Form test template';
-
-	/**
-	 * The name of the template for removing macros, id=99016.
-	 *
-	 * @var string
-	 */
-	protected $template_name_remove = 'Template to test graphs';
-
-	/**
-	 * The id of the template for removing inherited macros.
-	 *
-	 * @var integer
-	 */
-	protected static $templateid_remove_inherited;
-
+	const TEMPLATES_GROUP = 1;
 	public $vault_object = 'template';
-	public $hashi_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/3/value';
 	public $cyber_error_field = '/1/macros/4/value';
-	public $update_vault_macro = '{$VAULT_HOST_MACRO_CHANGED}';
+	public $update_vault_macro = '{$VAULT_TEMPLATE_MACRO_CHANGED}';
 	public $vault_macro_index = 0;
-
 	public $revert_macro_1 = '{$SECRET_TEMPLATE_MACRO_REVERT}';
 	public $revert_macro_2 = '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}';
 	public $revert_macro_object = 'template';
 
-	/**
-	 * @dataProvider getCreateMacrosData
-	 */
-	public function testFormMacrosTemplate_Create($data) {
-		$this->checkMacros($data, 'template');
-	}
+	protected static $templateid_remove_inherited;
 
-	/**
-	 * @dataProvider getUpdateMacrosNormalData
-	 * @dataProvider getUpdateMacrosCommonData
-	 */
-	public function testFormMacrosTemplate_Update($data) {
-		$this->checkMacros($data, 'template', $this->template_name_update, true);
-	}
-
-	public function testFormMacrosTemplate_RemoveAll() {
-		$this->checkRemoveAll($this->template_name_remove, 'template');
-	}
-
-	/**
-	 * @dataProvider getCheckInheritedMacrosData
-	 */
-	public function testFormMacrosTemplate_ChangeInheritedMacro($data) {
-		$this->checkChangeInheritedMacros($data, 'template');
-	}
-
-	public function prepareTemplateRemoveMacrosData() {
-		$response = CDataHelper::call('template.create', [
+	public function prepareTemplateMacrosData() {
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => 'Template with macros',
+				'groups' => ['groupid' => self::TEMPLATES_GROUP],
+				'macros' => [
+					['macro' => '{$TEMPLATE_MACRO1}', 'value' => ''],
+					['macro' => '{$TEMPLATE_MACRO2}', 'value' => '']
+				]
+			],
+			[
+				'host' => 'Template for removing macros',
+				'groups' => ['groupid' => self::TEMPLATES_GROUP],
+				'macros' => [
+					['macro' => '{$MACRO_FOR_REMOVE1}', 'value' => ''],
+					['macro' => '{$MACRO_FOR_REMOVE2}', 'value' => '']
+				]
+			],
+			[
 				'host' => 'Template for Inherited macros removing',
-				'groups' => [
-					['groupid' => '1']
-				],
+				'groups' => ['groupid' => self::TEMPLATES_GROUP],
 				'macros' => [
 					[
 						'macro' => '{$TEST_MACRO123}',
@@ -139,15 +93,143 @@ class testFormMacrosTemplate extends testFormMacros {
 						'description' => 'redefined description'
 					]
 				]
+			],
+			[
+				'host' => 'Template for secret macros layout',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]],
+				'macros' => [
+					[
+						'macro' => '{$SECRET_TEMPLATE_MACRO}',
+						'value' => 'some secret value',
+						'type' => ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$TEXT_TEMPLATE_MACRO}',
+						'value' => 'some text value'
+					],
+					[
+						'macro' => '{$VAULT_TEMPLATE_MACRO3}',
+						'value' => 'secret/path:key',
+						'description' => 'Change name, value, description',
+						'type' => ZBX_MACRO_TYPE_VAULT
+					]
+				]
+			],
+			[
+				'host' => 'Empty Template for creating secret macros',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]]
+			],
+			[
+				'host' => 'Template with secret macros',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]],
+				'items' => [
+					[
+						'name' => 'Macro value: {$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}',
+						'key_' => 'trap[{$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'macros' => [
+					[
+						'macro' => '{$SECRET_TEMPLATE_MACRO_REVERT}',
+						'value' => 'Secret host value',
+						'description' => 'Secret host macro description',
+						'type' => ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}',
+						'value' => 'Secret host value 2 text',
+						'description' => 'Secret host macro that will be changed to text',
+						'type' =>  ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$SECRET_TEMPLATE_MACRO_UPDATE_2_TEXT}',
+						'value' => 'Secret host value 2 B updated',
+						'description' => 'Secret host macro that is going to be updated',
+						'type' =>  ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$TEXT_TEMPLATE_MACRO_2_SECRET}',
+						'value' => 'Text host macro value',
+						'description' => 'Text host macro that is going to become secret'
+					],
+					[
+						'macro' => '{$SECRET_TEMPLATE_MACRO_UPDATE}',
+						'value' => 'Secret host macro value',
+						'description' => 'Secret host macro that is going to stay secret',
+						'type' =>  ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}',
+						'value' => 'Value 2 B resolved',
+						'description' => 'Host macro to be resolved'
+					]
+				]
+			],
+			[
+				'host' => 'Template with vault macro',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]],
+				'macros' => [
+					[
+						'macro' => '{$NEWMACROS}',
+						'value' => 'something/value:key',
+						'type' => 2
+					]
+				]
+			],
+			[
+				'host' => 'Template for creating Vault macros',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]]
+			],
+			[
+				'host' => 'Empty Template without macros',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]]
+			],
+			[
+				'host' => 'Template for updating Vault macros',
+				'groups' => [['groupid' => self::TEMPLATES_GROUP]],
+				'macros' => [
+					[
+						'macro' => '{$VAULT_HOST_MACRO}',
+						'value' => 'secret/path:key',
+						'description' => 'Change name, value, description',
+						'type' =>  ZBX_MACRO_TYPE_VAULT
+					]
+				]
+			]
 		]);
-		$this->assertArrayHasKey('templateids', $response);
-		self::$templateid_remove_inherited = $response['templateids'][0];
+		self::$templateid_remove_inherited = $templates['templateids']['Template for Inherited macros removing'];
+	}
+
+	/**
+	 * @dataProvider getCreateMacrosData
+	 */
+	public function testFormMacrosTemplate_Create($data) {
+		$this->checkMacros($data, 'template');
+	}
+
+	/**
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
+	 */
+	public function testFormMacrosTemplate_Update($data) {
+		$this->checkMacros($data, 'template', 'Template with macros', true);
+	}
+
+	public function testFormMacrosTemplate_RemoveAll() {
+		$this->checkRemoveAll('Template for removing macros', 'template');
+	}
+
+	/**
+	 * @dataProvider getCheckInheritedMacrosData
+	 */
+	public function testFormMacrosTemplate_ChangeInheritedMacro($data) {
+		$this->checkChangeInheritedMacros($data, 'template');
 	}
 
 	/**
 	 * @dataProvider getRemoveInheritedMacrosData
-	 *
-	 * @onBeforeOnce prepareTemplateRemoveMacrosData
 	 */
 	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'template', self::$templateid_remove_inherited,
@@ -203,16 +285,19 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'zabbix.php?action=template.list&filter_name=Template with item graph&filter_set=1',
-				'templates', 'Template with item graph');
+		$this->createSecretMacros($data, 'zabbix.php?action=template.list&filter_name='.
+				'Empty Template for creating secret macros&filter_set=1',
+				'templates', 'Empty Template for creating secret macros'
+		);
 	}
 
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormMacrosTemplate_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'zabbix.php?action=template.list&filter_name=Test Item Template&filter_set=1',
-				'templates', 'Test Item Template');
+		$this->revertSecretMacroChanges($data, 'zabbix.php?action=template.list&filter_name='.
+				'Template with secret macros&filter_set=1',
+				'templates', 'Template with secret macros');
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -256,23 +341,23 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosTemplate_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'zabbix.php?action=template.list&filter_name=Test Item Template&filter_set=1',
-				'templates', 'Test Item Template');
+		$this->updateSecretMacros($data, 'zabbix.php?action=template.list&filter_name=Template with secret macros&filter_set=1',
+				'templates', 'Template with secret macros');
 	}
 
 	/**
 	 * Check Vault macros validation.
 	 */
-	public function testFormMacrosTemplate_checkVaultValidation() {
-		$this->checkVaultValidation('zabbix.php?action=template.list&filter_name=Template ZBX6663 Second&filter_set=1',
-			'templates', 'Template ZBX6663 Second');
+	public function testFormMacrosTemplate_CheckVaultValidation() {
+		$this->checkVaultValidation('zabbix.php?action=template.list&filter_name=Template with vault macro&filter_set=1',
+			'templates', 'Template with vault macro');
 	}
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormMacrosTemplate_CreateVaultMacros($data) {
-		$template_name = ($data['vault'] === 'Hashicorp') ? 'Template with item graph' : 'Template ZBX6663 First';
+		$template_name = ($data['vault'] === 'Hashicorp') ? 'Template for creating Vault macros' : 'Empty Template without macros';
 		$this->createVaultMacros($data, 'zabbix.php?action=template.list&filter_name='.$template_name.'&filter_set=1',
 				'templates', $template_name);
 	}
@@ -282,7 +367,9 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'zabbix.php?action=template.list&filter_name=Empty template&filter_set=1',
-			'templates', 'Empty template');
+		$this->updateVaultMacros($data, 'zabbix.php?action=template.list&filter_name='.
+				'Template for updating Vault macros&filter_set=1',
+				'templates', 'Template for updating Vault macros'
+		);
 	}
 }

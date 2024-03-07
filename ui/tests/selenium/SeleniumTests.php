@@ -166,6 +166,7 @@ require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
 // Macros.
 require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosDiscoveredHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
@@ -487,6 +488,7 @@ class SeleniumTests {
 
 		// Macros.
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
+		$suite->addTestSuite('testFormMacrosDiscoveredHost');
 		$suite->addTestSuite('testFormMacrosHost');
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');

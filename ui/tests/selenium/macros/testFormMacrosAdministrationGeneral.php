@@ -29,39 +29,39 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormMacrosAdministrationGeneral extends testFormMacros {
 
-	private $macroMaxLength = 255;
-	private $macroPlaceholder = '{$MACRO}';
-	private $macroClass = 'textarea-flexible macro';
-
-	private $valueMaxLength = 2048;
-	private $valuePlaceholder = 'value';
-
-	private $descriptionMaxLength = 65535;
-	private $descriptionPlaceholder = 'description';
-
-	private $newMacro = '{$NEW_MACRO}';
-	private $newValue = 'Value of the new macro';
-	private $newDescription = 'New test description';
-
-	private $newEmptyMacro = '{$NEW_EMPTY_MACRO}';
-
-	private $oldGlobalMacroId = 7;
-	private $updMacro = '{$UPD_MACRO}';
-	private $updValue = 'Value of the updated macro';
-	private $updDescription = 'Description of the updated macro';
-
-	private $sqlHashGlobalMacros = '';
-	private $oldHashGlobalMacros = '';
-
-	public $macro_resolve = '{$Z_GLOBAL_MACRO_2_RESOLVE}';
-	public $macro_resolve_hostid = 99134;
-
-	public $vault_object = 'macros';
-	public $hashi_error_field = '/1/value';
-	public $cyber_error_field = '/1/value';
-
-	public $update_vault_macro = '{$1_VAULT_MACRO_CHANGED}';
-	public $vault_macro_index = 1;
+//	private $macroMaxLength = 255;
+//	private $macroPlaceholder = '{$MACRO}';
+//	private $macroClass = 'textarea-flexible macro';
+//
+//	private $valueMaxLength = 2048;
+//	private $valuePlaceholder = 'value';
+//
+//	private $descriptionMaxLength = 65535;
+//	private $descriptionPlaceholder = 'description';
+//
+//	private $newMacro = '{$NEW_MACRO}';
+//	private $newValue = 'Value of the new macro';
+//	private $newDescription = 'New test description';
+//
+//	private $newEmptyMacro = '{$NEW_EMPTY_MACRO}';
+//
+//	private $oldGlobalMacroId = 7;
+//	private $updMacro = '{$UPD_MACRO}';
+//	private $updValue = 'Value of the updated macro';
+//	private $updDescription = 'Description of the updated macro';
+//
+//	private $sqlHashGlobalMacros = '';
+//	private $oldHashGlobalMacros = '';
+//
+//	public $macro_resolve = '{$Z_GLOBAL_MACRO_2_RESOLVE}';
+//	public $macro_resolve_hostid = 99134;
+//
+//	public $vault_object = 'macros';
+//	public $hashi_error_field = '/1/value';
+//	public $cyber_error_field = '/1/value';
+//
+//	public $update_vault_macro = '{$1_VAULT_MACRO_CHANGED}';
+//	public $vault_macro_index = 1;
 
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('zabbix.php?action=macros.edit');

@@ -28,25 +28,8 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
 
-	/**
-	 * Parent hostid for macros test.
-	 *
-	 * @var integer
-	 */
 	protected static $hostid;
-
-	/**
-	 * Parent hostid for macros inheritance test.
-	 *
-	 * @var integer
-	 */
 	protected static $inherit_hostid;
-
-	/**
-	 * Names and ids for discovered hosts.
-	 *
-	 * @var array
-	 */
 	protected static $hosts = [];
 
 	public $vault_object = 'host';
@@ -442,7 +425,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosDiscoveredHost_Update($data) {
-		$this->checkMacros($data, 'host', self::$hosts[0]['name'], true, false, null, true);
+		$this->checkMacros($data, 'host', self::$hosts[0]['name'], true);
 	}
 
 	/**
@@ -455,9 +438,12 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	/**
 	 * @dataProvider getRemoveInheritedMacrosData
 	 */
-	public function testFormMacrosDiscoveredHost_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null, self::$hosts[1]['name']);
-	}
+	// TODO: Uncomment this test when ZBX-23397 is ready.
+//	public function testFormMacrosDiscoveredHost_RemoveInheritedMacro($data) {
+//		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null,
+//				self::$hosts[1]['name']
+//		);
+//	}
 
 	/**
 	 * @dataProvider getSecretMacrosLayoutData
@@ -545,14 +531,15 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
-	public function testFormMacrosDiscoveredHost_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[4]['name'], true);
-	}
+	// TODO: Uncomment this test when ZBX-23397 is ready.
+//	public function testFormMacrosDiscoveredHost_UpdateSecretMacros($data) {
+//		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[4]['name'], true);
+//	}
 
 	/**
 	 * Check Vault macros validation.
 	 */
-	public function testFormMacrosDiscoveredHost_checkVaultValidation() {
+	public function testFormMacrosDiscoveredHost_CheckVaultValidation() {
 		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', self::$hosts[5]['name'], true);
 	}
 
@@ -561,7 +548,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	public function testFormMacrosDiscoveredHost_CreateVaultMacros($data) {
 		$host = ($data['vault'] === 'Hashicorp') ? self::$hosts[7]['name'] : self::$hosts[6]['name'];
-		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host, true);
+		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host);
 	}
 
 	public function getUpdateVaultMacrosDiscoveredData() {

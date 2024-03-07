@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  */
 abstract class testFormMacros extends CLegacyWebTest {
 
+	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
+
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -39,8 +41,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 			CMessageBehavior::class
 		];
 	}
-
-	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
@@ -2474,7 +2474,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Latest data page. Macro is resolved only in key.
 			[
 				[
-					'url' => 'zabbix.php?action=latest.view&hostids%5B%5D='.$this->macro_resolve_hostid.'&show_details=1',
+					'url' => 'latest_data',
 					'name' => 'Macro value: '.$this->macro_resolve,
 					'key' => 'trap[Value 2 B resolved]',
 					'key_secret' => 'trap[******]'
@@ -2483,7 +2483,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Hosts items page. Macro is not resolved in any field.
 			[
 				[
-					'url' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$this->macro_resolve_hostid.'&context=host',
+					'url' => 'items_list',
 					'name' => 'Macro value: '.$this->macro_resolve,
 					'key' => 'trap['.$this->macro_resolve.']',
 					'key_secret' => 'trap['.$this->macro_resolve.']'
@@ -2498,12 +2498,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $data    data provider
 	 * @param string $object  macros level: global or host
 	 */
-	public function resolveSecretMacro($data, $object = 'global') {
-		$this->checkItemFields($data['url'], $data['name'], $data['key']);
+	public function resolveSecretMacro($data, $hostid, $object = 'global') {
+		$url = $data['url'] === 'latest_data'
+			? 'zabbix.php?action=latest.view&hostids%5B%5D='.$hostid.'&show_details=1'
+			: 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host';
+
+		$this->checkItemFields($url, $data['name'], $data['key']);
 
 		if ($object === 'host') {
 			// Open host form in popup and change macro type to secret.
-			$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, 'Available host in maintenance');
+			$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, 'Host with secret macros');
 			$this->getValueField($this->macro_resolve)->changeInputType(CInputGroupElement::TYPE_SECRET);
 
 			$form->submit();
@@ -2517,7 +2521,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->query('button:Update')->one()->click();
 		}
 
-		$this->checkItemFields($data['url'], $data['name'], $data['key_secret']);
+		$this->checkItemFields($url, $data['name'], $data['key_secret']);
 	}
 
 	/**
