@@ -52,3 +52,6 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO['SP_CERT']			= 'conf/certs/sp.crt';
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
 //$SSO['SETTINGS']		= [];
+
+// HTTP authentication setting is disabled in the frontend when set to false.
+// $HTTP_AUTH_VISIBLE = true;
