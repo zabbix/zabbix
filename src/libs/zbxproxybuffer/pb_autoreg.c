@@ -407,8 +407,8 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 
 			if (PB_DATABASE_MEMORY == get_pb_data()->state)
 			{
-				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to memory"
-						" mode");
+				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to"
+						" memory mode");
 			}
 			else
 			{

@@ -55,7 +55,6 @@ zbx_pb_state_t	get_pb_dst(int i)
 /* remap states to outgoing data source - database or memory */
 zbx_pb_state_t	pb_src[] = {PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY};
 
-
 zbx_pb_state_t	get_pb_src(int i)
 {
 	return pb_src[i];

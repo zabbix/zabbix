@@ -781,8 +781,8 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 
 			if (PB_DATABASE_MEMORY == get_pb_data()->state)
 			{
-				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to memory"
-						" mode");
+				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to"
+						" memory mode");
 			}
 			else
 			{

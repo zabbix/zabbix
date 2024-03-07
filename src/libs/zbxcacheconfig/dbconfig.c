@@ -137,7 +137,6 @@ void	set_config(ZBX_DC_CONFIG *in)
 	config = in;
 }
 
-
 zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
 
 void	rdlock_cache(void)

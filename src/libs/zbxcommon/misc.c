@@ -596,4 +596,3 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "unknown";
 	}
 }
-
