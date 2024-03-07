@@ -60,7 +60,6 @@ $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.sortable.js');
 $this->addJsFile('items.js');
 $this->addJsFile('multilineinput.js');
 

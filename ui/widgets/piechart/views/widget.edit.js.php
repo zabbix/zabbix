@@ -39,6 +39,11 @@ window.widget_pie_chart_form = new class {
 	#dataset_wrapper;
 
 	/**
+	 * @type {Map<HTMLLIElement, CSortable>}
+	 */
+	#single_items_sortable = new Map();
+
+	/**
 	 * @type {String}
 	 */
 	#templateid;
@@ -333,9 +338,14 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#removeDataSet(obj) {
-		obj
-			.closest('.list-accordion-item')
-			.remove();
+		const dataset_remove = obj.closest('.list-accordion-item');
+
+		dataset_remove.remove();
+
+		if (this.#single_items_sortable.has(dataset_remove)) {
+			this.#single_items_sortable.get(dataset_remove).enable(false);
+			this.#single_items_sortable.delete(dataset_remove);
+		}
 
 		this.#updateVariableOrder(jQuery(this.#dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 		this.#updateDatasetsLabel();
@@ -373,25 +383,16 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#initDataSetSortable() {
-		const datasets_count = this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
-
-		for (const drag_icon of this.#dataset_wrapper.querySelectorAll('.js-main-drag-icon')) {
-			drag_icon.classList.toggle('disabled', datasets_count < 2);
-		}
-
 		if (this._sortable_data_set === undefined) {
-			this._sortable_data_set = new CSortable(
-				document.querySelector('#data_set .<?= ZBX_STYLE_LIST_VERTICAL_ACCORDION ?>'),
-				{is_vertical: true}
-			);
+			this._sortable_data_set = new CSortable(document.querySelector('#data_sets'), {
+				selector_handle: '.js-main-drag-icon, .js-dataset-label'
+			});
 
-			this._sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {
+			this._sortable_data_set.on(CSortable.EVENT_SORT, () => {
 				this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this.#updateDatasetsLabel();
 			});
 		}
-
-		this._sortable_data_set.enableSorting(datasets_count > 1);
 	}
 
 	#selectItems() {
@@ -469,50 +470,26 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#initSingleItemSortable(dataset) {
-		const item_rows = dataset.querySelectorAll('.single-item-table-row');
+		const rows_container = dataset.querySelector('.single-item-table tbody');
 
-		if (item_rows.length < 1) {
+		if (rows_container === null) {
 			return;
 		}
 
-		for (const row of item_rows) {
-			row.querySelector('.<?= ZBX_STYLE_DRAG_ICON ?>').classList.toggle('disabled', item_rows.length < 2);
+		if (this.#single_items_sortable.has(dataset)) {
+			return;
 		}
 
-		jQuery(`.single-item-table`, dataset).sortable({
-			disabled: item_rows.length < 2,
-			items: '.single-item-table-row',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			update: () => {
-				this.#updateSingleItemsOrder(dataset);
-				this.#updateSingleItemsLinks();
-			},
-			helper: (e, ui) => {
-				for (const td of ui.find('>td')) {
-					const $td = jQuery(td);
-					$td.attr('width', $td.width());
-				}
-
-				// When dragging element on safari, it jumps out of the table.
-				if (SF) {
-					// Move back draggable element to proper position.
-					ui.css('left', (ui.offset().left - 2) + 'px');
-				}
-
-				return ui;
-			},
-			stop: (e, ui) => {
-				ui.item.find('>td').removeAttr('width');
-			},
-			start: (e, ui) => {
-				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-			}
+		const sortable = new CSortable(rows_container, {
+			selector_handle: '.table-col-handle'
 		});
+
+		sortable.on(CSortable.EVENT_SORT, () => {
+			this.#updateSingleItemsOrder(dataset);
+			this.#updateSingleItemsLinks();
+		});
+
+		this.#single_items_sortable.set(dataset, sortable);
 	}
 
 	#updateSingleItemsLinks() {

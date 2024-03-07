@@ -402,7 +402,7 @@ class CZabbixServer {
 
 		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
 			if ((time() - $active_node[0]['lastaccess']) <
-					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HA_FAILOVER_DELAY))) {
 				return true;
 			}
 		}

@@ -241,4 +241,6 @@ ZBX_VMSTAT_DATA;
 
 void	collect_vmstat_data(ZBX_VMSTAT_DATA *vmstat);
 #endif
+
+int	sysinfo_get_config_timeout(void);
 #endif /* ZABBIX_SYSINFO_H */

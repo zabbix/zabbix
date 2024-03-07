@@ -167,13 +167,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	}
 
 	/**
-	 * TODO remove after DEV-1535 is fixed.
-	 */
-	public function cleanupProfile() {
-		DBexecute('DELETE FROM profiles WHERE idx LIKE \'web.popup.generic.%\'');
-	}
-
-	/**
 	 * Test for checking new Graph prototype widget creation.
 	 *
 	 * @onAfter cleanupProfile

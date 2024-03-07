@@ -2876,7 +2876,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 	ZBX_DC_INTERFACE	*interface;
 
 	time_t			now;
-	unsigned char		status, type, value_type, old_poller_type;
+	unsigned char		status, type, value_type, old_poller_type, item_flags;
 	int			found, update_index, ret, i,  old_nextcheck;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
@@ -2900,6 +2900,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
+
+		item_flags = (unsigned char)atoi(row[18]);
+
+		/* item prototype does not have item_rtdata and shouldn't be present in sync */
+		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
+				item_flags != ZBX_FLAG_DISCOVERY_RULE)
+		{
+			continue;
+		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
@@ -2947,7 +2956,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		/* store new information in item structure */
 
 		item->hostid = hostid;
-		item->flags = (unsigned char)atoi(row[18]);
+		item->flags = item_flags;
 		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
 		dc_strpool_replace(found, &item->history_period, row[22]);

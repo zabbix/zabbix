@@ -67,9 +67,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
-			$this->assertTrue($this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]//li[contains(@class, "selected")]')
-					->one()->isPresent($status)
-			);
+			$this->assertTrue($this->query('id:monitoring_hosts_filter')->asFilterElement()->one()->isExpanded($status));
 			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
 		}
 

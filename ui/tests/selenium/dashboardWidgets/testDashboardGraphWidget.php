@@ -2747,7 +2747,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$form = $widget->edit();
 
 		// Check Data set names in created widget configuration form.
-		$data_set_labels = $form->query('xpath:.//label[@class="sortable-drag-handle js-dataset-label"]')->all()->asText();
+		$data_set_labels = $form->query('xpath:.//label[@class="js-dataset-label"]')->all()->asText();
 		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
 	}
 
