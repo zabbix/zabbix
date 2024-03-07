@@ -1442,7 +1442,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay,
-								config_unreachable_period, config_unreachable_delay};
+								config_unreachable_period, config_unreachable_delay,
+								get_config_forks};
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args = {
 							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],

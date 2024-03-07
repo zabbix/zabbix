@@ -1485,7 +1485,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 						zbx_config_source_ip};
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay,
-							config_unreachable_period, config_unreachable_delay};
+							config_unreachable_period, config_unreachable_delay,
+							get_config_forks};
 #endif
 	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip, config_ssl_ca_location,
 									config_ssl_cert_location,
