@@ -1447,6 +1447,9 @@ done:
 			host->maintenance_from = atoi(row[9]);
 			host->data_expected_from = now;
 			host->update_items = 0;
+			host->items_active_normal = 0;
+			host->items_active_notsupported = 0;
+			host->items_disabled = 0;
 
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
