@@ -92,7 +92,7 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_ds
 					zbx_vector_iprange_t *ipranges);
 void			discoverer_job_abort(zbx_discoverer_job_t *job, zbx_uint64_t *pending_checks_count,
 					zbx_vector_discoverer_drule_error_t *errors, char *error);
-zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job);
+zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job, int checks_per_task_max);
 int			discoverer_range_check_iter(zbx_discoverer_task_t *task);
 void			discoverer_ds_dcheck_free(zbx_ds_dcheck_t *ds_dcheck);
 

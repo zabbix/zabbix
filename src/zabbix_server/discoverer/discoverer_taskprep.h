@@ -26,7 +26,6 @@
 
 void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
 		zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common, zbx_vector_iprange_t *ipranges,
-		int checks_per_worker_max, zbx_vector_discoverer_drule_error_t *drule_errors,
-		zbx_vector_uint64_t *err_druleids);
+		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids);
 
 #endif /* ZABBIX_DISCOVERER_TASKPREP_H_ */

@@ -243,9 +243,12 @@ void	results_free(zbx_discoverer_results_t *result)
 
 void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 {
+	char		buf[MAX_STRING_LEN / 8 + 1];
 	const char	*start;
 
-	for (start = ports; '\0' != *start;)
+	zbx_strscpy(buf, ports);
+
+	for (start = buf; '\0' != *start;)
 	{
 		char		*comma, *last_port;
 		zbx_range_t	r;
@@ -773,8 +776,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		ipranges = (zbx_vector_iprange_t *)zbx_malloc(NULL, sizeof(zbx_vector_iprange_t));
 		zbx_vector_iprange_create(ipranges);
 
-		process_rule(drule, &tasks, check_counts, ds_dchecks_common, ipranges,
-				dmanager.queue.checks_per_worker_max, drule_errors, err_druleids);
+		process_rule(drule, &tasks, check_counts, ds_dchecks_common, ipranges, drule_errors, err_druleids);
 
 		if (0 != tasks.num_data)
 		{
@@ -982,7 +984,8 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 			zbx_str_free(hosts.values[i].dnsname);
 		}
 
-		(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, hosts.values_num);
+		(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0,
+				(zbx_uint64_t)hosts.values_num);
 		zbx_vector_fping_host_clear(&hosts);
 	}
 	while (0 == *stop && SUCCEED == abort && 0 != task->range.state.count &&
@@ -1013,7 +1016,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		zbx_str_free(hosts.values[i].dnsname);
 	}
 
-	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, hosts.values_num);
+	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, (zbx_uint64_t)hosts.values_num);
 	zbx_vector_fping_host_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:%d", log_worker_id, __func__,
@@ -1157,9 +1160,9 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	return SUCCEED;
 }
 
-int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
+int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 {
-	switch(dcheck->type)
+	switch(ds_dcheck->dcheck.type)
 	{
 		case SVC_AGENT:
 		case SVC_ICMPPING:
@@ -1224,7 +1227,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			zbx_uint64_t		druleid;
 			zbx_discoverer_task_t	*task;
 
-			if (NULL == (task = discoverer_task_pop(job)))
+			if (NULL == (task = discoverer_task_pop(job, queue->checks_per_worker_max)))
 			{
 				if (0 == job->workers_used)
 				{
@@ -1237,12 +1240,13 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				continue;
 			}
 
-			if (FAIL == dcheck_is_async(&task->ds_dchecks.values[0]->dcheck))
+			if (FAIL == dcheck_is_async(task->ds_dchecks.values[0]))
 				queue->pending_checks_count--;
 
 			job->workers_used++;
 
-			if (0 == job->concurrency_max || job->workers_used != job->concurrency_max)
+			if (0 == job->concurrency_max || job->workers_used != job->concurrency_max ||
+					SUCCEED == dcheck_is_async(task->ds_dchecks.values[0]))
 			{
 				discoverer_queue_push(queue, job);
 				discoverer_queue_notify(queue);
@@ -1259,7 +1263,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
 
-			if (FAIL == dcheck_is_async(&task->ds_dchecks.values[0]->dcheck))
+			if (FAIL == dcheck_is_async(task->ds_dchecks.values[0]))
 			{
 				ret = discoverer_net_check_common(druleid, task);
 			}
@@ -1271,7 +1275,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			else
 			{
 				ret = discovery_net_check_range(druleid, task, concurrency_max, &worker->stop,
-						&dmanager, log_worker_id, queue, &error);
+						&dmanager, log_worker_id, &error);
 			}
 
 			if (FAIL == ret)
@@ -1422,8 +1426,8 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 #ifdef	HAVE_GETRLIMIT
 	if (0 == getrlimit(RLIMIT_NOFILE, &rlim))
 	{
-		/* we will consume not more than 2/3 of all FD */
-		checks_per_worker_max = ((int)rlim.rlim_cur / 3 * 2) / args_in->workers_num;
+		/* we will consume not more than 3/5 of all FD */
+		checks_per_worker_max = ((int)rlim.rlim_cur / 5 * 3) / args_in->workers_num;
 
 		if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX > checks_per_worker_max)
 		{

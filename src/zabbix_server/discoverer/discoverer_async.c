@@ -585,7 +585,7 @@ static int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager, 
 int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int concurrency_max,
 		zbx_uint64_t total, zbx_uint64_t dec_counter)
 {
-	if ((0 != total && 0 != total % concurrency_max) || total == (zbx_uint64_t)concurrency_max)
+	if ((0 != total && 0 != total % (zbx_uint64_t)concurrency_max) || total == (zbx_uint64_t)concurrency_max)
 		return FAIL;
 
 	if (0 != dec_counter)
@@ -599,7 +599,7 @@ int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int c
 }
 
 int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int concurrency_max, int *stop,
-		zbx_discoverer_manager_t *dmanager, int worker_id, zbx_discoverer_queue_t *queue, char **error)
+		zbx_discoverer_manager_t *dmanager, int worker_id, char **error)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
 	discovery_poller_config_t		poller_config;
@@ -614,13 +614,14 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		log_worker_id = worker_id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
-			" checks per ip:%u dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
-			task->range.id, task->range.state.count, task->range.state.checks_per_ip,
-			task->ds_dchecks.values_num,
-			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, concurrency_max);
+			" checks per ip:%u dchecks:%d type:%u concurrency_max:%d checks_per_worker_max:%d",
+			log_worker_id, __func__, druleid, task->range.id, task->range.state.count,
+			task->range.state.checks_per_ip, task->ds_dchecks.values_num,
+			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, concurrency_max,
+			dmanager->queue.checks_per_worker_max);
 
 	if (0 == concurrency_max)
-		concurrency_max = queue->checks_per_worker_max;
+		concurrency_max = dmanager->queue.checks_per_worker_max;
 
 	discovery_async_poller_init(dmanager, &poller_config);
 	zbx_vector_discoverer_results_ptr_create(&results);
@@ -704,8 +705,8 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 
 		abort = discovery_net_check_result_flush(dmanager, task, &results, 0);
 
-		if (SUCCEED == discovery_pending_checks_count_decrease(queue, concurrency_max, task->range.state.count,
-				++dec_counter))
+		if (SUCCEED == discovery_pending_checks_count_decrease(&dmanager->queue, concurrency_max,
+				task->range.state.count, ++dec_counter))
 		{
 			dec_counter = 0;
 		}
@@ -729,7 +730,8 @@ out:
 	}
 #endif
 	discovery_async_poller_destroy(&poller_config);
-	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, task->range.state.count + dec_counter);
+	(void)discovery_pending_checks_count_decrease(&dmanager->queue, concurrency_max, 0,
+			task->range.state.count + dec_counter);
 #ifdef HAVE_NETSNMP
 	/* we must clear the EnginID cache before the next snmpv3 dcheck and */
 	/* remove unused collected values in any case */
@@ -737,9 +739,9 @@ out:
 		zbx_clear_cache_snmp(dmanager->process_type, FAIL);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
-			" last ip:%s abort:%d", log_worker_id, __func__, druleid,
+			" last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
 			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
-			task->range.state.count, first_ip, ip, abort);
+			task->range.state.count, first_ip, ip, abort, ret);
 
 	return ret;
 }

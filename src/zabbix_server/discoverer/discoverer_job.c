@@ -20,6 +20,7 @@
 #include "discoverer_job.h"
 #include "discoverer_queue.h"
 #include "discoverer_int.h"
+#include "zbx_discoverer_constants.h"
 
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
@@ -43,7 +44,7 @@ int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 
 	task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
 
-	if (++task->range.state.index_dcheck < task->ds_dchecks.values_num)
+	if (++(task->range.state.index_dcheck) < task->ds_dchecks.values_num)
 		return discoverer_range_check_iter(task);
 
 	task->range.state.index_dcheck = 0;
@@ -110,11 +111,79 @@ static zbx_discoverer_task_t	*discoverer_task_clone(zbx_discoverer_task_t *task)
 			task->ds_dchecks.values_num);
 	task_copy->unique_dcheckid = task->unique_dcheckid;
 	task_copy->range = task->range;
+	task_copy->range.id++;
 
 	return task_copy;
 }
 
-zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
+static int	discoverer_task_icmp_shift(zbx_discoverer_task_t *task, int checks_per_worker_max)
+{
+	if (task->range.state.count <= (zbx_uint64_t)checks_per_worker_max)
+		return FAIL;
+
+	do
+	{
+		do
+		{
+			zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
+							&task->range.state.index_ip, task->range.state.ipaddress);
+			task->range.state.count--;
+		}
+		while (0 != --checks_per_worker_max);
+
+		if (0 == checks_per_worker_max)
+			return SUCCEED;
+
+		task->range.state.index_dcheck++;
+		memset(task->range.state.ipaddress, 0, sizeof(task->range.state.ipaddress));
+	}
+	while (task->range.state.index_dcheck < task->ds_dchecks.values_num);
+
+	return FAIL;
+}
+
+static int	discoverer_task_async_shift(zbx_discoverer_task_t *task, int checks_per_worker_max)
+{
+	if (task->range.state.count <= (zbx_uint64_t)checks_per_worker_max)
+		return FAIL;
+
+	do
+	{
+		(void)discoverer_range_check_iter(task);
+	}
+	while (0 != --checks_per_worker_max);
+
+	return SUCCEED;
+}
+
+static zbx_discoverer_task_t	*discoverer_task_split_get(zbx_discoverer_task_t *task, zbx_discoverer_job_t *job,
+		int checks_per_task_max)
+{
+	zbx_task_range_t	range;
+	int			ret;
+
+	if (0 != job->concurrency_max || SVC_SNMPv3 == GET_DTYPE(task))
+		return task;
+
+	range.state = task->range.state;
+
+	if (SVC_ICMPPING == GET_DTYPE(task))
+		ret = discoverer_task_icmp_shift(task, checks_per_task_max);
+	else
+		ret = discoverer_task_async_shift(task, checks_per_task_max);
+
+	if (SUCCEED == ret)
+	{
+		(void)zbx_list_append(&job->tasks, discoverer_task_clone(task), NULL);
+		range.state.count = checks_per_task_max;
+	}
+
+	task->range.state = range.state;
+
+	return task;
+}
+
+zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job, int checks_per_task_max)
 {
 	zbx_discoverer_task_t	*task;
 	zbx_task_range_t	range;
@@ -122,8 +191,8 @@ zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
 	if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 		return NULL;
 
-	if (SUCCEED == dcheck_is_async(&task->ds_dchecks.values[0]->dcheck))
-		return task;
+	if (SUCCEED == dcheck_is_async(task->ds_dchecks.values[0]))
+		return discoverer_task_split_get(task, job, checks_per_task_max);
 
 	range.state = task->range.state;
 
