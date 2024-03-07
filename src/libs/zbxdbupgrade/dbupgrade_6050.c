@@ -3256,6 +3256,13 @@ static int	DBpatch_6050211(void)
 
 	return DBset_default("items", &field);
 }
+
+static int	DBpatch_6050212(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("lld_override_ophistory", &field);
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3472,5 +3479,6 @@ DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
 DBPATCH_ADD(6050210, 0, 1)
 DBPATCH_ADD(6050211, 0, 1)
+DBPATCH_ADD(6050212, 0, 1)
 
 DBPATCH_END()
