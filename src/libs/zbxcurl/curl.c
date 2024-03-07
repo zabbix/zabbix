@@ -21,6 +21,8 @@
 
 #ifdef HAVE_LIBCURL
 
+/* See https://curl.se/libcurl/c/symbols-by-name.html for informatio on cURL version in which a symbol was added. */
+
 /* added in 7.85.0 (0x075500) */
 #if LIBCURL_VERSION_NUM < 0x075500
 #	define CURLOPT_PROTOCOLS_STR	318L
