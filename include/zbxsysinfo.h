@@ -93,7 +93,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 		zbx_get_config_int_f get_config_unsafe_user_parameters_cb, zbx_get_config_str_f
 		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
 		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
-		get_config_host_metadata_item_f);
+		get_config_host_metadata_item_f, zbx_get_config_str_f get_config_service_name_f);
 
 void	zbx_init_metrics(void);
 int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len);

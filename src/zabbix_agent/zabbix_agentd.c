@@ -64,6 +64,11 @@ static char	**config_perf_counters_en = NULL;
 #define ZBX_SERVICE_NAME_LEN    64
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+static const char	*get_zbx_service_name(void)
+{
+	return ZABBIX_SERVICE_NAME;
+}
 #undef ZBX_SERVICE_NAME_LEN
 
 static char	*config_user = NULL;
@@ -1463,7 +1468,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
-			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
+			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item, get_zbx_service_name);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(get_zbx_progname);
 #else
@@ -1655,7 +1660,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags);
+	zbx_service_start(t.flags, get_zbx_service_name);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,

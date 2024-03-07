@@ -23,6 +23,9 @@
 
 #include "zbxwinservice.h"
 
+zbx_metric_t* get_me(void)
+{
+
 static zbx_metric_t	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
@@ -60,8 +63,8 @@ static zbx_metric_t	parameters_specific[] =
 	{"system.uname",	0,		system_uname,		NULL},
 
 	{"service.discovery",	0,		discover_services,	NULL},
-	{"service.info",	CF_HAVEPARAMS,	get_service_info,	ZABBIX_SERVICE_NAME},
-	{"service_state",	CF_HAVEPARAMS,	get_service_state,	ZABBIX_SERVICE_NAME},
+	{"service.info",	CF_HAVEPARAMS,	get_service_info,	NULL},
+	{"service_state",	CF_HAVEPARAMS,	get_service_state,	NULL},
 	{"services",		CF_HAVEPARAMS,	get_list_of_services,	NULL},
 	{"perf_counter",	CF_HAVEPARAMS,	perf_counter,		"\\System\\Processes"},
 	{"perf_counter_en",	CF_HAVEPARAMS,	perf_counter_en,	"\\System\\Processes"},
@@ -82,7 +85,17 @@ static zbx_metric_t	parameters_specific[] =
 	{NULL}
 };
 
+
+//	{"service.info",	CF_HAVEPARAMS,	get_service_info,	ZABBIX_SERVICE_NAME},
+//	{"service_state",	CF_HAVEPARAMS,	get_service_state,	ZABBIX_SERVICE_NAME},
+
+	parameters_specific[24].test_param = sysinfo_get_service_name();
+	parameters_specific[25].test_param = sysinfo_get_service_name();
+
+	return &parameters_specific;
+}
+
 zbx_metric_t	*get_parameters_specific(void)
 {
-	return parameters_specific;
+	return get_me();
 }

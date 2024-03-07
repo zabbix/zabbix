@@ -121,6 +121,7 @@ const char	*sysinfo_get_config_hostname(void);
 const char	*sysinfo_get_config_hostnames(void);
 const char	*sysinfo_get_config_host_metadata(void);
 const char	*sysinfo_get_config_host_metadata_item(void);
+const char	*sysinfo_get_service_name(void);
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 

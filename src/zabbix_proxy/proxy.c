@@ -1185,7 +1185,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_ipcservice(zbx_program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
+			get_zbx_config_source_ip, NULL, NULL, NULL, NULL, NULL);
 	zbx_init_library_stats(get_zbx_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_progname);

@@ -87,6 +87,7 @@ static zbx_get_config_str_f	get_config_hostname_cb = NULL;
 static zbx_get_config_str_f	get_config_hostnames_cb = NULL;
 static zbx_get_config_str_f	get_config_host_metadata_cb = NULL;
 static zbx_get_config_str_f	get_config_host_metadata_item_cb = NULL;
+static zbx_get_config_str_f	get_config_service_name_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -165,7 +166,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
 		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
 		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
-		get_config_host_metadata_item_f)
+		get_config_host_metadata_item_f, zbx_get_config_str_f get_config_service_name_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
@@ -176,6 +177,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 	get_config_hostnames_cb = get_config_hostnames_f;
 	get_config_host_metadata_cb = get_config_host_metadata_f;
 	get_config_host_metadata_item_cb = get_config_host_metadata_item_f;
+	get_config_service_name_cb = get_config_service_name_f;
 }
 
 /******************************************************************************
@@ -312,6 +314,8 @@ GET_CONFIG_VAR(const char *, hostname)
 GET_CONFIG_VAR(const char *, hostnames)
 GET_CONFIG_VAR(const char *, host_metadata)
 GET_CONFIG_VAR(const char *, host_metadata_item)
+
+GET_CONFIG_VAR(const char *, service_name)
 #undef GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
