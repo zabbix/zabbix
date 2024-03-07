@@ -256,71 +256,71 @@ zabbix_export:
           params: |
             try {
             
-                var params = JSON.parse(value);
-                var result = [];
+            	var params = JSON.parse(value);
+            	var result = [];
             
-                var req = new HttpRequest();
+            	var req = new HttpRequest();
             
-                var queue = [];
+            	var queue = [];
             
-                var node;
-                var current_folder;
-                var child_folders;
-                var child_files;
+            	var node;
+            	var current_folder;
+            	var child_folders;
+            	var child_files;
             
-                req.addHeader('Accept: application/json; odata=verbose');
-                req.setHttpAuth(HTTPAUTH_NTLM, params.user, params.password);
-                queue.push({
-                    patch: params.root,
-                    json_query: '$["data"]'
-                });
+            	req.addHeader('Accept: application/json; odata=verbose');
+            	req.setHttpAuth(HTTPAUTH_NTLM, params.user, params.password);
+            	queue.push({
+            		patch: params.root,
+            		json_query: '$["data"]'
+            	});
             
-                while (queue.length) {
-                    node = queue.pop();
+            	while (queue.length) {
+            		node = queue.pop();
             
-                    current_folder = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')")));
+            		current_folder = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')")));
             
-                    result.status = req.getStatus();
-                    if (result.status != 200) {
-                        throw result.status;
-                    }
+            		result.status = req.getStatus();
+            		if (result.status != 200) {
+            			throw result.status;
+            		}
             
-                    result.push({
-                        '{#SHAREPOINT.LLD.NAME}': current_folder.d.Name,
-                        '{#SHAREPOINT.LLD.TYPE}': 'FOLDER',
-                        '{#SHAREPOINT.LLD.FULL_PATH}': node.patch,
-                        '{#SHAREPOINT.LLD.JSON_PATH}': node.json_query + '["' + current_folder.d.Name + '"]',
-                        '{#SHAREPOINT.LLD.SIZE}': 0,
-                        '{#SHAREPOINT.LLD.CREATED}': Math.round(new Date(current_folder.d.TimeCreated).getTime() / 1000),
-                        '{#SHAREPOINT.LLD.MODIFIED}': Math.round(new Date(current_folder.d.TimeLastModified).getTime() / 1000)
-                    });
+            		result.push({
+            			'{#SHAREPOINT.LLD.NAME}': current_folder.d.Name,
+            			'{#SHAREPOINT.LLD.TYPE}': 'FOLDER',
+            			'{#SHAREPOINT.LLD.FULL_PATH}': node.patch,
+            			'{#SHAREPOINT.LLD.JSON_PATH}': node.json_query + '["' + current_folder.d.Name + '"]',
+            			'{#SHAREPOINT.LLD.SIZE}': 0,
+            			'{#SHAREPOINT.LLD.CREATED}': Math.round(new Date(current_folder.d.TimeCreated).getTime() / 1000),
+            			'{#SHAREPOINT.LLD.MODIFIED}': Math.round(new Date(current_folder.d.TimeLastModified).getTime() / 1000)
+            		});
             
-                    child_folders = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Folders")));
+            		child_folders = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Folders")));
             
-                    child_folders.d.results.forEach(function (dir) {
-                        queue.push({
-                            patch: dir.ServerRelativeUrl,
-                            json_query: node.json_query + '["' + current_folder.d.Name + '"]["data"]'
-                        });
-                    });
+            		child_folders.d.results.forEach(function (dir) {
+            			queue.push({
+            				patch: dir.ServerRelativeUrl,
+            				json_query: node.json_query + '["' + current_folder.d.Name + '"]["data"]'
+            			});
+            		});
             
-                    child_files = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Files")));
-                    child_files.d.results.forEach(function (file) {
-                        result.push({
-                            '{#SHAREPOINT.LLD.NAME}': file.Name,
-                            '{#SHAREPOINT.LLD.TYPE}': 'FILE',
-                            '{#SHAREPOINT.LLD.FULL_PATH}': file.ServerRelativeUrl,
-                            '{#SHAREPOINT.LLD.JSON_PATH}': node.json_query + '["' + current_folder.d.Name + '"]' + '["data"]["' + file.Name + '"]',
-                            '{#SHAREPOINT.LLD.SIZE}': file.Length,
-                            '{#SHAREPOINT.LLD.CREATED}': Math.round(new Date(file.TimeCreated).getTime() / 1000),
-                            '{#SHAREPOINT.LLD.MODIFIED}': Math.round(new Date(file.TimeLastModified).getTime() / 1000)
-                        });
-                    });
-                }
+            		child_files = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Files")));
+            		child_files.d.results.forEach(function (file) {
+            			result.push({
+            				'{#SHAREPOINT.LLD.NAME}': file.Name,
+            				'{#SHAREPOINT.LLD.TYPE}': 'FILE',
+            				'{#SHAREPOINT.LLD.FULL_PATH}': file.ServerRelativeUrl,
+            				'{#SHAREPOINT.LLD.JSON_PATH}': node.json_query + '["' + current_folder.d.Name + '"]' + '["data"]["' + file.Name + '"]',
+            				'{#SHAREPOINT.LLD.SIZE}': file.Length,
+            				'{#SHAREPOINT.LLD.CREATED}': Math.round(new Date(file.TimeCreated).getTime() / 1000),
+            				'{#SHAREPOINT.LLD.MODIFIED}': Math.round(new Date(file.TimeLastModified).getTime() / 1000)
+            			});
+            		});
+            	}
             
             } catch (error) {
-                Zabbix.log(3, "Sharepoint fs discovery failed: " + params.url + " Error: " + error);
-                return "Sharepoint fs discovery failed: " + params.url + " Error: " + error;
+            	Zabbix.log(3, "Sharepoint fs discovery failed: " + params.url + " Error: " + error);
+            	return "Sharepoint fs discovery failed: " + params.url + " Error: " + error;
             }
             
             return JSON.stringify(result);

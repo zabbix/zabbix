@@ -183,7 +183,6 @@ function createFontSelect(string $name): CSelect {
 								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
-								->addClass('ui-sortable')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -934,7 +933,6 @@ function createFontSelect(string $name): CSelect {
 					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('sortable')
 			->setId('triggerrow_#{triggerid}')
 			->toString()
 	?>
