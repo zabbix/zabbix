@@ -175,7 +175,7 @@ static zbx_discoverer_task_t	*discoverer_task_split_get(zbx_discoverer_task_t *t
 	if (SUCCEED == ret)
 	{
 		(void)zbx_list_append(&job->tasks, discoverer_task_clone(task), NULL);
-		range.state.count = checks_per_task_max;
+		range.state.count = (zbx_uint64_t)checks_per_task_max;
 	}
 
 	task->range.state = range.state;
