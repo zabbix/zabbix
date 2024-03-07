@@ -62,12 +62,18 @@ static char	**config_perf_counters_en = NULL;
 #endif
 
 #define ZBX_SERVICE_NAME_LEN    64
-char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	zabbix_service_name[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
 static const char	*get_zbx_service_name(void)
 {
-	return ZABBIX_SERVICE_NAME;
+	return zabbix_service_name;
+}
+
+char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+static const char	*get_zbx_event_source(void)
+{
+	return zabbix_event_source;
 }
 #undef ZBX_SERVICE_NAME_LEN
 
@@ -1211,7 +1217,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, ZABBIX_EVENT_SOURCE, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, zabbix_event_source, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1492,7 +1498,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, ZABBIX_EVENT_SOURCE, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, zabbix_event_source, NULL);
 	}
 #endif
 
@@ -1540,9 +1546,9 @@ int	main(int argc, char **argv)
 				first_hostname = NULL != (p = strchr(zbx_config_hostnames, ',')) ? zbx_dsprintf(NULL,
 						"%.*s", (int)(p - zbx_config_hostnames), zbx_config_hostnames) :
 						zbx_strdup(NULL, zbx_config_hostnames);
-				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
+				zbx_snprintf(zabbix_service_name, sizeof(zabbix_service_name), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
-				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
+				zbx_snprintf(zabbix_event_source, sizeof(zabbix_event_source), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_free(first_hostname);
 			}
@@ -1660,7 +1666,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags, get_zbx_service_name);
+	zbx_service_start(t.flags, get_zbx_service_name, get_zbx_event_source);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,

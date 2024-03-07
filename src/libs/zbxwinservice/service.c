@@ -38,6 +38,7 @@ static int	application_status = ZBX_APP_RUNNING;
 static zbx_on_exit_t	zbx_on_exit_cb;
 
 static zbx_get_config_str_f     get_zbx_service_name_cb = NULL;
+static zbx_get_config_str_f	get_zbx_event_source_cb = NULL;
 
 int	ZBX_IS_RUNNING(void)
 {
@@ -145,12 +146,14 @@ static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 	MAIN_ZABBIX_ENTRY(0);
 }
 
-void	zbx_service_start(int flags, zbx_get_config_str_f get_zbx_service_name_f)
+void	zbx_service_start(int flags, zbx_get_config_str_f get_zbx_service_name_f,
+		zbx_get_config_str_f get_zbx_event_source_f)
 {
 	int				ret;
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
 
 	get_zbx_service_name_cb = get_zbx_service_name_f;
+	get_zbx_event_source_cb = get_zbx_event_source_f
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -246,7 +249,7 @@ static int	svc_install_event_source(const char *path)
 
 	svc_get_fullpath(path, execName, MAX_PATH);
 
-	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
+	wevent_source = zbx_utf8_to_unicode(get_zbx_event_source_cb());
 	StringCchPrintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
@@ -262,7 +265,7 @@ static int	svc_install_event_source(const char *path)
 			(DWORD)(wcslen(execName) + 1) * sizeof(wchar_t));
 	RegCloseKey(hKey);
 
-	zbx_error("event source [%s] installed successfully", ZABBIX_EVENT_SOURCE);
+	zbx_error("event source [%s] installed successfully", get_zbx_event_source_cb());
 
 	return SUCCEED;
 }
@@ -329,19 +332,19 @@ static int	svc_RemoveEventSource()
 	wchar_t	*wevent_source;
 	int	ret = FAIL;
 
-	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
+	wevent_source = zbx_utf8_to_unicode(get_zbx_event_source_cb());
 	StringCchPrintf(regkey, ARRSIZE(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS == RegDeleteKey(HKEY_LOCAL_MACHINE, regkey))
 	{
-		zbx_error("event source [%s] uninstalled successfully", ZABBIX_EVENT_SOURCE);
+		zbx_error("event source [%s] uninstalled successfully", get_zbx_event_source_cb());
 		ret = SUCCEED;
 	}
 	else
 	{
 		zbx_error("unable to uninstall event source [%s]: %s",
-				ZABBIX_EVENT_SOURCE, zbx_strerror_from_system(GetLastError()));
+				get_zbx_event_source_cb(), zbx_strerror_from_system(GetLastError()));
 	}
 
 	return ret;
