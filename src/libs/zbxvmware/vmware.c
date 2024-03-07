@@ -1412,7 +1412,7 @@ static int	vmware_cq_instance_id_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort datastore names vector by name           *
+ * Purpose: comparison function to sort datastore names vector by name        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
@@ -1421,6 +1421,19 @@ int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
 	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
 
 	return strcmp(ds1->name, ds2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: comparison function to sort Datastore names vector by UUID        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_dsname_compare_uuid(const void *d1, const void *d2)
+{
+	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
+	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
 }
 
 int	zbx_vmware_pnic_compare(const void *v1, const void *v2)

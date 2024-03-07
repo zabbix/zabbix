@@ -33,7 +33,6 @@
 #include "zbxdiscovery.h"
 #include "zbxtrends.h"
 #include "zbxvmware.h"
-#include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
@@ -915,8 +914,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 				zbx_json_free(&json);
 			}
-			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, sysinfo_get_config_timeout(),
-					result))
+			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number,
+					config_comms->config_timeout, result))
 			{
 				goto out;
 			}
@@ -965,7 +964,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 					zbx_json_free(&json);
 				}
 				else if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip, port_number, tmp, tmp1,
-						sysinfo_get_config_timeout(), result))
+						config_comms->config_timeout, result))
 				{
 					goto out;
 				}

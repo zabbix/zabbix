@@ -252,11 +252,12 @@ class testFormWebScenarioStep extends CWebTest {
 
 			// Check the presence of the draggable icon.
 			if ($table_name === 'Variables') {
-				$this->assertFalse($row->query('class:drag-icon')->one(false)->isValid());
+				$this->assertFalse($table->query('class:sortable sortable-disabled')->one(false)->isValid());
 			}
 			else {
-				$drag_icon = $row->query('class:drag-icon')->one();
-				$this->assertFalse($drag_icon->isEnabled());
+				$this->assertEquals('sortable sortable-disabled',
+						$table->query('xpath:.//tbody')->one()->getAttribute('class')
+				);
 			}
 
 			// Fill in some data in first row and check that Remove buttons and draggable icon became enabled.
@@ -267,9 +268,11 @@ class testFormWebScenarioStep extends CWebTest {
 
 			// Check that draggable icon becomes enabled when a new row is added.
 			if ($table_name !== 'Variables') {
-				$this->assertFalse($drag_icon->isEnabled());
+				$this->assertEquals('sortable sortable-disabled',
+						$table->query('xpath:.//tbody')->one()->getAttribute('class')
+				);
 				$add_button->click();
-				$this->assertTrue($drag_icon->isEnabled());
+				$this->assertEquals('sortable', $table->query('xpath:.//tbody')->one()->getAttribute('class'));
 			}
 		}
 

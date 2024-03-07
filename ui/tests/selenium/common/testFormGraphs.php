@@ -721,7 +721,7 @@ class testFormGraphs extends CWebTest {
 			// Check saved items count.
 			$items_container = $form->getFieldContainer('Items');
 			$this->assertEquals(count($data['items']),
-					$items_container->query('xpath:.//tr[@class="sortable"]')->all()->count()
+					$items_container->query('xpath:.//tr[@class="graph-item"]')->all()->count()
 			);
 
 			// Check saved items names.
