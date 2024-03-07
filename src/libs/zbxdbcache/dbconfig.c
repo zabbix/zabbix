@@ -102,8 +102,9 @@ typedef struct
 {
 	zbx_uint64_t	id;
 	uint64_t	items_active_normal;
+	uint64_t	items_active_normal_old;
 	uint64_t	items_active_notsupported;
-	uint64_t	items_disabled;
+	uint64_t	items_active_notsupported_old;
 }
 zbx_dc_status_diff_host_t;
 
@@ -11569,6 +11570,8 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 
 		memset(&host_diff_local, 0, sizeof(zbx_dc_status_diff_host_t));
 		host_diff_local.id = dc_host->hostid;
+		host_diff_local.items_active_normal_old = dc_host->items_active_normal;
+		host_diff_local.items_active_notsupported_old = dc_host->items_active_notsupported;
 
 		/* gather per-proxy statistics of enabled and disabled hosts */
 		switch (dc_host->status)
@@ -11578,14 +11581,8 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 				if (0 == dc_host->proxy_hostid)
 					break;
 
-				if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
-						&dc_host->proxy_hostid)))
-				{
-					break;
-				}
-
 				if (NULL != (proxy_status_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
-						&dc_proxy->hostid)))
+						&dc_host->proxy_hostid)))
 				{
 					proxy_status_diff->hosts_monitored++;
 				}
@@ -11595,14 +11592,8 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 				if (0 == dc_host->proxy_hostid)
 					break;
 
-				if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
-						&dc_host->proxy_hostid)))
-				{
-					break;
-				}
-
 				if (NULL != (proxy_status_diff = (zbx_dc_status_diff_proxy_t *)zbx_hashset_search(&diff->proxies,
-						&dc_proxy->hostid)))
+						&dc_host->proxy_hostid)))
 				{
 					proxy_status_diff->hosts_not_monitored++;
 				}
@@ -11617,6 +11608,30 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 	get_trigger_statistics(&config->triggers, diff);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove unchanged host entries from status update diff             *
+ *                                                                            *
+ * Parameters: diff - [OUT]                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_status_update_remove_unchanged_hosts(zbx_dc_status_diff_t *diff)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_dc_status_diff_host_t	*host_diff;
+
+	zbx_hashset_iter_reset(&diff->hosts, &iter);
+
+	while (NULL != (host_diff = (zbx_dc_status_diff_host_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (host_diff->items_active_normal_old == host_diff->items_active_normal &&
+			host_diff->items_active_notsupported_old == host_diff->items_active_notsupported)
+		{
+			zbx_hashset_iter_remove(&iter);
+		}
+	}
 }
 
 /******************************************************************************
@@ -11646,7 +11661,6 @@ static void	dc_status_update_remove_unchanged_proxies(zbx_dc_status_diff_t *diff
 			zbx_hashset_iter_remove(&iter);
 		}
 	}
-
 }
 
 /******************************************************************************
@@ -11692,6 +11706,7 @@ static void	dc_status_update(void)
 
 	if (SUCCEED == diff_updated)
 	{
+		dc_status_update_remove_unchanged_hosts(&diff);
 		dc_status_update_remove_unchanged_proxies(&diff);
 
 		WRLOCK_CACHE;
