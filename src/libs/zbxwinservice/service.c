@@ -153,7 +153,7 @@ void	zbx_service_start(int flags, zbx_get_config_str_f get_zbx_service_name_f,
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
 
 	get_zbx_service_name_cb = get_zbx_service_name_f;
-	get_zbx_event_source_cb = get_zbx_event_source_f
+	get_zbx_event_source_cb = get_zbx_event_source_f;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{

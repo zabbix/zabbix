@@ -77,7 +77,7 @@ static zbx_metric_t	parameter_hostname =
 
 static zbx_metric_t		*commands = NULL;
 static zbx_metric_t		*commands_local = NULL;
-zbx_vector_ptr_t		key_access_rules;
+static zbx_vector_ptr_t		key_access_rules;
 static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
@@ -88,6 +88,11 @@ static zbx_get_config_str_f	get_config_hostnames_cb = NULL;
 static zbx_get_config_str_f	get_config_host_metadata_cb = NULL;
 static zbx_get_config_str_f	get_config_host_metadata_item_cb = NULL;
 static zbx_get_config_str_f	get_config_service_name_cb = NULL;
+
+zbx_vector_ptr_t	*get_key_access_rules(void)
+{
+	return &key_access_rules;
+}
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1

@@ -69,12 +69,15 @@ static const char	*get_zbx_service_name(void)
 	return zabbix_service_name;
 }
 
+
 char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
+#if defined(_WINDOWS)
 static const char	*get_zbx_event_source(void)
 {
 	return zabbix_event_source;
 }
+#endif
 #undef ZBX_SERVICE_NAME_LEN
 
 static char	*config_user = NULL;
