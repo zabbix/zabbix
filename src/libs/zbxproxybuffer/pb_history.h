@@ -20,8 +20,9 @@
 #ifndef ZABBIX_PB_HISTORY_H
 #define ZABBIX_PB_HISTORY_H
 
-#include "zbxproxybuffer.h"
 #include "proxybuffer.h"
+#include "zbxalgo.h"
+#include "zbxtypes.h"
 
 void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row);
 size_t	pb_history_estimate_row_size(const char *value, const char *source);

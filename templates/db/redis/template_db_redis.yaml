@@ -1553,7 +1553,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Keyspace["{#DB}"]'
+                    - '$[''{#DB}'']'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: redis.keyspace.info_raw

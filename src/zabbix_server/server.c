@@ -29,7 +29,7 @@
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
-#include "poller/poller.h"
+#include "poller/poller_server.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"
@@ -97,6 +97,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
+#include "zbxpoller.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -1193,11 +1194,23 @@ int	main(int argc, char **argv)
 
 	argv = zbx_setproctitle_init(argc, argv);
 	zbx_progname = get_program_name(argv[0]);
-
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
-	zbx_init_library_nix(get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
+
+	/* initialize libraries before using */
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
+	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
+	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_ipcservice(zbx_program_type);
+	zbx_init_library_stats(get_zbx_program_type);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
+			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
+	zbx_init_library_dbhigh(zbx_config_dbhigh);
+	zbx_init_library_preproc(preproc_flush_value_server, get_zbx_progname);
+	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -1292,18 +1305,6 @@ int	main(int argc, char **argv)
 		printf("Validation successful\n");
 		exit(EXIT_SUCCESS);
 	}
-
-	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
-	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
-	zbx_init_library_icmpping(&config_icmpping);
-	zbx_init_library_ipcservice(zbx_program_type);
-	zbx_init_library_stats(get_zbx_program_type);
-	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
-			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
-	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_server, get_zbx_progname);
-	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1448,13 +1449,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller, get_config_forks,
-							config_java_gateway, config_java_gateway_port, config_externalscripts};
+							config_java_gateway, config_java_gateway_port,
+							config_externalscripts, zbx_get_value_internal_ext_server};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
-							config_enable_global_scripts};
+							config_enable_global_scripts, zbx_get_value_internal_ext_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							get_config_forks, config_enable_global_scripts};
