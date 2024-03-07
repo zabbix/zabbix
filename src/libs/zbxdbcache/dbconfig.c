@@ -11568,11 +11568,6 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 		zbx_dc_status_diff_host_t	host_diff_local;
 		zbx_dc_status_diff_proxy_t	*proxy_status_diff = NULL;
 
-		memset(&host_diff_local, 0, sizeof(zbx_dc_status_diff_host_t));
-		host_diff_local.id = dc_host->hostid;
-		host_diff_local.items_active_normal_old = dc_host->items_active_normal;
-		host_diff_local.items_active_notsupported_old = dc_host->items_active_notsupported;
-
 		/* gather per-proxy statistics of enabled and disabled hosts */
 		switch (dc_host->status)
 		{
@@ -11598,7 +11593,14 @@ static int	dc_status_update_get_diff(zbx_dc_status_diff_t *diff)
 					proxy_status_diff->hosts_not_monitored++;
 				}
 				break;
+			default:
+				continue;
 		}
+
+		memset(&host_diff_local, 0, sizeof(zbx_dc_status_diff_host_t));
+		host_diff_local.id = dc_host->hostid;
+		host_diff_local.items_active_normal_old = dc_host->items_active_normal;
+		host_diff_local.items_active_notsupported_old = dc_host->items_active_notsupported;
 
 		zbx_hashset_insert(&diff->hosts, &host_diff_local, sizeof(host_diff_local));
 	}
