@@ -613,8 +613,8 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	if (0 == log_worker_id)
 		log_worker_id = worker_id;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
-			" checks per ip:%u dchecks:%d type:%u concurrency_max:%d checks_per_worker_max:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:"
+			ZBX_FS_UI64 " checks per ip:%u dchecks:%d type:%u concurrency_max:%d checks_per_worker_max:%d",
 			log_worker_id, __func__, druleid, task->range.id, task->range.state.count,
 			task->range.state.checks_per_ip, task->ds_dchecks.values_num,
 			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, concurrency_max,
@@ -738,8 +738,8 @@ out:
 	if (SVC_SNMPv3 == GET_DTYPE(task))
 		zbx_clear_cache_snmp(dmanager->process_type, FAIL);
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
-			" last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
+			" first ip:%s last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
 			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
 			task->range.state.count, first_ip, ip, abort, ret);
 
