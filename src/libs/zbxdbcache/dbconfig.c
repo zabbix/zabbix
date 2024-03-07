@@ -11640,7 +11640,8 @@ static void	dc_status_update_remove_unchanged_proxies(zbx_dc_status_diff_t *diff
 			proxy_diff->items_active_normal_old == proxy_diff->items_active_normal &&
 			proxy_diff->items_active_notsupported_old == proxy_diff->items_active_notsupported &&
 			proxy_diff->items_disabled_old == proxy_diff->items_disabled &&
-			proxy_diff->required_performance_old == proxy_diff->required_performance)
+			SUCCEED == zbx_double_compare(proxy_diff->required_performance_old,
+			proxy_diff->required_performance))
 		{
 			zbx_hashset_iter_remove(&iter);
 		}
