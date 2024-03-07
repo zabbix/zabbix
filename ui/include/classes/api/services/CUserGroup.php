@@ -290,7 +290,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
-		$this->checkMfa($usrgrps);
+		$this->checkMfaids($usrgrps);
 	}
 
 	/**
@@ -347,6 +347,7 @@ class CUserGroup extends CApiService {
 
 		$names = [];
 		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access', 'mfa_status']);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'usrgrpid' =>				['type' => API_ID],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
@@ -425,7 +426,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
-		$this->checkMfa($usrgrps);
+		$this->checkMfaids($usrgrps, $db_usrgrps);
 	}
 
 	/**
@@ -1630,31 +1631,34 @@ class CUserGroup extends CApiService {
 	/**
 	 * Check for valid MFA method.
 	 *
-	 * @param array  $usrgrps
-	 * @param string $usrgrps['mfaid']
+	 * @param array      $user_groups
+	 * @param array|null $db_user_groups
 	 *
 	 * @throws APIException
 	 */
-	private function checkMfa(array $usrgrps) {
-		$mfaids =  array_filter(array_column($usrgrps, 'mfaid'));
+	private function checkMfaids(array $user_groups, array $db_user_groups = null): void {
+		foreach ($user_groups as $i => $user_group) {
+			if (!array_key_exists('mfaid', $user_group) || $user_group['mfaid'] == 0
+					|| ($db_user_groups !== null
+						&& bccomp($user_group['mfaid'], $db_user_groups[$user_group['usrgrpid']]['mfaid']) == 0)) {
+				unset($user_groups[$i]);
+			}
+		}
 
-		if (!$mfaids) {
+		if (!$user_groups) {
 			return;
 		}
 
 		$db_mfas = DB::select('mfa', [
 			'output' => [],
-			'mfaids' => $mfaids,
+			'mfaids' => array_column($user_groups, 'mfaid'),
 			'preservekeys' => true
 		]);
 
-		foreach ($usrgrps as $i => $usrgrp) {
-			if (array_key_exists('mfaid', $usrgrp) && $usrgrp['mfaid'] != 0
-					&& !array_key_exists($usrgrp['mfaid'], $db_mfas)) {
+		foreach ($user_groups as $i => $user_group) {
+			if (!array_key_exists($user_group['mfaid'], $db_mfas)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/mfaid',
-						_('referred object does not exist')
-					)
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/mfaid', _('object does not exist'))
 				);
 			}
 		}

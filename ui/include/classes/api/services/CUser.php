@@ -369,7 +369,7 @@ class CUser extends CApiService {
 		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups);
-		$this->checkMfaMethods($users);
+		$this->checkMfaids($users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
@@ -567,7 +567,7 @@ class CUser extends CApiService {
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 
 		$this->checkUserdirectories($users);
-		$this->checkMfaMethods($users);
+		$this->checkMfaids($users);
 		$this->checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
@@ -781,43 +781,48 @@ class CUser extends CApiService {
 	 * Checks if MFA TOTP method exists that is used in users data.
 	 *
 	 * @param array $users
-	 * @param int   $users[]['mfa_totp_secrets']['mfaid']  (optional)
 	 *
 	 * @throws APIException  if mfa method does not exist.
 	 */
-	private function checkMfaMethods(array $users): void {
-		$mfaids = [];
+	private function checkMfaids(array $users): void {
+		$user_indexes = [];
 
-		foreach ($users as $user) {
-			if (array_key_exists('mfa_totp_secrets', $user)) {
-				$mfaids += array_column($user['mfa_totp_secrets'], 'mfaid', 'mfaid');
+		foreach ($users as $i1 => $user) {
+			if (!array_key_exists('mfa_totp_secrets', $user)) {
+				continue;
+			}
+
+			foreach ($user['mfa_totp_secrets'] as $i2 => $secret) {
+				$user_indexes[$secret['mfaid']][$i1] = $i2;
 			}
 		}
 
-		if (!$mfaids) {
+		if (!$user_indexes) {
 			return;
 		}
 
-		$db_mfaids = API::Mfa()->get([
+		$db_mfas = DB::select('mfa', [
 			'output' => ['type'],
-			'mfaids' => $mfaids,
+			'mfaids' => array_keys($user_indexes),
 			'preservekeys' => true
 		]);
-		$ids = array_diff_key($mfaids, $db_mfaids);
-		$invalid_mfas = array_filter($db_mfaids, function ($mfa) {
-			return $mfa['type'] != MFA_TYPE_TOTP;
-		});
 
-		if ($ids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('MFA method with ID "%1$s" is not available.', reset($ids))
-			);
-		}
+		foreach ($user_indexes as $mfaid => $indexes) {
+			if (!array_key_exists($mfaid, $db_mfas)) {
+				$i1 = key($indexes);
+				$i2 = reset($indexes);
 
-		if ($invalid_mfas) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect MFA method with ID "%1$s" type, TOTP secret is not available.', key($invalid_mfas))
-			);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/mfa_totp_secrets/'.($i2 + 1).'/mfaid',
+					_('object does not exist')
+				));
+			}
+			elseif ($db_mfas[$mfaid]['type'] != MFA_TYPE_TOTP) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/mfa_totp_secrets/'.($i2 + 1).'/mfaid',
+					_('object of TOTP type is expected')
+				));
+			}
 		}
 	}
 
@@ -850,7 +855,9 @@ class CUser extends CApiService {
 				$i2 = $indexes[$i1];
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($i1 + 1).'/usrgrps/'.($i2 + 1), _('object does not exist'))
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i1 + 1).'/usrgrps/'.($i2 + 1),
+						_('object does not exist')
+					)
 				);
 			}
 		}
@@ -1750,56 +1757,50 @@ class CUser extends CApiService {
 		unset($user);
 	}
 
-	/**
-	 * @param array $users
-	 */
 	private static function updateMfaTotpSecrets(array &$users, array $db_users = null): void {
 		$ins_secrets = [];
-		$del_secrets = [];
+		$upd_secrets = [];
+		$del_secretids = [];
 
-		foreach ($users as $i => &$user) {
+		foreach ($users as &$user) {
 			if (!array_key_exists('mfa_totp_secrets', $user)) {
 				continue;
 			}
 
-			$changed = false;
-			$db_mfa_totp_secrets = ($db_users !== null) ? $db_users[$user['userid']]['mfa_totp_secrets'] : [];
+			$db_secrets = $db_users !== null
+				? array_column($db_users[$user['userid']]['mfa_totp_secrets'], null, 'mfaid')
+				: [];
 
-			foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-				$mfa_totp_secretid = key(array_filter($db_mfa_totp_secrets,
-					static function (array $db_mfa_totp_secret) use ($mfa_totp_secret): bool {
-						return $mfa_totp_secret['mfaid'] === $db_mfa_totp_secret['mfaid']
-							&& (!array_key_exists('totp_secret', $mfa_totp_secret)
-								|| $mfa_totp_secret['totp_secret'] === $db_mfa_totp_secret['totp_secret']
-							);
-				}));
+			foreach ($user['mfa_totp_secrets'] as &$secret) {
+				if (array_key_exists($secret['mfaid'], $db_secrets)) {
+					$upd_secret = DB::getUpdatedValues('mfa_totp_secret', $secret, $db_secrets[$secret['mfaid']]);
 
-				if ($mfa_totp_secretid !== null) {
-					$mfa_totp_secret['mfa_totp_secretid'] = $mfa_totp_secretid;
-					unset($db_mfa_totp_secrets[$mfa_totp_secretid]);
+					if ($upd_secret) {
+						$upd_secrets[] = [
+							'values' => $upd_secret,
+							'where' => ['mfa_totp_secretid' => $db_secrets[$secret['mfaid']]['mfa_totp_secretid']]
+						];
+					}
+
+					$secret['mfa_totp_secretid'] = $db_secrets[$secret['mfaid']]['mfa_totp_secretid'];
+					unset($db_secrets[$secret['mfaid']]);
 				}
 				else {
-					$ins_secrets[] = ['userid' => $user['userid']] + $mfa_totp_secret;
-					$changed = true;
+					$ins_secrets[] = ['userid' => $user['userid']] + $secret;
 				}
-			}
-			unset($mfa_totp_secret);
 
-			if ($db_mfa_totp_secrets) {
-				$del_secrets = array_merge($del_secrets, array_keys($db_mfa_totp_secrets));
-				$changed = true;
+				$del_secretids = array_merge($del_secretids, array_column($db_secrets, 'mfa_totp_secretid'));
 			}
-
-			if ($db_users !== null) {
-				if (!$changed) {
-					unset($user['mfa_totp_secrets'], $db_users[$user['userid']]['mfa_totp_secrets']);
-				}
-			}
+			unset($secret);
 		}
 		unset($user);
 
-		if ($del_secrets) {
-			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_secrets]);
+		if ($del_secretids) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_secretids]);
+		}
+
+		if ($upd_secrets) {
+			DB::update('mfa_totp_secret', $upd_secrets);
 		}
 
 		if ($ins_secrets) {
@@ -2463,9 +2464,9 @@ class CUser extends CApiService {
 			}
 		}
 
-		if ($mfa_status == MFA_ENABLED && $db_user['mfaid'] === 0 && $mfaids) {
+		if ($mfa_status == MFA_ENABLED && $db_user['mfaid'] == 0 && $mfaids) {
 			$db_mfas = DB::select('mfa', [
-				'output' => ['mfaid', 'name'],
+				'output' => [],
 				'mfaids' => array_keys($mfaids),
 				'sortfield' => ['name'],
 				'limit' => 1,
