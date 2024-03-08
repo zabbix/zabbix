@@ -234,7 +234,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				else {
 					unset($host['maintenanceid']);
 				}
-				unset($host['maintenance_status']);
+				unset($host['maintenance_status'], $host['status']);
 			}
 			unset($host);
 
