@@ -78,19 +78,30 @@ static zbx_metric_t	parameter_hostname =
 static zbx_metric_t		*commands = NULL;
 static zbx_metric_t		*commands_local = NULL;
 zbx_vector_ptr_t		key_access_rules;
-static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
-static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
-static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
-static zbx_get_config_str_f	get_config_source_ip_cb = NULL;
-static zbx_get_config_str_f	get_config_hostname_cb = NULL;
-static zbx_get_config_str_f	get_config_hostnames_cb = NULL;
-static zbx_get_config_str_f	get_config_host_metadata_cb = NULL;
-static zbx_get_config_str_f	get_config_host_metadata_item_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
 #define ZBX_COMMAND_WITH_PARAMS		2
+
+#define GET_CONFIG_VAR(callback_type, callback, func_type, func)	\
+static callback_type	callback = NULL;				\
+func_type func(void)							\
+{									\
+	return callback();						\
+}
+
+GET_CONFIG_VAR(zbx_get_config_int_f, get_config_timeout_cb, int, sysinfo_get_config_timeout)
+GET_CONFIG_VAR(zbx_get_config_int_f, get_config_log_remote_commands_cb, int, sysinfo_get_config_log_remote_commands)
+GET_CONFIG_VAR(zbx_get_config_int_f, get_config_unsafe_user_parameters_cb, int,
+		sysinfo_get_config_unsafe_user_parameters)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_source_ip_cb, const char *, sysinfo_get_config_source_ip)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_hostname_cb, const char *, sysinfo_get_config_hostname)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_hostnames_cb, const char *, sysinfo_get_config_hostnames)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_host_metadata_cb, const char *, sysinfo_get_config_host_metadata)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_host_metadata_item_cb, const char *,
+		sysinfo_get_config_host_metadata_item)
+#undef GET_CONFIG_VAR
 
 static int	compare_key_access_rules(const void *rule_a, const void *rule_b);
 static int	zbx_parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule);
@@ -298,36 +309,6 @@ void	zbx_set_metrics(zbx_metric_t *metrics)
 	commands = metrics;
 }
 #endif
-
-#define GET_CONFIG_VAR(varname)			\
-{						\
-	return get_config_##varname##_cb();	\
-}
-
-int	sysinfo_get_config_timeout(void)
-GET_CONFIG_VAR(timeout)
-
-int	sysinfo_get_config_log_remote_commands(void)
-GET_CONFIG_VAR(log_remote_commands)
-
-int	sysinfo_get_config_unsafe_user_parameters(void)
-GET_CONFIG_VAR(unsafe_user_parameters)
-
-const char	*sysinfo_get_config_source_ip(void)
-GET_CONFIG_VAR(source_ip)
-
-const char	*sysinfo_get_config_hostname(void)
-GET_CONFIG_VAR(hostname)
-
-const char	*sysinfo_get_config_hostnames(void)
-GET_CONFIG_VAR(hostnames)
-
-const char	*sysinfo_get_config_host_metadata(void)
-GET_CONFIG_VAR(host_metadata)
-
-const char	*sysinfo_get_config_host_metadata_item(void)
-GET_CONFIG_VAR(host_metadata_item)
-#undef GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
 {
