@@ -43,9 +43,9 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
-	public const HOST_STATUS_ANY = 0;
-	public const HOST_STATUS_ENABLED = 1;
-	public const HOST_STATUS_DISABLED = 2;
+	public const HOST_STATUS_ANY = -1;
+	public const HOST_STATUS_ENABLED = 0;
+	public const HOST_STATUS_DISABLED = 1;
 
 	public const PROBLEMS_ALL = 0;
 	public const PROBLEMS_UNSUPPRESSED = 1;

@@ -73,7 +73,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		$output = $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
-			? ['hostid', 'name', 'maintenanceid', 'maintenance_status']
+			? ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status']
 			: ['hostid', 'name'];
 
 		$group_by_host_groups = false;
@@ -115,9 +115,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
 						: $this->fields_values['status'],
-					'maintenance_status' => $this->fields_values['maintenance'] != self::SHOW_IN_MAINTENANCE_ON
-						? HOST_MAINTENANCE_STATUS_OFF
-						: null
+					'maintenance_status' => $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
+						? null
+						: HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
@@ -137,9 +137,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
 						: $this->fields_values['status'],
-					'maintenance_status' => $this->fields_values['maintenance'] != self::SHOW_IN_MAINTENANCE_ON
-						? HOST_MAINTENANCE_STATUS_OFF
-						: null
+					'maintenance_status' => $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
+						? null
+						: HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
@@ -227,7 +227,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$maintenanceids = [];
 
 			foreach ($hosts as &$host) {
-				if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if ($host['status'] == HOST_STATUS_MONITORED
+						&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 					$maintenanceids[$host['maintenanceid']] = true;
 				}
 				else {
