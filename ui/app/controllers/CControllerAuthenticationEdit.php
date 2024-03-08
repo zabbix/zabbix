@@ -76,7 +76,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 				'http_strip_domains' =>		'db config.http_strip_domains',
-				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
 			];
 		}
 
@@ -178,7 +178,7 @@ class CControllerAuthenticationEdit extends CController {
 					'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
 					'http_login_form' => DB::getDefault('config', 'http_login_form'),
 					'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
-					'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+					'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
 				];
 			}
 

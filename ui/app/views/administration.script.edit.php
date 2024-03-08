@@ -121,7 +121,7 @@ $form_grid = (new CFormGrid())
 			!$data['global_scripts_enabled']
 				? makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration'))
 				: null
-		]))->setId('execute-on'),
+		]))->setId('execute-on')
 	])
 	->addItem([
 		(new CLabel(_('Authentication method'), 'authentication'))->setId('auth-type-label'),

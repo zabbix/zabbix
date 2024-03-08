@@ -83,7 +83,7 @@ class CControllerAuthenticationUpdate extends CController {
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 				'http_strip_domains' =>		'db config.http_strip_domains',
-				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
 			];
 		}
 
@@ -351,7 +351,7 @@ class CControllerAuthenticationUpdate extends CController {
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,
 				CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-				CAuthenticationHelper::HTTP_CASE_SENSITIVE,
+				CAuthenticationHelper::HTTP_CASE_SENSITIVE
 			]);
 
 			$fields['http_auth_enabled'] = ZBX_AUTH_HTTP_DISABLED;
