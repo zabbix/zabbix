@@ -35,6 +35,7 @@ class CSystemInfoHelper {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
+			'enable_global_scripts' => CSettingsHelper::getEnableGlobalScripts(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
 			'failover_delay' => 0
@@ -52,8 +53,6 @@ class CSystemInfoHelper {
 				break;
 			}
 		}
-
-		$data['enable_global_scripts'] = CSettingsHelper::getEnableGlobalScripts();
 
 		$housekeeper_warnings = CHousekeepingHelper::getWarnings($dbversion_status);
 
