@@ -29,4 +29,22 @@ class Widget extends CWidget {
 	{
 		return _('Host navigator');
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.hostnavigator.js' => [
+				'Not classified' => _('Not classified'),
+				'Information' => _('Information'),
+				'Warning' => _('Warning'),
+				'Average' => _('Average'),
+				'High' => _('High'),
+				'Disaster' => _('Disaster'),
+				'Uncategorized' => _('Uncategorized'),
+				'%1$d of %1$d+ hosts are shown' => _('%1$d of %1$d+ hosts are shown'),
+				'No data found.' => _('No data found.'),
+				'Host group' => _('Host group'),
+				'Severity' => _('Severity')
+			]
+		];
+	}
 }

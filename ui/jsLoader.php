@@ -113,6 +113,7 @@ $available_js = [
 	'class.tabfilteritem.js' => '',
 	'class.tagfilteritem.js' => '',
 	'class.template.js' => '',
+	'class.navigationtree.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
 	// templates
@@ -468,6 +469,7 @@ if (empty($_GET['files'])) {
 		'class.sidebar.js',
 		'class.sortable.js',
 		'class.template.js',
+		'class.navigationtree.js',
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',

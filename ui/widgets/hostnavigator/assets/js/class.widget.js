@@ -20,25 +20,100 @@
 
 class CWidgetHostNavigator extends CWidget {
 
-	#host_list = null;
+	/**
+	 * @type {CHostNavigator|null}
+	 */
+	#host_navigator = null;
+
+	/**
+	 * Events of host navigator widget.
+	 *
+	 * @type {Object}
+	 */
+	#events = {};
 
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			with_config: this.#host_list === null ? 1 : undefined
+			with_config: this.#host_navigator === null ? 1 : undefined
 		};
 	}
 
 	updateProperties({name, view_mode, fields}) {
-		this.#host_list = null;
+		if (this.#host_navigator !== null) {
+			this.#host_navigator.destroy();
+			this.#host_navigator = null;
+		}
 
 		super.updateProperties({name, view_mode, fields});
 	}
 
 	setContents(response) {
-		if (this.#host_list === null) {
-			this.#host_list = response.hosts;
+		if (this.#host_navigator === null) {
+			const severities = [
+				{
+					name: t('Not classified'),
+					class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
+					class_status: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG
+				},
+				{
+					name: t('Information'),
+					class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
+					class_status: ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG
+				},
+				{
+					name: t('Warning'),
+					class: ZBX_STYLE_SEVERITY_WARNING_BG,
+					class_status: ZBX_STYLE_SEVERITY_WARNING_STATUS_BG
+				},
+				{
+					name: t('Average'),
+					class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
+					class_status: ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG
+				},
+				{
+					name: t('High'),
+					class: ZBX_STYLE_SEVERITY_HIGH_BG,
+					class_status: ZBX_STYLE_SEVERITY_HIGH_STATUS_BG
+				},
+				{
+					name: t('Disaster'),
+					class: ZBX_STYLE_SEVERITY_DISASTER_BG,
+					class_status: ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG
+				}
+			]
+
+			this.#host_navigator = new CHostNavigator(response.config, severities);
+
+			this._body.appendChild(this.#host_navigator.getContainer());
+
+			this.#registerEvents();
+			this.#activateEvents();
 		}
+
+		this.#host_navigator.setValue({
+			hosts: response.hosts,
+			maintenances: response.maintenances,
+			is_limit_exceeded: response.is_limit_exceeded
+		});
+	}
+
+	#registerEvents() {
+		this.#events = {
+			hostSelect: e => {
+				this.broadcast({_hostid: e.detail._hostid});
+			},
+			groupToggle: e => {
+				updateUserProfile(`web.dashboard.widget.hostnavigator.group-${e.detail.group_id}.toggle`,
+					e.detail.is_closed, [this.getWidgetId()]
+				);
+			}
+		};
+	}
+
+	#activateEvents() {
+		this.#host_navigator.getContainer().addEventListener('host.select', this.#events.hostSelect);
+		this.#host_navigator.getContainer().addEventListener('group.toggle', this.#events.groupToggle);
 	}
 
 	hasPadding() {

@@ -20,10 +20,17 @@
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
+const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_COLOR_WARNING = 'color-warning';
+
+const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
+const ZBX_STYLE_ARROW_RIGHT = 'arrow-right';
 const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
 const ZBX_STYLE_COLLAPSED = 'collapsed';
 const ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';
+const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
+const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 
@@ -53,6 +60,21 @@ const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
+
+const ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG = 'na-bg';
+const ZBX_STYLE_SEVERITY_INFORMATION_BG = 'info-bg';
+const ZBX_STYLE_SEVERITY_WARNING_BG = 'warning-bg';
+const ZBX_STYLE_SEVERITY_AVERAGE_BG = 'average-bg';
+const ZBX_STYLE_SEVERITY_HIGH_BG = 'high-bg';
+const ZBX_STYLE_SEVERITY_DISASTER_BG = 'disaster-bg';
+
+const ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG = 'status-na-bg';
+const ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG = 'status-info-bg';
+const ZBX_STYLE_SEVERITY_WARNING_STATUS_BG = 'status-warning-bg';
+const ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG = 'status-average-bg';
+const ZBX_STYLE_SEVERITY_HIGH_STATUS_BG = 'status-high-bg';
+const ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG = 'status-disaster-bg';
 
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;
