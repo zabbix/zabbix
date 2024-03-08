@@ -1354,7 +1354,12 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (HOST_MONITORED_BY_SERVER != item->host.monitored_by)
+	{
+		*error = zbx_dsprintf(*error, "cannot process item \"%s\" trap:"
+				" host is monitored by a proxy or proxy group",
+				zbx_truncate_itemkey(item->key_orig, VALUE_ERRMSG_MAX, key_short, sizeof(key_short)));
 		return FAIL;
+	}
 
 	switch(item->type)
 	{

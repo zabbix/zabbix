@@ -1857,6 +1857,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		}
 
 		host->status = status;
+		host->monitored_by = monitored_by;
 
 		dc_host_set_proxy_group(host, proxy_groupid, pg_host_reloc);
 	}
