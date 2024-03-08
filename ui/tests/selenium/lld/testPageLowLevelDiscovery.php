@@ -51,8 +51,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check all field names.
-		$fields = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval',
-				'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
+		$fields = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval', 'Delete lost resources',
+				'Disable lost resources', 'SNMP OID', 'State', 'Status'
+		];
 		$this->assertEquals($fields, $form->getLabels()->asText());
 
 		// Check filter collapse/expand.
@@ -604,8 +605,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => TEST_GOOD,
 					'hostid' => self::HOST_ID,
 					'filter' => [
-						'Hosts' => 'Host for host prototype tests',
-						'Keep lost resources period' => ''
+						'Hosts' => 'Host for host prototype tests'
 					],
 					'keys' => [
 						'key1',
