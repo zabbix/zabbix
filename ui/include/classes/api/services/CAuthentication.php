@@ -71,7 +71,7 @@ class CAuthentication extends CApiService {
 		}
 		$db_auth = $this->unsetExtraFields($db_auth, ['configid'], []);
 
-		if (!$HTTP_AUTH_VISIBLE) {
+		if (!$HTTP_AUTH_VISIBLE && array_key_exists('http_auth_enabled', $db_auth[0])) {
 			$db_auth[0]['http_auth_enabled'] = ZBX_AUTH_HTTP_DISABLED;
 		}
 
