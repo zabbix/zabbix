@@ -159,7 +159,8 @@ static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_ev
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", r_event->name);
 	}
-	else if (EVENT_SOURCE_TRIGGERS == r_event->source || EVENT_SOURCE_SERVICE == r_event->source)
+	else if (EVENT_SOURCE_TRIGGERS == r_event->source || EVENT_SOURCE_INTERNAL == r_event->source ||
+			EVENT_SOURCE_SERVICE == r_event->source)
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
 			zbx_event_get_str_tags(r_event, replace_to);
