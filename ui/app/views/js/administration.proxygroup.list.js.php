@@ -67,7 +67,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {this.#reload(e.detail.success)});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
 		}
 
 		#reload(success) {
