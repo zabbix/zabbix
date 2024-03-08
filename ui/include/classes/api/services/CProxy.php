@@ -73,7 +73,8 @@ class CProxy extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid'])), 'default' => null],
+			'selectAssignedHosts' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid'])), 'default' => null],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid'])), 'default' => null],
 			'selectProxyGroup' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CProxyGroup::OUTPUT_FIELDS), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -180,10 +181,44 @@ class CProxy extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
+		$this->addRelatedAssignedHosts($options, $result);
 		$this->addRelatedHosts($options, $result);
 		$this->addRelatedProxyGroup($options, $result);
 
 		return $result;
+	}
+
+	protected function addRelatedAssignedHosts(array $options, array &$result): void {
+		if ($options['selectAssignedHosts'] === null) {
+			return;
+		}
+
+		if ($options['selectAssignedHosts'] === API_OUTPUT_COUNT) {
+			$output = ['hostid', 'assigned_proxyid'];
+		}
+		elseif ($options['selectAssignedHosts'] === API_OUTPUT_EXTEND) {
+			$output = array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid']);
+		}
+		else {
+			$output = $options['selectAssignedHosts'];
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => $this->outputExtend($output, ['hostid', 'assigned_proxyid']),
+			'filter' => ['assigned_proxyid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+
+		$relation_map = $this->createRelationMap($db_hosts, 'assigned_proxyid', 'hostid');
+		$db_hosts = $this->unsetExtraFields($db_hosts, ['hostid', 'assigned_proxyid'], $output);
+		$result = $relation_map->mapMany($result, $db_hosts, 'assignedHosts');
+
+		if ($options['selectAssignedHosts'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['assignedHosts'] = (string) count($row['assignedHosts']);
+			}
+			unset($row);
+		}
 	}
 
 	protected function addRelatedHosts(array $options, array &$result): void {
@@ -195,7 +230,7 @@ class CProxy extends CApiService {
 			$output = ['hostid', 'proxyid'];
 		}
 		elseif ($options['selectHosts'] === API_OUTPUT_EXTEND) {
-			$output = array_diff(CHost::OUTPUT_FIELDS, ['proxyid']);
+			$output = array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid']);
 		}
 		else {
 			$output = $options['selectHosts'];
@@ -362,6 +397,7 @@ class CProxy extends CApiService {
 	public function delete(array $proxyids): array {
 		$this->validateDelete($proxyids, $db_proxies);
 
+		DB::delete('host_proxy', ['proxyid' => $proxyids]);
 		DB::delete('proxy_rtdata', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
 
