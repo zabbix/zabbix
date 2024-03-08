@@ -172,4 +172,13 @@ class CSettingsHelper extends CConfigGeneralHelper {
 				]
 			];
 	}
+
+	/**
+	 * Gets enable_global_scripts value from server_status settings
+	 *
+	 * @return bool
+	 */
+	public static function getEnableGlobalScripts(): bool {
+		return self::getServerStatus()['configuration']['enable_global_scripts'];
+	}
 }

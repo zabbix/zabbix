@@ -267,6 +267,7 @@ else {
 
 	if (!function_exists('bindtextdomain')) {
 		$language_error = makeErrorIcon('Translations are unavailable because the PHP gettext module is missing.');
+
 		$lang_select->setReadonly();
 	}
 	elseif (!$all_locales_available) {

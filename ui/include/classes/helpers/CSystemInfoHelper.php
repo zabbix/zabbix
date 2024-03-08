@@ -53,7 +53,7 @@ class CSystemInfoHelper {
 			}
 		}
 
-		$data['global_scripts'] = CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts'];
+		$data['enable_global_scripts'] = CSettingsHelper::getEnableGlobalScripts();
 
 		$housekeeper_warnings = CHousekeepingHelper::getWarnings($dbversion_status);
 

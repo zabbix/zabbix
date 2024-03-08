@@ -331,7 +331,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$extend_fields = CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts']
+		$extend_fields = CSettingsHelper::getEnableGlobalScripts()
 			? ['name', 'type', 'scope']
 			: ['name', 'type', 'scope', 'execute_on'];
 
@@ -917,8 +917,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts']
-				&& $db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+		if (!CSettingsHelper::getEnableGlobalScripts() && $db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 				&& ($db_scripts[0]['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
 					|| ($db_scripts[0]['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY && $db_hosts[0]['proxyid'] == 0))) {
 			self::exception(ZBX_API_ERROR_INTERNAL,
@@ -1845,7 +1844,7 @@ class CScript extends CApiService {
 	}
 
 	private static function checkExecuteOnParameter (array $scripts): void {
-		if (!CSettingsHelper::getServerStatus()['configuration']['enable_global_scripts']) {
+		if (!CSettingsHelper::getEnableGlobalScripts()) {
 			foreach ($scripts as $script) {
 				if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 						&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
