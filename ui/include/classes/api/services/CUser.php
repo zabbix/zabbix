@@ -1771,6 +1771,10 @@ class CUser extends CApiService {
 				? array_column($db_users[$user['userid']]['mfa_totp_secrets'], null, 'mfaid')
 				: [];
 
+			if ($user['mfa_totp_secrets'] == []) {
+				$del_secretids = array_merge($del_secretids, array_keys($db_secrets));
+			}
+
 			foreach ($user['mfa_totp_secrets'] as &$secret) {
 				if (array_key_exists($secret['mfaid'], $db_secrets)) {
 					$upd_secret = DB::getUpdatedValues('mfa_totp_secret', $secret, $db_secrets[$secret['mfaid']]);
