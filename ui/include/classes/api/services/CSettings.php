@@ -101,6 +101,7 @@ class CSettings extends CApiService {
 		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 
 		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
+		$db_settings['server_status'] = json_decode($db_settings['server_status'], true) ?: [];
 
 		return $db_settings;
 	}
