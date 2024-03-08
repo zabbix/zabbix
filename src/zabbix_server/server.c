@@ -354,23 +354,18 @@ char	*CONFIG_NODE_ADDRESS	= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
-char	*config_history_storage_url		= NULL;
-char	*config_history_storage_opts		= NULL;
-int	config_history_storage_pipelines	= 0;
-
-static char	*config_stats_allowed_ip	= NULL;
-static int	config_tcp_max_backlog_size	= SOMAXCONN;
-
-static char	*zbx_config_webservice_url	= NULL;
-
-static int	config_service_manager_sync_frequency = 60;
-
-static int	config_vps_limit		= 0;
-static int	config_vps_overcommit_limit	= 0;
-
-static char	*config_file	= NULL;
-static int	config_allow_root	= 0;
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
+static char	*config_history_storage_url		= NULL;
+static char	*config_history_storage_opts		= NULL;
+static int	config_history_storage_pipelines	= 0;
+static char	*config_stats_allowed_ip		= NULL;
+static int	config_tcp_max_backlog_size		= SOMAXCONN;
+static char	*zbx_config_webservice_url		= NULL;
+static int	config_service_manager_sync_frequency	= 60;
+static int	config_vps_limit			= 0;
+static int	config_vps_overcommit_limit		= 0;
+static char	*config_file				= NULL;
+static int	config_allow_root			= 0;
+static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 

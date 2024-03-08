@@ -26,7 +26,6 @@
 #include "zbxvault.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-#include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "zbxnum.h"
 

@@ -23,7 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "user_macro.h"
 #include "vps_monitor.h"
-#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
 #include "zbx_trigger_constants.h"

@@ -303,14 +303,9 @@ static zbx_config_dbhigh_t	*zbx_config_dbhigh = NULL;
 static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 static char	*config_socket_path	= NULL;
-
-//static char	*config_history_storage_url		= NULL;
-//static char	*config_history_storage_opts		= NULL;
 static int	config_history_storage_pipelines	= 0;
-
 static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
-
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
