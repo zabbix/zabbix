@@ -256,7 +256,7 @@ class CScript extends CApiService {
 		}
 
 		self::checkUniqueness($scripts);
-		self::checkExecuteOnParameter($scripts);
+		self::checkEnableGlobalScriptsAndExecuteOn($scripts);
 		$this->checkDuplicates($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -349,7 +349,7 @@ class CScript extends CApiService {
 
 		self::checkUniqueness($scripts, $db_scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
-		self::checkExecuteOnParameter($scripts);
+		self::checkEnableGlobalScriptsAndExecuteOn($scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -1843,7 +1843,14 @@ class CScript extends CApiService {
 		}
 	}
 
-	private static function checkExecuteOnParameter (array $scripts): void {
+	/**
+	 * @param array $scripts
+	 *
+	 * @throws APIException if at least one script has execute_on parameter equal to Zabbix Server and global script
+	 * 						execution is disabled by Zabbix Server.
+	 * @return void
+	 */
+	private static function checkEnableGlobalScriptsAndExecuteOn(array $scripts): void {
 		if (!CSettingsHelper::getEnableGlobalScripts()) {
 			foreach ($scripts as $script) {
 				if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT

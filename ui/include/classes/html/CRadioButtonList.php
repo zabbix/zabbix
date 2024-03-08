@@ -76,6 +76,7 @@ class CRadioButtonList extends CList {
 	 * @param string $value      Input element value.
 	 * @param string $id         Input element id.
 	 * @param string $on_change  Javascript handler for onchange event.
+	 * @param bool   $disabled	 Disables the input element.
 	 *
 	 * @return CRadioButtonList
 	 */
