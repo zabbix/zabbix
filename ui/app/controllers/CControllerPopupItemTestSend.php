@@ -350,7 +350,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		$result_preproc = (array_key_exists('preprocessing', $result) ? $result['preprocessing'] : [])
 			+ ['steps' => []];
-		$result_item = $result['item'];
+		$result_item = array_key_exists('item', $result) ? $result['item'] : [];
 
 		if (array_key_exists('error', $result_item) && $result_item['error'] !== '') {
 			if ($steps_data	&& $steps_data[0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
