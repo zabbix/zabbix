@@ -2464,6 +2464,10 @@ class CUser extends CApiService {
 			}
 		}
 
+		/*
+		 * The default MFA has the highest priority.
+		 * If user's groups only have exact MFA IDs, we select first of them by name.
+		 */
 		if ($mfa_status == MFA_ENABLED && $db_user['mfaid'] == 0 && $mfaids) {
 			$db_mfas = DB::select('mfa', [
 				'output' => [],
@@ -2556,23 +2560,27 @@ class CUser extends CApiService {
 	}
 
 	private static function increaseFailedLoginAttempts(array &$db_user): void {
-		DBexecute(
-			'UPDATE users SET'.
-				' attempt_failed=attempt_failed + 1,attempt_clock='.time().','.
-				' attempt_ip='.zbx_dbstr(substr(CWebUser::getIp(), 0, 39)).
-			'WHERE userid='.zbx_dbstr($db_user['userid'])
-		);
+		$attempt_failed = $db_user['attempt_failed'] + 1;
 
-		[$_db_user] =  DB::select('users', [
-			'output' => ['userid', 'attempt_failed', 'attempt_clock'],
-			'userids' => $db_user['userid']
+		$upd_user = [
+			'attempt_failed' => $attempt_failed,
+			'attempt_clock' => time(),
+			'attempt_ip' => substr(CWebUser::getIp(), 0, 39)
+		];
+
+		DB::update('users', [
+			'values' => $upd_user,
+			'where' => ['userid' => $db_user['userid']]
 		]);
 
+		$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
+		$db_users = [$db_user['userid'] => $db_user];
+
 		self::addAuditLogByUser($db_user['userid'], CWebUser::getIp(), $db_user['username'],
-			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, [$_db_user], [$db_user['userid'] => $db_user]
+			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
 		);
 
-		$db_user = $_db_user + $db_user;
+		$db_user = $upd_user + $db_user;
 	}
 
 	private static function checkGroupStatus(array $db_user, int $group_status): void {
@@ -3314,24 +3322,24 @@ class CUser extends CApiService {
 	 * @return string data['prompt_uri']   If MFA_TYPE_DUO.
 	 */
 	public static function getConfirmData(array $session_data): array {
-		$userids = DB::select('sessions', [
+		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
-			'filter' => ['sessionid' => $session_data['sessionid']]
+			'sessionids' => $session_data['sessionid']
 		]);
 
-		if (!$userids) {
+		if (!$db_sessions) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
 		}
 
-		$userid = $userids[0]['userid'];
+		$userid = $db_sessions[0]['userid'];
 
-		$mfas = DB::select('mfa', [
+		$db_mfas = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
-			'filter' => ['mfaid' => $session_data['mfaid']]
+			'mfaids' => $session_data['mfaid']
 		]);
-		$mfa = $mfas[0];
+		$mfa = $db_mfas[0];
 
 		$data = [
 			'sessionid' => $session_data['sessionid'],
@@ -3357,7 +3365,8 @@ class CUser extends CApiService {
 		if ($mfa['type'] == MFA_TYPE_DUO) {
 			try {
 				$duo_client = new Client($data['mfa']['clientid'], $data['mfa']['client_secret'],
-					$data['mfa']['api_hostname'], $session_data['redirect_uri']);
+					$data['mfa']['api_hostname'], $session_data['redirect_uri']
+				);
 
 				$duo_client->healthCheck();
 			}
@@ -3367,11 +3376,11 @@ class CUser extends CApiService {
 				);
 			}
 
-			[$username] = DB::select('users', [
+			$db_users = DB::select('users', [
 				'output' => ['username'],
 				'filter' => ['userid' => $data['userid']]
 			]);
-			$data['username'] = $username['username'];
+			$data['username'] = $db_users[0]['username'];
 
 			$data['state'] = $duo_client->generateState();
 			$data['prompt_uri'] = $duo_client->createAuthUrl($data['username'], $data['state']);
@@ -3401,24 +3410,24 @@ class CUser extends CApiService {
 	 * @throws Exception
 	 */
 	public static function confirm(array $data): array {
-		$userids = DB::select('sessions', [
+		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
-			'filter' => ['sessionid' => $data['sessionid']]
+			'sessionids' => $data['sessionid']
 		]);
 
-		if (!$userids) {
+		if (!$db_sessions) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
-		$userid = $userids[0]['userid'];
+		$userid = $db_sessions[0]['userid'];
 
-		$mfas = DB::select('mfa', [
+		$db_mfas = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
-			'filter' => ['mfaid' => $data['mfaid']]
+			'mfaids' => $data['mfaid']
 		]);
-		$mfa = $mfas[0];
+		$mfa = $db_mfas[0];
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
