@@ -538,24 +538,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Keep lost resources period' => '50d'
-					],
-					'context' => 'template',
-					'expected' => [
-						'Discovery-rule-layout-test-001'
-					]
-				]
-			],
-			// #17
-			[
-				[
-					'filter' => [
 						'Name' => 'empty try'
 					],
 					'expected' => []
 				]
 			],
-			// #18
+			// #17
 			[
 				[
 					'filter' => [
@@ -565,7 +553,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Key' => 'test',
 						'Type' => 'Zabbix agent',
 						'Update interval' => '0',
-						'Keep lost resources period' => '30d',
 						'State' => 'All',
 						'Status' => 'Enabled'
 					],
