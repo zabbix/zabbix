@@ -994,11 +994,13 @@ static int	elastic_flush(zbx_history_iface_t *hist)
  *                                                                                  *
  * Purpose: initializes history storage interface                                   *
  *                                                                                  *
- * Parameters:  hist       - [IN] the history storage interface                     *
- *              value_type - [IN] the target value type                             *
- *              error      - [OUT] the error message                                *
+ * Parameters:                                                                      *
+ *    hist                       - [IN] history storage interface                   *
+ *    value_type                 - [IN] target value type                           *
+ *    config_history_storage_url - [IN]                                             *
+ *    error                      - [OUT] error message                              *
  *                                                                                  *
- * Return value: SUCCEED - the history storage interface was initialized            *
+ * Return value: SUCCEED - history storage interface was initialized                *
  *               FAIL    - otherwise                                                *
  *                                                                                  *
  ************************************************************************************/

@@ -644,14 +644,17 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
 	return db_read_values_by_time_and_count(itemid, hist->value_type, values, end - start, count, end);
 }
 
-/************************************************************************************
- *                                                                                  *
- * Purpose: sends history data to the storage                                       *
- *                                                                                  *
- * Parameters:  hist    - [IN] history storage interface                            *
- *              history - [IN] history data vector (may have mixed value types)     *
- *                                                                                  *
- ************************************************************************************/
+/**********************************************************************************************
+ *                                                                                            *
+ * Purpose: sends history data to storage                                                     *
+ *                                                                                            *
+ * Parameters:                                                                                *
+ *   hist                             - [IN] history storage interface                        *
+ *   history                          - [IN] history data vector (may have mixed value types) *
+ *   config_history_storage_pipelines - [IN] is unused, but signature must contain it to be   *
+ *                                           compatible with elastic version of _add_values   *
+ *                                                                                            *
+ *********************************************************************************************/
 static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history,
 		int config_history_storage_pipelines)
 {

@@ -89,9 +89,12 @@ void	zbx_history_destroy(void)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: Sends values to the history storage                                     *
+ * Purpose: sends values to history storage                                         *
  *                                                                                  *
- * Parameters: history - [IN] the values to store                                   *
+ * Parameters:                                                                      *
+ *    history                          - [IN] values to store                       *
+ *    ret_flush                        - [OUT]                                      *
+ *    config_history_storage_pipelines - [IN] values to store                       *
  *                                                                                  *
  * Comments: add history values to the configured storage backends                  *
  *                                                                                  *
