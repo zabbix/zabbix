@@ -1437,6 +1437,8 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 					" per worker has been reduced to %d", args_in->workers_num,
 					(int)rlim.rlim_cur, checks_per_worker_max);
 		}
+		else if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX < checks_per_worker_max)
+			checks_per_worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
 
 		if (0 == checks_per_worker_max)
 		{
