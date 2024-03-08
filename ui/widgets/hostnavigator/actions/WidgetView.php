@@ -261,14 +261,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getConfig(): array {
 		return [
-			'severities' => [
-				TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG,
-				TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
-				TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG,
-				TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
-				TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
-				TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG
-			],
 			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
 			'group_by' => $this->fields_values['group_by']
 		];
