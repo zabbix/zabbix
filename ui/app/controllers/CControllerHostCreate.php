@@ -68,7 +68,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-				'proxyid' => $this->getInput('proxyid', 0),
+				'monitored_by' => $this->getInput('monitored_by', ZBX_MONITORED_BY_SERVER),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),
@@ -82,6 +82,13 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
 				'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
 			];
+
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				$host['proxyid'] = $this->getInput('proxyid', 0);
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+				$host['proxy_groupid'] = $this->getInput('proxy_groupid', 0);
+			}
 
 			$this->getInputs($host, [
 				'host', 'visiblename', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
