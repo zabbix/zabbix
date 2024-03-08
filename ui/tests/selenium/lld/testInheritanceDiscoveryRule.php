@@ -48,7 +48,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	public function testInheritanceDiscoveryRule_SimpleUpdate($data) {
 		$sqlDiscovery = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
-		var_dump(CDBHelper::getAll($sqlDiscovery));
+		var_dump(CDBHelper::getAll('SELECT * FROM items ORDER BY itemid WHERE hostid=15000'));
 		var_dump('-------------');
 
 		$this->zbxTestLogin('host_discovery.php?form=update&context=host&itemid='.$data['itemid']);
@@ -57,7 +57,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Discovery rule updated');
 
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
-		var_dump(CDBHelper::getAll($sqlDiscovery));
+		var_dump(CDBHelper::getAll('SELECT * FROM items ORDER BY itemid WHERE hostid=15000'));
 	}
 
 	// Returns create data.
