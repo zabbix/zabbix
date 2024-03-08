@@ -1,1 +1,1 @@
-.......PS. [ZBX-24043] fixed extensive locking when retrieving Server statistics (dgoloscapov)
+........S. [ZBX-24043] fixed extensive locking when retrieving Zabbix server statistics (dgoloscapov)
