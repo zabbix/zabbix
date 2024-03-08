@@ -74,7 +74,7 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 					updateRowFieldVisibility([...e.target.querySelectorAll(".form_row")].at(-1));
 				})
 				.on("tableupdate.dynamicRows", (e) => {
-					e.target.querySelectorAll("form_row").forEach((row, index) => {
+					e.target.querySelectorAll(".form_row").forEach((row, index) => {
 						for (const field of row.querySelectorAll("[name^=\"'.$field_name.'[\"]")) {
 							field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
 						}
