@@ -237,7 +237,9 @@ $timeouts_tab = (new CFormGrid())
 			$data['user']['can_edit_global_timeouts']
 				? (new CLink(_('Global timeouts'),
 					(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
-				))->setTarget('_blank')
+				))
+					->addClass(ZBX_STYLE_LINK)
+					->setTarget('_blank')
 				: null
 		])
 	])

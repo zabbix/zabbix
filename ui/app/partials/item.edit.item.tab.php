@@ -665,7 +665,6 @@ $formgrid
 		))->setId('js-item-flex-intervals-field')
 	]);
 
-
 /**
  * Append timeout field to form list for item types:
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -677,11 +676,14 @@ $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENA
 if ($data['can_edit_source_timeouts'] && (!$readonly || !$custom_timeout_enabled)) {
 	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
-			->setAttribute('data-proxyid', $data['host']['proxyid'])
+			->addClass(ZBX_STYLE_LINK)
 			->addClass('js-edit-proxy')
+			->setAttribute('data-proxyid', $data['host']['proxyid'])
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
-		))->setTarget('_blank');
+		))
+			->addClass(ZBX_STYLE_LINK)
+			->setTarget('_blank');
 }
 
 $formgrid->addItem([
