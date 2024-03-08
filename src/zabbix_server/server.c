@@ -1321,7 +1321,7 @@ int	main(int argc, char **argv)
 
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
-	zbx_init_escalations(CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR]);
+	zbx_init_escalations(CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], zbx_rtc_notify_generic);
 
 	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_zbx_config_pid_file, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL, get_zbx_threads, get_zbx_threads_num);

@@ -19,15 +19,16 @@
 
 #include "zbxescalations.h"
 
-#include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
 
-static int	escalators_number;
+static int				escalators_number;
+static zbx_rtc_notify_generic_cb_t	rtc_notify_generic_cb;
 
-void	zbx_init_escalations(int escalators_num)
+void	zbx_init_escalations(int escalators_num, zbx_rtc_notify_generic_cb_t rtc_notify_cb)
 {
 	escalators_number = escalators_num;
+	rtc_notify_generic_cb = rtc_notify_cb;
 }
 
 int	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new_ptr_t *escalations)
@@ -75,7 +76,7 @@ int	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new
 				ptr += zbx_serialize_value(ptr, pair.second);
 			}
 
-			zbx_rtc_notify_generic(rtc, ZBX_PROCESS_TYPE_ESCALATOR, i + 1, ZBX_RTC_ESCALATOR_NOTIFY,
+			rtc_notify_generic_cb(rtc, ZBX_PROCESS_TYPE_ESCALATOR, i + 1, ZBX_RTC_ESCALATOR_NOTIFY,
 					(char *)notify_data, notify_size);
 			zbx_free(notify_data);
 		}
