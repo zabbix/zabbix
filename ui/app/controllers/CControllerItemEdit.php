@@ -135,11 +135,16 @@ class CControllerItemEdit extends CControllerItem {
 	 */
 	protected function getHost(): array {
 		[$host] = API::Host()->get([
-			'output' => ['hostid', 'proxyid', 'name', 'flags', 'status'],
+			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
 			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
 			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
 		]);
+
+		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$host['proxyid'] = $host['assigned_proxyid'];
+		}
+		unset($host['monitored_by'], $host['assigned_proxyid']);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		// Sort interfaces to be listed starting with one selected as 'main'.
