@@ -37,7 +37,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_TAG_VALUE, WidgetForm::GROUP_BY_SEVERITY])],
-				'tag_name'	=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => $this->getMaxLength()],
+				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()],
 			]]);
 	}
 
@@ -52,7 +52,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 		foreach ($this->getValue() as $key => $value) {
 			$attribute = $value['attribute'];
-			$tag_name = $value['tag_name'];
+			$tag_name = $attribute == WidgetForm::GROUP_BY_TAG_VALUE ? $value['tag_name'] : '';
 
 			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
