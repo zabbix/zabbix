@@ -2581,8 +2581,10 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
+ * Parameters:                                                                *
+ *    history                          - [IN] array of history data           *
+ *    history_num                      - [IN] number of history structures    *
+ *    config_history_storage_pipelines - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
 static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int config_history_storage_pipelines)
@@ -2925,29 +2927,30 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: flush history cache to database, process triggers of flushed      *
- *          and timer triggers from timer queue                               *
- *                                                                            *
- * Parameters:                                                                *
- *             values_num   - [IN/OUT] the number of synced values            *
- *             triggers_num - [IN/OUT] the number of processed timers         *
- *             events_cbs   - [IN]                                            *
- *             more         - [OUT] a flag indicating the cache emptiness:    *
- *                               ZBX_SYNC_DONE - nothing to sync, go idle     *
- *                               ZBX_SYNC_MORE - more data to sync            *
- *                                                                            *
- * Comments: This function loops syncing history values by 1k batches and     *
- *           processing timer triggers by batches of 500 triggers.            *
- *           Unless full sync is being done the loop is aborted if either     *
- *           timeout has passed or there are no more data to process.         *
- *           The last is assumed when the following is true:                  *
- *            a) history cache is empty or less than 10% of batch values were *
- *               processed (the other items were locked by triggers)          *
- *            b) less than 500 (full batch) timer triggers were processed     *
- *                                                                            *
- ******************************************************************************/
+/***************************************************************************************
+ *                                                                                     *
+ * Purpose: Flushes history cache to database, processes triggers of flushed           *
+ *          and timer triggers from timer queue.                                       *
+ *                                                                                     *
+ * Parameters:                                                                         *
+ *   values_num                       - [IN/OUT] number of synced values               *
+ *   triggers_num                     - [IN/OUT] number of processed timers            *
+ *   events_cbs                       - [IN]                                           *
+ *   config_history_storage_pipelines - [IN]                                           *
+ *   more                             - [OUT] flag indicating the cache emptiness:     *
+ *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
+ *                                            ZBX_SYNC_MORE - more data to sync        *
+ *                                                                                     *
+ * Comments: This function loops syncing history values by 1k batches and              *
+ *           processing timer triggers by batches of 500 triggers.                     *
+ *           Unless full sync is being done the loop is aborted if either              *
+ *           timeout has passed or there are no more data to process.                  *
+ *           The last is assumed when the following is true:                           *
+ *            a) history cache is empty or less than 10% of batch values were          *
+ *               processed (the other items were locked by triggers)                   *
+ *            b) less than 500 (full batch) timer triggers were processed              *
+ *                                                                                     *
+ ***************************************************************************************/
 void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		int config_history_storage_pipelines, int *more)
 {
@@ -3506,19 +3509,20 @@ void	zbx_log_sync_history_cache_progress(void)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: writes updates and new data from history cache to database        *
- *                                                                            *
- * Parameters:                                                                *
- *             events_cbs   - [IN]                                            *
- *             values_num   - [OUT] the number of synced values               *
- *             triggers_num - [OUT]                                           *
- *             more         - [OUT] a flag indicating the cache emptiness:    *
- *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
- *                                ZBX_SYNC_MORE - more data to sync           *
- *                                                                            *
- ******************************************************************************/
+/***************************************************************************************
+ *                                                                                     *
+ * Purpose: writes updates and new data from history cache to database                 *
+ *                                                                                     *
+ * Parameters:                                                                         *
+ *   events_cbs                       - [IN]                                           *
+ *   config_history_storage_pipelines - [IN]                                           *
+ *   values_num                       - [OUT] number of synced values                  *
+ *   triggers_num                     - [OUT]                                          *
+ *   more                             - [OUT] flag indicating cache emptiness:         *
+ *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
+ *                                            ZBX_SYNC_MORE - more data to sync        *
+ *                                                                                     *
+ ***************************************************************************************/
 void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines,
 		int *values_num, int *triggers_num, int *more)
 {

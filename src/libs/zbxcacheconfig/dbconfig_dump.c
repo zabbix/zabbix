@@ -387,7 +387,6 @@ static void	DCdump_interfaces(void)
 	zbx_vector_ptr_create(&index);
 	zbx_hashset_iter_reset(&(get_config())->interfaces, &iter);
 
-
 	while (NULL != (interface = (ZBX_DC_INTERFACE *)zbx_hashset_iter_next(&iter)))
 		zbx_vector_ptr_append(&index, interface);
 

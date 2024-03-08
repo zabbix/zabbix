@@ -349,8 +349,9 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_
  *                                                                            *
  * Purpose: performs cleanup of monitored hosts cache                         *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             now     - [IN] the current time                                *
+ * Parameters: manager          - [IN]                                        *
+ *             now              - [IN]                                        *
+ *             get_config_forks - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,

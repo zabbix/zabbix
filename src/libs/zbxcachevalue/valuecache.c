@@ -2514,11 +2514,14 @@ void	zbx_vc_reset(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds item values to the history and value cache                   *
+ * Purpose: adds item values to history and value cache                       *
  *                                                                            *
- * Parameters: history - [IN] item history values                             *
+ * Parameters:                                                                *
+ *   history                          - [IN] item history values              *
+ *   ret_flush                        - [OUT]                                 *
+ *   config_history_storage_pipelines - [IN]                                  *
  *                                                                            *
- * Return value: SUCCEED - the values were added successfully                 *
+ * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
