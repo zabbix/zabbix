@@ -36,7 +36,7 @@ static const char	*usage_message[] = {
 };
 
 #define ZBX_SERVICE_NAME_LEN	64
-char    zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 #undef ZBX_SERVICE_NAME_LEN
 
 #define JS_TIMEOUT_MIN		1

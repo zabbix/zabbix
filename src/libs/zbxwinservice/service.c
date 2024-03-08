@@ -37,7 +37,7 @@ static int	application_status = ZBX_APP_RUNNING;
 
 static zbx_on_exit_t	zbx_on_exit_cb;
 
-static zbx_get_config_str_f     get_zbx_service_name_cb = NULL;
+static zbx_get_config_str_f	get_zbx_service_name_cb = NULL;
 static zbx_get_config_str_f	get_zbx_event_source_cb = NULL;
 
 int	ZBX_IS_RUNNING(void)

@@ -61,7 +61,6 @@ zbx_session_type_t;
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
-
 typedef struct
 {
 	zbx_uint64_t	interfaceid;

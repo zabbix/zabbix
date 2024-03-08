@@ -61,14 +61,13 @@ static char	**config_perf_counters = NULL;
 static char	**config_perf_counters_en = NULL;
 #endif
 
-#define ZBX_SERVICE_NAME_LEN    64
+#define ZBX_SERVICE_NAME_LEN	64
 char	zabbix_service_name[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
 static const char	*get_zbx_service_name(void)
 {
 	return zabbix_service_name;
 }
-
 
 char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
