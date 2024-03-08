@@ -117,7 +117,6 @@ zabbix_export:
             			const filter_key = filter.key.startsWith('!') ? filter.key.substring(1) : filter.key;
             
             			if (!(filter_key in data)) {
-            				// if we have nothing to compare to, we've passed this filter.
             				return true;
             			}
             
@@ -127,10 +126,9 @@ zabbix_export:
             			if ((isExcludingFilter && isMatchForFilter) ||
             			    (!isExcludingFilter && !isMatchForFilter)) {
             					Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter.key + ': ' + filter.expression + '"');
-            
             					return false;
             			}
-            			// we've passed this filter, let's try the rest
+            
             			return true;
             		});
             	},
