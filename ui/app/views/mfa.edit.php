@@ -141,7 +141,7 @@ $form
 				'mfaid' => array_key_exists('mfaid', $data) ? $data['mfaid'] : null,
 				'change_sensitive_data' => array_intersect_key(
 					$data, array_flip(['type', 'hash_function', 'code_length'])
-				),
+				)
 			]).');'))->setOnDocumentReady())
 	);
 
