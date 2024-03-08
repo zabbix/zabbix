@@ -350,37 +350,34 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		$result_preproc = (array_key_exists('preprocessing', $result) ? $result['preprocessing'] : [])
 			+ ['steps' => []];
+		$result_item = $result['item'];
 
-		if ($this->get_value_from_host) {
-			$result_item = $result['item'];
-
-			if (array_key_exists('error', $result_item) && $result_item['error'] !== '') {
-				if ($steps_data	&& $steps_data[0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-					$output['runtime_error'] = $result_item['error'];
-					$output['not_supported'] = self::NOT_SUPPORTED_STATE;
-				}
-				else {
-					error($result_item['error']);
-
-					return;
-				}
+		if (array_key_exists('error', $result_item) && $result_item['error'] !== '') {
+			if ($steps_data	&& $steps_data[0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				$output['runtime_error'] = $result_item['error'];
+				$output['not_supported'] = self::NOT_SUPPORTED_STATE;
 			}
-			elseif (array_key_exists('result', $result_item)) {
-				$output['value'] = $result_item['result'];
-				$output['eol'] = $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
+			else {
+				error($result_item['error']);
 
-				// Move current value to previous value field.
-				if ($this->use_prev_value && $result_item['result'] !== '') {
-					$output['prev_value'] = $result_item['result'];
-					$output['prev_time'] = $this->getPrevTime();
-				}
+				return;
+			}
+		}
+		elseif (array_key_exists('result', $result_item)) {
+			$output['value'] = $result_item['result'];
+			$output['eol'] = $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
-				if (array_key_exists('truncated', $result_item) && $result_item['truncated']) {
-					$output['value_warning'] = _s('First %1$s of %2$s shown.',
-						convertUnits(['value' => strlen($result_item['result']), 'units' => 'B']),
-						convertUnits(['value' => $result_item['original_size'], 'units' => 'B'])
-					);
-				}
+			// Move current value to previous value field.
+			if ($this->use_prev_value && $result_item['result'] !== '') {
+				$output['prev_value'] = $result_item['result'];
+				$output['prev_time'] = $this->getPrevTime();
+			}
+
+			if (array_key_exists('truncated', $result_item) && $result_item['truncated']) {
+				$output['value_warning'] = _s('First %1$s of %2$s shown.',
+					convertUnits(['value' => strlen($result_item['result']), 'units' => 'B']),
+					convertUnits(['value' => $result_item['original_size'], 'units' => 'B'])
+				);
 			}
 		}
 
