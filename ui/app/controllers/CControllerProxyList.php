@@ -110,6 +110,7 @@ class CControllerProxyList extends CController {
 			'output' => ['proxyid', 'name', 'proxy_groupid', 'operating_mode', 'lastaccess', 'tls_connect',
 				'tls_accept', 'version', 'compatibility', 'state'
 			],
+			'selectAssignedHosts' => ['hostid', 'name', 'status'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectProxyGroup' => ['proxy_groupid', 'name'],
 			'proxyids' => array_keys($data['proxies']),
@@ -130,6 +131,9 @@ class CControllerProxyList extends CController {
 				? (intdiv($proxy['version'], 10000) % 100).'.'.(intdiv($proxy['version'], 100) % 100).'.'.
 					($proxy['version'] % 100)
 				: '';
+
+			$proxy['hosts'] = array_merge($proxy['hosts'], $proxy['assignedHosts']);
+			unset($proxy['assignedHosts']);
 			$proxy['host_count_total'] = count($proxy['hosts']);
 
 			if ($proxy['hosts']) {
