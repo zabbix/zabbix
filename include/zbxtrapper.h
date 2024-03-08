@@ -56,7 +56,7 @@ typedef struct
 }
 zbx_thread_trapper_args;
 
-ZBX_THREAD_ENTRY(trapper_thread, args);
+ZBX_THREAD_ENTRY(zbx_trapper_thread, args);
 
 int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);
 

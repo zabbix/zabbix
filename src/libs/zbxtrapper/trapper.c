@@ -1326,7 +1326,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			zbx_get_value_internal_ext_cb, config_ssh_key_location, trapper_process_request_cb);
 }
 
-ZBX_THREAD_ENTRY(trapper_thread, args)
+ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 {
 #define POLL_TIMEOUT	1
 	zbx_thread_trapper_args	*trapper_args_in = (zbx_thread_trapper_args *)
