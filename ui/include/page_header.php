@@ -90,8 +90,8 @@ switch ($page['type']) {
 		header('X-Content-Type-Options: nosniff');
 		header('X-XSS-Protection: 1; mode=block');
 
-		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
-			$x_frame_options = CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS);
+		if (strcasecmp(CSettingsHelper::getPublic(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
+			$x_frame_options = CSettingsHelper::getPublic(CSettingsHelper::X_FRAME_OPTIONS);
 
 			if (strcasecmp($x_frame_options, 'SAMEORIGIN') == 0) {
 				header('X-Frame-Options: SAMEORIGIN');

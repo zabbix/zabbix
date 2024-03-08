@@ -27,8 +27,6 @@
 #include "zbxvault.h"
 #include "zbxpoller.h"
 
-#define ZBX_IPC_SERVICE_TRAPPER	"trapper"
-
 zbx_get_program_type_f trapper_get_program_type(void);
 
 typedef struct
@@ -48,6 +46,7 @@ typedef struct
 	const char			*config_externalscripts;
 	int				config_enable_global_scripts;
 	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
+	const char			*config_ssh_key_location;
 }
 zbx_thread_trapper_args;
 

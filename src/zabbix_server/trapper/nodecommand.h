@@ -25,6 +25,7 @@
 
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type);
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		int config_enable_global_scripts, unsigned char program_type);
 
 #endif

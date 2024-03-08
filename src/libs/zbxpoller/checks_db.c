@@ -29,8 +29,8 @@
  *                                                                            *
  * Purpose: retrieves data from database                                      *
  *                                                                            *
- * Parameters: item           - [IN] item we are interested in                *
- *             result         - [OUT] check result                            *
+ * Parameters: item   - [IN] item we are interested in                        *
+ *             result - [OUT] check result                                    *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
@@ -43,8 +43,9 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	zbx_odbc_data_source_t	*data_source;
 	zbx_odbc_query_result_t	*query_result;
 	char			*error = NULL;
-	int			(*query_result_to_text)(zbx_odbc_query_result_t *query_result, char **text, char **error),
-				ret = NOTSUPPORTED;
+
+	int	(*query_result_to_text)(zbx_odbc_query_result_t *query_result, char **text, char **error),
+		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
 

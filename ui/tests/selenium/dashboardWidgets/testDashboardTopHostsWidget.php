@@ -833,8 +833,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #21 Error when time period "From" is empty.
@@ -903,7 +904,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #24 Error when time period fields values "From" and "To" are changed and maximum time period is > 730 days.
+			// #24 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -917,13 +918,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item' => 'Available memory',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-3y-2s',
+							'id:time_period_from' => 'now-3y-25h',
 							'id:time_period_to' => 'now-1y'
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #25 Error when time period "To" is empty.
@@ -1467,12 +1469,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Data' => 'Item value',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-63072002'
+							'id:time_period_from' => 'now-2y-1s'
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #6 Empty "From" field.
@@ -1526,7 +1529,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Error when time period fields values "From" and "To" are changed and maximum time period is > 730 days.
+			// #9 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1540,8 +1543,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #10 Error when time period "To" is empty.
@@ -2200,6 +2204,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			// Check error message in column form.
 			if (array_key_exists('column_error', $data)) {
+				// Count of days mentioned in error depends ot presence of leap year february in selected period.
+				if (CTestArrayHelper::get($data, 'days_count')) {
+					$data['column_error'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['column_error']);
+				}
+
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
 				$selector = ($action === 'update') ? 'Update column' : 'New column';
 				$this->query('xpath://div/h4[text()="'.$selector.'"]/../button[@title="Close"]')->one()->click();

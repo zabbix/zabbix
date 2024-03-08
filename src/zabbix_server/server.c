@@ -327,9 +327,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 static char	*zbx_config_snmptrap_file	= NULL;
 static char	*config_java_gateway		= NULL;
 static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
-
-char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
+static char	*config_ssh_key_location	= NULL;
 static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 
 /* how often Zabbix server sends configuration data to passive proxy, in seconds */
@@ -952,7 +950,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBTLSCipher13",		&(zbx_config_dbhigh->config_db_tls_cipher_13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
+		{"SSHKeyLocation",		&config_ssh_key_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogSlowQueries",		&config_log_slow_queries,		TYPE_INT,
 			PARM_OPT,	0,			3600000},
@@ -1450,16 +1448,19 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller, get_config_forks,
 							config_java_gateway, config_java_gateway_port,
-							config_externalscripts, zbx_get_value_internal_ext_server};
+							config_externalscripts, zbx_get_value_internal_ext_server,
+							config_ssh_key_location};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
-							config_enable_global_scripts, zbx_get_value_internal_ext_server};
+							config_enable_global_scripts, zbx_get_value_internal_ext_server,
+							config_ssh_key_location};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
-							get_config_forks, config_enable_global_scripts};
+							config_ssh_key_location, get_config_forks,
+							config_enable_global_scripts};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_zbx_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, config_ssl_ca_location,

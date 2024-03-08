@@ -67,12 +67,12 @@ static void	active_passive_misconfig(zbx_socket_t *sock, int config_timeout)
  *                                                                            *
  * Purpose: sends data from proxy to server                                   *
  *                                                                            *
- * Parameters: sock            - [IN] the connection socket                   *
- *             buffer          -                                              *
- *             buffer_size     -                                              *
- *             reserved        -                                              *
+ * Parameters: sock            - [IN] connection socket                       *
+ *             buffer          - [IN/OUT]                                     *
+ *             buffer_size     - [IN]                                         *
+ *             reserved        - [IN]                                         *
  *             config_timeout  - [IN]                                         *
- *             error           - [OUT] the error message                      *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
@@ -224,10 +224,10 @@ out:
  *                                                                            *
  * Purpose: sends 'task data' request to server                               *
  *                                                                            *
- * Parameters: sock             - [IN] connection socket                      *
- *             ts               - [IN] connection timestamp                   *
- *             config_comms     - [IN] proxy configuration for communication  *
- *                                     with server                            *
+ * Parameters: sock         - [IN] connection socket                          *
+ *             ts           - [IN] connection timestamp                       *
+ *             config_comms - [IN] proxy configuration for communication with *
+ *                                 server                                     *
  *                                                                            *
  ******************************************************************************/
 static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
@@ -306,14 +306,14 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: process proxy specific trapper requests                           *
- *                                                                            *
- * Comments: Some of proxy specific request processing was moved into separate*
- *           library to split server/proxy code dependencies                  *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: processes proxy specific trapper requests                          *
+ *                                                                             *
+ * Comments: Some of proxy specific request processing was moved into separate *
+ *           library to split server/proxy code dependencies.                  *
+ *                                                                             *
+ *******************************************************************************/
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,

@@ -726,7 +726,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#preprocessing .preprocessing-list-item:not(.ui-sortable-placeholder)')
+			.querySelectorAll('#preprocessing .preprocessing-list-item')
 			.length;
 	}
 
@@ -1754,6 +1754,12 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend = document.getElementById('legend');
 
 		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_value = document.getElementById('legend_value');
+
+		if (legend_value !== null && legend_value.checked) {
 			return true;
 		}
 

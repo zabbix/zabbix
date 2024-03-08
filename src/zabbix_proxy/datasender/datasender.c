@@ -90,7 +90,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
-				areg_records = 0, more_history, more_discovery, more_areg, proxy_delay,
+				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
 				host_avail_records = 0, data_read = FAIL;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
