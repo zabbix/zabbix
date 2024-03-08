@@ -978,7 +978,7 @@ class testUserGroup extends CAPITest {
 						'mfaid' => 999
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/mfaid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/mfaid": object does not exist.'
 			]
 		];
 	}
@@ -1031,7 +1031,7 @@ class testUserGroup extends CAPITest {
 						'mfaid' => 999
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/mfaid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/mfaid": object does not exist.'
 			]
 		];
 	}

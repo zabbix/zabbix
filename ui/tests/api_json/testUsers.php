@@ -603,7 +603,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'MFA method with ID "999" is not available.'
+				'expected_error' => 'Invalid parameter "/1/mfa_totp_secrets/1/mfaid": object does not exist.'
 			],
 			[
 				'user' => [
@@ -622,7 +622,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Incorrect MFA method with ID "12" type, TOTP secret is not available.'
+				'expected_error' => 'Invalid parameter "/1/mfa_totp_secrets/1/mfaid": object of TOTP type is expected.'
 			]
 		];
 	}
