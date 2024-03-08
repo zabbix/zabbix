@@ -53,6 +53,10 @@ class CXmlConstantName {
 	const IPMI = 'IPMI';
 	const JMX = 'JMX';
 
+	const SERVER = 'SERVER';
+	const PROXY = 'PROXY';
+	const PROXY_GROUP = 'PROXY_GROUP';
+
 	// const DISABLED = 'DISABLED'; // Duplicate.
 	const MANUAL = 'MANUAL';
 	const AUTOMATIC = 'AUTOMATIC';

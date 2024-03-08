@@ -334,6 +334,7 @@ class CConfigurationExportBuilder {
 				'name' => $host['name'],
 				'description' => $host['description'],
 				'proxy' => $host['proxy'],
+				'proxy_group' => $host['proxy_group'],
 				'status' => $host['status'],
 				'ipmi_authtype' => $host['ipmi_authtype'],
 				'ipmi_privilege' => $host['ipmi_privilege'],
