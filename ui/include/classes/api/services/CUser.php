@@ -3521,7 +3521,8 @@ class CUser extends CApiService {
 					' AND lastaccess<'.zbx_dbstr($outdated)
 		);
 
-		CWebUser::checkAuthentication($data['sessionid']);
+		self::$userData = $db_user + ['userip' => CWebUser::getIp()];
+
 		self::resetFailedLoginAttempts($db_user);
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
