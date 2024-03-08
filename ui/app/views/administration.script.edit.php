@@ -112,7 +112,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField([
 			(new CRadioButtonList('execute_on', (int) $data['execute_on']))
 				->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-				->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
+				->addValue(_('Zabbix proxy or server'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 				->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER, null, null,
 					!$data['global_scripts_enabled']
 				)
