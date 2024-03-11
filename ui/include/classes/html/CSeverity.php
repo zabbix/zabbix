@@ -43,13 +43,14 @@ class CSeverity extends CRadioButtonList {
 	 *
 	 * @return CSeverity
 	 */
-	public function addValue($label, $value, $class = null, $on_change = null): self {
+	public function addValue($label, $value, $class = null, $on_change = null, $disabled = false): self {
 		$this->values[] = [
 			'name' => $label,
 			'value' => $value,
 			'id' => null,
 			'class' => $class,
-			'on_change' => $on_change
+			'on_change' => $on_change,
+			'disabled' => $disabled
 		];
 
 		return $this;
