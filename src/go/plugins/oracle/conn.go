@@ -28,6 +28,7 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/uri"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
@@ -115,9 +116,10 @@ func (conn *OraConn) updateAccessTime() {
 
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
-	sync.Mutex
-	connMutex      sync.Mutex
-	connections    map[connDetails]*OraConn
+	// cached connections
+	connections   map[connDetails]*OraConn
+	connectionsMu sync.RWMutex
+
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
@@ -152,8 +154,8 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 
 // closeUnused closes each connection that has not been accessed at least within the keepalive interval.
 func (c *ConnManager) closeUnused() {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
 
 	for cd, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
@@ -166,12 +168,13 @@ func (c *ConnManager) closeUnused() {
 
 // closeAll closes all existed connections.
 func (c *ConnManager) closeAll() {
-	c.connMutex.Lock()
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
+
 	for uri, conn := range c.connections {
 		conn.client.Close()
 		delete(c.connections, uri)
 	}
-	c.connMutex.Unlock()
 }
 
 // housekeeper repeatedly checks for unused connections and closes them.
@@ -191,46 +194,46 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 	}
 }
 
-// create creates a new connection with given credentials.
+// create creates a new connection for given credentials.
 func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
-
-	if _, ok := c.connections[cd]; ok {
-		// Should never happen.
-		panic("connection already exists")
-	}
-
 	ctx := godror.ContextWithTraceTag(
 		context.Background(),
 		godror.TraceTag{
 			ClientInfo: "zbx_monitor",
 			Module:     godror.DriverName,
-		})
+		},
+	)
 
 	service, err := url.QueryUnescape(cd.uri.GetParam("service"))
 	if err != nil {
 		return nil, err
 	}
 
-	connectString := fmt.Sprintf(`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
-		`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		cd.uri.Host(), cd.uri.Port(), service, c.connectTimeout/time.Second)
+	connectString := fmt.Sprintf(
+		`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
+			`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
+		cd.uri.Host(),
+		cd.uri.Port(),
+		service,
+		c.connectTimeout/time.Second,
+	)
 
 	connParams, err := getConnParams(cd.privilege)
 	if err != nil {
-		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
-	connector := godror.NewConnector(godror.ConnectionParams{
-		StandaloneConnection: true,
-		CommonParams: godror.CommonParams{
-			Username:      cd.uri.User(),
-			ConnectString: connectString,
-			Password:      godror.NewPassword(cd.uri.Password()),
+	connector := godror.NewConnector(
+		godror.ConnectionParams{
+			StandaloneConnection: true,
+			CommonParams: godror.CommonParams{
+				Username:      cd.uri.User(),
+				ConnectString: connectString,
+				Password:      godror.NewPassword(cd.uri.Password()),
+			},
+			ConnParams: connParams,
 		},
-		ConnParams: connParams,
-	})
+	)
 
 	client := sql.OpenDB(connector)
 
@@ -239,7 +242,9 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		return nil, err
 	}
 
-	c.connections[cd] = &OraConn{
+	log.Debugf("[%s] Created new connection: %s", pluginName, cd.uri.Addr())
+
+	return &OraConn{
 		client:         client,
 		callTimeout:    c.callTimeout,
 		version:        serverVersion,
@@ -247,49 +252,54 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		ctx:            ctx,
 		queryStorage:   &c.queryStorage,
 		username:       cd.uri.User(),
-	}
-
-	log.Debugf("[%s] Created new connection: %s", pluginName, cd.uri.Addr())
-
-	return c.connections[cd], nil
+	}, nil
 }
 
-// get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(cd connDetails) *OraConn {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+// getConn concurrent cached connection getter.
+// Attempts to retrieve a connection from cache by its connDetails.
+// Returns nil if no connection associated with the given connDetails is found.
+func (c *ConnManager) getConn(cd connDetails) *OraConn {
+	c.connectionsMu.RLock()
+	defer c.connectionsMu.RUnlock()
 
-	if conn, ok := c.connections[cd]; ok {
-		conn.updateAccessTime()
-		return conn
+	conn, ok := c.connections[cd]
+	if !ok {
+		return nil
 	}
 
-	return nil
+	return conn
+}
+
+// setConn concurrent cached connection setter.
+func (c *ConnManager) setConn(cd connDetails, conn *OraConn) {
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
+
+	c.connections[cd] = conn
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(cd connDetails) (conn *OraConn, err error) {
-	c.Lock()
-	defer c.Unlock()
+func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) {
+	conn := c.getConn(cd)
+	if conn != nil {
+		conn.updateAccessTime()
 
-	conn = c.get(cd)
-
-	if conn == nil {
-		conn, err = c.create(cd)
+		return conn, nil
 	}
 
+	conn, err := c.create(cd)
 	if err != nil {
-		if oraErr, isOraErr := godror.AsOraErr(err); isOraErr {
-			err = zbxerr.ErrorConnectionFailed.Wrap(oraErr)
-		} else {
-			err = zbxerr.ErrorConnectionFailed.Wrap(err)
-		}
+		return nil, err
 	}
 
-	return
+	c.setConn(cd, conn)
+
+	return conn, err
 }
 
-func getConnParams(privilege string) (out godror.ConnParams, err error) {
+func getConnParams(privilege string) (godror.ConnParams, error) {
+	var out godror.ConnParams
+
 	switch privilege {
 	case "sysdba":
 		out.IsSysDBA = true
@@ -299,10 +309,8 @@ func getConnParams(privilege string) (out godror.ConnParams, err error) {
 		out.IsSysASM = true
 	case "":
 	default:
-		err = fmt.Errorf("incorrect privilege, %s", privilege)
-
-		return
+		return godror.ConnParams{}, fmt.Errorf("incorrect privilege, %s", privilege)
 	}
 
-	return
+	return out, nil
 }

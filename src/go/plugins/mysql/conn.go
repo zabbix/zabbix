@@ -28,14 +28,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
-	"github.com/omeid/go-yarn"
-
+	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
-
-	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"github.com/go-sql-driver/mysql"
+	"github.com/omeid/go-yarn"
 )
 
 const (
@@ -60,7 +58,7 @@ type MyConn struct {
 
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
-	connectionsMux sync.Mutex
+	connectionsMu  sync.RWMutex
 	connections    map[connKey]*MyConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
@@ -114,14 +112,13 @@ func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...interfac
 
 // GetConnection returns an existing connection or creates a new one.
 func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyConn, error) {
-	c.connectionsMux.Lock()
-	defer c.connectionsMux.Unlock()
-
 	ck := createConnKey(uri, params)
 
-	conn := c.get(ck)
+	conn := c.getConn(ck)
 	if conn != nil {
 		c.log.Tracef("connection found for host: %s", uri.Host())
+
+		conn.updateAccessTime()
 
 		return conn, nil
 	}
@@ -133,7 +130,7 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 		return nil, err
 	}
 
-	c.connections[ck] = conn
+	c.setConn(ck, conn)
 
 	return conn, nil
 }
@@ -166,8 +163,8 @@ func (conn *MyConn) updateAccessTime() {
 
 // closeUnused closes each connection that has not been accessed at least within the keepalive interval.
 func (c *ConnManager) closeUnused() {
-	c.connectionsMux.Lock()
-	defer c.connectionsMux.Unlock()
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
 
 	for ck, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
@@ -180,8 +177,8 @@ func (c *ConnManager) closeUnused() {
 
 // closeAll closes all existed connections.
 func (c *ConnManager) closeAll() {
-	c.connectionsMux.Lock()
-	defer c.connectionsMux.Unlock()
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
 
 	for uri, conn := range c.connections {
 		conn.client.Close()
@@ -235,15 +232,25 @@ func (c *ConnManager) create(ck connKey) (*MyConn, error) {
 	return &MyConn{client: client, lastTimeAccess: time.Now(), queryStorage: &c.queryStorage}, nil
 }
 
-// get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(ck connKey) *MyConn {
-	if conn, ok := c.connections[ck]; ok {
-		conn.updateAccessTime()
+// getConn concurrent connections cache getter.
+func (c *ConnManager) getConn(ck connKey) *MyConn {
+	c.connectionsMu.RLock()
+	defer c.connectionsMu.RUnlock()
 
-		return conn
+	conn, ok := c.connections[ck]
+	if !ok {
+		return nil
 	}
 
-	return nil
+	return conn
+}
+
+// setConn concurrent connections cache setter.
+func (c *ConnManager) setConn(ck connKey, conn *MyConn) {
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
+
+	c.connections[ck] = conn
 }
 
 func getMySQLConfig(uri uri.URI, tls *tls.Config, connectTimeout, callTimeout time.Duration) (*mysql.Config, error) {
