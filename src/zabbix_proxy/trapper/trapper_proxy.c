@@ -17,13 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "trapper_request.h"
+#include "trapper_proxy.h"
 
-#include "trapper.h"
-
-#include "zbxcommshigh.h"
-#include "../taskmanager/taskmanager_server.h"
-#include "proxyconfigwrite/proxyconfig_write.h"
+#include "../taskmanager/taskmanager_proxy.h"
+#include "../proxyconfigwrite/proxyconfig_write.h"
 
 #include "zbxcommshigh.h"
 #include "zbxtasks.h"
@@ -31,6 +28,8 @@
 #include "zbxdbwrap.h"
 #include "zbxproxybuffer.h"
 #include "zbxcompress.h"
+#include "zbxcacheconfig.h"
+#include "zbxjson.h"
 
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)
@@ -314,7 +313,7 @@ out:
  *           library to split server/proxy code dependencies.                  *
  *                                                                             *
  *******************************************************************************/
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,

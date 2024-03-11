@@ -17,12 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_AUTH_H
-#define ZABBIX_TRAPPER_AUTH_H
+#ifndef ZABBIX_TRAPPER_SERVER_H
+#define ZABBIX_TRAPPER_SERVER_H
 
-#include "zbxcommon.h"
+#include "zbxvault.h"
+#include "zbxdbhigh.h"
+#include "zbxcomms.h"
+#include "zbxtime.h"
 #include "zbxjson.h"
 
-int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);
+int	trapper_process_request_server(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
+		const zbx_config_vault_t *config_vault, int proxydata_frequency,
+		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
+		zbx_get_config_forks_f get_config_forks);
 
 #endif

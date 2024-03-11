@@ -249,7 +249,7 @@ class testFormUser extends CWebTest {
 					'maxlength' => '255'
 				],
 				'Refresh' => [
-					'maxlength' => '255'
+					'maxlength' => '32'
 				],
 				'Rows per page' => [
 					'maxlength' => '6'
