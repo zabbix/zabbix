@@ -3084,7 +3084,8 @@ output {
 .navigation-tree .navigation-tree-node-info-primary {
   display: flex;
   flex-grow: 1;
-  gap: 4px; }
+  gap: 4px;
+  min-width: 0; }
 .navigation-tree [data-level="0"] > .navigation-tree-node-info .navigation-tree-node-info-level {
   width: 0px; }
 .navigation-tree [data-level="1"] > .navigation-tree-node-info .navigation-tree-node-info-level {
