@@ -99,6 +99,7 @@
 #include "zbxdiag.h"
 #include "zbxpoller.h"
 #include "zbxhttppoller.h"
+#include "zbx_ha_constants.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
