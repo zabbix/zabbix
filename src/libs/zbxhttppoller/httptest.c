@@ -28,6 +28,12 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBCURL
 

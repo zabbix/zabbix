@@ -25,6 +25,7 @@
 #include "zbxself.h"
 #include "httptest.h"
 #include "zbxtime.h"
+#include "zbxthreads.h"
 
 /******************************************************************************
  *                                                                            *

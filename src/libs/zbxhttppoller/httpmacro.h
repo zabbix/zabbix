@@ -22,6 +22,8 @@
 
 #include "zbxdbhigh.h"
 
+#include "zbxalgo.h"
+
 typedef struct
 {
 	zbx_db_httptest		httptest;
