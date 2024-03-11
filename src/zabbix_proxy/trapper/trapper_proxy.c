@@ -19,7 +19,7 @@
 
 #include "trapper_proxy.h"
 
-#include "../../zabbix_server/taskmanager/taskmanager_server.h"
+#include "../taskmanager/taskmanager_proxy.h"
 #include "../proxyconfigwrite/proxyconfig_write.h"
 
 #include "zbxcommshigh.h"
