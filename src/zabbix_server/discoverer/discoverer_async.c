@@ -37,14 +37,14 @@
 
 static ZBX_THREAD_LOCAL int log_worker_id;
 
-static void	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
+static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
 {
 	char	*timeout;
 
 	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	timeout = zbx_dsprintf(NULL, "%d", poller_config->config_timeout);
@@ -52,10 +52,14 @@ static void	discovery_async_poller_dns_init(discovery_poller_config_t *poller_co
 	if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
-		exit(EXIT_FAILURE);
+		evdns_base_free(poller_config->dnsbase, 1);
+		zbx_free(timeout);
+		return FAIL;
 	}
 
 	zbx_free(timeout);
+
+	return SUCCEED;
 }
 
 static void	discovery_async_poller_destroy(discovery_poller_config_t *poller_config)
@@ -68,24 +72,31 @@ static void	discovery_async_poller_destroy(discovery_poller_config_t *poller_con
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }
 
-static void	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
+static int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 		discovery_poller_config_t *poller_config)
 {
+	int	ret;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s()", log_worker_id, __func__);
 
 	if (NULL == (poller_config->base = event_base_new()))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 
 	poller_config->processing = 0;
 	poller_config->config_source_ip = dmanager->source_ip;
 	poller_config->config_timeout = dmanager->config_timeout;
 	poller_config->progname = dmanager->progname;
-	discovery_async_poller_dns_init(poller_config);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+	if (FAIL == (ret = discovery_async_poller_dns_init(poller_config)))
+		event_base_free(poller_config->base);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 #ifdef HAVE_NETSNMP
@@ -623,7 +634,12 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	if (0 == concurrency_max)
 		concurrency_max = dmanager->queue.checks_per_worker_max;
 
-	discovery_async_poller_init(dmanager, &poller_config);
+	if (SUCCEED != discovery_async_poller_init(dmanager, &poller_config))
+	{
+		*error = zbx_strdup(*error, "Cannot initialize discovery async poller.");
+		goto poller_fail;
+	}
+
 	zbx_vector_discoverer_results_ptr_create(&results);
 	*first_ip = '\0';
 #ifdef HAVE_LIBCURL
@@ -738,6 +754,7 @@ out:
 	if (SVC_SNMPv3 == GET_DTYPE(task))
 		zbx_clear_cache_snmp(dmanager->process_type, FAIL);
 #endif
+poller_fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
 			" first ip:%s last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
 			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
