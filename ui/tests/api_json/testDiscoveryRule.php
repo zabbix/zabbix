@@ -2895,7 +2895,7 @@ class testDiscoveryRule extends CAPITest {
 				'SELECT i.itemid,i.type,i.snmp_oid,i.hostid,i.name,i.key_,i.delay,i.status,i.value_type,'.
 					'i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.authtype,i.username,'.
 					'i.password,i.publickey,i.privatekey,i.flags,i.description,i.inventory_link,i.lifetime,'.
-					'i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime,i.jmx_endpoint,i.url,i.query_fields,'.
+					'i.lifetime_type,i.enabled_lifetime,i.enabled_lifetime_type,i.jmx_endpoint,i.url,i.query_fields,'.
 					'i.timeout,i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,'.
 					'i.retrieve_mode,i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
 					'i.verify_host,i.allow_traps'.
@@ -2913,7 +2913,7 @@ class testDiscoveryRule extends CAPITest {
 					'dest.value_type,dest.trapper_hosts,dest.units,dest.logtimefmt,dest.valuemapid,dest.params,'.
 					'dest.ipmi_sensor,dest.authtype,dest.username,dest.password,dest.publickey,dest.privatekey,'.
 					'dest.flags,dest.description,dest.inventory_link,dest.lifetime,dest.lifetime_type,'.
-					'dest.enabled_lifetime,dest.enabled_lifetime,dest.jmx_endpoint,dest.url,dest.query_fields,'.
+					'dest.enabled_lifetime,dest.enabled_lifetime_type,dest.jmx_endpoint,dest.url,dest.query_fields,'.
 					'dest.timeout,dest.posts,dest.status_codes,dest.follow_redirects,dest.post_type,dest.http_proxy,'.
 					'dest.headers,dest.retrieve_mode,dest.request_method,dest.ssl_cert_file,dest.ssl_key_file,'.
 					'dest.ssl_key_password,dest.verify_peer,dest.verify_host,dest.allow_traps'.

@@ -997,8 +997,6 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 */
 	private static function checkLifetimeFields(array $items, ?array $db_items = null): void {
-		sdff($items);
-
 		foreach ($items as $index => $item) {
 			if ($db_items) {
 				$itemid = $item['itemid'];
