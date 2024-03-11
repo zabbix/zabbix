@@ -165,7 +165,6 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 {
-	int		ret = SUCCEED;
 	CURLcode	err;
 
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
@@ -176,8 +175,8 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "SMTP,SMTPS")))
 			{
-				ret = FAIL;
 				setopt_error("SMTP/SMTPS", err, error);
+				return FAIL;
 			}
 		}
 		else
@@ -185,13 +184,34 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, CURLPROTO_SMTP | CURLPROTO_SMTPS)))
 			{
-				ret = FAIL;
 				setopt_error("SMTP/SMTPS", err, error);
+				return FAIL;
 			}
 		}
 	}
 
-	return ret;
+	return SUCCEED;
+}
+
+int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error)
+{
+	CURLcode	err;
+
+/* CURL_SSLVERSION_TLSv1_2 (6) was added in 7.34.0 (0x072200) */
+#if LIBCURL_VERSION_NUM < 0x072200
+#	define CURL_SSLVERSION_TLSv1_2	6
+#endif
+
+	if (libcurl_version_num() >= 0x072200)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2)))
+		{
+			setopt_error("CURL_SSLVERSION_TLSv1_2", err, error);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
 }
 
 int	zbx_curl_has_bearer(char **error)
@@ -203,23 +223,6 @@ int	zbx_curl_has_bearer(char **error)
 		{
 			*error = zbx_dsprintf(*error, "cURL library version %s does not support HTTP Bearer token"
 					" authentication, 7.61.0 or newer is required", libcurl_version_str());
-		}
-
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-int	zbx_curl_good_for_elasticsearch(char **error)
-{
-	/* Elasticsearch needs curl_multi_wait() which was added in 7.28.0 (0x071c00) */
-	if (libcurl_version_num() < 0x071c00)
-	{
-		if (NULL != error)
-		{
-			*error = zbx_dsprintf(*error, "cURL library version %s is too old for Elasticsearch history"
-					" backend, 7.28.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
@@ -260,4 +263,22 @@ int	zbx_curl_has_smtp_auth(char **error)
 
 	return SUCCEED;
 }
+
+int	zbx_curl_good_for_elasticsearch(char **error)
+{
+	/* Elasticsearch needs curl_multi_wait() which was added in 7.28.0 (0x071c00) */
+	if (libcurl_version_num() < 0x071c00)
+	{
+		if (NULL != error)
+		{
+			*error = zbx_dsprintf(*error, "cURL library version %s is too old for Elasticsearch history"
+					" backend, 7.28.0 or newer is required", libcurl_version_str());
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif /* HAVE_LIBCURL */

@@ -71,10 +71,11 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds);
 int	zbx_curl_protocol(const char *protocol, char **error);
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);
+int	zbx_curl_setopt_ssl_version(CURL *easyhandle, char **error);
 int	zbx_curl_has_ssl(char **error);
 int	zbx_curl_has_bearer(char **error);
-int	zbx_curl_good_for_elasticsearch(char **error);
 int	zbx_curl_has_smtp_auth(char **error);
+int	zbx_curl_good_for_elasticsearch(char **error);
 
 #endif /* HAVE_LIBCURL */
 
