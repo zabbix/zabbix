@@ -64,7 +64,8 @@ class CProxyGroup extends CApiService {
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
