@@ -29,13 +29,6 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 
-/* HTTP item types */
-#define ZBX_HTTPITEM_TYPE_RSPCODE	0
-#define ZBX_HTTPITEM_TYPE_TIME		1
-#define ZBX_HTTPITEM_TYPE_SPEED		2
-#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
-#define ZBX_HTTPITEM_TYPE_LASTERROR	4
-
 #ifdef HAVE_LIBCURL
 
 typedef struct
@@ -50,16 +43,14 @@ zbx_httpstat_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove all macro variables cached during http test execution      *
+ * Purpose: removes all macro variables cached during http test execution     *
  *                                                                            *
- * Parameters: httptest - [IN] the http test data                             *
+ * Parameters: httptest - [IN] http test data                                 *
  *                                                                            *
  ******************************************************************************/
 static void	httptest_remove_macros(zbx_httptest_t *httptest)
 {
-	int	i;
-
-	for (i = 0; i < httptest->macros.values_num; i++)
+	for (int i = 0; i < httptest->macros.values_num; i++)
 	{
 		zbx_ptr_pair_t	*pair = &httptest->macros.values[i];
 
@@ -70,6 +61,13 @@ static void	httptest_remove_macros(zbx_httptest_t *httptest)
 	zbx_vector_ptr_pair_clear(&httptest->macros);
 }
 
+/* HTTP item types */
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
+
 static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, double speed_download,
 		const char *err_str, zbx_timespec_t *ts)
 {
@@ -79,7 +77,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	zbx_dc_item_t	items[3];
 	zbx_uint64_t	itemids[3];
 	int		errcodes[3];
-	size_t		i, num = 0;
+	size_t		num = 0;
 	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -117,7 +115,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	{
 		zbx_dc_config_get_items_by_itemids(items, itemids, errcodes, num);
 
-		for (i = 0; i < num; i++)
+		for (size_t i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
@@ -178,13 +176,9 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, const char *value_delimiter,
 		const char *pair_delimiter, zbx_vector_ptr_pair_t *pairs)
 {
-	int	p;
-	char	*key, *value;
-
-	for (p = 0; p < pairs->values_num; p++)
+	for (int p = 0; p < pairs->values_num; p++)
 	{
-		key = (char *)pairs->values[p].first;
-		value = (char *)pairs->values[p].second;
+		char	*key = (char *)pairs->values[p].first, *value = (char *)pairs->values[p].second;
 
 		if (0 != p)
 			zbx_strcpy_alloc(str, alloc_len, offset, pair_delimiter);
@@ -199,14 +193,12 @@ static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, c
  *                                                                            *
  * Purpose: frees memory allocated for vector of pairs                        *
  *                                                                            *
- * Parameters: pairs           - [IN] vector of pairs                         *
+ * Parameters: pairs - [IN] vector of pairs                                   *
  *                                                                            *
  ******************************************************************************/
 static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
 {
-	int	p;
-
-	for (p = 0; p < pairs->values_num; p++)
+	for (int p = 0; p < pairs->values_num; p++)
 	{
 		zbx_free(pairs->values[p].first);
 		zbx_free(pairs->values[p].second);
@@ -224,7 +216,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zbx_dc_item_t	items[3];
 	zbx_uint64_t	itemids[3];
 	int		errcodes[3];
-	size_t		i, num = 0;
+	size_t		num = 0;
 	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_CURLINFO_SPEED_DOWNLOAD_FMT,
@@ -256,7 +248,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	{
 		zbx_dc_config_get_items_by_itemids(items, itemids, errcodes, num);
 
-		for (i = 0; i < num; i++)
+		for (size_t i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
@@ -305,8 +297,8 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
  *                                                                            *
  * Purpose: loads http fields of web scenario step                            *
  *                                                                            *
- * Parameters: host            - [IN] host to be used in macro expansion      *
- *             httpstep        - [IN/OUT] web scenario step                   *
+ * Parameters: host     - [IN] host to be used in macro expansion             *
+ *             httpstep - [IN/OUT] web scenario step                          *
  *                                                                            *
  * Return value: SUCCEED if http fields were loaded and macro expansion was   *
  *               successful. FAIL on error.                                   *
@@ -457,16 +449,15 @@ out:
  *                                                                            *
  * Purpose: adds HTTP headers to curl_slist and prepares cookie header string *
  *                                                                            *
- * Parameters: headers         - [IN] HTTP headers as string                  *
- *             headers_slist   - [IN/OUT] curl_slist                          *
- *             header_cookie   - [IN/OUT] cookie header as string             *
+ * Parameters: headers       - [IN] HTTP headers as string                    *
+ *             headers_slist - [IN/OUT] curl_slist                            *
+ *             header_cookie - [IN/OUT] cookie header as string               *
  *                                                                            *
  ******************************************************************************/
 static void	add_http_headers(char *headers, struct curl_slist **headers_slist, char **header_cookie)
 {
 #define COOKIE_HEADER_STR	"Cookie:"
 #define COOKIE_HEADER_STR_LEN	ZBX_CONST_STRLEN(COOKIE_HEADER_STR)
-
 	char	*line;
 
 	while (NULL != (line = zbx_http_parse_header(&headers)))
@@ -478,18 +469,23 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
 
 		zbx_free(line);
 	}
-
 #undef COOKIE_HEADER_STR
 #undef COOKIE_HEADER_STR_LEN
 }
 #endif
 
+#undef ZBX_HTTPITEM_TYPE_RSPCODE
+#undef ZBX_HTTPITEM_TYPE_TIME
+#undef ZBX_HTTPITEM_TYPE_SPEED
+#undef ZBX_HTTPITEM_TYPE_LASTSTEP
+#undef ZBX_HTTPITEM_TYPE_LASTERROR
+
 /******************************************************************************
  *                                                                            *
  * Purpose: loads http fields of web scenario                                 *
  *                                                                            *
- * Parameters: host            - [IN] host to be used in macro expansion      *
- *             httptest        - [IN/OUT] web scenario                        *
+ * Parameters: host     - [IN] host to be used in macro expansion             *
+ *             httptest - [IN/OUT] web scenario                               *
  *                                                                            *
  * Return value: SUCCEED if http fields were loaded and macro expansion was   *
  *               successful. FAIL on error.                                   *
@@ -574,7 +570,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process single scenario of http test                              *
+ * Purpose: processes single scenario of http test                            *
  *                                                                            *
  ******************************************************************************/
 static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay,
@@ -584,10 +580,9 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 	zbx_db_result_t		result;
 	zbx_db_httpstep		db_httpstep;
 	char			*err_str = NULL, *buffer = NULL;
-	int			lastfailedstep = 0;
 	zbx_timespec_t		ts;
 	double			speed_download = 0;
-	int			speed_download_num = 0;
+	int			speed_download_num = 0, lastfailedstep = 0;
 #ifdef HAVE_LIBCURL
 	zbx_db_row_t		row;
 	zbx_httpstat_t		stat;
@@ -1018,8 +1013,6 @@ httptest_error:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process httptests                                                 *
- *                                                                            *
  * Parameters: now                      - [IN] current timestamp              *
  *             config_source_ip         - [IN]                                *
  *             config_ssl_ca_location   - [IN]                                *
@@ -1059,8 +1052,9 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 		result = zbx_db_select(
 				"select h.hostid,h.host,h.name,t.httptestid,t.name,t.agent,"
-					"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
-					"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host,t.delay"
+					"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,"
+					"t.ssl_cert_file,t.ssl_key_file,t.ssl_key_password,t.verify_peer,"
+					"t.verify_host,t.delay"
 				" from httptest t,hosts h"
 				" where t.hostid=h.hostid"
 					" and t.httptestid=" ZBX_FS_UI64,

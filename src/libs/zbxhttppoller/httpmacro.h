@@ -47,6 +47,7 @@ zbx_httpstep_t;
 
 void	http_variable_urlencode(const char *source, char **result);
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data);
-int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data, char **err_str);
+int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,
+		char **err_str);
 
 #endif
