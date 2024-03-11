@@ -840,32 +840,33 @@ out:
 	return ret;
 }
 
-/***********************************************************************************
- *                                                                                 *
- * Purpose: executes user scripts or remote commands                               *
- *                                                                                 *
- * Parameters:  script                  - [IN] script to be executed               *
- *              host                    - [IN] host the script will be executed on *
- *              params                  - [IN] parameters for the script           *
- *              config_timeout          - [IN]                                     *
- *              config_trapper_timeout  - [IN]                                     *
- *              config_source_ip        - [IN]                                     *
- *              config_ssh_key_location - [IN]                                     *
- *              get_config_forks        - [IN]                                     *
- *              result                  - [OUT] result of a script execution       *
- *              error                   - [OUT] error reported by the script       *
- *              max_error_len           - [IN] maximum error length                *
- *              debug                   - [OUT] debug data (optional)              *
- *                                                                                 *
- * Return value:  SUCCEED - processed successfully                                 *
- *                FAIL - error occurred                                            *
- *                TIMEOUT_ERROR - timeout occurred                                 *
- *                                                                                 *
- ***********************************************************************************/
+/****************************************************************************************
+ *                                                                                      *
+ * Purpose: executes user scripts or remote commands                                    *
+ *                                                                                      *
+ * Parameters:  script                       - [IN] script to be executed               *
+ *              host                         - [IN] host the script will be executed on *
+ *              params                       - [IN] parameters for the script           *
+ *              config_timeout               - [IN]                                     *
+ *              config_trapper_timeout       - [IN]                                     *
+ *              config_source_ip             - [IN]                                     *
+ *              config_ssh_key_location      - [IN]                                     *
+ *              config_enable_global_scripts - [IN]                                     *
+ *              get_config_forks             - [IN]                                     *
+ *              result                       - [OUT] result of a script execution       *
+ *              error                        - [OUT] error reported by the script       *
+ *              max_error_len                - [IN] maximum error length                *
+ *              debug                        - [OUT] debug data (optional)              *
+ *                                                                                      *
+ * Return value:  SUCCEED - processed successfully                                      *
+ *                FAIL - error occurred                                                 *
+ *                TIMEOUT_ERROR - timeout occurred                                      *
+ *                                                                                      *
+ ***************************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		int config_enable_global_scripts, unsigned char program_type, char **result, char *error,
+		const char *config_ssh_key_location, int config_enable_global_scripts,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
 		size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;

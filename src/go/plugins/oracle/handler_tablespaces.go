@@ -23,6 +23,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -44,10 +45,13 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 		return nil, err
 	}
 
+	t1 := time.Now()
 	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+	t2 := time.Now()
+	fmt.Println(t2.Sub(t1))
 
 	err = row.Scan(&tablespaces)
 	if err != nil {

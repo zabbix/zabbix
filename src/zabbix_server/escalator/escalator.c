@@ -1455,8 +1455,8 @@ fail:
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
 							config_trapper_timeout, config_source_ip,
-							config_ssh_key_location, get_config_forks,
-							config_enable_global_scripts, program_type, NULL, error,
+							config_ssh_key_location, config_enable_global_scripts,
+							get_config_forks, program_type, NULL, error,
 							sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
