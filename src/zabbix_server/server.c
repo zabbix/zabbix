@@ -2368,12 +2368,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_on_exit(ZBX_EXIT_STATUS());
-
 	zbx_ipc_service_close(&rtc.service);
 
 	zbx_tcp_unlisten(&listen_sock);
 
+	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
 }
