@@ -109,7 +109,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'name' => in_array('*', $this->fields_values['hosts'], true) ? null : $this->fields_values['hosts']
 				],
 				'searchWildcardsEnabled' => true,
-				'searchByAny' => true,
 				'severities' => $this->fields_values['severities'] ?: null,
 				'filter' => [
 					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
