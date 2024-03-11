@@ -1828,6 +1828,7 @@ out:
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);
+	zbx_vector_uint64_destroy(&del_jobs);
 	zbx_vector_discoverer_drule_error_clear_ext(&drule_errors, zbx_discoverer_drule_error_free);
 	zbx_vector_discoverer_drule_error_destroy(&drule_errors);
 	zbx_hashset_destroy(&incomplete_druleids);
