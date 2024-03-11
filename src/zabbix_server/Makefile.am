@@ -7,7 +7,6 @@ SUBDIRS = \
 	discoverer \
 	events \
 	housekeeper \
-	pinger \
 	poller \
 	timer \
 	escalator \
@@ -47,13 +46,13 @@ zabbix_server_SOURCES = \
 
 zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	actions/libzbxactions.a \
-	pinger/libzbxpinger.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \

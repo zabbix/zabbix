@@ -27,7 +27,6 @@
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
 #include "housekeeper/housekeeper.h"
-#include "pinger/pinger.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
 #include "trapper/trapper_server.h"
@@ -54,6 +53,7 @@
 #include "zbxself.h"
 
 #include "cfg.h"
+#include "zbxpinger.h"
 #include "zbxtrapper.h"
 #include "zbxdbupgrade.h"
 #include "zbxlog.h"
