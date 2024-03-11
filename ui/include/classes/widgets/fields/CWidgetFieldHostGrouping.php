@@ -35,7 +35,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
+			->setValidationRules(['type' => API_OBJECTS, 'length' => 10, 'fields' => [
 				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_TAG_VALUE, WidgetForm::GROUP_BY_SEVERITY])],
 				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()],
 			]]);

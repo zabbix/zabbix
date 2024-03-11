@@ -58,6 +58,10 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 				tag_name_input.disabled = attribute.value != '.$tag_value_attribute.';
 			}
 
+			function updateAddButtonState(rows) {
+				document.querySelector("#add-row").disabled = rows.length == 10;
+			}
+
 			jQuery("#'.$field_name.'-table")
 				.dynamicRows({
 					template: "#'.$field_name.'-row-tmpl",
@@ -74,11 +78,15 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 					updateRowFieldVisibility([...e.target.querySelectorAll(".form_row")].at(-1));
 				})
 				.on("tableupdate.dynamicRows", (e) => {
-					e.target.querySelectorAll(".form_row").forEach((row, index) => {
+					const rows = e.target.querySelectorAll(".form_row");
+
+					rows.forEach((row, index) => {
 						for (const field of row.querySelectorAll("[name^=\"'.$field_name.'[\"]")) {
 							field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
 						}
 					});
+
+					updateAddButtonState(rows);
 				});
 
 			document.querySelector("#'.$field_name.'-table").addEventListener("change", e => {
@@ -87,8 +95,11 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 				}
 			});
 
-			// Update initial row field visibility
-			document.querySelectorAll("#'.$field_name.'-table .form_row").forEach(updateRowFieldVisibility);
+			// Update initial row field visibility and Add button state
+			const rows = document.querySelectorAll("#'.$field_name.'-table .form_row");
+
+			rows.forEach(updateRowFieldVisibility);
+			updateAddButtonState(rows);
 		';
 	}
 
