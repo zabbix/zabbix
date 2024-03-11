@@ -30,5 +30,4 @@
 #define ZBX_NODE_STATUS_UNAVAILABLE		2
 #define ZBX_NODE_STATUS_ACTIVE			3
 
-
 #endif
