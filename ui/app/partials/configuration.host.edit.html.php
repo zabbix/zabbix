@@ -317,7 +317,8 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['host']['tags'],
 	'with_automatic' => true,
 	'tabs_id' => 'host-tabs',
-	'tags_tab_id' => 'host-tags-tab'
+	'tags_tab_id' => 'host-tags-tab',
+	'field_label' => _('Tags')
 ]);
 
 // Macros tab.
@@ -490,14 +491,17 @@ $encryption_tab = (new CFormGrid())
 
 // Value mapping tab.
 if (!$host_is_discovered) {
-	$value_mapping_tab = (new CFormList('valuemap-formlist'))
-		->addRow(null, new CPartial('configuration.valuemap', [
+	$value_mapping_tab = (new CFormList('valuemap-formlist'))->addRow(
+		_('Value mapping'),
+		new CPartial('configuration.valuemap', [
 			'source' => 'host',
 			'valuemaps' => $data['host']['valuemaps'],
 			'readonly' => $host_is_discovered,
 			'form' => 'host',
-			'table_id' => 'valuemap-table'
-		]));
+			'table_id' => 'valuemap-table',
+			'with_label' => true
+		])
+	);
 }
 
 // main output

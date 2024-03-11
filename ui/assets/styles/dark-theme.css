@@ -7143,18 +7143,12 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
     float: left;
     margin-left: -1em; }
 
-.overlay-dialogue #host-form #tagsFormList .form-field,
-.overlay-dialogue #host-form #macrosFormList .form-field,
-.overlay-dialogue #host-form #valuemap-formlist .form-field {
+.overlay-dialogue #host-form #macrosFormList .form-field {
   grid-column-start: 1; }
-.overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
-.overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
-.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {
-  display: none; }
-.overlay-dialogue #host-form #tagsFormList .table-forms-td-right,
-.overlay-dialogue #host-form #macrosFormList .table-forms-td-right,
-.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-right {
   width: 100%; }
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-left {
+  display: none; }
 
 .overlay-dialogue #templates-form #macrosFormList .form-field {
   grid-column-start: 1; }
