@@ -148,12 +148,16 @@ class CItemHelper extends CItemGeneralHelper {
 			return false;
 		}
 
+		$dst_item_hosts = [
+			['status' => key($dst_options) === 'templateids' ? HOST_STATUS_TEMPLATE : HOST_STATUS_MONITORED]
+		];
+
 		do {
 			$dst_items = [];
 
 			foreach ($dst_hostids as $dst_hostid) {
 				foreach ($src_items as $src_item) {
-					$dst_item = ['hostid' => $dst_hostid] + array_diff_key($src_item, array_flip(['itemid', 'hosts']));
+					$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts']));
 
 					if (array_key_exists($src_item['itemid'], $dst_valuemapids)) {
 						$dst_item['valuemapid'] = $dst_valuemapids[$src_item['itemid']][$dst_hostid];
@@ -167,7 +171,12 @@ class CItemHelper extends CItemGeneralHelper {
 						$dst_item['master_itemid'] = $dst_master_itemids[$src_item['itemid']][$dst_hostid];
 					}
 
-					$dst_items[] = $dst_item;
+					$dst_items[] = ['hostid' => $dst_hostid] + getSanitizedItemFields([
+						'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+						'hosts' => $dst_item_hosts,
+						'templateid' => 0
+					] + $dst_item);
+
 				}
 			}
 

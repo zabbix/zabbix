@@ -84,10 +84,11 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 * @param array $src_options
 	 * @param array $dst_options
 	 * @param array $dst_ruleids
+	 * @param array $dst_host_statuses
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options, array $dst_ruleids): bool {
+	public static function copy(array $src_options, array $dst_options, array $dst_ruleids, array $dst_host_statuses): bool {
 		$src_items = self::getSourceItemPrototypes($src_options);
 
 		if (!$src_items) {
@@ -123,10 +124,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 
 			foreach ($dst_hostids as $dst_hostid) {
 				foreach ($src_items as $src_item) {
-					$dst_item = [
-						'hostid' => $dst_hostid,
-						'ruleid' => $dst_ruleids[$src_item['discoveryRule']['itemid']][$dst_hostid]
-					] + array_diff_key($src_item, array_flip(['itemid', 'hosts', 'discoveryRule']));
+					$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts', 'discoveryRule']));
 
 					if (array_key_exists($src_item['itemid'], $dst_valuemapids)) {
 						$dst_item['valuemapid'] = $dst_valuemapids[$src_item['itemid']][$dst_hostid];
@@ -140,7 +138,14 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 						$dst_item['master_itemid'] = $dst_master_itemids[$src_item['itemid']][$dst_hostid];
 					}
 
-					$dst_items[] = $dst_item;
+					$dst_items[] = [
+						'hostid' => $dst_hostid,
+						'ruleid' => $dst_ruleids[$src_item['discoveryRule']['itemid']][$dst_hostid]
+					] + getSanitizedItemFields([
+						'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						'hosts' => [$dst_host_statuses[$dst_hostid]],
+						'templateid' => 0
+					] + $dst_item);
 				}
 			}
 
