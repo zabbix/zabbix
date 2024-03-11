@@ -2085,6 +2085,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
+	src/libs/zbxpinger/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2121,7 +2122,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/operations/Makefile
-	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile

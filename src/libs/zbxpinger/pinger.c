@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pinger.h"
+#include "zbxpinger.h"
 #include "zbxexpression.h"
 
 #include "zbxlog.h"
@@ -31,18 +31,13 @@
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxpreproc.h"
-
-/* defines for `fping' and `fping6' to successfully process pings */
-#define MIN_COUNT	1
-#define MAX_COUNT	10000
-#define MIN_INTERVAL	20
-#define MIN_SIZE	24
-#define MAX_SIZE	65507
-#define MIN_TIMEOUT	50
+#include "zbxdbhigh.h"
+#include "zbxthreads.h"
+#include "zbxtimekeeper.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new item value                                            *
+ * Purpose: processes new item value                                          *
  *                                                                            *
  ******************************************************************************/
 static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	zbx_timespec_t *ts,
@@ -50,7 +45,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 {
 	zbx_dc_item_t	item;
 	int		errcode;
-	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -73,6 +67,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	}
 	else
 	{
+		AGENT_RESULT	value;
+
 		zbx_init_agent_result(&value);
 
 		if (NULL != value_ui64)
@@ -96,19 +92,15 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new item values                                           *
+ * Purpose: processes new item values                                         *
  *                                                                            *
  ******************************************************************************/
 static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
 		int hosts_count, zbx_timespec_t *ts, int ping_result, char *error)
 {
-	int		i, h;
-	zbx_uint64_t	value_uint64;
-	double		value_dbl;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (h = 0; h < hosts_count; h++)
+	for (int h = 0; h < hosts_count; h++)
 	{
 		const ZBX_FPING_HOST	*host = &hosts[h];
 
@@ -123,8 +115,10 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 					host->addr, host->cnt, host->rcv, host->min, host->max, host->sum);
 		}
 
-		for (i = first_index; i < last_index; i++)
+		for (int i = first_index; i < last_index; i++)
 		{
+			zbx_uint64_t		value_uint64;
+			double			value_dbl;
 			const icmpitem_t	*item = &items[i];
 
 			if (0 != strcmp(item->addr, host->addr))
@@ -185,6 +179,13 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type,
 		unsigned char *allow_redirect, char *error, int max_error_len)
 {
+/* defines for `fping' and `fping6' to successfully process pings */
+#define MIN_COUNT	1
+#define MAX_COUNT	10000
+#define MIN_INTERVAL	20
+#define MIN_SIZE	24
+#define MAX_SIZE	65507
+#define MIN_TIMEOUT	50
 	const char	*tmp;
 	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
@@ -322,9 +323,16 @@ out:
 	zbx_free_agent_request(&request);
 
 	return ret;
+#undef MIN_COUNT
+#undef MAX_COUNT
+#undef MIN_INTERVAL
+#undef MIN_SIZE
+#undef MAX_SIZE
+#undef MIN_TIMEOUT
 }
 
-static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int count, int interval, int size, int timeout)
+static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int count, int interval, int size,
+		int timeout)
 {
 	int		first_index, last_index, index;
 	icmpitem_t	*item;
@@ -334,29 +342,42 @@ static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int cou
 
 	first_index = 0;
 	last_index = items_count - 1;
+
 	while (1)
 	{
 		index = first_index + (last_index - first_index) / 2;
 		item = &items[index];
 
-		if (item->count == count && item->interval == interval && item->size == size && item->timeout == timeout)
+		if (item->count == count && item->interval == interval && item->size == size &&
+				item->timeout == timeout)
+		{
 			return index;
+		}
 		else if (last_index == first_index)
 		{
 			if (item->count < count ||
 					(item->count == count && item->interval < interval) ||
 					(item->count == count && item->interval == interval && item->size < size) ||
-					(item->count == count && item->interval == interval && item->size == size && item->timeout < timeout))
+					(item->count == count && item->interval == interval && item->size == size &&
+					item->timeout < timeout))
+			{
 				index++;
+			}
+
 			return index;
 		}
 		else if (item->count < count ||
 				(item->count == count && item->interval < interval) ||
 				(item->count == count && item->interval == interval && item->size < size) ||
-				(item->count == count && item->interval == interval && item->size == size && item->timeout < timeout))
+				(item->count == count && item->interval == interval && item->size == size &&
+				item->timeout < timeout))
+		{
 			first_index = index + 1;
+		}
 		else
+		{
 			last_index = index;
+		}
 	}
 }
 
@@ -402,7 +423,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  *                                                                            *
  * Purpose: creates buffer which contains list of hosts to ping               *
  *                                                                            *
- * Return value: SUCCEED - the file was created successfully                  *
+ * Return value: SUCCEED - file was created successfully                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -410,7 +431,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		int config_timeout)
 {
 	zbx_dc_item_t		item, *items;
-	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
+	int			num, count, interval, size, timeout, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	unsigned char		allow_redirect;
 	icmpping_t		icmpping;
@@ -424,11 +445,11 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	items = &item;
 	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, 0, 0, &items);
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL, ZBX_MACRO_TYPE_ITEM_KEY,
-				error, sizeof(error));
+		int	rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
+				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error));
 
 		if (SUCCEED == rc)
 		{
@@ -471,9 +492,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 static void	free_hosts(icmpitem_t **items, int *items_count)
 {
-	int	i;
-
-	for (i = 0; i < *items_count; i++)
+	for (int i = 0; i < *items_count; i++)
 		zbx_free((*items)[i].addr);
 
 	*items_count = 0;
@@ -481,13 +500,11 @@ static void	free_hosts(icmpitem_t **items, int *items_count)
 
 static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts_count, char *addr)
 {
-	int		i;
-	size_t		sz;
 	ZBX_FPING_HOST	*h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
 
-	for (i = 0; i < *hosts_count; i++)
+	for (int i = 0; i < *hosts_count; i++)
 	{
 		if (0 == strcmp(addr, (*hosts)[i].addr))
 			return;
@@ -497,6 +514,8 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 
 	if (*hosts_alloc < *hosts_count)
 	{
+		size_t	sz;
+
 		*hosts_alloc += 4;
 		sz = *hosts_alloc * sizeof(ZBX_FPING_HOST);
 		*hosts = (ZBX_FPING_HOST *)zbx_realloc(*hosts, sz);
@@ -511,7 +530,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 
 static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num, int process_type)
 {
-	int			i, first_index = 0, ping_result;
+	int			ping_result, first_index = 0;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
@@ -523,7 +542,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 	if (NULL == hosts)
 		hosts = (ZBX_FPING_HOST *)zbx_malloc(hosts, sizeof(ZBX_FPING_HOST) * hosts_alloc);
 
-	for (i = 0; i < items_count && ZBX_IS_RUNNING(); i++)
+	for (int i = 0; i < items_count && ZBX_IS_RUNNING(); i++)
 	{
 		add_pinger_host(&hosts, &hosts_alloc, &hosts_count, items[i].addr);
 
@@ -553,20 +572,20 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 
 /******************************************************************************
  *                                                                            *
- * Purpose: periodically perform ICMP pings                                   *
+ * Purpose: periodically performs ICMP pings                                  *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(pinger_thread, args)
 {
-	int			nextcheck, sleeptime, items_count = 0, itc;
+	int			nextcheck, sleeptime, itc, items_count = 0,
+				server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_thread_pinger_args	*pinger_args_in = (zbx_thread_pinger_args *)(((zbx_thread_args_t *)args)->args);
 
