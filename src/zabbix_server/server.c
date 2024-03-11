@@ -1086,7 +1086,7 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
-static void	zbx_on_exit(int ret)
+static void	zbx_on_exit(zbx_rtc_t *rtc, int ret)
 {
 	char	*error = NULL;
 
@@ -1158,6 +1158,8 @@ static void	zbx_on_exit(int ret)
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
 	zbx_deinit_library_export();
+
+	zbx_ipc_service_close(&rtc->service);
 
 	exit(EXIT_SUCCESS);
 }
@@ -2368,7 +2370,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(&rtc, ZBX_EXIT_STATUS());
 
 	return SUCCEED;
 }
