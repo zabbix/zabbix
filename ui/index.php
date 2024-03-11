@@ -79,7 +79,6 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 	}
 
 	if (CWebUser::$data['mfaid']) {
-		CSessionHelper::set('mfaid', CWebUser::$data['mfaid']);
 		CSessionHelper::set('confirmid', CWebUser::$data['sessionid']);
 
 		// In case user has not finished their Duo authentication, need to unset data saved into session by Duo.

@@ -2401,8 +2401,8 @@ class CUser extends CApiService {
 		);
 
 		$deprovision_groupid = CAuthenticationHelper::getPublic(CAuthenticationHelper::DISABLED_USER_GROUPID);
-		$mfa_status = CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS);
-		$default_mfaid = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
+		$mfa_status = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFA_STATUS);
+		$default_mfaid = CAuthenticationHelper::getPublic(CAuthenticationHelper::MFAID);
 
 		$userdirectoryids = [];
 		$mfaids = [];
@@ -3328,23 +3328,28 @@ class CUser extends CApiService {
 		]);
 
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
-		$userid = $db_sessions[0]['userid'];
+		$db_user = ['userid' => $db_sessions[0]['userid']];
+		static::addUserGroupFields($db_user, $group_status);
+
+		if (!$db_user['mfaid']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
+		}
 
 		$db_mfas = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
-			'mfaids' => $session_data['mfaid']
+			'mfaids' => $db_user['mfaid']
 		]);
 		$mfa = $db_mfas[0];
 
 		$data = [
 			'sessionid' => $session_data['sessionid'],
 			'mfa' => $mfa,
-			'userid' => $userid
+			'userid' => $db_user['userid']
 		];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
@@ -3395,7 +3400,6 @@ class CUser extends CApiService {
 	 *
 	 * @param array  $data
 	 * @param string $data['sessionid']                               User's sessionid passed in session data.
-	 * @param string $data['mfaid']                                   User's mfaid passed in session data.
 	 * @param string $data['redirect_uri']                            Redirect uri that will be used for Duo MFA.
 	 * @param array  $data['mfa_response_data']                       Array with data for MFA response confirmation.
 	 * @param int    $data['mfa_response_data']['verification_code']  TOTP MFA verification code.
@@ -3419,27 +3423,32 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
-		$userid = $db_sessions[0]['userid'];
+		$db_user = ['userid' => $db_sessions[0]['userid']];
+		static::addUserGroupFields($db_user, $group_status);
+
+		if (!$db_user['mfaid']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
+		}
 
 		$db_mfas = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
-			'mfaids' => $data['mfaid']
+			'mfaids' => $db_user['mfaid']
 		]);
 		$mfa = $db_mfas[0];
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
-			'userids' => $userid
+			'userids' => $db_user['userid']
 		]);
-		$db_user = $db_users[0];
+		$db_user = $db_user + $db_users[0];
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
 			$db_user_secrets = DB::select('mfa_totp_secret', [
 				'output' => ['totp_secret'],
-				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']]
 			]);
 
 			if ($db_user_secrets && array_key_exists('totp_secret', $mfa_response)
@@ -3456,11 +3465,11 @@ class CUser extends CApiService {
 			if ($valid_code) {
 				if (!$db_user_secrets) {
 					// Delete any previously saved totp_secret for this specific user.
-					DB::delete('mfa_totp_secret', ['userid' => $userid]);
+					DB::delete('mfa_totp_secret', ['userid' => $db_user['userid']]);
 
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $mfa['mfaid'],
-						'userid' => $userid,
+						'userid' => $db_user['userid'],
 						'totp_secret' => $mfa_response['totp_secret']
 					]]);
 				}
@@ -3516,7 +3525,7 @@ class CUser extends CApiService {
 
 		DBexecute(
 			'DELETE FROM sessions'.
-				' WHERE '.dbConditionId('userid', [$userid]).
+				' WHERE '.dbConditionId('userid', [$db_user['userid']]).
 					' AND '.dbConditionInt('status', [ZBX_SESSION_CONFIRMATION_REQUIRED]).
 					' AND lastaccess<'.zbx_dbstr($outdated)
 		);

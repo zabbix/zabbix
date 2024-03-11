@@ -55,7 +55,7 @@ try {
 	$session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 
 	// If no session data or MFA is not required - redirect to the main login page.
-	if (!$session_data || !array_key_exists('mfaid', $session_data)) {
+	if (!$session_data || !array_key_exists('confirmid', $session_data)) {
 		redirect($redirect_to->toString());
 	}
 
@@ -80,7 +80,6 @@ try {
 
 	$confirm_data = [
 		'sessionid' => CSessionHelper::get('confirmid'),
-		'mfaid' => CSessionHelper::get('mfaid'),
 		'redirect_uri' => implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri])
 	];
 
@@ -118,7 +117,7 @@ try {
 		if ($confirm) {
 			CWebUser::checkAuthentication($confirm['sessionid']);
 			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-			CSessionHelper::unset(['mfaid', 'state', 'username', 'confirmid']);
+			CSessionHelper::unset(['state', 'username', 'confirmid']);
 
 			API::getWrapper()->auth = [
 				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
