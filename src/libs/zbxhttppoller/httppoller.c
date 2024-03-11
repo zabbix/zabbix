@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "httppoller.h"
+#include "zbxhttppoller.h"
 
 #include "zbxdbhigh.h"
 #include "zbxlog.h"

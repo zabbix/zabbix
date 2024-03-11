@@ -35,12 +35,12 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxpoller.h"
+#include "zbxhttppoller.h"
 #include "zbxvmware.h"
 #include "zbxdbsyncer.h"
 #include "zbxtrapper.h"
 
 #include "../zabbix_server/discoverer/discoverer.h"
-#include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller_proxy.h"

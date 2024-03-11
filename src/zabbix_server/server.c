@@ -26,7 +26,6 @@
 #include "postinit/postinit.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
-#include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller_server.h"
@@ -99,6 +98,7 @@
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
 #include "zbxpoller.h"
+#include "zbxhttppoller.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
