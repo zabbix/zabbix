@@ -101,37 +101,39 @@ $item_form_list
 	);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields.
-$headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [json_encode([['name' => '', 'value' => '']])];
+$data['headers'] = [['name' => '', 'value' => '']];
 
 $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[headers]', 'headers_pairs', _('Original')))->setLabel(_('Headers')),
 		(new CDiv([
 			(new CTable())
-				->addStyle('width: 100%;')
+				->setId('headers-table')
+				->setAttribute('style', 'width: 100%;')
 				->setHeader(['', _('Name'), '', _('Value'), ''])
-				->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
-				->setFooter(new CRow(
+				->setFooter(
 					(new CCol(
-						(new CButtonLink(_('Add')))->setAttribute('data-row-action', 'add_row')
+						(new CButtonLink(_('Add')))->addClass('element-table-add')
 					))->setColSpan(5)
-				)),
-			(new CTag('script', true))
-				->setAttribute('type', 'text/x-jquery-tmpl')
-				->addItem(new CRow([
+				),
+			new CTemplateTag('item-header-row-tmpl',
+				(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CTextBox('headers[#{index}][name]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+					(new CTextBox('headers[#{rowNum}][name]', '#{name}'))
+						->removeId()
+						->setAttribute('placeholder', _('name'))
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					RARR(),
-					(new CTextBox('headers[#{index}][value]', '#{value}', false, 2000))
+					(new CTextBox('headers[#{rowNum}][value]', '#{value}', false, 2000))
+						->removeId()
+						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-					(new CButtonLink(_('Remove')))->setAttribute('data-row-action', 'remove_row')
-				])),
-			$headers
+					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+				]))->addClass('form_row')
+			)
 		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('headers_pairs')
-			->setAttribute('data-sortable-pairs-table', '1')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	)
 	// Append value type to form list.
@@ -507,7 +509,6 @@ $form->addItem($tabs);
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('item.massupdate.js.php', $data)));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));
 
 $output = [

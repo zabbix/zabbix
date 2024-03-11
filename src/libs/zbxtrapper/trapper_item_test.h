@@ -17,21 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_REQUEST_H
-#define ZABBIX_TRAPPER_REQUEST_H
+#ifndef ZABBIX_TRAPPER_ITEM_TEST_H
+#define ZABBIX_TRAPPER_ITEM_TEST_H
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
-#include "zbxvault.h"
-#include "zbxdbhigh.h"
+#include "zbxpoller.h"
 
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
-		const zbx_config_vault_t *config_vault, int proxydata_frequency,
-		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
-		zbx_get_config_forks_f get_config_forks);
-
-int	init_proxy_history_lock(unsigned char program_type, char **error);
-void	free_proxy_history_lock(unsigned char program_type);
-
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location);
 #endif

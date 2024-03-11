@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "trapper_auth.h"
+#include "zbxtrapper.h"
 
+#include "zbxjson.h"
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
 

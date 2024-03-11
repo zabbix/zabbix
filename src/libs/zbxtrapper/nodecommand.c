@@ -19,9 +19,9 @@
 
 #include "nodecommand.h"
 
-#include "zbxexpression.h"
-#include "trapper_auth.h"
+#include "zbxtrapper.h"
 
+#include "zbxexpression.h"
 #include "zbxscripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
@@ -30,6 +30,14 @@
 #include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_scripts_constants.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 /**********************************************************************************
  *                                                                                *

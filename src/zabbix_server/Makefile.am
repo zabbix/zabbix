@@ -10,7 +10,6 @@ SUBDIRS = \
 	httppoller \
 	poller \
 	timer \
-	trapper \
 	escalator \
 	operations \
 	postinit \
@@ -23,6 +22,7 @@ SUBDIRS = \
 	lld \
 	reporter \
 	service \
+	trapper \
 	rtc \
 	ha \
 	proxyconfigread
@@ -56,7 +56,7 @@ zabbix_server_LDADD = \
 	actions/libzbxactions.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
-	trapper/libzbxtrapper.a \
+	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \

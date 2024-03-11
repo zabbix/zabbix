@@ -9,6 +9,7 @@ SUBDIRS = \
 	rtc \
 	stats \
 	taskmanager \
+	trapper \
 	proxyconfigwrite \
 	poller
 
@@ -26,8 +27,8 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/zabbix_proxy/poller/libzbxpoller_proxy.a \
-	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
-	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
+	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
+	trapper/libzbxtrapper_proxy.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_proxy.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \

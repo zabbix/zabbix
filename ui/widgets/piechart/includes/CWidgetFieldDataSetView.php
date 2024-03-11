@@ -54,9 +54,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$view = (new CList())
-			->setId('data_sets')
-			->addClass(ZBX_STYLE_SORTABLE_LIST);
+		$view = (new CList())->setId('data_sets');
 
 		$values = $this->field->getValue();
 
@@ -265,11 +263,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
-			(new CLabel(''))
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-				->addClass('js-dataset-label'),
+			(new CLabel(''))->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -336,7 +331,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
-			->addClass(ZBX_STYLE_SORTABLE_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
 			->setAttribute('data-set', $row_num)
 			->setAttribute('data-type', $dataset_type);
@@ -378,8 +372,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			]))
 				->addClass('table-col-action')
 				->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass(ZBX_STYLE_SORTABLE)
-			->addClass('single-item-table-row');
+		]))->addClass('single-item-table-row');
 	}
 }

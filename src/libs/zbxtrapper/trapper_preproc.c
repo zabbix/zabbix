@@ -18,8 +18,9 @@
 **/
 
 #include "trapper_preproc.h"
+#include "zbxtrapper.h"
+
 #include "zbxpreproc.h"
-#include "trapper_auth.h"
 #include "zbxcommshigh.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"

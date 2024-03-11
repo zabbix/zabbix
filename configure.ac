@@ -2078,6 +2078,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile
+	src/libs/zbxtrapper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
@@ -2104,6 +2105,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
+	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/actions/Makefile
