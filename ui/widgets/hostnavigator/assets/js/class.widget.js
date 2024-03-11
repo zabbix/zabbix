@@ -50,40 +50,7 @@ class CWidgetHostNavigator extends CWidget {
 
 	setContents(response) {
 		if (this.#host_navigator === null) {
-			const severities = [
-				{
-					name: t('Not classified'),
-					class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
-					class_status: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG
-				},
-				{
-					name: t('Information'),
-					class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
-					class_status: ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG
-				},
-				{
-					name: t('Warning'),
-					class: ZBX_STYLE_SEVERITY_WARNING_BG,
-					class_status: ZBX_STYLE_SEVERITY_WARNING_STATUS_BG
-				},
-				{
-					name: t('Average'),
-					class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
-					class_status: ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG
-				},
-				{
-					name: t('High'),
-					class: ZBX_STYLE_SEVERITY_HIGH_BG,
-					class_status: ZBX_STYLE_SEVERITY_HIGH_STATUS_BG
-				},
-				{
-					name: t('Disaster'),
-					class: ZBX_STYLE_SEVERITY_DISASTER_BG,
-					class_status: ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG
-				}
-			]
-
-			this.#host_navigator = new CHostNavigator(response.config, severities);
+			this.#host_navigator = new CHostNavigator(response.config);
 
 			this._body.appendChild(this.#host_navigator.getContainer());
 

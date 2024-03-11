@@ -85,12 +85,11 @@ class CHostNavigator {
 	#selected_host_id = '';
 
 	/**
-	 * @param {Object} config      Widget configuration.
-	 * @param {Array}  severities  All severities and their info.
+	 * @param {Object} config  Widget configuration.
 	 */
-	constructor(config, severities) {
+	constructor(config) {
 		this.#config = config;
-		this.#severities = severities;
+		this.#severities = this.#getSeverities();
 
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CHostNavigator.ZBX_STYLE_CLASS);
@@ -166,6 +165,46 @@ class CHostNavigator {
 	 */
 	destroy() {
 		this.#container.remove();
+	}
+
+	/**
+	 * Severity classifier.
+	 *
+	 * @returns {Array}  All severities with necessary info.
+	 */
+	#getSeverities() {
+		return [
+			{
+				name: t('Not classified'),
+				class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
+				class_status: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG
+			},
+			{
+				name: t('Information'),
+				class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
+				class_status: ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG
+			},
+			{
+				name: t('Warning'),
+				class: ZBX_STYLE_SEVERITY_WARNING_BG,
+				class_status: ZBX_STYLE_SEVERITY_WARNING_STATUS_BG
+			},
+			{
+				name: t('Average'),
+				class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
+				class_status: ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG
+			},
+			{
+				name: t('High'),
+				class: ZBX_STYLE_SEVERITY_HIGH_BG,
+				class_status: ZBX_STYLE_SEVERITY_HIGH_STATUS_BG
+			},
+			{
+				name: t('Disaster'),
+				class: ZBX_STYLE_SEVERITY_DISASTER_BG,
+				class_status: ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG
+			}
+		];
 	}
 
 	/**
