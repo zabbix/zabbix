@@ -93,7 +93,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 		}
 		unset($item);
 
-		$result = [
+		return [
 			[
 				[],
 				[]
@@ -129,13 +129,6 @@ class C64ImportConverterTest extends CImportConverterTest {
 				]
 			]
 		];
-
-		foreach ($expected_items as &$item) {
-			unset($item['history']);
-		}
-		unset($item);
-
-		return $result;
 	}
 
 	public function importConverterDataProviderExpressionHistoryFunction(): array {
