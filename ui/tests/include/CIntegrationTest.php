@@ -377,8 +377,12 @@ class CIntegrationTest extends CAPITest {
 	 */
 	private static function checkPidKilled($component) {
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+			var_dump("[checkPidKilled] component ", $component);
 			if (!file_exists(self::getPidPath($component))) {
+				var_dump("[checkPidKilled] component ", $component, "IS killed");
 				return true;
+			} else {
+				var_dump("[checkPidKilled] component ", $component, "is NOT killed");
 			}
 
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
@@ -586,6 +590,9 @@ class CIntegrationTest extends CAPITest {
 
 		$background = ($component === self::COMPONENT_AGENT2);
 
+		var_dump("startComponent", $component);
+		var_dump(floor(microtime(true) * 1000));
+
 		$bin_path = $component === self::COMPONENT_SERVER_HANODE1
 			? PHPUNIT_BINARY_DIR.'zabbix_'.self::COMPONENT_SERVER
 			: PHPUNIT_BINARY_DIR.'zabbix_'.$component;
@@ -606,15 +613,24 @@ class CIntegrationTest extends CAPITest {
 
 		$child_pids = [];
 		$pid = @file_get_contents(self::getPidPath($component));
+		var_dump("[stopComponent] pid file contents: ", $pid);
 
 		if ($pid !== false && is_numeric($pid)) {
 			$output = shell_exec('pgrep -P '.$pid);
+			var_dump('[stopComponent] inside if');
+			var_dump("[stopComponent] pgrep -P output: ", $output);
 			if ($output !== false && $output !== null) {
 				$child_pids = explode("\n", $output);
 			}
+			var_dump("[stopComponent] child pids: ", $child_pids);
 
-			posix_kill($pid, SIGTERM);
+			$rc = posix_kill($pid, SIGTERM);
+			var_dump('[stopComponent[ posix_kill rc = ', $rc);
+			var_dump('[stopComponent] killed at:', floor(microtime(true) * 1000));
+		} else {
+			var_dump('[stopComponent] not inside if');
 		}
+
 		self::waitForShutdown($component, $child_pids);
 	}
 
