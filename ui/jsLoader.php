@@ -439,6 +439,10 @@ $translate_strings = [
 		'Open URL' => _('Open URL'),
 		'Unexpected server error.' => _('Unexpected server error.'),
 		'URL opening confirmation' => _('URL opening confirmation')
+	],
+	'class.navigationtree.js' => [
+		'Maintenance without data collection' => _('Maintenance without data collection'),
+		'Maintenance with data collection' => _('Maintenance with data collection')
 	]
 ];
 
