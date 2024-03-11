@@ -2723,7 +2723,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_INTERFACE	*interface;
 
 	time_t			now;
-	unsigned char		status, type, value_type, old_poller_type;
+	unsigned char		status, type, value_type, old_poller_type, item_flags;
 	int			found, update_index, ret, i,  old_nextcheck;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
@@ -2747,6 +2747,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
+
+		item_flags = (unsigned char)atoi(row[18]);
+
+		/* item prototype does not have item_rtdata and shouldn't be present in sync */
+		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
+				item_flags != ZBX_FLAG_DISCOVERY_RULE)
+		{
+			continue;
+		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
@@ -2794,7 +2803,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		/* store new information in item structure */
 
 		item->hostid = hostid;
-		item->flags = (unsigned char)atoi(row[18]);
+		item->flags = item_flags;
 		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
 		if (SUCCEED != is_time_suffix(row[22], &item->history_sec, ZBX_LENGTH_UNLIMITED))
@@ -5989,10 +5998,48 @@ static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items
 				items->values[i]->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
 		}
 
-		if (0 != items->values_num)
+		if (0 != vc_items.values_num)
 			zbx_vc_add_new_items(&vc_items);
 
 		zbx_vector_uint64_pair_destroy(&vc_items);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add new items with triggers to trend cache                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
+{
+	if (0 != items->values_num)
+	{
+		zbx_vector_uint64_t	itemids;
+		int			i;
+
+		zbx_vector_uint64_create(&itemids);
+		zbx_vector_uint64_reserve(&itemids, (size_t)items->values_num);
+
+		for (i = 0; i < items->values_num; i++)
+		{
+			ZBX_DC_ITEM	*item = items->values[i];
+
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
+			{
+				ZBX_DC_NUMITEM	*numitem;
+
+				numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &item->itemid);
+
+				if (NULL != numitem && 0 != numitem->trends)
+					zbx_vector_uint64_append(&itemids, items->values[i]->itemid);
+			}
+
+		}
+
+		if (0 != itemids.values_num)
+			zbx_trend_add_new_items(&itemids);
+
+		zbx_vector_uint64_destroy(&itemids);
 	}
 }
 
@@ -6324,6 +6371,7 @@ void	DCsync_configuration(unsigned char mode)
 	if (NULL != pnew_items)
 	{
 		dc_add_new_items_to_valuecache(pnew_items);
+		dc_add_new_items_to_trends(pnew_items);
 		zbx_vector_dc_item_ptr_clear(pnew_items);
 	}
 
@@ -11140,7 +11188,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	now = time(NULL);
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
@@ -11155,12 +11203,14 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (SUCCEED != zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
 			continue;
 
+		if (now - dc_item->nextcheck < from || (ZBX_QUEUE_TO_INFINITY != to && now - dc_item->nextcheck >= to))
+			continue;
+
 		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
-
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
@@ -11191,9 +11241,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 		}
 
-		if (now - dc_item->nextcheck < from || (ZBX_QUEUE_TO_INFINITY != to && now - dc_item->nextcheck >= to))
-			continue;
-
 		if (NULL != queue)
 		{
 			queue_item = (zbx_queue_item_t *)zbx_malloc(NULL, sizeof(zbx_queue_item_t));
@@ -11207,7 +11254,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		nitems++;
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	return nitems;
 }
