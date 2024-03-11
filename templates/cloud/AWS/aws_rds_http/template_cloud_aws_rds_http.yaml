@@ -510,6 +510,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -534,13 +535,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -681,9 +682,9 @@ zabbix_export:
             		},
             			result = [];
             
-            		while (payload.nextToken !== '') {
+            		while (payload.NextToken !== '') {
             			var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
-            			payload.nextToken = alarms.nextToken || '';
+            			payload.NextToken = alarms.NextToken || '';
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
@@ -757,6 +758,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -781,13 +783,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -995,6 +997,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -1019,13 +1022,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1213,6 +1216,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -1237,13 +1241,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -2145,7 +2149,7 @@ zabbix_export:
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: aab5aaf6e27740c6ac92f5494b3aef4b
-              name: 'AWS RDS Alarms: ["{#ALARM_NAME}"]: State'
+              name: 'AWS RDS Alarms: [{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.rds.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -2176,13 +2180,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7d87b8d84fef4aff8aa9c0fd49e49619
                   expression: 'last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS RDS Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
+                  name: 'AWS RDS Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 6e95f834b2284447b5ab0f6516d29946
-              name: 'AWS RDS Alarms: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS RDS Alarms: [{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.rds.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -2209,7 +2213,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 0f70f3d91d9c403c9d4c3cfb3283865f
               expression: 'last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS RDS Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
+              name: 'AWS RDS Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -2227,6 +2231,7 @@ zabbix_export:
                   var alarms = JSON.parse(value);
                   
                   alarms.forEach(function (alarm) {
+                  
                   	result.push({
                   		'{#ALARM_DESCRIPTION}': alarm.AlarmDescription !== null ? alarm.AlarmDescription : 'None',
                   		'{#ALARM_NAME}': alarm.AlarmName,
@@ -3222,10 +3227,10 @@ zabbix_export:
           description: 'RDS DB Instance identifier.'
         - macro: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable alarms by namespace.'
+          description: 'Filter of discoverable alarms by name.'
         - macro: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered alarms by namespace.'
+          description: 'Filter to exclude discovered alarms by name.'
         - macro: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by namespace.'

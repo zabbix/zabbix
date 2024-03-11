@@ -8,10 +8,8 @@ SUBDIRS = \
 	events \
 	housekeeper \
 	httppoller \
-	pinger \
 	poller \
 	timer \
-	trapper \
 	escalator \
 	operations \
 	postinit \
@@ -24,6 +22,7 @@ SUBDIRS = \
 	lld \
 	reporter \
 	service \
+	trapper \
 	rtc \
 	ha \
 	proxyconfigread
@@ -33,8 +32,7 @@ sbin_PROGRAMS = zabbix_server
 noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
-	db_lengths_constants.h \
-	zbxreport.h
+	db_lengths_constants.h
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
@@ -49,18 +47,18 @@ zabbix_server_SOURCES = \
 
 zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	actions/libzbxactions.a \
-	pinger/libzbxpinger.a \
-	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
-	trapper/libzbxtrapper.a \
+	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_server.a \
+	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \

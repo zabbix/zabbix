@@ -248,4 +248,11 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 
 		COverlayDialogElement::find()->one()->close();
 	}
+
+	/**
+	 * @dataProvider getItemsParametersData
+	 */
+	public function testFormPreprocessingItem_CheckParametersPlaceholders($data) {
+		$this->checkParameters($data);
+	}
 }

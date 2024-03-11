@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->addJsFile('d3.v7.min.js');
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -53,11 +53,10 @@ $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))

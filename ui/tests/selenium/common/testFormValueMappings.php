@@ -49,8 +49,8 @@ class testFormValueMappings extends CWebTest {
 		[
 			'Name' => 'Valuemap for delete',
 			'Value' => "=1010101010101010101010101010101\n⇒\ndefault value1010101010101010101010101010101".
-					"\n424242424242424242424242424242424242424242424242\n⇒\nAnswer to the Ultimate Question of Life, ".
-					"Universe and Everything\n123458945-987653341\n⇒\nfrom 123458945 to 987653341\n…",
+				"\n424242424242424242424242424242424242424242424242\n⇒\nAnswer to the Ultimate Question of Life, ".
+				"Universe and Everything\n123458945-987653341\n⇒\nfrom 123458945 to 987653341\n…",
 			'Action' => 'Remove'
 		],
 		[
@@ -94,7 +94,7 @@ class testFormValueMappings extends CWebTest {
 		$this->assertEquals('64', $mapping_form->query('id:name')->one()->getAttribute('maxlength'));
 
 		// Check mappings table layout.
-		$mappings_table = $mapping_form->query('id:mappings_table')->asTable()->one();
+		$mappings_table = $mapping_form->query('id:mappings-table')->asTable()->one();
 		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', 'Action', ''], $mappings_table->getHeadersText());
 		$row = $mappings_table->getRow(0);
 		foreach (['Value', 'Mapped to'] as $mapping_column) {
@@ -106,7 +106,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check types.
 		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
-		$dropdown = $row->query('name:mappings[1][type]')->asDropdown()->one();
+		$dropdown = $row->query('name:mappings[0][type]')->asDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
 
@@ -123,10 +123,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that both overlay control buttons are clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
-
-		$dialog->close();
-		COverlayDialogElement::find()->one()->close();
+			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 	}
 
 	/**
@@ -836,14 +833,13 @@ class testFormValueMappings extends CWebTest {
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
 			: 'link:'.($expected === TEST_GOOD ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
-		))->one()->click();
+			))->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
-		$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
-		$form = $dialog->asForm();
-		$form->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
+		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
 
-		$mapping_table = $form->query('id:mappings_table')->asMultifieldTable()->one();
+		$mapping_table = $dialog->query('id:mappings-table')->asMultifieldTable()->one();
 		if (CTestArrayHelper::get($data, 'remove_all')) {
 			$mapping_table->clear();
 		}
@@ -854,13 +850,11 @@ class testFormValueMappings extends CWebTest {
 			}
 			$mapping_table->fill($data['mappings']);
 		}
-		$form->submit();
+		$dialog->submit();
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error_details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-
-			$dialog->close();
 		}
 		else {
 			// Save the configuration of the host with created/updated value mappings.
@@ -884,29 +878,19 @@ class testFormValueMappings extends CWebTest {
 				$this->page->removeFocus();
 				$this->page->updateViewport();
 
-				$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-
 				// Take a screenshot to test draggable object position in overlay dialog.
 				if ($action === 'create') {
-					$this->assertScreenshot($mapping_dialog->query('id:mappings_table')->asMultifieldTable()->one(),
-							'Value mappings popup'.$data['screenshot_id']);
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+					$this->assertScreenshot($dialog->query('id:mappings-table')->asMultifieldTable()->one(),
+						'Value mappings popup'.$data['screenshot_id']);
 				}
-
-				$mapping_dialog->close();
-				COverlayDialogElement::find()->one()->close();
 
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->one(),
-						$action.$source.$data['screenshot_id']);
+					$action.$source.$data['screenshot_id']);
 				COverlayDialogElement::find()->one()->close();
 			}
-		}
-
-		$dialogs = COverlayDialogElement::find()->all();
-		$count = $dialogs->count();
-		for ($i = $count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close();
 		}
 	}
 
@@ -917,7 +901,7 @@ class testFormValueMappings extends CWebTest {
 	 */
 	private function checkMappings($data) {
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
-		$mappings_table = $this->query('id:mappings_table')->asMultifieldTable()->one();
+		$mappings_table = $this->query('id:mappings-table')->asMultifieldTable()->one();
 
 		// Check value mapping name.
 		$this->assertEquals($data['name'], $dialog->query('xpath:.//input[@id="name"]')->one()->getValue());
@@ -972,7 +956,7 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkSimpleUpdate($source) {
 		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
-				' ORDER BY v.name, v.valuemapid, vm.sortorder';
+			' ORDER BY v.name, v.valuemapid, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open configuration of a value mapping and save it without making any changes.
@@ -1014,7 +998,7 @@ class testFormValueMappings extends CWebTest {
 		];
 
 		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
-				' ORDER BY v.name, v.valuemapid, vm.sortorder';
+			' ORDER BY v.name, v.valuemapid, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open value mapping configuration and update its fields.
@@ -1022,7 +1006,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query('link', self::UPDATE_VALUEMAP2)->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($fields['name']);
-		$dialog->query('id:mappings_table')->asMultifieldTable()->one()->fill($fields['mappings']);
+		$dialog->query('id:mappings-table')->asMultifieldTable()->one()->fill($fields['mappings']);
 
 		// Submit the value mapping configuration dialog, but Cancel the update of the host/template.
 		$dialog->submit()->waitUntilNotVisible();
@@ -1095,7 +1079,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query('name:valuemap_add')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($valuemap['name']);
-		$dialog->query('id:mappings_table')->asMultifieldTable()->one()->fill($valuemap['mappings']);
+		$dialog->query('id:mappings-table')->asMultifieldTable()->one()->fill($valuemap['mappings']);
 		$dialog->submit()->waitUntilNotVisible();
 
 		// Submit host/template configuration and wait for the error message to appear.
@@ -1105,8 +1089,6 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
-
-		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -1118,22 +1100,17 @@ class testFormValueMappings extends CWebTest {
 		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'zabbix.php?action=template.list')->waitUntilReady();
 		$this->selectTableRows();
 		$this->query('button:Mass update')->one()->click();
-		$update_dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$update_form = $update_dialog->asForm();
+		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$update_form->selectTab('Value mapping');
 		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
 		$update_form->query('id:valuemap_add')->one()->click();
-		$mapping_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$mapping_form = $mapping_dialog->asForm();
+		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 
 		// Take a screenshot to test draggable object position of value mapping field.
 		$this->page->removeFocus();
 
 		// It is necessary because of unexpected viewport shift.
 		$this->page->updateViewport();
-		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilVisible()->one(), 'Value mapping mass update');
-
-		$mapping_dialog->close();
-		$update_dialog->close();
+		$this->assertScreenshot($mapping_form->query('id:mappings-table')->waitUntilVisible()->one(), 'Value mapping mass update');
 	}
 }

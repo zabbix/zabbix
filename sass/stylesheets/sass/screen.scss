@@ -1437,12 +1437,12 @@ select {
 
 .ui-draggable {
 	.dashboard-widget-head {
-		@extend %cursor-drag;
+		cursor: grab;
 	}
 
 	&.ui-draggable-dragging {
 		.dashboard-widget-head {
-			@extend %cursor-dragging;
+			cursor: grabbing;
 		}
 	}
 }
@@ -2856,18 +2856,8 @@ $browser-logos: (
 	}
 }
 
-%cursor-drag {
-	cursor: move; // fallback if grab cursor is unsupported
-	cursor: grab;
-}
-
-%cursor-dragging {
-	cursor: move; // fallback if grabbing cursor is unsupported
-	cursor: grabbing;
-}
-
 .cursor-dragging {
-	@extend %cursor-dragging;
+	cursor: grabbing;
 }
 
 .cursor-move {
@@ -3070,6 +3060,31 @@ svg {
 
 .visibility-box-caption {
 	line-height: 24px;
+}
+
+.drag-icon {
+	@extend .zi-drag-handle;
+	@extend %icon-position;
+	@extend %drag-icon-enabled;
+
+	width: 12px;
+	height: $body-line-height;
+
+	&::before {
+		@extend %icons-font;
+
+		font-size: 22px;
+	}
+}
+
+%drag-icon-enabled {
+	cursor: grab;
+	color: $btn-icon-color;
+}
+
+%drag-icon-disabled {
+	cursor: unset;
+	color: $btn-icon-disabled-color;
 }
 
 .preprocessing-list {

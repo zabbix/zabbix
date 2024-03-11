@@ -140,7 +140,7 @@ class ItemValueWidget {
 			]
 		]);
 
-		$response = CDataHelper::call('dashboard.create', [
+		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Single Item value Widget test',
 				'pages' => [
@@ -262,7 +262,7 @@ class ItemValueWidget {
 				]
 			],
 			[
-				'name' => 'Item value widget: Dashboard for zoom filter check',
+				'name' => 'Dashboard for zoom filter check',
 				'pages' => [
 					[
 						'name' => 'Page with widgets'
@@ -270,7 +270,7 @@ class ItemValueWidget {
 				]
 			],
 			[
-				'name' => 'Item value widget: Dashboard for threshold(s) check',
+				'name' => 'Dashboard for threshold(s) check',
 				'pages' => [
 					[
 						'name' => 'Page with widgets'
@@ -288,7 +288,7 @@ class ItemValueWidget {
 								'name' => 'Widget for aggregation function data check',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[
@@ -303,16 +303,10 @@ class ItemValueWidget {
 				]
 			]
 		]);
-		$dashboardid = $response['dashboardids'][0];
-		$dashboard_zoom = $response['dashboardids'][1];
-		$dashboard_threshold = $response['dashboardids'][2];
-		$dashboard_aggregation = $response['dashboardids'][3];
+		$dashboardids = CDataHelper::getIds('name');
 
 		return [
-			'dashboardid' => $dashboardid,
-			'dashboard_zoom' => $dashboard_zoom,
-			'dashboard_threshold' => $dashboard_threshold,
-			'dashboard_aggregation' => $dashboard_aggregation,
+			'dashboardids' => $dashboardids,
 			'itemids' => $itemids
 		];
 	}

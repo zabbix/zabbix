@@ -2032,7 +2032,7 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);

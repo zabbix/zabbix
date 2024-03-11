@@ -244,7 +244,7 @@ class testPageHostGroups extends testPageGroups {
 				[
 					'Name' => ' enabled ',
 					'expected' => ['Group with enabled host testPageHostGroup',
-						'Group with two enabled hosts testPageHostGroup', 'ZBX6648 Enabled Triggers'
+						'Group with two enabled hosts testPageHostGroup'
 					]
 				]
 			],

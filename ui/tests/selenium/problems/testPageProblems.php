@@ -1529,6 +1529,7 @@ class testPageProblems extends CWebTest {
 			$this->query('button:Apply')->one()->click();
 		}
 
+		$this->page->waitUntilReady();
 		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
@@ -1583,8 +1584,8 @@ class testPageProblems extends CWebTest {
 				else {
 					$this->assertTrue($tick->exists());
 					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
-					$action_dialog = $this->query($dialog_selector)->waitUntilVisible()->one();
-					$this->assertTableData($action, 'xpath://div[@class="overlay-dialogue"]//table');
+					$action_dialog = $this->query($dialog_selector)->asOverlayDialog()->waitUntilReady()->one();
+					$this->assertTableData($action, $dialog_selector.'//table');
 					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					$action_dialog->waitUntilNotPresent();
 				}

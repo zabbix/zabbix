@@ -84,6 +84,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -108,13 +109,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -284,9 +285,9 @@ zabbix_export:
             		},
             			result = [];
             
-            		while (payload.nextToken !== '') {
+            		while (payload.NextToken !== '') {
             			var alarms = AWS.getField(AWS.request('alarms', 'GET', region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
-            			payload.nextToken = alarms.nextToken || '';
+            			payload.NextToken = alarms.NextToken || '';
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
@@ -363,6 +364,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 2 * 86400,
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -387,13 +389,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -748,7 +750,7 @@ zabbix_export:
           description: 'Discovery of bucket alarms.'
           item_prototypes:
             - uuid: b38bd6e4566445acb52e8ecce4014f0f
-              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State'
+              name: 'AWS S3 Alarms: [{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.s3.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -779,13 +781,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7f0ba96047784510b734c0064d434edc
                   expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
+                  name: 'AWS S3 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 7e536a43faf742058d303ffe21cd9a8c
-              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS S3 Alarms: [{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.s3.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -812,7 +814,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: c1b94199b7ac4cc9889ff0e724f7057d
               expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
+              name: 'AWS S3 Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -1070,7 +1072,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: eabbd51547cb4a0484182d42601728c3
-              name: 'AWS S3: Filter ["{#AWS.S3.FILTER.ID.NAME}"]: Get request metrics'
+              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Get request metrics'
               type: SCRIPT
               key: 'aws.s3.get_metrics["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '{$AWS.S3.UPDATE.INTERVAL}'
@@ -1080,6 +1082,7 @@ zabbix_export:
               params: |
                 var AWS = {
                 	params: {},
+                	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
                 
                 	getField: function (data, path) {
                 		var steps = path.split('.');
@@ -1112,13 +1115,13 @@ zabbix_export:
                 			case 'role_base':
                 				AWS.params['auth_type'] = 'role_base';
                 				var request = new HttpRequest(),
-                					IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                					IamRoleName = request.get(AWS.metadata);
                 
                 				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                 					throw 'Error getting security credentials from instance metadata. Role not found.';
                 				}
                 
-                				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+                				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
                 
                 				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
                 					throw 'Error getting security credentials from instance metadata.';

@@ -32,6 +32,7 @@
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 ZBX_PTR_VECTOR_IMPL(action_eval_ptr, zbx_action_eval_t *)
+ZBX_PTR_VECTOR_IMPL(queue_item_ptr, zbx_queue_item_t *)
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
@@ -98,6 +99,13 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 			dst_item->trends_period = NULL;
 			dst_item->units = NULL;
 	}
+
+	/* check also for update_triggers flag to avoid race condition when value is being added */
+	/* after item has been synced but before triggers are linked to it                       */
+	if (NULL != src_item->triggers || 0 != src_item->update_triggers)
+		dst_item->has_trigger = 1;
+	else
+		dst_item->has_trigger = 0;
 }
 
 /******************************************************************************
@@ -114,11 +122,8 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	{
 		zbx_dc_expand_user_and_func_macros(um_handle, &item->trends_period, &item->host.hostid, 1, NULL);
 
-		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
-			item->trends_sec = ZBX_HK_PERIOD_MAX;
-
-		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->trends_global)
-			item->trends_sec = config_hk->trends;
+		item->trends_sec = zbx_dc_config_history_get_trends_sec(item->trends_period, config_hk->trends_global,
+				config_hk->trends);
 
 		item->trends = (0 != item->trends_sec);
 	}
@@ -226,6 +231,19 @@ void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int 
 		zbx_free(items[i].history_period);
 		zbx_free(items[i].trends_period);
 	}
+}
+
+int	zbx_dc_config_history_get_trends_sec(const char *trends_period, int trends_global, int hk_trends)
+{
+	int	trends_sec;
+
+	if (SUCCEED != zbx_is_time_suffix(trends_period, &trends_sec, ZBX_LENGTH_UNLIMITED))
+		trends_sec = ZBX_HK_PERIOD_MAX;
+
+	if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == trends_global)
+		trends_sec = hk_trends;
+
+	return trends_sec;
 }
 
 void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids)

@@ -188,8 +188,8 @@ class TabIndicatorFactory {
 				return new EncryptionTabIndicatorItem;
 			case 'Filters':
 				return new FiltersTabIndicatorItem;
-			case 'FrontendMessage':
-				return new FrontendMessageTabIndicatorItem;
+			case 'FrontendNotifications':
+				return new FrontendNotificationsTabIndicatorItem;
 			case 'GraphAxes':
 				return new GraphAxesTabIndicatorItem;
 			case 'GraphDataset':
@@ -726,7 +726,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#preprocessing .preprocessing-list-item:not(.ui-sortable-placeholder)')
+			.querySelectorAll('#preprocessing .preprocessing-list-item')
 			.length;
 	}
 
@@ -1249,7 +1249,7 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
+class FrontendNotificationsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1754,6 +1754,12 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend = document.getElementById('legend');
 
 		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_value = document.getElementById('legend_value');
+
+		if (legend_value !== null && legend_value.checked) {
 			return true;
 		}
 
