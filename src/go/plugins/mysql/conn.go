@@ -233,7 +233,7 @@ func (c *ConnManager) create(ck connKey) (*MyConn, error) {
 }
 
 // getConn concurrent connections cache getter.
-func (c *ConnManager) getConn(ck connKey) *MyConn {
+func (c *ConnManager) getConn(ck connKey) *MyConn { //nolint:gocritic
 	c.connectionsMu.RLock()
 	defer c.connectionsMu.RUnlock()
 
@@ -246,7 +246,7 @@ func (c *ConnManager) getConn(ck connKey) *MyConn {
 }
 
 // setConn concurrent connections cache setter.
-func (c *ConnManager) setConn(ck connKey, conn *MyConn) {
+func (c *ConnManager) setConn(ck connKey, conn *MyConn) { //nolint:gocritic
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 

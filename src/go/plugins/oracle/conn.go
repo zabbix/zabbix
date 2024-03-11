@@ -36,6 +36,8 @@ import (
 	"github.com/omeid/go-yarn"
 )
 
+var errInvalidPrivilege = errs.New("invalid connection privilege")
+
 type OraClient interface {
 	Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error)
 	QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error)
@@ -258,7 +260,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 // getConn concurrent cached connection getter.
 // Attempts to retrieve a connection from cache by its connDetails.
 // Returns nil if no connection associated with the given connDetails is found.
-func (c *ConnManager) getConn(cd connDetails) *OraConn {
+func (c *ConnManager) getConn(cd connDetails) *OraConn { //nolint:gocritic
 	c.connectionsMu.RLock()
 	defer c.connectionsMu.RUnlock()
 
@@ -271,7 +273,7 @@ func (c *ConnManager) getConn(cd connDetails) *OraConn {
 }
 
 // setConn concurrent cached connection setter.
-func (c *ConnManager) setConn(cd connDetails, conn *OraConn) {
+func (c *ConnManager) setConn(cd connDetails, conn *OraConn) { //nolint:gocritic
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 
@@ -279,7 +281,7 @@ func (c *ConnManager) setConn(cd connDetails, conn *OraConn) {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) {
+func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) { //nolint:gocritic
 	conn := c.getConn(cd)
 	if conn != nil {
 		conn.updateAccessTime()
@@ -309,7 +311,8 @@ func getConnParams(privilege string) (godror.ConnParams, error) {
 		out.IsSysASM = true
 	case "":
 	default:
-		return godror.ConnParams{}, fmt.Errorf("incorrect privilege, %s", privilege)
+		return godror.ConnParams{},
+			errs.Wrapf(errInvalidPrivilege, "unknown privilege %s", privilege)
 	}
 
 	return out, nil
