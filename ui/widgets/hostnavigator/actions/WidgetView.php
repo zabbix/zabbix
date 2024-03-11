@@ -134,9 +134,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => [$hostid],
 				'severities' => $this->fields_values['severities'] ?: null,
 				'filter' => [
-					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
-						? null
-						: $this->fields_values['status'],
 					'maintenance_status' => $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
 						? null
 						: HOST_MAINTENANCE_STATUS_OFF
@@ -152,7 +149,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$is_limit_exceeded = false;
 
-		if (count($hosts) > $this->fields_values['show_lines']) {
+		if (!$this->isTemplateDashboard() && count($hosts) > $this->fields_values['show_lines']) {
 			$is_limit_exceeded = true;
 			array_pop($hosts);
 		}

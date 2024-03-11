@@ -65,8 +65,9 @@ class WidgetForm extends CWidgetForm {
 				? null
 				: new CWidgetFieldHostPatternSelect('hosts', _('Hosts'))
 			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('status', _('Host status'), [
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldRadioButtonList('status', _('Host status'), [
 					self::HOST_STATUS_ANY => _('Any'),
 					self::HOST_STATUS_ENABLED => _('Enabled'),
 					self::HOST_STATUS_DISABLED => _('Disabled')
@@ -101,8 +102,9 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldHostGrouping('group_by', _('Group by'))
 			)
-			->addField(
-				(new CWidgetFieldIntegerBox('show_lines', _('Host limit'), 1, 9999))
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldIntegerBox('show_lines', _('Host limit'), 1, 9999))
 					->setDefault(ZBX_MAX_WIDGET_LINES)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)

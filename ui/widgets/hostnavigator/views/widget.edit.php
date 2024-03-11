@@ -45,8 +45,9 @@ $hosts_field = array_key_exists('hosts', $data['fields'])
 $form
 	->addField($groupids_field)
 	->addField($hosts_field)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['status'])
+	->addField(array_key_exists('status', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['status'])
+		: null
 	)
 	->addField(array_key_exists('host_tags_evaltype', $data['fields'])
 		? new CWidgetFieldRadioButtonListView($data['fields']['host_tags_evaltype'])
@@ -68,7 +69,8 @@ $form
 	->addField(
 		new CWidgetFieldHostGroupingView($data['fields']['group_by'])
 	)
-	->addField(
-		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
+	->addField(array_key_exists('show_lines', $data['fields'])
+		? new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
+		: null
 	)
 	->show();
