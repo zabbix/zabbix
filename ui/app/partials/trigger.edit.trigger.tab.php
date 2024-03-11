@@ -290,7 +290,7 @@ $trigger_form_grid
 		)
 	]);
 
-$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED
+$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('triggerDiscovery', $data)
 		&& $data['triggerDiscovery'] && $data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
 	: null;
