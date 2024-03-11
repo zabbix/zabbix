@@ -93,7 +93,7 @@
 	}
 
 	.navigation-tree-node-info-name {
-		height: 14px;
+		height: 16px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -103,6 +103,8 @@
 		> .navigation-tree-node-info {
 			.navigation-tree-node-info-name {
 				font-style: italic;
+				padding-left: 0.2em;
+				padding-right: 0.2em;
 			}
 		}
 	}

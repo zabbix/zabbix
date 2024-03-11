@@ -3138,12 +3138,14 @@ output {
 .navigation-tree .navigation-tree-node-is-opened > .navigation-tree-node-children {
   display: block; }
 .navigation-tree .navigation-tree-node-info-name {
-  height: 14px;
+  height: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; }
 .navigation-tree .navigation-tree-group-uncategorized > .navigation-tree-node-info .navigation-tree-node-info-name {
-  font-style: italic; }
+  font-style: italic;
+  padding-left: 0.2em;
+  padding-right: 0.2em; }
 .navigation-tree .navigation-tree-node-info-problems {
   display: flex; }
 
