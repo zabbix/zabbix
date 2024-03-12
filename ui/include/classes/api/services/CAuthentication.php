@@ -79,7 +79,7 @@ class CAuthentication extends CApiService {
 	public static function getPublic(): array {
 		$output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 			'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status', 'disabled_usrgrpid',
-			'mfa_status', 'mfaid'
+			'mfa_status', 'mfaid', 'ldap_userdirectoryid'
 		];
 
 		return DB::select('config', ['output' => $output_fields])[0];

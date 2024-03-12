@@ -2443,8 +2443,8 @@ class CUser extends CApiService {
 			if (array_key_exists(0, $userdirectoryids)) {
 				unset($userdirectoryids[0]);
 
-				if (CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID) != 0) {
-					$userdirectoryids[CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
+				if (CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID) != 0) {
+					$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
 				}
 			}
 
