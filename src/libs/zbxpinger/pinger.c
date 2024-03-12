@@ -577,7 +577,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(pinger_thread, args)
+ZBX_THREAD_ENTRY(zbx_pinger_thread, args)
 {
 	int			nextcheck, sleeptime, itc, items_count = 0,
 				server_num = ((zbx_thread_args_t *)args)->info.server_num,

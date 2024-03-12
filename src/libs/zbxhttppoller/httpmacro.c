@@ -21,20 +21,18 @@
 
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-
-#define REGEXP_PREFIX		"regex:"
-#define REGEXP_PREFIX_SIZE	ZBX_CONST_STRLEN(REGEXP_PREFIX)
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two macros by name                                        *
+ * Purpose: compares two macros by name                                       *
  *                                                                            *
- * Parameters: d1 - [IN] the first macro                                      *
- *             d2 - [IN] the second macro                                     *
+ * Parameters: d1 - [IN] first macro                                          *
+ *             d2 - [IN] second macro                                         *
  *                                                                            *
- * Return value: <0 - the first macro name is 'less' than second              *
- *                0 - the macro names are equal                               *
- *               >0 - the first macro name is 'greater' than second           *
+ * Return value: <0 - first macro name is 'less' than second                  *
+ *                0 - macro names are equal                                   *
+ *               >0 - first macro name is 'greater' than second               *
  *                                                                            *
  ******************************************************************************/
 static int 	httpmacro_cmp_func(const void *d1, const void *d2)
@@ -47,21 +45,21 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: appends key/value pair to the http test macro cache.              *
+ * Purpose: Appends key/value pair to the HTTP test macro cache.              *
  *          If the value format is 'regex:<pattern>', then regular expression *
  *          match is performed against the supplied data value and specified  *
  *          pattern. The first captured group is assigned to the macro value. *
  *                                                                            *
- * Parameters: httptest - [IN/OUT] the http test data                         *
- *             pkey     - [IN] a pointer to the macro name (key) data         *
- *             nkey     - [IN] the macro name (key) size                      *
- *             pvalue   - [IN] a pointer to the macro value data              *
- *             nvalue   - [IN] the value size                                 *
- *             data     - [IN] the data for regexp matching (optional)        *
- *             err_str  - [OUT] the error message (optional)                  *
+ * Parameters: httptest - [IN/OUT] HTTP test data                             *
+ *             pkey     - [IN] pointer to macro name (key) data               *
+ *             nkey     - [IN] macro name (key) size                          *
+ *             pvalue   - [IN] pointer to macro value data                    *
+ *             nvalue   - [IN] value size                                     *
+ *             data     - [IN] data for regexp matching (optional)            *
+ *             err_str  - [OUT] error message (optional)                      *
  *                                                                            *
- * Return value:  SUCCEED - the key/value pair was added successfully         *
- *                   FAIL - key/value pair adding to cache failed.            *
+ * Return value:  SUCCEED - key/value pair was added successfully             *
+ *                   FAIL - key/value pair adding to cache failed             *
  *                          The failure reason can be either empty key/value, *
  *                          wrong key format or failed regular expression     *
  *                          match.                                            *
@@ -70,6 +68,8 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
 			const char *pvalue, size_t nvalue, const char *data, char **err_str)
 {
+#define REGEXP_PREFIX		"regex:"
+#define REGEXP_PREFIX_SIZE	ZBX_CONST_STRLEN(REGEXP_PREFIX)
 	char 		*value_str = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
@@ -153,14 +153,16 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef REGEXP_PREFIX
+#undef REGEXP_PREFIX_SIZE
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute variables in input string with their values from http  *
+ * Purpose: substitutes variables in input string with their values from HTTP *
  *          test config                                                       *
  *                                                                            *
- * Parameters: httptest - [IN]     the http test data                         *
+ * Parameters: httptest - [IN] HTTP test data                                 *
  *             data     - [IN/OUT] string to substitute macros in             *
  *                                                                            *
  ******************************************************************************/
@@ -251,36 +253,33 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses http test/step variable string and stores results into     *
+ * Purpose: Parses HTTP test/step variable string and stores results into     *
  *          httptest macro cache.                                             *
  *          The variables are specified as {<key>}=><value> pairs             *
  *          If the value format is 'regex:<pattern>', then regular expression *
  *          match is performed against the supplied data value and specified  *
  *          pattern. The first captured group is assigned to the macro value. *
  *                                                                            *
- * Parameters: httptest  - [IN/OUT] the http test data                        *
- *             variables - [IN] the variable vector                           *
- *             data      - [IN] the data for variable regexp matching         *
- *                         (optional).                                        *
- *             err_str   - [OUT] the error message (optional)                 *
+ * Parameters: httptest  - [IN/OUT] HTTP test data                            *
+ *             variables - [IN] variable vector                               *
+ *             data      - [IN] data for variable regexp matching (optional)  *
+ *             err_str   - [OUT] error message (optional)                     *
  *                                                                            *
- * Return value: SUCCEED - the variables were processed successfully          *
- *               FAIL    - the variable processing failed (regexp match       *
- *                         failed).                                           *
+ * Return value: SUCCEED - variables were processed successfully              *
+ *               FAIL    - variable processing failed (regexp match failed)   *
  *                                                                            *
  ******************************************************************************/
 int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,
 		char **err_str)
 {
-	char	*key, *value;
-	int	i, ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d variables", __func__, variables->values_num);
 
-	for (i = 0; i < variables->values_num; i++)
+	for (int i = 0; i < variables->values_num; i++)
 	{
-		key = (char *)variables->values[i].first;
-		value = (char *)variables->values[i].second;
+		char	*key = (char *)variables->values[i].first, *value = (char *)variables->values[i].second;
+
 		if (FAIL == httpmacro_append_pair(httptest, key, strlen(key), value, strlen(value), data, err_str))
 			goto out;
 	}
