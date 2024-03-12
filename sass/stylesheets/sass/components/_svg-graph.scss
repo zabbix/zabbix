@@ -33,7 +33,7 @@
 		color: $font-alt-color;
 
 		&:first-of-type {
-			grid-column: 2;
+			grid-column-start: 2;
 		}
 	}
 
@@ -60,12 +60,18 @@
 		color: $font-alt-color;
 	}
 
+	.svg-graph-legend-header,
+	.svg-graph-legend-no-data,
+	.svg-graph-legend-value {
+		text-align: right;
+	}
+
 	&.svg-graph-legend-statistic {
 		grid-template-columns: auto repeat(3, max-content);
 		justify-content: stretch;
 
 		.svg-graph-legend-item {
-			grid-column: 1;
+			grid-column-start: 1;
 		}
 	}
 }

@@ -663,6 +663,8 @@ ZBX_PTR_VECTOR_IMPL(agent_result_ptr, AGENT_RESULT*)
  *             config_java_gateway        - [IN]                                   *
  *             config_java_gateway_port   - [IN]                                   *
  *             config_externalscripts     - [IN]                                   *
+ *             get_value_internal_ext_cb  - [IN]                                   *
+ *             config_ssh_key_location    - [IN]                                   *
  *                                                                                 *
  * Return value: number of items processed                                         *
  *                                                                                 *

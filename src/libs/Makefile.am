@@ -53,6 +53,7 @@ DIST_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxpoller \
 	zbxagentget \
 	zbxpreproc \
@@ -75,6 +76,7 @@ DIST_SUBDIRS = \
 	zbxthreads \
 	zbxtime \
 	zbxtimekeeper \
+	zbxtrapper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -117,6 +119,7 @@ SERVER_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
@@ -136,6 +139,7 @@ SERVER_SUBDIRS = \
 	zbxtime \
 	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
@@ -175,6 +179,7 @@ PROXY_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
@@ -193,6 +198,7 @@ PROXY_SUBDIRS = \
 	zbxtime \
 	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
@@ -235,6 +241,7 @@ SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxregexp \
 	zbxscripts \
 	zbxsysinfo \
@@ -242,6 +249,7 @@ SUBDIRS = \
 	zbxthreads \
 	zbxtime \
 	zbxvariant \
+	zbxtrapper \
 	zbxversion \
 	zbxvmware \
 	zbxxml \

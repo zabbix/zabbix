@@ -156,4 +156,11 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}
+
+	/**
+	 * @dataProvider getItemsParametersData
+	 */
+	public function testFormPreprocessingItemPrototype_CheckParametersPlaceholders($data) {
+		$this->checkParameters($data);
+	}
 }

@@ -731,6 +731,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 						result->alertid);
 
 				if ((EVENT_SOURCE_TRIGGERS == result->source ||
+						EVENT_SOURCE_INTERNAL == result->source ||
 						EVENT_SOURCE_SERVICE == result->source) && NULL != result->value)
 				{
 					mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid);

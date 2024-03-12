@@ -80,8 +80,8 @@ TRAPPER_LIBS = \
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
-	../../../src/zabbix_server/trapper/trapper_preproc.c  \
-	../../../src/zabbix_server/trapper/trapper_auth.c  \
+	../../../src/libs/zbxtrapper/trapper_preproc.c  \
+	../../../src/libs/zbxtrapper/trapper_auth.c  \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)

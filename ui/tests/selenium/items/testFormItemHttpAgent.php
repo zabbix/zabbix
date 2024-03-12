@@ -68,34 +68,22 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Add, update, delete query or headers fields.
 	 */
 	private function processPairFields($rows, $id_part) {
+		$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
+		$element_id = ($id_part === 'query_fields') ? 'Query fields' : 'Headers';
+		$query_form = $form->getField($element_id)->asMultifieldTable();
 
-	$element_id = ($id_part === 'query_fields') ? 'query-fields' : 'headers';
-
-		foreach ($rows as $i => $field_pair) {
-			$i++;
-
-			switch (CTestArrayHelper::get($field_pair, 'action', 'add')) {
+		foreach ($rows as $row) {
+			switch (CTestArrayHelper::get($rows, 'action', 'add')) {
 				case 'add':
-					if (!$this->zbxTestElementPresentId($id_part.'_'.($i-1).'_name')) {
-						COverlayDialogElement::find()->one()->waitUntilReady()
-								->query('xpath://div[contains(@id, "'.$element_id.'")]//button[@class="btn-link element-table-add"]')
-								->one()->click();
-					}
-					// break is not missing here.
+					$query_form->fill($row);
+					break;
+
 				case 'update':
-					if (array_key_exists('name', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_'.($i-1).'_name'));
-						$this->zbxTestInputType($id_part.'_'.($i-1).'_name', $field_pair['name']);
-					}
-					if (array_key_exists('value', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_'.($i-1).'_value'));
-						$this->zbxTestInputType($id_part.'_'.($i-1).'_value', $field_pair['value']);
-					}
+					$query_form->updateRow($row['index'], $row);
 					break;
 
 				case 'remove':
-					$this->query('xpath://table[@id="'.$element_id.'-table"]/tbody/tr['.$i.']/td[5]/button')->one()->click();
-					break;
+					$query_form->removeRow($row['index']);
 			}
 		}
 	}
@@ -103,25 +91,21 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Parse url and check result in query fields.
 	 */
-	private function parseUrlAndCheckQuery($rows, $parsed_url = false) {
-		COverlayDialogElement::find()->one()->waitUntilready()->query('button:Parse')->one()->click();
+	private function parseUrlAndCheckQuery($data) {
+		$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
+		$url_field = $form->getField('id:url');
+		$url_field->fill($data['url']);
+		$query_table = $form->getField('Query fields')->asMultifieldTable();
 
-		foreach ($rows as $i => $parsed_query) {
-			$i += (!$this->zbxTestElementPresentId('query_fields_0_name') ? 1 : 0);
-			$name = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_name']");
-			$this->assertEquals($parsed_query['name'], $name);
-
-			if (array_key_exists('value', $parsed_query)) {
-				$value = $this->zbxTestGetValue("//input[@id='query_fields_".$i."_value']");
-				$this->assertEquals($value, $parsed_query['value']);
-			}
+		// Fill in existing query fields if such are present in the data provider.
+		if (array_key_exists('query', $data)) {
+			$query_table->fill($data['query']);
 		}
 
-		// Check url after parse.
-		if ($parsed_url) {
-			$url = $this->zbxTestGetValue("//input[@id='url']");
-			$this->assertEquals($parsed_url, $url);
-		}
+		$form->query('button:Parse')->one()->click();
+
+		$query_table->checkValue($data['parsed_query']);
+		$this->assertEquals($data['parsed_url'], $url_field->getValue());
 	}
 
 	public static function getUrlParseData() {
@@ -283,26 +267,20 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getUrlParseData
 	 */
 	public function testFormItemHttpAgent_UrlParse($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
 		$this->query('button:Create item')->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
-		$form = $dialog->asForm();
+		$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
 		$form->getField('Type')->asDropdown()->select('HTTP agent');
 		$form->getField('URL')->type($data['url']);
 
-		// Type query fields.
-		if (array_key_exists('query', $data)) {
-			$this->processPairFields($data['query'], 'query_fields');
-		}
-
 		// Check query fields and new url after parse.
 		if (array_key_exists('parsed_query', $data)) {
-			$this->parseUrlAndCheckQuery($data['parsed_query'], $data['parsed_url']);
+			$this->parseUrlAndCheckQuery($data);
 		}
 
 		// Check that URL parse failed.
 		if (array_key_exists('error', $data)) {
-			$dialog->query('button:Parse')->one()->click();
+			$form->query('button:Parse')->one()->click();
 			$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");
 			$result = trim(preg_replace('/\s\s+/', ' ', $get_text));
 			$this->assertEquals($result, $data['error']);
@@ -660,7 +638,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'query' => [
-						['name' => '', 'value' => 'admin', 'action' => 'update']
+						['name' => '', 'value' => 'admin', 'action' => 'update', 'index' => 0]
 					],
 					'error_details' => [
 						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
@@ -670,7 +648,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'query' => [
-						['name' => 'user update', 'value' => 'admin update', 'action' => 'update'],
+						['name' => 'user update', 'value' => 'admin update', 'action' => 'update', 'index' => 0],
 						['value' => 'admin']
 					],
 					'error_details' => [
@@ -681,7 +659,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'headers' => [
-						['name' => '', 'value' => 'admin update', 'action' => 'update']
+						['name' => '', 'value' => 'admin update', 'action' => 'update', 'index' => 0]
 					],
 					'error_details' => [
 						'Invalid parameter "/1/headers/1/name": cannot be empty.'
@@ -691,7 +669,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'headers' => [
-						['name' => 'user update', 'value' => 'admin update', 'action' => 'update'],
+						['name' => 'user update', 'value' => 'admin update', 'action' => 'update', 'index' => 0],
 						['value' => 'admin']
 					],
 					'error_details' => [
@@ -989,7 +967,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		// Check query fields after url parse.
 		if (array_key_exists('parsed_query', $data)) {
-			$this->parseUrlAndCheckQuery($data['parsed_query'], $data['parsed_url']);
+			$this->parseUrlAndCheckQuery($data);
 		}
 
 		$dialog->getFooter()->query('button:Add')->one()->click();
@@ -1040,7 +1018,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Request body' => '{$MACRO}'
 					],
 					'query' => [
-						['action' => 'remove'],
+						['action' => 'remove', 'index' => 0],
 						['name' => '!\'(foo);:@&=+$,/?#[]', 'value' => '!\'(foo);:@&=+$,/?#[]', 'action' => 'add']
 					],
 					'headers' => [
@@ -1135,10 +1113,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Enabled' => false
 					],
 					'query' => [
-						['action' => 'remove']
+						['action' => 'remove', 'index' => 0]
 					],
 					'headers' => [
-						['action' => 'remove']
+						['action' => 'remove', 'index' => 0]
 					],
 					'request_type' => 'JSON data',
 					'override_timeout' => true,
