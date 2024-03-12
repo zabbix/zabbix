@@ -1409,7 +1409,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int					i, ret;
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
-	zbx_on_exit_args_t			exit_args = {NULL, NULL};
+	zbx_on_exit_args_t			exit_args = {.rtc = NULL, .listen_sock = NULL};
 
 	zbx_config_comms_args_t			config_comms = {zbx_config_tls, config_hostname, config_server,
 								config_proxymode, zbx_config_timeout,

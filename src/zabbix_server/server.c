@@ -1997,15 +1997,15 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char		*error = NULL;
-	int		i, db_type, ret, ha_status_old;
+	char			*error = NULL;
+	int			i, db_type, ret, ha_status_old;
 
-	zbx_socket_t	listen_sock = {0};
-	time_t		standby_warning_time;
-	zbx_rtc_t	rtc;
-	zbx_timespec_t	rtc_timeout = {1, 0};
-	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
-	zbx_on_exit_args_t	exit_args = {NULL, NULL};
+	zbx_socket_t		listen_sock = {0};
+	time_t			standby_warning_time;
+	zbx_rtc_t		rtc;
+	zbx_timespec_t		rtc_timeout = {1, 0};
+	zbx_ha_config_t		*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
+	zbx_on_exit_args_t	exit_args = {.rtc = NULL, .listen_sock = NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
