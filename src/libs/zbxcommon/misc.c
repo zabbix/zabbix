@@ -148,6 +148,14 @@ const char	*get_program_name(const char *path)
 	return filename;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: normalizes timespec value if there are more than 10^9 ns          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     ts - [in/OUT]                                                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	timespec_normalize(zbx_timespec_t *ts)
 {
 	while (ts->ns >= 1000000000)
@@ -157,6 +165,22 @@ static void	timespec_normalize(zbx_timespec_t *ts)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares two timespec values                                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     ts1 - [IN]                                                             *
+ *     ts2 - [IN]                                                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *     -1: if ts1 < ts2                                                       *
+ *      0: if ts1 = ts2                                                       *
+ *      1: if ts1 > ts2                                                       *
+ *                                                                            *
+ * Comments: normalized timespec values are expected                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	timespec_cmp(const zbx_timespec_t *ts1, const zbx_timespec_t *ts2)
 {
 	if (ts1->sec < ts2->sec)
@@ -203,18 +227,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 	ts->sec = (int)tb.time;
 	ts->ns = tb.millitm * 1000000;
-
-	/* dbg start */
-	static ZBX_THREAD_LOCAL zbx_timespec_t	dbg_last_ts = {0, 0};
-
-	if (ts->sec < dbg_last_ts.sec ||
-			(ts->sec == dbg_last_ts.sec && ts->ns < dbg_last_ts.ns))
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "[ DBG ] %s():%d OS time shift back detected: ts = %d %d, dbg_last_ts = %d %d", __func__, __LINE__, ts->sec, ts->ns, dbg_last_ts.sec, dbg_last_ts.ns);
-	}
-
-	dbg_last_ts = *ts;
-	/* dbg end */
 
 	if (0 != tickPerSecond.QuadPart)
 	{
