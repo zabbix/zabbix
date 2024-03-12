@@ -316,35 +316,11 @@ class JMXItemChecker extends ItemChecker
 
 		logger.trace("drilling down the {} to find metric '{}'", dataObject, metric);
 
-		if (metric.equals(""))
+		while (!metric.equals(""))
 		{
-			try
-			{
-				if (isPrimitiveMetricType(dataObject))
-				{
-					logger.trace("found: {}", dataObject.toString());
-					return dataObject.toString();
-				}
-				else
-				{
-					throw new NoSuchMethodException();
-				}
-			}
-			catch (NoSuchMethodException e)
-			{
-				throw new ZabbixException("The value cannot be converted to string.");
-			}
-		}
-
-		if (dataObject instanceof CompositeData)
-		{
-			logger.trace("[{}] contains composite data", metric);
-
-			CompositeData composite = (CompositeData)dataObject;
-
-			String objectName;
-
+			// get next objectName from the metric
 			int separatorIndex = HelperFunctionChest.separatorIndex(metric);
+			String objectName;
 
 			if (-1 != separatorIndex)
 			{
@@ -360,43 +336,45 @@ class JMXItemChecker extends ItemChecker
 			// unescape possible dots or backslashes that were escaped by user
 			objectName = HelperFunctionChest.unescapeUserInput(objectName);
 
-			return getValueByMetric(composite.get(objectName), metric);
-		}
-
-		if (dataObject instanceof TabularData)
-		{
-			logger.trace("[{}] contains tabular data", metric);
-
-			TabularData tabular = (TabularData)dataObject;
-
-			String objectName;
-
-			int separatorIndex = HelperFunctionChest.separatorIndex(metric);
-
-			if (-1 != separatorIndex)
+			// get next object
+			if (dataObject instanceof CompositeData)
 			{
-				objectName = metric.substring(0, separatorIndex);
-				metric = metric.substring(separatorIndex + 1);
+				logger.trace("[{}] contains composite data", metric);
+
+				CompositeData obj = (CompositeData)dataObject;
+
+				dataObject = obj.get(objectName);
+			}
+			else if (dataObject instanceof TabularData)
+			{
+				logger.trace("[{}] contains tabular data", metric);
+
+				TabularData obj = (TabularData)dataObject;
+
+				dataObject = obj.get(new String[]{objectName});
 			}
 			else
 			{
-				objectName = metric;
-				metric = "";
-			}
-
-			// unescape possible dots or backslashes that were escaped by user
-			objectName = HelperFunctionChest.unescapeUserInput(objectName);
-
-			for (Object values: tabular.values()) {
-				CompositeData row = (CompositeData)values;
-				String rowKey = (String)row.values().iterator().next();
-
-				if (rowKey.equals(objectName))
-					return getValueByMetric(row, metric);
+				throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 			}
 		}
 
-		throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
+		try
+		{
+			if (isPrimitiveMetricType(dataObject))
+			{
+				logger.trace("found: {}", dataObject.toString());
+				return dataObject.toString();
+			}
+			else
+			{
+				throw new NoSuchMethodException();
+			}
+		}
+		catch (NoSuchMethodException e)
+		{
+			throw new ZabbixException("The value cannot be converted to string.");
+		}
 	}
 
 	private JSONArray getTabularData(TabularData data) throws JSONException
