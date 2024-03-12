@@ -607,7 +607,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 
 static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, int now, zbx_uint64_t unique_dcheckid,
-		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb)
+		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb)
 {
 	int	host_status = -1;
 
@@ -620,7 +621,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
 			host_status = service->status;
 
-		zbx_discovery_update_service(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
 				ip, dns, service->port, service->status, service->value, now, add_event_cb);
 	}
 
@@ -869,10 +870,13 @@ out:
 }
 
 static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
-		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks, const zbx_events_funcs_t *events_cbs)
+		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks, const zbx_events_funcs_t *events_cbs,
+		zbx_discovery_open_func_t discovery_open_cb, zbx_discovery_close_func_t discovery_close_cb,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb)
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
-	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
+	zbx_uint64_t				res_check_total = 0, res_check_count = 0;
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
 	zbx_hashset_iter_t			iter;
@@ -928,7 +932,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 	if (0 != results.values_num)
 	{
 
-		void	*handle = zbx_discovery_open();
+		void	*handle = discovery_open_cb();
 
 		for (int i = 0; i < results.values_num; i++)
 		{
@@ -948,12 +952,11 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			memset(&dhost, 0, sizeof(zbx_db_dhost));
 
 			zbx_db_begin();
-
 			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
 					result->now, result->unique_dcheckid, &result->services,
-					events_cbs->add_event_cb);
+					events_cbs->add_event_cb, discovery_update_service_cb);
 
-			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
+			discovery_update_host_cb(handle, result->druleid, &dhost, result->ip, result->dnsname,
 					host_status, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
@@ -965,7 +968,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			zbx_db_commit();
 		}
 
-		zbx_discovery_close(handle);
+		discovery_close_cb(handle);
 	}
 
 	*unsaved_checks = res_check_total - res_check_count;
@@ -1833,7 +1836,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks,
-				discoverer_args_in->events_cbs);
+				discoverer_args_in->events_cbs, discoverer_args_in->discovery_open_cb,
+				discoverer_args_in->discovery_close_cb, discoverer_args_in->discovery_update_host_cb,
+				discoverer_args_in->discovery_update_service_cb);
 
 		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used, " ZBX_FS_UI64
 				" unsaved checks]", get_process_type_string(process_type), process_num,

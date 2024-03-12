@@ -4,6 +4,7 @@ SUBDIRS = \
 	actions \
 	dbconfig \
 	diag \
+	discovery \
 	events \
 	housekeeper \
 	httppoller \
@@ -73,7 +74,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
-	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_server.a \
+	discovery/libzbxdiscovery_server.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \

@@ -95,6 +95,7 @@ SERVER_SUBDIRS = \
 	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
 	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -157,6 +158,7 @@ PROXY_SUBDIRS = \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
 	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \

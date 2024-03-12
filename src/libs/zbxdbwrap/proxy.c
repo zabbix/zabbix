@@ -1678,7 +1678,9 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  ******************************************************************************/
 static int	process_services(const zbx_vector_dservice_ptr_t *services, const char *ip,
 		const zbx_add_event_func_t add_event_cb, zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids,
-		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
+		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb)
 {
 	zbx_db_dhost			dhost;
 	zbx_dservice_t			*service;
@@ -1808,9 +1810,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime,
-				add_event_cb);
+		discovery_update_service_cb(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+				&dhost, ip, service->dns, service->port, service->status, service->value,
+				service->itemtime, add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -1823,13 +1825,13 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime,
-				add_event_cb);
+		discovery_update_service_cb(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+				&dhost, ip, service->dns, service->port, service->status, service->value,
+				service->itemtime, add_event_cb);
 	}
 
 	service = services->values[(*processed_num)++];
-	zbx_discovery_update_host(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
+	discovery_update_host_cb(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
 
 	ret = SUCCEED;
 fail:
@@ -1855,7 +1857,8 @@ fail:
  *                                                                            *
  ******************************************************************************/
 static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_events_funcs_t *events_cbs,
-		char **error)
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -2009,7 +2012,8 @@ json_parse_error:
 			{
 				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip,
 						events_cbs->add_event_cb, drule->druleid, &drule->dcheckids,
-						unique_dcheckid, &processed_num, j)))
+						unique_dcheckid, &processed_num, j, discovery_update_host_cb,
+						discovery_update_service_cb)))
 				{
 					break;
 				}
@@ -2316,8 +2320,9 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *                                                                                 *
  ***********************************************************************************/
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
-		char **error)
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old, lastaccess;
@@ -2418,8 +2423,11 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, events_cbs, &error_step)))
+		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, events_cbs,
+				discovery_update_host_cb, discovery_update_service_cb, &error_step)))
+		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+		}
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))

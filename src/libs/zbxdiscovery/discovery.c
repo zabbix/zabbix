@@ -22,16 +22,6 @@
 #include "zbxserialize.h"
 #include "zbx_discoverer_constants.h"
 
-typedef struct
-{
-	zbx_uint64_t	dserviceid;
-	int		status;
-	int		lastup;
-	int		lastdown;
-	char		*value;
-}
-DB_DSERVICE;
-
 #define DISCOVERER_INITIALIZED_YES	1
 
 static int	discoverer_initialized = 0;

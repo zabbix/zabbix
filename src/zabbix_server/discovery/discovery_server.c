@@ -17,20 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "discovery_server.h"
+
 #include "zbxdiscovery.h"
 
 #include "zbxtime.h"
 #include "zbxnum.h"
-
-typedef struct
-{
-	zbx_uint64_t	dserviceid;
-	int		status;
-	int		lastup;
-	int		lastdown;
-	char		*value;
-}
-DB_DSERVICE;
 
 static zbx_db_result_t	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
@@ -473,7 +465,7 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
  * Purpose: process new host status                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -494,7 +486,7 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
  * Purpose: process new service status                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
 {
@@ -524,12 +516,12 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	*zbx_discovery_open(void)
+void	*zbx_discovery_open_server(void)
 {
 	return NULL;
 }
 
-void	zbx_discovery_close(void *handle)
+void	zbx_discovery_close_server(void *handle)
 {
 	ZBX_UNUSED(handle);
 }

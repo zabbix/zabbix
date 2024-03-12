@@ -40,7 +40,9 @@
 #include "zbxpinger.h"
 #include "zbxtrapper.h"
 #include "zbxdiscoverer.h"
+#include "zbxdiscovery.h"
 
+#include "discovery/discovery_proxy.h"
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "poller/poller_proxy.h"
@@ -63,7 +65,6 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "preproc/preproc_proxy.h"
-#include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
@@ -1429,7 +1430,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
 								get_zbx_progname, zbx_config_timeout,
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
-								zbx_config_source_ip, &events_cbs};
+								zbx_config_source_ip, &events_cbs,
+								zbx_discovery_open_proxy, zbx_discovery_close_proxy,
+								zbx_discovery_update_host_proxy,
+								zbx_discovery_update_service_proxy};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,
