@@ -38,7 +38,6 @@
 #include "zbx_discoverer_constants.h"
 #include "zbxpoller.h"
 
-
 #ifdef HAVE_LDAP
 #	include <ldap.h>
 #endif
@@ -78,9 +77,6 @@ typedef struct
 }
 zbx_discoverer_check_count_t;
 
-#define DISCOVERER_WORKER_INIT_NONE	0x00
-#define DISCOVERER_WORKER_INIT_THREAD	0x01
-
 typedef struct
 {
 	zbx_discoverer_queue_t	*queue;
@@ -112,9 +108,6 @@ typedef struct
 	zbx_timekeeper_t			*timekeeper;
 }
 zbx_discoverer_manager_t;
-
-#define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
-#define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
 
 static zbx_discoverer_manager_t		dmanager;
 static const char			*source_ip;
@@ -205,7 +198,7 @@ static int	dcheck_get_timeout(unsigned char type, int *timeout_sec)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if service is available                                     *
+ * Purpose: checks if service is available                                    *
  *                                                                            *
  * Parameters: dcheck           - [IN] service type                           *
  *             ip               - [IN]                                        *
@@ -465,7 +458,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 	for (start = dcheck->ports; '\0' != *start;)
 	{
 		char	*comma, *last_port;
-		int	port, first, last;
+		int	first, last;
 
 		if (NULL != (comma = strchr(start, ',')))
 			*comma = '\0';
@@ -480,7 +473,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 		else
 			first = last = atoi(start);
 
-		for (port = first; port <= last; port++)
+		for (int port = first; port <= last; port++)
 		{
 			zbx_discoverer_task_t	task_local, *task;
 			zbx_dc_dcheck_t		*dcheck_ptr;
@@ -590,10 +583,9 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int *need_resolve,
 		zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
 {
-	int		i;
 	zbx_uint64_t	checks_count = 0;
 
-	for (i = 0; i < drule->dchecks.values_num; i++)
+	for (int i = 0; i < drule->dchecks.values_num; i++)
 	{
 		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
@@ -617,11 +609,11 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		const char *dns, int now, zbx_uint64_t unique_dcheckid,
 		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb)
 {
-	int	host_status = -1, i;
+	int	host_status = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < services->values_num; i++)
+	for (int i = 0; i < services->values_num; i++)
 	{
 		zbx_discoverer_dservice_t	*service = (zbx_discoverer_dservice_t *)services->values[i];
 
@@ -637,15 +629,18 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	return host_status;
 }
 
+#define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
+#define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
+
 /******************************************************************************
  *                                                                            *
- * Purpose: process single discovery rule                                     *
+ * Purpose: processes single discovery rule                                   *
  *                                                                            *
  ******************************************************************************/
 static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
 		zbx_hashset_t *check_counts)
 {
-	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
+	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma;
 	int		ipaddress[8];
 	size_t		idx = 0, iprange_alloc_num = 10;
 	zbx_iprange_t	*iprange = NULL;
@@ -654,7 +649,7 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zb
 
 	iprange = (zbx_iprange_t*)zbx_malloc(iprange, iprange_alloc_num * sizeof(zbx_iprange_t));
 
-	for (start = drule->iprange; '\0' != *start;)
+	for (char *start = drule->iprange; '\0' != *start;)
 	{
 		if (NULL != (comma = strchr(start, ',')))
 			*comma = '\0';
@@ -763,7 +758,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clean dservices and dhosts not presenting in drule                *
+ * Purpose: cleans dservices and dhosts not present in drule                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_clean_services(zbx_uint64_t druleid)
@@ -824,8 +819,6 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 
 	if (0 != del_dserviceids.values_num)
 	{
-		int	i;
-
 		/* remove dservices */
 
 		zbx_vector_uint64_sort(&del_dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -845,7 +838,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 		zbx_vector_uint64_sort(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_dhostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		for (i = 0; i < del_dhostids.values_num; i++)
+		for (int i = 0; i < del_dhostids.values_num; i++)
 		{
 			dhostid = del_dhostids.values[i];
 
@@ -879,7 +872,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks, const zbx_events_funcs_t *events_cbs)
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
-	int					i;
 	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
@@ -936,11 +928,9 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 	if (0 != results.values_num)
 	{
 
-		void	*handle;
+		void	*handle = zbx_discovery_open();
 
-		handle = zbx_discovery_open();
-
-		for (i = 0; i < results.values_num; i++)
+		for (int i = 0; i < results.values_num; i++)
 		{
 			zbx_db_dhost	dhost;
 			int		host_status;
@@ -987,10 +977,12 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 #undef DISCOVERER_BATCH_RESULTS_NUM
 }
 
+#define DISCOVERER_QUEUE_MAX_SIZE	2000000
+
 static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
 {
-	int				rule_count = 0, delay, i, k, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
+	int				rule_count = 0, delay, i, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
 	char				*delay_str = NULL;
 	zbx_uint64_t			queue_checks_count = 0;
 	zbx_dc_um_handle_t		*um_handle;
@@ -1007,7 +999,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 
 	um_handle = zbx_dc_open_user_macros();
 
-	for (k = 0; ZBX_IS_RUNNING() && k < drules.values_num; k++)
+	for (int k = 0; ZBX_IS_RUNNING() && k < drules.values_num; k++)
 	{
 		zbx_uint64_t			queue_capacity, queue_capacity_local;
 		zbx_hashset_t			tasks, drule_check_counts;
@@ -1198,14 +1190,14 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 		int dcheck_idx, zbx_vector_discoverer_results_ptr_t *results, int worker_max)
 {
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
-	int				i, index;
+	int				index;
 	zbx_vector_fping_host_t		hosts;
 	zbx_discoverer_results_t	result_cmp, *result;
 	const zbx_dc_dcheck_t		*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[dcheck_idx];
 
 	zbx_vector_fping_host_create(&hosts);
 
-	for (i = 0; i < task->ips->values_num; i++)
+	for (int i = 0; i < task->ips->values_num; i++)
 	{
 		ZBX_FPING_HOST			host;
 		zbx_discoverer_dservice_t	*service;
@@ -1239,7 +1231,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 	if (0 == worker_max)
 		worker_max = hosts.values_num;
 
-	for (i = 0; i < hosts.values_num; i += worker_max)
+	for (int i = 0; i < hosts.values_num; i += worker_max)
 	{
 		if (hosts.values_num - i < worker_max)
 			worker_max = hosts.values_num - i;
@@ -1254,7 +1246,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 
 	zbx_vector_discoverer_results_ptr_sort(results, discoverer_results_compare);
 
-	for (i = 0; i < hosts.values_num; i++)
+	for (int i = 0; i < hosts.values_num; i++)
 	{
 		ZBX_FPING_HOST			*h = &hosts.values[i];
 		zbx_discoverer_dservice_t	service_cmp;
@@ -1292,9 +1284,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 
 static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src)
 {
-	int	i;
-
-	for (i = 0; i < vr_src->values_num; i++)
+	for (int i = 0; i < vr_src->values_num; i++)
 	{
 		zbx_discoverer_results_t	*dst, *src = vr_src->values[i];
 
@@ -1327,14 +1317,11 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
-	int					i;
 
 	zbx_vector_discoverer_results_ptr_create(&results);
 
-	for (i = 0; i < task->dchecks.values_num; i++)
-	{
+	for (int i = 0; i < task->dchecks.values_num; i++)
 		discover_icmp(druleid, task, i, &results, worker_max);
-	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
 	discover_results_merge(&dmanager.results, &results);
@@ -1346,7 +1333,6 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_
 
 static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task)
 {
-	int					i;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	zbx_vector_discoverer_services_ptr_t	services;
 	zbx_discoverer_results_t		*result = NULL, result_cmp;
@@ -1360,7 +1346,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
-	for (i = 0; i < task->dchecks.values_num; i++)
+	for (int i = 0; i < task->dchecks.values_num; i++)
 	{
 		zbx_dc_dcheck_t			*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[i];
 		zbx_discoverer_dservice_t	*service;
@@ -1520,6 +1506,9 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 	return (void*)0;
 }
 
+#define DISCOVERER_WORKER_INIT_NONE	0x00
+#define DISCOVERER_WORKER_INIT_THREAD	0x01
+
 static int	discoverer_worker_init(zbx_discoverer_worker_t *worker, zbx_discoverer_queue_t *queue,
 		zbx_timekeeper_t *timekeeper, void *func(void *), char **error)
 {
@@ -1559,9 +1548,12 @@ static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
 		worker->stop = 1;
 }
 
+#undef DISCOVERER_WORKER_INIT_NONE
+#undef DISCOVERER_WORKER_INIT_THREAD
+
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize libraries, called before creating worker threads       *
+ * Purpose: initializes libraries, called before creating worker threads      *
  *                                                                            *
  ******************************************************************************/
 static void	discoverer_libs_init(void)
@@ -1579,7 +1571,7 @@ static void	discoverer_libs_init(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release libraries resources                                       *
+ * Purpose: releases libraries resources                                      *
  *                                                                            *
  ******************************************************************************/
 static void	discoverer_libs_destroy(void)
@@ -1594,7 +1586,7 @@ static void	discoverer_libs_destroy(void)
 
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int workers_num, char **error)
 {
-	int		i, err, ret = FAIL, started_num = 0;
+	int		err, ret = FAIL, started_num = 0;
 	time_t		time_start;
 	struct timespec	poll_delay = {0, 1e8};
 
@@ -1625,7 +1617,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)workers_num,
 			sizeof(zbx_discoverer_worker_t));
 
-	for (i = 0; i < workers_num; i++)
+	for (int i = 0; i < workers_num; i++)
 	{
 		manager->workers[i].worker_id = i + 1;
 
@@ -1658,7 +1650,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 out:
 	if (FAIL == ret)
 	{
-		for (i = 0; i < manager->workers_num; i++)
+		for (int i = 0; i < manager->workers_num; i++)
 			discoverer_worker_stop(&manager->workers[i]);
 
 		discoverer_queue_destroy(&manager->queue);
@@ -1676,19 +1668,18 @@ out:
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 {
-	int				i;
 	zbx_hashset_iter_t		iter;
 	zbx_discoverer_results_t	*result;
 
 	discoverer_queue_lock(&manager->queue);
 
-	for (i = 0; i < manager->workers_num; i++)
+	for (int i = 0; i < manager->workers_num; i++)
 		discoverer_worker_stop(&manager->workers[i]);
 
 	discoverer_queue_notify_all(&manager->queue);
 	discoverer_queue_unlock(&manager->queue);
 
-	for (i = 0; i < manager->workers_num; i++)
+	for (int i = 0; i < manager->workers_num; i++)
 		discoverer_worker_destroy(&manager->workers[i]);
 
 	zbx_free(manager->workers);
@@ -1716,10 +1707,10 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: respond to worker usage statistics request                        *
+ * Purpose: responds to worker usage statistics request                       *
  *                                                                            *
- * Parameters: manager     - [IN] discovery manager                           *
- *             client      - [IN] the request source                          *
+ * Parameters: manager - [IN] discovery manager                               *
+ *             client  - [IN] request source                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discoverer_reply_usage_stats(zbx_discoverer_manager_t *manager, zbx_ipc_client_t *client)
@@ -1741,7 +1732,7 @@ static void	discoverer_reply_usage_stats(zbx_discoverer_manager_t *manager, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: periodically try to find new hosts and services                   *
+ * Purpose: periodically tries to find new hosts and services                 *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
@@ -1755,8 +1746,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_ipc_message_t		*message;
 	zbx_timespec_t			sleeptime = { .sec = DISCOVERER_DELAY, .ns = 0 };
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char				*error = NULL;
 	zbx_vector_uint64_pair_t	revisions;
@@ -1804,7 +1795,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int		processing_rules_num, i, more_results;
+		int		processing_rules_num, more_results;
 		zbx_uint64_t	queue_used, unsaved_checks;
 
 		sec = zbx_time();
@@ -1818,7 +1809,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		discoverer_queue_lock(&dmanager.queue);
 
-		for (i = 0; i < dmanager.job_refs.values_num; i++)
+		for (int i = 0; i < dmanager.job_refs.values_num; i++)
 		{
 			int			k;
 			zbx_uint64_pair_t	revision;
@@ -1888,11 +1879,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				discoverer_queue_lock(&dmanager.queue);
 				dmanager.queue.pending_checks_count += queued;
 
-				for (i = 0; i < jobs.values_num; i++)
+				for (int i = 0; i < jobs.values_num; i++)
 				{
-					zbx_discoverer_job_t	*job;
+					zbx_discoverer_job_t	*job = jobs.values[i];
 
-					job = jobs.values[i];
 					discoverer_queue_push(&dmanager.queue, job);
 					zbx_vector_discoverer_jobs_ptr_append(&dmanager.job_refs, job);
 				}
@@ -1961,3 +1951,5 @@ out:
 
 	exit(EXIT_SUCCESS);
 }
+
+#undef DISCOVERER_QUEUE_MAX_SIZE

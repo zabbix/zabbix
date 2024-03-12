@@ -22,8 +22,6 @@
 
 #include "discoverer_job.h"
 
-#define DISCOVERER_QUEUE_MAX_SIZE	2000000
-
 typedef struct
 {
 	int		workers_num;
