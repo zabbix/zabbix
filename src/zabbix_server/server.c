@@ -2000,7 +2000,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	char		*error = NULL;
 	int		i, db_type, ret, ha_status_old;
 
-	zbx_socket_t	listen_sock;
+	zbx_socket_t	listen_sock = {0};
 	time_t		standby_warning_time;
 	zbx_rtc_t	rtc;
 	zbx_timespec_t	rtc_timeout = {1, 0};
