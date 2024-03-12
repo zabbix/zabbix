@@ -383,6 +383,13 @@ static	const zbx_events_funcs_t	events_cbs = {
 	.events_update_itservices_cb	= zbx_events_update_itservices
 };
 
+typedef struct
+{
+	zbx_rtc_t	*rtc;
+	zbx_socket_t	*listen_sock;
+}
+zbx_pre_exit_args_t;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -1086,7 +1093,7 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
-static void	zbx_on_exit(int ret)
+static void	zbx_on_exit(int ret, void *pre_exit_args)
 {
 	char	*error = NULL;
 
@@ -1158,6 +1165,18 @@ static void	zbx_on_exit(int ret)
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
 	zbx_deinit_library_export();
+
+	if (NULL != pre_exit_args)
+	{
+		zbx_pre_exit_args_t	*args = (zbx_pre_exit_args_t *)pre_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_close(&args->rtc->service);
+
+	}
 
 	exit(EXIT_SUCCESS);
 }
@@ -1984,6 +2003,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t	rtc;
 	zbx_timespec_t	rtc_timeout = {1, 0};
 	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
+	zbx_pre_exit_args_t	exit_args = {NULL, NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -2105,6 +2125,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	exit_args.rtc = &rtc;
 
 	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
@@ -2229,6 +2251,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			/* check if the HA status has not been changed during startup process */
 			if (ZBX_NODE_STATUS_ACTIVE != ha_status)
 				server_teardown(&rtc, &listen_sock);
+			else
+				exit_args.listen_sock = &listen_sock;
 		}
 	}
 
@@ -2368,11 +2392,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_ipc_service_close(&rtc.service);
-
-	zbx_tcp_unlisten(&listen_sock);
-
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
 }

@@ -209,7 +209,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 != sig_exit_on_terminate)
 			{
 				zbx_log_exit_signal();
-				zbx_on_exit_cb(SUCCEED);
+				zbx_on_exit_cb(SUCCEED, NULL);
 			}
 		}
 	}
