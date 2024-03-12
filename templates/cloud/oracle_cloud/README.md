@@ -732,8 +732,8 @@ This template has been tested on:
 ## Setup
 
 This template is not meant to be used independently. A host with the `Oracle Cloud by HTTP` template will
-discover OCI virtual network cards (VNCs) automatically, create host prototypes for each discovered
-VNC, and apply it this template.
+discover OCI virtual cloud networks (VCNs) automatically, create host prototypes for each discovered
+VCN, and apply it this template.
 
 If needed, you can specify an HTTP proxy for the template to use by changing the value of `{$OCI.HTTP.PROXY}`
 user macro.
@@ -760,7 +760,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |OCI VCN: Get VCN state|<p>State of the virtual cloud network.</p>|Script|oci.vcn.state.get<p>**Preprocessing**</p><ul><li><p>Replace: `" -> `</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|OCI VCN: Get subnets|<p>Get data about subnets linked to the particular VNC.</p>|Script|oci.vcn.subnets.get|
+|OCI VCN: Get subnets|<p>Get data about subnets linked to the particular VCN.</p>|Script|oci.vcn.subnets.get|
 
 ### Triggers
 
@@ -773,7 +773,7 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Subnet discovery|<p>Discover subnets linked to the particular VNC.</p>|Dependent item|oci.vcn.subnet.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Subnet discovery|<p>Discover subnets linked to the particular VCN.</p>|Dependent item|oci.vcn.subnet.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Subnet discovery
 

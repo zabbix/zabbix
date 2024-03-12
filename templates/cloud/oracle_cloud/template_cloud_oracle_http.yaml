@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-11T10:17:10Z'
+  date: '2024-03-12T10:41:40Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -11363,7 +11363,7 @@ zabbix_export:
             
             return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/subnets', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid']) + '&vcnId=' + encodeURIComponent(params['vcn_id'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
           description: |
-            Get data about subnets linked to the particular VNC.
+            Get data about subnets linked to the particular VCN.
             
           timeout: 30s
           parameters:
@@ -11410,7 +11410,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
           description: |
-            Discover subnets linked to the particular VNC.
+            Discover subnets linked to the particular VCN.
             
           item_prototypes:
             - uuid: 759c6bff98fb4cb3bc8c9269513339bf
