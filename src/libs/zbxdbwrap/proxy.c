@@ -1325,14 +1325,21 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
  ******************************************************************************/
 static int	agent_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *sock, void *args, char **error)
 {
-	ZBX_UNUSED(sock);
-	ZBX_UNUSED(args);
-	ZBX_UNUSED(error);
+	zbx_host_rights_t	*rights = (zbx_host_rights_t *)args;
+
+	if (0 != item->host.proxyid)
+		return FAIL;
 
 	if (ITEM_TYPE_ZABBIX_ACTIVE != item->type)
 		return FAIL;
 
-	return SUCCEED;
+	if (rights->hostid != item->host.hostid)
+	{
+		rights->hostid = item->host.hostid;
+		rights->value = zbx_host_check_permissions(&item->host, sock, error);
+	}
+
+	return rights->value;
 }
 
 /******************************************************************************
@@ -1568,8 +1575,9 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 	int			ret = FAIL, version;
 	char			*token = NULL;
 	zbx_session_t		*session;
-	zbx_history_recv_host_t	host;
+	zbx_uint64_t		hostid;
 	size_t			token_alloc = 0;
+	zbx_host_rights_t	rights = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1618,7 +1626,7 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 		}
 	}
 
-	if (FAIL == (ret = zbx_dc_config_get_host_by_name(tmp, sock, &host, &redirect)))
+	if (FAIL == (ret = zbx_dc_config_get_hostid_by_name(tmp, sock, &hostid, &redirect)))
 	{
 		*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
 		/* send success response so agent will not retry upload with the same non-existing host */
@@ -1638,22 +1646,19 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 		goto out;
 	}
 
-	if (SUCCEED != zbx_host_check_permissions(&host, sock, info))
-		goto out;
-
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) <= version)
 	{
 		if (NULL == token)
 			session = NULL;
 		else
-			session = zbx_dc_get_or_create_session(host.hostid, token, ZBX_SESSION_TYPE_DATA);
+			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
 
-		ret = process_history_data_by_itemids(sock, agent_item_validator, NULL, &jp_data, session, NULL,
+		ret = process_history_data_by_itemids(sock, agent_item_validator, &rights, &jp_data, session, NULL,
 				info, ZBX_ITEM_GET_DEFAULT);
 	}
 	else
 	{
-		process_history_data_by_keys(sock, agent_item_validator, NULL, info, &jp_data, token);
+		process_history_data_by_keys(sock, agent_item_validator, &rights, info, &jp_data, token);
 		ret = SUCCEED;
 	}
 out:
