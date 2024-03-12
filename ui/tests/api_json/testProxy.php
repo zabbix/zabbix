@@ -5256,52 +5256,6 @@ class testProxy extends CAPITest {
 			}
 		}
 
-//		if (array_key_exists('proxyids', $request)) {
-//			if (is_array($request['proxyids'])) {
-//				foreach ($request['proxyids'] as &$id) {
-//					if (self::isValidIdPlaceholder($id)) {
-//						$id = self::$data['proxyids'][$id];
-//					}
-//				}
-//				unset($id);
-//			}
-//			elseif (self::isValidIdPlaceholder($request['proxyids'])) {
-//				$request['proxyids'] = self::$data['proxyids'][$request['proxyids']];
-//			}
-//		}
-//		elseif (array_key_exists('proxyid', $request) && self::isValidIdPlaceholder($request['proxyid'])) {
-//			$request['proxyid'] = self::$data['proxyids'][$request['proxyid']];
-//		}
-//
-//		if (array_key_exists('proxy_groupid', $request) && self::isValidIdPlaceholder($request['proxy_groupid'])) {
-//			$request['proxy_groupid'] = self::$data['proxy_groupids'][$request['proxy_groupid']];
-//		}
-//
-//		if (array_key_exists('hosts', $request) && is_array($request['hosts'])) {
-//			foreach ($request['hosts'] as &$host) {
-//				if (is_array($host) && array_key_exists('hostid', $host)
-//						&& self::isValidIdPlaceholder($host['hostid'])) {
-//					$host['hostid'] = self::$data['hostids'][$host['hostid']];
-//				}
-//			}
-//			unset($host);
-//		}
-//
-//		if (array_key_exists('filter', $request) && is_array($request['filter'])
-//				&& array_key_exists('proxyid', $request['filter'])) {
-//			if (is_array($request['filter']['proxyid'])) {
-//				foreach ($request['filter']['proxyid'] as &$proxyid) {
-//					if (self::isValidIdPlaceholder($proxyid)) {
-//						$proxyid = self::$data['proxyids'][$proxyid];
-//					}
-//				}
-//				unset($proxyid);
-//			}
-//			elseif (self::isValidIdPlaceholder($request['filter']['proxyid'])) {
-//				$request['filter']['proxyid'] = self::$data['proxyids'][$request['filter']['proxyid']];
-//			}
-//		}
-
 		return $request;
 	}
 
