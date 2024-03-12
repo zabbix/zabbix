@@ -629,7 +629,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->fields_values['legend'] == WidgetForm::LEGEND_ON) {
 			$legend['show'] = true;
 			$legend['value_show'] = $this->fields_values['legend_value'] === self::LEGEND_VALUE_ON;
+			$legend['lines_mode'] = $this->fields_values['legend_lines_mode'];
 			$legend['lines'] = $this->fields_values['legend_lines'];
+
 			if (!$legend['value_show']) {
 				$legend['columns'] = $this->fields_values['legend_columns'];
 			}

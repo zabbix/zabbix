@@ -1795,7 +1795,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * Click Sign out button.
 	 */
 	private function signOut() {
-		$this->query('xpath://a[@class="zi-signout"]')->waitUntilPresent()->one()->click();
+		$this->query('xpath://a[@class="zi-sign-out"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('button:Sign in')->waitUntilVisible();
 	}

@@ -25,9 +25,9 @@
 class CTabFilter extends CDiv {
 
 	const ZBX_STYLE_CLASS = 'tabfilter-container';
+	const CSS_TABS = 'tabfilter-tabs';
 	const CSS_TAB_SELECTED = 'selected';
 	const CSS_TAB_EXPANDED = 'expanded';
-	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
 	const CSS_TABFILTER_ITEM = 'tabfilter-item-label';
 
@@ -378,11 +378,13 @@ class CTabFilter extends CDiv {
 			}
 		}
 
-		return new CTag('nav', true , new CList([
-			(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
-			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
-			$static ?: null,
-			$nav_list
-		]));
+		return new CTag('nav', true,
+			new CList([
+				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
+				$sortable ? (new CList($sortable))->addClass(static::CSS_TABS) : null,
+				$static ?: null,
+				$nav_list
+			])
+		);
 	}
 }
