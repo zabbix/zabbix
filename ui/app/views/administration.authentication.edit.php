@@ -24,8 +24,6 @@
  * @var array $data
  */
 
-global $HTTP_AUTH_VISIBLE;
-
 $this->addJsFile('class.form.fieldset.collapsible.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
@@ -148,7 +146,7 @@ $auth_tab = (new CFormGrid())
 	]);
 
 // HTTP authentication fields.
-if ($HTTP_AUTH_VISIBLE) {
+if ($data['http_auth_visible']) {
 	$http_tab = (new CFormGrid())
 		->addItem([
 			new CLabel([_('Enable HTTP authentication'),
@@ -565,7 +563,7 @@ $saml_tab = (new CFormGrid())
 		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab);
 
-	if ($HTTP_AUTH_VISIBLE) {
+	if ($data['http_auth_visible']) {
 		$tab_view->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP);
 	}
 
@@ -657,7 +655,7 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media'],
 		'templates' => $templates,
-		'http_tab_visible' => $HTTP_AUTH_VISIBLE
+		'http_tab_visible' => $data['http_auth_visible']
 	]).');'
 ))
 	->setOnDocumentReady()

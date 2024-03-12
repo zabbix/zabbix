@@ -107,6 +107,7 @@ class CControllerAuthenticationEdit extends CController {
 		$data = [
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
+			'http_auth_visible' => $HTTP_AUTH_VISIBLE,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'form_refresh' => $this->getInput('form_refresh', 0)
