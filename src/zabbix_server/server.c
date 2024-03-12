@@ -388,7 +388,7 @@ typedef struct
 	zbx_rtc_t	*rtc;
 	zbx_socket_t	*listen_sock;
 }
-zbx_pre_exit_args_t;
+zbx_on_exit_args_t;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1168,7 +1168,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	if (NULL != on_exit_args)
 	{
-		zbx_pre_exit_args_t	*args = (zbx_pre_exit_args_t *)on_exit_args;
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
 		if (NULL != args->listen_sock)
 		{
@@ -1447,7 +1447,8 @@ static void	zbx_db_save_server_status(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc, zbx_pre_exit_args_t *exit_args)
+static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc,
+		zbx_on_exit_args_t *exit_args)
 {
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
@@ -2011,7 +2012,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t	rtc;
 	zbx_timespec_t	rtc_timeout = {1, 0};
 	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
-	zbx_pre_exit_args_t	exit_args = {NULL, NULL};
+	zbx_on_exit_args_t	exit_args = {NULL, NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
