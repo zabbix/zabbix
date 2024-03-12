@@ -183,12 +183,6 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.API.USER}|<p>OCID of user.</p>||
 |{$OCI.API.PRIVATE.KEY}|<p>Entire private key for API access.</p>||
 |{$OCI.API.FINGERPRINT}|<p>Fingerprint of private key.</p>||
-|{$OCI.SERVICE.DISCOVERY.COMPUTE}|<p>Set "true"/"false" to enable or disable monitoring of compute instances.</p>|`true`|
-|{$OCI.SERVICE.DISCOVERY.VCN}|<p>Set "true"/"false" to enable or disable monitoring of virtual cloud networks.</p>|`true`|
-|{$OCI.SERVICE.DISCOVERY.BLOCK.VOLUMES}|<p>Set "true"/"false" to enable or disable monitoring of block volumes.</p>|`true`|
-|{$OCI.SERVICE.DISCOVERY.BOOT.VOLUMES}|<p>Set "true"/"false" to enable or disable monitoring of boot volumes.</p>|`true`|
-|{$OCI.SERVICE.DISCOVERY.OBJECT.STORAGE}|<p>Set "true"/"false" to enable or disable monitoring of object storage.</p>|`true`|
-|{$OCI.SERVICE.DISCOVERY.AUTONOMOUS.DB}|<p>Set "true"/"false" to enable or disable monitoring of autonomous databases.</p>|`true`|
 |{$OCI.COMPUTE.DISCOVERY.STATE.MATCHES}|<p>Sets the regex string of compute instance states to allow in discovery.</p>|`.*`|
 |{$OCI.COMPUTE.DISCOVERY.STATE.NOT_MATCHES}|<p>Sets the regex string of compute instance states to ignore in discovery.</p>|`TERMINATED`|
 |{$OCI.COMPUTE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of compute instance names to allow in discovery.</p>|`.*`|

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-12T10:41:40Z'
+  date: '2024-03-12T13:16:16Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -6440,15 +6440,10 @@ zabbix_export:
             
             
             const params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'discovery_status', 'http_status_code'], params);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new OCI('Block volume', 'Get volumes', params);
             
-            if (params['discovery_status'] === 'true') {
-            	var oci = new OCI('Block volume', 'Get volumes', params);
-            
-            	return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/volumes', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
-            } else {
-            	return '[]';
-            }
+            return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/volumes', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
           filter:
             evaltype: AND
             conditions:
@@ -6487,8 +6482,6 @@ zabbix_export:
           parameters:
             - name: api_host
               value: '{$OCI.API.CORE.HOST}'
-            - name: discovery_status
-              value: '{$OCI.SERVICE.DISCOVERY.BLOCK.VOLUMES}'
             - name: fingerprint
               value: '{$OCI.API.FINGERPRINT}'
             - name: http_proxy
@@ -6661,15 +6654,10 @@ zabbix_export:
             
             
             const params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'discovery_status', 'http_status_code'], params);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new OCI('Boot volume', 'Get volumes', params);
             
-            if (params['discovery_status'] === 'true') {
-            	var oci = new OCI('Boot volume', 'Get volumes', params);
-            
-            	return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/bootVolumes', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
-            } else {
-            	return '[]';
-            }
+            return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/bootVolumes', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
           filter:
             evaltype: AND
             conditions:
@@ -6708,8 +6696,6 @@ zabbix_export:
           parameters:
             - name: api_host
               value: '{$OCI.API.CORE.HOST}'
-            - name: discovery_status
-              value: '{$OCI.SERVICE.DISCOVERY.BOOT.VOLUMES}'
             - name: fingerprint
               value: '{$OCI.API.FINGERPRINT}'
             - name: http_proxy
@@ -6882,15 +6868,10 @@ zabbix_export:
             
             
             const params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'discovery_status', 'http_status_code'], params);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new OCI('Compute', 'Get instances', params);
             
-            if (params['discovery_status'] === 'true') {
-            	var oci = new OCI('Compute', 'Get instances', params);
-            
-            	return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/instances', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags', 'availabilityDomain']));
-            } else {
-            	return '[]';
-            }
+            return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/instances', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags', 'availabilityDomain']));
           filter:
             evaltype: AND
             conditions:
@@ -6932,8 +6913,6 @@ zabbix_export:
           parameters:
             - name: api_host
               value: '{$OCI.API.CORE.HOST}'
-            - name: discovery_status
-              value: '{$OCI.SERVICE.DISCOVERY.COMPUTE}'
             - name: fingerprint
               value: '{$OCI.API.FINGERPRINT}'
             - name: http_proxy
@@ -7108,15 +7087,10 @@ zabbix_export:
             
             
             const params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'discovery_status', 'http_status_code'], params);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new OCI('Autonomous DB', 'Get DBs', params);
             
-            if (params['discovery_status'] === 'true') {
-            	var oci = new OCI('Autonomous DB', 'Get DBs', params);
-            
-            	return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/autonomousDatabases', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'dbName', 'lifecycleState', 'freeformTags']));
-            } else {
-            	return '[]';
-            }
+            return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/autonomousDatabases', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'dbName', 'lifecycleState', 'freeformTags']));
           filter:
             evaltype: AND
             conditions:
@@ -7155,8 +7129,6 @@ zabbix_export:
           parameters:
             - name: api_host
               value: '{$OCI.API.AUTONOMOUS.DB.HOST}'
-            - name: discovery_status
-              value: '{$OCI.SERVICE.DISCOVERY.AUTONOMOUS.DB}'
             - name: fingerprint
               value: '{$OCI.API.FINGERPRINT}'
             - name: http_proxy
@@ -7329,16 +7301,11 @@ zabbix_export:
             
             
             const params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'discovery_status', 'http_status_code'], params);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new OCI('Object storage', 'Get buckets', params);
+            const namespace = JSON.parse(oci.executeRequest('get', '/n', ''));
             
-            if (params['discovery_status'] === 'true') {
-            	var oci = new OCI('Object storage', 'Get buckets', params);
-            	const namespace = JSON.parse(oci.executeRequest('get', '/n', ''));
-            
-            	return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/n/' + encodeURIComponent(namespace) + '/b/', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid']) + '&fields=tags'), ['name', 'freeformTags']));
-            } else {
-            	return '[]';
-            }
+            return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/n/' + encodeURIComponent(namespace) + '/b/', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid']) + '&fields=tags'), ['name', 'freeformTags']));
           filter:
             evaltype: AND
             conditions:
@@ -7370,8 +7337,6 @@ zabbix_export:
           parameters:
             - name: api_host
               value: '{$OCI.API.OBJECT.STORAGE.HOST}'
-            - name: discovery_status
-              value: '{$OCI.SERVICE.DISCOVERY.OBJECT.STORAGE}'
             - name: fingerprint
               value: '{$OCI.API.FINGERPRINT}'
             - name: http_proxy
@@ -7540,15 +7505,10 @@ zabbix_export:
             
             
             const params = JSON.parse(value);
-            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'discovery_status', 'http_status_code'], params);
+            validateZabbixParams(['tenancy_ocid', 'user_ocid', 'private_key', 'fingerprint', 'api_host', 'http_status_code'], params);
+            var oci = new OCI('VCN', 'Get VCNs', params);
             
-            if (params['discovery_status'] === 'true') {
-            	var oci = new OCI('VCN', 'Get VCNs', params);
-            
-            	return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/vcns', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
-            } else {
-            	return '[]';
-            }
+            return JSON.stringify(oci.extractData('get', oci.executeRequest('get', '/20160918/vcns', '?compartmentId=' + encodeURIComponent(params['tenancy_ocid'])), ['id', 'displayName', 'lifecycleState', 'freeformTags']));
           filter:
             evaltype: AND
             conditions:
@@ -7587,8 +7547,6 @@ zabbix_export:
           parameters:
             - name: api_host
               value: '{$OCI.API.CORE.HOST}'
-            - name: discovery_status
-              value: '{$OCI.SERVICE.DISCOVERY.VCN}'
             - name: fingerprint
               value: '{$OCI.API.FINGERPRINT}'
             - name: http_proxy
@@ -7671,24 +7629,6 @@ zabbix_export:
         - macro: '{$OCI.OBJECT.STORAGE.DISCOVERY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Set an HTTP proxy for OCI API requests if needed.'
-        - macro: '{$OCI.SERVICE.DISCOVERY.AUTONOMOUS.DB}'
-          value: 'true'
-          description: 'Set "true"/"false" to enable or disable monitoring of autonomous databases.'
-        - macro: '{$OCI.SERVICE.DISCOVERY.BLOCK.VOLUMES}'
-          value: 'true'
-          description: 'Set "true"/"false" to enable or disable monitoring of block volumes.'
-        - macro: '{$OCI.SERVICE.DISCOVERY.BOOT.VOLUMES}'
-          value: 'true'
-          description: 'Set "true"/"false" to enable or disable monitoring of boot volumes.'
-        - macro: '{$OCI.SERVICE.DISCOVERY.COMPUTE}'
-          value: 'true'
-          description: 'Set "true"/"false" to enable or disable monitoring of compute instances.'
-        - macro: '{$OCI.SERVICE.DISCOVERY.OBJECT.STORAGE}'
-          value: 'true'
-          description: 'Set "true"/"false" to enable or disable monitoring of object storage.'
-        - macro: '{$OCI.SERVICE.DISCOVERY.VCN}'
-          value: 'true'
-          description: 'Set "true"/"false" to enable or disable monitoring of virtual cloud networks.'
         - macro: '{$OCI.VCN.DISCOVERY.NAME.MATCHES}'
           value: '.*'
           description: 'Sets the regex string of virtual cloud network names to allow in discovery.'
