@@ -3361,7 +3361,7 @@ static int	DBpatch_6050226(void)
 		return SUCCEED;
 
 	/* update default value for items and item prototypes */
-	if (ZBX_DB_OK > zbx_db_execute("update items set lifetime='7d' where flags<>1"))
+	if (ZBX_DB_OK > zbx_db_execute("update items set lifetime='7d' where flags in (0,2,4)"))
 		return FAIL;
 
 	return SUCCEED;
