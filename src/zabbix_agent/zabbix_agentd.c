@@ -1120,6 +1120,9 @@ zbx_on_exit_args_t;
 
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
+#ifdef _WINDOWS
+	ZBX_UNUSED(on_exit_args)
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	zbx_free_service_resources(ret);
@@ -1133,7 +1136,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
-#endif
+#else
 	if (NULL != on_exit_args)
 	{
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
@@ -1141,6 +1144,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		if (NULL != args->listen_sock)
 			zbx_tcp_unlisten(args->listen_sock);
 	}
+#endif
 
 	exit(EXIT_SUCCESS);
 }
@@ -1192,7 +1196,9 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t		listen_sock = {0};
+#ifndef _WINDOWS
 	zbx_on_exit_args_t	exit_args = {NULL};
+#endif
 	char			*error = NULL;
 	int			i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
@@ -1271,8 +1277,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_LISTENER])
 	{
+#ifndef _WINDOWS
 		exit_args.listen_sock = &listen_sock;
 		zbx_set_on_exit_args(&exit_args);
+#endif
 
 		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
