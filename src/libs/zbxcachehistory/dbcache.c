@@ -3210,12 +3210,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 					zbx_vector_ptr_clear_ext(&trigger_diff,
 							(zbx_clean_func_t)zbx_trigger_diff_free);
-					for (i = 0; i < escalations.values_num; i++)
-					{
-						zbx_escalation_new_t	*escalation = escalations.values[i];
-
-						zbx_free(escalation);
-					}
+					zbx_vector_escalation_new_ptr_clear_ext(&escalations,
+							 (zbx_escalation_new_ptr_free_func_t)zbx_ptr_free);
 					zbx_vector_escalation_new_ptr_destroy(&escalations);
 				}
 				while (ZBX_DB_DOWN == txn_error);

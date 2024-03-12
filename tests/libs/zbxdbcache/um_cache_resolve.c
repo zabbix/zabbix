@@ -26,24 +26,6 @@
 #include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
-
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
-{
-	ZBX_UNUSED(local_server_num);
-	ZBX_UNUSED(local_process_type);
-	ZBX_UNUSED(local_process_num);
-
-	return 0;
-}
-
-int	MAIN_ZABBIX_ENTRY(int flags)
-{
-	ZBX_UNUSED(flags);
-
-	return 0;
-}
-
 static void	mock_get_hostids(zbx_vector_uint64_t *hostids, zbx_mock_handle_t handle)
 {
 	zbx_mock_error_t	err;

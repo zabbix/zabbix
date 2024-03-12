@@ -35,24 +35,6 @@ int	zbx_dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, time_t
 #define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
-
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
-{
-	ZBX_UNUSED(local_server_num);
-	ZBX_UNUSED(local_process_type);
-	ZBX_UNUSED(local_process_num);
-
-	return 0;
-}
-
-int	MAIN_ZABBIX_ENTRY(int flags)
-{
-	ZBX_UNUSED(flags);
-
-	return 0;
-}
-
 static int	str_to_timer_type(const char *str)
 {
 	if (0 == strcmp(str, "ZBX_TRIGGER_TIMER_TRIGGER"))

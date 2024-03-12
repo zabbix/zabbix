@@ -18,6 +18,12 @@
 **/
 
 #include "zbxautoreg.h"
+
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 #include "zbx_trigger_constants.h"
 
 void	zbx_autoreg_host_free(zbx_autoreg_host_t *autoreg_host)

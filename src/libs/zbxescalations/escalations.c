@@ -19,6 +19,9 @@
 
 #include "zbxescalations.h"
 
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
 
@@ -31,9 +34,8 @@ void	zbx_init_escalations(int escalators_num, zbx_rtc_notify_generic_cb_t rtc_no
 	rtc_notify_generic_cb = rtc_notify_cb;
 }
 
-int	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new_ptr_t *escalations)
+void	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new_ptr_t *escalations)
 {
-	int				ret = FAIL;
 	zbx_vector_uint64_pair_t	*trigger_escalations;
 	zbx_uint64_pair_t		pair;
 
@@ -86,6 +88,4 @@ int	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new
 		zbx_vector_uint64_pair_destroy(&trigger_escalations[i]);
 
 	zbx_free(trigger_escalations);
-
-	return ret;
 }

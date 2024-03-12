@@ -27,6 +27,10 @@
 #include "zbxdiag.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxipcservice.h"
+#include "zbxprof.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
@@ -328,7 +332,7 @@ int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remote notify subscribers                                         *
+ * Purpose: notifies remote subscribers                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_rtc_notify_generic(zbx_ipc_async_socket_t *rtc, unsigned char process_type, int process_num,

@@ -33,6 +33,7 @@
 #include "zbxthreads.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
 
 static sigset_t			orig_mask;
 
@@ -157,7 +158,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	for (;;)
 	{
-		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data = NULL;
 		int		ret;
 
@@ -230,6 +230,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		wait_start_time = time(NULL);
 		do
 		{
+			zbx_uint32_t	rtc_cmd;
+
 			if (0 == sleeptime_after_notify)
 				sleeptime_after_notify = sleeptime;
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
@@ -253,7 +255,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	}
 end_loop:
 	if (SUCCEED == zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
-		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num );
+		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);

@@ -35,7 +35,6 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxescalations.h"
 
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 {
@@ -3094,7 +3093,7 @@ static void	prepare_actions_conditions_eval(zbx_vector_action_eval_ptr_t *action
  * Parameters: events          - [IN] events to apply actions for             *
  *             closed_events   - [IN] Vector of closed event data -           *
  *                                    (PROBLEM eventid, OK eventid) pairs.    *
- *             escalations     - [OUT]                                         *
+ *             escalations     - [IN/OUT]                                     *
  *                                                                            *
  ******************************************************************************/
 void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events,

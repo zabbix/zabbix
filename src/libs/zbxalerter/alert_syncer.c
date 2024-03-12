@@ -986,6 +986,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
+
 		alerts_num = am_db_queue_alerts(&amdb);
 		results_num = am_db_flush_results(&amdb);
 

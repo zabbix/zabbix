@@ -2908,20 +2908,20 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid,
 		zbx_ipc_async_socket_t *rtc)
 {
-	zbx_dc_trigger_t		trigger;
-	int				errcode, processed_num = 0;
-	zbx_timespec_t			ts;
-	zbx_db_event			*r_event;
-	zbx_vector_escalation_new_ptr_t	escalations;
+	zbx_dc_trigger_t	trigger;
+	int			errcode, processed_num = 0;
+	zbx_timespec_t		ts;
+	zbx_db_event		*r_event;
 
-	zbx_vector_escalation_new_ptr_create(&escalations);
 	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
 
 	if (SUCCEED == errcode)
 	{
-		zbx_vector_ptr_t	trigger_diff;
+		zbx_vector_ptr_t		trigger_diff;
+		zbx_vector_escalation_new_ptr_t	escalations;
 
 		zbx_vector_ptr_create(&trigger_diff);
+		zbx_vector_escalation_new_ptr_create(&escalations);
 
 		zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
 				ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger.value,
@@ -2981,16 +2981,11 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		zbx_vector_ptr_destroy(&trigger_diff);
 
-		for (int i = 0; i < escalations.values_num; i++)
-		{
-			zbx_escalation_new_t	*escalation = escalations.values[i];
-
-			zbx_free(escalation);
-		}
+		zbx_vector_escalation_new_ptr_clear_ext(&escalations, (zbx_escalation_new_ptr_free_func_t)zbx_ptr_free);
+		zbx_vector_escalation_new_ptr_destroy(&escalations);
 	}
 
 	zbx_dc_config_clean_triggers(&trigger, &errcode, 1);
-	zbx_vector_escalation_new_ptr_destroy(&escalations);
 
 	return (0 == processed_num ? FAIL : SUCCEED);
 }
