@@ -450,6 +450,8 @@ class CNavigationTree {
 	#registerEvents() {
 		this.#events = {
 			itemSelect: (e) => {
+				e.preventDefault();
+
 				const selected_node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
 				const selected_id = selected_node.dataset.id;
 
