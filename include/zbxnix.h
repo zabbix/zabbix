@@ -124,6 +124,7 @@ void	zbx_set_exit_on_terminate(void);
 void	zbx_unset_exit_on_terminate(void);
 
 void	zbx_log_exit_signal(void);
+void	zbx_set_on_exit_args(void *args);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);
