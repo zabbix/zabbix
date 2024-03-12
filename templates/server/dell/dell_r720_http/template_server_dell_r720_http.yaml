@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T21:00:31Z'
+  date: '2024-01-22T16:08:32Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -163,87 +163,87 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      system = JSON.parse(value);
+                  	system = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      system = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	system = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = {
-                      model: '',
-                      serialnumber: '',
-                      status: '',
-                      firmware: ''
+                  	model: '',
+                  	serialnumber: '',
+                  	status: '',
+                  	firmware: ''
                   };
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   result.model = getField(system, 'Model', '');

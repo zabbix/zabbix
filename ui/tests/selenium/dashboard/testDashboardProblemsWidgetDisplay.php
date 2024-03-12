@@ -677,8 +677,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							// Click on icon and open hint.
 							$button->click();
 							$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
-									->waitUntilVisible()->one();
-							$hint_table = $hint->query('class:list-table')->asTable()->one();
+									->waitUntilReady()->one();
+							$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 
 							// Check rows in hint's table.
 							foreach ($hint_table->getRows() as $i => $row) {

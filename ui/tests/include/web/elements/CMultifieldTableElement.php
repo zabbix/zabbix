@@ -130,6 +130,9 @@ class CMultifieldTableElement extends CTableElement {
 	 * Should be defined as follows (array keys match table headers):
 	 * ['Name' => 'tag', 'Value' => 'value']
 	 *
+	 * In case if selectors need to be specified for tables with headings, mapping keys also should match table header:
+	 * ['Name' => ['selector' => 'xpath:./input[@id="name"]'], 'Value' => ['selector' => 'xpath:./input[@id="value"]']]
+	 *
 	 * Be advised that when mapping is not set, multifield operations are slower and fields are indexed by indices (for
 	 * tables without headers) or by header text (for tables with headers).
 	 *
