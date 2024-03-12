@@ -124,6 +124,9 @@ class testFormValueMappings extends CWebTest {
 		// Check that both overlay control buttons are clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
 			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+
+		$dialog->close();
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -836,10 +839,11 @@ class testFormValueMappings extends CWebTest {
 			))->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
-		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
+		$form = $dialog->asForm();
+		$form->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
 
-		$mapping_table = $dialog->query('id:mappings-table')->asMultifieldTable()->one();
+		$mapping_table = $form->query('id:mappings-table')->asMultifieldTable()->one();
 		if (CTestArrayHelper::get($data, 'remove_all')) {
 			$mapping_table->clear();
 		}
@@ -850,11 +854,13 @@ class testFormValueMappings extends CWebTest {
 			}
 			$mapping_table->fill($data['mappings']);
 		}
-		$dialog->submit();
+		$form->submit();
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error_details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+
+			$dialog->close();
 		}
 		else {
 			// Save the configuration of the host with created/updated value mappings.
@@ -878,12 +884,17 @@ class testFormValueMappings extends CWebTest {
 				$this->page->removeFocus();
 				$this->page->updateViewport();
 
+				$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+
 				// Take a screenshot to test draggable object position in overlay dialog.
 				if ($action === 'create') {
-					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$this->assertScreenshot($dialog->query('id:mappings-table')->asMultifieldTable()->one(),
-						'Value mappings popup'.$data['screenshot_id']);
+					$this->assertScreenshot($mapping_dialog->query('id:mappings-table')->asMultifieldTable()->one(),
+							'Value mappings popup'.$data['screenshot_id']
+					);
 				}
+
+				$mapping_dialog->close();
+				COverlayDialogElement::find()->one()->close();
 
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
@@ -892,6 +903,8 @@ class testFormValueMappings extends CWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
+
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -1089,6 +1102,8 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -1112,5 +1127,7 @@ class testFormValueMappings extends CWebTest {
 		// It is necessary because of unexpected viewport shift.
 		$this->page->updateViewport();
 		$this->assertScreenshot($mapping_form->query('id:mappings-table')->waitUntilVisible()->one(), 'Value mapping mass update');
+
+		COverlayDialogElement::closeAll();
 	}
 }

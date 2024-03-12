@@ -46,18 +46,7 @@ class testMultiselectDialogs extends CWebTest {
 				}
 			}
 
-			$this->closeMultiselectDialogs();
-		}
-	}
-
-	/**
-	 * Function for closing all opened multiselect dialogs one by one.
-	 */
-	protected function closeMultiselectDialogs() {
-		$dialogs = COverlayDialogElement::find()->all();
-
-		for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
+			COverlayDialogElement::closeAll(true);
 		}
 	}
 

@@ -413,4 +413,13 @@ class CElementCollection implements Iterator {
 
 		return new CElementCollection($elements, $this->element_class);
 	}
+
+	/**
+	 * Reverse the order of element in an element collection.
+	 *
+	 * @return CElementCollection
+	 */
+	public function reverse() {
+		return new self(array_reverse($this->elements), $this->element_class);
+	}
 }

@@ -132,4 +132,13 @@ class COverlayDialogElement extends CElement {
 	public function scrollToTop() {
 		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this->getContent()]);
 	}
+
+	/**
+	 * Close all opened overlay dialogues
+	 *
+	 * @param boolean $cancel		true if cancel button, false if close (x) button
+	 */
+	public static function closeAll($cancel = false) {
+		COverlayDialogElement::find()->all()->reverse()->close($cancel);
+	}
 }

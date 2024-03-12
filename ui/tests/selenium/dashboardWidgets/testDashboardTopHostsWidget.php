@@ -2096,11 +2096,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Check that tag/column/threshold removed.
 		$this->assertEquals($amount_before - 1, $table->getRows()->count());
 
-		if ($data['table_id'] === 'id:thresholds_table') {
-			COverlayDialogElement::find()->all()->last()->close();
-		}
-
-		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::closeAll();
 	}
 
 	/**

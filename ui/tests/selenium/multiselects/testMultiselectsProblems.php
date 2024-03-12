@@ -276,7 +276,7 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 				break;
 		}
 
-		$this->closeMultiselectDialogs();
+		COverlayDialogElement::closeAll(true);
 	}
 }
 
