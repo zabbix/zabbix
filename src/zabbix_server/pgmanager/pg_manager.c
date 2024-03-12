@@ -64,6 +64,8 @@ static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
 	result = zbx_db_select("select hostid,proxy_groupid from hosts where monitored_by=%d",
 			HOST_MONITORED_BY_PROXY_GROUP);
 
+	pg_cache_lock(cache);
+
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	hostid, proxy_groupid;
@@ -80,6 +82,9 @@ static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
 
 		zbx_vector_uint64_append(&group->hostids, hostid);
 	}
+
+	pg_cache_unlock(cache);
+
 	zbx_db_free_result(result);
 }
 
@@ -97,6 +102,8 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 	now = (int)time(NULL);
 
 	result = zbx_db_select("select hostid,proxyid,revision,hostproxyid from host_proxy");
+
+	pg_cache_lock(cache);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -135,7 +142,6 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
 			proxy->group->hostmap_revision = revision;
 	}
-	zbx_db_free_result(result);
 
 	/* queue unmapped hosts for proxy assignment */
 
@@ -151,6 +157,10 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 				zbx_vector_uint64_append(&group->unassigned_hostids, group->hostids.values[i]);
 		}
 	}
+
+	pg_cache_lock(cache);
+
+	zbx_db_free_result(result);
 }
 
 
