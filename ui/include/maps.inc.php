@@ -627,7 +627,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	$triggers = $triggers + $selement_triggers;
 
-	$triggers_by_hostids = [];
+	$triggers_by_hostids = array_fill_keys(array_keys($hosts), []);
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
 			$triggerid = $trigger['triggerid'];
