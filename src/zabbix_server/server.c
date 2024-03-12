@@ -2255,8 +2255,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			/* check if the HA status has not been changed during startup process */
 			if (ZBX_NODE_STATUS_ACTIVE != ha_status)
 				server_teardown(&rtc, &listen_sock);
-			else
-				exit_args.listen_sock = &listen_sock;
 		}
 	}
 
