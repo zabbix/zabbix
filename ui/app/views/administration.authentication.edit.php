@@ -145,55 +145,6 @@ $auth_tab = (new CFormGrid())
 		)
 	]);
 
-// HTTP authentication fields.
-if ($data['http_auth_visible']) {
-	$http_tab = (new CFormGrid())
-		->addItem([
-			new CLabel([_('Enable HTTP authentication'),
-				makeHelpIcon(
-					_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
-				)
-			], 'http_auth_enabled'),
-			new CFormField(
-				(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
-					->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
-					->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
-			)
-		])
-		->addItem([
-			new CLabel(_('Default login form'), 'label-http-login-form'),
-			new CFormField(
-				(new CSelect('http_login_form'))
-					->setFocusableElementId('label-http-login-form')
-					->setValue($data['http_login_form'])
-					->addOptions(CSelect::createOptionsFromArray([
-						ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
-						ZBX_AUTH_FORM_HTTP => _('HTTP login form')
-					]))
-					->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
-			)
-		])
-		->addItem([
-			new CLabel(_('Remove domain name'), 'http_strip_domains'),
-			new CFormField(
-				(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
-					DB::getFieldLength('config', 'http_strip_domains')
-				))
-					->setEnabled($data['http_auth_enabled'])
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
-			new CFormField(
-				(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
-					->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-					->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
-					->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-			)
-		]);
-}
-
 // LDAP authentication fields.
 $ldap_auth_enabled = $data['ldap_error'] === '' && $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED;
 $form->addVar('ldap_default_row_index', $data['ldap_default_row_index']);
@@ -564,6 +515,53 @@ $saml_tab = (new CFormGrid())
 		->addTab('auth', _('Authentication'), $auth_tab);
 
 	if ($data['http_auth_visible']) {
+		// HTTP authentication fields.
+		$http_tab = (new CFormGrid())
+			->addItem([
+				new CLabel([_('Enable HTTP authentication'),
+					makeHelpIcon(
+						_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+					)
+				], 'http_auth_enabled'),
+				new CFormField(
+					(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
+						->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+						->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
+				)
+			])
+			->addItem([
+				new CLabel(_('Default login form'), 'label-http-login-form'),
+				new CFormField(
+					(new CSelect('http_login_form'))
+						->setFocusableElementId('label-http-login-form')
+						->setValue($data['http_login_form'])
+						->addOptions(CSelect::createOptionsFromArray([
+							ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
+							ZBX_AUTH_FORM_HTTP => _('HTTP login form')
+						]))
+						->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
+				)
+			])
+			->addItem([
+				new CLabel(_('Remove domain name'), 'http_strip_domains'),
+				new CFormField(
+					(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
+						DB::getFieldLength('config', 'http_strip_domains')
+					))
+						->setEnabled($data['http_auth_enabled'])
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
+				new CFormField(
+					(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+						->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+						->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+						->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+				)
+			]);
+
 		$tab_view->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP);
 	}
 
