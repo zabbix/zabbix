@@ -1121,7 +1121,7 @@ zbx_on_exit_args_t;
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 #ifdef _WINDOWS
-	ZBX_UNUSED(on_exit_args)
+	ZBX_UNUSED(on_exit_args);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
@@ -1196,9 +1196,7 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t		listen_sock = {0};
-#ifndef _WINDOWS
 	zbx_on_exit_args_t	exit_args = {NULL};
-#endif
 	char			*error = NULL;
 	int			i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
