@@ -304,8 +304,8 @@ class CHostNavigator {
 	/**
 	 * Create group for host according to current grouping level.
 	 *
-	 * @param {Object} host         Host object.
-	 * @param {number} level        Current grouping level.
+	 * @param {Object}      host    Host object.
+	 * @param {number}      level   Current grouping level.
 	 * @param {Object|null} parent  Parent object (group).
 	 */
 	#createGroup(host, level = 0, parent = null) {
@@ -482,24 +482,34 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Calculate problems for groups from child nodes.
+	 * Calculate problems for groups from each unique child host.
 	 *
 	 * @param {Array}       nodes   Array of nodes.
 	 * @param {Object|null} parent  Group object to set problems to.
+	 *
+	 * @returns {Object}  Problem count of unique hosts in parent group.
 	 */
 	#calculateGroupsProblems(nodes, parent = null) {
+		let hosts_problems = {};
+
 		for (const node of nodes) {
-
 			if (node.children?.length > 0) {
-				this.#calculateGroupsProblems(node.children, node);
+				hosts_problems = {...hosts_problems, ...this.#calculateGroupsProblems(node.children, node)};
 			}
+			else {
+				hosts_problems[node.hostid] = node.problem_count;
+			}
+		}
 
-			if (parent !== null) {
-				for (let i = 0; i < node.problem_count.length; i++) {
-					parent.problem_count[i] += node.problem_count[i];
+		if (parent !== null) {
+			for (const problem_count of Object.values(hosts_problems)) {
+				for (let i = 0; i < problem_count.length; i++) {
+					parent.problem_count[i] += problem_count[i];
 				}
 			}
 		}
+
+		return hosts_problems;
 	}
 
 	/**
