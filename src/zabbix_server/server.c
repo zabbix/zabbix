@@ -1097,7 +1097,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+	zabbix_log(1, "zbx_on_exit() called with ret:%d", ret);
 
 	if (NULL != zbx_threads)
 	{
@@ -1171,10 +1171,16 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_pre_exit_args_t	*args = (zbx_pre_exit_args_t *)on_exit_args;
 
 		if (NULL != args->listen_sock)
+		{
+			puts("cleaned sock");
 			zbx_tcp_unlisten(args->listen_sock);
+		}
 
 		if (NULL != args->rtc)
+		{
+			puts("cleaned rtc");
 			zbx_ipc_service_close(&args->rtc->service);
+		}
 
 	}
 
@@ -2005,7 +2011,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t	rtc;
 	zbx_timespec_t	rtc_timeout = {1, 0};
 	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
-	zbx_pre_exit_args_t	exit_args;
+	zbx_pre_exit_args_t	exit_args = {NULL, NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
