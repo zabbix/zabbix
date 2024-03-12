@@ -49,9 +49,9 @@ zbx_httpstat_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes all macro variables cached during http test execution     *
+ * Purpose: removes all macro variables cached during HTTP test execution     *
  *                                                                            *
- * Parameters: httptest - [IN] http test data                                 *
+ * Parameters: httptest - [IN] HTTP test data                                 *
  *                                                                            *
  ******************************************************************************/
 static void	httptest_remove_macros(zbx_httptest_t *httptest)
@@ -301,12 +301,12 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: loads http fields of web scenario step                            *
+ * Purpose: loads HTTP fields of web scenario step                            *
  *                                                                            *
  * Parameters: host     - [IN] host to be used in macro expansion             *
  *             httpstep - [IN/OUT] web scenario step                          *
  *                                                                            *
- * Return value: SUCCEED if http fields were loaded and macro expansion was   *
+ * Return value: SUCCEED if HTTP fields were loaded and macro expansion was   *
  *               successful. FAIL on error.                                   *
  *                                                                            *
  ******************************************************************************/
@@ -488,12 +488,12 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: loads http fields of web scenario                                 *
+ * Purpose: loads HTTP fields of web scenario                                 *
  *                                                                            *
  * Parameters: host     - [IN] host to be used in macro expansion             *
  *             httptest - [IN/OUT] web scenario                               *
  *                                                                            *
- * Return value: SUCCEED if http fields were loaded and macro expansion was   *
+ * Return value: SUCCEED if HTTP fields were loaded and macro expansion was   *
  *               successful. FAIL on error.                                   *
  *                                                                            *
  ******************************************************************************/
@@ -576,7 +576,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes single scenario of http test                            *
+ * Purpose: processes single scenario of HTTP test                            *
  *                                                                            *
  ******************************************************************************/
 static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay,

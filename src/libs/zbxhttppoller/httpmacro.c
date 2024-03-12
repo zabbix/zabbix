@@ -45,12 +45,12 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Appends key/value pair to the http test macro cache.              *
+ * Purpose: Appends key/value pair to the HTTP test macro cache.              *
  *          If the value format is 'regex:<pattern>', then regular expression *
  *          match is performed against the supplied data value and specified  *
  *          pattern. The first captured group is assigned to the macro value. *
  *                                                                            *
- * Parameters: httptest - [IN/OUT] http test data                             *
+ * Parameters: httptest - [IN/OUT] HTTP test data                             *
  *             pkey     - [IN] pointer to macro name (key) data               *
  *             nkey     - [IN] macro name (key) size                          *
  *             pvalue   - [IN] pointer to macro value data                    *
@@ -159,10 +159,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitutes variables in input string with their values from http *
+ * Purpose: substitutes variables in input string with their values from HTTP *
  *          test config                                                       *
  *                                                                            *
- * Parameters: httptest - [IN] http test data                                 *
+ * Parameters: httptest - [IN] HTTP test data                                 *
  *             data     - [IN/OUT] string to substitute macros in             *
  *                                                                            *
  ******************************************************************************/
@@ -253,14 +253,14 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Parses http test/step variable string and stores results into     *
+ * Purpose: Parses HTTP test/step variable string and stores results into     *
  *          httptest macro cache.                                             *
  *          The variables are specified as {<key>}=><value> pairs             *
  *          If the value format is 'regex:<pattern>', then regular expression *
  *          match is performed against the supplied data value and specified  *
  *          pattern. The first captured group is assigned to the macro value. *
  *                                                                            *
- * Parameters: httptest  - [IN/OUT] http test data                            *
+ * Parameters: httptest  - [IN/OUT] HTTP test data                            *
  *             variables - [IN] variable vector                               *
  *             data      - [IN] data for variable regexp matching (optional)  *
  *             err_str   - [OUT] error message (optional)                     *
