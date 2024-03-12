@@ -23,7 +23,8 @@ namespace Widgets\HostNavigator\Actions;
 
 use API,
 	CControllerDashboardWidgetView,
-	CControllerResponseData;
+	CControllerResponseData,
+	CProfile;
 
 use Widgets\HostNavigator\Includes\WidgetForm;
 
@@ -35,7 +36,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'with_config' => 'in 1'
+			'with_config' =>	'in 1',
+			'widgetid' =>		'db widget.widgetid',
+			'fields' =>			'array'
 		]);
 	}
 
@@ -49,7 +52,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if ($this->hasInput('with_config')) {
-			$data['vars']['config'] = $this->getConfig();
+			$data['vars']['config'] = $this->hasInput('widgetid')
+				? $this->getConfig($this->getInput('widgetid'))
+				: $this->getConfig();
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
@@ -82,29 +87,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$tags_to_keep = [];
 
 		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
-			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_TAG_VALUE) {
-				$group_by_tags = true;
-				$tags_to_keep[] = $group_by_attribute['tag_name'];
-			}
-
-			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_HOST_GROUP) {
-				$group_by_host_groups = true;
-			}
-
-			if ($group_by_attribute['attribute'] == WidgetForm::GROUP_BY_SEVERITY) {
-				$group_by_severity = true;
+			switch ($group_by_attribute['attribute']) {
+				case WidgetForm::GROUP_BY_TAG_VALUE:
+					$group_by_tags = true;
+					$tags_to_keep[] = $group_by_attribute['tag_name'];
+					break;
+				case WidgetForm::GROUP_BY_HOST_GROUP:
+					$group_by_host_groups = true;
+					break;
+				case WidgetForm::GROUP_BY_SEVERITY:
+					$group_by_severity = true;
+					break;
 			}
 		}
 
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
-			// Get hosts based on filter configurations
+			// Get hosts based on filter configurations.
 			$hosts = API::Host()->get([
 				'output' => $output,
 				'groupids' => $groupids,
-				'evaltype' => !$this->isTemplateDashboard() ? $this->fields_values['host_tags_evaltype'] : null,
-				'tags' => !$this->isTemplateDashboard() && $this->fields_values['host_tags']
-					? $this->fields_values['host_tags']
-					: null,
+				'evaltype' => $this->fields_values['host_tags_evaltype'],
+				'tags' => $this->fields_values['host_tags'] ?: null,
 				'search' => [
 					'name' => in_array('*', $this->fields_values['hosts'], true) ? null : $this->fields_values['hosts']
 				],
@@ -121,7 +124,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
 				'sortfield' => 'name',
-				// Request more than the set limit to distinguish if there are even more hosts available
+				// Request more than the set limit to distinguish if there are even more hosts available.
 				'limit' => $this->fields_values['show_lines'] + 1
 			]);
 		}
@@ -159,7 +162,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					return in_array($tag['tag'], $tags_to_keep);
 				});
 
-				// Reset array keys
+				// Reset array keys.
 				$host['tags'] = array_values($host['tags']);
 			}
 			unset($host);
@@ -255,10 +258,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 	}
 
-	private function getConfig(): array {
+	private function getConfig(string $widgetid = null): array {
+		$open_groups = [];
+
+		if ($widgetid !== null) {
+			$open_groupids = CProfile::findByIdxPattern('web.dashboard.widget.open.%', $widgetid);
+
+			foreach ($open_groupids as $open_groupid) {
+				$open_group = CProfile::get($open_groupid, [], $widgetid);
+
+				if ($open_group) {
+					$open_groups[] = $open_group;
+				}
+			}
+		}
+
 		return [
-			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
-			'group_by' => $this->fields_values['group_by']
+			'group_by' => $this->fields_values['group_by'],
+			'open_groups' => $open_groups,
+			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE
 		];
 	}
 }

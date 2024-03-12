@@ -28,6 +28,14 @@
 	"actions": {
 		"widget.hostnavigator.view": {
 			"class": "WidgetView"
+		},
+		"widget.hostnavigator.open": {
+			"class": "NavigatorGroupOpen",
+			"layout": "layout.json"
+		},
+		"widget.hostnavigator.close": {
+			"class": "NavigatorGroupClose",
+			"layout": "layout.json"
 		}
 	},
 	"assets": {

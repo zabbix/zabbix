@@ -72,8 +72,45 @@ class CWidgetHostNavigator extends CWidget {
 			},
 
 			groupToggle: e => {
-				// e.detail.group_identifier
-				// e.detail.is_open
+				const data = {
+					group_path: e.detail.group_identifier,
+					widgetid: this._widgetid
+				}
+
+				const curl = new Curl('zabbix.php');
+
+				curl.setArgument('action', e.detail.is_open
+					? 'widget.hostnavigator.open'
+					: 'widget.hostnavigator.close'
+				);
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(data)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						return response;
+					})
+					.catch((exception) => {
+						let title;
+						let messages;
+
+						if (typeof exception === 'object' && 'error' in exception) {
+							title = exception.error.title;
+							messages = exception.error.messages;
+
+							this._updateMessages(messages, title);
+						}
+						else {
+							this._updateMessages([t('Unexpected server error.')]);
+						}
+					});
 			}
 		};
 	}

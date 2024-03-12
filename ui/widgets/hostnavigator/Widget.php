@@ -31,6 +31,9 @@ class Widget extends CWidget {
 
 	public function getTranslationStrings(): array {
 		return [
+			'class.widget.js' => [
+				'Unexpected server error.' => _('Unexpected server error.')
+			],
 			'class.hostnavigator.js' => [
 				'Not classified' => _('Not classified'),
 				'Information' => _('Information'),
