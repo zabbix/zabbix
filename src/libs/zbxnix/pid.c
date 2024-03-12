@@ -111,5 +111,4 @@ void	drop_pid_file(const char *pidfile)
 	zbx_fclose(fpid);
 
 	unlink(pidfile);
-	sleep(4);
 }
