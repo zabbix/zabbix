@@ -49,10 +49,14 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$sqlDiscovery = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
+		echo (json_encode(CDBHelper::getAll('SELECT * FROM items WHERE hostid=15000 ORDER BY itemid'), JSON_PRETTY_PRINT));
+		var_dump('-------------');
+
 		$this->zbxTestLogin('host_discovery.php?form=update&context=host&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
+		echo (json_encode(CDBHelper::getAll('SELECT * FROM items WHERE hostid=15000 ORDER BY itemid'), JSON_PRETTY_PRINT));
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 	}
 
