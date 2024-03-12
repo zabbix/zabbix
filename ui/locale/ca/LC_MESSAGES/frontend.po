@@ -21637,6 +21637,10 @@ msgstr "per defecte"
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Converteix un valor de radians a graus"
 
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
@@ -22515,6 +22519,10 @@ msgstr "power() - La potència d'un valor base a un valor de potència"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "patró del problema"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"
