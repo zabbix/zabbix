@@ -234,7 +234,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 		{
 			char	err[MAX_STRING_LEN];
 
-			zbx_snprintf(err, sizeof(err), "wrong format of IP range \"%s\"", start);
+			zbx_snprintf(err, sizeof(err), "Wrong format of IP range \"%s\"", start);
 			discoverer_queue_append_error(drule_errors, drule->druleid, err);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
 			goto out;
@@ -255,7 +255,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 		{
 			char	err[MAX_STRING_LEN];
 
-			zbx_snprintf(err, sizeof(err), "encountered IP range \"%s\","
+			zbx_snprintf(err, sizeof(err), "Encountered IP range \"%s\","
 					" but IPv6 support not compiled in", start);
 			discoverer_queue_append_error(drule_errors, drule->druleid, err);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
