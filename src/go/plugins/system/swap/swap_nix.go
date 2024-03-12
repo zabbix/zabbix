@@ -26,7 +26,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"strconv"
 	"strings"
@@ -103,7 +102,7 @@ func getSwapPages() (r uint64, w uint64, data bool) {
 func getSwapDevStats(swapdev string, rw bool) (uint64, uint64, bool) {
 	var err error
 
-	var stat fs.FileInfo
+	var stat os.FileInfo
 	stat, err = os.Stat(swapdev)
 	if err != nil {
 		return 0, 0, false
@@ -200,11 +199,13 @@ func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, 
 			continue
 		}
 
-		if len(swapdev) != 0 && !strings.HasPrefix(scanner.Text(), swapdev) {
+		fields := strings.Fields(scanner.Text())
+
+		if len(swapdev) != 0 && swapdev != fields[0] {
 			continue
 		}
 
-		ioRec, sectRec, gotStats := getSwapDevStats(scanner.Text(), rw)
+		ioRec, sectRec, gotStats := getSwapDevStats(fields[0], rw)
 		if gotStats {
 			io += ioRec
 			sect += sectRec
