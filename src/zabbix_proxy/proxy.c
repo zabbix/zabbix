@@ -39,8 +39,8 @@
 #include "zbxdbsyncer.h"
 #include "zbxpinger.h"
 #include "zbxtrapper.h"
+#include "zbxdiscoverer.h"
 
-#include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "poller/poller_proxy.h"

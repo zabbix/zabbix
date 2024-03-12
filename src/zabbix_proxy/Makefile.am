@@ -20,7 +20,7 @@ zabbix_proxy_SOURCES = proxy.c
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
-	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
+	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
 	$(top_builddir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	proxyconfig/libzbxproxyconfig.a \
