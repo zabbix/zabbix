@@ -123,6 +123,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				(new CCheckBoxList())
 					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setOptions($ui)
+					->setVertical()
 					->setColumns(3)
 					->setLayoutFixed()
 					->setEnabled(!$data['readonly'])
