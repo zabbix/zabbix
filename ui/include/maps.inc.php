@@ -620,6 +620,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'hostids' => array_keys($monitored_hosts),
 			'filter' => ['state' => null],
 			'monitored' => true,
+			'only_true' => true,
 			'skipDependent' => true,
 			'preservekeys' => true
 		])
