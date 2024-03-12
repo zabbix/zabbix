@@ -1779,7 +1779,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
-				zbx_thread_start(dbconfig_worker_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_dbconfig_worker_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
 				thread_args.args = &report_manager_args;
