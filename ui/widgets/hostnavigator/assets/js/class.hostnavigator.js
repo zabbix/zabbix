@@ -258,6 +258,11 @@ class CHostNavigator {
 				nodes[i] = properties;
 			}
 			else {
+				const group_identifier = JSON.stringify(nodes[i].group_identifier);
+
+				nodes[i].group_identifier = group_identifier;
+				nodes[i].is_open = this.#config.open_groups?.includes(group_identifier);
+
 				if (show_problems) {
 					const severity_filter = nodes[i].group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY
 						? nodes[i].severity_index
@@ -321,7 +326,10 @@ class CHostNavigator {
 							attribute: CHostNavigator.GROUP_BY_HOST_GROUP,
 							name: t('Host group')
 						},
-						level: level
+						group_identifier: parent !== null
+							? [...parent.group_identifier, hostgroup.groupid]
+							: [hostgroup.groupid],
+						level
 					};
 
 					this.#insertGroup(new_group, parent, level, host);
@@ -340,8 +348,9 @@ class CHostNavigator {
 							attribute: CHostNavigator.GROUP_BY_TAG_VALUE,
 							name: attribute.tag_name
 						},
-						is_uncategorized: true,
-						level: level
+						group_identifier: parent !== null ? [...parent.group_identifier, null] : [null],
+						level,
+						is_uncategorized: true
 					};
 
 					this.#insertGroup(new_group, parent, level, host);
@@ -355,7 +364,8 @@ class CHostNavigator {
 								attribute: CHostNavigator.GROUP_BY_TAG_VALUE,
 								name: attribute.tag_name
 							},
-							level: level
+							group_identifier: parent !== null ? [...parent.group_identifier, tag.value] : [tag.value],
+							level
 						};
 
 						this.#insertGroup(new_group, parent, level, host);
@@ -375,8 +385,9 @@ class CHostNavigator {
 							attribute: CHostNavigator.GROUP_BY_SEVERITY,
 							name: t('Severity')
 						},
+						group_identifier: parent !== null ? [...parent.group_identifier, null] : [null],
+						level,
 						is_uncategorized: true,
-						level: level,
 						severity_index: -1
 					};
 
@@ -392,7 +403,8 @@ class CHostNavigator {
 									attribute: CHostNavigator.GROUP_BY_SEVERITY,
 									name: t('Severity')
 								},
-								level: level,
+								group_identifier: parent !== null ? [...parent.group_identifier, i] : [i],
+								level,
 								severity_index: i
 							};
 
@@ -414,11 +426,12 @@ class CHostNavigator {
 		return {
 			name: '',
 			group_by: {},
+			group_identifier: [],
+			level: 0,
 			is_uncategorized: false,
 			problem_count: Array.from({length: this.#severities.length}, () => 0),
-			level: 0,
 			children: [],
-			is_opened: true
+			is_open: false
 		};
 	}
 
@@ -541,11 +554,12 @@ class CHostNavigator {
 					}));
 				}
 			},
+
 			groupToggle: e => {
 				this.#container.dispatchEvent(new CustomEvent('group.toggle', {
 					detail: {
-						group_id: e.detail.group_id,
-						is_closed: e.detail.is_closed
+						group_identifier: e.detail.group_identifier,
+						is_open: e.detail.is_open
 					}
 				}));
 			}

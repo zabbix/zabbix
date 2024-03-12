@@ -70,10 +70,10 @@ class CWidgetHostNavigator extends CWidget {
 			hostSelect: e => {
 				this.broadcast({_hostid: e.detail._hostid});
 			},
+
 			groupToggle: e => {
-				updateUserProfile(`web.dashboard.widget.hostnavigator.group-${e.detail.group_id}.toggle`,
-					e.detail.is_closed, [this.getWidgetId()]
-				);
+				// e.detail.group_identifier
+				// e.detail.is_open
 			}
 		};
 	}

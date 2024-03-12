@@ -24,7 +24,7 @@ class CNavigationTree {
 	static ZBX_STYLE_NODES =									'navigation-tree-nodes';
 	static ZBX_STYLE_NODE =										'navigation-tree-node';
 	static ZBX_STYLE_NODE_IS_GROUP =							'navigation-tree-node-is-group';
-	static ZBX_STYLE_NODE_IS_OPENED =							'navigation-tree-node-is-opened';
+	static ZBX_STYLE_NODE_IS_OPEN =								'navigation-tree-node-is-open';
 	static ZBX_STYLE_NODE_IS_SELECTED =							'navigation-tree-node-is-selected';
 	static ZBX_STYLE_NODE_INFO =								'navigation-tree-node-info';
 	static ZBX_STYLE_NODE_INFO_HELPERS =						'navigation-tree-node-info-helpers';
@@ -158,10 +158,11 @@ class CNavigationTree {
 
 		if (node.children?.length > 0) {
 			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_GROUP);
+			container.dataset.group_identifier = node.group_identifier;
 		}
 
-		if (node.is_opened) {
-			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPENED);
+		if (node.is_open) {
+			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
 		}
 
 		if (node.is_uncategorized) {
@@ -248,7 +249,7 @@ class CNavigationTree {
 			button.type = 'button';
 
 			const span = document.createElement('span');
-			span.classList.add(node.is_opened ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_RIGHT);
+			span.classList.add(node.is_open ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_RIGHT);
 
 			button.appendChild(span);
 			arrow.appendChild(button);
@@ -468,36 +469,40 @@ class CNavigationTree {
 			groupToggle: (e) => {
 				const node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
 				const arrow = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-				let is_closed = '1';
+				let is_open = false;
 
-				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPENED)) {
-					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPENED);
+				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
+					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
 					arrow.querySelector('span').classList.add(ZBX_STYLE_ARROW_RIGHT);
 					arrow.querySelector('span').classList.remove(ZBX_STYLE_ARROW_DOWN);
 
-					const inner_opened_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPENED}`);
+					const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
 
-					for (const inner_opened_node of inner_opened_nodes) {
-						inner_opened_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPENED);
+					for (const inner_open_node of inner_open_nodes) {
+						inner_open_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
 
-						const inner_arrow = inner_opened_node
+						const inner_arrow = inner_open_node
 							.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
 
 						inner_arrow.querySelector('span').classList.add(ZBX_STYLE_ARROW_RIGHT);
 						inner_arrow.querySelector('span').classList.remove(ZBX_STYLE_ARROW_DOWN);
-
-						this.#container.dispatchEvent(new CustomEvent('group.toggle', {detail: {group_id: '123', is_closed}}));
 					}
 				}
 				else {
-					node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPENED);
+					node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
 					arrow.querySelector('span').classList.add(ZBX_STYLE_ARROW_DOWN);
 					arrow.querySelector('span').classList.remove(ZBX_STYLE_ARROW_RIGHT);
-					is_closed = '0';
+
+					is_open = true;
 				}
 
-				this.#container.dispatchEvent(new CustomEvent('group.toggle', {detail: {group_id: '123', is_closed}}));
-			},
+				this.#container.dispatchEvent(new CustomEvent('group.toggle', {
+					detail: {
+						group_identifier: node.dataset.group_identifier,
+						is_open
+					}
+				}));
+			}
 		};
 	}
 

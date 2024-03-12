@@ -3130,7 +3130,7 @@ output {
       border-top-color: #0275b8; }
 .navigation-tree .navigation-tree-node-children {
   display: none; }
-.navigation-tree .navigation-tree-node-is-opened > .navigation-tree-node-children {
+.navigation-tree .navigation-tree-node-is-open > .navigation-tree-node-children {
   display: block; }
 .navigation-tree .navigation-tree-node-info-name {
   height: 16px;
