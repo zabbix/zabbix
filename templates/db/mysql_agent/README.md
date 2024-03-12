@@ -23,27 +23,30 @@ This template has been tested on:
 ## Setup
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
-2. Copy `template_db_mysql.conf` into the folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart Zabbix agent.
-3. Create a MySQL user for monitoring (`<password>` at your discretion):
+2. Copy the `template_db_mysql.conf` file with user parameters into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget to restart Zabbix agent.
+3. Create the MySQL user that will be used for monitoring (`<password>` at your discretion). For example:
 
 ```text
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
 
-For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
+For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/grant.html).
 
-4. Create `.my.cnf` in the home directory of Zabbix agent for Linux (`/var/lib/zabbix` by default ) or `my.cnf` in c:\ for Windows. The file must have three strings:
+4. Create `.my.cnf` configuration file in the home directory of Zabbix agent for Linux distributions (/var/lib/zabbix by default) or `my.cnf` in c:\ for Windows. For example:
 
 ```text
 [client]
+protocol=tcp
 user='zbx_monitor'
 password='<password>'
 ```
-NOTE: Use systemd to start Zabbix agent on Linux OS.
-For example, in Centos use "systemctl edit zabbix-agent.service" to set the required user to start the Zabbix agent.
 
-Add the rule to the SELinux policy (example for Centos):
+For more information, please see [`MySQL documentation`](https://dev.mysql.com/doc/refman/8.0/en/option-files.html).
+
+NOTE: Linux distributions that use SELinux may require additional steps for access configuration.
+
+For example, the following rule could be added to the SELinux policy:
 
 ```text
 # cat <<EOF > zabbix_home.te
@@ -180,20 +183,20 @@ EOF
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|MySQL: Replication Slave status {#MASTERHOST}|<p>The item gets status information on the essential parameters of the slave threads.</p>|Zabbix agent|mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]|
+|MySQL: Replication Slave status {#MASTER_HOST}|<p>The item gets status information on the essential parameters of the slave threads.</p>|Zabbix agent|mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]|
 |MySQL: Replication Slave SQL Running State {#MASTER_HOST}|<p>This shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|MySQL: Replication Seconds Behind Master {#MASTERHOST}|<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTERHOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Seconds_Behind_Master']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li></ul>|
-|MySQL: Replication Slave IO Running {#MASTERHOST}|<p>Whether the I/O thread for reading the master's binary log is running.</p><p>Normally, you want this to be Yes unless you have not yet started replication or have</p><p>explicitly stopped it with STOP SLAVE.</p>|Dependent item|mysql.slave_io_running["{#MASTERHOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_IO_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|MySQL: Replication Slave SQL Running {#MASTERHOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be Yes.</p>|Dependent item|mysql.slave_sql_running["{#MASTERHOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_SQL_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|MySQL: Replication Seconds Behind Master {#MASTER_HOST}|<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Seconds_Behind_Master']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li></ul>|
+|MySQL: Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running.</p><p>Normally, you want this to be Yes unless you have not yet started replication or have</p><p>explicitly stopped it with STOP SLAVE.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_IO_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|MySQL: Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be Yes.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_SQL_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Replication discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MySQL: Replication lag is too high||`min(/MySQL by Zabbix agent/mysql.seconds_behind_master["{#MASTERHOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
-|MySQL: The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTERHOST}"],#1,"eq","No")=1`|Average||
-|MySQL: The slave I/O thread is not connected to a replication master||`count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTERHOST}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
-|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by Zabbix agent/mysql.slave_sql_running["{#MASTERHOST}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
+|MySQL: Replication lag is too high||`min(/MySQL by Zabbix agent/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
+|MySQL: The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Average||
+|MySQL: The slave I/O thread is not connected to a replication master||`count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
+|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by Zabbix agent/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
 
 ### LLD rule MariaDB discovery
 

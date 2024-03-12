@@ -220,9 +220,9 @@ class testPageHostDashboards extends CWebTest {
 			],
 			[
 				[
-					'fields' => ['id:from' => CURRENT_YEAR.'-01', 'id:to' => CURRENT_YEAR.'-01'],
-					'expected_fields' => ['id:from' => CURRENT_YEAR.'-01-01 00:00:00', 'id:to' => CURRENT_YEAR.'-01-31 23:59:59'],
-					'expected_tab' => CURRENT_YEAR.'-01-01 00:00:00 – '.CURRENT_YEAR.'-01-31 23:59:59',
+					'fields' => ['id:from' => '2023-01', 'id:to' => '2023-01'],
+					'expected_fields' => ['id:from' => '2023-01-01 00:00:00', 'id:to' => '2023-01-31 23:59:59'],
+					'expected_tab' => '2023-01-01 00:00:00 – 2023-01-31 23:59:59',
 					'zoom_buttons' => [
 						'btn-time-left' => true,
 						'btn-time-out' => true,
@@ -243,8 +243,9 @@ class testPageHostDashboards extends CWebTest {
 				[
 					'fields' => ['id:from' => 'now-3y', 'id:to' => 'now'],
 					'error' => [
-						'from' => 'Maximum time period to display is 730 days.'
-					]
+						'from' => 'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			]
 		];
@@ -271,11 +272,13 @@ class testPageHostDashboards extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'error', false)) {
-			// If error expected.
-
-			// Assert error text.
+		// Check error message if such is expected.
+		if (CTestArrayHelper::get($data, 'error')) {
 			foreach ($data['error'] as $field => $text) {
+				// Count of days mentioned in error depends ot presence of leap year february in selected period.
+				if (CTestArrayHelper::get($data, 'days_count')) {
+					$text = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $text);
+				}
 				$message = $this->query('xpath://ul[@data-error-for='.CXPathHelper::escapeQuotes($field).']//li')->one();
 				$this->assertEquals($text, $message->getText());
 			}

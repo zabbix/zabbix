@@ -1864,8 +1864,10 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	ZBX_DC_ITEM		*item;
 	char			**row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
-	if (NULL == (result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.itemid,i.hostid,i.status,i.type,i.value_type,i.key_,i.snmp_oid,i.ipmi_sensor,i.delay,"
 				"i.trapper_hosts,i.logtimefmt,i.params,ir.state,i.authtype,i.username,i.password,"
 				"i.publickey,i.privatekey,i.flags,i.interfaceid,ir.lastlogsize,ir.mtime,"
@@ -1875,15 +1877,22 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
 				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null"
 			" from items i"
+			" join item_rtdata ir on i.itemid=ir.itemid");
+
+	if (ZBX_DBSYNC_INIT != sync->mode)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			" inner join hosts h on i.hostid=h.hostid"
-			" join item_rtdata ir on i.itemid=ir.itemid"
 			" where (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d or i.flags=%d)",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
-			ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_CREATED)))
-
-	{
-		return FAIL;
+			ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_CREATED);
 	}
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	if (NULL == result)
+		return FAIL;
 
 	dbsync_prepare(sync, 50, dbsync_item_preproc_row);
 

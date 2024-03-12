@@ -227,7 +227,7 @@ class testFormUserMedia extends CWebTest {
 					'fields' => [
 						'Type' => 'SMS',
 						'Send to' => '192.168.0.1',
-						'When active' => 'allways'
+						'When active' => 'always'
 					],
 					'error_message' => 'Incorrect value for field "period": a time period is expected'
 				]

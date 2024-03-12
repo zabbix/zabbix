@@ -89,7 +89,7 @@ class testFormApiTokens extends CWebTest {
 
 		$expires_at = $form->getField('Expires at')->query('id:expires_at')->one();
 		$this->assertEquals('',$field->getValue());
-		$this->assertEquals('19', $expires_at->getAttribute('maxlength'));
+		$this->assertEquals('255', $expires_at->getAttribute('maxlength'));
 		$this->assertEquals('YYYY-MM-DD hh:mm:ss', $expires_at->getAttribute('placeholder'));
 		$calendar = $form->query('id:expires_at_calendar')->one();
 		$this->assertTrue($calendar->isClickable());

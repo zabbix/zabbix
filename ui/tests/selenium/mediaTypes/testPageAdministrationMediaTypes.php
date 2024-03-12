@@ -151,7 +151,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'Jira '
 					],
-					'result' => ['Jira ServiceDesk', 'Jira with CustomFields']
+					'result' => ['Jira ServiceDesk']
 				]
 			],
 			[
@@ -164,9 +164,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'a w'
+						'Name' => 'a S'
 					],
-					'result' => ['Jira with CustomFields']
+					'result' => ['Jira ServiceDesk']
 				]
 			],
 			// Filter by status.

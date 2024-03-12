@@ -1,5 +1,7 @@
-git.zabbix.com/ap/plugin-support v1.2.2-0.20231218083952-520d6761c876 h1:g8ZrA4U9t5Xd8qd0bJsVevoAMHq1yt58qkaxd5MAwHw=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20231218083952-520d6761c876/go.mod h1:FLyfsn/a9DjxDBgeMZsgIyTuvvnRm64Tuf32DaA0zcs=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20240228143153-d4d51ba21c80 h1:pS44jcuIXzYg9hLSlXU1Dx998LBc6sOCXoPjbzop4LY=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20240228143153-d4d51ba21c80/go.mod h1:FLyfsn/a9DjxDBgeMZsgIyTuvvnRm64Tuf32DaA0zcs=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20240229095958-858bf946dade h1:dER2H1ONx+91XQWV5MR6MnogphJ6hZe+3gQKqlwDCmM=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20240229095958-858bf946dade/go.mod h1:FLyfsn/a9DjxDBgeMZsgIyTuvvnRm64Tuf32DaA0zcs=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69/go.mod h1:L1AbZdiDllfyYH5l5OkAaZtk7VkWe89bPJFmnDBNHxg=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
@@ -52,8 +54,8 @@ github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFF
 github.com/ledongthuc/pdf v0.0.0-20220302134840-0c2507a12d80 h1:6Yzfa6GP0rIo/kULo2bwGEkFvCePZ3qHDDTC3/J9Swo=
 github.com/mailru/easyjson v0.7.7 h1:UGYAvKxe3sBsEDzO8ZeWOSlIQfWFlxbzLZe7hwFURr0=
 github.com/mailru/easyjson v0.7.7/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
-github.com/mattn/go-sqlite3 v1.14.8 h1:gDp86IdQsN/xWjIEmr9MF6o9mpksUgh0fu+9ByFxzIU=
-github.com/mattn/go-sqlite3 v1.14.8/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
+github.com/mattn/go-sqlite3 v1.14.19 h1:fhGleo2h1p8tVChob4I9HpmVFIAkKGpiukdrgQbWfGI=
+github.com/mattn/go-sqlite3 v1.14.19/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
 github.com/mediocregopher/radix/v3 v3.5.0 h1:8QHQmNh2ne9aFxTD3z63u/bkPPiOtknHoz80oP8EA/E=
 github.com/mediocregopher/radix/v3 v3.5.0/go.mod h1:8FL3F6UQRXHXIBSPUs5h0RybMF8i4n7wVopoX3x7Bv8=
 github.com/memcachier/mc/v3 v3.0.1 h1:Os/fUl/8c+hc1qWgjv5hNK0JI6GxKUOuehzB/UmjLP0=

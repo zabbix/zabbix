@@ -5630,23 +5630,20 @@ span.is-loading {
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
   overflow: hidden; }
 
-.menu-popup-preloader,
-.hintbox-preloader {
-  background: #ebeef0;
+.menu-popup-preloader {
+  background: #ffffff;
   border: 1px solid #ccd5d9;
   box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5);
-  height: 128px;
-  width: 128px;
+  height: 50px;
+  width: 50px;
   position: fixed;
   right: auto;
   bottom: auto;
   z-index: 1010; }
-  .menu-popup-preloader::before,
-  .hintbox-preloader::before {
-    background: #ebeef0; }
 
 .hintbox-preloader {
-  position: absolute; }
+  height: 50px;
+  width: 50px; }
 
 .browser-logo-chrome, .browser-logo-ff, .browser-logo-ed, .browser-logo-opera, .browser-logo-safari {
   background: url("../img/browser-sprite.png?20211222") no-repeat;

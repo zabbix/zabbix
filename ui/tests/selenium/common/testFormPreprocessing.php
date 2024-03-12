@@ -1099,7 +1099,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'json-wrong-parameter-space'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu usage_system']
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu usage_system']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -1112,7 +1112,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'json-wrong-parameter-slash'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu\\']
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu\\']
 
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
@@ -1126,7 +1126,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'json-wrong-parameter-digits'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus to JSON',  'parameter_1' => '123']
+						['type' => 'Prometheus to JSON', 'parameter_1' => '123']
 
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
@@ -1458,7 +1458,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong equals operator',
-						'Key' => 'rometeus-wrong-equals-operator'
+						'Key' => 'prometeus-wrong-equals-operator'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}=1']
@@ -1681,7 +1681,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter =!',
-						'Key' => 'wrong-second-parameter-equals-exlamation'
+						'Key' => 'wrong-second-parameter-equals-exclamation'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']
@@ -2673,7 +2673,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public function getItemInheritancePreprocessing() {
 		$data = $this->getCommonInheritancePreprocessing();
-		$data[0][0]['preprocessing'] =  array_merge([
+		$data[0][0]['preprocessing'] = array_merge([
 					[
 						'type' => 'Check for not supported value'
 					],
@@ -2827,7 +2827,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param CFormElement	$form				item, prototype or LLD configuration form
 	 * @param array			$original_steps		preprocessing steps of original item
 	 */
-	private function checkPreprocessingSteps($form, $original_steps) {
+	protected function checkPreprocessingSteps($form, $original_steps) {
 		$form->selectTab('Preprocessing');
 		$this->assertEquals($original_steps, $this->listPreprocessingSteps());
 
@@ -2835,6 +2835,210 @@ abstract class testFormPreprocessing extends CWebTest {
 		foreach (array_keys($this->listPreprocessingSteps()) as $i) {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
 			$this->assertNull($step->getAttribute('readonly'));
+		}
+	}
+
+	/**
+	 * Please note that this data provider consists only from ONE test case with an array of steps.
+	 */
+	public static function getItemsParametersData() {
+		return [
+			[
+				[
+					[
+						'type' => 'Regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern'],
+							['placeholder' => 'output']
+						]
+					],
+					[
+						'type' => 'Replace',
+						'parameters' => [
+							['placeholder' => 'search string'],
+							['placeholder' => 'replacement']
+						]
+					],
+					[
+						'type' => 'Trim',
+						'parameters' => [
+							['placeholder' => 'list of characters']
+						]
+					],
+					[
+						'type' => 'Right trim',
+						'parameters' => [
+							['placeholder' => 'list of characters']
+						]
+					],
+					[
+						'type' => 'Left trim',
+						'parameters' => [
+							['placeholder' => 'list of characters']
+						]
+					],
+					[
+						'type' => 'XML XPath',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'JSONPath',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'CSV to JSON',
+						'parameters' => [
+							['placeholder' => 'delimiter', 'value' => ','],
+							['placeholder' => 'qualifier', 'value' => '"'],
+							['value' => true]
+						]
+					],
+					[
+						'type' => 'XML to JSON'
+					],
+					[
+						'type' => 'Custom multiplier',
+						'parameters' => [
+							['placeholder' => 'number']
+						]
+					],
+					[
+						'type' => 'Simple change'
+					],
+					[
+						'type' => 'Change per second'
+					],
+					[
+						'type' => 'Boolean to decimal'
+					],
+					[
+						'type' => 'Octal to decimal'
+					],
+					[
+						'type' => 'Hexadecimal to decimal'
+					],
+					[
+						'type' => 'JavaScript',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'placeholder' => 'script'
+							]
+						]
+					],
+					[
+						'type' => 'In range',
+						'parameters' => [
+							['placeholder' => 'min'],
+							['placeholder' => 'max']
+						]
+					],
+					[
+						'type' => 'Matches regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern']
+						]
+					],
+					[
+						'type' => 'Does not match regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern']
+						]
+					],
+					[
+						'type' => 'Check for error in JSON',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'Check for error in XML',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'Check for error using regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern'],
+							['placeholder' => 'output']
+						]
+					],
+					[
+						'type' => 'Check for not supported value'
+					],
+					[
+						'type' => 'Discard unchanged'
+					],
+					[
+						'type' => 'Discard unchanged with heartbeat',
+						'parameters' => [
+							['placeholder' => 'seconds']
+						]
+					],
+					[
+						'type' => 'Prometheus pattern',
+						'parameters' => [
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>'],
+							['selector' => 'xpath:.//z-select[contains(@class, "preproc-param")]', 'value' => 'value'],
+							['placeholder' => '<label name>']
+						]
+					],
+					[
+						'type' => 'Prometheus to JSON',
+						'parameters' => [
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>']
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check placeholders and default values in preprocessing parameters.
+	 *
+	 * @param array $data    given preprocessing steps
+	 */
+	protected function checkParameters($data) {
+		$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(
+			[
+				'Name' => 'Item for preprocessing parameters check',
+				'Key' => 'preproc-params-check'
+			]
+		);
+
+		$form->selectTab('Preprocessing');
+		$this->query('id:param_add')->one()->click();
+		$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")][1]')->waitUntilPresent()->one();
+
+		foreach ($data as $step) {
+			$container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one()->fill($step['type']);
+
+			if (array_key_exists('parameters', $step)) {
+				foreach ($step['parameters'] as $i => $parameter) {
+					$parameter['selector'] = CTestArrayHelper::get($parameter, 'selector',
+							'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
+					);
+					$field = $container->query($parameter['selector'])->waitUntilPresent()->one();
+
+					if (array_key_exists('placeholder', $parameter)) {
+						$this->assertEquals($parameter['placeholder'], $field->getAttribute('placeholder'));
+					}
+
+					$this->assertEquals(CTestArrayHelper::get($parameter, 'value', ''), $field->getValue());
+				}
+			}
+			else {
+				$this->assertFalse($container->query('xpath:.//input[contains(@id, "preprocessing_0_params")]')->exists());
+			}
 		}
 	}
 }

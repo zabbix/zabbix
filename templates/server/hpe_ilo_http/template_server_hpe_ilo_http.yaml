@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-02T11:59:22Z'
+  date: '2024-01-22T16:11:53Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -35,290 +35,290 @@ zabbix_export:
           value_type: TEXT
           params: |
             var ilo = {
-                params: {},
-                session_token: "",
-                session_url: "",
+            	params: {},
+            	session_token: "",
+            	session_url: "",
             
-                setParams: function (params) {
-                    ['ilo_url', 'user', 'password'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
-                            throw 'Required parameter is not set: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['ilo_url', 'user', 'password'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required parameter is not set: "' + field + '".';
+            			}
+            		});
             
-                    ilo.params = params;
+            		ilo.params = params;
             
-                    if (typeof ilo.params.ilo_url === 'string' && !ilo.params.ilo_url.endsWith('/')) {
-                        ilo.params.ilo_url += '/';
-                    }
-                },
+            		if (typeof ilo.params.ilo_url === 'string' && !ilo.params.ilo_url.endsWith('/')) {
+            			ilo.params.ilo_url += '/';
+            		}
+            	},
             
-                apiAuth: function () {
-                    var request = new HttpRequest(),
-                        response,
-                        headers,
-                        url = encodeURI(ilo.params.ilo_url + 'redfish/v1/SessionService/Sessions/'),
-                        auth_data = {
-                            UserName: ilo.params.user,
-                            Password: ilo.params.password
-                        };
+            	apiAuth: function () {
+            		var request = new HttpRequest(),
+            			response,
+            			headers,
+            			url = encodeURI(ilo.params.ilo_url + 'redfish/v1/SessionService/Sessions/'),
+            			auth_data = {
+            				UserName: ilo.params.user,
+            				Password: ilo.params.password
+            			};
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Basic ' + btoa(ilo.params.user + ':' + ilo.params.password));
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Basic ' + btoa(ilo.params.user + ':' + ilo.params.password));
             
-                    if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
-                        request.setProxy(ilo.params.http_proxy);
-                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
-                    }
+            		if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
+            			request.setProxy(ilo.params.http_proxy);
+            			Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
+            		}
             
-                    Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
+            		Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
             
-                    response = request.post(url, JSON.stringify(auth_data));
+            		response = request.post(url, JSON.stringify(auth_data));
             
-                    Zabbix.log(4, '[ HPE iLO ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ HPE iLO ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() != 201) {
-                        throw 'Authentication failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() != 201) {
+            			throw 'Authentication failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse auth response received from API. Check debug log for more information.';
-                    }
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse auth response received from API. Check debug log for more information.';
+            		}
             
-                    try {
-                        headers = request.getHeaders();
-                    }
-                    catch (error) {
-                        throw 'Failed to parse auth headers received from API. Check debug log for more information.';
-                    }
+            		try {
+            			headers = request.getHeaders();
+            		}
+            		catch (error) {
+            			throw 'Failed to parse auth headers received from API. Check debug log for more information.';
+            		}
             
-                    try {
-                        ilo.session_token = headers['X-Auth-Token'];
-                        ilo.session_url = headers['Location'];
-                    }
-                    catch (error) {
-                        throw 'Failed to retrieve auth token or session URL from API. Check debug log for more information.';
-                    }
+            		try {
+            			ilo.session_token = headers['X-Auth-Token'];
+            			ilo.session_url = headers['Location'];
+            		}
+            		catch (error) {
+            			throw 'Failed to retrieve auth token or session URL from API. Check debug log for more information.';
+            		}
             
-                    delete request;
-                },
+            		delete request;
+            	},
             
-                apiLogout: function () {
-                    var request = new HttpRequest(),
-                        response,
-                        url = encodeURI(ilo.session_url);
+            	apiLogout: function () {
+            		var request = new HttpRequest(),
+            			response,
+            			url = encodeURI(ilo.session_url);
             
-                    request.addHeader('X-Auth-Token: ' + ilo.session_token);
+            		request.addHeader('X-Auth-Token: ' + ilo.session_token);
             
-                    if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
-                        request.setProxy(ilo.params.http_proxy);
-                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
-                    }
+            		if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
+            			request.setProxy(ilo.params.http_proxy);
+            			Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
+            		}
             
-                    Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
+            		Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
             
-                    response = request.delete(url);
+            		response = request.delete(url);
             
-                    Zabbix.log(4, '[ HPE iLO ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ HPE iLO ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() != 200) {
-                        throw 'Deleting of session failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() != 200) {
+            			throw 'Deleting of session failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    delete request;
-                },
+            		delete request;
+            	},
             
-                apiRequest: function (query) {
-                    var request = new HttpRequest(),
-                        response,
-                        url = encodeURI(ilo.params.ilo_url + query);
+            	apiRequest: function (query) {
+            		var request = new HttpRequest(),
+            			response,
+            			url = encodeURI(ilo.params.ilo_url + query);
             
-                    if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
-                        request.setProxy(ilo.params.http_proxy);
-                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
-                    }
+            		if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
+            			request.setProxy(ilo.params.http_proxy);
+            			Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
+            		}
             
-                    request.addHeader('X-Auth-Token: ' + ilo.session_token);
+            		request.addHeader('X-Auth-Token: ' + ilo.session_token);
             
-                    Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
+            		Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
             
-                    response = request.get(url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ HPE iLO ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ HPE iLO ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API. Check debug log for more information.';
-                    }
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API. Check debug log for more information.';
+            		}
             
-                    delete request;
+            		delete request;
             
-                    return response;
-                },
+            		return response;
+            	},
             
-                checkArray: function (array) {
-                    return typeof array !== 'undefined' && Array.isArray(array) && array.length > 0 ? true : false;
-                }
+            	checkArray: function (array) {
+            		return typeof array !== 'undefined' && Array.isArray(array) && array.length > 0 ? true : false;
+            	}
             };
             
             try {
-                ilo.setParams(JSON.parse(value));
-                ilo.apiAuth();
-                var systems = [],
-                    storages = [],
-                    controllers = [],
-                    drives = [],
-                    volumes = [],
-                    chassis = [],
-                    fans = [],
-                    sensors = [],
-                    psu = [],
-                    managers = [];
+            	ilo.setParams(JSON.parse(value));
+            	ilo.apiAuth();
+            	var systems = [],
+            		storages = [],
+            		controllers = [],
+            		drives = [],
+            		volumes = [],
+            		chassis = [],
+            		fans = [],
+            		sensors = [],
+            		psu = [],
+            		managers = [];
             
-                var get_systems = ilo.apiRequest('redfish/v1/Systems?$expand=.');
+            	var get_systems = ilo.apiRequest('redfish/v1/Systems?$expand=.');
             
-                if (ilo.checkArray(get_systems.Members)) {
-                    for (i in get_systems.Members) {
-                        if ('Id' in get_systems.Members[i]) {
-                            if (get_systems.Members[i].HostName === null) {
-                                get_systems.Members[i].HostName = get_systems.Members[i].Id;
-                            }
+            	if (ilo.checkArray(get_systems.Members)) {
+            		for (i in get_systems.Members) {
+            			if ('Id' in get_systems.Members[i]) {
+            				if (get_systems.Members[i].HostName === null) {
+            					get_systems.Members[i].HostName = get_systems.Members[i].Id;
+            				}
             
-                            systems.push(get_systems.Members[i]);
+            				systems.push(get_systems.Members[i]);
             
-                            var system_storages = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage?$expand=.');
+            				var system_storages = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage?$expand=.');
             
-                            if (ilo.checkArray(system_storages.Members)) {
-                                for (j in system_storages.Members) {
-                                    system_storages.Members[j].systemHostname = get_systems.Members[i].HostName;
-                                    system_storages.Members[j].systemType = get_systems.Members[i].SystemType;
-                                    system_storages.Members[j].systemId = get_systems.Members[i].Id;
+            				if (ilo.checkArray(system_storages.Members)) {
+            					for (j in system_storages.Members) {
+            						system_storages.Members[j].systemHostname = get_systems.Members[i].HostName;
+            						system_storages.Members[j].systemType = get_systems.Members[i].SystemType;
+            						system_storages.Members[j].systemId = get_systems.Members[i].Id;
             
-                                    storages.push(system_storages.Members[j]);
+            						storages.push(system_storages.Members[j]);
             
-                                    if ('Id' in system_storages.Members[j]) {
-                                        var storage_controllers = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Controllers?$expand=.');
+            						if ('Id' in system_storages.Members[j]) {
+            							var storage_controllers = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Controllers?$expand=.');
             
-                                        if (ilo.checkArray(storage_controllers.Members)) {
-                                            for (k in storage_controllers.Members) {
-                                                storage_controllers.Members[k].systemHostname = get_systems.Members[i].HostName;
-                                                storage_controllers.Members[k].systemType = get_systems.Members[i].SystemType;
-                                                storage_controllers.Members[k].systemId = get_systems.Members[i].Id;
-                                                storage_controllers.Members[k].storageId = system_storages.Members[j].Id;
+            							if (ilo.checkArray(storage_controllers.Members)) {
+            								for (k in storage_controllers.Members) {
+            									storage_controllers.Members[k].systemHostname = get_systems.Members[i].HostName;
+            									storage_controllers.Members[k].systemType = get_systems.Members[i].SystemType;
+            									storage_controllers.Members[k].systemId = get_systems.Members[i].Id;
+            									storage_controllers.Members[k].storageId = system_storages.Members[j].Id;
             
-                                                controllers.push(storage_controllers.Members[k]);
-                                            }
-                                        }
+            									controllers.push(storage_controllers.Members[k]);
+            								}
+            							}
             
-                                        var storage_drives = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '?$expand=.');
+            							var storage_drives = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '?$expand=.');
             
-                                        if (ilo.checkArray(storage_drives.Drives)) {
-                                            for (k in storage_drives.Drives) {
-                                                storage_drives.Drives[k].systemHostname = get_systems.Members[i].HostName;
-                                                storage_drives.Drives[k].systemType = get_systems.Members[i].SystemType;
-                                                storage_drives.Drives[k].systemId = get_systems.Members[i].Id;
-                                                storage_drives.Drives[k].storageId = system_storages.Members[j].Id;
+            							if (ilo.checkArray(storage_drives.Drives)) {
+            								for (k in storage_drives.Drives) {
+            									storage_drives.Drives[k].systemHostname = get_systems.Members[i].HostName;
+            									storage_drives.Drives[k].systemType = get_systems.Members[i].SystemType;
+            									storage_drives.Drives[k].systemId = get_systems.Members[i].Id;
+            									storage_drives.Drives[k].storageId = system_storages.Members[j].Id;
             
-                                                drives.push(storage_drives.Drives[k]);
-                                            }
-                                        }
+            									drives.push(storage_drives.Drives[k]);
+            								}
+            							}
             
-                                        var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
+            							var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
             
-                                        if (ilo.checkArray(storage_volumes.Members)) {
-                                            for (k in storage_volumes.Members) {
-                                                storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
-                                                storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
-                                                storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
-                                                storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
+            							if (ilo.checkArray(storage_volumes.Members)) {
+            								for (k in storage_volumes.Members) {
+            									storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
+            									storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
+            									storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
+            									storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
             
-                                                volumes.push(storage_volumes.Members[k]);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            									volumes.push(storage_volumes.Members[k]);
+            								}
+            							}
+            						}
+            					}
+            				}
+            			}
+            		}
+            	}
             
-                var get_chassis = ilo.apiRequest('redfish/v1/Chassis?$expand=.');
+            	var get_chassis = ilo.apiRequest('redfish/v1/Chassis?$expand=.');
             
-                if (ilo.checkArray(get_chassis.Members)) {
-                    for (i in get_chassis.Members) {
-                        if ('Id' in get_chassis.Members[i]) {
-                            chassis.push(get_chassis.Members[i]);
+            	if (ilo.checkArray(get_chassis.Members)) {
+            		for (i in get_chassis.Members) {
+            			if ('Id' in get_chassis.Members[i]) {
+            				chassis.push(get_chassis.Members[i]);
             
-                            chassis_thermal = ilo.apiRequest('redfish/v1/Chassis/' + get_chassis.Members[i].Id + '/Thermal/');
+            				chassis_thermal = ilo.apiRequest('redfish/v1/Chassis/' + get_chassis.Members[i].Id + '/Thermal/');
             
-                            if (ilo.checkArray(chassis_thermal.Fans)) {
-                                for (j in chassis_thermal.Fans) {
-                                    chassis_thermal.Fans[j].chassisId = get_chassis.Members[i].Id;
+            				if (ilo.checkArray(chassis_thermal.Fans)) {
+            					for (j in chassis_thermal.Fans) {
+            						chassis_thermal.Fans[j].chassisId = get_chassis.Members[i].Id;
             
-                                    fans.push(chassis_thermal.Fans[j]);
-                                }
-                            }
+            						fans.push(chassis_thermal.Fans[j]);
+            					}
+            				}
             
-                            if (ilo.checkArray(chassis_thermal.Temperatures)) {
-                                for (j in chassis_thermal.Temperatures) {
-                                    chassis_thermal.Temperatures[j].chassisId = get_chassis.Members[i].Id;
+            				if (ilo.checkArray(chassis_thermal.Temperatures)) {
+            					for (j in chassis_thermal.Temperatures) {
+            						chassis_thermal.Temperatures[j].chassisId = get_chassis.Members[i].Id;
             
-                                    sensors.push(chassis_thermal.Temperatures[j]);
-                                }
-                            }
+            						sensors.push(chassis_thermal.Temperatures[j]);
+            					}
+            				}
             
-                            chassis_power = ilo.apiRequest('redfish/v1/Chassis/' + get_chassis.Members[i].Id + '/Power/');
+            				chassis_power = ilo.apiRequest('redfish/v1/Chassis/' + get_chassis.Members[i].Id + '/Power/');
             
-                            if (ilo.checkArray(chassis_power.PowerSupplies)) {
-                                for (j in chassis_power.PowerSupplies) {
-                                    chassis_power.PowerSupplies[j].chassisId = get_chassis.Members[i].Id;
+            				if (ilo.checkArray(chassis_power.PowerSupplies)) {
+            					for (j in chassis_power.PowerSupplies) {
+            						chassis_power.PowerSupplies[j].chassisId = get_chassis.Members[i].Id;
             
-                                    psu.push(chassis_power.PowerSupplies[j]);
-                                }
-                            }
-                        }
-                    }
-                }
+            						psu.push(chassis_power.PowerSupplies[j]);
+            					}
+            				}
+            			}
+            		}
+            	}
             
-                var get_managers = ilo.apiRequest('redfish/v1/Managers?$expand=.');
+            	var get_managers = ilo.apiRequest('redfish/v1/Managers?$expand=.');
             
-                if (ilo.checkArray(get_managers.Members)) {
-                    for (i in get_managers.Members) {
-                        if ('Id' in get_managers.Members[i]) {
-                            managers.push(get_managers.Members[i]);
-                        }
-                    }
-                }
+            	if (ilo.checkArray(get_managers.Members)) {
+            		for (i in get_managers.Members) {
+            			if ('Id' in get_managers.Members[i]) {
+            				managers.push(get_managers.Members[i]);
+            			}
+            		}
+            	}
             
-                ilo.apiLogout();
+            	ilo.apiLogout();
             
-                return JSON.stringify({
-                    'systems': systems,
-                    'storages': storages,
-                    'controllers': controllers,
-                    'drives': drives,
-                    'volumes': volumes,
-                    'chassis': chassis,
-                    'fans': fans,
-                    'sensors': sensors,
-                    'psu': psu,
-                    'managers': managers
-                });
+            	return JSON.stringify({
+            		'systems': systems,
+            		'storages': storages,
+            		'controllers': controllers,
+            		'drives': drives,
+            		'volumes': volumes,
+            		'chassis': chassis,
+            		'fans': fans,
+            		'sensors': sensors,
+            		'psu': psu,
+            		'managers': managers
+            	});
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ HPE iLO ] ERROR: ' + error);
-                return JSON.stringify({ error: error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ HPE iLO ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
             }
           description: 'The JSON with the result of API requests.'
           timeout: '{$ILO.TIMEOUT}'
@@ -535,9 +535,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -602,12 +602,12 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'Physical',
-                          'Virtual',
-                          'OS',
-                          'PhysicallyPartitioned',
-                          'VirtuallyPartitioned',
-                          'DPU'
+                      	'Physical',
+                      	'Virtual',
+                      	'OS',
+                      	'PhysicallyPartitioned',
+                      	'VirtuallyPartitioned',
+                      	'DPU'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -897,9 +897,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1083,8 +1083,8 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'HDD',
-                          'SSD'
+                      	'HDD',
+                      	'SSD'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1241,13 +1241,13 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Fail',
-                          'Rebuild',
-                          'PredictiveFailureAnalysis',
-                          'Hotspare',
-                          'InACriticalArray',
-                          'InAFailedArray'
+                      	'OK',
+                      	'Fail',
+                      	'Rebuild',
+                      	'PredictiveFailureAnalysis',
+                      	'Hotspare',
+                      	'InACriticalArray',
+                      	'InAFailedArray'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1435,9 +1435,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1636,9 +1636,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1701,9 +1701,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'ManagementController',
-                          'EnclosureManager',
-                          'BMC'
+                      	'ManagementController',
+                      	'EnclosureManager',
+                      	'BMC'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1911,9 +1911,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2076,9 +2076,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2263,9 +2263,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2439,23 +2439,23 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'RAID0',
-                          'RAID1',
-                          'RAID3',
-                          'RAID4',
-                          'RAID5',
-                          'RAID6',
-                          'RAID10',
-                          'RAID01',
-                          'RAID6TP',
-                          'RAID1E',
-                          'RAID50',
-                          'RAID60',
-                          'RAID00',
-                          'RAID10E',
-                          'RAID1Triple',
-                          'RAID10Triple',
-                          'None'
+                      	'RAID0',
+                      	'RAID1',
+                      	'RAID3',
+                      	'RAID4',
+                      	'RAID5',
+                      	'RAID6',
+                      	'RAID10',
+                      	'RAID01',
+                      	'RAID6TP',
+                      	'RAID1E',
+                      	'RAID50',
+                      	'RAID60',
+                      	'RAID00',
+                      	'RAID10E',
+                      	'RAID1Triple',
+                      	'RAID10Triple',
+                      	'None'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 20;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2497,9 +2497,9 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'OK',
-                          'Warning',
-                          'Critical'
+                      	'OK',
+                      	'Warning',
+                      	'Critical'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT

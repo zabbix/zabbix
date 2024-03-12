@@ -573,6 +573,10 @@ func (t *mockWatcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *mockWatcherTask) Delay() string {
+	return ""
+}
+
 type mockConfigerTask struct {
 	taskBase
 	sink    chan performer

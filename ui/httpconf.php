@@ -218,12 +218,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (array_key_exists('pairs', $step)) {
 				foreach ($field_names as $field_name) {
 					foreach ($step['pairs'] as $pair) {
-						if (array_key_exists('type', $pair) && $field_name === $pair['type'] &&
-							((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-							(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
+						if (array_key_exists('type', $pair) && $field_name === $pair['type']) {
+							$name = array_key_exists('name', $pair) ? trim($pair['name']) : '';
+							$value = array_key_exists('value', $pair) ? trim($pair['value']) : '';
+
+							if ($name === '' && $value === '') {
+								continue;
+							}
+
 							$step[$field_name][] = [
-								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
+								'name' => $name,
+								'value' => $value
 							];
 						}
 					}
@@ -231,14 +236,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['pairs']);
 			}
 
-			foreach ($step['variables'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-			}
-			unset($variable);
-
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = $step['post_fields'];
 			}
+			else {
+				$step['posts'] = trim($step['posts']);
+			}
+
 			unset($step['post_fields'], $step['post_type']);
 		}
 		unset($step);
@@ -266,21 +270,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		];
 
 		foreach (getRequest('pairs', []) as $pair) {
-			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
-				((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-				(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
+			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers'])) {
+				$name = array_key_exists('name', $pair) ? trim($pair['name']) : '';
+				$value = array_key_exists('value', $pair) ? trim($pair['value']) : '';
+
+				if ($name === '' && $value === '') {
+					continue;
+				}
 
 				$httpTest[$pair['type']][] = [
-					'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-					'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
+					'name' => $name,
+					'value' => $value
 				];
 			}
 		}
-
-		foreach ($httpTest['variables'] as &$variable) {
-			$variable['name'] = trim($variable['name']);
-		}
-		unset($variable);
 
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change

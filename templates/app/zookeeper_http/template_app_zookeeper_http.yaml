@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:47:13Z'
+  date: '2024-01-22T15:19:32Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -50,9 +50,9 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value),
-                      res = metrics.avg_election_time || metrics['election_time{quantile="0.5"}'];
+                  	res = metrics.avg_election_time || metrics['election_time{quantile="0.5"}'];
                   if (isNaN(res)) {
-                      return 0;
+                  	return 0;
                   }
                   return res;
           master_item:
@@ -74,9 +74,9 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value),
-                      res = metrics.avg_fsynctime || metrics['fsynctime{quantile="0.5"}'];
+                  	res = metrics.avg_fsynctime || metrics['fsynctime{quantile="0.5"}'];
                   if (isNaN(res)) {
-                      return 0;
+                  	return 0;
                   }
                   return res;
           master_item:
@@ -116,9 +116,9 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value),
-                      res = metrics['snapshottime{quantile="0.5"}'] || metrics.avg_snapshottime ;
+                  	res = metrics['snapshottime{quantile="0.5"}'] || metrics.avg_snapshottime ;
                   if (isNaN(res)) {
-                      return 0;
+                  	return 0;
                   }
                   return res;
           master_item:
@@ -160,10 +160,10 @@ zabbix_export:
                 - |
                   var metrics = JSON.parse(value);
                   if (metrics.server_state === "standalone") {
-                      return 0
-                      }
+                  	return 0
+                  	}
                   else {
-                      return metrics.cnt_election_time || metrics.election_time_count
+                  	return metrics.cnt_election_time || metrics.election_time_count
                   }
           master_item:
             key: zookeeper.get_metrics

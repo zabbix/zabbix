@@ -190,7 +190,7 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
-					// If problem is Aknowledged - label is changed to Unacknowledge.
+					// If problem is Acknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Unacknowledge', 'Close problem', ''],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
