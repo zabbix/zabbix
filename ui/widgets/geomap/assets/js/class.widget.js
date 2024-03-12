@@ -37,17 +37,16 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	promiseReady() {
-		const readiness = [super.promiseReady()];
-
-		if (this._map !== null) {
-			readiness.push(
-				new Promise(resolve => {
-					this._map.whenReady(() => setTimeout(resolve, 300));
-				})
-			);
+		if (this._map === null){
+			return super.promiseReady();
 		}
 
-		return Promise.all(readiness);
+		return new Promise(resolve => {
+			this._map.whenReady(() => {
+				super.promiseReady()
+					.then(() => setTimeout(resolve, 300));
+			});
+		});
 	}
 
 	getUpdateRequestData() {

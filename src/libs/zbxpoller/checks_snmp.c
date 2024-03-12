@@ -224,10 +224,10 @@ ZBX_VECTOR_IMPL(engineid_device, zbx_snmp_engineid_device_t)
 
 typedef struct
 {
-	unsigned char					engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
-	size_t							engineid_len;
+	unsigned char			engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
+	size_t				engineid_len;
 	zbx_vector_engineid_device_t	devices;
-	time_t							lastlog;
+	time_t				lastlog;
 }
 zbx_snmp_engineid_record_t;
 
@@ -1154,11 +1154,11 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 static void	zbx_snmp_dump_oid(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len)
 {
-	size_t	i, offset = 0;
+	size_t	offset = 0;
 
 	*buffer = '\0';
 
-	for (i = 0; i < objid_len; i++)
+	for (size_t i = 0; i < objid_len; i++)
 		offset += zbx_snprintf(buffer + offset, buffer_len - offset, ".%lu", (unsigned long)objid[i]);
 }
 
@@ -1652,6 +1652,9 @@ out:
 
 	return ret;
 }
+
+#undef ZBX_OID_INDEX_STRING
+#undef ZBX_OID_INDEX_NUMERIC
 
 static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 		char oids[][ZBX_ITEM_SNMP_OID_LEN_MAX], AGENT_RESULT *results, int *errcodes,

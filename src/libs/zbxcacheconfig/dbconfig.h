@@ -384,10 +384,6 @@ typedef struct
 	zbx_uint64_t	proxyid;
 	zbx_uint64_t	items_active_normal;		/* On enabled hosts these two fields store number of enabled */
 	zbx_uint64_t	items_active_notsupported;	/* and supported items and enabled and not supported items.  */
-	zbx_uint64_t	items_disabled;			/* On "hosts" corresponding to proxies this and two fields   */
-							/* above store cumulative statistics for all hosts monitored */
-							/* by a particular proxy. */
-							/* NOTE: On disabled hosts all items are counted as disabled. */
 	zbx_uint64_t	maintenanceid;
 
 	const char	*host;
