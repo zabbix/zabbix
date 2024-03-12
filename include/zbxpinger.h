@@ -24,10 +24,10 @@
 
 typedef struct
 {
-	int			config_timeout;
+	int	config_timeout;
 }
 zbx_thread_pinger_args;
 
-ZBX_THREAD_ENTRY(pinger_thread, args);
+ZBX_THREAD_ENTRY(zbx_pinger_thread, args);
 
 #endif

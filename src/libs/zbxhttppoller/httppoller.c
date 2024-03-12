@@ -34,7 +34,7 @@
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(httppoller_thread, args)
+ZBX_THREAD_ENTRY(zbx_httppoller_thread, args)
 {
 	int					sleeptime = -1, httptests_count = 0, old_httptests_count = 0,
 						server_num = ((zbx_thread_args_t *)args)->info.server_num,
