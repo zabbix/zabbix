@@ -417,7 +417,7 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 
 	if (0 < query_fields.values_num)
 	{
-		/* url can contain '?' so proper delimiter should be selected */
+		/* URL can contain '?' so proper delimiter should be selected */
 		if (NULL != strchr(url, '?'))
 			query_delimiter = '&';
 
@@ -1049,7 +1049,7 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 	um_handle = zbx_dc_open_user_macros();
 
-	/* create macro cache to use in http tests */
+	/* create macro cache to use in HTTP tests */
 	zbx_vector_ptr_pair_create(&httptest.macros);
 
 	do
@@ -1152,7 +1152,7 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 			zbx_free(httptest.headers);
 			httppairs_free(&httptest.variables);
 
-			/* clear the macro cache used in this http test */
+			/* clear the macro cache used in this HTTP test */
 			httptest_remove_macros(&httptest);
 
 			httptests_count++;	/* performance metric */
@@ -1161,7 +1161,7 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 	}
 	while (ZBX_IS_RUNNING() && SUCCEED == zbx_dc_httptest_next(now, &httptestid, nextcheck));
 
-	/* destroy the macro cache used in http tests */
+	/* destroy the macro cache used in HTTP tests */
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
 
 	zbx_dc_close_user_macros(um_handle);
