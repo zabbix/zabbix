@@ -604,8 +604,14 @@ switch ($data['popup_type']) {
 					'value_type' => $item['value_type'],
 					'host' => $host['name']
 				];
+
+				$records[$item['name']] = $item;
 			}
 			unset($item);
+
+			if ($options['patternselect']) {
+				$data['table_records'] = $records;
+			}
 		}
 		break;
 
