@@ -80,7 +80,8 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 			exit(EXIT_FAILURE);
 		}
 
-		if (NULL == (fptr = dlsym(handle, "curl_multi_wait")))
+		/* use *(void **)(&fptr) to silence the "-pedantic" warning */
+		if (NULL == (*(void **)(&fptr) = dlsym(handle, "curl_multi_wait")))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_multi_wait(): %s", dlerror());
 			exit(EXIT_FAILURE);
