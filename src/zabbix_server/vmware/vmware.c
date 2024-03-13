@@ -476,6 +476,7 @@ static int	vmware_shared_strsearch(const char *str)
 static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
 {
 	void	*ptr;
+	zbx_uint64_t	sz;
 
 	if (NULL != len)
 		*len = 0;
@@ -483,20 +484,12 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 	if (NULL == str)
 		return NULL;
 
-	ptr = zbx_hashset_search(strpool, str - REFCOUNT_FIELD_SIZE);
+	sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+	ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE,
+			ZBX_HASHSET_UNIQ_FALSE);
 
-	if (NULL == ptr)
-	{
-		zbx_uint64_t	sz;
-
-		sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
-		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE);
-
-		*(zbx_uint32_t *)ptr = 0;
-
-		if (NULL != len)
-			*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
-	}
+	if (NULL != len)
+		*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
 
 	(*(zbx_uint32_t *)ptr)++;
 
@@ -3924,7 +3917,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort Datastore names vector by name           *
+ * Purpose: comparison function to sort Datastore names vector by name        *
  *                                                                            *
  ******************************************************************************/
 int	vmware_dsname_compare(const void *d1, const void *d2)
@@ -3933,6 +3926,19 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
 
 	return strcmp(ds1->name, ds2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: comparison function to sort Datastore names vector by UUID        *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_dsname_compare_uuid(const void *d1, const void *d2)
+{
+	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
+	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
 }
 
 /******************************************************************************
