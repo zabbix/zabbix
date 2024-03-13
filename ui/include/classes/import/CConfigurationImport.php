@@ -2422,6 +2422,7 @@ class CConfigurationImport {
 			API::ItemPrototype()->delete(array_keys($item_prototypes_to_delete));
 
 			$this->referencer->refreshItems();
+			$this->referencer->refreshTriggers();
 		}
 	}
 
