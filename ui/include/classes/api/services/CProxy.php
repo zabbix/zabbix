@@ -99,6 +99,10 @@ class CProxy extends CApiService {
 			}
 		}
 
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $output_fields;
+		}
+
 		$resource = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
 
 		$db_proxies = [];
