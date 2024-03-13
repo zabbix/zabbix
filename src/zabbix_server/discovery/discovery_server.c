@@ -69,9 +69,12 @@ static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, cons
 
 /******************************************************************************
  *                                                                            *
- * Purpose: separate multiple-IP hosts                                        *
+ * Purpose: separates multiple-IP hosts                                       *
  *                                                                            *
- * Parameters: host ip address                                                *
+ * Parameters:                                                                *
+ *    druleid - [IN] host ip address                                          *
+ *    dhost   - [OUT]                                                         *
+ *    ip      - [IN]                                                          *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip)
@@ -122,9 +125,17 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register host if one does not exist                               *
+ * Purpose: registers host if one does not exist yet                          *
  *                                                                            *
- * Parameters: host ip address                                                *
+ * Parameters:                                                                *
+ *    druleid         - [IN]                                                  *
+ *    dcheckid        - [IN]                                                  *
+ *    unique_dcheckid - [IN]                                                  *
+ *    dhost           - [IN]                                                  *
+ *    ip              - [OUT] host ip address                                 *
+ *    port            - [IN]                                                  *
+ *    status          - [IN]                                                  *
+ *    value           - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
@@ -202,9 +213,16 @@ zbx_db_dservice;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register service if one does not exist                            *
+ * Purpose: registers service if one does not exist yet                       *
  *                                                                            *
- * Parameters: host ip address                                                *
+ * Parameters:                                                                *
+ *    dcheckid - [IN]                                                         *
+ *    dhost    - [OUT]                                                        *
+ *    dservice - [IN]                                                         *
+ *    ip       - [IN] host ip address                                         *
+ *    dns      - [IN]                                                         *
+ *    port     - [IN]                                                         *
+ *    status   - [IN]                                                         *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhost, zbx_db_dservice *dservice,
@@ -292,7 +310,7 @@ static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhos
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update discovered service details                                 *
+ * Purpose: updates discovered service details                                *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int lastup, int lastdown,
@@ -310,7 +328,7 @@ static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int l
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update discovered service details                                 *
+ * Purpose: updates discovered service details                                *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char *value)
@@ -326,7 +344,7 @@ static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update discovered host details                                    *
+ * Purpose: updates discovered host details                                   *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dhost(const zbx_db_dhost *dhost)
@@ -337,7 +355,7 @@ static void	discovery_update_dhost(const zbx_db_dhost *dhost)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process and update the new service status                         *
+ * Purpose: processes and updates new service status                          *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_dservice *dservice,
@@ -414,7 +432,7 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update new host status                                            *
+ * Purpose: updates new host status                                           *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int now,
@@ -472,7 +490,7 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new host status                                           *
+ * Purpose: processes new host status                                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
@@ -493,7 +511,7 @@ void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new service status                                        *
+ * Purpose: processes new service status                                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,

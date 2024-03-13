@@ -1843,19 +1843,22 @@ fail:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parse discovery data contents and process it                      *
- *                                                                            *
- * Parameters: jp_data         - [IN] JSON with discovery data                *
- *             events_cbs      - [IN]                                         *
- *             error           - [OUT] address of a pointer to the info       *
- *                                     string (should be freed by the caller) *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: parsees discovery data contents and processes it                     *
+ *                                                                               *
+ * Parameters:                                                                   *
+ *    jp_data                     - [IN] JSON with discovery data                *
+ *    events_cbs                  - [IN]                                         *
+ *    discovery_update_host_cb    - [IN]                                         *
+ *    discovery_update_service_cb - [IN]                                         *
+ *    error                       - [OUT] address of a pointer to the info       *
+ *                                        string (should be freed by the caller) *
+ *                                                                               *
+ * Return value:  SUCCEED - processed successfully                               *
+ *                FAIL - error occurred                                          *
+ *                                                                               *
+ *********************************************************************************/
 static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_events_funcs_t *events_cbs,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb, char **error)
@@ -2300,25 +2303,28 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
 	}
 }
 
-/***********************************************************************************
- *                                                                                 *
- * Purpose: process 'proxy data' request                                           *
- *                                                                                 *
- * Parameters: proxy               - [IN] source proxy                             *
- *             jp                  - [IN] JSON with proxy data                     *
- *             ts                  - [IN] timestamp when the proxy connection was  *
- *                                        established                              *
- *             proxy_status        - [IN] active or passive proxy mode             *
- *             events_cbs          - [IN]                                          *
- *             proxydata_frequency - [IN]                                          *
- *             more                - [OUT] available data flag                     *
- *             error               - [OUT] address of a pointer to the info string *
- *                                         (should be freed by the caller)         *
- *                                                                                 *
- * Return value:  SUCCEED - processed successfully                                 *
- *                FAIL - an error occurred                                         *
- *                                                                                 *
- ***********************************************************************************/
+/*****************************************************************************
+ *                                                                           *
+ * Purpose: processes 'proxy data' request                                   *
+ *                                                                           *
+ * Parameters:                                                               *
+ *    proxy                       - [IN] source proxy                        *
+ *    jp                          - [IN] JSON with proxy data                *
+ *    ts                          - [IN] timestamp when proxy connection was *
+ *                                       established                         *
+ *    proxy_status                - [IN] active or passive proxy mode        *
+ *    events_cbs                  - [IN]                                     *
+ *    proxydata_frequency         - [IN]                                     *
+ *    discovery_update_host_cb    - [IN]                                     *
+ *    discovery_update_service_cb - [IN]                                     *
+ *    more                        - [OUT] available data flag                *
+ *    error                       - [OUT] address of pointer to info string  *
+ *                                        (should be freed by the caller)    *
+ *                                                                           *
+ * Return value:  SUCCEED - processed successfully                           *
+ *                FAIL - error occurred                                      *
+ *                                                                           *
+ *****************************************************************************/
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
