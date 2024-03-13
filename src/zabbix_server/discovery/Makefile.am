@@ -8,5 +8,4 @@ libzbxdiscovery_server_a_SOURCES = \
 	discovery_server.c
 
 libzbxdiscovery_server_a_CFLAGS = \
-	-I$(top_srcdir)/src/zabbix_server/ \
 	$(TLS_CFLAGS)

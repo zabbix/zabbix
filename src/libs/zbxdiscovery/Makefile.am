@@ -6,3 +6,5 @@ noinst_LIBRARIES = 			\
 libzbxdiscovery_a_SOURCES = \
 	discovery.c
 
+libzbxdiscovery_a_CFLAGS = \
+	$(TLS_CFLAGS)
