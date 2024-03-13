@@ -3328,8 +3328,8 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first',
 						'Time period' => 'Custom',
-						'id:time_period_from' => 'now-2M',
-						'id:time_period_to' => 'now-1M'
+						'id:time_period_from' => 'now-30d',
+						'id:time_period_to' => 'now-1d'
 					],
 					'item_data' => [
 						[
@@ -3338,19 +3338,19 @@ class testDashboardItemValueWidget extends testWidgets {
 						],
 						[
 							'value' => '12.55',
-							'time' => '-40 days'
+							'time' => '-15 days'
 						],
 						[
 							'value' => '12.01',
-							'time' => '-45 days'
+							'time' => '-20 days'
 						],
 						[
 							'value' => '12.99',
-							'time' => '-50 days'
+							'time' => '-25 days'
 						],
 						[
 							'value' => '121.12',
-							'time' => '-70 days'
+							'time' => '-31 days'
 						]
 					],
 					'expected_value' => '12.99'
@@ -3364,27 +3364,28 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last',
 						'Time period' => 'Custom',
-						'id:time_period_from' => '2024-01-17 00:00:00',
-						'id:time_period_to' => '2024-01-18 00:00:00'
+						'id:time_period_from' => '{date} 00:00:00',
+						'id:time_period_to' => '{date} 23:59:59'
 					],
 					'item_data' => [
 						[
-							'value' => '12.33',
-							'time' => '2024-01-17 04:00:00'
+							'value' => '10.33',
+							'time' => '{date} 04:00:00'
 						],
 						[
 							'value' => '12.55',
-							'time' => '2024-01-17 08:00:00'
+							'time' => '{date} 08:00:00'
 						],
 						[
 							'value' => '12.99',
-							'time' => '2024-01-17 11:00:00'
+							'time' => '{date} 11:00:00'
 						],
 						[
 							'value' => '11.99',
-							'time' => '2024-01-17 12:00:00'
+							'time' => '{date} 12:00:00'
 						]
 					],
+					'substitute_date' => true,
 					'expected_value' => '11.99'
 				]
 			],
@@ -3871,6 +3872,11 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * @dataProvider getAggregationFunctionData
 	 */
 	public function testDashboardItemValueWidget_AggregationFunctionData($data) {
+		// Substitute macro in date related fields in test case where fixed history data (not trends) is checked.
+		if (CTestArrayHelper::get($data, 'substitute_date')) {
+			$data = $this->replaceDateMacroInData($data, 'today - 1 week', ['id:time_period_from', 'id:time_period_to']);
+		}
+
 		foreach ($data['item_data'] as $params) {
 			$params['time'] = strtotime($params['time']);
 			CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $params['value'], $params['time']);
