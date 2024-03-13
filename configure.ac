@@ -2076,6 +2076,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxstats/Makefile
 	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
+	src/libs/zbxhttppoller/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile
@@ -2121,7 +2122,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/events/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
-	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/operations/Makefile
 	src/zabbix_server/poller/Makefile

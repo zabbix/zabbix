@@ -39,6 +39,7 @@ DIST_SUBDIRS = \
 	zbxhash \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxipcservice \
@@ -113,6 +114,7 @@ SERVER_SUBDIRS = \
 	zbxexpr \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxkvs \
@@ -175,6 +177,7 @@ PROXY_SUBDIRS = \
 	zbxexport \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxkvs \
@@ -231,6 +234,7 @@ SUBDIRS = \
 	zbxgetopt \
 	zbxhash \
 	zbxhttp \
+	zbxhttppoller \
 	zbxip \
 	zbxipcservice \
 	zbxjson \

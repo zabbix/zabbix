@@ -31,6 +31,6 @@ typedef struct
 }
 zbx_thread_httppoller_args;
 
-ZBX_THREAD_ENTRY(httppoller_thread, args);
+ZBX_THREAD_ENTRY(zbx_httppoller_thread, args);
 
 #endif
