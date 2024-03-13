@@ -217,14 +217,17 @@
 			width: auto;
 		}
 
-		.form_row,
-		.sortable {
+		.form_row {
 			td {
 				line-height: 24px;
 			}
 		}
 
-		.sortable td {
+		td.sortable-item {
+			&:not(.sortable-item-frozen) {
+				line-height: 24px;
+			}
+
 			&.td-drag-icon {
 				line-height: inherit;
 			}

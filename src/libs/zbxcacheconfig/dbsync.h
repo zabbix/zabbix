@@ -57,7 +57,7 @@
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-typedef char **(*zbx_dbsync_preproc_row_func_t)(char **row);
+typedef char **(*zbx_dbsync_preproc_row_func_t)(zbx_dbsync_t *sync, char **row);
 
 typedef struct
 {
@@ -112,6 +112,7 @@ int	zbx_dbsync_env_changelog_num(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
 
 int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);

@@ -26,12 +26,10 @@
 #include "postinit/postinit.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
-#include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
-#include "pinger/pinger.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
-#include "trapper/trapper.h"
+#include "trapper/trapper_server.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "taskmanager/taskmanager_server.h"
@@ -55,6 +53,8 @@
 #include "zbxself.h"
 
 #include "cfg.h"
+#include "zbxpinger.h"
+#include "zbxtrapper.h"
 #include "zbxdbupgrade.h"
 #include "zbxlog.h"
 #include "zbxgetopt.h"
@@ -101,6 +101,8 @@
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
 #include "zbxpoller.h"
+#include "zbxhttppoller.h"
+#include "zbx_ha_constants.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -1455,7 +1457,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
-							zbx_get_value_internal_ext_server, config_ssh_key_location};
+							zbx_get_value_internal_ext_server, config_ssh_key_location,
+							trapper_process_request_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							config_ssh_key_location, get_config_forks};
@@ -1667,20 +1670,20 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
 				poller_args.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &trapper_args;
-				zbx_thread_start(trapper_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_trapper_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
 				thread_args.args = &pinger_args;
-				zbx_thread_start(pinger_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_pinger_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ALERTER:
 				thread_args.args = &alerter_args;
@@ -1696,7 +1699,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:
 				thread_args.args = &httppoller_args;
-				zbx_thread_start(httppoller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
@@ -1715,7 +1718,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_JAVA;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
 				thread_args.args = &snmptrapper_args;
@@ -1730,7 +1733,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				thread_args.args = &vmware_args;
-				zbx_thread_start(vmware_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_vmware_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
 				thread_args.args = &taskmanager_args;
@@ -1768,7 +1771,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HISTORY;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
@@ -1785,7 +1788,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
-				zbx_thread_start(dbconfig_worker_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_dbconfig_worker_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
 				thread_args.args = &report_manager_args;
@@ -1802,27 +1805,27 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
 				thread_args.args = &poller_args;
-				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
-				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMP_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
-				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PG_MANAGER:
 				poller_args.poller_type = ZBX_PROCESS_TYPE_PG_MANAGER;

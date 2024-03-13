@@ -121,22 +121,22 @@ $formgrid = (new CFormGrid())
 				(new CTable())
 					->setId('query-fields-table')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
-					->setFooter((new CCol(
-						(new CButtonLink(_('Add')))
-							->addClass('element-table-add')
-							->setEnabled(!$readonly)
+					->setFooter(
+						(new CCol(
+							(new CButtonLink(_('Add')))
+								->addClass('element-table-add')
+								->setEnabled(!$readonly)
 						))->setColSpan(5)
 					),
 				new CTemplateTag('query-field-row-tmpl', (new CRow([
-						(new CCol([
-							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('query_fields[#{rowNum}][sortorder]', '#{rowNum}')
-						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $readonly))
+							->removeId()
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
 						(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $readonly))
+							->removeId()
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -256,15 +256,14 @@ $formgrid = (new CFormGrid())
 					),
 				new CTemplateTag('item-header-row-tmpl',
 					(new CRow([
-						(new CCol([
-							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('headers[#{rowNum}][sortorder]', '#{rowNum}')
-						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[#{rowNum}][name]', '#{name}', $readonly))
+							->removeId()
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
 						(new CTextBox('headers[#{rowNum}][value]', '#{value}', $readonly, 2000))
+							->removeId()
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
