@@ -21,6 +21,8 @@
 class CWidgetHostNavigator extends CWidget {
 
 	/**
+	 * Host navigator instance.
+	 *
 	 * @type {CHostNavigator|null}
 	 */
 	#host_navigator = null;
@@ -31,6 +33,21 @@ class CWidgetHostNavigator extends CWidget {
 	 * @type {Object}
 	 */
 	#events = {};
+
+	/**
+	 * Scroll amount of contents.
+	 *
+	 * @type {number}
+	 */
+	#contents_scroll_top = 0;
+
+	onActivate() {
+		this._contents.scrollTop = this.#contents_scroll_top;
+	}
+
+	onDeactivate() {
+		this.#contents_scroll_top = this._contents.scrollTop;
+	}
 
 	getUpdateRequestData() {
 		return {

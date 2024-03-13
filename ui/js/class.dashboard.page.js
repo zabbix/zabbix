@@ -169,8 +169,8 @@ class CDashboardPage {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
 
 		for (const widget of this._widgets.keys()) {
-			this._dashboard_grid.removeChild(widget.getView());
 			this._deactivateWidget(widget);
+			this._dashboard_grid.removeChild(widget.getView());
 		}
 
 		this.#deactivateEvents();
