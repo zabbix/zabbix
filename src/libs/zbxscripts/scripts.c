@@ -893,7 +893,8 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
 					if (0 == config_enable_global_scripts)
 					{
-						zbx_snprintf(error, max_error_len, "global scripts are disabled");
+						zbx_snprintf(error, max_error_len, "Global script execution on Zabbix "
+								"server is disabled by server configuration");
 						ret = FAIL;
 					}
 					else if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
