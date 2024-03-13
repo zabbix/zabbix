@@ -62,9 +62,9 @@ typedef struct
 }
 zbx_thread_poller_args;
 
-ZBX_THREAD_ENTRY(poller_thread, args);
+ZBX_THREAD_ENTRY(zbx_poller_thread, args);
 
-ZBX_THREAD_ENTRY(async_poller_thread, args);
+ZBX_THREAD_ENTRY(zbx_async_poller_thread, args);
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros);
