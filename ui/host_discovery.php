@@ -112,12 +112,12 @@ $fields = [
 									IN([ZBX_LLD_DELETE_AFTER.','.ZBX_LLD_DELETE_NEVER.','.ZBX_LLD_DELETE_IMMEDIATELY]),
 									'(isset({add}) || isset({update}))'
 								],
-	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})'],
 	'enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_LLD_DISABLE_AFTER.','.ZBX_LLD_DISABLE_NEVER.','.ZBX_LLD_DISABLE_IMMEDIATELY]),
 									'(isset({add}) || isset({update}))'
 								],
-	'enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})'],
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
@@ -768,7 +768,7 @@ if (hasRequest('form')) {
 		$data['enabled_lifetime_type'] = $item['enabled_lifetime_type'];
 		$data['enabled_lifetime'] = $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER
 			? $item['enabled_lifetime']
-			: DB::getDefault('items', 'enabled_lifetime');
+			: ZBX_LLD_RULE_ENABLED_LIFETIME;
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);

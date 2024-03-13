@@ -97,7 +97,7 @@ function getItemFormData(array $item = []) {
 		'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
 		'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
 		'enabled_lifetime_type' => getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type')),
-		'enabled_lifetime' => getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'))
+		'enabled_lifetime' => getRequest('enabled_lifetime', ZBX_LLD_ENABLED_LIFETIME)
 	];
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
