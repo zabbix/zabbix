@@ -19,9 +19,9 @@
 
 #include "taskmanager_proxy.h"
 
-#include "../../zabbix_server/trapper/trapper_item_test.h"
 #include "../poller/poller_proxy.h"
 
+#include "zbxtrapper.h"
 #include "zbxscripts.h"
 #include "zbxpoller.h"
 #include "zbxnix.h"

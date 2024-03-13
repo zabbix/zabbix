@@ -1250,18 +1250,6 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
 
-define('SVG_GRAPH_LEGEND_OFF',	0);
-define('SVG_GRAPH_LEGEND_ON',	1);
-
-define('SVG_GRAPH_LEGEND_STATISTIC_OFF',	0);
-define('SVG_GRAPH_LEGEND_STATISTIC_ON',		1);
-
-define('SVG_GRAPH_LEGEND_LINES_MIN',	1);
-define('SVG_GRAPH_LEGEND_LINES_MAX',	10);
-
-define('SVG_GRAPH_LEGEND_COLUMNS_MIN',	1);
-define('SVG_GRAPH_LEGEND_COLUMNS_MAX',	4);
-
 define('SVG_GRAPH_PROBLEMS_OFF',	0);
 define('SVG_GRAPH_PROBLEMS_ON',		1);
 
@@ -2094,10 +2082,6 @@ define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
 define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
-define('ZBX_STYLE_SORTABLE', 'sortable');
-define('ZBX_STYLE_SORTABLE_LIST', 'sortable-list');
-define('ZBX_STYLE_SORTABLE_ITEM', 'sortable-item');
-define('ZBX_STYLE_SORTABLE_DRAG_HANDLE', 'sortable-drag-handle');
 define('ZBX_STYLE_STATUS_AVERAGE_BG', 'status-average-bg');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
 define('ZBX_STYLE_STATUS_DISASTER_BG', 'status-disaster-bg');
