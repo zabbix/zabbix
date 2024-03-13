@@ -47,13 +47,14 @@ type OraClient interface {
 }
 
 type OraConn struct {
-	client         *sql.DB
-	callTimeout    time.Duration
-	version        godror.VersionInfo
-	lastTimeAccess time.Time
-	ctx            context.Context
-	queryStorage   *yarn.Yarn
-	username       string
+	client           *sql.DB
+	callTimeout      time.Duration
+	version          godror.VersionInfo
+	lastAccessTime   time.Time
+	lastAccessTimeMu sync.Mutex
+	ctx              context.Context //nolint:containedctx
+	queryStorage     *yarn.Yarn
+	username         string
 }
 
 var errorQueryNotFound = "query %q not found"
@@ -112,15 +113,25 @@ func (conn *OraConn) WhoAmI() string {
 }
 
 // updateAccessTime updates the last time a connection was accessed.
-func (conn *OraConn) updateAccessTime() {
-	conn.lastTimeAccess = time.Now()
+func (conn *OraConn) updateLastAccessTime() {
+	conn.lastAccessTimeMu.Lock()
+	defer conn.lastAccessTimeMu.Unlock()
+
+	conn.lastAccessTime = time.Now()
+}
+
+func (conn *OraConn) getLastAccessTime() time.Time {
+	conn.lastAccessTimeMu.Lock()
+	defer conn.lastAccessTimeMu.Unlock()
+
+	return conn.lastAccessTime
 }
 
 // ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
 	// cached connections
 	connections   map[connDetails]*OraConn
-	connectionsMu sync.RWMutex
+	connectionsMu sync.Mutex
 
 	keepAlive      time.Duration
 	connectTimeout time.Duration
@@ -160,7 +171,7 @@ func (c *ConnManager) closeUnused() {
 	defer c.connectionsMu.Unlock()
 
 	for cd, conn := range c.connections {
-		if time.Since(conn.lastTimeAccess) > c.keepAlive {
+		if time.Since(conn.getLastAccessTime()) > c.keepAlive {
 			conn.client.Close()
 			delete(c.connections, cd)
 			log.Debugf("[%s] Closed unused connection: %s", pluginName, cd.uri.Addr())
@@ -250,7 +261,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		client:         client,
 		callTimeout:    c.callTimeout,
 		version:        serverVersion,
-		lastTimeAccess: time.Now(),
+		lastAccessTime: time.Now(),
 		ctx:            ctx,
 		queryStorage:   &c.queryStorage,
 		username:       cd.uri.User(),
@@ -258,11 +269,12 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 }
 
 // getConn concurrent cached connection getter.
+//
 // Attempts to retrieve a connection from cache by its connDetails.
 // Returns nil if no connection associated with the given connDetails is found.
 func (c *ConnManager) getConn(cd connDetails) *OraConn { //nolint:gocritic
-	c.connectionsMu.RLock()
-	defer c.connectionsMu.RUnlock()
+	c.connectionsMu.Lock()
+	defer c.connectionsMu.Unlock()
 
 	conn, ok := c.connections[cd]
 	if !ok {
@@ -273,18 +285,32 @@ func (c *ConnManager) getConn(cd connDetails) *OraConn { //nolint:gocritic
 }
 
 // setConn concurrent cached connection setter.
-func (c *ConnManager) setConn(cd connDetails, conn *OraConn) { //nolint:gocritic
+//
+// Returns the cached connection. If the provider connection is already present
+// in cache, it is closed.
+//
+//nolint:gocritic
+func (c *ConnManager) setConn(cd connDetails, conn *OraConn) *OraConn {
 	c.connectionsMu.Lock()
 	defer c.connectionsMu.Unlock()
 
+	existingConn, ok := c.connections[cd]
+	if ok {
+		defer conn.client.Close() //nolint:errcheck
+
+		return existingConn
+	}
+
 	c.connections[cd] = conn
+
+	return conn
 }
 
 // GetConnection returns an existing connection or creates a new one.
 func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) { //nolint:gocritic
 	conn := c.getConn(cd)
 	if conn != nil {
-		conn.updateAccessTime()
+		conn.updateLastAccessTime()
 
 		return conn, nil
 	}
@@ -294,9 +320,7 @@ func (c *ConnManager) GetConnection(cd connDetails) (*OraConn, error) { //nolint
 		return nil, err
 	}
 
-	c.setConn(cd, conn)
-
-	return conn, err
+	return c.setConn(cd, conn), err
 }
 
 func getConnParams(privilege string) (godror.ConnParams, error) {
