@@ -19,13 +19,7 @@
 **/
 
 
-namespace Widgets\HostNavigator\Actions;
-
-use CController,
-	CControllerResponseData,
-	CProfile;
-
-class NavigatorGroupOpen extends CController {
+class CControllerWidgetNavigationTreeToggle extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -34,8 +28,9 @@ class NavigatorGroupOpen extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'group_path' => 'required|string',
-			'widgetid' =>	'required|db widget.widgetid'
+			'is_open' =>			'required|bool',
+			'group_identifier' =>	'required|array',
+			'widgetid' =>			'required|db widget.widgetid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,27 +53,58 @@ class NavigatorGroupOpen extends CController {
 	}
 
 	protected function doAction(): void {
+		$is_open = $this->getInput('is_open');
 		$widgetid = $this->getInput('widgetid');
+		$selected_group = $this->getInput('group_identifier');
+		$open_groups = [];
+
 		$open_groupids = CProfile::findByIdxPattern('web.dashboard.widget.open.%', $widgetid);
 
-		$used_indexes = array_map(function($groupid) {
-			preg_match('/\.(\d+)$/', $groupid, $matches);
-			return (int) $matches[1] ?? null;
-		}, $open_groupids);
+		foreach ($open_groupids as $open_groupid) {
+			$open_group = CProfile::get($open_groupid, [], $widgetid);
 
-		$new_index = 0;
-
-		foreach ($used_indexes as $index) {
-			if ($index == $new_index) {
-				$new_index++;
-			} else {
-				break;
+			if ($open_group) {
+				$open_groups[$open_groupid] = json_decode($open_group, true);
 			}
 		}
 
-		CProfile::update('web.dashboard.widget.open.'.$new_index, $this->getInput('group_path'), PROFILE_TYPE_STR,
-			$widgetid
-		);
+		if ($is_open) {
+			$parent_groups = [];
+			$subgroup = [];
+
+			// Generate all parent group path identifiers.
+			foreach ($selected_group as $identifier) {
+				$subgroup[] = $identifier;
+				$parent_groups[] = $subgroup;
+			}
+
+			$index = 0;
+			foreach ($parent_groups as $group) {
+				if (!in_array($group, $open_groups)) {
+					// Save each parent group (and selected group) under first available index if not already saved.
+					foreach ($open_groupids as $groupid) {
+						if (str_ends_with($groupid, '.'.$index)) {
+							$index++;
+						}
+					}
+
+					CProfile::update('web.dashboard.widget.open.'.$index, json_encode($group), PROFILE_TYPE_STR,
+						$widgetid);
+
+					$index++;
+				}
+			}
+		}
+		else {
+			foreach ($open_groups as $key => $open_group) {
+				// Find the matching group and it's subgroups to update all as closed.
+				$group_match = array_slice($open_group, 0, count($selected_group)) == $selected_group;
+
+				if ($group_match) {
+					CProfile::delete($key, $widgetid);
+				}
+			}
+		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}

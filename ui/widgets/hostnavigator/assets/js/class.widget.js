@@ -89,45 +89,44 @@ class CWidgetHostNavigator extends CWidget {
 			},
 
 			groupToggle: e => {
-				const data = {
-					group_path: e.detail.group_identifier,
-					widgetid: this._widgetid
-				}
+				if (this._widgetid) {
+					const data = {
+						is_open: e.detail.is_open,
+						group_identifier: e.detail.group_identifier,
+						widgetid: this._widgetid
+					}
 
-				const curl = new Curl('zabbix.php');
+					const curl = new Curl('zabbix.php');
 
-				curl.setArgument('action', e.detail.is_open
-					? 'widget.hostnavigator.open'
-					: 'widget.hostnavigator.close'
-				);
+					curl.setArgument('action', 'widget.navigation.tree.toggle');
 
-				fetch(curl.getUrl(), {
-					method: 'POST',
-					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify(data)
-				})
-					.then((response) => response.json())
-					.then((response) => {
-						if ('error' in response) {
-							throw {error: response.error};
-						}
-
-						return response;
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(data)
 					})
-					.catch((exception) => {
-						let title;
-						let messages;
+						.then((response) => response.json())
+						.then((response) => {
+							if ('error' in response) {
+								throw {error: response.error};
+							}
 
-						if (typeof exception === 'object' && 'error' in exception) {
-							title = exception.error.title;
-							messages = exception.error.messages;
+							return response;
+						})
+						.catch((exception) => {
+							let title;
+							let messages = [];
+
+							if (typeof exception === 'object' && 'error' in exception) {
+								title = exception.error.title;
+								messages = exception.error.messages;
+							} else {
+								title = t('Unexpected server error.');
+							}
 
 							this._updateMessages(messages, title);
-						}
-						else {
-							this._updateMessages([t('Unexpected server error.')]);
-						}
-					});
+						});
+				}
 			}
 		};
 	}
