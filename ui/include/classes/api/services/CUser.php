@@ -2182,7 +2182,7 @@ class CUser extends CApiService {
 
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
-		self::createSession($db_user);
+		self::createSession($db_user, $db_user['mfaid'] == 0 ? ZBX_SESSION_ACTIVE : ZBX_SESSION_CONFIRMATION_REQUIRED);
 		unset($db_user['ugsetid']);
 
 		if ($db_user['attempt_failed'] != 0 && $db_user['mfaid'] == 0) {
@@ -2215,7 +2215,7 @@ class CUser extends CApiService {
 
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
-		self::createSession($db_user);
+		self::createSession($db_user, ZBX_SESSION_ACTIVE);
 		unset($db_user['ugsetid']);
 
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
@@ -2643,14 +2643,9 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function createSession(array &$db_user): void {
+	private static function createSession(array &$db_user, $session_status): void {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
 		$db_user['secret'] = CEncryptHelper::generateKey();
-		$session_status = ZBX_SESSION_ACTIVE;
-
-		if (array_key_exists('mfaid', $db_user) && $db_user['mfaid'] != 0) {
-			$session_status = ZBX_SESSION_CONFIRMATION_REQUIRED;
-		}
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
