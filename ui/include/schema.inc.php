@@ -1330,7 +1330,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '1h'
+				'default' => '0'
 			],
 			'enabled_lifetime_type' => [
 				'null' => false,

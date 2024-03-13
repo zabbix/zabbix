@@ -3259,7 +3259,7 @@ static int	DBpatch_6050211(void)
 
 static int	DBpatch_6050212(void)
 {
-	const zbx_db_field_t	field = {"enabled_lifetime", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"enabled_lifetime", "0", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
