@@ -67,13 +67,13 @@ class testProxy extends CAPITest {
 	private function prepareTestDataProxyGroups(): void {
 		$proxy_groups = [
 			'empty' => [
-				'name' => 'API test empty proxy group'
+				'name' => 'API test proxy - empty'
 			],
-			'with_proxies_1' => [
-				'name' => 'API test proxy group 1 with proxies'
+			'with_1_proxy' => [
+				'name' => 'API test proxy - with 1 proxy'
 			],
-			'with_proxies_2' => [
-				'name' => 'API test proxy group 2 with proxies'
+			'with_3_proxies' => [
+				'name' => 'API test proxy - with 3 proxies'
 			]
 		];
 		$db_proxy_groups = CDataHelper::call('proxygroup.create', array_values($proxy_groups));
@@ -150,8 +150,26 @@ class testProxy extends CAPITest {
 			],
 			'with_proxy_group' => [
 				'name' => 'API test proxy - with proxy group',
-				'proxy_groupid' => self::$data['proxy_groupids']['with_proxies_1'],
+				'proxy_groupid' => self::$data['proxy_groupids']['with_1_proxy'],
 				'local_address' => 'localhost',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			'with_proxy_group_1' => [
+				'name' => 'API test proxy - with proxy group 1',
+				'proxy_groupid' => self::$data['proxy_groupids']['with_3_proxies'],
+				'local_address' => 'proxy1.lan',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			'with_proxy_group_2' => [
+				'name' => 'API test proxy - with proxy group 2',
+				'proxy_groupid' => self::$data['proxy_groupids']['with_3_proxies'],
+				'local_address' => 'proxy2.lan',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			'with_proxy_group_3' => [
+				'name' => 'API test proxy - with proxy group 3',
+				'proxy_groupid' => self::$data['proxy_groupids']['with_3_proxies'],
+				'local_address' => 'proxy3.lan',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			],
 			'with_custom_timeouts' => [
@@ -210,36 +228,12 @@ class testProxy extends CAPITest {
 				'name' => 'API test proxy - state online',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			],
-			'update_hosts' => [
-				'name' => 'API test proxy.update - hosts',
-				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
-			'delete_single' => [
-				'name' => 'API test proxy.delete - single',
-				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
-			'delete_multiple_1' => [
-				'name' => 'API test proxy.delete - multiple 1',
-				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
-			'delete_multiple_2' => [
-				'name' => 'API test proxy.delete - multiple 2',
-				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
-			'used_in_host' => [
-				'name' => 'API test proxy - used in host',
-				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
 			'used_in_action' => [
 				'name' => 'API test proxy - used in action',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			],
 			'used_in_discovery_rule' => [
 				'name' => 'API test proxy - used in discovery rule',
-				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
-			'select_hosts_extend' => [
-				'name' => 'API test proxy - verify fields returned with selectHosts extend',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			]
 		];
@@ -298,7 +292,7 @@ class testProxy extends CAPITest {
 	 */
 	private function prepareTestDataHostGroups(): void {
 		$db_hostgroups = CDataHelper::call('hostgroup.create', [
-			'name' => 'API test host group'
+			'name' => 'API test proxy - host group'
 		]);
 		$this->assertArrayHasKey('groupids', $db_hostgroups, __FUNCTION__.'() failed: Could not create host groups.');
 
@@ -310,29 +304,62 @@ class testProxy extends CAPITest {
 	 */
 	private function prepareTestDataHosts(): void {
 		$hosts = [
-			'with_proxy' => [
-				'host' => 'api_test_host_with_proxy',
-				'name' => 'API test host - with proxy',
+			'monitored_by_server_1' => [
+				'host' => 'host_monitored_by_server_1',
+				'name' => 'API test proxy - monitored by server 1',
+				'groups' => [
+					[
+						'groupid' => self::$data['groupids'][0]
+					]
+				]
+			],
+			'monitored_by_server_2' => [
+				'host' => 'host_monitored_by_server_2',
+				'name' => 'API test proxy - monitored by server 2',
+				'groups' => [
+					[
+						'groupid' => self::$data['groupids'][0]
+					]
+				]
+			],
+			'monitored_by_proxy_without_group' => [
+				'host' => 'host_monitored_by_proxy_without_group',
+				'name' => 'API test proxy - monitored by proxy without group',
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
-				'proxyid' => self::$data['proxyids']['used_in_host'],
+				'proxyid' => self::$data['proxyids']['without_proxy_group'],
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
 					]
 				]
 			],
-			'without_proxy_1' => [
-				'host' => 'api_test_host_without_proxy_1',
-				'name' => 'API test host - without proxy 1',
+			'monitored_by_proxy_with_group' => [
+				'host' => 'host_monitored_by_proxy_with_group',
+				'name' => 'API test proxy - monitored by proxy with group',
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
+				'proxyid' => self::$data['proxyids']['with_proxy_group'],
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
 					]
 				]
 			],
-			'without_proxy_2' => [
-				'host' => 'api_test_host_without_proxy_2',
-				'name' => 'API test host - without proxy 2',
+			'monitored_by_empty_proxy_group' => [
+				'host' => 'host_monitored_by_empty_proxy_group',
+				'name' => 'API test proxy - monitored by empty proxy group',
+				'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+				'proxy_groupid' => self::$data['proxy_groupids']['empty'],
+				'groups' => [
+					[
+						'groupid' => self::$data['groupids'][0]
+					]
+				]
+			],
+			'monitored_by_proxy_group' => [
+				'host' => 'host_monitored_by_proxy_group',
+				'name' => 'API test proxy - monitored by proxy group',
+				'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+				'proxy_groupid' => self::$data['proxy_groupids']['with_3_proxies'],
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
@@ -344,6 +371,16 @@ class testProxy extends CAPITest {
 		$this->assertArrayHasKey('hostids', $db_hosts, __FUNCTION__.'() failed: Could not create hosts.');
 
 		self::$data['hostids'] = array_combine(array_keys($hosts), $db_hosts['hostids']);
+
+		// Manually insert data into "host_proxy" table.
+		$host_proxy = [
+			[
+				'hostid' => self::$data['hostids']['monitored_by_proxy_group'],
+				'proxyid' => self::$data['proxyids']['with_proxy_group_2']
+			]
+		];
+
+		DB::insert('host_proxy', $host_proxy);
 	}
 
 	/**
@@ -351,7 +388,7 @@ class testProxy extends CAPITest {
 	 */
 	private function prepareTestDataActions(): void {
 		$actions = [
-			'name' => 'API test discovery action',
+			'name' => 'API test proxy - discovery action',
 			'eventsource' => EVENT_SOURCE_DISCOVERY,
 			'filter' => [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
@@ -389,7 +426,7 @@ class testProxy extends CAPITest {
 	 */
 	private function prepareTestDataDiscoveryRules(): void {
 		$drules = [
-			'name' => 'API test discovery rule',
+			'name' => 'API test proxy - discovery rule',
 			'iprange' => '192.168.1.1-255',
 			'proxyid' => self::$data['proxyids']['used_in_discovery_rule'],
 			'dchecks' => [
@@ -503,12 +540,12 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
 			],
-			'Test proxy.get: invalid parameter "output" (array with string)' => [
+			'Test proxy.get: unexpected parameter in "output"' => [
 				'request' => [
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
 			],
 
 			// Check write-only fields are not returned.
@@ -517,14 +554,14 @@ class testProxy extends CAPITest {
 					'output' => ['tls_psk_identity']
 				],
 				'expected_result' => [],
-				'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
 			],
 			'Test proxy.get: write-only field "tls_psk"' => [
 				'request' => [
 					'output' => ['tls_psk']
 				],
 				'expected_result' => [],
-				'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "proxy_groupid", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
 			],
 
 			// Check "selectAssignedHosts" option.
@@ -535,7 +572,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/selectAssignedHosts": value must be one of "extend", "count".'
 			],
-			'Test proxy.get: invalid parameter "selectAssignedHosts" (array with string)' => [
+			'Test proxy.get: unexpected parameter in "selectAssignedHosts"' => [
 				'request' => [
 					'selectAssignedHosts' => ['abc']
 				],
@@ -551,7 +588,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/selectHosts": value must be one of "extend", "count".'
 			],
-			'Test proxy.get: invalid parameter "selectHosts" (array with string)' => [
+			'Test proxy.get: unexpected parameter in "selectHosts"' => [
 				'request' => [
 					'selectHosts' => ['abc']
 				],
@@ -707,7 +744,6 @@ class testProxy extends CAPITest {
 			'Test proxy.get: filter by "proxyid"' => [
 				'request' => [
 					'output' => ['name'],
-					'proxyids' => ['active_defaults', 'passive_defaults'],
 					'filter' => [
 						'proxyid' => 'active_defaults'
 					]
@@ -725,7 +761,7 @@ class testProxy extends CAPITest {
 				'request' => [
 					'output' => ['name'],
 					'filter' => [
-						'proxy_groupid' => 'with_proxies_1'
+						'proxy_groupid' => 'with_1_proxy'
 					]
 				],
 				'expected_result' => [
@@ -835,6 +871,28 @@ class testProxy extends CAPITest {
 				'expected_error' => null
 			],
 
+			// Filter by "state".
+			'Test proxy.get: filter by "state"' => [
+				'request' => [
+					'output' => ['name', 'state'],
+					'proxyids' => ['state_unknown', 'state_offline', 'state_online'],
+					'filter' => [
+						'state' => [ZBX_PROXY_STATE_OFFLINE, ZBX_PROXY_STATE_ONLINE]
+					]
+				],
+				'expected_result' => [
+					[
+						'name' => 'API test proxy - state offline',
+						'state' => (string) ZBX_PROXY_STATE_OFFLINE
+					],
+					[
+						'name' => 'API test proxy - state online',
+						'state' => (string) ZBX_PROXY_STATE_ONLINE
+					]
+				],
+				'expected_error' => null
+			],
+
 			// Search by proxy name.
 			'Test proxy.get: search by "name"' => [
 				'request' => [
@@ -925,17 +983,32 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => null
 			],
-			'Test proxy.get: selectHosts="extend" excludes proxyid, proxy_groupid, assigned_proxyid' => [
+
+			// Check "selectAssignedHosts".
+			'Test proxy.get: selectAssignedHosts=[] excludes hostid' => [
 				'request' => [
 					'output' => [],
-					'proxyids' => 'used_in_host',
-					'selectHosts' => API_OUTPUT_EXTEND
+					'proxyids' => 'with_proxy_group_2',
+					'selectAssignedHosts' => []
 				],
 				'expected_result' => [[
-					'hosts' => [[
-						'hostid' => 'with_proxy',
-						'host' => 'api_test_host_with_proxy',
-						'monitored_by' => (string) ZBX_MONITORED_BY_PROXY,
+					'assignedHosts' => [
+						[]
+					]
+				]],
+				'expected_error' => null
+			],
+			'Test proxy.get: selectAssignedHosts="extend" excludes proxyid, proxy_groupid, assigned_proxyid' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => 'with_proxy_group_2',
+					'selectAssignedHosts' => API_OUTPUT_EXTEND
+				],
+				'expected_result' => [[
+					'assignedHosts' => [[
+						'hostid' => 'monitored_by_proxy_group',
+						'host' => 'host_monitored_by_proxy_group',
+						'monitored_by' => (string) ZBX_MONITORED_BY_PROXY_GROUP,
 						'status' => DB::getDefault('hosts', 'status'),
 						'ipmi_authtype' => DB::getDefault('hosts', 'ipmi_authtype'),
 						'ipmi_privilege' => DB::getDefault('hosts', 'ipmi_privilege'),
@@ -945,7 +1018,7 @@ class testProxy extends CAPITest {
 						'maintenance_status' => DB::getDefault('hosts', 'maintenance_status'),
 						'maintenance_type' => DB::getDefault('hosts', 'maintenance_type'),
 						'maintenance_from' => DB::getDefault('hosts', 'maintenance_from'),
-						'name' => 'API test host - with proxy',
+						'name' => 'API test proxy - monitored by proxy group',
 						'flags' => DB::getDefault('hosts', 'flags'),
 						'description' => DB::getDefault('hosts', 'description'),
 						'tls_connect' => DB::getDefault('hosts', 'tls_connect'),
@@ -956,6 +1029,96 @@ class testProxy extends CAPITest {
 						'active_available' => '0'
 					]]
 				]],
+				'expected_error' => null
+			],
+			'Test proxy.get: selectAssignedHosts="count"' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => 'with_proxy_group_2',
+					'selectAssignedHosts' => API_OUTPUT_COUNT
+				],
+				'expected_result' => [[
+					'assignedHosts' => '1'
+				]],
+				'expected_error' => null
+			],
+
+			// Check "selectHosts".
+			'Test proxy.get: selectHosts=[] excludes hostid' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => 'without_proxy_group',
+					'selectHosts' => []
+				],
+				'expected_result' => [[
+					'hosts' => [
+						[]
+					]
+				]],
+				'expected_error' => null
+			],
+			'Test proxy.get: selectHosts="extend" excludes proxyid, proxy_groupid, assigned_proxyid' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => 'without_proxy_group',
+					'selectHosts' => API_OUTPUT_EXTEND
+				],
+				'expected_result' => [[
+					'hosts' => [[
+						'hostid' => 'monitored_by_proxy_without_group',
+						'host' => 'host_monitored_by_proxy_without_group',
+						'monitored_by' => (string) ZBX_MONITORED_BY_PROXY,
+						'status' => DB::getDefault('hosts', 'status'),
+						'ipmi_authtype' => DB::getDefault('hosts', 'ipmi_authtype'),
+						'ipmi_privilege' => DB::getDefault('hosts', 'ipmi_privilege'),
+						'ipmi_username' => DB::getDefault('hosts', 'ipmi_username'),
+						'ipmi_password' => DB::getDefault('hosts', 'ipmi_password'),
+						'maintenanceid' => '0',
+						'maintenance_status' => DB::getDefault('hosts', 'maintenance_status'),
+						'maintenance_type' => DB::getDefault('hosts', 'maintenance_type'),
+						'maintenance_from' => DB::getDefault('hosts', 'maintenance_from'),
+						'name' => 'API test proxy - monitored by proxy without group',
+						'flags' => DB::getDefault('hosts', 'flags'),
+						'description' => DB::getDefault('hosts', 'description'),
+						'tls_connect' => DB::getDefault('hosts', 'tls_connect'),
+						'tls_accept' => DB::getDefault('hosts', 'tls_accept'),
+						'tls_issuer' => DB::getDefault('hosts', 'tls_issuer'),
+						'tls_subject' => DB::getDefault('hosts', 'tls_subject'),
+						'inventory_mode' => (string) HOST_INVENTORY_DISABLED,
+						'active_available' => '0'
+					]]
+				]],
+				'expected_error' => null
+			],
+			'Test proxy.get: selectHosts="count"' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => 'without_proxy_group',
+					'selectHosts' => API_OUTPUT_COUNT
+				],
+				'expected_result' => [[
+					'hosts' => '1'
+				]],
+				'expected_error' => null
+			],
+
+			// Check "selectProxyGroup".
+			'Test proxy.get: selectProxyGroup' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => ['without_proxy_group', 'with_proxy_group'],
+					'selectProxyGroup' => ['name']
+				],
+				'expected_result' => [
+					[
+						'proxyGroup' => []
+					],
+					[
+						'proxyGroup' => [
+							'name' => 'API test proxy - with 1 proxy'
+						]
+					]
+				],
 				'expected_error' => null
 			]
 		];
@@ -1103,7 +1266,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_address" (null)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => null
 				],
 				'expected_error' => 'Invalid parameter "/1/local_address": a character string is expected.'
@@ -1111,7 +1274,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_address" (boolean)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/local_address": a character string is expected.'
@@ -1119,7 +1282,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_address" (empty string)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/local_address": cannot be empty.'
@@ -1127,7 +1290,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_address" (user macro)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => '{$MACRO}'
 				],
 				'expected_error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
@@ -1135,7 +1298,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_address" (too long)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => str_repeat('a', DB::getFieldLength('proxy', 'local_address') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/local_address": value is too long.'
@@ -1145,7 +1308,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_port" (null)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => 'localhost',
 					'local_port' => null
 				],
@@ -1154,7 +1317,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_port" (boolean)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => 'localhost',
 					'local_port' => false
 				],
@@ -1163,7 +1326,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_port" (empty string)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => 'localhost',
 					'local_port' => ''
 				],
@@ -1172,7 +1335,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_port" (too small)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => 'localhost',
 					'local_port' => -1
 				],
@@ -1181,7 +1344,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_port" (too large)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => 'localhost',
 					'local_port' => self::INVALID_NUMBER
 				],
@@ -1190,7 +1353,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "local_port" (too long)' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'proxy_groupid' => 'with_proxies_1',
+					'proxy_groupid' => 'empty',
 					'local_address' => 'localhost',
 					'local_port' => str_repeat('a', DB::getFieldLength('proxy', 'local_port') + 1)
 				],
@@ -1311,15 +1474,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "interface".
-			'Test proxy.create: invalid parameter "interface" 1' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'interface' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "interface".'
-			],
-			'Test proxy.create: invalid parameter "interface" 2' => [
+			'Test proxy.create: invalid parameter "interface"' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
@@ -1332,16 +1487,77 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "interface".'
 			],
-			'Test proxy.create: empty "address" and "port" for passive proxy' => [
+
+			// Check "address".
+			'Test proxy.create: invalid "address" (null) for passive proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
-					'address' => '',
-					'port' => ''
+					'address' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/address": a character string is expected.'
+			],
+			'Test proxy.create: invalid "address" (boolean) for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/address": a character string is expected.'
+			],
+			'Test proxy.create: invalid "address" (empty string) for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/address": cannot be empty.'
 			],
-			'Test proxy.create: empty "port" for passive proxy' => [
+			'Test proxy.create: invalid parameter "address" (string) for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => 'http://'
+				],
+				'expected_error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			'Test proxy.create: invalid "address" (too long) for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => str_repeat('a', DB::getFieldLength('proxy', 'address') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/address": value is too long.'
+			],
+			'Test proxy.create: invalid "address" (not empty) for active proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'address' => 'localhost'
+				],
+				'expected_error' => 'Invalid parameter "/1/address": value must be "127.0.0.1".'
+			],
+
+			// Check "port".
+			'Test proxy.create: empty "port" (null) for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => null
+				],
+				'expected_error' => 'Invalid parameter "/1/port": a number is expected.'
+			],
+			'Test proxy.create: invalid "port" (boolean) for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/port": a number is expected.'
+			],
+			'Test proxy.create: invalid "port" (empty string) for passive proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
@@ -1359,31 +1575,6 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
 			],
-			'Test proxy.create: invalid "address" (too long) for passive proxy' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
-					'address' => str_repeat('a', DB::getFieldLength('proxy', 'address') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/address": value is too long.'
-			],
-			'Test proxy.create: invalid "address" (boolean) for passive proxy' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
-					'address' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/address": a character string is expected.'
-			],
-			'Test proxy.create: invalid parameter "address" (string) for passive proxy' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
-					'address' => 'http://',
-					'port' => '10050'
-				],
-				'expected_error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
-			],
 			'Test proxy.create: invalid "port" (not in range) for passive proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
@@ -1392,14 +1583,6 @@ class testProxy extends CAPITest {
 					'port' => self::INVALID_NUMBER
 				],
 				'expected_error' =>	'Invalid parameter "/1/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
-			],
-			'Test proxy.create: invalid "address" (not empty) for active proxy' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
-					'address' => 'localhost'
-				],
-				'expected_error' => 'Invalid parameter "/1/address": value must be "127.0.0.1".'
 			],
 			'Test proxy.create: invalid "port" (not empty int) for active proxy' => [
 				'proxy' => [
@@ -4693,19 +4876,19 @@ class testProxy extends CAPITest {
 			// Check proxy can be assigned to host.
 			'Test proxy.update: assign proxy to single host' => [
 				'proxy' => [
-					'proxyid' => 'update_hosts',
+					'proxyid' => 'active_defaults',
 					'hosts' => [
-						['hostid' => 'without_proxy_1']
+						['hostid' => 'monitored_by_server_1']
 					]
 				],
 				'expected_error' => null
 			],
 			'Test proxy.update: assign proxy to multiple hosts' => [
 				'proxy' => [
-					'proxyid' => 'update_hosts',
+					'proxyid' => 'passive_defaults',
 					'hosts' => [
-						['hostid' => 'without_proxy_1'],
-						['hostid' => 'without_proxy_2']
+						['hostid' => 'monitored_by_server_1'],
+						['hostid' => 'monitored_by_server_2']
 					]
 				],
 				'expected_error' => null
@@ -5030,22 +5213,20 @@ class testProxy extends CAPITest {
 
 			// Check if deleted proxies used to monitor hosts.
 			'Test proxy.delete: used in host' => [
-				'proxyids' => ['used_in_host'],
-				'expected_error' =>
-					'Host "API test host - with proxy" is monitored by proxy "API test proxy - used in host".'
+				'proxyids' => ['without_proxy_group'],
+				'expected_error' => 'Host "API test proxy - monitored by proxy without group" is monitored by proxy "API test proxy - without proxy group".'
 			],
 
 			// Check if deleted proxies used in actions.
 			'Test proxy.delete: used in action' => [
 				'proxyids' => ['used_in_action'],
-				'expected_error' =>
-					'Proxy "API test proxy - used in action" is used by action "API test discovery action".'
+				'expected_error' => 'Proxy "API test proxy - used in action" is used by action "API test proxy - discovery action".'
 			],
 
 			// Check if deleted proxies used in network discovery rules.
 			'Test proxy.delete: used in discovery rule' => [
 				'proxyids' => ['used_in_discovery_rule'],
-				'expected_error' => 'Proxy "API test proxy - used in discovery rule" is used by discovery rule "API test discovery rule".'
+				'expected_error' => 'Proxy "API test proxy - used in discovery rule" is used by discovery rule "API test proxy - discovery rule".'
 			]
 		];
 	}
@@ -5058,13 +5239,13 @@ class testProxy extends CAPITest {
 	public static function getProxyDeleteDataValid(): array {
 		return [
 			'Test proxy.delete: delete single' => [
-				'proxy' => ['delete_single'],
+				'proxy' => ['state_unknown'],
 				'expected_error' => null
 			],
 			'Test proxy.delete: delete multiple' => [
 				'proxy' => [
-					'delete_multiple_1',
-					'delete_multiple_2'
+					'state_offline',
+					'state_online'
 				],
 				'expected_error' => null
 			]
@@ -5097,7 +5278,6 @@ class testProxy extends CAPITest {
 				'SELECT p.proxyid FROM proxy p WHERE '.dbConditionId('p.proxyid', $proxyids)
 			));
 
-			// proxy.delete checks if given "proxyid" exists, so they need to be removed from self::$data['proxyids']
 			foreach ($proxyids as $proxyid) {
 				$key = array_search($proxyid, self::$data['proxyids']);
 
@@ -5226,14 +5406,16 @@ class testProxy extends CAPITest {
 			}
 		}
 
-		if (array_key_exists('hosts', $request) && is_array($request['hosts'])) {
-			foreach ($request['hosts'] as &$host) {
-				if (is_array($host) && array_key_exists('hostid', $host)
-						&& self::isValidIdPlaceholder($host['hostid'])) {
-					$host['hostid'] = self::$data['hostids'][$host['hostid']];
+		foreach (['assignedHosts', 'hosts'] as $hosts) {
+			if (array_key_exists($hosts, $request) && is_array($request[$hosts])) {
+				foreach ($request[$hosts] as &$host) {
+					if (is_array($host) && array_key_exists('hostid', $host)
+							&& self::isValidIdPlaceholder($host['hostid'])) {
+						$host['hostid'] = self::$data['hostids'][$host['hostid']];
+					}
 				}
+				unset($host);
 			}
-			unset($host);
 		}
 
 		if (array_key_exists('filter', $request) && is_array($request['filter'])) {
