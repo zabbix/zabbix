@@ -190,6 +190,16 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	zbx_uint64_t	dserviceid;
+	int		status;
+	int		lastup;
+	int		lastdown;
+	char		*value;
+}
+zbx_db_dservice;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: register service if one does not exist                            *
@@ -197,7 +207,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
  * Parameters: host ip address                                                *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhost, DB_DSERVICE *dservice,
+static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhost, zbx_db_dservice *dservice,
 		const char *ip, const char *dns, int port, int status)
 {
 	zbx_db_result_t	result;
@@ -330,8 +340,8 @@ static void	discovery_update_dhost(const zbx_db_dhost *dhost)
  * Purpose: process and update the new service status                         *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_update_service_status(zbx_db_dhost *dhost, const DB_DSERVICE *dservice, int service_status,
-		const char *value, int now, zbx_add_event_func_t add_event_cb)
+static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_dservice *dservice,
+		int service_status, const char *value, int now, zbx_add_event_func_t add_event_cb)
 {
 	zbx_timespec_t	ts;
 
@@ -490,7 +500,7 @@ void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
 {
-	DB_DSERVICE	dservice;
+	zbx_db_dservice	dservice;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' dns:'%s' port:%d status:%d value:'%s'",
 			__func__, ip, dns, port, status, value);
