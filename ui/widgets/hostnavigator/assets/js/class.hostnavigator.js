@@ -553,6 +553,33 @@ class CHostNavigator {
 			},
 
 			groupToggle: e => {
+				const selected_group_identifier = e.detail.group_identifier;
+
+				if (e.detail.is_open) {
+					this.#config.open_groups.push(JSON.stringify(selected_group_identifier));
+				}
+				else {
+					for (let i = 0; i < this.#config.open_groups.length; i++) {
+						const open_group_identifier = JSON.parse(this.#config.open_groups[i]);
+
+						if (open_group_identifier.length >= selected_group_identifier.length) {
+							let is_subgroup = true;
+
+							for (let j = 0; j < selected_group_identifier.length; j++) {
+								if (open_group_identifier[j] !== selected_group_identifier[j]) {
+									is_subgroup = false;
+									break;
+								}
+							}
+
+							if (is_subgroup) {
+								this.#config.open_groups.splice(i, 1);
+								i--;
+							}
+						}
+					}
+				}
+
 				this.#container.dispatchEvent(new CustomEvent('group.toggle', {
 					detail: {
 						group_identifier: e.detail.group_identifier,
