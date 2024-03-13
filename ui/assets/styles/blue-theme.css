@@ -3085,7 +3085,9 @@ output {
   display: flex;
   flex-grow: 1;
   gap: 4px;
-  min-width: 0; }
+  min-width: 0;
+  height: 18px;
+  line-height: 18px; }
 .navigation-tree [data-level="0"] > .navigation-tree-node-info .navigation-tree-node-info-level {
   width: 0px; }
 .navigation-tree [data-level="1"] > .navigation-tree-node-info .navigation-tree-node-info-level {
@@ -3133,7 +3135,6 @@ output {
 .navigation-tree .navigation-tree-node-is-open > .navigation-tree-node-children {
   display: block; }
 .navigation-tree .navigation-tree-node-info-name {
-  height: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; }

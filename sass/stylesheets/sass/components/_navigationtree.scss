@@ -21,6 +21,8 @@
 		flex-grow: 1;
 		gap: 4px;
 		min-width: 0;
+		height: 18px;
+		line-height: 18px;
 	}
 
 	$max_levels: 10;
@@ -93,7 +95,6 @@
 	}
 
 	.navigation-tree-node-info-name {
-		height: 16px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
