@@ -2441,8 +2441,12 @@ class CUser extends CApiService {
 
 		if ($group_auth_type == ZBX_AUTH_LDAP) {
 			if (array_key_exists(0, $userdirectoryids)) {
-				$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
 				unset($userdirectoryids[0]);
+
+				if (CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID) != 0) {
+					$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)]
+						= true;
+				}
 			}
 
 			if (count($userdirectoryids) > 1) {
