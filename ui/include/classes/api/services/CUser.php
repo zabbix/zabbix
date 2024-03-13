@@ -2441,11 +2441,8 @@ class CUser extends CApiService {
 
 		if ($group_auth_type == ZBX_AUTH_LDAP) {
 			if (array_key_exists(0, $userdirectoryids)) {
+				$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
 				unset($userdirectoryids[0]);
-
-				if (CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID) != 0) {
-					$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
-				}
 			}
 
 			if (count($userdirectoryids) > 1) {
@@ -3331,10 +3328,15 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
-		$db_user = ['userid' => $db_sessions[0]['userid']];
+		$db_user = DB::select('users', [
+			'output' => ['userid', 'userdirectoryid', 'username'],
+			'userids' => $db_sessions[0]['userid']
+		])[0];
 		static::addUserGroupFields($db_user, $group_status);
 
-		if (!$db_user['mfaid']) {
+		self::checkGroupStatus($db_user, $group_status);
+
+		if ($db_user['mfaid'] == 0) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
@@ -3355,7 +3357,7 @@ class CUser extends CApiService {
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
 			$user_totp_secret = DB::select('mfa_totp_secret', [
 				'output' => ['totp_secret'],
-				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
+				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']]
 			]);
 
 			if (!$user_totp_secret) {
@@ -3381,12 +3383,7 @@ class CUser extends CApiService {
 				);
 			}
 
-			$db_users = DB::select('users', [
-				'output' => ['username'],
-				'filter' => ['userid' => $data['userid']]
-			]);
-			$data['username'] = $db_users[0]['username'];
-
+			$data['username'] = $db_user['username'];
 			$data['state'] = $duo_client->generateState();
 			$data['prompt_uri'] = $duo_client->createAuthUrl($data['username'], $data['state']);
 		}
@@ -3423,10 +3420,15 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
-		$db_user = ['userid' => $db_sessions[0]['userid']];
+		$db_user = DB::select('users', [
+			'output' => ['userid', 'userdirectoryid', 'username', 'attempt_failed', 'attempt_clock'],
+			'userids' => $db_sessions[0]['userid']
+		])[0];
 		static::addUserGroupFields($db_user, $group_status);
 
-		if (!$db_user['mfaid']) {
+		self::checkGroupStatus($db_user, $group_status);
+
+		if ($db_user['mfaid'] == 0) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 		}
 
@@ -3438,11 +3440,6 @@ class CUser extends CApiService {
 		]);
 		$mfa = $db_mfas[0];
 
-		$db_users = DB::select('users', [
-			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
-			'userids' => $db_user['userid']
-		]);
-		$db_user = $db_user + $db_users[0];
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
