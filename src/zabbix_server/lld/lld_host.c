@@ -4496,8 +4496,7 @@ static int	lld_host_delete_validate(zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates host_discovery.lastcheck and host_discovery.ts_delete     *
- *          fields; removes lost resources                                    *
+ * Purpose: updates host_discovery fields; removes or disables lost resources *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *lifetime,
@@ -4561,7 +4560,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == lifetime->type)
 				ts_delete = 0;
-			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type)
+			else if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type)
 				ts_delete = 1;
 
 			if (host->ts_delete != ts_delete)
@@ -4737,8 +4736,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates group_discovery.lastcheck and group_discovery.ts_delete   *
- *          fields; removes lost resources                                    *
+ * Purpose: updates group_discovery fields; removes lost resources            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, zbx_lld_lifetime_t *lifetime, int lastcheck)
@@ -4781,7 +4779,7 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, zbx_lld_
 
 			if (0 == (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED))
 			{
-				int	ts_delete;
+				int	ts_delete = 0;
 
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED) ||
 						ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type ||
@@ -4797,11 +4795,7 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, zbx_lld_
 				if (ZBX_LLD_DISCOVERY_STATUS_LOST != discovery->discovery_status)
 					zbx_vector_uint64_append(&lost_ids, discovery->groupdiscoveryid);
 
-				if (ZBX_LLD_LIFETIME_TYPE_NEVER == lifetime->type)
-					ts_delete = 0;
-
-				if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != lifetime->type &&
-						discovery->ts_delete != ts_delete)
+				if (discovery->ts_delete != ts_delete)
 				{
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update group_discovery"
