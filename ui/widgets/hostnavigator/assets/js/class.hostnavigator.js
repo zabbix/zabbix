@@ -258,10 +258,7 @@ class CHostNavigator {
 				nodes[i] = properties;
 			}
 			else {
-				const group_identifier = JSON.stringify(nodes[i].group_identifier);
-
-				nodes[i].group_identifier = group_identifier;
-				nodes[i].is_open = this.#config.open_groups?.includes(group_identifier);
+				nodes[i].is_open = this.#config.open_groups.includes(JSON.stringify(nodes[i].group_identifier));
 
 				if (show_problems) {
 					const severity_filter = nodes[i].group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY

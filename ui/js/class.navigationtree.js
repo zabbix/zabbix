@@ -158,7 +158,7 @@ class CNavigationTree {
 
 		if (node.children?.length > 0) {
 			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_GROUP);
-			container.dataset.group_identifier = node.group_identifier;
+			container.dataset.group_identifier = JSON.stringify(node.group_identifier);
 		}
 
 		if (node.is_open) {
@@ -500,7 +500,7 @@ class CNavigationTree {
 
 				this.#container.dispatchEvent(new CustomEvent('group.toggle', {
 					detail: {
-						group_identifier: node.dataset.group_identifier,
+						group_identifier: JSON.parse(node.dataset.group_identifier),
 						is_open
 					}
 				}));
