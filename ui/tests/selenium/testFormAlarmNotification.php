@@ -147,20 +147,6 @@ class testFormAlarmNotification extends CWebTest {
 		DBexecute('UPDATE profiles SET value_str=1 WHERE userid=1 AND source='.zbx_dbstr('enabled'));
 	}
 
-	private function createNotification($severity, $itemid, $trigger_name) {
-		$time = time();
-		$eventid = CDBHelper::getValue('SELECT eventid FROM events ORDER by eventid DESC LIMIT 1');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns, name, severity) '.
-				'VALUES ('.zbx_dbstr($eventid).', 0, 0, '.zbx_dbstr($itemid).', '.zbx_dbstr($time).', 1, 0, 638331661,'.
-				zbx_dbstr($trigger_name).','.zbx_dbstr($severity).')'
-		);
-
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, r_clock, r_ns, name, acknowledged) '.
-				'VALUES ('.zbx_dbstr($eventid).', 0, 0, '.zbx_dbstr($itemid).', '.zbx_dbstr($itemid).', 638331661, 0, 0, '.
-				zbx_dbstr($trigger_name).','.zbx_dbstr($severity).')'
-		);
-	}
-
 	/**
 	 * Check Alarm notification overlay dialog  layout.
 	 */
