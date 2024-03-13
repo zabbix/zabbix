@@ -98,7 +98,7 @@ class testWidgets extends CWebTest {
 	 * Replace macro {date} with specified date in YYYY-MM-DD format for specified fields and for item data to be inserted in DB.
 	 *
 	 * @param array		$data				data provider
-	 * @param string	$new_date			dinamic date that is converted into YYYY-MM-DD format and replaces the {date} macro
+	 * @param string	$new_date			dynamic date that is converted into YYYY-MM-DD format and replaces the {date} macro
 	 * @param array		$impacted_fields	array of fields that require to replace the {date} macro with a static date
 	 *
 	 * return array
@@ -122,6 +122,7 @@ class testWidgets extends CWebTest {
 		foreach ($data['item_data'] as &$item_value) {
 			$item_value['time'] = str_replace('{date}', $new_date, $item_value['time']);
 		}
+		unset($item_value);
 
 		return $data;
 	}

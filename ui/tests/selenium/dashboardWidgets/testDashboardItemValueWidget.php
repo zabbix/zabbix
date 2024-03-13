@@ -3882,7 +3882,8 @@ class testDashboardItemValueWidget extends testWidgets {
 			CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $params['value'], $params['time']);
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD_AGGREGATION])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardids[self::DASHBOARD_AGGREGATION])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
 
@@ -3915,6 +3916,8 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * Test function for assuring that binary items are not available in Item Value widget.
 	 */
 	public function testDashboardItemValueWidget_CheckAvailableItems() {
-		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD], 'Item value');
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD],
+				'Item value'
+		);
 	}
 }
