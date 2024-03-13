@@ -1845,15 +1845,15 @@ fail:
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: parsees discovery data contents and processes it                     *
+ * Purpose: parses discovery data contents and processes it                      *
  *                                                                               *
  * Parameters:                                                                   *
  *    jp_data                     - [IN] JSON with discovery data                *
  *    events_cbs                  - [IN]                                         *
  *    discovery_update_host_cb    - [IN]                                         *
  *    discovery_update_service_cb - [IN]                                         *
- *    error                       - [OUT] address of a pointer to the info       *
- *                                        string (should be freed by the caller) *
+ *    error                       - [OUT] address of pointer to info string      *
+ *                                        (should be freed by the caller)        *
  *                                                                               *
  * Return value:  SUCCEED - processed successfully                               *
  *                FAIL - error occurred                                          *
