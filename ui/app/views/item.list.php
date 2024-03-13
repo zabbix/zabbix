@@ -68,7 +68,10 @@ $header = [
 	($data['context'] === 'host') ? _('Info') : null
 ];
 
-$item_list = (new CTableInfo())->setHeader($header);
+$item_list = (new CTableInfo())
+	->setHeader($header)
+	->setPageNavigation($data['paging']);
+
 $now_ts = time();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
@@ -210,7 +213,7 @@ foreach ($data['items'] as $item) {
 	$item_list->addRow($row);
 }
 
-$form->addItem([$item_list, $data['paging']]);
+$form->addItem($item_list);
 
 $buttons = [
 	[

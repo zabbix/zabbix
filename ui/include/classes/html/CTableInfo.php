@@ -22,6 +22,7 @@
 class CTableInfo extends CTable {
 
 	protected $message;
+	protected $pageNavigation;
 
 	public function __construct() {
 		parent::__construct();
@@ -48,12 +49,23 @@ class CTableInfo extends CTable {
 		return $this;
 	}
 
+	public function setPageNavigation($pageNavigation) {
+		$this->pageNavigation = $pageNavigation;
+
+		return $this;
+	}
 	protected function endToString() {
 		$ret = '';
+
 		if ($this->rownum == 0 && $this->message !== null) {
 			$ret .= $this->prepareRow(new CCol($this->message), ZBX_STYLE_NOTHING_TO_SHOW)->toString();
 		}
+
 		$ret .= parent::endToString();
+
+		if ($this->pageNavigation && $this->getNumRows() != 0) {
+			$ret .= $this->pageNavigation;
+		}
 
 		return $ret;
 	}

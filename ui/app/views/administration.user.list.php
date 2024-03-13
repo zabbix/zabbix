@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.user.list.js.php');
@@ -139,7 +140,8 @@ $table = (new CTableInfo())
 		_('Status'),
 		make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url),
 		_('Info')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('user');
 
@@ -296,7 +298,6 @@ foreach ($data['users'] as $user) {
 // Append table to form.
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'userids', [
 		'user.provision' => [
 			'name' => _('Provision now'),

@@ -172,7 +172,8 @@ $graphTable = (new CTableInfo())
 		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'], $url),
 		$discover,
 		$info_column
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('graphs.php');
 
@@ -180,6 +181,7 @@ foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
 	$hostList = null;
+
 	if (empty($this->data['hostid'])) {
 		$hostList = [];
 		foreach ($graph['hosts'] as $host) {
@@ -255,6 +257,7 @@ foreach ($data['graphs'] as $graph) {
 
 // buttons
 $buttons = [];
+
 if (!$this->data['parent_discoveryid']) {
 	$buttons['graph.masscopyto'] = [
 		'content' => (new CSimpleButton(_('Copy')))
@@ -263,6 +266,7 @@ if (!$this->data['parent_discoveryid']) {
 			->removeId()
 	];
 }
+
 $buttons['graph.massdelete'] = [
 	'name' => _('Delete'),
 	'confirm_singular' => $this->data['parent_discoveryid']
@@ -277,10 +281,7 @@ $buttons['graph.massdelete'] = [
 // append table to form
 $graphForm->addItem([
 	$graphTable,
-	$data['paging'],
-	new CActionButtonList('action', 'group_graphid', $buttons,
-		$data['parent_discoveryid'] ?: $data['hostid']
-	)
+	new CActionButtonList('action', 'group_graphid', $buttons, $data['parent_discoveryid'] ?: $data['hostid'])
 ]);
 
 (new CScriptTag('

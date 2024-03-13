@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
@@ -208,7 +209,8 @@ $discoveryTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		($data['context'] === 'host') ? _('Info') : null
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $csrf_token = CCsrfTokenHelper::get('host_discovery.php');
@@ -373,9 +375,10 @@ $button_list += [
 ];
 
 // Append table to form.
-$discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList('action', 'g_hostdruleid',
-	$button_list, $data['checkbox_hash']
-)]);
+$discoveryForm->addItem([
+	$discoveryTable,
+	new CActionButtonList('action', 'g_hostdruleid', $button_list, $data['checkbox_hash'])
+]);
 
 $html_page
 	->addItem($discoveryForm)

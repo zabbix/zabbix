@@ -75,7 +75,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
 		(new CColHeader(_('Hosts')))->setColSpan(2),
 		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $current_time = time();
 
@@ -215,7 +216,6 @@ foreach ($data['groups'] as $group) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'groups', [
 		'hostgroup.massenable' => [
 			'content' => (new CSimpleButton(_('Enable hosts')))

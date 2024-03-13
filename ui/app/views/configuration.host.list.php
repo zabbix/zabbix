@@ -215,7 +215,8 @@ $table = (new CTableInfo())
 		_('Agent encryption'),
 		_('Info'),
 		_('Tags')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $current_time = time();
 $csrf_token_massupdate = CCsrfTokenHelper::get('host');
@@ -519,7 +520,6 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'hostids', [
 		'enable-hosts' => [
 			'name' => _('Enable'),
