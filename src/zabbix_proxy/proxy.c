@@ -35,19 +35,20 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxpoller.h"
+#include "zbxhttppoller.h"
 #include "zbxvmware.h"
 #include "zbxdbsyncer.h"
+#include "zbxpinger.h"
+#include "zbxtrapper.h"
 
 #include "../zabbix_server/discoverer/discoverer.h"
-#include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
-#include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller_proxy.h"
-#include "../zabbix_server/trapper/trapper.h"
-#include "../zabbix_server/trapper/trapper_request.h"
+#include "trapper/trapper_proxy.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
+
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
@@ -1438,7 +1439,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_externalscripts,
 								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location};
+								config_ssh_key_location, trapper_process_request_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
@@ -1720,7 +1721,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &trapper_args;
-				zbx_thread_start(trapper_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_trapper_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
 				thread_args.args = &datasender_args;
@@ -1729,16 +1730,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
 				poller_args.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
 				thread_args.args = &pinger_args;
-				zbx_thread_start(pinger_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_pinger_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 				thread_args.args = &housekeeper_args;
@@ -1746,7 +1747,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:
 				thread_args.args = &httppoller_args;
-				zbx_thread_start(httppoller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
@@ -1761,7 +1762,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_JAVA;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
 				thread_args.args = &snmptrapper_args;
@@ -1772,7 +1773,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				thread_args.args = &vmware_args;
-				zbx_thread_start(vmware_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_vmware_thread, &thread_args, &zbx_threads[i]);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
@@ -1799,27 +1800,27 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
 				thread_args.args = &poller_args;
-				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
-				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMP_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
-				zbx_thread_start(async_poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
 				thread_args.args = &poller_args;
-				zbx_thread_start(poller_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 		}
 	}
 
