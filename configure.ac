@@ -1024,9 +1024,6 @@ freebsd*)
 netbsd*)
 	ARCH="netbsd"
 	;;
-osf*)
-	ARCH="osf"
-	;;
 openbsd*)
 	ARCH="openbsd"
 	;;
@@ -2071,7 +2068,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/linux/Makefile
 	src/libs/zbxsysinfo/netbsd/Makefile
 	src/libs/zbxsysinfo/openbsd/Makefile
-	src/libs/zbxsysinfo/osf/Makefile
 	src/libs/zbxsysinfo/osx/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/solaris/Makefile
@@ -2082,12 +2078,14 @@ AC_CONFIG_FILES([
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile
+	src/libs/zbxtrapper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
+	src/libs/zbxpinger/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2107,6 +2105,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
+	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/actions/Makefile
@@ -2123,7 +2122,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/operations/Makefile
-	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile

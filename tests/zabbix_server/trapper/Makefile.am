@@ -9,6 +9,7 @@ COMMON_SRC_FILES = \
 TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/lld/libzbxlld.a \
 	$(top_srcdir)/src/zabbix_server/ha/libzbxha.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
@@ -94,8 +95,7 @@ endif
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
-	../../../src/zabbix_server/trapper/trapper_item_test.c \
-	../../../src/zabbix_server/trapper/trapper_auth.c \
+	../../../src/libs/zbxtrapper/trapper_item_test.c \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)

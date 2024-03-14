@@ -110,9 +110,6 @@ AC_DEFUN([CONF_TESTS],
 		netbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/netbsd/Makefile])
 			;;
-		osf)
-			AC_CONFIG_FILES([tests/libs/zbxsysinfo/osf/Makefile])
-			;;
 		openbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/openbsd/Makefile])
 			;;

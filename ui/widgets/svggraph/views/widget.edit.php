@@ -245,6 +245,7 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 	$legend = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
 	$legend_statistic = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_statistic']));
 	$legend_aggregation = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_aggregation']));
+	$legend_lines_mode_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['legend_lines_mode']));
 	$legend_lines = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
 	$legend_columns = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
@@ -268,6 +269,10 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 		)
 		->addItem(
 			(new CFormGrid())
+				->addItem([
+					$legend_lines_mode_field->getLabel(),
+					new CFormField($legend_lines_mode_field->getView())
+				])
 				->addItem([
 					$legend_lines->getLabel(),
 					new CFormField($legend_lines->getView())

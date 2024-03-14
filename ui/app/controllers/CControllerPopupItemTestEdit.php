@@ -264,8 +264,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 											}
 											break;
 
-										case CHistFunctionParser::PARAM_TYPE_PERIOD:
 										case CHistFunctionParser::PARAM_TYPE_QUOTED:
+											$match = CHistFunctionParser::unquoteParam($parameter['match']);
+											$texts_support_user_macros[] = $match;
+											$texts_support_lld_macros[] = $match;
+											break;
+
+										case CHistFunctionParser::PARAM_TYPE_PERIOD:
 										case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
 											$texts_support_user_macros[] = $parameter['match'];
 											$texts_support_lld_macros[] = $parameter['match'] ;

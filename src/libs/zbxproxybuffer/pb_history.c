@@ -18,13 +18,19 @@
 **/
 
 #include "pb_history.h"
-#include "zbxproxybuffer.h"
+#include "proxybuffer.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
-#include "proxybuffer.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbx_item_constants.h"
-#include "zbx_host_constants.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
+#include "zbxtime.h"
 
 static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid);
 
@@ -218,7 +224,7 @@ try_again:
  *                                                                            *
  * Parameters: j             - [IN/OUT] json output buffer                    *
  *             rows          - [IN] history rows to export                    *
- *             lastid        - [OUT] the id of last added record              *
+ *             lastid        - [OUT] id of last added record                  *
  *                                                                            *
  * Return value: The total number of records exported.                        *
  *                                                                            *
@@ -858,7 +864,7 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int	state, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, *lastid);
 
 	pb_lock();
 

@@ -33,7 +33,9 @@ func checkMetric(s scheduler.Scheduler, metric string) {
 	value, err := s.PerformTask(metric, timeoutForTestrunChecks, agent.TestrunClientID)
 	if err != nil {
 		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
+	} else if value == nil {
+		fmt.Printf("%-46s[-|ZBX_NODATA]\n", metric)
 	} else {
-		fmt.Printf("%-46s[s|%s]\n", metric, value)
+		fmt.Printf("%-46s[s|%s]\n", metric, *value)
 	}
 }

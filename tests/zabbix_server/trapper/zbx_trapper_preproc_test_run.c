@@ -23,7 +23,7 @@
 #include "zbxmockjson.h"
 #include "zbxembed.h"
 #include "libs/zbxpreproc/pp_execute.h"
-#include "zabbix_server/trapper/trapper_item_test.h"
+#include "libs/zbxtrapper/trapper_item_test.h"
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;

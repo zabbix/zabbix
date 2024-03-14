@@ -17,18 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "trapper_request.h"
 #include "trapper_history_push.h"
-#include "cfg.h"
-#include "trapper_auth.h"
+#include "trapper_server.h"
+
+#include "../proxyconfigread/proxyconfig_read.h"
+#include "proxydata.h"
+#include "../reporter/report.h"
+
+#include "zbxtrapper.h"
 #include "zbxdbhigh.h"
 #include "zbxalerter.h"
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
-#include "proxyconfigread/proxyconfig_read.h"
-#include "proxydata.h"
-#include "../reporter/report.h"
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
 		zbx_get_config_forks_f get_config_forks)
@@ -70,10 +71,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process alert send request that is used to test media types       *
+ * Purpose: processes alert send request that is used to test media types     *
  *                                                                            *
- * Parameters:  sock  - [IN] the request socket                               *
- *              jp    - [IN] the request data                                 *
+ * Parameters:  sock           - [IN] request socket                          *
+ *              jp             - [IN] request data                            *
+ *              config_timeout - [IN]                                         *
  *                                                                            *
  ******************************************************************************/
 static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
@@ -215,7 +217,7 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+int	trapper_process_request_server(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,

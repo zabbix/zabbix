@@ -1,55 +1,47 @@
 .sortable {
-	position: relative;
-	overflow: hidden;
-
-	.sortable-list {
+	.sortable-item {
 		position: relative;
-		top: 0;
-		left: 0;
 
 		@if $ui-transitions {
 			transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
 		}
 	}
 
-	.sortable-item {
-		box-sizing: border-box;
+	&.sortable-dragging {
+		isolation: isolate;
 
-		@if $ui-transitions {
-			&:not(.sortable-dragging) {
-				transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
+		.sortable-item {
+			&.sortable-item-dragging {
+				opacity: 0.6;
+				z-index: 1;
+				transition: left 0s, top 0s;
 			}
 		}
 	}
 
-	&.sortable-dragging {
+	&.sortable-transitions-disabled {
 		.sortable-item {
-			position: absolute;
-
-			&.sortable-dragging {
-				opacity: 0.6;
+			@if $ui-transitions {
+				transition: left 0s, top 0s;
 			}
 		}
 	}
 }
 
-.drag-icon {
-	@extend .zi-drag-handle;
-	@extend %icon-position;
-	@extend %cursor-drag;
+.sortable {
+	&.sortable-disabled {
+		.sortable-item {
+			.drag-icon {
+				@extend %drag-icon-disabled;
+			}
 
-	width: 12px;
-	height: $body-line-height;
-	color: $btn-icon-color;
-
-	&::before {
-		@extend %icons-font;
-
-		font-size: 22px;
-	}
-
-	&.disabled {
-		color: $btn-icon-disabled-color;
-		opacity: 1;
+			.sortable:not(.sortable-disabled) {
+				.sortable-item {
+					.drag-icon {
+						@extend %drag-icon-enabled;
+					}
+				}
+			}
+		}
 	}
 }
