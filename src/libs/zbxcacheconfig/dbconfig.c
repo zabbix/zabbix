@@ -2574,7 +2574,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			}
 		}
 
-		if (INTERFACE_TYPE_SNMP == interface->type)
+		if (INTERFACE_TYPE_SNMP == update->interface->type)
 			dc_interface_snmpaddrs_update(update->interface);
 	}
 
