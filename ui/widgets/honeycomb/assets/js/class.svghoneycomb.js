@@ -346,7 +346,7 @@ class CSVGHoneycomb {
 		);
 
 		this.#honeycomb_container
-			.style('--stroke-width', 2 / this.#container_params.scale)
+			.style('--stroke-width', `${2 / this.#container_params.scale}px`)
 			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
 			.each((d, i, cells) => {
 				if (d.scale_timeout !== undefined) {
@@ -563,7 +563,7 @@ class CSVGHoneycomb {
 			.style('--dx', `${scaled_position.dx}px`)
 			.style('--dy', `${scaled_position.dy}px`)
 			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
-			.style('--stroke-width', 2 / this.#container_params.scale / cell_scale)
+			.style('--stroke-width', `${2 / this.#container_params.scale / cell_scale}px`)
 			.style('--scale', cell_scale)
 			.select('path')
 			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`);
