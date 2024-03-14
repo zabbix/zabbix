@@ -298,6 +298,8 @@ func (c *ConnManager) setConn(cd connDetails, conn *OraConn) *OraConn {
 	if ok {
 		defer conn.client.Close() //nolint:errcheck
 
+		log.Debugf("[%s] Closed redundant connection: %s", pluginName, cd.uri.Addr())
+
 		return existingConn
 	}
 

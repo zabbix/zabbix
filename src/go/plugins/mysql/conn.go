@@ -268,6 +268,8 @@ func (c *ConnManager) setConn(ck connKey, conn *MyConn) *MyConn {
 	if ok {
 		defer conn.client.Close() //nolint:errcheck
 
+		log.Debugf("[%s] Closed redundant connection: %s", pluginName, ck.uri.Addr())
+
 		return existingConn
 	}
 
