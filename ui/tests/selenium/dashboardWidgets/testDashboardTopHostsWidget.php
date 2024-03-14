@@ -5104,7 +5104,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 
-		$widget_name = 'Aggegation check widget '.microtime();
+		$widget_name = 'Aggregation check widget '.microtime();
 		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_AGGREGATION], $widget_name);
 		$dashboard = CDashboardElement::find()->one();
 

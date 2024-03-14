@@ -3883,7 +3883,9 @@ class testDashboardItemValueWidget extends testWidgets {
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardids[self::DASHBOARD_AGGREGATION])->waitUntilReady();
+				self::$dashboardids[self::DASHBOARD_AGGREGATION]
+		)->waitUntilReady();
+
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
 
