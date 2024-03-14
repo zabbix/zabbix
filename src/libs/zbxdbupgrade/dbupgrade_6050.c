@@ -3249,6 +3249,20 @@ out:
 
 	return ret;
 }
+
+static int	DBpatch_6050211(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'itemnavigator','widgets/itemnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3464,5 +3478,6 @@ DBPATCH_ADD(6050207, 0, 1)
 DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
 DBPATCH_ADD(6050210, 0, 1)
+DBPATCH_ADD(6050211, 0, 1)
 
 DBPATCH_END()
