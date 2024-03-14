@@ -2532,15 +2532,14 @@ class CUser extends CApiService {
 			$idp_user_data['userid'] = $db_user['userid'];
 
 			if ($this->updateProvisionedUser($idp_user_data)) {
-
 				$db_user = self::findUsersByUsername($db_user['username'])[0];
-
-				self::addUserGroupFields($db_user, $group_status);
-				$db_user['auth_type'] = ZBX_AUTH_LDAP;
 			}
 			else {
 				$db_user['deprovisioned'] = true;
 			}
+
+			self::addUserGroupFields($db_user, $group_status);
+			$db_user['auth_type'] = ZBX_AUTH_LDAP;
 		}
 	}
 
