@@ -93,6 +93,13 @@ void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_handle, int now);
 void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_handle, int now);
 
+void	pg_cache_rebalance_groups(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle);
+void	pg_cache_get_group_and_proxy_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *group_updates,
+		zbx_vector_pg_update_t *proxy_updates);
+void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *hosts_new,
+		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del, zbx_vector_uint64_t *groupids);
+void	pg_cache_add_new_hostmaps(zbx_pg_cache_t *cache, const zbx_vector_pg_host_t *hosts_new);
+void	pg_cache_add_deleted_hostmaps(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *hosts_del);
 
 void	pg_cache_lock(zbx_pg_cache_t *cache);
 void	pg_cache_unlock(zbx_pg_cache_t *cache);

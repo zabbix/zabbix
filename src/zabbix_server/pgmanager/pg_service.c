@@ -120,7 +120,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 {
 	unsigned char	*ptr = message->data, *data, mode = ZBX_PROXY_SYNC_NONE;
 	zbx_uint64_t	proxyid, proxy_hostmap_revision, hostmap_revision = 0;
-	int		now;
+	time_t		now;
 	zbx_uint32_t	data_len, failover_delay_len;
 	zbx_pg_proxy_t	*proxy;
 	char		*failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY_STR;
@@ -130,7 +130,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	ptr += zbx_deserialize_value(ptr, &proxyid);
 	(void)zbx_deserialize_value(ptr, &proxy_hostmap_revision);
 
-	now = (int)time(NULL);
+	now = time(NULL);
 
 	pg_cache_lock(pgs->cache);
 

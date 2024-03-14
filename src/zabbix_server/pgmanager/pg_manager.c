@@ -133,10 +133,6 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 
 		zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
 
-		/* proxies with assigned hosts are assumed to be online */
-		proxy->state = ZBX_PG_PROXY_STATE_ONLINE;
-		proxy->lastaccess = now;
-
 		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
 			proxy->group->hostmap_revision = revision;
 	}
@@ -457,7 +453,7 @@ static void	pgm_db_flush_host_proxy_revision(zbx_uint64_t revision)
  * Purpose: flush proxy group and host-proxy mapping updates to database      *
  *                                                                            *
  ******************************************************************************/
-static void	pgm_flush_updates(zbx_pg_cache_t *cache)
+static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 {
 	zbx_vector_pg_update_t	groups, proxies;
 	zbx_vector_pg_host_t	hosts_new, hosts_mod, hosts_del;
@@ -475,12 +471,17 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_uint64_create(&groupids);
 
 	um_handle = zbx_dc_open_user_macros();
-
 	pg_cache_lock(cache);
-	hostmap_revision = cache->hostmap_revision;
-	pg_cache_get_updates(cache, um_handle, &groups, &proxies, &hosts_new, &hosts_mod, &hosts_del, &groupids);
-	pg_cache_unlock(cache);
 
+	hostmap_revision = cache->hostmap_revision;
+
+	pg_cache_rebalance_groups(cache, um_handle);
+	pg_cache_get_group_and_proxy_updates(cache, &groups, &proxies);
+	pg_cache_get_hostmap_updates(cache, &hosts_new, &hosts_mod, &hosts_del, &groupids);
+	pg_cache_add_new_hostmaps(cache, &hosts_new);
+	pg_cache_add_deleted_hostmaps(cache, &hosts_del);
+
+	pg_cache_unlock(cache);
 	zbx_dc_close_user_macros(um_handle);
 
 	if (0 != groups.values_num || 0 != proxies.values_num || 0 != hosts_new.values_num ||
@@ -598,7 +599,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		if (0 != cache.group_updates.values_num)
-			pgm_flush_updates(&cache);
+			pgm_rebalance_and_flush_updates(&cache);
 	}
 
 	pg_service_destroy(&pgs);

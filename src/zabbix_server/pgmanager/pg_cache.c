@@ -596,23 +596,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: apply pending changes to local cache and return changeset for     *
- *          database update                                                   *
+ * Purpose: check group balance and reassign hosts if necessary               *
  *                                                                            *
- * Parameters: cache          - [IN] proxy group cache                        *
- *             um_handle      - [IN] user macro cache handle                  *
- *             groups         - [OUT] group database updates                  *
- *             proxies        - [OUT] proxy database updates                  *
- *             hosts_new      - [OUT] new host-proxy links                    *
- *             hosts_mod      - [OUT] modified host-proxy links               *
- *             hosts_del      - [OUT] removed host-proxy links                *
- *             groupids       - [OUT] ids of groups with updated host-proxy   *
- *                                    mapping                                 *
+ * Parameters: cache     - [IN] proxy group cache                             *
+ *             um_handle - [IN] user macro cache handle                       *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle, zbx_vector_pg_update_t *groups,
-		zbx_vector_pg_update_t *proxies, zbx_vector_pg_host_t *hosts_new, zbx_vector_pg_host_t *hosts_mod,
-		zbx_vector_pg_host_t *hosts_del, zbx_vector_uint64_t *groupids)
+void	pg_cache_rebalance_groups(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle)
 {
 #define PG_UNBALANCE_PERIOD_COEFF	10
 
@@ -626,51 +616,72 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 	{
 		zbx_pg_group_t	*group = cache->group_updates.values[i];
 
-		if (ZBX_PG_GROUP_STATE_ONLINE == group->state)
+		if (ZBX_PG_GROUP_STATE_ONLINE != group->state)
+			continue;
+
+		if (SUCCEED != pg_cache_is_group_balanced(cache, um_handle, group))
 		{
-			if (SUCCEED != pg_cache_is_group_balanced(cache, um_handle, group))
+			group->unbalanced = PG_GROUP_UNBALANCED_YES;
+
+			/* unassigned hostids must be assigned without balancing delays */
+			if (0 != group->unassigned_hostids.values_num)
+				group->balance_time = now;
+
+			if (0 == group->balance_time)
 			{
-				group->unbalanced = PG_GROUP_UNBALANCED_YES;
+				char	*tmp;
+				int	failover_delay;
 
-				/* unassigned hostids must be assigned without balancing delays */
-				if (0 != group->unassigned_hostids.values_num)
-					group->balance_time = now;
+				tmp = zbx_strdup(NULL, group->failover_delay);
+				(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
 
-				if (0 == group->balance_time)
+				if (FAIL == zbx_is_time_suffix(tmp, &failover_delay, ZBX_LENGTH_UNLIMITED))
 				{
-					char	*tmp;
-					int	failover_delay;
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid proxy group '" ZBX_FS_UI64
+							"' failover delay '%s', using %d seconds default value",
+							group->proxy_groupid, tmp, ZBX_PG_DEFAULT_FAILOVER_DELAY);
 
-					tmp = zbx_strdup(NULL, group->failover_delay);
-					(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
-
-					if (FAIL == zbx_is_time_suffix(tmp, &failover_delay, ZBX_LENGTH_UNLIMITED))
-					{
-						zabbix_log(LOG_LEVEL_DEBUG, "invalid proxy group '" ZBX_FS_UI64
-								"' failover delay '%s', using %d seconds default value",
-								group->proxy_groupid, tmp,
-								ZBX_PG_DEFAULT_FAILOVER_DELAY);
-
-						failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
-					}
-					zbx_free(tmp);
-
-					group->balance_time = now + failover_delay * PG_UNBALANCE_PERIOD_COEFF;
+					failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 				}
-				else if (now >= group->balance_time)
-				{
-					pg_cache_reassign_hosts(cache, group);
-					group->balance_time = 0;
-					group->unbalanced = PG_GROUP_UNBALANCED_NO;
-				}
+				zbx_free(tmp);
+
+				group->balance_time = now + failover_delay * PG_UNBALANCE_PERIOD_COEFF;
 			}
-			else
+			else if (now >= group->balance_time)
 			{
+				pg_cache_reassign_hosts(cache, group);
 				group->balance_time = 0;
 				group->unbalanced = PG_GROUP_UNBALANCED_NO;
 			}
 		}
+		else
+		{
+			group->balance_time = 0;
+			group->unbalanced = PG_GROUP_UNBALANCED_NO;
+		}
+	}
 
+#undef PG_UNBALANCE_PERIOD_COEFF
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group and proxy updates that must be flushed            *
+ *          to database                                                       *
+ *                                                                            *
+ * Parameters: cache         - [IN] proxy group cache                         *
+ *             group_updates - [OUT] group updates                            *
+ *             proxy_updates - [OUT] proxy updates                            *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_get_group_and_proxy_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *group_updates,
+		zbx_vector_pg_update_t *proxy_updates)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group updates:%d", __func__, cache->group_updates.values_num);
+
+	for (int i = 0; i < cache->group_updates.values_num; i++)
+	{
+		zbx_pg_group_t	*group = cache->group_updates.values[i];
 		if (ZBX_PG_GROUP_FLAGS_NONE != group->flags)
 		{
 			zbx_pg_update_t	group_update = {
@@ -679,7 +690,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 					.flags = group->flags
 				};
 
-			zbx_vector_pg_update_append_ptr(groups, &group_update);
+			zbx_vector_pg_update_append_ptr(group_updates, &group_update);
 			group->flags = ZBX_PG_GROUP_FLAGS_NONE;
 		}
 
@@ -695,7 +706,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 						.flags = proxy->flags
 					};
 
-				zbx_vector_pg_update_append_ptr(proxies, &proxy_update);
+				zbx_vector_pg_update_append_ptr(proxy_updates, &proxy_update);
 				proxy->flags = ZBX_PG_GROUP_FLAGS_NONE;
 			}
 		}
@@ -719,15 +730,35 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 		}
 	}
 
-	if (0 != cache->hostmap_updates.num_data)
-		cache->hostmap_revision++;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() groups:%d proxies:%d", __func__, group_updates->values_num,
+			proxy_updates->values_num);
+}
 
-	zbx_hashset_iter_t		iter;
-	zbx_pg_host_t			*host, *new_host;
-	zbx_vector_pg_host_ptr_t	added_hosts;
-	zbx_pg_proxy_t			*proxy;
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host-proxy link updates to be flushed to database             *
+ *                                                                            *
+ * Parameters: cache          - [IN] proxy group cache                        *
+ *             hosts_new      - [OUT] new host-proxy links                    *
+ *             hosts_mod      - [OUT] modified host-proxy links               *
+ *             hosts_del      - [OUT] removed host-proxy links                *
+ *             groupids       - [OUT] ids of groups with updated host-proxy   *
+ *                                    mapping                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *hosts_new,
+		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del, zbx_vector_uint64_t *groupids)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostmap updates:%d", __func__, cache->hostmap_updates.num_data);
 
-	zbx_vector_pg_host_ptr_create(&added_hosts);
+	if (0 == cache->hostmap_updates.num_data)
+		goto out;
+
+	cache->hostmap_revision++;
+
+	zbx_hashset_iter_t	iter;
+	zbx_pg_host_t		*host, *new_host;
+	zbx_pg_proxy_t		*proxy;
 
 	zbx_hashset_iter_reset(&cache->hostmap_updates, &iter);
 	while (NULL != (new_host = (zbx_pg_host_t *)zbx_hashset_iter_next(&iter)))
@@ -762,11 +793,7 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 			}
 		}
 		else
-		{
 			zbx_vector_pg_host_append_ptr(hosts_new, &host_local);
-			host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
-			zbx_vector_pg_host_ptr_append(&added_hosts, host);
-		}
 
 		if (0 != new_host->proxyid)
 		{
@@ -780,25 +807,61 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 		}
 	}
 
-	/* assign hostproxyid for new hosts-proxy links */
+	zbx_hashset_clear(&cache->hostmap_updates);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() added:%d updated:%d removed:%d", __func__, hosts_new->values_num,
+			hosts_mod->values_num, hosts_del->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add new host-proxy links to cache                                 *
+ *                                                                            *
+ * Parameters: cache          - [IN] proxy group cache                        *
+ *             hosts_new      - [IN] new host-proxy links                     *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_add_new_hostmaps(zbx_pg_cache_t *cache, const zbx_vector_pg_host_t *hosts_new)
+{
+	if (0 == hosts_new->values_num)
+		return;
 
 	zbx_uint64_t	hostproxyid;
 
-	hostproxyid = zbx_db_get_maxid_num("host_proxy", added_hosts.values_num);
-	for (int i = 0; i < added_hosts.values_num; i++)
+	hostproxyid = zbx_db_get_maxid_num("host_proxy", hosts_new->values_num);
+	for (int i = 0; i < hosts_new->values_num; i++)
 	{
-		added_hosts.values[i]->hostproxyid = hostproxyid;
 		hosts_new->values[i].hostproxyid = hostproxyid++;
+		zbx_hashset_insert(&cache->hostmap, &hosts_new->values[i], sizeof(hosts_new->values[i]));
 	}
+}
 
-	/* add deleted host-group links to every group proxy so they are synced to them */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add deleted host-proxy links to all proxies of group monitoring   *
+ *          corresponding hosts                                               *
+ *                                                                            *
+ * Parameters: cache          - [IN] proxy group cache                        *
+ *             hosts_del      - [OUT] removed host-proxy links                *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_add_deleted_hostmaps(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *hosts_del)
+{
+	if (0 == hosts_del->values_num)
+		return;
 
+	time_t	now;
+
+	now = time(NULL);
+
+	/* add deleted host-proxy links to every group proxy so they are synced to them */
 	for (int i = 0; i < hosts_del->values_num; i++)
 	{
-		host = &hosts_del->values[i];
+		zbx_pg_proxy_t	*proxy;
+		zbx_pg_host_t	*host = &hosts_del->values[i];
 
 		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)) ||
-				NULL == proxy->group)
+				NULL == proxy->group || ZBX_PG_GROUP_STATE_DISABLED == proxy->group->state)
 		{
 			continue;
 		}
@@ -821,14 +884,6 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_ha
 			}
 		}
 	}
-
-	zbx_vector_pg_host_ptr_destroy(&added_hosts);
-
-	zbx_hashset_clear(&cache->hostmap_updates);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-#undef PG_UNBALANCE_PERIOD_COEFF
 }
 
 /******************************************************************************

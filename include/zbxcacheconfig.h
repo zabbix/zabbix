@@ -1418,7 +1418,7 @@ typedef struct
 	int				version;
 	int				lastaccess;
 	int				firstaccess;
-	int				sync_time;	/* sync_time is used to stop collecting potentially infinite */
+	time_t				sync_time;	/* sync_time is used to stop collecting potentially infinite */
 							/* host changes into deleted_group_hosts if the proxy was    */
 							/* offline for day+. In this case full proxy group data      */
 							/* resync will be forced                                     */
