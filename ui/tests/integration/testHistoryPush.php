@@ -524,7 +524,7 @@ class testHistoryPush extends CIntegrationTest {
 		$response = $this->call('history.push', [
 			'itemid' => self::$itemids['trapper_uint_maintained_host'],
 			'value' => 12345,
-			'clock' => time() - 25,
+			'clock' => $maint_start_tm,
 			'ns' => 255
 		]);
 
