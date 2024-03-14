@@ -434,6 +434,24 @@ class testUserDirectory extends CAPITest {
 					]]
 				]],
 				'expected_error' => 'Invalid parameter "/1/provision_media/1/period": cannot be empty.'
+			],
+			'Test invalid provision media userdirectory_mediaid=0' => [
+				'userdirectories' => [[
+					'name' => 'LDAP #3',
+					'idp_type' => IDP_TYPE_LDAP,
+					'host' => 'ldap.forumsys.com',
+					'port' => 389,
+					'base_dn' => 'dc=example,dc=com',
+					'search_attribute' => 'uid',
+					'provision_status' => JIT_PROVISIONING_ENABLED,
+					'provision_groups' => [
+						['name' => 'zabbix-devs', 'roleid' => 1, 'user_groups' => [['usrgrpid' => 7]]]
+					],
+					'provision_media' => [
+						['userdirecotry_mediaid' => 0, 'name' => 'Media #2', 'mediatypeid' => 1, 'attribute' => 'attr_media2', 'active' => MEDIA_STATUS_ACTIVE]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1": unexpected parameter "userdirecotry_mediaid".'
 			]
 		];
 	}
@@ -647,6 +665,17 @@ class testUserDirectory extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/provision_media/1/period": a time period is expected.'
+			],
+			'Set incorrect provision media userdirectory_mediaid=0' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'LDAP #3',
+						'provision_media' => [
+							['userdirectory_mediaid' => 0, 'name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1']
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/userdirectory_mediaid": referred object does not exist.'
 			],
 			'Test invalid SAML Encrypt assertions' => [
 				'userdirectories' => [[

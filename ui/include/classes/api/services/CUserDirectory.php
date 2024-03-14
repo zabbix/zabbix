@@ -671,6 +671,7 @@ class CUserDirectory extends CApiService {
 
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories);
+		self::checkProvisionMedias($userdirectories);
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 	}
@@ -875,6 +876,62 @@ class CUserDirectory extends CApiService {
 						_('referred object does not exist')
 					)
 				);
+			}
+		}
+	}
+
+	private static function checkProvisionMedias(array $userdirectories): void {
+		$mediaid_userdirectoryid = [];
+		foreach ($userdirectories as $userdirectory) {
+			if (!array_key_exists('provision_media', $userdirectory) || !$userdirectory['provision_media']) {
+				continue;
+			}
+
+			$mediaid_userdirectoryid += array_fill_keys(
+				array_column($userdirectory['provision_media'], 'userdirectory_mediaid', 'userdirectory_mediaid'),
+				$userdirectory['userdirectoryid']
+			);
+		}
+
+		if (!$mediaid_userdirectoryid) {
+			return;
+		}
+
+		$db_mediaids = [];
+		unset($mediaid_userdirectoryid[0]);
+
+		if ($mediaid_userdirectoryid) {
+			$db_mediaids = DB::select('userdirectory_media', [
+				'output' => ['userdirectory_mediaid', 'userdirectoryid'],
+				'userdirectory_mediaids' => array_keys($mediaid_userdirectoryid)
+			]);
+			$db_mediaids = array_column($db_mediaids, 'userdirectoryid', 'userdirectory_mediaid');
+		}
+
+		$i = 0;
+		foreach ($userdirectories as $userdirectory) {
+			$i++;
+			if (!array_key_exists('provision_media', $userdirectory) || !$userdirectory['provision_media']) {
+				continue;
+			}
+
+			$j = 0;
+			$userdirectoryid = $userdirectory['userdirectoryid'];
+
+			foreach ($userdirectory['provision_media'] as $media) {
+				$j++;
+				if (!array_key_exists('userdirectory_mediaid', $media)) {
+					continue;
+				}
+
+				if (!array_key_exists($media['userdirectory_mediaid'], $db_mediaids)
+						|| bccomp($db_mediaids[$media['userdirectory_mediaid']], $userdirectoryid) !== 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.$i.'/provision_media/'.$j.'/userdirectory_mediaid',
+							_('referred object does not exist')
+						)
+					);
+				}
 			}
 		}
 	}
@@ -1434,8 +1491,7 @@ class CUserDirectory extends CApiService {
 											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')],
 											'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), 'default' => DB::getDefault('userdirectory_media', 'active')],
 											'severity' =>		['type' => API_INT32, 'in' => '0:63', 'default' => DB::getDefault('userdirectory_media', 'severity')],
-											'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')],
-											'userdirectory_mediaid' => ['type' => API_ID, 'in' => '0']
+											'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
