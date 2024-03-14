@@ -192,7 +192,7 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
  * Purpose: vmware collector main loop                                        *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(vmware_thread, args)
+ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	int				services_updated = 0, services_removed = 0,

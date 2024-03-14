@@ -669,6 +669,17 @@ window.widget_pie_chart_form = new class {
 		legend_value.disabled = !is_legend_visible;
 		document.getElementById('legend_aggregation').disabled = !is_legend_visible;
 
+		for (const input of this.#form.querySelectorAll('[name=legend_lines_mode]')) {
+			input.disabled = !is_legend_visible;
+		}
+
+		const legend_lines_mode = this.#form.querySelector('[name=legend_lines_mode]:checked').value;
+
+		this.#form.querySelector('[for=legend_lines]')
+			.textContent = legend_lines_mode == <?= WidgetForm::LEGEND_LINES_MODE_VARIABLE ?>
+				? '<?= _('Maximum number of rows') ?>'
+				: '<?= _('Number of rows') ?>';
+
 		// Trigger event to update tab indicators.
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
 	}

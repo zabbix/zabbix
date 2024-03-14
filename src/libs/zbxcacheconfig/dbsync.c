@@ -29,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include <stddef.h>
 
 /* global correlation constants */
 #define ZBX_CORRELATION_ENABLED				0
@@ -127,16 +128,10 @@ static int	dbsync_strpool_compare_func(const void *d1, const void *d2)
 static char	*dbsync_strdup(const char *str)
 {
 	void	*ptr;
+	size_t	size = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
 
-	ptr = zbx_hashset_search(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE);
-
-	if (NULL == ptr)
-	{
-		ptr = zbx_hashset_insert_ext(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
-
-		*(zbx_uint32_t *)ptr = 0;
-	}
+	ptr = zbx_hashset_insert_ext(&dbsync_env.strpool, str - REFCOUNT_FIELD_SIZE, size, REFCOUNT_FIELD_SIZE,
+			size, ZBX_HASHSET_UNIQ_FALSE);
 
 	(*(zbx_uint32_t *)ptr)++;
 
@@ -290,13 +285,12 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 	if (NULL == sync->preproc_row_func)
 		return row;
 
+	/* row is unchanged, preprocessing was not performed */
+	if (row == sync->preproc_row_func(sync, row))
+		return row;
+
 	/* free the resources allocated by last preprocessing call */
 	zbx_vector_ptr_clear_ext(&sync->columns, zbx_ptr_free);
-
-	/* copy the original data */
-	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
-
-	sync->row = sync->preproc_row_func(sync->row);
 
 	for (i = 0; i < sync->columns_num; i++)
 	{
@@ -769,6 +763,24 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets the number of rows                                           *
+ *                                                                            *
+ * Parameters: sync - [IN] changeset                                          *
+ *                                                                            *
+ * Return value: number of rows to sync                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_UPDATE == sync->mode)
+		return sync->rows.values_num;
+
+	return zbx_db_get_row_num(sync->dbresult);
 }
 
 /******************************************************************************
@@ -1591,7 +1603,8 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
  *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
+ * Parameter: sync - [IN] changeset                                           *
+ *            row  - [IN] row to preprocess                                   *
  *                                                                            *
  * Return value: the preprocessed row                                         *
  *                                                                            *
@@ -1599,12 +1612,15 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-static char	**dbsync_interface_preproc_row(char **row)
+static char	**dbsync_interface_preproc_row(zbx_dbsync_t *sync, char **row)
 {
 	zbx_uint64_t	hostid;
 
 	/* get associated host identifier */
 	ZBX_STR2UINT64(hostid, row[1]);
+
+	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+	row = sync->row;
 
 	/* expand user macros */
 	if (NULL != strstr(row[5], "{$"))
@@ -1613,7 +1629,7 @@ static char	**dbsync_interface_preproc_row(char **row)
 	if (NULL != strstr(row[6], "{$"))
 		row[6] = dc_expand_user_and_func_macros_dyn(row[6], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 
-	return row;
+	return sync->row;
 }
 
 /******************************************************************************
@@ -1693,7 +1709,8 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
+ * Parameter: sync - [IN] the changeset                                       *
+ *            row  - [IN] the row to preprocess                                *
  *                                                                            *
  * Return value: the preprocessed row                                         *
  *                                                                            *
@@ -1701,7 +1718,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-static char	**dbsync_item_preproc_row(char **row)
+static char	**dbsync_item_preproc_row(zbx_dbsync_t *sync, char **row)
 {
 	unsigned char	type;
 
@@ -1714,6 +1731,10 @@ static char	**dbsync_item_preproc_row(char **row)
 		zbx_eval_context_t	ctx;
 		char			*error = NULL;
 
+		/* copy the original data */
+		memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+		row = sync->row;
+
 		if (FAIL == zbx_eval_parse_expression(&ctx, row[11], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 		{
 			zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
@@ -1722,6 +1743,8 @@ static char	**dbsync_item_preproc_row(char **row)
 
 		row[49] = encode_expression(&ctx);
 		zbx_eval_clear(&ctx);
+
+		return sync->row;
 	}
 
 	return row;
@@ -1752,11 +1775,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
 				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null"
 			" from items i"
-			" inner join hosts h on i.hostid=h.hostid"
-			" join item_rtdata ir on i.itemid=ir.itemid"
-			" where (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d or i.flags=%d)",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
-			ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_CREATED);
+			" join item_rtdata ir on i.itemid=ir.itemid");
 
 	dbsync_prepare(sync, 50, dbsync_item_preproc_row);
 
@@ -1767,7 +1786,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
 out:
 	zbx_free(sql);
@@ -1967,7 +1986,8 @@ out:
  *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
+ * Parameter: sync - [IN] the changeset                                       *
+ *            row  - [IN] the row to preprocess                                *
  *                                                                            *
  * Return value: the preprocessed row                                         *
  *                                                                            *
@@ -1978,7 +1998,7 @@ out:
  *           columns.                                                         *
  *                                                                            *
  ******************************************************************************/
-static char	**dbsync_trigger_preproc_row(char **row)
+static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 {
 	zbx_eval_context_t	ctx, ctx_r;
 	char			*error = NULL;
@@ -1988,6 +2008,9 @@ static char	**dbsync_trigger_preproc_row(char **row)
 
 	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
 		return row;
+
+	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+	row = sync->row;
 
 	if (FAIL == zbx_eval_parse_expression(&ctx, row[2], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
 	{
@@ -2028,7 +2051,7 @@ static char	**dbsync_trigger_preproc_row(char **row)
 
 	row[18] = zbx_dsprintf(NULL, "%d", timer);
 
-	return row;
+	return sync->row;
 }
 
 /******************************************************************************
@@ -2155,7 +2178,8 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
  *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
+ * Parameter: sync - [IN] the changeset                                       *
+ *            row  - [IN] the row to preprocess                                *
  *                                                                            *
  * Return value: the preprocessed row                                         *
  *                                                                            *
@@ -2163,10 +2187,12 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-static char	**dbsync_function_preproc_row(char **row)
+static char	**dbsync_function_preproc_row(zbx_dbsync_t *sync, char **row)
 {
 	const char	*row3;
 
+	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
+	row = sync->row;
 	/* first parameter is /host/key placeholder $, don't cache it */
 	if (NULL == (row3 = strchr(row[3], ',')))
 		row3 = "";
@@ -2175,7 +2201,7 @@ static char	**dbsync_function_preproc_row(char **row)
 
 	row[3] = zbx_strdup(NULL, row3);
 
-	return row;
+	return sync->row;
 }
 
 /******************************************************************************

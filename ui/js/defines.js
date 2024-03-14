@@ -22,6 +22,8 @@ const ZBX_STYLE_BTN_GREY = 'btn-grey';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_FORM_GRID = 'form-grid';
+
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
 
 const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
