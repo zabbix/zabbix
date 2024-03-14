@@ -91,9 +91,9 @@ class CSVGHoneycomb {
 	/**
 	 * Data about cells.
 	 *
-	 * @type {Array}
+	 * @type {Array | null}
 	 */
-	#cells_data = [];
+	#cells_data = null;
 
 	/**
 	 * Maximum number of cells based on the container size.
@@ -228,7 +228,10 @@ class CSVGHoneycomb {
 			.attr('height', height);
 
 		this.#adjustSize();
-		this.#updateCells();
+
+		if (this.#cells_data !== null) {
+			this.#updateCells();
+		}
 	}
 
 	/**
@@ -312,7 +315,9 @@ class CSVGHoneycomb {
 		const max_rows = Math.floor((this.#height - cell_min_height) / (cell_min_height * .75)) + 1;
 		const max_columns = Math.floor((this.#width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width);
 
-		this.#cells_max_count = Math.min(this.#cells_data.length, max_rows * max_columns);
+		this.#cells_max_count = this.#cells_data !== null
+			? Math.min(this.#cells_data.length, max_rows * max_columns)
+			: 0;
 
 		const rows = Math.max(1, Math.min(max_rows, this.#cells_max_count,
 			Math.sqrt(this.#height * this.#cells_max_count / this.#width))
@@ -409,7 +414,10 @@ class CSVGHoneycomb {
 					.each((d, i, cells) => {
 						const cell = d3.select(cells[i]);
 
-						if (d.no_data !== true && d.has_more !== true) {
+						if (d.no_data === true) {
+							this.#drawNoDataLabel(cell);
+						}
+						else if (d.has_more !== true) {
 							this.#drawLabel(cell);
 						}
 
@@ -448,17 +456,8 @@ class CSVGHoneycomb {
 	#drawCellNoData(cell) {
 		cell
 			.classed(CSVGHoneycomb.ZBX_STYLE_CELL_NO_DATA, true)
-			.append('foreignObject')
-			.append('xhtml:div')
-			.attr('class', CSVGHoneycomb.ZBX_STYLE_CONTENT)
-			.append('span')
-			.text(t('No data'))
-			.style('font-size',
-				`${Math.max(CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale, this.#cell_width / 10)}px`
-			);
-
-		this.#resizeLabels(cell);
-	};
+			.call(cell => this.#drawNoDataLabel(cell));
+	}
 
 	#drawCell(cell) {
 		cell
@@ -647,6 +646,26 @@ class CSVGHoneycomb {
 					);
 				}
 			});
+
+		this.#resizeLabels(cell);
+	}
+
+	#drawNoDataLabel(cell) {
+		cell.call(cell => cell.select('foreignObject')?.remove());
+
+		if (((this.#cell_width - this.#cells_gap) * this.#container_params.scale) < CSVGHoneycomb.LABEL_WIDTH_MIN) {
+			return;
+		}
+
+		cell
+			.append('foreignObject')
+			.append('xhtml:div')
+			.attr('class', CSVGHoneycomb.ZBX_STYLE_CONTENT)
+			.append('span')
+			.text(t('No data'))
+			.style('font-size',
+				`${Math.max(CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale, this.#cell_width / 10)}px`
+			);
 
 		this.#resizeLabels(cell);
 	}
