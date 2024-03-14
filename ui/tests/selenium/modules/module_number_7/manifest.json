@@ -1,0 +1,19 @@
+{
+	"manifest_version": 2,
+	"id": "testcsrf",
+	"name": "Test CSRF token",
+	"author": "",
+	"description": "Test CSRF token support for modules",
+	"version": "0.1",
+	"namespace": "CSRF",
+	"url": "",
+	"actions": {
+		"csrftoken.form": {
+			"class": "CsrfFormEdit",
+			"view": "csrf.form.view"
+		},
+		"csrftoken.form.update": {
+			"class": "CsrfFormUpdate"
+		}
+	}
+}
