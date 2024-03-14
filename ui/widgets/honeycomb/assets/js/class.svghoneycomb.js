@@ -260,7 +260,7 @@ class CSVGHoneycomb {
 
 				d3.select(cells[i])
 					.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED, selected)
-					.style('--stroke-selected', selected ? d3.color(this.#getFillColor(d))?.darker(.6).formatHex() : null)
+					.style('--stroke-selected', d => selected ? this.#getStrokeColor(d, true) : null)
 			});
 
 		return has_selected;
@@ -421,9 +421,8 @@ class CSVGHoneycomb {
 							this.#drawLabel(cell);
 						}
 
-						cell.style('--stroke-selected', cell.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED)
-							? d3.color(this.#getFillColor(d))?.darker(.6).formatHex()
-							: null
+						cell.style('--stroke-selected', d => this.#getStrokeColor(d,
+							cell.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED))
 						);
 					}),
 				exit => exit.remove()
@@ -561,7 +560,7 @@ class CSVGHoneycomb {
 		cell
 			.style('--dx', `${scaled_position.dx}px`)
 			.style('--dy', `${scaled_position.dy}px`)
-			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
+			.style('--stroke', d => this.#getStrokeColor(d))
 			.style('--stroke-width', `${2 / this.#container_params.scale / cell_scale}px`)
 			.style('--scale', cell_scale)
 			.select('path')
@@ -870,6 +869,18 @@ class CSVGHoneycomb {
 		}
 
 		return `#${curr.color}`;
+	}
+
+	#getStrokeColor(d, wide = false) {
+		const fill_color = d3.color(this.#getFillColor(d));
+
+		if (fill_color === null) {
+			return null;
+		}
+
+		return document.documentElement.getAttribute('color-scheme') === ZBX_COLOR_SCHEME_LIGHT
+			? fill_color.darker(wide ? .6 : .3).formatHex()
+			: fill_color.brighter(wide ? 1 : .6).formatHex();
 	}
 
 	/**

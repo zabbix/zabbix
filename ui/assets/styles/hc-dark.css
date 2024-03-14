@@ -3507,6 +3507,10 @@ section {
     height: 10px;
     margin-right: 10px; }
 
+[color-scheme="dark"] .svg-honeycomb .svg-honeycomb-container {
+  --stroke-hover: #447185;
+  --stroke-selected: #568da6; }
+
 .svg-honeycomb .svg-honeycomb-container {
   --color: #eeeeee;
   --fill: #335463;
@@ -3537,8 +3541,6 @@ section {
     grid-auto-rows: minmax(max-content, auto);
     align-content: stretch;
     align-items: center;
-    justify-self: center;
-    width: var(--label-width);
     height: 100%;
     text-align: center;
     line-height: var(--line-height);

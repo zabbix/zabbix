@@ -3553,6 +3553,10 @@ section {
     height: 10px;
     margin-right: 10px; }
 
+[color-scheme="dark"] .svg-honeycomb .svg-honeycomb-container {
+  --stroke-hover: #fcfdfd;
+  --stroke-selected: white; }
+
 .svg-honeycomb .svg-honeycomb-container {
   --color: #1f2c33;
   --fill: #d9e7ed;

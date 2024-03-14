@@ -1851,6 +1851,9 @@ define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 define('TAB_INDICATOR_TEMPLATE_VALUEMAPS', 'template-valuemaps');
 
+define('ZBX_COLOR_SCHEME_DARK', 'dark');
+define('ZBX_COLOR_SCHEME_LIGHT', 'light');
+
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');

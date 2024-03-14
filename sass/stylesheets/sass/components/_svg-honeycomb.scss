@@ -1,3 +1,12 @@
+[color-scheme="dark"] {
+	.svg-honeycomb {
+		.svg-honeycomb-container {
+			--stroke-hover: #{lighten($honeycomb-cell-color, 10%)};
+			--stroke-selected: #{lighten($honeycomb-cell-color, 20%)};
+		}
+	}
+}
+
 .svg-honeycomb {
 	.svg-honeycomb-container {
 		--color: #{$honeycomb-label-color};
