@@ -2643,7 +2643,7 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function createSession(array &$db_user, $session_status): void {
+	private static function createSession(array &$db_user, int $session_status): void {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
 		$db_user['secret'] = CEncryptHelper::generateKey();
 
