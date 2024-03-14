@@ -78,15 +78,16 @@ class testFormConnectors extends CWebTest {
 				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password'
 			],
 			'required' => ['Name', 'URL', 'Type of information', 'Max records per message', 'Concurrent sessions',
-				'Attempts', 'Attempt interval', 'Timeout'],
+				'Attempts', 'Attempt interval', 'Timeout'
+			],
 			'default' => [
 				'Data type' => 'Item values',
 				'Tag filter' => 'And/Or',
-				'id:item_value_types_8' => true, // Numeric (unsigned).
-				'id:item_value_types_1' => true, // Numeric (float).
-				'id:item_value_types_2' => true, // Character.
-				'id:item_value_types_4' => true, // Log.
-				'id:item_value_types_16' => true, // Text.
+				'Numeric (unsigned)' => true,
+				'Numeric (float)' => true,
+				'Character' => true,
+				'Log' => true,
+				'Text' => true,
 				'HTTP authentication' => 'None',
 				'Max records per message' => 'Unlimited',
 				'Concurrent sessions' => '1',
@@ -243,10 +244,16 @@ class testFormConnectors extends CWebTest {
 		* Check that 'Attempt interval' and 'Type of information' fields state changes
 		* if 'Attempts' and 'Data type' match criteria (Attempts > 1, Data type !== Item values).
 		*/
-		$this->assertFalse($form->getField('Attempt interval')->isEnabled());
-		$form->fill(['Attempts' => 2, 'Data type' => 'Events']);
-		$this->assertFalse($form->getField('Type of information')->isDisplayed());
-		$this->assertTrue($form->getField('Attempt interval')->isEnabled());
+		foreach (['Events' => false, 'Item values' => true] as $data_type => $state) {
+			$form->fill(['Data type' => $data_type]);
+			$this->assertEquals($state, $form->getField('Type of information')->isDisplayed());
+		}
+
+		foreach (['2' => true, '1' => false, '9' => true, '0' => false] as $attempts => $state) {
+			$form->getField('Attempts')->fill($attempts)->fireEvent();
+			$this->assertEquals($state, $form->getField('Attempt interval')->isEnabled());
+			$form->checkValue(['Attempt interval' => '5s']);
+		}
 
 		// Check that both 'Cancel' and 'Add' footer buttons are present and clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
@@ -371,11 +378,11 @@ class testFormConnectors extends CWebTest {
 					'fields' => [
 						'Name' => 'Connector with unchecked Type of information checkboxes',
 						'URL' => '{$URL}',
-						'id:item_value_types_8' => false, // Numeric (unsigned).
-						'id:item_value_types_1' => false, // Numeric (float).
-						'id:item_value_types_2' => false, // Character.
-						'id:item_value_types_4' => false, // Log.
-						'id:item_value_types_16' => false // Text.
+						'Numeric (unsigned)' => false,
+						'Numeric (float)' => false,
+						'Character' => false,
+						'Log' => false,
+						'Text' => false
 					],
 					'error' => [
 						'Field "item_value_types" is mandatory.'
@@ -807,11 +814,11 @@ class testFormConnectors extends CWebTest {
 					'fields' => [
 						'Name' => 'One type of information',
 						'URL' => '{$URL}',
-						'id:item_value_types_8' => false, // Numeric (unsigned).
-						'id:item_value_types_1' => false, // Numeric (float).
-						'id:item_value_types_2' => false, // Character.
-						'id:item_value_types_4' => true, // Log.
-						'id:item_value_types_16' => false // Text.
+						'Numeric (unsigned)' => false,
+						'Numeric (float)' => false,
+						'Character' => false,
+						'Log' => true,
+						'Text' => false
 					]
 				]
 			],
@@ -821,11 +828,11 @@ class testFormConnectors extends CWebTest {
 					'fields' => [
 						'Name' => 'Two types of information',
 						'URL' => '{$URL}',
-						'id:item_value_types_8' => true, // Numeric (unsigned).
-						'id:item_value_types_1' => false, // Numeric (float).
-						'id:item_value_types_2' => false, // Character.
-						'id:item_value_types_4' => true, // Log.
-						'id:item_value_types_16' => false // Text.
+						'Numeric (unsigned)' => true,
+						'Numeric (float)' => false,
+						'Character' => false,
+						'Log' => true,
+						'Text' => false
 					]
 				]
 			],
@@ -835,11 +842,11 @@ class testFormConnectors extends CWebTest {
 					'fields' => [
 						'Name' => 'All types of information',
 						'URL' => '{$URL}',
-						'id:item_value_types_8' => true, // Numeric (unsigned).
-						'id:item_value_types_1' => true, // Numeric (float).
-						'id:item_value_types_2' => true, // Character.
-						'id:item_value_types_4' => true, // Log.
-						'id:item_value_types_16' => true // Text.
+						'Numeric (unsigned)' => true,
+						'Numeric (float)' => true,
+						'Character' => true,
+						'Log' => true,
+						'Text' => true
 					]
 				]
 			],
