@@ -68,6 +68,9 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds);
 #	define CURLAUTH_BEARER		(((unsigned long)1)<<6)
 #endif
 
+/* this is a wrapper for curl_easy_header() that was added in cURL 7.83.0 (0x075300) */
+const char	*zbx_curl_content_type(CURL *easyhandle);
+
 int	zbx_curl_protocol(const char *protocol, char **error);
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);

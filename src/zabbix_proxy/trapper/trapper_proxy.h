@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -18,28 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_TRAPPER_PROXY_H
+#define ZABBIX_TRAPPER_PROXY_H
 
-namespace Widgets\PieChart;
+#include "zbxcomms.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
+#include "zbxvault.h"
+#include "zbxjson.h"
 
-use Zabbix\Core\CWidget;
+int	init_proxy_history_lock(unsigned char program_type, char **error);
 
-class Widget extends CWidget {
+void	free_proxy_history_lock(unsigned char program_type);
 
-	public function getDefaultName(): string {
-		return _('Pie chart');
-	}
+int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
+		const zbx_config_vault_t *config_vault, int proxydata_frequency,
+		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
+		zbx_get_config_forks_f get_config_forks);
 
-	public function getTranslationStrings(): array {
-		return [
-			'class.svgpie.js' => [
-				'No data' => _('No data')
-			],
-			'class.widget.js' => [
-				'Actions' => _('Actions'),
-				'Download image' => _('Download image'),
-				'Value' => _('Value'),
-				'no data' => _('no data')
-			]
-		];
-	}
-}
+#endif

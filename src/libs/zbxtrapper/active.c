@@ -19,7 +19,7 @@
 
 #include "active.h"
 
-#include "trapper.h"
+#include "zbxtrapper.h"
 
 #include "zbxexpression.h"
 #include "zbxregexp.h"
@@ -34,6 +34,11 @@
 #include "zbx_item_constants.h"
 #include "zbxautoreg.h"
 #include "zbxscripts.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxexpr.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 /**********************************************************************************
  *                                                                                *

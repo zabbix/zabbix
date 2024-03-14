@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -18,28 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_HA_CONSTANTS_H
+#define ZABBIX_HA_CONSTANTS_H
 
-namespace Widgets\PieChart;
+#define ZBX_HA_DEFAULT_FAILOVER_DELAY		SEC_PER_MIN
 
-use Zabbix\Core\CWidget;
+#define ZBX_NODE_STATUS_HATIMEOUT		-3
+#define ZBX_NODE_STATUS_ERROR			-2
+#define ZBX_NODE_STATUS_UNKNOWN			-1
+#define ZBX_NODE_STATUS_STANDBY			0
+#define ZBX_NODE_STATUS_STOPPED			1
+#define ZBX_NODE_STATUS_UNAVAILABLE		2
+#define ZBX_NODE_STATUS_ACTIVE			3
 
-class Widget extends CWidget {
-
-	public function getDefaultName(): string {
-		return _('Pie chart');
-	}
-
-	public function getTranslationStrings(): array {
-		return [
-			'class.svgpie.js' => [
-				'No data' => _('No data')
-			],
-			'class.widget.js' => [
-				'Actions' => _('Actions'),
-				'Download image' => _('Download image'),
-				'Value' => _('Value'),
-				'no data' => _('no data')
-			]
-		];
-	}
-}
+#endif

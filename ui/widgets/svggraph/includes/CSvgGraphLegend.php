@@ -18,11 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+namespace Widgets\SvgGraph\Includes;
+
+use CDiv,
+	CSpan;
 
 class CSvgGraphLegend extends CDiv {
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
-	public const LINE_HEIGHT = 18;
+	private const LINE_HEIGHT = 18;
 
 	private const ZBX_STYLE_CLASS = 'svg-graph-legend';
 
@@ -32,11 +36,12 @@ class CSvgGraphLegend extends CDiv {
 	private const ZBX_STYLE_GRAPH_LEGEND_NO_DATA = 'svg-graph-legend-no-data';
 	private const ZBX_STYLE_GRAPH_LEGEND_VALUE = 'svg-graph-legend-value';
 
-	private $legend_items;
+	private array $legend_items;
 
-	private $columns_count = 0;
-	private $lines_count = 0;
-	private $show_statistic = false;
+	private int $columns_count = 0;
+	private int $lines_count = 0;
+	private int $lines_mode = 0;
+	private bool $show_statistic = false;
 
 	/**
 	 * @param array  $legend_items
@@ -59,8 +64,15 @@ class CSvgGraphLegend extends CDiv {
 		return $this;
 	}
 
-	public function getLinesCount(): int {
-		return $this->lines_count + ($this->show_statistic ? 1 : 0);
+	private function getLinesCount(): int {
+		if ($this->lines_mode == WidgetForm::LEGEND_LINES_MODE_FIXED) {
+			return $this->lines_count;
+		}
+
+		return max(WidgetForm::LEGEND_LINES_MIN, min($this->lines_count, $this->show_statistic
+			? count($this->legend_items)
+			: ceil(count($this->legend_items) / $this->columns_count)
+		));
 	}
 
 	public function setLinesCount(int $lines_count): self {
@@ -69,8 +81,18 @@ class CSvgGraphLegend extends CDiv {
 		return $this;
 	}
 
+	public function setLinesMode(int $lines_mode): self {
+		$this->lines_mode = $lines_mode;
+
+		return $this;
+	}
+
+	public function getHeight(): int {
+		return ($this->getLinesCount() + ($this->show_statistic ? 1 : 0)) * self::LINE_HEIGHT;
+	}
+
 	public function showStatistic(int $show_statistic): self {
-		$this->show_statistic = ($show_statistic == SVG_GRAPH_LEGEND_STATISTIC_ON);
+		$this->show_statistic = ($show_statistic == WidgetForm::LEGEND_STATISTIC_ON);
 
 		return $this;
 	}
@@ -125,10 +147,10 @@ class CSvgGraphLegend extends CDiv {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass($this->show_statistic ? self::ZBX_STYLE_GRAPH_LEGEND_STATISTIC : null)
-			->addStyle('--lines: '.$this->getLinesCount().';');
+			->addStyle('--lines: '.($this->getLinesCount() + ($this->show_statistic ? 1 : 0)).';');
 
 		if (!$this->show_statistic) {
-			$this->addStyle('--columns: '. min($this->columns_count, count($this->legend_items)).';');
+			$this->addStyle('--columns: '.min($this->columns_count, count($this->legend_items)).';');
 		}
 
 		$this->draw();
