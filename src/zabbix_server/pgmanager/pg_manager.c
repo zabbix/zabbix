@@ -158,7 +158,7 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		}
 	}
 
-	pg_cache_lock(cache);
+	pg_cache_unlock(cache);
 
 	zbx_db_free_result(result);
 }
