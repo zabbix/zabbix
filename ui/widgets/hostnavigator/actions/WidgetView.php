@@ -141,7 +141,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						: HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
-				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
+				'selectTags' => $group_by_tags ? ['tag', 'value'] : null
 			]);
 		}
 
