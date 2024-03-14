@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-22T10:49:52Z'
+  date: '2024-03-13T13:19:26Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -87,7 +87,7 @@ zabbix_export:
           history: 7d
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Status of a primary override flag.
+            Status of the primary override flag.
           valuemap:
             name: 'HA option status'
           preprocessing:
@@ -160,7 +160,7 @@ zabbix_export:
           history: 7d
           description: |
             Host accessibility by ICMP.
-            0 - ICMP ping fails.
+            0 - ICMP ping failed.
             1 - ICMP ping successful.
           valuemap:
             name: 'Service state'
@@ -197,7 +197,7 @@ zabbix_export:
               name: 'FortiGate: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'ICMP packets loss detected.'
+              description: 'ICMP ping loss detected.'
               dependencies:
                 - name: 'FortiGate: Unavailable by ICMP ping'
                   expression: 'max(/FortiGate by SNMP/icmpping,#3)=0'
@@ -281,7 +281,7 @@ zabbix_export:
           value_type: FLOAT
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Number of intrusions DECed as anomalies per second.
+            Number of intrusions detected as anomalies per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
@@ -430,7 +430,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: LOG
-          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items.'
+          description: 'Used for collecting all SNMP traps unmatched by other `snmptrap` items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             - tag: component
@@ -446,7 +446,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
+            Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.
           inventory_link: CONTACT
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -599,7 +599,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet`, `3rd floor`). If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -619,7 +619,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.
+            An administratively-assigned name for the node (the node's fully-qualified domain name). If not provided, the value is a zero-length string.
           inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -652,7 +652,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.
+            The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -707,7 +707,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100-(last(//vfs.fs.used[fgSysDiskUsage.0])/last(//vfs.fs.total[fgSysDiskCapacity.0])*100)'
-          description: 'Free disk space, in %.'
+          description: 'Free disk space, expressed in %.'
           tags:
             - tag: component
               value: storage
@@ -717,7 +717,7 @@ zabbix_export:
               name: 'FortiGate: Free disk space is low'
               event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.WARN}%'
               priority: WARNING
-              description: 'Left disk space is not enough.'
+              description: 'Available disk space is not enough.'
               dependencies:
                 - name: 'FortiGate: Free disk space is too low'
                   expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}'
@@ -731,7 +731,7 @@ zabbix_export:
               name: 'FortiGate: Free disk space is too low'
               event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.CRIT}%'
               priority: HIGH
-              description: 'Left disk space is too low.'
+              description: 'Available disk space is too low.'
               tags:
                 - tag: scope
                   value: capacity
@@ -776,7 +776,7 @@ zabbix_export:
           key: 'vm.memory.available[fgSysMemFree.0]'
           history: 7d
           params: 'last(//vm.memory.total[fgSysMemCapacity.0])-last(//vm.memory.used[fgSysMemUsage.0])'
-          description: 'The total memory freed for utilization.'
+          description: 'Total memory available for utilization.'
           tags:
             - tag: component
               value: memory
@@ -789,7 +789,7 @@ zabbix_export:
           units: B
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            The total memory allocated for the tasks.
+            Total memory allocated for the tasks.
           tags:
             - tag: component
               value: memory
@@ -838,7 +838,7 @@ zabbix_export:
           history: 7d
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Whether SSL-VPN is enabled on this virtual domain.
+            Used to determine whether SSL-VPN is enabled on this virtual domain.
           valuemap:
             name: 'Option state'
           preprocessing:
@@ -858,7 +858,7 @@ zabbix_export:
           history: 7d
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            The number of IPsec VPN tunnels with at least one SA.
+            Number of IPsec VPN tunnels with at least one SA.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -874,7 +874,7 @@ zabbix_export:
           history: 7d
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            The current number of users logged in through SSL-VPN tunnels in the virtual domain.
+            Current number of users logged in through SSL-VPN tunnels in the virtual domain.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -933,7 +933,7 @@ zabbix_export:
               - macro: '{#CPU.TYPE}'
                 value: 12356.101.4.4.3.3
                 formulaid: C
-          description: 'Discovering CPUs from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering CPUs from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 8223516fe91b4d17998d3846d8e6c134
               name: 'CPU Core {#CPU.ID}: Average system usage over 1min'
@@ -945,11 +945,13 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The processor's CPU system space usage, which is an average calculated over the last minute.
-                (only valid for processors types that support this statistic).
+                The processor's CPU system space usage, expressed as an average calculated over the last minute.
+                (Only valid for processor types that support this statistic.)
               tags:
                 - tag: component
                   value: cpu
+                - tag: processor
+                  value: '{#CPU.ID}'
             - uuid: e0ddf801fd874ab6a97cefe9c7096b2f
               name: 'CPU Core {#CPU.ID}: Average usage over 1min'
               type: SNMP_AGENT
@@ -960,11 +962,13 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The processor's CPU usage (percentage), which is an average calculated over the last minute.
-                (only valid for processors types that support this statistic).
+                The processor's CPU usage in %, expressed as an average calculated over the last minute.
+                (Only valid for processor types that support this statistic.)
               tags:
                 - tag: component
                   value: cpu
+                - tag: processor
+                  value: '{#CPU.ID}'
             - uuid: 3351a929f6fc40cd8d7c83fbeb5da100
               name: 'CPU Core {#CPU.ID}: Average user usage over 1min'
               type: SNMP_AGENT
@@ -975,11 +979,13 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The processor's CPU user space usage, which is an average calculated over the last minute.
-                (only valid for processors types that support this statistic).
+                The processor's CPU user space usage, expressed as an average calculated over the last minute.
+                (Only valid for processor types that support this statistic.)
               tags:
                 - tag: component
                   value: cpu
+                - tag: processor
+                  value: '{#CPU.ID}'
           graph_prototypes:
             - uuid: e504c1a69c4d4fd781ab3083c801f04b
               name: 'CPU Core {#CPU.ID}: Average usage per core'
@@ -1001,7 +1007,7 @@ zabbix_export:
                     host: 'FortiGate by SNMP'
                     key: 'system.cpu.usage[fgProcessorSysUsage.{#SNMPINDEX}]'
         - uuid: 0503618cc863464b86f6661a3bba5970
-          name: 'HA members discovery'
+          name: 'HA member discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#HA.ID},1.3.6.1.4.1.12356.101.13.2.1.1.1,{#HA.SN},1.3.6.1.4.1.12356.101.13.2.1.1.2]'
           key: ha.discovery
@@ -1016,7 +1022,7 @@ zabbix_export:
                 value: '{$HA.MEMBER.SN.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering HA members from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering HA members from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 93a6937b6fbe488cbd78cf8f962f94ad
               name: 'HA {#HA.ID}: Anti-virus events'
@@ -1159,7 +1165,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Network bandwidth usage of specified cluster member (bps).
+                Network bandwidth usage of the specified cluster member (bps).
               preprocessing:
                 - type: MULTIPLIER
                   parameters:
@@ -1199,7 +1205,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Serial number of the primary during the last synch attempt (successful or not).
+                Serial number of the primary HA member during the last sync attempt (successful or not).
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1238,7 +1244,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Current session count of specified cluster member.
+                Current session count of the specified cluster member.
               tags:
                 - tag: component
                   value: ha
@@ -1254,7 +1260,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Current HA Sync status.
+                Current HA sync status.
               valuemap:
                 name: 'HA sync status'
               tags:
@@ -1316,7 +1322,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SENSOR.ID},1.3.6.1.4.1.12356.101.4.3.2.1.1,{#SENSOR.NAME},1.3.6.1.4.1.12356.101.4.3.2.1.2]'
           key: hw.sensor.discovery
           delay: 1h
-          description: 'Discovering hardware sensors from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering hardware sensors from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: b9d76803cb8d4dd2ae27f2a36ae8d243
               name: 'Sensor {#SENSOR.NAME}: Alarm status'
@@ -1344,7 +1350,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                A string representation of the value of the sensor. Because sensors can present data in different formats, string representation is most general format. Interpretation of the value (units of measure, for example) is dependent on the individual sensor.
+                A string representation of the value of the sensor. Because sensors can present data in different formats, string representation is the most general format. Interpretation of the value (units of measure, for example) is dependent on the individual sensor.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1355,7 +1361,7 @@ zabbix_export:
                 - tag: sensor
                   value: '{#SENSOR.NAME}'
         - uuid: c63cc3b7fc484074b7d9eb007dfde091
-          name: 'Network interfaces discovery'
+          name: 'Network interface discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
           key: net.if.discovery
@@ -1405,7 +1411,7 @@ zabbix_export:
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: L
-          description: 'Discovering interfaces from IF-MIB.'
+          description: 'Used for discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: d715da9ce25f4bdd8ea64ecdf207aba1
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
@@ -1416,11 +1422,9 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                The number of inbound packets which were chosen to be discarded
-                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
                 One possible reason for discarding such a packet could be to free up buffer space.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1441,8 +1445,9 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system 
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                For packet-oriented interfaces - the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces - the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1464,8 +1469,8 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of `ifInOctets`.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1489,11 +1494,9 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                The number of outbound packets which were chosen to be discarded
-                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
                 One possible reason for discarding such a packet could be to free up buffer space.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1514,8 +1517,9 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system 
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                For packet-oriented interfaces - the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces - the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1537,8 +1541,8 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system 
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of `ifOutOctets`.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of `ifCounterDiscontinuityTime`.
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -1565,7 +1569,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second.
-                If this object reports a value of `n` then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
+                If this object reports a value of `n`, then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
                 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
@@ -1592,12 +1596,12 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
-                - The testing(3) state indicates that no operational packets can be passed
-                - If ifAdminStatus is down(2), then ifOperStatus should be down(2).
-                - If ifAdminStatus is changed to up(1), then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic.
-                - It should change to dormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection).
-                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state.
-                - It should remain in the notPresent(6) state if the interface has missing (typically, hardware) components.
+                - The `testing(3)` state indicates that no operational packets can be passed.
+                - If `ifAdminStatus` is `down(2)`, then `ifOperStatus` should be `down(2)`.
+                - If `ifAdminStatus` is changed to `up(1)`, then `ifOperStatus` should change to `up(1)` if the interface is ready to transmit and receive network traffic.
+                - It should change to `dormant(5)` if the interface is waiting for external actions (such as a serial line waiting for an incoming connection).
+                - It should remain in the `down(2)` state if and only if there is a fault that prevents it from going to the `up(1)` state.
+                - It should remain in the `notPresent(6)` state if the interface has missing (typically, hardware) components.
               valuemap:
                 name: 'Interface status'
               tags:
@@ -1618,8 +1622,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the 'eternal off' interfaces).
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to "1" sometime before.
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of `.diff`.
                   manual_close: 'YES'
@@ -1637,7 +1641,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA) through updating the syntax of the IANAifType textual convention.
+                Additional values for `ifType` are assigned by the Internet Assigned Numbers Authority (IANA) through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'Interface type'
               preprocessing:
@@ -1713,7 +1717,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
+              description: 'The trigger recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
                 - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
@@ -1766,9 +1770,9 @@ zabbix_export:
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 6h
+                - 1h
         - uuid: 1359682c719440798e44e19202442f5e
-          name: 'SD-WAN health-checks discovery'
+          name: 'SD-WAN health-check discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#HID},1.3.6.1.4.1.12356.101.4.9.2.1.1,{#HNAME},1.3.6.1.4.1.12356.101.4.9.2.1.2,{#IFNAME},1.3.6.1.4.1.12356.101.4.9.2.1.14,{#MEMBER.SEQ},1.3.6.1.4.1.12356.101.4.9.2.1.3]'
           key: sdwan_health.discovery
@@ -1783,7 +1787,7 @@ zabbix_export:
                 value: '{$SDWAN.HEALTH.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering SD-WAN health-checks from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering SD-WAN health-check from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 63b53c82ad3b49028b4f7afe53b5d0d3
               name: 'SD-WAN [{#HNAME}]:[{#IFNAME}]: Jitter'
@@ -1795,7 +1799,7 @@ zabbix_export:
               units: ms
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The average jitter of a health check on a specific member link in float number within last 30 probes.
+                The average jitter of a health check on a specific member link in a float number within the last 30 probes.
               tags:
                 - tag: component
                   value: sd-wan
@@ -1813,7 +1817,7 @@ zabbix_export:
               units: ms
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The average latency of a health check on a specific member link in float number within last 30 probes.
+                The average latency of a health check on a specific member link in a float number within the last 30 probes.
               tags:
                 - tag: component
                   value: sd-wan
@@ -1831,7 +1835,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The packet loss percentage of a health check on a specific member link in float number within last 30 probes.
+                The packet loss percentage of a health check on a specific member link in a float number within the last 30 probes.
               tags:
                 - tag: component
                   value: sd-wan
@@ -1845,7 +1849,7 @@ zabbix_export:
                   name: 'SD-WAN [{#HNAME}]:[{#IFNAME}]: High packets loss'
                   opdata: 'Loss: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'High level of packets loss detected.'
+                  description: 'High level of packet loss detected.'
                   tags:
                     - tag: scope
                       value: performance
@@ -1921,8 +1925,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the health check state is dead.
-                    2. `{$SDWAN.HEALTH.IF.CONTROL:"{#HNAME}"}=1` - a user can redefine context macro to value - 0. That marks this health check as not important. No new trigger will be fired if this health check is dead.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the health check state was up to (1) sometime before.
+                    2. `{$SDWAN.HEALTH.IF.CONTROL:"{#HNAME}"}=1` - a user can redefine the context macro to "0", marking this health check as not important. No new trigger will be fired if this health check is dead.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the health check state was up to "1" sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of `diff`.
                   manual_close: 'YES'
@@ -1973,7 +1977,7 @@ zabbix_export:
               - macro: '{#CPU.TYPE}'
                 value: 12356.101.4.4.3.9
                 formulaid: A
-          description: 'Discovering SoC3 NP6Lite processors from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering SoC3 NP6Lite processors from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 15caa12cf78b430dbe63ba27606cf04b
               name: 'SoC3 {#CPU.ID}: Packets dropped'
@@ -1984,8 +1988,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The total number of packets dropped by this processor
-                (only valid for processors types that support this statistic).
+                The total number of packets dropped by this processor (only valid for processor types that support this statistic).
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -2004,8 +2007,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The total number of packets received by this processor
-                (only valid for processors types that support this statistic).
+                The total number of packets received by this processor (only valid for processor types that support this statistic).
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -2024,8 +2026,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The total number of packets transmitted by this processor
-                (only valid for processors types that support this statistic).
+                The total number of packets transmitted by this processor (only valid for processor types that support this statistic).
               preprocessing:
                 - type: CHANGE_PER_SECOND
                   parameters:
@@ -2069,7 +2070,7 @@ zabbix_export:
                 value: '{$VDOM.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering virtual domains from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering virtual domains from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: f6f60e7e4fcf4bb6935a19742ac13199
               name: 'VDOM {#VDOM.NAME}: CPU usage'
@@ -2151,7 +2152,7 @@ zabbix_export:
               value_type: FLOAT
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                The session setup rate on the virtual domain per seconds.
+                The session setup rate on the virtual domain per second.
               tags:
                 - tag: component
                   value: vdom
@@ -2187,7 +2188,7 @@ zabbix_export:
                 value: '{$VPN.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering VPN tunnels from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering VPN tunnels from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 7478dc658f184f1eb3718ddfab780b01
               name: 'VPN {#VPN.NAME}: Tunnel Status'
@@ -2216,7 +2217,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the current tunnel state is down.
-                    2. `{$VPN.STATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this tunnel is down.
+                    2. `{$VPN.STATE.CONTROL}=1` - a user can redefine the context macro to "0", marking this notification as not important. No new trigger will be fired if this tunnel is down.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2237,7 +2238,7 @@ zabbix_export:
                 value: '{$WC.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovering wireless access points from FORTINET-FORTIGATE-MIB.'
+          description: 'Used for discovering wireless access points from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 95946d5063f04c75aaeef7d36699da80
               name: 'WTP {#WC.NAME}: Administrative status'
@@ -2248,13 +2249,13 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Represents the administrative status of this WTP.
+                Represents the administrative status of this wireless termination point (WTP).
                 
                 The following enumerated values are supported:
-                discovered(1) - This WTP was discovered though discovery or join request messages.
-                disable(2) - Controller is configured to not provide service to this WTP.
-                enable(3) - Controller is configured to provide service to this WTP.
-                other(0) - The administration state of the WTP is unknown.
+                `discovered(1)` - This WTP was discovered though discovery or join request messages.
+                `disable(2)` - Controller is configured to not provide service to this WTP.
+                `enable(3)` - Controller is configured to provide service to this WTP.
+                `other(0)` - The administration state of the WTP is unknown.
               valuemap:
                 name: 'Wireless admin status'
               tags:
@@ -2345,14 +2346,14 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Represents the connection status of a WTP to AC.
+                Represents the connection status of a WTP to the AC.
                 
                 The following enumerated values are supported:
-                offLine(1) - The WTP is not connected.
-                onLine(2) - The WTP is connected.
-                downloadingImage(3) - The WTP is downloading software image from the AC on joining.
-                connectedImage(4) - The AC is pushing software image to the connected WTP.
-                other(0) - The WTP connection status is unknown.
+                `offLine(1)` - The WTP is not connected.
+                `onLine(2)` - The WTP is connected.
+                `downloadingImage(3)` - The WTP is downloading software image from the AC on joining.
+                `connectedImage(4)` - The AC is pushing a software image to the connected WTP.
+                `other(0)` - The WTP connection status is unknown.
               valuemap:
                 name: 'Wireless connection status'
               tags:
@@ -2370,8 +2371,8 @@ zabbix_export:
                   priority: HIGH
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the current connection status is offLine.
-                    2. `{$WC.STATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this connection is down.
+                    1. It can be triggered if the current connection status is `offLine`.
+                    2. `{$WC.STATE.CONTROL}=1` - a user can redefine the context macro to "0", marking this notification as not important. No new trigger will be fired if this connection is down.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2385,8 +2386,8 @@ zabbix_export:
                   priority: INFO
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the current connection status is downloadingImage.
-                    2. `{$WC.UPDATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this it is downloadingImage.
+                    1. It can be triggered if the current connection status is `downloadingImage`.
+                    2. `{$WC.UPDATE.CONTROL}=1` - a user can redefine the context macro to "0", marking this notification as not important. No new trigger will be fired if the status is `downloadingImage`.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2400,8 +2401,8 @@ zabbix_export:
                   priority: INFO
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the current connection status is connectedImage.
-                    2. `{$WC.UPDATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this it is connectedImage.
+                    1. It can be triggered if the current connection status is `connectedImage`.
+                    2. `{$WC.UPDATE.CONTROL}=1` - a user can redefine the context macro to "0", marking this notification as not important. No new trigger will be fired if the status is `connectedImage`.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2532,7 +2533,7 @@ zabbix_export:
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the local IP address of a WTP and models the CAPWAP Local IPv4 Address or CAPWAP Local IPv6 Address fields [RFC5415].
-                If a Network Address Translation (NAT) device is present between WTP and AC, the value of fgWcWtpWtpLocalIpAddress will be different from the value of fgWcWtpWtpIpAddress.
+                If a Network Address Translation (NAT) device is present between the WTP and access controller (AC), the value of `fgWcWtpWtpLocalIpAddress` will be different from the value of `fgWcWtpWtpIpAddress`.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2793,7 +2794,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Represents the radio TX power setting configured for this WTP, in percentage.
+                Represents the radio TX power setting configured for this WTP, expressed in %.
               tags:
                 - tag: access-point
                   value: '{#WC.NAME}'
@@ -2875,7 +2876,7 @@ zabbix_export:
               units: uptime
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Represents the time since the WTP connects to the AC.
+                Represents the time since the WTP has been connected to the AC.
               preprocessing:
                 - type: MULTIPLIER
                   parameters:
@@ -2926,7 +2927,7 @@ zabbix_export:
               units: uptime
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Represents the time since the WTP boots.
+                Represents the time since the WTP has booted.
               preprocessing:
                 - type: MULTIPLIER
                   parameters:
@@ -2945,7 +2946,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Whether all Wireless Virtual Access Point (VAP) are selected for this WTP.
+                Whether all wireless virtual access points (VAP) are selected for this WTP.
               valuemap:
                 name: 'Option state'
               tags:
@@ -2964,7 +2965,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Represents a list of Wireless Virtual Access Points (VAP) configured for this WTP.
+                Represents a list of wireless virtual access points (VAP) configured for this WTP.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3020,121 +3021,121 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'Threshold of CPU utilization for warning trigger in %.'
+          description: 'Threshold of CPU utilization for Warning trigger in %.'
         - macro: '{$DISK.FREE.CRIT}'
           value: '10'
-          description: 'Threshold of disk free space for critical trigger in %.'
+          description: 'Threshold of disk free space for Critical trigger in %.'
         - macro: '{$DISK.FREE.WARN}'
           value: '20'
-          description: 'Threshold of disk free space for warning trigger in %.'
+          description: 'Threshold of disk free space for Warning trigger in %.'
         - macro: '{$HA.MEMBER.SN.MATCHES}'
           value: '.*'
-          description: 'This macro is used in HA members discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in HA member discovery. Can be overridden on the host or linked template level.'
         - macro: '{$HA.MEMBER.SN.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in HA members discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in HA member discovery. Can be overridden on the host or linked template level.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
-          description: 'Threshold of ICMP packets loss for warning trigger in %.'
+          description: 'Threshold of ICMP packet loss for Warning trigger in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
-          description: 'Threshold of average ICMP response time for warning trigger in seconds.'
+          description: 'Threshold of average ICMP response time for Warning trigger in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
-          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
+          description: 'Threshold of error packet rate for Warning trigger. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '95'
-          description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
+          description: 'Threshold of interface bandwidth utilization for Warning trigger in %. Can be used with interface name as context.'
         - macro: '{$IFCONTROL}'
           value: '1'
-          description: 'Macro for operational state of the interface for "Link down" trigger. Can be used with interface name as context.'
+          description: 'Macro for operational state of interface for "Link down" trigger. Can be used with interface name as context.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
           description: 'Threshold of memory utilization for trigger in %.'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.'
+          value: '(^[Ll]o[0-9.]*$)'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.HEALTH.IF.CONTROL}'
           value: '1'
-          description: 'This macro is used in "Health check state is dead" trigger. Can be used with health check name as context.'
+          description: 'Used in "Health check state is dead" trigger. Can be used with health check name as context.'
         - macro: '{$SDWAN.HEALTH.IF.LOSS.WARN}'
           value: '20'
-          description: 'Threshold of packets loss for warning trigger in %. Can be used with health check name as context.'
+          description: 'Threshold of packet loss for Warning trigger in %. Can be used with health check name as context.'
         - macro: '{$SDWAN.HEALTH.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in SD-WAN health-check discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.HEALTH.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in SD-WAN health-check discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'The time interval for SNMP availability trigger.'
         - macro: '{$VDOM.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Virtual domain discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Virtual domain discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VDOM.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Virtual domain discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Virtual domain discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in VPN tunnel discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in VPN tunnel discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in VPN tunnel discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in VPN tunnel discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.STATE.CONTROL}'
           value: '1'
-          description: 'This macro is used in "Tunnel down" trigger. Can be used with interface name as context.'
+          description: 'Used in "Tunnel down" trigger. Can be used with interface name as context.'
         - macro: '{$WC.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'Threshold of WTP CPU utilization for warning trigger in %. Can be used with interface name as context.'
+          description: 'Threshold of WTP CPU utilization for Warning trigger in %. Can be used with interface name as context.'
         - macro: '{$WC.MEMORY.UTIL.MAX}'
           value: '90'
           description: 'Threshold of WTP memory utilization for trigger in %. Can be used with interface name as context.'
         - macro: '{$WC.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Wireless discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Wireless discovery. Can be overridden on the host or linked template level.'
         - macro: '{$WC.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Wireless discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Wireless discovery. Can be overridden on the host or linked template level.'
         - macro: '{$WC.STATE.CONTROL}'
           value: '1'
-          description: 'This macro is used in "Connection down" trigger. Can be used with interface name as context.'
+          description: 'Used in "Connection down" trigger. Can be used with interface name as context.'
         - macro: '{$WC.UPDATE.CONTROL}'
           value: '1'
-          description: 'This macro is used in "Receiving firmware update" trigger. Can be used with interface name as context.'
+          description: 'Used in "Receiving firmware update" trigger. Can be used with interface name as context.'
       dashboards:
         - uuid: 16e0654e4e27472cb770e74f6ba29403
           name: 'FortiGate: General'
