@@ -2444,8 +2444,8 @@ class CUser extends CApiService {
 				unset($userdirectoryids[0]);
 
 				if (CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID) != 0) {
-					$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)]
-						= true;
+					$userdirectoryids[CAuthenticationHelper::getPublic(CAuthenticationHelper::LDAP_USERDIRECTORYID)] =
+						true;
 				}
 			}
 
