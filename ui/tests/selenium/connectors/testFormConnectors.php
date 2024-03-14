@@ -42,15 +42,15 @@ class testFormConnectors extends CWebTest {
 		];
 	}
 
-	private static $connector_sql = 'SELECT * FROM connector ORDER BY connectorid';
-	private static $default_connector = 'Default connector';
-	private static $update_connector = 'Update connector';
-	private static $delete_connector = 'Delete connector';
+	const CONNECTOR_SQL = 'SELECT * FROM connector ORDER BY connectorid';
+	const DEFAULT_CONNECTOR = 'Default connector';
+	const DELETE_CONNECTOR = 'Delete connector';
+	protected static $update_connector = 'Update connector';
 
 	public static function prepareConnectorsData() {
 		CDataHelper::call('connector.create', [
 			[
-				'name' => self::$default_connector,
+				'name' => self::DEFAULT_CONNECTOR,
 				'url' => '{$URL}'
 			],
 			[
@@ -58,7 +58,7 @@ class testFormConnectors extends CWebTest {
 				'url' => '{$URL}'
 			],
 			[
-				'name' => self::$delete_connector,
+				'name' => self::DELETE_CONNECTOR,
 				'url' => '{$URL}'
 			]
 		]);
@@ -78,10 +78,16 @@ class testFormConnectors extends CWebTest {
 				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password'
 			],
 			'required' => ['Name', 'URL', 'Type of information', 'Max records per message', 'Concurrent sessions',
-				'Attempts', 'Attempt interval', 'Timeout'],
+				'Attempts', 'Attempt interval', 'Timeout'
+			],
 			'default' => [
 				'Data type' => 'Item values',
 				'Tag filter' => 'And/Or',
+				'Numeric (unsigned)' => true,
+				'Numeric (float)' => true,
+				'Character' => true,
+				'Log' => true,
+				'Text' => true,
 				'HTTP authentication' => 'None',
 				'Max records per message' => 'Unlimited',
 				'Concurrent sessions' => '1',
@@ -106,7 +112,7 @@ class testFormConnectors extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=connector.list');
 
 		// Check title for create/update form.
-		$this->query('link', self::$default_connector)->one()->click();
+		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Connector', $dialog->getTitle());
 		$dialog->close();
@@ -207,6 +213,9 @@ class testFormConnectors extends CWebTest {
 			'Attempts' => [
 				'maxlength' => '1'
 			],
+			'Attempt interval' => [
+				'maxlength' => '32'
+			],
 			'Timeout' => [
 				'maxlength' => '255'
 			],
@@ -229,6 +238,21 @@ class testFormConnectors extends CWebTest {
 		];
 		foreach ($inputs as $field => $attributes) {
 			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
+		}
+
+		/**
+		* Check that 'Attempt interval' and 'Type of information' fields state changes
+		* if 'Attempts' and 'Data type' match criteria (Attempts > 1, Data type !== Item values).
+		*/
+		foreach (['Events' => false, 'Item values' => true] as $data_type => $state) {
+			$form->fill(['Data type' => $data_type]);
+			$this->assertEquals($state, $form->getField('Type of information')->isDisplayed());
+		}
+
+		foreach (['2' => true, '1' => false, '9' => true, '0' => false] as $attempts => $state) {
+			$form->getField('Attempts')->fill($attempts)->fireEvent();
+			$this->assertEquals($state, $form->getField('Attempt interval')->isEnabled());
+			$form->checkValue(['Attempt interval' => '5s']);
 		}
 
 		// Check that both 'Cancel' and 'Add' footer buttons are present and clickable.
@@ -347,6 +371,24 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// 'Type of information' field validation when all related checkboxes are unchecked.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Connector with unchecked Type of information checkboxes',
+						'URL' => '{$URL}',
+						'Numeric (unsigned)' => false,
+						'Numeric (float)' => false,
+						'Character' => false,
+						'Log' => false,
+						'Text' => false
+					],
+					'error' => [
+						'Field "item_value_types" is mandatory.'
+					]
+				]
+			],
 			// Check validation for 'Concurrent sessions' field.
 			[
 				[
@@ -444,6 +486,112 @@ class testFormConnectors extends CWebTest {
 					],
 					'error' => [
 						'Incorrect value for field "max_attempts": value must be no greater than "5".'
+					]
+				]
+			],
+			// 'Attempt interval' field validation checks.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with emty attempt interval field',
+						'Attempt interval' => ''
+					],
+					'error' => [
+						'Incorrect value for field "attempt_interval": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with incorrect value for attempt interval field',
+						'Attempt interval' => ' '
+					],
+					'error' => [
+						'Incorrect value for field "attempt_interval": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with incorrect value for attempt interval field',
+						'Attempt interval' => '🔔'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '1m'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '-1s'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '11s'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '11111111111111111111111111111111'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": a number is too large.'
 					]
 				]
 			],
@@ -664,6 +812,48 @@ class testFormConnectors extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'One type of information',
+						'URL' => '{$URL}',
+						'Numeric (unsigned)' => false,
+						'Numeric (float)' => false,
+						'Character' => false,
+						'Log' => true,
+						'Text' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Two types of information',
+						'URL' => '{$URL}',
+						'Numeric (unsigned)' => true,
+						'Numeric (float)' => false,
+						'Character' => false,
+						'Log' => true,
+						'Text' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'All types of information',
+						'URL' => '{$URL}',
+						'Numeric (unsigned)' => true,
+						'Numeric (float)' => true,
+						'Character' => true,
+						'Log' => true,
+						'Text' => true
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Simple create with changed fields and Basic auth',
 						'URL' => '{$URL}',
 						'Data type' => 'Events',
@@ -732,10 +922,7 @@ class testFormConnectors extends CWebTest {
 						'SSL key file' => '  {$SSL_KEY}  ',
 						'Description' => '  trim check  '
 					],
-					'trim' => ['Name', 'URL', 'id:tags_0_tag', 'id:tags_0_value', 'Username', 'id:max_records',
-						'Concurrent sessions', 'Timeout', 'HTTP proxy', 'SSL certificate file', 'SSL key file',
-						'Description'
-					]
+					'trim' => true
 				]
 			],
 			[
@@ -806,6 +993,67 @@ class testFormConnectors extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 0',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '0'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 0s',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '0s'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 10',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '10'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 10s',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '10s'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval and leading and trailing spaces',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '  0s  '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Simple create with changed fields and Bearer token',
 						'URL' => 'https://zabbix.com:82/v1/events',
 						'Data type' => 'Events',
@@ -829,7 +1077,7 @@ class testFormConnectors extends CWebTest {
 						'Bearer token' => '  {$TOKEN}  ',
 						'Description' => 'bearer token'
 					],
-					'trim' => ['Bearer token']
+					'trim' => true
 				]
 			]
 		];
@@ -843,14 +1091,14 @@ class testFormConnectors extends CWebTest {
 	}
 
 	public function testFormConnectors_SimpleUpdate() {
-		$old_hash = CDBHelper::getHash(self::$connector_sql);
+		$old_hash = CDBHelper::getHash(self::CONNECTOR_SQL);
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
 		$this->query('link', self::$update_connector)->waitUntilClickable()->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->submit();
 
 		$this->assertMessage(TEST_GOOD, 'Connector updated');
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::$connector_sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::CONNECTOR_SQL));
 	}
 
 	/**
@@ -866,10 +1114,8 @@ class testFormConnectors extends CWebTest {
 	 * @param boolean $update	updating is performed
 	 */
 	public function checkConnectorForm($data, $update = false) {
-		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-
-		if ($expected === TEST_BAD) {
-			$old_hash = CDBHelper::getHash(self::$connector_sql);
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::CONNECTOR_SQL);
 		}
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
@@ -885,7 +1131,7 @@ class testFormConnectors extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Add a prefix to the name of the Connector in case of update scenario to avoid duplicate names.
-		if ($update && CTesTArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+		if ($update && $data['expected'] === TEST_GOOD) {
 			$data['fields']['Name'] = 'Update: '.$data['fields']['Name'];
 		}
 
@@ -896,19 +1142,17 @@ class testFormConnectors extends CWebTest {
 		$form->fill($data['fields']);
 		$form->submit();
 
-		if ($expected === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update connector' : 'Cannot create connector'), $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash(self::$connector_sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::CONNECTOR_SQL));
 			$dialog->close();
 		}
 		else {
 			$dialog->ensureNotPresent();
 
-			// Trim leading and trailing spaces from expected results if necessary.
-			if (array_key_exists('trim', $data)) {
-				foreach ($data['trim'] as $field) {
-					$data['fields'][$field] = trim($data['fields'][$field]);
-				}
+			// Trim trailing and leading spaces before comparison.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$data = CTestArrayHelper::trim($data);
 			}
 
 			$this->assertMessage(TEST_GOOD, ($update ? 'Connector updated' : 'Connector created'));
@@ -945,7 +1189,7 @@ class testFormConnectors extends CWebTest {
 			[
 				[
 					'action' => 'Update',
-					'name' => self::$default_connector,
+					'name' => self::DEFAULT_CONNECTOR,
 					'new_values' => [
 						'Name' => 'New zabbix test connector',
 						'URL' => 'http://zabbix.com:82/v1/history',
@@ -965,13 +1209,13 @@ class testFormConnectors extends CWebTest {
 			[
 				[
 					'action' => 'Clone',
-					'name' => self::$default_connector
+					'name' => self::DEFAULT_CONNECTOR
 				]
 			],
 			[
 				[
 					'action' => 'Delete',
-					'name' => self::$delete_connector,
+					'name' => self::DELETE_CONNECTOR,
 					'alert_message' => 'Delete selected connector?'
 				]
 			]
@@ -984,7 +1228,7 @@ class testFormConnectors extends CWebTest {
 	 * @dataProvider getCancellationData
 	 */
 	public function testFormConnectors_CancelAction($data) {
-		$old_hash = CDBHelper::getHash(self::$connector_sql);
+		$old_hash = CDBHelper::getHash(self::CONNECTOR_SQL);
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
 		$this->query(($data['action'] === 'Create') ? 'button:Create connector' : 'link:'.$data['name'])->one()->click();
@@ -1010,7 +1254,7 @@ class testFormConnectors extends CWebTest {
 		$dialog->query('button:Cancel')->one()->click();
 
 		$dialog->ensureNotPresent();
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::$connector_sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::CONNECTOR_SQL));
 	}
 
 	public static function getCloneData() {
@@ -1018,15 +1262,15 @@ class testFormConnectors extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'Name' => self::$default_connector
+					'Name' => self::DEFAULT_CONNECTOR
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => self::$delete_connector,
+					'Name' => self::DELETE_CONNECTOR,
 					'error' => [
-						'Connector "'.self::$delete_connector.'" already exists.'
+						'Connector "'.self::DELETE_CONNECTOR.'" already exists.'
 					]
 				]
 			]
@@ -1073,7 +1317,7 @@ class testFormConnectors extends CWebTest {
 
 	public function testFormConnectors_Delete() {
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		$this->query('link', self::$delete_connector)->waitUntilClickable()->one()->click();
+		$this->query('link', self::DELETE_CONNECTOR)->waitUntilClickable()->one()->click();
 
 		// Click on the Delete button in the opened Connector configuration dialog.
 		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
@@ -1082,9 +1326,9 @@ class testFormConnectors extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Connector deleted');
-		$this->assertFalse($this->query('link', self::$delete_connector)->one(false)->isValid());
+		$this->assertFalse($this->query('link', self::DELETE_CONNECTOR)->one(false)->isValid());
 
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr(self::$delete_connector)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr(self::DELETE_CONNECTOR)));
 	}
 
 	/**
@@ -1097,7 +1341,7 @@ class testFormConnectors extends CWebTest {
 		];
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		$this->query('link', self::$default_connector)->one()->click();
+		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
@@ -1136,7 +1380,7 @@ class testFormConnectors extends CWebTest {
 	 * @param string $expected		expected result after connector form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$this->query('link', self::$default_connector)->one()->click();
+		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);
@@ -1146,7 +1390,7 @@ class testFormConnectors extends CWebTest {
 			if ($expected === TEST_GOOD) {
 				$this->assertMessage(TEST_GOOD, 'Connector updated');
 				$message->close();
-				$this->query('link', self::$default_connector)->one()->click();
+				$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 			}
 			else {
 				$this->assertMessage(TEST_BAD, 'Cannot update connector', 'Invalid parameter "/1/url": unacceptable URL.');
