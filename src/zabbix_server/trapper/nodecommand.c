@@ -581,15 +581,9 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		}
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
-	{
-		if (SUCCEED != is_ip(clientip))
-		{
-			result = zbx_dsprintf(result, "Invalid IP in the %s tag.", ZBX_PROTO_TAG_CLIENTIP);
-			goto finish;
-		}
-	}
-	else
+	/* although we could validate the IP address here it appears that web server sometimes can return */
+	/* weird result, e. g. "<IPv6 ADDR>%<NIC NAME>" in $_SERVER['REMOTE_ADDR'] so we don't do it      */
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
 	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, &result, &debug)))
