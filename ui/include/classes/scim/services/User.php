@@ -365,7 +365,7 @@ class User extends ScimApiService {
 				// If user status 'active' is changed to false, user needs to be added to disabled group.
 				$new_user_data['usrgrps'] = [];
 			}
-			else if (!$db_user['roleid'] && $user_idp_data['active'] === true) {
+			elseif (!$db_user['roleid']) {
 				// If disabled user is activated again, need to return group mapping.
 				$group_names = DBfetchColumn(DBselect(
 					'SELECT g.name'.

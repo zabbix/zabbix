@@ -444,7 +444,7 @@ class CUser extends CApiService {
 
 		$superadminids_to_update = [];
 		$usernames = [];
-		$readonly_fields = array_fill_keys(['username', 'passwd'], 1);
+		$readonly_fields = array_flip(['username', 'passwd']);
 
 		foreach ($users as $i => &$user) {
 			$db_user = $db_users[$user['userid']];
@@ -702,11 +702,11 @@ class CUser extends CApiService {
 	 *
 	 * @param array  $users[]
 	 * @param string $users[]['userdirectoryid']
-	 * @param string $users[]['medias']								(optional)
-	 * @param string $users[]['medias'][]['userdirectory_mediaid']	(optional)
+	 * @param array  $users[]['medias']                             (optional)
+	 * @param string $users[]['medias'][]['userdirectory_mediaid']  (optional)
 	 * @param array  $db_users[]
-	 * @param string $db_users[]['userdirectoryid']					(required) update operation validation
-	 * @param array  $db_users[]['medias']							(required) update operation validation
+	 * @param string $db_users[]['userdirectoryid']                 update operation validation
+	 * @param array  $db_users[]['medias']                          update operation validation
 	 *
 	 * @throws APIException
 	 */
@@ -716,8 +716,8 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$path = '/'.($i+1).'/medias';
-			$db_usermedias = $db_users ? array_column($db_users[$user['userid']]['medias'], null, 'mediaid') : [];
+			$path = '/'.($i + 1).'/medias';
+			$db_usermedias = array_column($db_users[$user['userid']]['medias'], null, 'mediaid');
 			$db_provisioned_media = array_column($db_usermedias, 'mediaid', 'userdirectory_mediaid');
 			unset($db_provisioned_media[0]);
 			$readonly_fields = array_flip(['sendto', 'mediatypeid']);
@@ -729,8 +729,8 @@ class CUser extends CApiService {
 
 				if (!array_key_exists($user_media['mediaid'], $db_usermedias)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $path.'/'.++$j.'/mediaid',
-						_s('value "%1$s" not found', $user_media['mediaid'])
+						_s('Incorrect value for field "%1$s": %2$s.', $path.'/'.($j + 1).'/mediaid',
+						_s('referred object does not exist')
 					));
 				}
 
@@ -3095,18 +3095,18 @@ class CUser extends CApiService {
 		$email_validator = new CEmailValidator();
 
 		if ($mediatypeids) {
-			$email_mediatypeids = array_keys(DB::select('media_type', [
+			$email_mediatypeids = DB::select('media_type', [
 				'output' => ['mediatypeid'],
 				'filter' => ['type' => MEDIA_TYPE_EMAIL],
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => true
-			]));
+			]);
 		}
 
 		foreach ($medias as $media) {
 			$sendto = array_filter($media['sendto'], 'strlen');
 
-			if (in_array($media['mediatypeid'], $email_mediatypeids)) {
+			if (array_key_exists($media['mediatypeid'], $email_mediatypeids)) {
 				$sendto = array_filter($media['sendto'], [$email_validator, 'validate']);
 
 				while (mb_strlen(implode("\n", $sendto)) > $max_length && count($sendto) > 0) {
