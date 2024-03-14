@@ -1,0 +1,1 @@
+A......... [ZBX-20871] fixed support for macro functions in prometheus pattern and labels used in preprocessing (jfreibergs)

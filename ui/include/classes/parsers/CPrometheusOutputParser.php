@@ -31,6 +31,7 @@ class CPrometheusOutputParser extends CParser {
 
 	private $user_macro_parser;
 	private $lld_macro_parser;
+	private $lld_macro_function_parser;
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
@@ -45,6 +46,7 @@ class CPrometheusOutputParser extends CParser {
 		}
 		if ($this->options['lldmacros']) {
 			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 	}
 
@@ -92,6 +94,12 @@ class CPrometheusOutputParser extends CParser {
 		}
 		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->lld_macro_parser->getLength();
+
+			return true;
+		}
+		elseif ($this->options['lldmacros']
+				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->lld_macro_function_parser->getLength();
 
 			return true;
 		}
