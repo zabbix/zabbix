@@ -878,7 +878,7 @@ class CUser extends CApiService {
 
 				if (!array_key_exists('passwd', $user) && $db_user['passwd'] === ''
 						&& ((!array_key_exists('userdirectoryid', $user) && $db_user['userdirectoryid'] == 0)
-							|| $user['userdirectoryid'] == 0)) {
+							|| (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] == 0))) {
 					$userdirectory_changed = array_key_exists('userdirectoryid', $user)
 						&& bccomp($user['userdirectoryid'], $db_user['userdirectoryid']) != 0;
 
