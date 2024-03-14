@@ -74,6 +74,7 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision);
 void	pg_cache_destroy(zbx_pg_cache_t *cache);
 
 void	pg_cache_queue_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
+void	pg_cache_remove_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
 void	pg_cache_get_updates(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle, zbx_vector_pg_update_t *groups,
 		zbx_vector_pg_update_t *proxies, zbx_vector_pg_host_t *hosts_new, zbx_vector_pg_host_t *hosts_mod,
 		zbx_vector_pg_host_t *hosts_del, zbx_vector_uint64_t *groupids);

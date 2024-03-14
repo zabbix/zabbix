@@ -95,9 +95,6 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
-	int		now;
-
-	now = (int)time(NULL);
 
 	result = zbx_db_select("select hostid,proxyid,revision,hostproxyid from host_proxy");
 

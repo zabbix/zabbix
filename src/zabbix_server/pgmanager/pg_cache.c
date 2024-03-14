@@ -177,6 +177,23 @@ void	pg_cache_queue_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: remove proxy group from update queue                              *
+ *                                                                            *
+ ******************************************************************************/
+void	pg_cache_remove_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
+{
+	for (int i = 0; i < cache->group_updates.values_num; i++)
+	{
+		if (cache->group_updates.values[i] == group)
+		{
+			zbx_vector_pg_group_ptr_remove_noorder(&cache->group_updates, i);
+			return;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: assign proxy to host                                              *
  *                                                                            *
  ******************************************************************************/
@@ -916,6 +933,7 @@ void	pg_cache_update_groups(zbx_pg_cache_t *cache)
 
 		if (ZBX_PG_GROUP_FLAGS_NONE == group->flags)
 		{
+			pg_cache_remove_group_update(cache, group);
 			pg_group_clear(group);
 			zbx_hashset_iter_remove(&iter);
 			continue;
