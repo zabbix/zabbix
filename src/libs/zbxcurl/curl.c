@@ -25,7 +25,7 @@
 
 /* added in 7.85.0 (0x075500) */
 #if LIBCURL_VERSION_NUM < 0x075500
-#	define CURLOPT_PROTOCOLS_STR	318L
+#	define CURLOPT_PROTOCOLS_STR	10318L
 #endif
 
 static unsigned int	libcurl_version_num(void)
