@@ -166,7 +166,7 @@ class CSVGHoneycomb {
 	 *
 	 * @type {CanvasRenderingContext2D}
 	 */
-	#canvas_context = null;
+	#canvas_context;
 
 	/**
 	 * @param {Object} padding             Inner padding of the root SVG element.
@@ -457,7 +457,7 @@ class CSVGHoneycomb {
 				`${Math.max(CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale, this.#cell_width / 10)}px`
 			);
 
-		this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height / 2);
+		this.#resizeLabels(cell);
 	};
 
 	#drawCell(cell) {
@@ -548,7 +548,12 @@ class CSVGHoneycomb {
 		d.stored_labels = d.labels;
 
 		this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2, true);
-		this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
+		this.#resizeLabels(cell, {
+			x: scaled_position.dx + d.position.x,
+			y: scaled_position.dy + d.position.y,
+			width: scaled_size.width,
+			height: (scaled_size.height + this.#cells_gap) / 2
+		});
 
 		this.#svg
 			.select(`#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id} feDropShadow`)
@@ -576,7 +581,7 @@ class CSVGHoneycomb {
 	#cellLeave(cell, d) {
 		d.labels = d.stored_labels;
 
-		this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
+		this.#resizeLabels(cell);
 
 		cell
 			.style('--dx', null)
@@ -643,16 +648,20 @@ class CSVGHoneycomb {
 				}
 			});
 
-		this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height / 2);
+		this.#resizeLabels(cell);
 	}
 
-	#resizeLabels(cell, width, height) {
+	#resizeLabels(cell, box = {}) {
+		const d = cell.datum();
+
+		box = {...d.position, width: this.#cell_width - this.#cells_gap, height: this.#cell_height  / 2, ...box};
+
 		cell
 			.call(cell => cell.select('foreignObject')
-				.attr('x', d => d.position.x + this.#container_params.cell_padding - width / 2)
-				.attr('y', d => d.position.y + -height / 2)
-				.attr('width', width - this.#container_params.cell_padding * 2)
-				.attr('height', height)
+				.attr('x', box.x + this.#container_params.cell_padding - box.width / 2)
+				.attr('y', box.y - box.height / 2)
+				.attr('width', box.width - this.#container_params.cell_padding * 2)
+				.attr('height', box.height)
 			)
 			.call(cell => cell.select(`.${CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY}`)
 				.style('max-height', d => `${d.labels.primary.lines_count * CSVGHoneycomb.LINE_HEIGHT}em`)

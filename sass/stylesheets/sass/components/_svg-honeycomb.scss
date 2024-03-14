@@ -47,11 +47,8 @@
 		}
 
 		foreignObject {
-			transform: translate(var(--dx, 0px), var(--dy, 0px));
-
 			@if $ui-transitions {
-				transition: transform $ui-transition-duration,
-							x $ui-transition-duration,
+				transition: x $ui-transition-duration,
 							y $ui-transition-duration,
 							width $ui-transition-duration,
 							height $ui-transition-duration;

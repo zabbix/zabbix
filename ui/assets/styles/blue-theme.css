@@ -3581,8 +3581,7 @@ section {
       --cell-stroke: transparent;
       transform: translate(var(--x), var(--y)); }
   .svg-honeycomb .svg-honeycomb-cell foreignObject {
-    transform: translate(var(--dx, 0px), var(--dy, 0px));
-    transition: transform 0.3s, x 0.3s, y 0.3s, width 0.3s, height 0.3s; }
+    transition: x 0.3s, y 0.3s, width 0.3s, height 0.3s; }
   .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-content {
     display: grid;
     grid-auto-rows: minmax(max-content, auto);
