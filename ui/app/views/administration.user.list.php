@@ -215,13 +215,18 @@ foreach ($data['users'] as $user) {
 			->setArgument('action', 'user.edit')
 			->setArgument('userid', $userid)
 	);
+	$btn_actions = [];
 
 	if ($user['userdirectoryid'] && $data['idp_names'][$user['userdirectoryid']]['idp_type'] == IDP_TYPE_LDAP) {
-		$checkbox->setAttribute('data-actions', 'ldap');
+		$btn_actions[] = 'ldap';
 	}
 
 	if (array_key_exists('totp_enabled', $user) && $user['totp_enabled']) {
-		$checkbox->setAttribute('data-actions', 'totp');
+		$btn_actions[] = 'totp';
+	}
+
+	if ($btn_actions) {
+		$checkbox->setAttribute('data-actions', implode(' ', $btn_actions));
 	}
 
 	if ($user['userdirectoryid']) {
