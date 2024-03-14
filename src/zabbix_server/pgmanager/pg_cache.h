@@ -35,6 +35,8 @@
 #define ZBX_PG_GROUP_STATE_DECAY	4
 #define ZBX_PG_GROUP_STATE_DISABLED	5
 
+#define PG_STATE_CHECK_INTERVAL		5
+
 typedef struct
 {
 	int				startup_time;
@@ -87,6 +89,10 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache);
 void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t *groupids);
 
 void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
+
+void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_handle, int now);
+void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_handle, int now);
+
 
 void	pg_cache_lock(zbx_pg_cache_t *cache);
 void	pg_cache_unlock(zbx_pg_cache_t *cache);
