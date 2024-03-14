@@ -1,5 +1,5 @@
-git.zabbix.com/ap/plugin-support v1.2.2-0.20240305151223-0394cbcc2ba5 h1:9ioxiRZujhM3O45DvrrTbn2FbEb1xhLE72pKhpP+OEU=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20240305151223-0394cbcc2ba5/go.mod h1:FLyfsn/a9DjxDBgeMZsgIyTuvvnRm64Tuf32DaA0zcs=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20240314091034-64911fdde7d5 h1:J6Q62CYTZ9ZvEZP+WpqvWvUA8F9q+uDFhPgVZzxW/fk=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20240314091034-64911fdde7d5/go.mod h1:FLyfsn/a9DjxDBgeMZsgIyTuvvnRm64Tuf32DaA0zcs=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69/go.mod h1:L1AbZdiDllfyYH5l5OkAaZtk7VkWe89bPJFmnDBNHxg=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=

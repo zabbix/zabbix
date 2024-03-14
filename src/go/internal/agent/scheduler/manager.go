@@ -988,13 +988,15 @@ func getPluginOpts(
 	name string,
 ) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
 	var opt pluginOptions
+	var err error
 
 	if optsRaw == nil {
-		return
+		err = conf.StructDefaultsInit(&opt)
+	} else {
+		err = conf.Unmarshal(optsRaw, &opt, false)
 	}
-
-	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
-		log.Warningf("invalid plugin %s configuration: %s", name, err)
+	if err != nil {
+		log.Warningf("invalid plugin '%s' configuration: %s", name, err)
 
 		return
 	}
