@@ -125,6 +125,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 					->setOptions($ui)
 					->setVertical()
 					->setColumns(3)
+					->setLayoutFixed()
 					->setEnabled(!$data['readonly'])
 			)
 		]);

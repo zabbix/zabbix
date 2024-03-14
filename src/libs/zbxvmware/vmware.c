@@ -148,20 +148,14 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 	if (NULL == str)
 		return NULL;
 
-	ptr = zbx_hashset_search(strpool, str - REFCOUNT_FIELD_SIZE);
+	zbx_uint64_t	sz;
 
-	if (NULL == ptr)
-	{
-		zbx_uint64_t	sz;
+	sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+	ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE, sz,
+			ZBX_HASHSET_UNIQ_FALSE);
 
-		sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
-		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE);
-
-		*(zbx_uint32_t *)ptr = 0;
-
-		if (NULL != len)
-			*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
-	}
+	if (NULL != len)
+		*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
 
 	(*(zbx_uint32_t *)ptr)++;
 

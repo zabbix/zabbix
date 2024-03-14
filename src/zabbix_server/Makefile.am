@@ -7,7 +7,6 @@ SUBDIRS = \
 	discoverer \
 	events \
 	housekeeper \
-	httppoller \
 	poller \
 	timer \
 	escalator \
@@ -57,12 +56,12 @@ zabbix_server_LDADD = \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
+	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
-	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \

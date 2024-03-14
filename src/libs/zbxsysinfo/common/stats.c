@@ -423,7 +423,7 @@ void	diskstat_shm_extend(void)
  * Purpose: collects system information                                       *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(collector_thread, args)
+ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 {
 	unsigned char	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	int		server_num = ((zbx_thread_args_t *)args)->info.server_num,
