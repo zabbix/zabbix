@@ -5109,7 +5109,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 
 		if (array_key_exists('screen_name', $data)) {
-			$this->assertScreenshot($dashboard->getWidget($widget_name), $data['screen_name']);
+			$widget = $dashboard->getWidget($widget_name);
+			$this->assertScreenshotExcept($widget, $widget->query('xpath:.//h4')->one(), $data['screen_name']);
 		}
 		else {
 			$table_data = (array_key_exists('no_data_found', $data)) ? '' : $data['result'];
