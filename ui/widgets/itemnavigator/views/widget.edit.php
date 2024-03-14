@@ -44,6 +44,14 @@ $hostids_field = $data['templateid'] === null
 $form
 	->addField($groupids_field)
 	->addField($hostids_field)
+	->addField(array_key_exists('host_tags_evaltype', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['host_tags_evaltype'])
+		: null
+	)
+	->addField(array_key_exists('host_tags', $data['fields'])
+		? new CWidgetFieldTagsView($data['fields']['host_tags'])
+		: null
+	)
 	->addField(
 		(new CWidgetFieldPatternSelectItemView($data['fields']['items']))
 			->setPlaceholder(_('item pattern'))
@@ -55,14 +63,6 @@ $form
 				]
 				: []
 			)
-	)
-	->addField(array_key_exists('host_tags_evaltype', $data['fields'])
-		? new CWidgetFieldRadioButtonListView($data['fields']['host_tags_evaltype'])
-		: null
-	)
-	->addField(array_key_exists('host_tags', $data['fields'])
-		? new CWidgetFieldTagsView($data['fields']['host_tags'])
-		: null
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['item_tags_evaltype'])

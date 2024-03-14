@@ -65,9 +65,6 @@ class WidgetForm extends CWidgetForm {
 				? null
 				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
-			->addField(
-				new CWidgetFieldPatternSelectItem('items', _('Items'))
-			)
 			->addField($this->isTemplateDashboard()
 				? null
 				: (new CWidgetFieldRadioButtonList('host_tags_evaltype', _('Host tags'), [
@@ -78,6 +75,9 @@ class WidgetForm extends CWidgetForm {
 			->addField($this->isTemplateDashboard()
 				? null
 				: new CWidgetFieldTags('host_tags')
+			)
+			->addField(
+				new CWidgetFieldPatternSelectItem('items', _('Item pattern'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('item_tags_evaltype', _('Item tags'), [
