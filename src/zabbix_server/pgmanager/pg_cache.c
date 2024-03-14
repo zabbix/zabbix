@@ -565,7 +565,11 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	if (0 == online_num)
 		goto out;
 
-	hosts_avg = hosts_num / online_num;
+	if (hosts_num > online_num)
+		hosts_avg = hosts_num / online_num;
+	else
+		hosts_avg = 1;
+
 	hosts_required = 0;
 
 	/* calculate how many hosts are needed to balance groups with deficit hosts */
@@ -576,7 +580,7 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
-		if (0 != proxy->hosts.values_num || group->hostids.values_num < proxy->hosts.values_num)
+		if (0 != proxy->hosts.values_num)
 		{
 			if (PG_GROUP_UNBALANCE_LIMIT > hosts_avg - proxy->hosts.values_num)
 				continue;
