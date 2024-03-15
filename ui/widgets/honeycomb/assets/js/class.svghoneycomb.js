@@ -357,15 +357,14 @@ class CSVGHoneycomb {
 			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
 			.each((d, i, cells) => {
 				if (d.scale_timeout !== undefined) {
-
 					clearTimeout(d.scale_timeout);
-					delete(d.scale_timeout);
+					delete (d.scale_timeout);
+				}
 
-					if (d.scaled) {
-						d.scaled = true;
+				if (d.scaled) {
+					d.scaled = false;
 
-						this.#cellLeave(d3.select(cells[i]), d);
-					}
+					this.#cellLeave(d3.select(cells[i]), d);
 				}
 			})
 			.data(data, (d, i) => {
@@ -478,6 +477,7 @@ class CSVGHoneycomb {
 					cell.raise();
 
 					d.scale_timeout = setTimeout(() => {
+						delete d.scale_timeout;
 						d.scaled = true;
 
 						this.#cellEnter(cell, d);
@@ -486,15 +486,14 @@ class CSVGHoneycomb {
 			})
 			.on('mouseleave', (e, d) => {
 				if (d.scale_timeout !== undefined) {
-
 					clearTimeout(d.scale_timeout);
-					delete(d.scale_timeout);
+					delete d.scale_timeout;
+				}
 
-					if (d.scaled) {
-						d.scaled = true;
+				if (d.scaled) {
+					d.scaled = false;
 
-						this.#cellLeave(cell, d);
-					}
+					this.#cellLeave(cell, d);
 				}
 			});
 	}
@@ -654,7 +653,7 @@ class CSVGHoneycomb {
 	#drawNoDataLabel(cell) {
 		cell.call(cell => cell.select('foreignObject')?.remove());
 
-		if (((this.#cell_width - this.#cells_gap) * this.#container_params.scale) < CSVGHoneycomb.LABEL_WIDTH_MIN) {
+		if ((this.#cell_width - this.#cells_gap) * this.#container_params.scale < CSVGHoneycomb.LABEL_WIDTH_MIN) {
 			return;
 		}
 
@@ -729,7 +728,7 @@ class CSVGHoneycomb {
 				};
 			}
 
-			if ((container_width * this.#container_params.scale) < CSVGHoneycomb.LABEL_WIDTH_MIN) {
+			if (container_width * this.#container_params.scale < CSVGHoneycomb.LABEL_WIDTH_MIN) {
 				return;
 			}
 
@@ -779,13 +778,13 @@ class CSVGHoneycomb {
 		const font_size_min = CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale;
 
 		for (const d of data) {
-			const { primary, secondary } = d.labels;
+			const {primary, secondary} = d.labels;
 
 			let p_height = primary !== null ? primary.font_size * primary.lines_count : 0;
 			let s_height = secondary !== null ? secondary.font_size * secondary.lines_count : 0;
 
 			while ((primary?.lines_count || 0) > 1 || (secondary?.lines_count || 0) > 1) {
-				if ((p_height + s_height) <= height_limit) {
+				if (p_height + s_height <= height_limit) {
 					break;
 				}
 
@@ -803,7 +802,7 @@ class CSVGHoneycomb {
 				}
 
 				if (secondary !== null) {
-					const s_font_size = s_height * height_limit / (s_height + p_height) / secondary.lines_count;
+					const s_font_size = s_height * height_limit / (p_height + s_height) / secondary.lines_count;
 
 					if (s_font_size < font_size_min) {
 						if (secondary.lines_count > 1) {
@@ -819,7 +818,7 @@ class CSVGHoneycomb {
 				s_height = secondary !== null ? secondary.font_size * secondary.lines_count : 0;
 			}
 
-			if ((p_height + s_height) <= height_limit) {
+			if (p_height + s_height <= height_limit) {
 				continue;
 			}
 
