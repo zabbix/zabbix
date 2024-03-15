@@ -2948,6 +2948,8 @@ Changes for 5.0.42rc1
 New features:
 
 Bug fixes:
+.....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
+.......PS. [ZBX-23145,ZBX-24032] disabled deprecated automatic reconnection in MySQL (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.41
