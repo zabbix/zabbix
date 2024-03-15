@@ -316,9 +316,7 @@ static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhos
 static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int lastup, int lastdown,
 		const char *value)
 {
-	char	*value_esc;
-
-	value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
+	char	*value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
 
 	zbx_db_execute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
 			status, lastup, lastdown, value_esc, dserviceid);
@@ -333,9 +331,7 @@ static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int l
  ******************************************************************************/
 static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char *value)
 {
-	char	*value_esc;
-
-	value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
+	char	*value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
 
 	zbx_db_execute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64, value_esc, dserviceid);
 
@@ -361,12 +357,9 @@ static void	discovery_update_dhost(const zbx_db_dhost *dhost)
 static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_dservice *dservice,
 		int service_status, const char *value, int now, zbx_add_event_func_t add_event_cb)
 {
-	zbx_timespec_t	ts;
+	zbx_timespec_t	ts = {.sec = now, .ns = 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	ts.sec = now;
-	ts.ns = 0;
 
 	if (DOBJECT_STATUS_UP == service_status)
 	{
@@ -438,10 +431,7 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int now,
 		zbx_add_event_func_t add_event_cb)
 {
-	zbx_timespec_t	ts;
-
-	ts.sec = now;
-	ts.ns = 0;
+	zbx_timespec_t	ts = {.sec = now, .ns = 0};
 
 	/* update host status */
 	if (DOBJECT_STATUS_UP == status)

@@ -1377,9 +1377,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 
 	if (NULL == (result = zbx_hashset_search(&dmanager.results, &result_cmp)))
 	{
-		zbx_discoverer_results_t	*r;
+		zbx_discoverer_results_t	*r = rdiscovery_result_create(druleid, task);
 
-		r = rdiscovery_result_create(druleid, task);
 		r->ip = zbx_strdup(NULL, task->ip);
 
 		result = zbx_hashset_insert(&dmanager.results, r, sizeof(zbx_discoverer_results_t));

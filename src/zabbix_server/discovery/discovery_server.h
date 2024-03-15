@@ -31,4 +31,5 @@ void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_close_server(void *handle);
+
 #endif
