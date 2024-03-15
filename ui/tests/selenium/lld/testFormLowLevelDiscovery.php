@@ -631,10 +631,14 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			// #8 Empty keep lost resources period
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'name' => 'Discovery lifetime',
 					'key' => 'discovery-lifetime-test',
-					'lifetime' => ' '
+					'lifetime' => ' ',
+					'error_msg' => 'Page received incorrect data',
+					'errors' => [
+						'Incorrect value for field "lifetime": cannot be empty.'
+					]
 				]
 			],
 			// #9 Incorrect keep lost resources period
