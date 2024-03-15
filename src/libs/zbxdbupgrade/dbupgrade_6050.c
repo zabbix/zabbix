@@ -3264,7 +3264,7 @@ static int	DBpatch_6050212(void)
 	return DBset_default("lld_override_ophistory", &field);
 }
 
-static int	DBpatch_60502113.void)
+static int	DBpatch_6050213(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
