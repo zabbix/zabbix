@@ -367,6 +367,46 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	}
 }
 
+void	zbx_eval_compose_expression_by_token(const zbx_eval_context_t *ctx, char **expression, size_t shift_pos)
+{
+	zbx_vector_ptr_t	tokens;
+	const zbx_eval_token_t	*token;
+	int			i;
+	size_t			expression_alloc = 0, expression_offset = 0;
+
+	zbx_vector_ptr_create(&tokens);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		if ((0 != (ctx->stack.values[i].type & ZBX_EVAL_TOKEN_VAR_MACRO)) ||
+				(0 != (ctx->stack.values[i].type & ZBX_EVAL_TOKEN_VAR_USERMACRO)) ||
+				(0 != (ctx->stack.values[i].type & ZBX_EVAL_TOKEN_VAR_LLDMACRO)))
+		{
+			if (ZBX_VARIANT_NONE != ctx->stack.values[i].value.type)
+				zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
+		}
+	}
+
+	zbx_vector_ptr_sort(&tokens, zbx_eval_compare_tokens_by_loc);
+
+	for (i = 0; i < tokens.values_num; i++)
+	{
+		token = (const zbx_eval_token_t *)tokens.values[i];
+
+		zbx_strncpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + shift_pos,
+				token->loc.l - shift_pos);
+
+		shift_pos = token->loc.r + 1;
+
+		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token);
+	}
+
+	if ('\0' != ctx->expression[shift_pos])
+		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + shift_pos);
+
+	zbx_vector_ptr_destroy(&tokens);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: composes expression by replacing processed tokens (with values)   *
