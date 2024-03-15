@@ -181,6 +181,7 @@ static void	timespec_normalize(zbx_timespec_t *ts)
  * Comments: normalized timespec values are expected                          *
  *                                                                            *
  ******************************************************************************/
+#if defined(_WINDOWS) || defined(__MINGW32__)
 static int	timespec_cmp(const zbx_timespec_t *ts1, const zbx_timespec_t *ts2)
 {
 	if (ts1->sec < ts2->sec)
@@ -194,6 +195,7 @@ static int	timespec_cmp(const zbx_timespec_t *ts1, const zbx_timespec_t *ts2)
 
 	return 0;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
