@@ -286,11 +286,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$get_text = $this->zbxTestGetText("//div[@class='overlay-dialogue-body']/span");
 			$result = trim(preg_replace('/\s\s+/', ' ', $get_text));
 			$this->assertEquals($result, $data['error']);
-
-			COverlayDialogElement::find()->all()->last()->close();
 		}
 
-		$dialog->close();
+		COverlayDialogElement::closeAll();
 	}
 
 	/*
