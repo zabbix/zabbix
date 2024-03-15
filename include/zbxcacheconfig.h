@@ -1459,8 +1459,12 @@ struct zbx_pg_group
 
 ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
 
+#define ZBX_PG_PROXY_FETCH_REVISION	0
+#define ZBX_PG_PROXY_FETCH_FORCE	1
+
 int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
-int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vector_objmove_t *proxy_reloc);
+int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint64_t *revision, int flags,
+		zbx_vector_objmove_t *proxy_reloc);
 
 int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_comms_redirect_t *redirect);

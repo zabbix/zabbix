@@ -42,7 +42,7 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 
 	pg_cache_lock(pgs->cache);
 
-	pg_cache_update_groups(pgs->cache);
+	(void)pg_cache_update_groups(pgs->cache);
 
 	while (ptr - message->data < message->size)
 	{

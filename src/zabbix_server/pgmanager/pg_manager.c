@@ -161,10 +161,16 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
  ******************************************************************************/
 static void	pgm_update_config(zbx_pg_cache_t *cache)
 {
+	int	flags;
+
 	pg_cache_lock(cache);
 
-	pg_cache_update_groups(cache);
-	pg_cache_update_proxies(cache);
+	if (SUCCEED == pg_cache_update_groups(cache))
+		flags = ZBX_PG_PROXY_FETCH_FORCE;
+	else
+		flags = ZBX_PG_PROXY_FETCH_REVISION;
+
+	pg_cache_update_proxies(cache, flags);
 
 	pg_cache_unlock(cache);
 }
@@ -176,15 +182,19 @@ static void	pgm_update_config(zbx_pg_cache_t *cache)
  ******************************************************************************/
 static void	pgm_update(zbx_pg_cache_t *cache)
 {
-	int			now;
+	int			now, flags;
 	zbx_dc_um_handle_t	*um_handle;
 
 	um_handle = zbx_dc_open_user_macros();
 
 	pg_cache_lock(cache);
 
-	pg_cache_update_groups(cache);
-	pg_cache_update_proxies(cache);
+	if (SUCCEED == pg_cache_update_groups(cache))
+		flags = ZBX_PG_PROXY_FETCH_FORCE;
+	else
+		flags = ZBX_PG_PROXY_FETCH_REVISION;
+
+	pg_cache_update_proxies(cache, flags);
 
 	now = (int)time(NULL);
 

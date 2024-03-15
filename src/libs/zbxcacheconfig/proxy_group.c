@@ -170,21 +170,28 @@ out:
  *                                                                            *
  * Purpose: update local proxy cache                                          *
  *                                                                            *
- * Parameter: proxies  - [IN/OUT] local proxy cache                           *
+ * Parameter: groups   - [IN] local proxy group cache                         *
+ *            proxies  - [IN/OUT] local proxy cache                           *
  *            revision - [IN/OUT] local proxy cache revision                  *
+ *            flags    - [IN] ZBX_PG_PROXY_FETCH_FORCE - force configuration  *
+ *                            update ignoring revision checks                 *
+ *                            ZBX_PG_PROXY_FETCH_REVISION - update by proxy   *
+ *                            configuration revision                          *
+ *            proxy_reloc - [OUT] proxy relocation data                       *
  *                                                                            *
  * Return value: SUCCEED - local cache was updated                            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vector_objmove_t *proxy_reloc)
+int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint64_t *revision, int flags,
+		zbx_vector_objmove_t *proxy_reloc)
 {
 	int		ret = FAIL;
 	zbx_uint64_t	old_revision = *revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (*revision >= config->revision.proxy)
+	if (ZBX_PG_PROXY_FETCH_REVISION == flags && *revision >= config->revision.proxy)
 		goto out;
 
 	zbx_hashset_iter_t	iter;
@@ -199,6 +206,9 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *proxies, zbx_uint64_t *revision, zbx_vec
 
 	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 	{
+		if (0 != dc_proxy->proxy_groupid && NULL == zbx_hashset_search(groups, &dc_proxy->proxy_groupid))
+			continue;
+
 		proxy = (zbx_pg_proxy_t *)zbx_hashset_search(proxies, &dc_proxy->proxyid);
 
 		if (NULL != proxy)

@@ -919,12 +919,12 @@ void	pg_cache_add_deleted_hostmaps(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *
  * Purpose: update proxy group cache from configuration cache                 *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_update_groups(zbx_pg_cache_t *cache)
+int	pg_cache_update_groups(zbx_pg_cache_t *cache)
 {
 	zbx_uint64_t	old_revision = cache->group_revision;
 
 	if (SUCCEED != zbx_dc_fetch_proxy_groups(&cache->groups, &cache->group_revision))
-		return;
+		return FAIL;
 
 	zbx_hashset_iter_t	iter;
 	zbx_pg_group_t		*group;
@@ -951,6 +951,8 @@ void	pg_cache_update_groups(zbx_pg_cache_t *cache)
 		if (old_revision < group->revision)
 			pg_cache_queue_group_update(cache, group);
 	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -958,7 +960,7 @@ void	pg_cache_update_groups(zbx_pg_cache_t *cache)
  * Purpose: update proxy cache from configuration cache                       *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_update_proxies(zbx_pg_cache_t *cache)
+void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 {
 	zbx_vector_objmove_t	proxy_reloc;
 	zbx_hashset_iter_t	iter;
@@ -966,7 +968,7 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache)
 
 	zbx_vector_objmove_create(&proxy_reloc);
 
-	zbx_dc_fetch_proxies(&cache->proxies, &cache->proxy_revision, &proxy_reloc);
+	zbx_dc_fetch_proxies(&cache->groups, &cache->proxies, &cache->proxy_revision, flags, &proxy_reloc);
 
 	/* remove deleted proxies */
 

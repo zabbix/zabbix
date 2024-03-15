@@ -85,8 +85,8 @@ void	pg_cache_group_remove_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zb
 void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t hostid);
 void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uint64_t proxyid);
 
-void	pg_cache_update_groups(zbx_pg_cache_t *cache);
-void	pg_cache_update_proxies(zbx_pg_cache_t *cache);
+int	pg_cache_update_groups(zbx_pg_cache_t *cache);
+void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags);
 void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t *groupids);
 
 void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
