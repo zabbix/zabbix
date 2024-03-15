@@ -63,6 +63,7 @@ $proxy_tab = (new CFormGrid())
 			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
 		)
 	])
 	->addItem([
