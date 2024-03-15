@@ -266,16 +266,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	return r, err
 }
 
-// executeSingle returns device data for single device from smartctl based on provided path.
-func (p *Plugin) executeSingle(path string) ([]byte, error) {
-	out, err := p.ctl.Execute("-a", path, "-j")
-	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
-	}
-
-	return out, nil
-}
-
 // executeBase executed runners for basic devices retrieved from smartctl.
 func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
 	r.startBasicRunners(jsonRunner)

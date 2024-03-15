@@ -33,7 +33,7 @@ if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
 }
 
-if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) != ZBX_AUTH_HTTP_ENABLED) {
+if (CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_AUTH_ENABLED) != ZBX_AUTH_HTTP_ENABLED) {
 	redirect($redirect_to->toString());
 }
 
@@ -49,7 +49,7 @@ if ($http_user) {
 	$parser = new CADNameAttributeParser(['strict' => true]);
 
 	if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
-		$strip_domain = explode(',', CAuthenticationHelper::get(CAuthenticationHelper::HTTP_STRIP_DOMAINS));
+		$strip_domain = explode(',', CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_STRIP_DOMAINS));
 		$strip_domain = array_map('trim', $strip_domain);
 
 		if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
@@ -59,8 +59,8 @@ if ($http_user) {
 
 	try {
 		CWebUser::$data = API::getApiService('user')->loginByUsername($http_user,
-			(CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
+			(CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::getPublic(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
 		if (!empty(CWebUser::$data)) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,13 @@ package smart
 
 import (
 	"context"
+	"errors"
 	"os/exec"
 	"runtime"
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 )
 
@@ -65,7 +67,7 @@ func NewSmartCtl(logr log.Logger, path string, timeoutSecs int) *SmartCtl {
 func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 	_, err := exec.LookPath(s.commandPath)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to look up smartctl exec path")
 	}
 
 	cmd := "sudo"
@@ -80,10 +82,21 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 	defer cancel()
 
 	s.logr.Tracef(
-		"executing smartctl command: %s %s", cmd, strings.Join(args, " "),
+		"executing smartctl command: %s %s", cmd, strings.Join(cmdArgs, " "),
 	)
 
-	// don't wrap to preserve exit code allowing caller to handle exit code non
-	// zero and retrieve stdout/stderr.
-	return exec.CommandContext(ctx, cmd, cmdArgs...).CombinedOutput()
+	out, err := exec.CommandContext(ctx, cmd, cmdArgs...).CombinedOutput()
+	if err != nil {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
+			return out, nil
+		}
+
+		return nil, errs.Wrap(
+			err,
+			"failed to get combined output of stdout and stderr for smartctl process",
+		)
+	}
+
+	return out, nil
 }

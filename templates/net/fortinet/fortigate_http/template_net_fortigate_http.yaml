@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:51:55Z'
+  date: '2024-01-22T15:37:15Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -475,89 +475,89 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = {"data": {}, "error": ""},
-                api_url = "",
-                policies = {},
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = {"data": {}, "error": ""},
+            	api_url = "",
+            	policies = {},
+            	error_msg = "";
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
-                    var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
-                    throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
-                }
+            	if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
+            		var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
+            		throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
-                    var macro = '{$FGATE.' + field.toUpperCase() + '}';
-                    var key = field.split('.').pop();
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
+            		var macro = '{$FGATE.' + field.toUpperCase() + '}';
+            		var key = field.split('.').pop();
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
             
-                var firewall_data = getHttpData(
-                    api_url + '/api/v2/monitor/firewall/policy?access_token=' + encodeURIComponent(params.token)
-                );
+            	var firewall_data = getHttpData(
+            		api_url + '/api/v2/monitor/firewall/policy?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                var firewall_list = getHttpData(
-                    api_url + '/api/v2/cmdb/firewall/policy?access_token=' + encodeURIComponent(params.token)
-                );
+            	var firewall_list = getHttpData(
+            		api_url + '/api/v2/cmdb/firewall/policy?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                firewall_list.results.forEach(function (v) {
-                    var item = {};
-                    ['q_origin_key', 'status', 'name', 'uuid', 'action', 'ip-version-type', 'label'].forEach(function (k) {
-                        item[k] = v[k];
-                    });
-                    policies[v.policyid] = item;
-                });
+            	firewall_list.results.forEach(function (v) {
+            		var item = {};
+            		['q_origin_key', 'status', 'name', 'uuid', 'action', 'ip-version-type', 'label'].forEach(function (k) {
+            			item[k] = v[k];
+            		});
+            		policies[v.policyid] = item;
+            	});
             
-                result.data = firewall_data.results.map(function (v) {
-                    if (typeof v.policyid !== 'undefined' && typeof policies[String(v.policyid)] !== 'undefined') {
-                        Object.assign(v, policies[String(v.policyid)]);
-                    }
-                    return v;
-                }).filter(function (v) {
-                    if (typeof v.name !== 'undefined') {
-                        return v;
-                    }
-                });
+            	result.data = firewall_data.results.map(function (v) {
+            		if (typeof v.policyid !== 'undefined' && typeof policies[String(v.policyid)] !== 'undefined') {
+            			Object.assign(v, policies[String(v.policyid)]);
+            		}
+            		return v;
+            	}).filter(function (v) {
+            		if (typeof v.name !== 'undefined') {
+            			return v;
+            		}
+            	});
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += error_msg.endsWith('.') ? '' : '.';
-                Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += error_msg.endsWith('.') ? '' : '.';
+            	Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -723,93 +723,93 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = {"data": {}, "error": ""},
-                api_url = "",
-                interfaces = {},
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = {"data": {}, "error": ""},
+            	api_url = "",
+            	interfaces = {},
+            	error_msg = "";
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
-                    var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
-                    throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
-                }
+            	if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
+            		var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
+            		throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
-                    var macro = '{$FGATE.' + field.toUpperCase() + '}';
-                    var key = field.split('.').pop();
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
+            		var macro = '{$FGATE.' + field.toUpperCase() + '}';
+            		var key = field.split('.').pop();
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
             
-                var netif_data = getHttpData(
-                    api_url + '/api/v2/monitor/system/interface?access_token=' + encodeURIComponent(params.token)
-                );
+            	var netif_data = getHttpData(
+            		api_url + '/api/v2/monitor/system/interface?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                var netif_list = getHttpData(
-                    api_url + '/api/v2/cmdb/system/interface?access_token=' + encodeURIComponent(params.token)
-                );
+            	var netif_list = getHttpData(
+            		api_url + '/api/v2/cmdb/system/interface?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                result.data = netif_list.results.map(function (v) {
-                    var item = {};
-                    ['q_origin_key', 'name', 'mode', 'type', 'description'].forEach(function (k) {
-                        item[k] = v[k];
-                    });
-                    if (typeof item.q_origin_key !== 'undefined' && typeof netif_data.results[String(item.q_origin_key)] !== 'undefined') {
-                        Object.assign(item, netif_data.results[String(item.q_origin_key)]);
-                    }
-                    if (typeof item.alias !== 'undefined') {
-                        item.alias = item.alias.slice(1,-1);
-                    }
-                    else {
-                        item.alias = '';
-                    }
-                    if (typeof item.link === 'undefined') {
-                        item.link = false;
-                    }
-                    if (typeof item.id === 'undefined') {
-                        item.id = item.q_origin_key;
-                    }
-                    return item;
-                });
+            	result.data = netif_list.results.map(function (v) {
+            		var item = {};
+            		['q_origin_key', 'name', 'mode', 'type', 'description'].forEach(function (k) {
+            			item[k] = v[k];
+            		});
+            		if (typeof item.q_origin_key !== 'undefined' && typeof netif_data.results[String(item.q_origin_key)] !== 'undefined') {
+            			Object.assign(item, netif_data.results[String(item.q_origin_key)]);
+            		}
+            		if (typeof item.alias !== 'undefined') {
+            			item.alias = item.alias.slice(1,-1);
+            		}
+            		else {
+            			item.alias = '';
+            		}
+            		if (typeof item.link === 'undefined') {
+            			item.link = false;
+            		}
+            		if (typeof item.id === 'undefined') {
+            			item.id = item.q_origin_key;
+            		}
+            		return item;
+            	});
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += error_msg.endsWith('.') ? '' : '.';
-                Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += error_msg.endsWith('.') ? '' : '.';
+            	Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -873,85 +873,85 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = {"data": {}, "error": ""},
-                api_url = "",
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = {"data": {}, "error": ""},
+            	api_url = "",
+            	error_msg = "";
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
-                    var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
-                    throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
-                }
+            	if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
+            		var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
+            		throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
-                    var macro = '{$FGATE.' + field.toUpperCase() + '}';
-                    var key = field.split('.').pop();
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
+            		var macro = '{$FGATE.' + field.toUpperCase() + '}';
+            		var key = field.split('.').pop();
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
             
-                var resource_list = getHttpData(
-                    api_url + '/api/v2/monitor/system/resource/usage?access_token=' + encodeURIComponent(params.token) + '&interval=1-min'
-                );
+            	var resource_list = getHttpData(
+            		api_url + '/api/v2/monitor/system/resource/usage?access_token=' + encodeURIComponent(params.token) + '&interval=1-min'
+            	);
             
-                var disk_info = getHttpData(
-                    api_url + '/api/v2/monitor/log/current-disk-usage?access_token=' + encodeURIComponent(params.token)
-                );
+            	var disk_info = getHttpData(
+            		api_url + '/api/v2/monitor/log/current-disk-usage?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                if (typeof resource_list.results !== 'undefined' && typeof resource_list.results === 'object') {
-                    Object.keys(resource_list.results).forEach(function (key) {
-                        var resource = resource_list.results[key];
-                        if (resource.length > 0) {
-                            result.data[key] = resource[0].current;
-                        }
-                    });
-                }
-                else {
-                    throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
-                }
+            	if (typeof resource_list.results !== 'undefined' && typeof resource_list.results === 'object') {
+            		Object.keys(resource_list.results).forEach(function (key) {
+            			var resource = resource_list.results[key];
+            			if (resource.length > 0) {
+            				result.data[key] = resource[0].current;
+            			}
+            		});
+            	}
+            	else {
+            		throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
+            	}
             
-                Object.keys(disk_info.results).forEach(function (key) {
-                    result.data['disk_' + key.split('_')[0]] = disk_info.results[key];
-                });
+            	Object.keys(disk_info.results).forEach(function (key) {
+            		result.data['disk_' + key.split('_')[0]] = disk_info.results[key];
+            	});
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += error_msg.endsWith('.') ? '' : '.';
-                Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += error_msg.endsWith('.') ? '' : '.';
+            	Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -1015,129 +1015,129 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = {"data": {}, "error": ""},
-                api_url = "",
-                health_members = [],
-                health_checks = [],
-                members = {},
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = {"data": {}, "error": ""},
+            	api_url = "",
+            	health_members = [],
+            	health_checks = [],
+            	members = {},
+            	error_msg = "";
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
-                    var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
-                    throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
-                }
+            	if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
+            		var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
+            		throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
-                    var macro = '{$FGATE.' + field.toUpperCase() + '}';
-                    var key = field.split('.').pop();
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
+            		var macro = '{$FGATE.' + field.toUpperCase() + '}';
+            		var key = field.split('.').pop();
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
             
-                var sdwan_member_data = getHttpData(
-                    api_url + '/api/v2/monitor/virtual-wan/members?access_token=' + encodeURIComponent(params.token)
-                );
+            	var sdwan_member_data = getHttpData(
+            		api_url + '/api/v2/monitor/virtual-wan/members?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                var sdwan_health_data = getHttpData(
-                    api_url + '/api/v2/monitor/virtual-wan/health-check?access_token=' + encodeURIComponent(params.token)
-                );
+            	var sdwan_health_data = getHttpData(
+            		api_url + '/api/v2/monitor/virtual-wan/health-check?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                var sdwan_list = getHttpData(
-                    api_url + '/api/v2/cmdb/system/sdwan?access_token=' + encodeURIComponent(params.token)
-                );
+            	var sdwan_list = getHttpData(
+            		api_url + '/api/v2/cmdb/system/sdwan?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                sdwan_list.results['health-check'].forEach(function (item) {
-                    health_checks[item.q_origin_key] = item.members.length;
-                    item.members.forEach(function (m) {
-                        health_members.push({
-                            'member_id': m.q_origin_key,
-                            'health_id': item.q_origin_key,
-                            'health_name': item.name,
-                        });
-                    });
-                });
+            	sdwan_list.results['health-check'].forEach(function (item) {
+            		health_checks[item.q_origin_key] = item.members.length;
+            		item.members.forEach(function (m) {
+            			health_members.push({
+            				'member_id': m.q_origin_key,
+            				'health_id': item.q_origin_key,
+            				'health_name': item.name,
+            			});
+            		});
+            	});
             
-                sdwan_list.results.members.forEach(function (item) {
-                    members[item.q_origin_key] = item;
-                });
+            	sdwan_list.results.members.forEach(function (item) {
+            		members[item.q_origin_key] = item;
+            	});
             
-                result.data = {
-                    'member_lld': sdwan_list.results.members.filter(function (v) {
-                        if (v.interface.length > 0) {
-                            return v;
-                        }
-                    }).map(function (v) {
-                        if (typeof v.interface !== 'undefined' && typeof sdwan_member_data.results[v.interface] !== 'undefined') {
-                            Object.assign(v, sdwan_member_data.results[v.interface]);
-                        }
-                        return v;
-                    }),
-                    'health_lld': health_members.map(function (m) {
-                        var item = {};
-                        if (typeof members[String(m.member_id)] !== 'undefined') {
-                            ['interface', 'status'].forEach(function (k) {
-                                item[k] = members[String(m.member_id)][k];
-                            });
-                            Object.assign(item, m);
-                        };
-                        return item;
-                    }).filter(function (v) {
-                        if (v.interface.length > 0) {
-                            return v;
-                        }
-                    }),
-                    'health_data': sdwan_list.results['health-check'].filter(function (v) {
-                        if (typeof health_checks[String(v.q_origin_key)] !== 'undefined' && health_checks[String(v.q_origin_key)] > 0) {
-                            return v;
-                        }
-                    }).map(function (v) {
-                        delete v.members;
-                        if (typeof v.name !== 'undefined' && typeof sdwan_health_data.results[v.name] !== 'undefined') {
-                            Object.assign(v, sdwan_health_data.results[v.name]);
-                        }
-                        return v;
-                    })
-                }
+            	result.data = {
+            		'member_lld': sdwan_list.results.members.filter(function (v) {
+            			if (v.interface.length > 0) {
+            				return v;
+            			}
+            		}).map(function (v) {
+            			if (typeof v.interface !== 'undefined' && typeof sdwan_member_data.results[v.interface] !== 'undefined') {
+            				Object.assign(v, sdwan_member_data.results[v.interface]);
+            			}
+            			return v;
+            		}),
+            		'health_lld': health_members.map(function (m) {
+            			var item = {};
+            			if (typeof members[String(m.member_id)] !== 'undefined') {
+            				['interface', 'status'].forEach(function (k) {
+            					item[k] = members[String(m.member_id)][k];
+            				});
+            				Object.assign(item, m);
+            			};
+            			return item;
+            		}).filter(function (v) {
+            			if (v.interface.length > 0) {
+            				return v;
+            			}
+            		}),
+            		'health_data': sdwan_list.results['health-check'].filter(function (v) {
+            			if (typeof health_checks[String(v.q_origin_key)] !== 'undefined' && health_checks[String(v.q_origin_key)] > 0) {
+            				return v;
+            			}
+            		}).map(function (v) {
+            			delete v.members;
+            			if (typeof v.name !== 'undefined' && typeof sdwan_health_data.results[v.name] !== 'undefined') {
+            				Object.assign(v, sdwan_health_data.results[v.name]);
+            			}
+            			return v;
+            		})
+            	}
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += error_msg.endsWith('.') ? '' : '.';
-                Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += error_msg.endsWith('.') ? '' : '.';
+            	Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -1201,104 +1201,104 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = {"data": {}, "lld": [], "error": ""},
-                api_url = "",
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = {"data": {}, "lld": [], "error": ""},
+            	api_url = "",
+            	error_msg = "";
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ FortiGate ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from FortiGate API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
-                    var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
-                    throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
-                }
+            	if ((typeof response.status !== 'undefined' && response.status != 'success') || typeof response.results === 'undefined') {
+            		var uri = '/' + response.path + '/' + response.name + ((typeof response.action !== 'undefined') ? '?action=' + response.action : "");
+            		throw 'Failed to parse response received from ' + uri + '. Check debug log for more information.';
+            	}
             
-                return response;
+            	return response;
             };
             
             function capitalize(word, idx) {
-                return upAcronymCase(word.charAt(idx).toUpperCase() + word.slice(idx+1));
+            	return upAcronymCase(word.charAt(idx).toUpperCase() + word.slice(idx+1));
             }
             
             function upAcronymCase(word) {
-                if (word.length < 4) {
-                    return word.toUpperCase()
-                }
-                return word;
+            	if (word.length < 4) {
+            		return word.toUpperCase()
+            	}
+            	return word;
             }
             
             function prepareServiceName(key) {
-                var result = [];
-                key.split('_').forEach(function (w) {
-                    var forti_idx = w.indexOf('forti');
-                    w = upAcronymCase(w);
-                    if (forti_idx !== -1)
-                        w = 'Forti' + capitalize(w, forti_idx + 5);
-                    else
-                        w = capitalize(w, 0)
-                    result.push(w);
-                });
+            	var result = [];
+            	key.split('_').forEach(function (w) {
+            		var forti_idx = w.indexOf('forti');
+            		w = upAcronymCase(w);
+            		if (forti_idx !== -1)
+            			w = 'Forti' + capitalize(w, forti_idx + 5);
+            		else
+            			w = capitalize(w, 0)
+            		result.push(w);
+            	});
             
-                return result.join(' ');
+            	return result.join(' ');
             };
             
             try {
-                ['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
-                    var macro = '{$FGATE.' + field.toUpperCase() + '}';
-                    var key = field.split('.').pop();
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['scheme', 'api.token', 'api.fqdn', 'api.port'].forEach(function (field) {
+            		var macro = '{$FGATE.' + field.toUpperCase() + '}';
+            		var key = field.split('.').pop();
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set "' + key + '" script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
+            	api_url = params.scheme + '://' + params.fqdn + ':' + params.port;
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$FGATE.HTTP.PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                var licence_list = getHttpData(
-                    api_url + '/api/v2/monitor/license/status?access_token=' + encodeURIComponent(params.token)
-                );
+            	var licence_list = getHttpData(
+            		api_url + '/api/v2/monitor/license/status?access_token=' + encodeURIComponent(params.token)
+            	);
             
-                result.data = licence_list.results;
-                Object.keys(licence_list.results).forEach(function (key) {
-                    var resource = licence_list.results[key];
-                    if (typeof resource.status !== 'undefined' && typeof resource.type !== 'undefined') {
-                        result.lld.push({
-                            "key": key,
-                            "name": prepareServiceName(key),
-                            "status": resource.status,
-                            "type": resource.type,
-                        });
-                    }
-                });
+            	result.data = licence_list.results;
+            	Object.keys(licence_list.results).forEach(function (key) {
+            		var resource = licence_list.results[key];
+            		if (typeof resource.status !== 'undefined' && typeof resource.type !== 'undefined') {
+            			result.lld.push({
+            				"key": key,
+            				"name": prepareServiceName(key),
+            				"status": resource.status,
+            				"type": resource.type,
+            			});
+            		}
+            	});
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += error_msg.endsWith('.') ? '' : '.';
-                Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += error_msg.endsWith('.') ? '' : '.';
+            	Zabbix.log(3, '[ FortiGate ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -1483,10 +1483,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'accept',   // 0
-                          'deny',     // 1
-                          'ipsec'     // 2
+                      const idx = [
+                      	'accept',
+                      	'deny',
+                      	'ipsec'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1648,8 +1648,8 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                          'enable',    // 0
-                          'disable'    // 1
+                      	'enable',
+                      	'disable'
                       ].indexOf(value);
                       return idx !== -1 ? idx : value;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2086,25 +2086,25 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [       // 30 - unknown (default)
-                          'physical',     // 0
-                          'vlan',         // 1
-                          'aggregate',    // 2
-                          'redundant',    // 3
-                          'tunnel',       // 4
-                          'vdom-link',    // 5
-                          'loopback',     // 6
-                          'switch',       // 7
-                          'vap-switch',   // 8
-                          'wl-mesh',      // 9
-                          'fext-wan',     // 10
-                          'vxlan',        // 11
-                          'geneve',       // 12
-                          'hdlc',         // 13
-                          'switch-vlan',  // 14
-                          'emac-vlan',    // 15
-                          'ssl',          // 16
-                          'lan-extension' // 17
+                      const idx = [
+                      	'physical',
+                      	'vlan',
+                      	'aggregate',
+                      	'redundant',
+                      	'tunnel',
+                      	'vdom-link',
+                      	'loopback',
+                      	'switch',
+                      	'vap-switch',
+                      	'wl-mesh',
+                      	'fext-wan',
+                      	'vxlan',
+                      	'geneve',
+                      	'hdlc',
+                      	'switch-vlan',
+                      	'emac-vlan',
+                      	'ssl',
+                      	'lan-extension'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 30;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2434,10 +2434,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'up',       // 0
-                          'down',     // 1
-                          'error'     // 2
+                      const idx = [
+                      	'up',
+                      	'down',
+                      	'error'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
               master_item:
@@ -2617,10 +2617,10 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'up',       // 0
-                          'down',     // 1
-                          'error'     // 2
+                      const idx = [
+                      	'up',
+                      	'down',
+                      	'error'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
               master_item:
@@ -2745,9 +2745,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'enable',   // 0
-                          'disable'   // 1
+                      const idx = [
+                      	'enable',
+                      	'disable'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2998,36 +2998,36 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [                  // 30 - Unknown (default)
-                          'cloud_logged_in',         // 0
-                          'licensed',                // 1
-                          'registered',              // 2
-                          'vm_eval',                 // 3
-                          'free_license',            // 4
-                          'vm_valid',                // 5
-                          'cloud_confirm_email',     // 6
-                          'cloud_error',             // 7
-                          'cloud_logged_out',        // 8
-                          'cloud_login_in_progress', // 9
-                          'expired',                 // 10
-                          'expires_soon',            // 11
-                          'free_license_exhausted',  // 12
-                          'licensed_exhausted',      // 13
-                          'no_license',              // 14
-                          'no_support',              // 15
-                          'not_registered',          // 16
-                          'pending',                 // 17
-                          'unavailable',             // 18
-                          'update_manual',           // 19
-                          'update_push',             // 20
-                          'update_sched',            // 21
-                          'vm_eval_expired',         // 22
-                          'vm_expired',              // 23
-                          'vm_expires_soon',         // 24
-                          'vm_grace_period',         // 25
-                          'vm_invalid',              // 26
-                          'vm_pending',              // 27
-                          'vm_validation_overdue',   // 28
+                      const idx = [
+                      	'cloud_logged_in',
+                      	'licensed',
+                      	'registered',
+                      	'vm_eval',
+                      	'free_license',
+                      	'vm_valid',
+                      	'cloud_confirm_email',
+                      	'cloud_error',
+                      	'cloud_logged_out',
+                      	'cloud_login_in_progress',
+                      	'expired',
+                      	'expires_soon',
+                      	'free_license_exhausted',
+                      	'licensed_exhausted',
+                      	'no_license',
+                      	'no_support',
+                      	'not_registered',
+                      	'pending',
+                      	'unavailable',
+                      	'update_manual',
+                      	'update_push',
+                      	'update_sched',
+                      	'vm_eval_expired',
+                      	'vm_expired',
+                      	'vm_expires_soon',
+                      	'vm_grace_period',
+                      	'vm_invalid',
+                      	'vm_pending',
+                      	'vm_validation_overdue',
                       ].indexOf(value);
                       return idx !== -1 ? idx : 30;
                 - type: DISCARD_UNCHANGED_HEARTBEAT

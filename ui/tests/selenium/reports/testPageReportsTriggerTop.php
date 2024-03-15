@@ -301,7 +301,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
 		}
 
-		foreach (['id:from' => 16, 'id:to' => 16] as $input => $value) {
+		foreach (['id:from' => 255, 'id:to' => 255] as $input => $value) {
 			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
 		}
 
@@ -706,8 +706,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'date' => [
-						'from' => 'now-1y/y',
-						'to' => 'now-1y/y'
+						'from' => 'now-10y/y',
+						'to' => 'now-10y/y'
 					],
 					'expected' => []
 				]
@@ -775,6 +775,7 @@ class testPageReportsTriggerTop extends CWebTest {
 	 */
 	public function testPageReportsTriggerTop_Filter($data) {
 		$this->page->login()->open(self::LINK)->waitUntilReady();
+		$table = $this->getTable();
 
 		$filter = CFilterElement::find()->one();
 		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
@@ -810,6 +811,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		if (array_key_exists('background_colors', $data)) {
 			foreach ($data['background_colors'] as $trigger => $color) {
