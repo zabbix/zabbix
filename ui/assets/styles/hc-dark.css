@@ -4170,6 +4170,10 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 div.dashboard-widget-item a:link {
   border-bottom: none; }
 
+form.dashboard-widget-itemnavigator #tags_table_host_tags .form_row td:nth-child(3) input[type="text"],
+form.dashboard-widget-itemnavigator #tags_table_item_tags .form_row td:nth-child(3) input[type="text"] {
+  width: 159px !important; }
+
 div.dashboard-widget-map .sysmap-widget-container {
   overflow: hidden;
   height: 100%;
