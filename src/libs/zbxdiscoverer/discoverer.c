@@ -1192,8 +1192,8 @@ static zbx_discoverer_results_t	*rdiscovery_result_create(zbx_uint64_t druleid,
 	return result;
 }
 
-ZBX_PTR_VECTOR_DECL(fping_host, zbx_fping_host)
-ZBX_PTR_VECTOR_IMPL(fping_host, zbx_fping_host)
+ZBX_PTR_VECTOR_DECL(fping_host, zbx_fping_host_t)
+ZBX_PTR_VECTOR_IMPL(fping_host, zbx_fping_host_t)
 
 static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
 		int dcheck_idx, zbx_vector_discoverer_results_ptr_t *results, int worker_max)
@@ -1208,7 +1208,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 
 	for (int i = 0; i < task->ips->values_num; i++)
 	{
-		zbx_fping_host			host;
+		zbx_fping_host_t		host;
 		zbx_discoverer_dservice_t	*service;
 
 		memset(&host, 0, sizeof(host));
@@ -1257,7 +1257,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 
 	for (int i = 0; i < hosts.values_num; i++)
 	{
-		zbx_fping_host			*h = &hosts.values[i];
+		zbx_fping_host_t		*h = &hosts.values[i];
 		zbx_discoverer_dservice_t	service_cmp;
 
 		result_cmp.ip = h->addr;
