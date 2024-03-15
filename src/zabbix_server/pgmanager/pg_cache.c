@@ -794,12 +794,6 @@ void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *h
 		{
 			host_local.hostproxyid = host->hostproxyid;
 
-			if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)) &&
-					NULL != proxy->group)
-			{
-				zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
-			}
-
 			if (0 == new_host->proxyid)
 			{
 				host_local.proxyid = host->proxyid;
@@ -811,21 +805,19 @@ void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *h
 				zbx_vector_pg_host_append_ptr(hosts_mod, &host_local);
 				host->proxyid = new_host->proxyid;
 				host->revision = cache->hostmap_revision;
+
+				if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies,
+						&host->proxyid)))
+				{
+					zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
+
+					if (NULL != proxy->group)
+						zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
+				}
 			}
 		}
 		else
 			zbx_vector_pg_host_append_ptr(hosts_new, &host_local);
-
-		if (0 != new_host->proxyid)
-		{
-			if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)))
-			{
-				zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
-
-				if (NULL != proxy->group)
-					zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
-			}
-		}
 	}
 
 	zbx_hashset_clear(&cache->hostmap_updates);
@@ -840,9 +832,12 @@ out:
  *                                                                            *
  * Parameters: cache          - [IN] proxy group cache                        *
  *             hosts_new      - [IN] new host-proxy links                     *
+ *             groupids       - [OUT] ids of groups with updated host-proxy   *
+ *                                    mapping                                 *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_add_new_hostmaps(zbx_pg_cache_t *cache, const zbx_vector_pg_host_t *hosts_new)
+void	pg_cache_add_new_hostmaps(zbx_pg_cache_t *cache, const zbx_vector_pg_host_t *hosts_new,
+		zbx_vector_uint64_t *groupids)
 {
 	if (0 == hosts_new->values_num)
 		return;
@@ -852,8 +847,20 @@ void	pg_cache_add_new_hostmaps(zbx_pg_cache_t *cache, const zbx_vector_pg_host_t
 	hostproxyid = zbx_db_get_maxid_num("host_proxy", hosts_new->values_num);
 	for (int i = 0; i < hosts_new->values_num; i++)
 	{
+		zbx_pg_host_t	*host;
+		zbx_pg_proxy_t	*proxy;
+
 		hosts_new->values[i].hostproxyid = hostproxyid++;
-		zbx_hashset_insert(&cache->hostmap, &hosts_new->values[i], sizeof(hosts_new->values[i]));
+		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &hosts_new->values[i],
+				sizeof(hosts_new->values[i]));
+
+		if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)))
+		{
+			zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
+
+			if (NULL != proxy->group)
+				zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
+		}
 	}
 }
 

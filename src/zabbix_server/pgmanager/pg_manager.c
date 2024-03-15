@@ -475,7 +475,7 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 	pg_cache_rebalance_groups(cache, um_handle);
 	pg_cache_get_group_and_proxy_updates(cache, &groups, &proxies);
 	pg_cache_get_hostmap_updates(cache, &hosts_new, &hosts_mod, &hosts_del, &groupids);
-	pg_cache_add_new_hostmaps(cache, &hosts_new);
+	pg_cache_add_new_hostmaps(cache, &hosts_new, &groupids);
 	pg_cache_add_deleted_hostmaps(cache, &hosts_del);
 
 	pg_cache_unlock(cache);
