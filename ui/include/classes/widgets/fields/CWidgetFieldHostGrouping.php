@@ -41,7 +41,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 			]]);
 	}
 
-	public function validate($strict = false): array {
+	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
 		if ($errors) {

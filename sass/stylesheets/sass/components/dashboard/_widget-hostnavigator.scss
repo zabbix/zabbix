@@ -1,3 +1,15 @@
+form.dashboard-widget-hostnavigator {
+	#tags_table_host_tags {
+		.form_row {
+			td:nth-child(3) {
+				input[type="text"] {
+					width: 159px !important;
+				}
+			}
+		}
+	}
+}
+
 .host-navigator {
 	.host-navigator-limit {
 		display: flex;
