@@ -22,7 +22,7 @@
 
 #include "discoverer_job.h"
 
-#define DISCOVERER_QUEUE_MAX_SIZE	2000000
+#include "zbxalgo.h"
 
 typedef struct
 {

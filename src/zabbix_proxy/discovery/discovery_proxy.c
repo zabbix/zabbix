@@ -17,20 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdiscovery.h"
+#include "discovery_proxy.h"
+
 #include "zbxproxybuffer.h"
 
-void	*zbx_discovery_open(void)
+void	*zbx_discovery_open_proxy(void)
 {
 	return zbx_pb_discovery_open();
 }
 
-void	zbx_discovery_close(void *handle)
+void	zbx_discovery_close_proxy(void *handle)
 {
 	zbx_pb_discovery_close((zbx_pb_discovery_data_t *)handle);
 }
 
-void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+void	zbx_discovery_update_host_proxy(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	ZBX_UNUSED(dhost);
@@ -39,7 +40,7 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
 	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now);
 }
 
-void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+void	zbx_discovery_update_service_proxy(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
 {
@@ -50,6 +51,3 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 	zbx_pb_discovery_write_service((zbx_pb_discovery_data_t *)handle, druleid, dcheckid, ip, dns, port, status,
 			value, (int)now);
 }
-
-
-

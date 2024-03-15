@@ -17,20 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdiscovery.h"
+#include "discovery_server.h"
 
 #include "zbxtime.h"
 #include "zbxnum.h"
-
-typedef struct
-{
-	zbx_uint64_t	dserviceid;
-	int		status;
-	int		lastup;
-	int		lastdown;
-	char		*value;
-}
-DB_DSERVICE;
+#include "zbxdb.h"
 
 static zbx_db_result_t	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
@@ -77,9 +68,12 @@ static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, cons
 
 /******************************************************************************
  *                                                                            *
- * Purpose: separate multiple-IP hosts                                        *
+ * Purpose: separates multiple-IP hosts                                       *
  *                                                                            *
- * Parameters: host ip address                                                *
+ * Parameters:                                                                *
+ *    druleid - [IN] host ip address                                          *
+ *    dhost   - [OUT]                                                         *
+ *    ip      - [IN]                                                          *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip)
@@ -130,9 +124,17 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register host if one does not exist                               *
+ * Purpose: registers host if one does not exist yet                          *
  *                                                                            *
- * Parameters: host ip address                                                *
+ * Parameters:                                                                *
+ *    druleid         - [IN]                                                  *
+ *    dcheckid        - [IN]                                                  *
+ *    unique_dcheckid - [IN]                                                  *
+ *    dhost           - [IN]                                                  *
+ *    ip              - [OUT] host ip address                                 *
+ *    port            - [IN]                                                  *
+ *    status          - [IN]                                                  *
+ *    value           - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
@@ -198,14 +200,31 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	zbx_uint64_t	dserviceid;
+	int		status;
+	int		lastup;
+	int		lastdown;
+	char		*value;
+}
+zbx_db_dservice;
+
 /******************************************************************************
  *                                                                            *
- * Purpose: register service if one does not exist                            *
+ * Purpose: registers service if one does not exist yet                       *
  *                                                                            *
- * Parameters: host ip address                                                *
+ * Parameters:                                                                *
+ *    dcheckid - [IN]                                                         *
+ *    dhost    - [OUT]                                                        *
+ *    dservice - [IN]                                                         *
+ *    ip       - [IN] host ip address                                         *
+ *    dns      - [IN]                                                         *
+ *    port     - [IN]                                                         *
+ *    status   - [IN]                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhost, DB_DSERVICE *dservice,
+static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhost, zbx_db_dservice *dservice,
 		const char *ip, const char *dns, int port, int status)
 {
 	zbx_db_result_t	result;
@@ -290,15 +309,13 @@ static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhos
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update discovered service details                                 *
+ * Purpose: updates discovered service details                                *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int lastup, int lastdown,
 		const char *value)
 {
-	char	*value_esc;
-
-	value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
+	char	*value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
 
 	zbx_db_execute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
 			status, lastup, lastdown, value_esc, dserviceid);
@@ -308,14 +325,12 @@ static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int l
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update discovered service details                                 *
+ * Purpose: updates discovered service details                                *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char *value)
 {
-	char	*value_esc;
-
-	value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
+	char	*value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
 
 	zbx_db_execute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64, value_esc, dserviceid);
 
@@ -324,7 +339,7 @@ static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update discovered host details                                    *
+ * Purpose: updates discovered host details                                   *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dhost(const zbx_db_dhost *dhost)
@@ -335,18 +350,15 @@ static void	discovery_update_dhost(const zbx_db_dhost *dhost)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process and update the new service status                         *
+ * Purpose: processes and updates new service status                          *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_update_service_status(zbx_db_dhost *dhost, const DB_DSERVICE *dservice, int service_status,
-		const char *value, int now, zbx_add_event_func_t add_event_cb)
+static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_dservice *dservice,
+		int service_status, const char *value, int now, zbx_add_event_func_t add_event_cb)
 {
-	zbx_timespec_t	ts;
+	zbx_timespec_t	ts = {.sec = now, .ns = 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	ts.sec = now;
-	ts.ns = 0;
 
 	if (DOBJECT_STATUS_UP == service_status)
 	{
@@ -412,16 +424,13 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const DB_DSERVI
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update new host status                                            *
+ * Purpose: updates new host status                                           *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int now,
 		zbx_add_event_func_t add_event_cb)
 {
-	zbx_timespec_t	ts;
-
-	ts.sec = now;
-	ts.ns = 0;
+	zbx_timespec_t	ts = {.sec = now, .ns = 0};
 
 	/* update host status */
 	if (DOBJECT_STATUS_UP == status)
@@ -470,10 +479,10 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new host status                                           *
+ * Purpose: processes new host status                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -491,14 +500,14 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process new service status                                        *
+ * Purpose: processes new service status                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
 {
-	DB_DSERVICE	dservice;
+	zbx_db_dservice	dservice;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' dns:'%s' port:%d status:%d value:'%s'",
 			__func__, ip, dns, port, status, value);
@@ -524,12 +533,12 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	*zbx_discovery_open(void)
+void	*zbx_discovery_open_server(void)
 {
 	return NULL;
 }
 
-void	zbx_discovery_close(void *handle)
+void	zbx_discovery_close_server(void *handle)
 {
 	ZBX_UNUSED(handle);
 }

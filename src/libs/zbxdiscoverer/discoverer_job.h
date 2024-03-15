@@ -20,7 +20,8 @@
 #ifndef ZABBIX_DISCOVERER_JOB_H
 #define ZABBIX_DISCOVERER_JOB_H
 
-#include "zbxdiscovery.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {

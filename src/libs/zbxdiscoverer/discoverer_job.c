@@ -19,6 +19,8 @@
 
 #include "discoverer_job.h"
 
+#include "zbxdiscovery.h"
+
 zbx_hash_t	discoverer_task_hash(const void *data)
 {
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;

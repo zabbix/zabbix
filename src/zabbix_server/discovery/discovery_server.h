@@ -17,26 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DISCOVERER_H
-#define ZABBIX_DISCOVERER_H
-
-#include "zbxthreads.h"
+#ifndef ZABBIX_DISCOVERY_SERVER_H
+#define ZABBIX_DISCOVERY_SERVER_H
 
 #include "zbxdbhigh.h"
-#include "zbxcomms.h"
 
-typedef struct
-{
-	zbx_config_tls_t		*zbx_config_tls;
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
-	zbx_get_progname_f		zbx_get_progname_cb_arg;
-	int				config_timeout;
-	int				workers_num;
-	const char			*config_source_ip;
-	const zbx_events_funcs_t	*events_cbs;
-}
-zbx_thread_discoverer_args;
-
-ZBX_THREAD_ENTRY(discoverer_thread, args);
+void	*zbx_discovery_open_server(void);
+void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb);
+void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
+		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb);
+void	zbx_discovery_close_server(void *handle);
 
 #endif
