@@ -118,9 +118,9 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a
-
-zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
+	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
+	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
 
 if HAVE_IPMI
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a

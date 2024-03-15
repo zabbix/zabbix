@@ -16,6 +16,7 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
+	zbxcurl \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -221,6 +222,7 @@ SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
+	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxexec \
