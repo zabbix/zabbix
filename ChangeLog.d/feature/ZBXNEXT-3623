@@ -1,1 +1,0 @@
-...GI..PS. [ZBXNEXT-3623] moved the cURL library feature detection from build-time to runtime, increased required built-time cURL library version to 7.19.1 (dimir)
