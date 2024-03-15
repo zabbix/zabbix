@@ -3561,16 +3561,10 @@ section {
     height: 10px;
     margin-right: 10px; }
 
-[color-scheme="dark"] .svg-honeycomb .svg-honeycomb-container {
-  --stroke-hover: #526b77;
-  --stroke-selected: #668696; }
-
 .svg-honeycomb .svg-honeycomb-container {
   --color: #eeeeee;
   --fill: #3d5059;
   --stroke: transparent;
-  --stroke-hover: #33424a;
-  --stroke-selected: #1e272c;
   --no-data-color: #eeeeee;
   --no-data-fill: #383838; }
 .svg-honeycomb feDropShadow {
@@ -3609,7 +3603,7 @@ section {
     white-space: nowrap;
     transition: max-height 0.3s, font-size 0.3s; }
   .svg-honeycomb .svg-honeycomb-cell:hover {
-    --stroke: var(--stroke-hover); }
+    --stroke: var(--stroke-selected); }
   .svg-honeycomb .svg-honeycomb-cell.svg-honeycomb-cell-selected {
     --cell-stroke: var(--stroke-selected);
     --cell-stroke-width: calc(var(--stroke-width) * 2); }
@@ -3617,7 +3611,7 @@ section {
 .svg-honeycomb .svg-honeycomb-cell-other {
   --color: var(--no-data-color);
   --fill: var(--no-data-fill);
-  --stroke-hover: transparent;
+  --stroke-selected: transparent;
   cursor: default; }
 .svg-honeycomb .svg-honeycomb-cell-other-ellipsis {
   transform: translate(var(--px), var(--py)); }

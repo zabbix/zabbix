@@ -20,6 +20,8 @@
 
 class CSVGHoneycomb {
 
+	static ZBX_COLOR_CELL_FILL_LIGHT =		'#a5c6d4';
+	static ZBX_COLOR_CELL_FILL_DARK =		'#668696';
 	static ZBX_STYLE_CLASS =				'svg-honeycomb';
 	static ZBX_STYLE_HONEYCOMB_CONTAINER =	'svg-honeycomb-container';
 	static ZBX_STYLE_CELL =					'svg-honeycomb-cell';
@@ -260,7 +262,7 @@ class CSVGHoneycomb {
 
 				d3.select(cells[i])
 					.classed(CSVGHoneycomb.ZBX_STYLE_CELL_SELECTED, selected)
-					.style('--stroke-selected', d => selected ? this.#getStrokeColor(d, true) : null)
+					.style('--stroke-selected', d => this.#getStrokeColor(d, selected))
 			});
 
 		return has_selected;
@@ -871,13 +873,9 @@ class CSVGHoneycomb {
 	#getStrokeColor(d, wide = false) {
 		const fill_color = d3.color(this.#getFillColor(d));
 
-		if (fill_color === null) {
-			return null;
-		}
-
 		return document.documentElement.getAttribute('color-scheme') === ZBX_COLOR_SCHEME_LIGHT
-			? fill_color.darker(wide ? .6 : .3).formatHex()
-			: fill_color.brighter(wide ? 1 : .6).formatHex();
+			? (fill_color ?? d3.color(CSVGHoneycomb.ZBX_COLOR_CELL_FILL_LIGHT)).darker(wide ? .6 : .3).formatHex()
+			: (fill_color ?? d3.color(CSVGHoneycomb.ZBX_COLOR_CELL_FILL_DARK)).brighter(wide ? 1 : .6).formatHex();
 	}
 
 	/**
