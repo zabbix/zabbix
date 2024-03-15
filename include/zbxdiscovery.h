@@ -58,4 +58,5 @@ int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error);
 zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 void	zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg);
 void	zbx_discovery_get_worker_info(zbx_process_info_t *info);
+
 #endif

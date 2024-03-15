@@ -1754,7 +1754,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &discoverer_args;
-				zbx_thread_start(discoverer_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;

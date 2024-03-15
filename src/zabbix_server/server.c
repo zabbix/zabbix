@@ -1698,7 +1698,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &discoverer_args;
-				zbx_thread_start(discoverer_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;

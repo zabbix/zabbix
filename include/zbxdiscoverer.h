@@ -42,6 +42,6 @@ typedef struct
 }
 zbx_thread_discoverer_args;
 
-ZBX_THREAD_ENTRY(discoverer_thread, args);
+ZBX_THREAD_ENTRY(zbx_discoverer_thread, args);
 
 #endif

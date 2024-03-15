@@ -200,11 +200,11 @@ static int	dcheck_get_timeout(unsigned char type, int *timeout_sec)
  *                                                                            *
  * Purpose: checks if service is available                                    *
  *                                                                            *
- * Parameters: dcheck           - [IN] service type                           *
- *             ip               - [IN]                                        *
- *             port             - [IN]                                        *
- *             value            - [OUT]                                       *
- *             value_alloc      - [IN/OUT]                                    *
+ * Parameters: dcheck      - [IN] service type                                *
+ *             ip          - [IN]                                             *
+ *             port        - [IN]                                             *
+ *             value       - [OUT]                                            *
+ *             value_alloc - [IN/OUT]                                         *
  *                                                                            *
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
  *                                                                            *
@@ -931,7 +931,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 	if (0 != results.values_num)
 	{
-
 		void	*handle = discovery_open_cb();
 
 		for (int i = 0; i < results.values_num; i++)
@@ -1738,7 +1737,7 @@ static void	discoverer_reply_usage_stats(zbx_discoverer_manager_t *manager, zbx_
  * Purpose: periodically tries to find new hosts and services                 *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(discoverer_thread, args)
+ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 {
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
