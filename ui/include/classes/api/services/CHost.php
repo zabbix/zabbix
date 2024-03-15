@@ -2283,7 +2283,7 @@ class CHost extends CHostGeneral {
 				}
 
 				if ($db_hosts === null || $host['proxy_groupid'] !== $db_hosts[$host['hostid']]['proxy_groupid']) {
-					$proxyids[$host['proxy_groupid']] = true;
+					$proxy_groupids[$host['proxy_groupid']] = true;
 				}
 			}
 		}
