@@ -178,11 +178,12 @@ static int	dcheck_get_timeout(unsigned char type, int *timeout_sec, char *error_
  *             port             - [IN]                                        *
  *             value            - [OUT]                                       *
  *             value_alloc      - [IN/OUT]                                    *
+ *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
  *                                                                            *
  ******************************************************************************/
-static int	discoverer_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
+static int	discoverer_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, char **error)
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
@@ -195,10 +196,16 @@ static int	discoverer_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
 	switch (dcheck->type)
 	{
 		case SVC_LDAP:
+#ifdef HAVE_LDAP
 			service = "ldap";
+#else
+			ret = FAIL;
+			*error = zbx_strdup(*error, "Support for LDAP checks was not compiled in.");
+#endif
 			break;
 		default:
 			ret = FAIL;
+			*error = zbx_dsprintf(*error, "Unsupported check type %u.", dcheck->type);
 			break;
 	}
 
@@ -1112,8 +1119,9 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 	return ret;
 }
 
-static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task)
+static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task, char **error)
 {
+	int				ret;
 	char				dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char				ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_dc_dcheck_t			*dcheck = &task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck;
@@ -1126,11 +1134,16 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 	TASK_IP2STR(task, ip);
 
-	if (SUCCEED == discoverer_service(dcheck, ip, (unsigned short)task->range.state.port))
+	if (SUCCEED == discoverer_service(dcheck, ip, (unsigned short)task->range.state.port, error))
 	{
 		service = result_dservice_create((unsigned short)task->range.state.port, dcheck->dcheckid);
 		service->status = DOBJECT_STATUS_UP;
 		zbx_gethost_by_ip(ip, dns, sizeof(dns));
+	}
+	else if (NULL != *error)
+	{
+		ret = FAIL;
+		goto err;
 	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
@@ -1154,11 +1167,12 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 		service_free(service);	/* drule revision has been changed or drule aborted */
 
 	pthread_mutex_unlock(&dmanager.results_lock);
-
+	ret = SUCCEED;
+err:
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d rdns:%s", log_worker_id, __func__,
 			ip, NULL != result ? result->services.values_num : -1, NULL != result ? result->dnsname : "");
 
-	return SUCCEED;
+	return ret;
 }
 
 int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
@@ -1266,7 +1280,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (FAIL == dcheck_is_async(task->ds_dchecks.values[0]))
 			{
-				ret = discoverer_net_check_common(druleid, task);
+				ret = discoverer_net_check_common(druleid, task, &error);
 			}
 			else if (SVC_ICMPPING == GET_DTYPE(task))
 			{
@@ -1282,7 +1296,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			if (FAIL == ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "[%d] Discovery rule " ZBX_FS_UI64 " error:%s",
-						worker->worker_id, druleid, error);
+						worker->worker_id, druleid, ZBX_NULL2STR(error));
 			}
 
 			dcheck_type = GET_DTYPE(task);
