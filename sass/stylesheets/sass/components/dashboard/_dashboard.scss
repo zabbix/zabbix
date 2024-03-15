@@ -60,98 +60,85 @@
 	.sortable {
 		// Accommodate 2px shadow of focused tabs.
 		padding: 2px 0;
-		// Hide the invisible tab paddings.
-		margin: 0 -1.5px;
-	}
 
-	.sortable-list {
 		display: flex;
-		padding: 0;
-		margin: 0;
 		align-items: center;
 
-		& > .sortable-item:focus:not(:active) {
+		li {
+			// This container should not be visually styled at this level.
+			box-sizing: border-box;
+			display: block;
+			// Invisible padding for tab separation.
+			padding: 0 1.5px;
+			margin: 0;
+			list-style-type: none;
+			outline: none;
+
+			div {
+				display: flex;
+				align-items: center;
+
+				min-height: 22px;
+				line-height: 22px;
+				padding: 0 10px;
+				flex-shrink: 0;
+
+				font-size: 12px;
+				white-space: nowrap;
+
+				cursor: pointer;
+				user-select: none;
+
+				background-color: $ui-bg-color;
+				border: 1px solid $ui-border-color;
+				border-radius: 2px;
+
+				@if $ui-transitions {
+					transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
+				}
+
+				span {
+					@extend %overflow-ellipsis;
+					max-width: 300px;
+					color: $font-color;
+				}
+
+				button {
+					margin: -1px -9px -1px 4px;
+				}
+
+				&:not(.selected-tab) {
+					button {
+						display: none;
+					}
+				}
+			}
+		}
+
+		li:not(.sortable-item-dragging):focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
 			padding: 0 3.5px;
 
-			& > div {
+			div {
 				padding: 0 8px;
 				border: 1px solid transparent;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
-	}
 
-	.sortable-item {
-		// This container should not be visually styled at this level.
-		box-sizing: border-box;
-		display: block;
-		// Invisible padding for tab separation.
-		padding: 0 1.5px;
-		margin: 0;
-		list-style-type: none;
-		outline: none;
+		li div:hover,
+		li.sortable-item-dragging div {
+			background: $action-hover-color;
+			border: 1px solid darken($action-hover-color, 20%);
+		}
 
-		& > div {
-			display: flex;
-			align-items: center;
-
-			min-height: 22px;
-			line-height: 22px;
-			padding: 0 10px;
-			flex-shrink: 0;
-
-			font-size: 12px;
-			white-space: nowrap;
-
-			cursor: pointer;
-			user-select: none;
-
-			background-color: $ui-bg-color;
-			border: 1px solid $ui-border-color;
-			border-radius: 2px;
-
-			@if $ui-transitions {
-				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
-			}
+		li div.selected-tab {
+			background-color: $ui-bg-selected-color;
+			border: 1px solid transparent;
 
 			span {
-				@extend %overflow-ellipsis;
-				max-width: 300px;
-				color: $font-color;
+				color: $font-selected-color;
 			}
-
-			button {
-				margin: -1px -9px -1px 4px;
-			}
-
-			&:not(.selected-tab) {
-				button {
-					display: none;
-				}
-			}
-		}
-	}
-
-	.sortable > .sortable-item > div,
-	.sortable-list > .sortable-item > div:hover {
-		background: $action-hover-color;
-		border: 1px solid darken($action-hover-color, 20%);
-	}
-
-	.sortable > .sortable-item > div.selected-tab,
-	.sortable-list > .sortable-item > div.selected-tab {
-		background-color: $ui-bg-selected-color;
-		border: 1px solid transparent;
-
-		span {
-			color: $font-selected-color;
-		}
-	}
-
-	.sortable-item {
-		&.sortable-dragging > div {
-			@extend %cursor-dragging;
 		}
 	}
 
@@ -749,13 +736,13 @@
 .dashboard-grid-iterator.ui-draggable {
 	.dashboard-grid-widget-header,
 	.dashboard-grid-iterator-header {
-		@extend %cursor-drag;
+		cursor: grab;
 	}
 
 	&.ui-draggable-dragging {
 		.dashboard-grid-widget-header,
 		.dashboard-grid-iterator-header {
-			@extend %cursor-dragging;
+			cursor: grabbing;
 		}
 	}
 
@@ -979,41 +966,6 @@
 	animation: zoom-in-out $ui-controls-transition-duration linear;
 }
 
-.dashboard-widget {
-	min-width: 250px;
-	margin: 0 10px 10px 0;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-
-	.dashboard-widget-head {
-		margin: 8px 10px;
-	}
-
-	.list-table {
-		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
-
-		tbody tr {
-			&:last-child td {
-				border-bottom: 1px solid $table-border-color;
-			}
-		}
-	}
-
-	.msg-bad,
-	.msg-good,
-	.msg-warning {
-		margin: 0 10px;
-	}
-}
-
 %dashboard-widget-td {
 	&:first-child {
 		padding-left: 10px;
@@ -1021,32 +973,6 @@
 
 	&:last-child {
 		padding-right: 10px;
-	}
-}
-
-.dashboard-widget-head {
-	display: flex;
-	margin-bottom: 8px;
-
-	h4 {
-		color: widget-head-font-color($font-color);
-		font-weight: bold;
-		margin-right: auto;
-	}
-
-	& > ul {
-		margin: -8px -10px -10px 10px;
-	}
-}
-
-.dashboard-widget-foot {
-	text-align: right;
-	color: $font-alt-color;
-	margin: 0 10px;
-
-	li {
-		display: inline-block;
-		padding: 8px 0 8px 13px;
 	}
 }
 

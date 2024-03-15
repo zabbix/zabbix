@@ -1505,7 +1505,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Number of rows' => '5',
-						'Display min/max/avg' => true
+						'Display min/avg/max' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -1797,8 +1797,9 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Number of rows' => '5',
-						'Display min/max/avg' => true
+						'Rows' => 'Variable',
+						'Maximum number of rows' => '5',
+						'Display min/avg/max' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -2338,14 +2339,27 @@ class testDashboardGraphWidget extends testWidgets {
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
+		$fields = ['Rows', 'Number of rows', 'Display min/avg/max', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
 		$form->fill(['Show legend' => false]);
 		$this->assertEnabledFields($fields, false);
-		$form->fill(['Show legend' => true, 'Display min/max/avg' => true]);
+		$form->fill(['Show legend' => true, 'Display min/avg/max' => true]);
 		$this->assertEnabledFields('Number of columns', false);
+
+		// Check that the label "Number of rows" changes to "Maximum number of rows" when setting "Rows" to "Variable".
+		foreach (['Variable', 'Fixed'] as $rows_type) {
+			$form->fill(['Rows' => $rows_type]);
+
+			$visible_label = ($rows_type === 'Variable') ? 'Maximum number of rows' : 'Number of rows';
+			$removed_label = array_values(array_diff(['Number of rows', 'Maximum number of rows'], [$visible_label]))[0];
+
+			$this->assertTrue($form->getLabel($visible_label)->isValid());
+			$this->assertFalse($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($removed_label).']')
+					->one(false)->isValid()
+			);
+		}
 
 		foreach (['lines' => 2, 'columns' => 1] as $id => $maxlength) {
 			$this->assertEquals($maxlength, $form->getField('id:legend_'.$id)->getAttribute('maxlength'));
@@ -2747,7 +2761,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$form = $widget->edit();
 
 		// Check Data set names in created widget configuration form.
-		$data_set_labels = $form->query('xpath:.//label[@class="sortable-drag-handle js-dataset-label"]')->all()->asText();
+		$data_set_labels = $form->query('xpath:.//label[@class="js-dataset-label"]')->all()->asText();
 		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
 	}
 

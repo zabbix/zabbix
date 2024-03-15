@@ -94,10 +94,10 @@ static zbx_vmware_hv_t	*hv_get(const zbx_hashset_t *hvs, const char *uuid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns pointer to Datastore data from vector with id             *
+ * Purpose: gets pointer to Datastore data in vector by UUID                  *
  *                                                                            *
  * Parameters: dss     - [IN] vector with all Datastores                      *
- *             ds_uuid - [IN] id of Datastore                                 *
+ *             ds_uuid - [IN] UUID of Datastore                               *
  *                                                                            *
  * Return value:                                                              *
  *        zbx_vmware_datastore_t* - operation has completed successfully      *
@@ -111,7 +111,7 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_ptr_t *d
 
 	ds_cmp.uuid = (char *)ds_uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, vmware_ds_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, zbx_vmware_ds_uuid_compare)))
 		return NULL;
 
 	return dss->values[i];
@@ -136,7 +136,7 @@ static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_ptr_t *dv
 
 	dvs_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_dvswitch_ptr_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dvswitch_ptr_bsearch(dvss, &dvs_cmp, zbx_vmware_dvs_uuid_compare)))
 		return NULL;
 
 	return dvss->values[i];
@@ -161,10 +161,40 @@ static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_ptr_t 
 
 	cmp.id = (char *)id;
 
-	if (FAIL == (i = zbx_vector_vmware_datacenter_ptr_bsearch(dcs, &cmp, vmware_dc_id_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datacenter_ptr_bsearch(dcs, &cmp, zbx_vmware_dc_id_compare)))
 		return NULL;
 
 	return dcs->values[i];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets index of dsname data in vector by datastore UUID or name     *
+ *                                                                            *
+ * Parameters: hv_dsnames   - [IN] vector with all hv Datastores              *
+ *             uuid_or_name - [IN] name or UUID of Datastore                  *
+ *                                                                            *
+ * Return value:                                                              *
+ *        index - operation has completed successfully                        *
+ *        FAIL  - operation has failed                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	dsname_idx_get(const zbx_vector_vmware_dsname_ptr_t *hv_dsnames, const char *uuid_or_name)
+{
+	int			i;
+	zbx_vmware_dsname_t	dsname_cmp;
+
+	dsname_cmp.name = (char *)uuid_or_name;
+	dsname_cmp.uuid = (char *)uuid_or_name;
+
+	if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(hv_dsnames, &dsname_cmp, zbx_vmware_dsname_compare)) &&
+			FAIL == (i = zbx_vector_vmware_dsname_ptr_search(hv_dsnames, &dsname_cmp,
+					zbx_vmware_dsname_compare_uuid)))
+	{
+		return FAIL;
+	}
+
+	return i;
 }
 
 static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
@@ -255,14 +285,14 @@ out:
  *             counterid - [IN] performance counter identifier                *
  *             instance  - [IN] performance counter instance or "" for        *
  *                              aggregate data                                *
- *             coeff     - [IN] coefficient to apply to the value             *
+ *             coeff     - [IN] coefficient to apply to value                 *
  *             unit      - [IN] counter unit info (kilo, mega, % etc)         *
  *             result    - [OUT] output result                                *
  *                                                                            *
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
  *               SYSINFO_RET_OK, result has no value - performance counter    *
- *                               was found without a value                    *
+ *                               was found without value                      *
  *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
  *                                                                            *
  * Comments: There can be situation when performance counter is configured    *
@@ -287,7 +317,7 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 
 	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
-		/* the requested counter has not been queried yet */
+		/* requested counter has not been queried yet */
 		zabbix_log(LOG_LEVEL_DEBUG, "performance data is not yet ready, ignoring request");
 		ret = SYSINFO_RET_OK;
 		goto out;
@@ -299,7 +329,8 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 		goto out;
 	}
 
-	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
@@ -345,7 +376,7 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 		goto out;
 	}
 
-	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
+	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it. */
 	if (ZBX_MAX_UINT64 == perfvalue->value)
 	{
 		ret = SYSINFO_RET_OK;
@@ -403,7 +434,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets vmware performance counter value by the path                 *
+ * Purpose: gets vmware performance counter value by path                     *
  *                                                                            *
  * Parameters: service  - [IN] vmware service                                 *
  *             type     - [IN] performance entity type (HostSystem,           *
@@ -413,13 +444,13 @@ out:
  *                             (<group>/<key>[<rollup type>])                 *
  *             instance - [IN] performance counter instance or "" for         *
  *                             aggregate data                                 *
- *             coeff    - [IN] coefficient to apply to the value              *
+ *             coeff    - [IN] coefficient to apply to value                  *
  *             result   - [OUT] output result                                 *
  *                                                                            *
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
  *               SYSINFO_RET_OK, result has no value - performance counter    *
- *                               was found without a value                    *
+ *                               was found without value                      *
  *               SYSINFO_RET_FAIL - otherwise, error message is set in result *
  *                                                                            *
  * Comments: There can be situation when performance counter is configured    *
@@ -534,7 +565,6 @@ out:
  *             username  - [IN] vmware service user name                      *
  *             password  - [IN] vmware service password                       *
  *             propid    - [IN]                                               *
- *             xpath     - [IN] xpath describing data to retrieve             *
  *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
@@ -595,13 +625,13 @@ out:
  *                                                                            *
  * Purpose: retrieves hypervisor property                                     *
  *                                                                            *
- * Parameters: request   - [IN] The original request. The first parameter is  *
- *                              vmware service URL and the second parameter   *
- *                              is hypervisor uuid.                           *
- *             username  - [IN] vmware service user name                      *
- *             password  - [IN] vmware service password                       *
- *             propid    - [IN] property id                                   *
- *             result    - [OUT] request result                               *
+ * Parameters: request  - [IN] The original request. The first parameter is   *
+ *                             vmware service URL and the second parameter.   *
+ *                             is hypervisor uuid.                            *
+ *             username - [IN] vmware service user name                       *
+ *             password - [IN] vmware service password                        *
+ *             propid   - [IN] property id                                    *
+ *             result   - [OUT] request result                                *
  *                                                                            *
  ******************************************************************************/
 static int	get_vcenter_hvprop(const AGENT_REQUEST *request, const char *username, const char *password, int propid,
@@ -1031,7 +1061,7 @@ out:
 }
 
 static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t eventlog_last_key,
-		const zbx_dc_item_t *item, zbx_vector_ptr_t *add_results)
+		const zbx_dc_item_t *item, zbx_vector_agent_result_ptr_t *add_results)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
@@ -1057,7 +1087,7 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_u
 				add_result->log->timestamp = event->timestamp;
 			}
 
-			zbx_vector_ptr_append(add_results, add_result);
+			zbx_vector_agent_result_ptr_append(add_results, add_result);
 		}
 		else
 			zbx_free(add_result);
@@ -1098,10 +1128,10 @@ static int	severity_to_mask(const char *level, unsigned char *severity_mask)
  *                                                                            *
  * Purpose: converts VMware event log level severity to bitmask               *
  *                                                                            *
- * Parameters: severity - [IN]  event severity value from item parameter,     *
- *                              which might contain multiple severity levels  *
+ * Parameters: severity - [IN] event severity value from item parameter,      *
+ *                             which might contain multiple severity levels   *
  *             mask     - [OUT] result of conversion                          *
- *             error    - [OUT] error message in case of an error             *
+ *             error    - [OUT] error message in case of error                *
  *                                                                            *
  * Return value: SUCCEED - if no errors were detected                         *
  *               FAIL    - otherwise                                          *
@@ -1134,7 +1164,7 @@ static int	evt_severities_to_mask(const char *severity, unsigned char *mask, cha
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results)
+		zbx_vector_agent_result_ptr_t *add_results)
 {
 	const char		*url, *skip, *severity_str;
 	unsigned char		skip_old, severity = 0;
@@ -1188,7 +1218,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
 			(0 != skip_old && 0 != service->eventlog.last_key ))
 	{
-		/* this may happen if recreate item vmware.eventlog for the same service URL */
+		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;
 		service->eventlog.skip_old = skip_old;
 	}
@@ -1199,8 +1229,8 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	}
 	else if (request->lastlogsize < service->eventlog.last_key && 0 != request->lastlogsize)
 	{
-		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
-		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
+		/* This may happen if there are multiple vmware.eventlog items for the same service URL or item has   */
+		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet. */
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
 		goto unlock;
 	}
@@ -2357,7 +2387,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	nic_cmp.name = (char *)if_name;
 
-	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
+	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, zbx_vmware_pnic_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
 		goto out;
@@ -2480,7 +2510,7 @@ out:
 int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*url, *uuid;
+	const char		*url, *hv_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	struct zbx_json		json_data;
@@ -2495,14 +2525,14 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
+	hv_uuid = get_rparam(request, 1);
 
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
@@ -2574,12 +2604,11 @@ out:
 static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
 		int direction, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *hv_uuid, *ds_name, *perfcounter;
+	const char		*url, *mode, *hv_uuid, *ds_uuid, *perfcounter;
 	zbx_uint64_t		access_filter;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
-	zbx_vmware_dsname_t	dsname_cmp;
 	int			i, metric_mode, ret = SYSINFO_RET_FAIL;
 	zbx_str_uint64_pair_t	uuid_cmp = {.value = 0};
 
@@ -2593,7 +2622,7 @@ static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char
 
 	url = get_rparam(request, 0);
 	hv_uuid = get_rparam(request, 1);
-	ds_name = get_rparam(request, 2);
+	ds_uuid = get_rparam(request, 2);
 	mode = get_rparam(request, 3);
 
 	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
@@ -2621,11 +2650,9 @@ static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
-	dsname_cmp.name = (char *)ds_name;
-
-	if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+	if (FAIL == (i = dsname_idx_get(&hv->dsnames, ds_uuid)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", ds_name));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", ds_uuid));
 		goto unlock;
 	}
 
@@ -2751,7 +2778,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_name};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
@@ -2977,7 +3004,7 @@ static int	check_vcenter_ds_param(const char *param, int *mode)
 	return SUCCEED;
 }
 
-static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *name, const int mode,
+static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *ds_uuid, const int mode,
 		const char *username, const char *password, AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
@@ -2997,18 +3024,16 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 
 	if (NULL != hv_uuid)
 	{
-		zbx_vmware_dsname_t	dsname_cmp = {.name = (char *)name};
-
 		if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 			goto unlock;
 		}
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = dsname_idx_get(&hv->dsnames, ds_uuid)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
-					name));
+					ds_uuid));
 			goto unlock;
 		}
 
@@ -3018,14 +3043,15 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 	}
-	else if (NULL == (datastore = ds_get(&service->data->datastores, name)))
+	/* allow passing ds uuid or name for backwards compatibility */
+	else if (NULL == (datastore = ds_get(&service->data->datastores, ds_uuid)))
 	{
-		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)name};
+		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_uuid};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 			goto unlock;
 		}
 
@@ -3127,7 +3153,7 @@ unlock:
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*url, *uuid, *name, *param;
+	const char	*url, *hv_uuid, *ds_uuid, *param;
 	int		ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3139,12 +3165,12 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	hv_uuid = get_rparam(request, 1);
+	ds_uuid = get_rparam(request, 2);
 	param = get_rparam(request, 3);
 
 	if (SUCCEED == check_vcenter_ds_param(param, &mode))
-		ret = check_vcenter_ds_size(url, uuid, name, mode, username, password, result);
+		ret = check_vcenter_ds_size(url, hv_uuid, ds_uuid, mode, username, password, result);
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 out:
@@ -3204,7 +3230,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, counterid,
 			instance, 1, unit, result);
 unlock:
@@ -3265,7 +3291,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_HV, hv->id, counterid, instance, 1, unit,
 			result);
 unlock:
@@ -3332,7 +3358,7 @@ out:
 int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*url, *hv_uuid, *ds_name, *partition;
+	const char		*url, *hv_uuid, *ds_uuid, *partition;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_dsname_t	*dsname;
@@ -3349,7 +3375,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 	url = get_rparam(request, 0);
 	hv_uuid = get_rparam(request, 1);
-	ds_name = get_rparam(request, 2);
+	ds_uuid = get_rparam(request, 2);
 	partition = get_rparam(request, 3);
 
 	if ('\0' == *hv_uuid)
@@ -3360,7 +3386,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 	if (NULL != partition && '\0' != *partition)
 	{
-		if (NULL == ds_name || '\0' == *ds_name)
+		if (NULL == ds_uuid || '\0' == *ds_uuid)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto out;
@@ -3380,17 +3406,14 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		goto unlock;
 	}
 
-	if (NULL != ds_name && '\0' != *ds_name)
+	if (NULL != ds_uuid && '\0' != *ds_uuid)
 	{
-		zbx_vmware_dsname_t	dsname_cmp;
 		zbx_vmware_hvdisk_t	hvdisk_cmp;
 
-		dsname_cmp.name = (char *)ds_name;
-
-		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = dsname_idx_get(&hv->dsnames, ds_uuid)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
-					ds_name));
+					ds_uuid));
 			goto unlock;
 		}
 
@@ -3467,7 +3490,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 		zbx_vmware_datastore_t	ds_cmp =  {.name = (char *)ds_name};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
@@ -3557,7 +3580,7 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_DS, ds->id, counterid, instance, 1, unit,
 			result);
 unlock:
@@ -3610,7 +3633,7 @@ int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *usernam
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)uuid};
 
 		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
-				vmware_ds_name_compare)))
+				zbx_vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
 			goto unlock;
@@ -3646,7 +3669,7 @@ out:
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*url, *name, *param;
+	const char	*url, *ds_uuid, *param;
 	int		ret = SYSINFO_RET_FAIL, mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3658,11 +3681,11 @@ int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, c
 	}
 
 	url = get_rparam(request, 0);
-	name = get_rparam(request, 1);
+	ds_uuid = get_rparam(request, 1);
 	param = get_rparam(request, 2);
 
 	if (SUCCEED == check_vcenter_ds_param(param, &mode))
-		ret = check_vcenter_ds_size(url, NULL, name, mode, username, password, result);
+		ret = check_vcenter_ds_size(url, NULL, ds_uuid, mode, username, password, result);
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 out:
@@ -4385,8 +4408,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 				rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
-				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(&service->data->resourcepools,
-						&rpool_cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(
+						&service->data->resourcepools, &rpool_cmp,
+						ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 				{
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", ZBX_NULL2EMPTY_STR(
 							service->data->resourcepools.values[idx]->path),
@@ -5361,7 +5385,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_VM, vm->id, counterid, instance, 1, unit,
 			result);
 unlock:
@@ -5959,7 +5983,7 @@ static int	check_vcenter_rp_common(const char *url, const char *username, const 
 		goto unlock;
 	}
 
-	/* the performance counter is already being monitored, try to get the results from statistics */
+	/* The performance counter is already being monitored, try to get the results from statistics. */
 	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_RESOURCEPOOL, rpid, counterid, "", 0,
 			unit, result);
 unlock:

@@ -236,9 +236,11 @@ $toc-title-bg-color: #4f4f4f;
 }
 
 .dashboard-navigation-tabs {
-	& .csortable > .csortable-item > div,
-	& .csortable-list > .csortable-item > div:hover {
-		border: 1px solid transparent;
+	.sortable {
+		li div:hover,
+		li.sortable-item-dragging div {
+			border: 1px solid transparent;
+		}
 	}
 }
 

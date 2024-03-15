@@ -833,8 +833,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #21 Error when time period "From" is empty.
@@ -903,7 +904,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #24 Error when time period fields values "From" and "To" are changed and maximum time period is > 730 days.
+			// #24 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -917,13 +918,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item' => 'Available memory',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-3y-2s',
+							'id:time_period_from' => 'now-3y-25h',
 							'id:time_period_to' => 'now-1y'
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #25 Error when time period "To" is empty.
@@ -1467,12 +1469,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Data' => 'Item value',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-63072002'
+							'id:time_period_from' => 'now-2y-1s'
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #6 Empty "From" field.
@@ -1526,7 +1529,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Error when time period fields values "From" and "To" are changed and maximum time period is > 730 days.
+			// #9 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1540,8 +1543,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #10 Error when time period "To" is empty.
@@ -2200,6 +2204,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			// Check error message in column form.
 			if (array_key_exists('column_error', $data)) {
+				// Count of days mentioned in error depends ot presence of leap year february in selected period.
+				if (CTestArrayHelper::get($data, 'days_count')) {
+					$data['column_error'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['column_error']);
+				}
+
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
 				$selector = ($action === 'update') ? 'Update column' : 'New column';
 				$this->query('xpath://div/h4[text()="'.$selector.'"]/../button[@title="Close"]')->one()->click();
@@ -4042,8 +4051,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-2M',
-							'id:time_period_to' => 'now-1M'
+							'id:time_period_from' => 'now-30d',
+							'id:time_period_to' => 'now-1d'
 						]
 					],
 					'item_data' => [
@@ -4055,22 +4064,22 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '12.55',
-							'time' => '-40 days'
+							'time' => '-15 days'
 						],
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '12.01',
-							'time' => '-45 days'
+							'time' => '-20 days'
 						],
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '12.99',
-							'time' => '-50 days'
+							'time' => '-25 days'
 						],
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '121.12',
-							'time' => '-70 days'
+							'time' => '-31 days'
 						]
 					],
 					'result' => [
@@ -4089,32 +4098,33 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
-							'id:time_period_from' => '2024-01-17 00:00:00',
-							'id:time_period_to' => '2024-01-18 00:00:00'
+							'id:time_period_from' => '{date} 00:00:00',
+							'id:time_period_to' => '{date} 23:59:59'
 						]
 					],
 					'item_data' => [
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '12.33',
-							'time' => '2024-01-17 04:00:00'
+							'time' => '{date} 04:00:00'
 						],
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '12.55',
-							'time' => '2024-01-17 08:00:00'
+							'time' => '{date} 08:00:00'
 						],
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '12.99',
-							'time' => '2024-01-17 11:00:00'
+							'time' => '{date} 11:00:00'
 						],
 						[
 							'name' => 'Item with type of information - numeric (float)',
 							'value' => '11.99',
-							'time' => '2024-01-17 12:00:00'
+							'time' => '{date} 12:00:00'
 						]
 					],
+					'substitute_date' => true,
 					'result' => [
 						[
 							'Last' => '11.99'
@@ -5083,38 +5093,50 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * @dataProvider getAggregationFunctionData
 	 */
 	public function testDashboardTopHostsWidget_AggregationFunctionData($data) {
+		// Substitute macro in date related fields in test case where fixed history data (not trends) is checked.
+		if (CTestArrayHelper::get($data, 'substitute_date')) {
+			$data = $this->replaceDateMacroInData($data, 'today - 1 week', ['id:time_period_from', 'id:time_period_to']);
+		}
+
 		if (array_key_exists('item_data', $data)) {
 			foreach ($data['item_data'] as $params) {
 				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], strtotime($params['time']));
 			}
 		}
 
-		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_AGGREGATION]);
+		$widget_name = 'Aggregation check widget '.microtime();
+		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_AGGREGATION], $widget_name);
 		$dashboard = CDashboardElement::find()->one();
 
 		if (array_key_exists('screen_name', $data)) {
-			$this->assertScreenshot($dashboard->getWidget(self::DEFAULT_WIDGET_NAME), $data['screen_name']);
+			$widget = $dashboard->getWidget($widget_name);
+			$this->assertScreenshotExcept($widget, $widget->query('xpath:.//h4')->one(), $data['screen_name']);
 		}
 		else {
 			$table_data = (array_key_exists('no_data_found', $data)) ? '' : $data['result'];
-			$this->assertTableData($table_data);
+			$this->assertTableData($table_data, 'xpath://h4[text()='.CXPathHelper::escapeQuotes($widget_name).']/../..//table');
 		}
 
-		// Necessary for test stability.
-		$dashboard->edit()->deleteWidget(self::DEFAULT_WIDGET_NAME)->save();
+		// Necessary not to fill dashboard with widgets and, therefore, avoid slowing down dashboard performance during test.
+		$dashboard->edit()->deleteWidget($widget_name)->save();
 	}
 
 	/**
 	 * Function used to create Top Hosts widget with special columns.
 	 *
-	 * @param array     $data    data provider values
-	 * @param string    $name    name of the dashboard where to create Top Hosts widget
+	 * @param array     $data			data provider values
+	 * @param string    $name		    name of the dashboard where to create Top Hosts widget
+	 * @param string	$widget_name	name of the widget to be created
 	 */
-	protected function createTopHostsWidget($data, $name) {
+	protected function createTopHostsWidget($data, $name, $widget_name = null) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$name);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
+
+		if ($widget_name) {
+			$form->fill(['Name' => $widget_name]);
+		}
 
 		// Add new column(s) and save widget.
 		$this->fillColumnForm($data, 'create');

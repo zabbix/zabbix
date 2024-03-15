@@ -25,6 +25,8 @@ const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 
+const ZBX_STYLE_FORM_GRID = 'form-grid';
+
 const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
 const ZBX_STYLE_COLLAPSED = 'collapsed';
 const ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';

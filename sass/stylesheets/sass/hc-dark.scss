@@ -309,23 +309,10 @@ a.btn-icon,
 }
 
 .dashboard-navigation-tabs {
-	.sortable-list {
-		& > .sortable-item:focus:not(:active) {
-			& > div {
-				box-shadow: 0 0 0 2px $btn-focus-outline-color;
-			}
-		}
-	}
-
-	& .sortable > .sortable-item > div,
-	& .sortable-list > .sortable-item > div:hover {
-		border: 1px solid transparent;
-	}
-
-	& .sortable > .sortable-item > div.selected-tab,
-	& .sortable-list > .sortable-item > div.selected-tab {
-		span {
-			color: $white;
+	.sortable {
+		li div:hover,
+		li.sortable-item-dragging div {
+			border: 1px solid transparent;
 		}
 	}
 }

@@ -2,6 +2,7 @@
 
 SUBDIRS = \
 	diag \
+	discovery \
 	housekeeper \
 	proxyconfig \
 	preproc \
@@ -9,6 +10,7 @@ SUBDIRS = \
 	rtc \
 	stats \
 	taskmanager \
+	trapper \
 	proxyconfigwrite \
 	poller
 
@@ -19,15 +21,14 @@ zabbix_proxy_SOURCES = proxy.c
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
-	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
+	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
-	$(top_builddir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	proxyconfig/libzbxproxyconfig.a \
-	$(top_builddir)/src/zabbix_server/pinger/libzbxpinger.a \
+	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/zabbix_proxy/poller/libzbxpoller_proxy.a \
-	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
-	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
+	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
+	trapper/libzbxtrapper_proxy.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_proxy.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
@@ -40,7 +41,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
-	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_proxy.a \
+	discovery/libzbxdiscovery_proxy.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	taskmanager/libzbxtaskmanager_proxy.a \
 	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
@@ -115,11 +116,12 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
 	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
+	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a
-
-zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
+	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
+	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
 
 if HAVE_IPMI
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a

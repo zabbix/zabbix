@@ -3252,6 +3252,20 @@ out:
 
 static int	DBpatch_6050211(void)
 {
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050212(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("lld_override_ophistory", &field);
+}
+
+static int	DBpatch_60502113.void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -3263,7 +3277,6 @@ static int	DBpatch_6050211(void)
 
 	return SUCCEED;
 }
-
 #endif
 
 DBPATCH_START(6050)
@@ -3480,5 +3493,7 @@ DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
 DBPATCH_ADD(6050210, 0, 1)
 DBPATCH_ADD(6050211, 0, 1)
+DBPATCH_ADD(6050212, 0, 1)
+DBPATCH_ADD(6050213, 0, 1)
 
 DBPATCH_END()

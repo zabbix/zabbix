@@ -456,13 +456,17 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
-            	getField: function (data, path) {
+            	getField: function (data, path, val) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+            				if (typeof val === 'undefined') {
+            					throw 'Required field was not found: ' + path;
+            				}
+            				return val
             			}
             
             			data = data[step];
@@ -480,13 +484,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -618,6 +622,7 @@ zabbix_export:
             
             		return response;
             	},
+            
             	getVolumes: function () {
             		var payload = {
             			'Action': 'DescribeVolumes',
@@ -626,22 +631,23 @@ zabbix_export:
             			'Filter.1.Name': 'attachment.instance-id',
             			'Filter.1.Value': AWS.params.instance_id
             		},
-            			result = [];
+            			value = [],
+            			volumes = [],
+            			volumes_list = [];
             
-            		while (payload.nextToken !== '') {
-            			var volumes = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse');
-            			payload.nextToken = volumes.nextToken || '';
-            			volumes_item = AWS.getField(volumes, 'volumeSet.item');
+            		while (payload.NextToken !== '') {
+            			var result = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse');
+            			payload.NextToken = result.nextToken || '';
+            			volumes = AWS.getField(result, 'volumeSet.item', value);
+            			volumes_list.push(Array.isArray(volumes) ? volumes : [volumes])
             
-            			if (!Array.isArray(volumes_item))
-            				volumes_item = [volumes_item]
-            			volumes_item.forEach(function (volume) {
-            				result.push(volume.volumeId)
-            			});
             		}
-            
-            		return result;
+            		var flattenedData = volumes_list.reduce(function (acc, val) {
+            			return acc.concat(val);
+            		}, []);
+            		return flattenedData;
             	},
+            
             	getAlarms: function () {
             		var payload = {
             			'Action': 'DescribeAlarms',
@@ -651,9 +657,9 @@ zabbix_export:
             			result = [],
             			volumes = AWS.getVolumes()
             
-            		while (payload.nextToken !== '') {
+            		while (payload.NextToken !== '') {
             			var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
-            			payload.nextToken = alarms.nextToken || '';
+            			payload.NextToken = alarms.NextToken || '';
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
@@ -732,6 +738,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -756,13 +763,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1040,15 +1047,18 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
-            	getField: function (data, path) {
+            	getField: function (data, path, val) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+            				if (typeof val === 'undefined') {
+            					throw 'Required field was not found: ' + path;
+            				}
+            				return val
             			}
-            
             			data = data[step];
             		}
             
@@ -1064,13 +1074,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1195,31 +1205,28 @@ zabbix_export:
             		return response;
             	},
             
-            
             	getVolumesData: function () {
-            		payload = {
+            		var payload = {
             			'Action': 'DescribeVolumes',
             			'Version': '2016-11-15',
             			'Filter.1.Name': 'attachment.instance-id',
-            			'Filter.1.Value': AWS.params.instance_id
-            		};
-            		volumes_list = [],
-            			result = [];
+            			'Filter.1.Value': AWS.params.instance_id,
+            			'MaxResults': 100
+            		},
+            			value = [],
+            			volumes_list = [];
             
-            		while (payload.nextToken !== '') {
-            			var result = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse');
-            			payload.nextToken = result.nextToken || '';
-            			volumes_list = AWS.getField(result, 'volumeSet.item');
-            
-            			if (typeof volumes_list === 'object'
-            				&& volumes_list !== null
-            				&& !Array.isArray(volumes_list)) {
-            				volumes_list = [volumes_list];
-            			}
-            
+            		while (payload.NextToken !== '') {
+            			var result = AWS.getField(AWS.request('GET', AWS.params.region, 'ec2', AWS.prepareParams(payload)), 'DescribeVolumesResponse'),
+            				volumes_set = AWS.getField(result, 'volumeSet'),
+            				volumes = AWS.getField(volumes_set, 'item', value);
+            			volumes_list.push(Array.isArray(volumes) ? volumes : [volumes]);
+            			payload.NextToken = result.nextToken || '';
             		}
-            
-            		return volumes_list;
+            		var flattenedData = volumes_list.reduce(function (acc, val) {
+            			return acc.concat(val);
+            		}, []);
+            		return flattenedData;
             	}
             };
             
@@ -1556,7 +1563,7 @@ zabbix_export:
           description: 'Discovery instance and attached EBS volumes alarms.'
           item_prototypes:
             - uuid: 6294e05dc170431bb3af2caf1ccf6d40
-              name: 'AWS EC2 Alarms: ["{#ALARM_NAME}"]: Get metrics'
+              name: 'AWS EC2 Alarms: [{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.ec2.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
@@ -1575,7 +1582,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 87a163166aed40b786785b64122ab365
-              name: 'AWS EC2 Alarms: ["{#ALARM_NAME}"]: State'
+              name: 'AWS EC2 Alarms: [{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -1606,13 +1613,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: be1301d97b5a47cc81dd6c2b76349f5d
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS EC2 Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
+                  name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 92a33b49f010464db7e6c7ef586240e9
-              name: 'AWS EC2 Alarms: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS EC2 Alarms: [{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -1639,7 +1646,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 93813bd6aaf14fcb84068cb2c2e5d47e
               expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS EC2 Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
+              name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -1689,7 +1696,7 @@ zabbix_export:
           description: 'Discovery attached EBS volumes.'
           item_prototypes:
             - uuid: cc0ece769d954bb590fb1a1a3d20e559
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Attachment state'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Attachment state'
               type: DEPENDENT
               key: 'aws.ec2.ebs.attachment_status["{#VOLUME_ID}"]'
               delay: '0'
@@ -1721,7 +1728,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 639e7ddcac6345239fa27549ad35e799
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Attachment time'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Attachment time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.attachment_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -1749,7 +1756,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 2df96e6c726e40c6a257c00ae26e8902
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Create time'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Create time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.create_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -1775,7 +1782,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 141205eac3e4437d824794f8e6c76e90
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Device'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Device'
               type: DEPENDENT
               key: 'aws.ec2.ebs.device["{#VOLUME_ID}"]'
               delay: '0'
@@ -1801,7 +1808,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 6145bf692ea0469eb5583485b6622a59
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Get volume data'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Get volume data'
               type: DEPENDENT
               key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               delay: '0'
@@ -1824,7 +1831,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 95add92252e24ab8b596c539d8090f3d
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Status'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Status'
               type: DEPENDENT
               key: 'aws.ec2.ebs.status["{#VOLUME_ID}"]'
               delay: '0'
@@ -1860,13 +1867,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 2d4de438bdaa49b2930496ce6ddbe52d
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5'
-                  name: 'AWS EBS: Volume "{#VOLUME_ID}" has ''error'' state'
+                  name: 'AWS EBS: Volume [{#VOLUME_ID}] has ''error'' state'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: fd10966f674e430a9dd70b148dcfa002
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Burst balance'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Burst balance'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]'
               delay: '0'
@@ -1902,7 +1909,7 @@ zabbix_export:
                     - tag: scope
                       value: capacity
             - uuid: 8b936cef38294799a6826764eae68850
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Consumed Read/Write, ops'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Consumed Read/Write, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]'
               delay: '0'
@@ -1928,7 +1935,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 5476d32c036d49588238cb2d2a4d652f
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Idle time'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Idle time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.idle_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -1953,7 +1960,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 4dbb00e53cd84b9f88c44c765e73bd85
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Queue length'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Queue length'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.queue_length["{#VOLUME_ID}"]'
               delay: '0'
@@ -1975,7 +1982,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 7313a503be27469ea82733ed965b57e4
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Read, bytes'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Read, bytes'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.read_bytes["{#VOLUME_ID}"]'
               delay: '0'
@@ -2001,7 +2008,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 13d3dce70956402c945421c87e8eb784
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Read, ops'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Read, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.read_ops["{#VOLUME_ID}"]'
               delay: '0'
@@ -2024,7 +2031,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 8d0b610ac0e3479a921720ef623ef896
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Throughput, pct'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Throughput, pct'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.throughput_percentage["{#VOLUME_ID}"]'
               delay: '0'
@@ -2052,7 +2059,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 58163c98e1b943ceae5fcb52ff85dcfd
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Read time, total'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Read time, total'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.total_read_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -2080,7 +2087,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 264a8f7df9e64d219082d5239b90cdf3
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Write time, total'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Write time, total'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.total_write_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -2108,7 +2115,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 459900740e784ca9ba7a8baf5b95734e
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Write, bytes'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Write, bytes'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.write_bytes["{#VOLUME_ID}"]'
               delay: '0'
@@ -2134,7 +2141,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 7216494987dc45f59fc3a4b9100e4159
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Write, ops'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Write, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.write_ops["{#VOLUME_ID}"]'
               delay: '0'
@@ -2157,7 +2164,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 8b3b008f7f65408fbd49e46186b01cfb
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Get metrics'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Get metrics'
               type: SCRIPT
               key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               delay: 0s;m/5
@@ -2168,6 +2175,7 @@ zabbix_export:
                 var AWS = {
                 	params: {},
                 	request_period: 600,
+                	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
                 
                 	getField: function (data, path) {
                 		var steps = path.split('.');
@@ -2192,13 +2200,13 @@ zabbix_export:
                 				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 					request.setProxy(AWS.params.proxy);
                 				}
-                				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                				var IamRoleName = request.get(AWS.metadata);
                 
                 				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                 					throw 'Error getting security credentials from instance metadata. Role not found.';
                 				}
                 
-                				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+                				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
                 
                 				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
                 					throw 'Error getting security credentials from instance metadata.';
@@ -2459,7 +2467,7 @@ zabbix_export:
                   value: '{#VOLUME_ID}'
           graph_prototypes:
             - uuid: dbf87c66b9034e1ab40f3a2d4adb1a5a
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Volume read/write bytes'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Volume read/write bytes'
               graph_items:
                 - color: 199C0D
                   item:
@@ -2471,7 +2479,7 @@ zabbix_export:
                     host: 'AWS EC2 by HTTP'
                     key: 'aws.ec2.ebs.volume.read_bytes["{#VOLUME_ID}"]'
             - uuid: 97faf8177efd46f2b90a7078e532f623
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Volume read/write ops'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Volume read/write ops'
               graph_items:
                 - color: 199C0D
                   item:
@@ -2483,7 +2491,7 @@ zabbix_export:
                     host: 'AWS EC2 by HTTP'
                     key: 'aws.ec2.ebs.volume.read_ops["{#VOLUME_ID}"]'
             - uuid: c27e794ff80a4335874ae9b58c8ce6b8
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Volume read/write time'
+              name: 'AWS EBS: [{#VOLUME_ID}]: Volume read/write time'
               graph_items:
                 - color: 199C0D
                   item:
@@ -2550,10 +2558,10 @@ zabbix_export:
           description: 'EC2 instance ID.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable alarms by namespace.'
+          description: 'Filter of discoverable alarms by name.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered alarms by namespace.'
+          description: 'Filter to exclude discovered alarms by name.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by namespace.'

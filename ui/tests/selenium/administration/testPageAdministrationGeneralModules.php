@@ -354,6 +354,13 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Status' => 'Disabled'
 			],
 			[
+				'Name' => 'Test CSRF token',
+				'Version' => '0.1',
+				'Author' => '',
+				'Description' => 'Test CSRF token support for modules',
+				'Status' => 'Disabled'
+			],
+			[
 				'Name' => 'Empty widget',
 				'Version' => '1.0',
 				'Author' => 'Some Zabbix employee',
@@ -522,12 +529,26 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'URL' => '-',
 					'Enabled' => false
 				]
+			],
+			// CSRF check module.
+			[
+				[
+					'Name' => 'Test CSRF token',
+					'Version' => '0.1',
+					'Author' => '-',
+					'Description' => 'Test CSRF token support for modules',
+					'Directory' => 'modules/module_number_7',
+					'Namespace' => 'Modules\CSRF',
+					'URL' => '-',
+					'Enabled' => false
+				]
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider getModuleDetails
+	 *
 	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_Details($data) {
@@ -666,13 +687,32 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'menu_entry' => 'Maps'
 					]
 				]
+			],
+			// Enable Test CSRF token module and check that it works.
+			[
+				[
+					[
+						'module_name' => 'Test CSRF token',
+						'top_menu_entry' => 'Administration',
+						'menu_entries' => [
+							[
+								'name' => 'CSRF test',
+								'action' => 'csrftoken.form',
+								'form' => 'xpath://input[@name="_csrf_token"]/parent::form',
+								'message' => 'CSRF token validation succeeded.'
+							]
+						]
+					]
+				]
 			]
 		];
 	}
 
 	/**
 	 * @backupOnce module
+	 *
 	 * @dataProvider getModuleData
+	 *
 	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_EnableDisable($data) {
@@ -778,6 +818,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'5th Module',
 						'Clock2',
 						'Empty widget',
+						'Test CSRF token',
 						'шестой модуль'
 					]
 				]
@@ -799,6 +840,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	/**
 	 * @dataProvider getFilterData
+	 *
 	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_Filter($data) {
@@ -1250,8 +1292,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function assertModuleEnabled($module) {
 		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
 		// If module removes a menu entry or top level menu entry, check that such entries are not present.
-		if (CTestArrayHelper::get($module, 'remove', false)) {
+		if (CTestArrayHelper::get($module, 'remove')) {
 			$this->assertEquals(0, $this->query($xpath.$module['menu_entry'].'"]')->count());
+
 			if (array_key_exists('top_menu_entry', $module)) {
 				$this->assertEquals(0, $this->query($xpath.$module['top_menu_entry'].'"]')->count());
 			}
@@ -1259,15 +1302,29 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			return;
 		}
 		// If module adds single or multiple menu entries, open each corresponding view, check view header and URL.
-		$top_entry = CTestArrayHelper::get($module, 'top_menu_entry', 'Monitoring');
+		$top_entry_name = CTestArrayHelper::get($module, 'top_menu_entry', 'Monitoring');
 
-		$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
+		$top_entry = $this->query('link', $top_entry_name)->one();
+
+		// Click on top level menu only in case if it is not expanded already.
+		if (!$top_entry->parents('tag:li')->one()->hasClass('is-expanded')) {
+			$top_entry->waitUntilClickable()->click();
+		}
+
 		foreach ($module['menu_entries'] as $entry) {
 			sleep(1);
-			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
+			$this->query($xpath.$entry['name'].'"]')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertStringContainsString('zabbix.php?action='.$entry['action'], $this->page->getCurrentURL());
-			$this->assertEquals($entry['message'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
+
+			if (CTestArrayHelper::get($entry, 'form')) {
+				$this->query($entry['form'])->asForm()->one()->submit();
+
+				$this->assertMessage(TEST_GOOD, $entry['message']);
+			}
+			else {
+				$this->assertEquals($entry['message'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
+			}
 		}
 		// Get back to modules list to enable or disable the next module.
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
@@ -1292,9 +1349,16 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			return;
 		}
 		// If module adds single or multiple menu entries, check that entries don't exist after disabling the module.
+		$top_menus = ['Dashboards', 'Monitoring', 'Services', 'Inventory', 'Reports', 'Data collection', 'Alerts',
+				'Users', 'Administration'
+		];
+
 		foreach ($module['menu_entries'] as $entry) {
-			$check_entry = CTestArrayHelper::get($module, 'top_menu_entry', $entry['name']);
+			$check_entry = (array_key_exists('top_menu_entry', $module) && !in_array($module['top_menu_entry'], $top_menus))
+				? $module['top_menu_entry']
+				: $entry['name'];
 			$this->assertEquals(0, $this->query($xpath.$check_entry.'"]')->count());
+
 			// In case if module many entry leads to an existing view, don't check that menu entry URL isn't available.
 			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
 				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();

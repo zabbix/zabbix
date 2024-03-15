@@ -193,11 +193,11 @@
 		}
 
 		#activateHostDashboardNavigation() {
-			const sortable_element = document.createElement('div');
+			const sortable_element = document.createElement('ul');
 			this.#host_dashboard_navigation_tabs.appendChild(sortable_element);
 			this.#dashboard_tabs = new CSortable(sortable_element, {
-				is_vertical: false,
-				is_sorting_enabled: false
+				is_horizontal: true,
+				enable_sorting: false
 			});
 		}
 
@@ -217,10 +217,12 @@
 				tab.appendChild(tab_contents);
 				tab_contents.appendChild(tab_contents_name);
 
+				tab.tabIndex = 0;
+
 				tab_contents_name.textContent = host_dashboard.name;
 				tab_contents_name.title = host_dashboard.name;
 
-				this.#dashboard_tabs.insertItemBefore(tab);
+				this.#dashboard_tabs.getTarget().insertBefore(tab, null);
 				this.#host_dashboard_tabs.set(host_dashboard.dashboardid, tab);
 			}
 
@@ -228,17 +230,21 @@
 			this.#selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 			this.#previous_dashboard.disabled = this.#selected_dashboard_tab.previousElementSibling === null;
 			this.#next_dashboard.disabled = this.#selected_dashboard_tab.nextElementSibling === null;
-			this.#dashboard_tabs.scrollItemIntoView(this.#selected_dashboard_tab);
+			this.#dashboard_tabs.scrollIntoView(this.#selected_dashboard_tab, {immediate: true});
 		}
 
 		#addEventListeners() {
 			this.#host_dashboard_navigation_tabs.addEventListener('click', (e) => {
-				this.#selectHostDashboardTab(e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`));
+				const dashboard_tab = e.target.closest('li');
+
+				if (dashboard_tab !== null && dashboard_tab.parentElement === this.#dashboard_tabs.getTarget()) {
+					this.#selectHostDashboardTab(dashboard_tab);
+				}
 			});
 
 			this.#host_dashboard_navigation_tabs.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') {
-					const dashboard_tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+					const dashboard_tab = e.target.closest('li');
 
 					if (dashboard_tab !== null && dashboard_tab !== this.#selected_dashboard_tab) {
 						this.#selectHostDashboardTab(dashboard_tab);
