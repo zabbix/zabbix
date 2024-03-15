@@ -18,11 +18,11 @@
 **/
 
 #include "trapper_history_push.h"
+#include "zbxtrapper.h"
 #include "zbxjson.h"
 #include "zbxcommshigh.h"
 #include "zbxcomms.h"
 #include "zbxstr.h"
-#include "trapper_auth.h"
 #include "zbxcacheconfig.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
@@ -30,6 +30,11 @@
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
 #include "audit/zbxaudit.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
 

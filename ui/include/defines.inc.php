@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0beta2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050225);
+define('ZABBIX_DB_VERSION',		6050227);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1270,18 +1270,6 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
 
-define('SVG_GRAPH_LEGEND_OFF',	0);
-define('SVG_GRAPH_LEGEND_ON',	1);
-
-define('SVG_GRAPH_LEGEND_STATISTIC_OFF',	0);
-define('SVG_GRAPH_LEGEND_STATISTIC_ON',		1);
-
-define('SVG_GRAPH_LEGEND_LINES_MIN',	1);
-define('SVG_GRAPH_LEGEND_LINES_MAX',	10);
-
-define('SVG_GRAPH_LEGEND_COLUMNS_MIN',	1);
-define('SVG_GRAPH_LEGEND_COLUMNS_MAX',	4);
-
 define('SVG_GRAPH_PROBLEMS_OFF',	0);
 define('SVG_GRAPH_PROBLEMS_ON',		1);
 
@@ -1954,10 +1942,7 @@ define('ZBX_STYLE_DASHBOARD_GRID', 'dashboard-grid');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION', 'dashboard-navigation');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS', 'dashboard-navigation-controls');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION_TABS', 'dashboard-navigation-tabs');
-define('ZBX_STYLE_DASHBOARD_WIDGET', 'dashboard-widget');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FORM', 'dashboard-widget-form');
-define('ZBX_STYLE_DASHBOARD_WIDGET_HEAD', 'dashboard-widget-head');
-define('ZBX_STYLE_DASHBOARD_WIDGET_FOOT', 'dashboard-widget-foot');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
@@ -2191,6 +2176,7 @@ define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR', 'zabbix-logo-sidebar');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT', 'zabbix-logo-sidebar-compact');
 define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
+define('ZBX_STYLE_OVERLAY_DIALOGUE_HEADER', 'overlay-dialogue-header');
 
 // HTML column layout.
 define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');
