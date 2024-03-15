@@ -720,7 +720,7 @@ class CSVGHoneycomb {
 					lines,
 					lines_count,
 					line_max_length: Math.ceil(Math.max(...lines.map(line => line.length)) / 8) * 8,
-					color: d.is_numeric && this.#config[c_param].color !== '' ? `#${this.#config[c_param].color}` : null,
+					color: this.#config[c_param].color !== '' ? `#${this.#config[c_param].color}` : null,
 					font_size: 0,
 					font_weight,
 					is_custom_size
@@ -808,14 +808,13 @@ class CSVGHoneycomb {
 	}
 
 	#getFillColor(d) {
-		if (!d.is_numeric) {
-			// Do not apply thresholds to non-numeric items
+		if (d.no_data === true || d.has_more === true) {
 			return null;
 		}
 
 		const bg_color = this.#config.bg_color !== '' ? `#${this.#config.bg_color}` : null;
 
-		if (this.#config.thresholds.length === 0) {
+		if (this.#config.thresholds.length === 0 || !d.is_numeric) {
 			return bg_color;
 		}
 
