@@ -163,7 +163,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		/* use *(void **)(&fptr) to silence the "-pedantic" warning */
 		if (NULL == (*(void **)(&fptr) = dlsym(handle, "curl_easy_header")))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_multi_wait(): %s", dlerror());
+			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_easy_header(): %s", dlerror());
 			exit(EXIT_FAILURE);
 		}
 	}
