@@ -487,8 +487,15 @@ class CSVGHoneycomb {
 							d.scaled = true;
 							this.#cellEnter(cell, d);
 						});
-					}, 100);
+					}, 150);
 				}
+
+				this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
+					detail: {
+						hostid: d.hostid,
+						itemid: d.itemid
+					}
+				});
 			})
 			.on('mouseleave', (e, d) => {
 				if (d.enter_timeout !== undefined) {
@@ -505,6 +512,13 @@ class CSVGHoneycomb {
 					this.#cellLeave(cell, d);
 					d.scaled = false;
 				}
+
+				this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
+					detail: {
+						hostid: d.hostid,
+						itemid: d.itemid
+					}
+				});
 			});
 	}
 
@@ -577,14 +591,7 @@ class CSVGHoneycomb {
 			.select('path')
 			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`);
 
-		this.#svg
-			.style('--shadow-opacity', 1)
-			.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
-				detail: {
-					hostid: d.hostid,
-					itemid: d.itemid
-				}
-			});
+		this.#svg.style('--shadow-opacity', 1);
 	}
 
 	#cellLeave(cell, d) {
@@ -601,14 +608,7 @@ class CSVGHoneycomb {
 			.select('path')
 			.style('filter', null);
 
-		this.#svg
-			.style('--shadow-opacity', null)
-			.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
-				detail: {
-					hostid: d.hostid,
-					itemid: d.itemid
-				}
-			});
+		this.#svg.style('--shadow-opacity', null);
 
 		d.backdrop_timeout = setTimeout(() => {
 			cell
