@@ -804,6 +804,25 @@ class CSVGHoneycomb {
 					p_height = primary.font_size * primary.lines_count;
 				}
 			}
+
+			if ((p_height + s_height) <= height_limit) {
+				continue;
+			}
+
+			const font_size_min = CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale;
+			let font_scale = height_limit / (p_height + s_height);
+
+			if (primary !== null) {
+				primary.font_size = Math.max(font_size_min,
+					primary.font_size * (primary.is_custom_size ? 1 : font_scale)
+				);
+			}
+
+			if (secondary !== null) {
+				secondary.font_size = Math.max(font_size_min,
+					secondary.font_size * (secondary.is_custom_size ? 1 : font_scale)
+				);
+			}
 		}
 	}
 
