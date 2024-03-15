@@ -2291,20 +2291,6 @@ button {
   .search-suggest .suggest-hover {
     background-color: #454545; }
 
-.host-navigator .host-navigator-limit {
-  display: flex;
-  justify-content: flex-end;
-  height: 18px;
-  padding: 9px 8px;
-  color: #737373; }
-.host-navigator .host-navigator-no-data {
-  display: flex;
-  justify-content: center;
-  height: 18px;
-  padding: 9px 8px;
-  color: #737373;
-  border-bottom: 1px solid #383838; }
-
 .inline-filter {
   line-height: 24px;
   text-align: right; }
@@ -4174,6 +4160,20 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
 div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   color: #f2f2f2;
   background-color: transparent; }
+
+.host-navigator .host-navigator-limit {
+  display: flex;
+  justify-content: flex-end;
+  height: 18px;
+  padding: 9px 8px;
+  color: #737373; }
+.host-navigator .host-navigator-no-data {
+  display: flex;
+  justify-content: center;
+  height: 18px;
+  padding: 9px 8px;
+  color: #737373;
+  border-bottom: 1px solid #383838; }
 
 .dashboard-widget-inaccessible {
   display: grid;

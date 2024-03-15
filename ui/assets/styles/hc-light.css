@@ -2257,20 +2257,6 @@ button {
   .search-suggest .suggest-hover {
     background-color: #f4f4f4; }
 
-.host-navigator .host-navigator-limit {
-  display: flex;
-  justify-content: flex-end;
-  height: 18px;
-  padding: 9px 8px;
-  color: #333333; }
-.host-navigator .host-navigator-no-data {
-  display: flex;
-  justify-content: center;
-  height: 18px;
-  padding: 9px 8px;
-  color: #333333;
-  border-bottom: 1px solid #888888; }
-
 .inline-filter {
   line-height: 24px;
   text-align: right; }
@@ -4136,6 +4122,20 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed,
 div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
 div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   background-color: transparent; }
+
+.host-navigator .host-navigator-limit {
+  display: flex;
+  justify-content: flex-end;
+  height: 18px;
+  padding: 9px 8px;
+  color: #333333; }
+.host-navigator .host-navigator-no-data {
+  display: flex;
+  justify-content: center;
+  height: 18px;
+  padding: 9px 8px;
+  color: #333333;
+  border-bottom: 1px solid #888888; }
 
 .dashboard-widget-inaccessible {
   display: grid;
