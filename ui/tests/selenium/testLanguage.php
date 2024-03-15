@@ -167,7 +167,7 @@ class testLanguage extends CWebTest {
 		$this->page->open('zabbix.php?action=userprofile.edit');
 		$form = $this->query('name:user_form')->one()->asForm();
 
-		// Red info icon check.
+		// Yellow info icon check.
 		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
 		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
 
