@@ -44,6 +44,7 @@ $form_grid = (new CFormGrid())
 			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy_group', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
 		)
 	])
 	->addItem([
