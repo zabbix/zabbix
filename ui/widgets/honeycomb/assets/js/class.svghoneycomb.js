@@ -352,26 +352,11 @@ class CSVGHoneycomb {
 			this.#cell_width - this.#cells_gap, this.#cell_height / 2, false
 		);
 
+		this.#leaveAll();
+
 		this.#honeycomb_container
 			.style('--stroke-width', `${2 / this.#container_params.scale}px`)
 			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
-			.each((d, i, cells) => {
-				if (d.enter_timeout !== undefined) {
-					clearTimeout(d.enter_timeout);
-					delete d.enter_timeout;
-				}
-
-				if (d.scale_timeout !== undefined) {
-					clearTimeout(d.scale_timeout);
-					delete (d.scale_timeout);
-				}
-
-				if (d.scaled) {
-					d.scaled = false;
-
-					this.#cellLeave(d3.select(cells[i]), d);
-				}
-			})
 			.data(data, (d, i) => {
 				const row = Math.floor(i / this.#container_params.columns);
 				const column = i % this.#container_params.columns;
@@ -481,6 +466,7 @@ class CSVGHoneycomb {
 				if (d.enter_timeout === undefined && d.scale_timeout === undefined && !d.scaled) {
 					d.enter_timeout = setTimeout(() => {
 						cell.raise();
+						this.#leaveAll();
 
 						d.scale_timeout = setTimeout(() => {
 							delete d.scale_timeout;
@@ -592,6 +578,28 @@ class CSVGHoneycomb {
 			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`);
 
 		this.#svg.style('--shadow-opacity', 1);
+	}
+
+	#leaveAll() {
+		this.#honeycomb_container
+			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
+			.each((d, i, cells) => {
+				if (d.enter_timeout !== undefined) {
+					clearTimeout(d.enter_timeout);
+					delete d.enter_timeout;
+				}
+
+				if (d.scale_timeout !== undefined) {
+					clearTimeout(d.scale_timeout);
+					delete (d.scale_timeout);
+				}
+
+				if (d.scaled) {
+					d.scaled = false;
+
+					this.#cellLeave(d3.select(cells[i]), d);
+				}
+			});
 	}
 
 	#cellLeave(cell, d) {
