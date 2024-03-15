@@ -479,7 +479,7 @@ class CSVGHoneycomb {
 						d.scaled = true;
 
 						this.#cellEnter(cell, d);
-					}, 200);
+					}, 100);
 				}
 			})
 			.on('mouseleave', (e, d) => {
