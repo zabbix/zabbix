@@ -2449,7 +2449,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		update->interface = interface;
 		update->host = host;
 
-				/* remove old address->interfaceid index */
+		/* remove old address->interfaceid index */
 		if (0 != found && INTERFACE_TYPE_SNMP == interface->type)
 			dc_interface_snmpaddrs_remove(interface);
 
@@ -2605,10 +2605,11 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			{
 				update->snmp->max_succeed = 0;
 				update->snmp->min_fail = ZBX_MAX_SNMP_ITEMS + 1;
-
-				dc_interface_snmpaddrs_update(update->interface);
 			}
 		}
+
+		if (INTERFACE_TYPE_SNMP == update->interface->type)
+			dc_interface_snmpaddrs_update(update->interface);
 	}
 
 	/* remove deleted interfaces from buffer */
