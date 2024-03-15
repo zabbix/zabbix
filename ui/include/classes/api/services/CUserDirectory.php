@@ -1234,7 +1234,6 @@ class CUserDirectory extends CApiService {
 					];
 				}
 
-				$userdirectory['provision_media'][$i]['userdirectory_mediaid'] = $db_mediaid;
 				unset($db_provision_medias[$db_mediaid]);
 			}
 

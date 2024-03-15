@@ -414,16 +414,14 @@ class testUsers extends CAPITest {
 
 	public static function dataProviderUserMediaUpdate() {
 		return [
-			// #0 Provisioned media cannot be deleted.
-			[
+			'Provisioned media cannot be deleted.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => []
 				]],
 				'expected_error' => 'Incorrect value for field "/1/medias": cannot delete provisioned media.'
 			],
-			// #1 Provisioned media cannot be replaced.
-			[
+			'Provisioned media cannot be replaced.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -432,8 +430,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Incorrect value for field "/1/medias": cannot delete provisioned media.'
 			],
-			// #2 Property userdirectory_mediaid is not supported in medias for user.update.
-			[
+			'Property userdirectory_mediaid is not supported in medias for user.update.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -453,8 +450,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/medias/1": unexpected parameter "userdirectory_mediaid".'
 			],
-			// #3 Duplicate value of mediaid is not allowed.
-			[
+			'Duplicate value of mediaid is not allowed.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -472,8 +468,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/medias/2": value (mediaid)=(%d) already exists.'
 			],
-			// #4 Property mediatypeid cannot be changed for existing provisioned medias.
-			[
+			'Property mediatypeid cannot be changed for existing provisioned medias.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -491,8 +486,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Not allowed to update field "mediatypeid" for provisioned user.'
 			],
-			// #5 Update provisioned media successful.
-			[
+			'Update provisioned media successful.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -511,8 +505,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => null
 			],
-			// #6 Add custom media to provisioned media list successful.
-			[
+			'Add custom media to provisioned media list successful.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -1151,32 +1144,28 @@ class testUsers extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// #27 Cannot update provisioned user readonly field username.
-			[
+			'Cannot update provisioned user readonly field username.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'username' => 'other-username-value'
 				]],
 				'expected_error' => 'Not allowed to update field "username" for provisioned user.'
 			],
-			// #28 Cannot update provisioned user readonly field password.
-			[
+			'Cannot update provisioned user readonly field password.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'passwd' => 'Z@BB1X@dmln'
 				]],
 				'expected_error' => 'Not allowed to update field "passwd" for provisioned user.'
 			],
-			// #29 Cannot update user userdirectoryid to make provisioned user not provisioned.
-			[
+			'Cannot update user userdirectoryid to make provisioned user not provisioned.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'userdirectoryid' => 0
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
 			],
-			// #30 Cannot update user userdirectoryid to make user provisioned.
-			[
+			'Cannot update user userdirectoryid to make user provisioned.' => [
 				'user' => [
 					[
 						'userid' => 'API test user with disabled group',
