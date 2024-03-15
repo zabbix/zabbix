@@ -1,3 +1,5 @@
+// Widget configuration.
+
 form.dashboard-widget-hostnavigator {
 	#tags_table_host_tags {
 		.form_row {
@@ -10,21 +12,25 @@ form.dashboard-widget-hostnavigator {
 	}
 }
 
-.host-navigator {
-	.host-navigator-limit {
-		display: flex;
-		justify-content: flex-end;
-		height: 18px;
-		padding: 9px 8px;
-		color: $font-alt-color;
-	}
+// Widget view.
 
-	.host-navigator-no-data {
-		display: flex;
-		justify-content: center;
-		height: 18px;
-		padding: 9px 8px;
-		color: $font-alt-color;
-		border-bottom: 1px solid $table-border-color;
+div.dashboard-widget-hostnavigator {
+	.host-navigator {
+		.host-navigator-limit {
+			display: flex;
+			justify-content: flex-end;
+			height: 18px;
+			padding: 9px 8px;
+			color: $font-alt-color;
+		}
+
+		.host-navigator-no-data {
+			display: flex;
+			justify-content: center;
+			height: 18px;
+			padding: 9px 8px;
+			color: $font-alt-color;
+			border-bottom: 1px solid $table-border-color;
+		}
 	}
 }

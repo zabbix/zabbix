@@ -4164,13 +4164,13 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
 form.dashboard-widget-hostnavigator #tags_table_host_tags .form_row td:nth-child(3) input[type="text"] {
   width: 159px !important; }
 
-.host-navigator .host-navigator-limit {
+div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
   display: flex;
   justify-content: flex-end;
   height: 18px;
   padding: 9px 8px;
   color: #737373; }
-.host-navigator .host-navigator-no-data {
+div.dashboard-widget-hostnavigator .host-navigator .host-navigator-no-data {
   display: flex;
   justify-content: center;
   height: 18px;
