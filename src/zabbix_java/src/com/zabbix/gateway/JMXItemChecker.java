@@ -85,18 +85,18 @@ class JMXItemChecker extends ItemChecker
 			// e. g. the second "rmi" in service:jmx:rmi:///jndi/rmi://
 			String[] parts = url.getURLPath().split(":", 2);
 
-			if (0 != parts.length)
+			if (0 != parts.length && !parts[0].equals(""))
 			{
 				parts = parts[0].split("/", 0);
 
-				if (0 != parts.length)
+				if (0 != parts.length && !parts[parts.length - 1].equals(""))
 				{
-					String rmiProtocol = parts[parts.length - 1];
+					String serviceProvider = parts[parts.length - 1];
 
-					if (!rmiProtocol.equals("rmi"))
+					if (!serviceProvider.equals("rmi"))
 					{
 						throw new ZabbixException("unsupported JNDI service provider, \"%s\"",
-								rmiProtocol);
+								serviceProvider);
 					}
 				}
 			}
