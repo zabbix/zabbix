@@ -1326,17 +1326,17 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'enabled_lifetime' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '0'
-			],
 			'enabled_lifetime_type' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '2'
+			],
+			'enabled_lifetime' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '0'
 			]
 		]
 	],
