@@ -29,6 +29,7 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
+#include "zbxcurl.h"
 #include "cfg.h"
 #include "zbx_discoverer_constants.h"
 
@@ -164,7 +165,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 	CURL		*easyhandle;
 	CURLoption	opt;
 	CURLcode	err;
-	char		https_host[MAX_STRING_LEN];
+	char		https_host[MAX_STRING_LEN], *error = NULL;
 
 	*value_int = 0;
 
@@ -192,28 +193,18 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
-		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
 				__func__, (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
+	if (SUCCEED != zbx_curl_setopt_https(easyhandle, &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
-				__func__, (int)opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s", __func__, error);
 		goto clean;
 	}
-#endif
 
 	if (NULL != sysinfo_get_config_source_ip())
 	{
@@ -232,6 +223,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: curl_easy_perform failed for [%s:%hu]: %s",
 				__func__, host, port, curl_easy_strerror(err));
 clean:
+	zbx_free(error);
 	curl_easy_cleanup(easyhandle);
 
 	return SYSINFO_RET_OK;

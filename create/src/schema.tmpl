@@ -257,7 +257,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts	|		|RESTRICT
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(1024)|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|history	|t_varchar(255)	|'90d'	|NOT NULL	|ZBX_PROXY
+FIELD		|history	|t_varchar(255)	|'31d'	|NOT NULL	|ZBX_PROXY
 FIELD		|trends		|t_varchar(255)	|'365d'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -1851,7 +1851,7 @@ FIELD	|delay				|t_varchar(1024)|'0'	|NOT NULL	|0
 
 TABLE|lld_override_ophistory|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
-FIELD	|history			|t_varchar(255)	|'90d'	|NOT NULL	|0
+FIELD	|history			|t_varchar(255)	|'31d'	|NOT NULL	|0
 
 TABLE|lld_override_optrends|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation

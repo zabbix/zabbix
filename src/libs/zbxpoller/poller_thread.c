@@ -821,7 +821,7 @@ exit:
 	return num;
 }
 
-ZBX_THREAD_ENTRY(poller_thread, args)
+ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
