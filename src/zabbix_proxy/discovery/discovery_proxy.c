@@ -19,7 +19,6 @@
 
 #include "discovery_proxy.h"
 
-#include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
 
 void	*zbx_discovery_open_proxy(void)

@@ -37,6 +37,9 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
+#include "zbxcacheconfig.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 

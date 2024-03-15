@@ -21,6 +21,11 @@
 
 #include "zbxserialize.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxstats.h"
 
 #define DISCOVERER_INITIALIZED_YES	1
 

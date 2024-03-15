@@ -22,7 +22,6 @@
 #include <signal.h>
 
 #include "zbxcomms.h"
-#include "zbxexec.h"
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"

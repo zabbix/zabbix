@@ -22,6 +22,8 @@
 
 #include "discoverer_job.h"
 
+#include "zbxalgo.h"
+
 typedef struct
 {
 	int		workers_num;

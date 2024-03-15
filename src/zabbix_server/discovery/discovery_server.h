@@ -21,8 +21,6 @@
 #define ZABBIX_DISCOVERY_SERVER_H
 
 #include "zbxdbhigh.h"
-#include "zbxcacheconfig.h"
-#include "zbxstats.h"
 
 void	*zbx_discovery_open_server(void);
 void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,

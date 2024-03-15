@@ -68,6 +68,14 @@
 #include "zbxproxybuffer.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
+#include "zbxalgo.h"
+#include "zbxavailability.h"
+#include "zbxdb.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxpreproc.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"

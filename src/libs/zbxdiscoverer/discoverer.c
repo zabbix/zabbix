@@ -37,6 +37,13 @@
 #include "discoverer_job.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxpoller.h"
+#include "zbxalgo.h"
+#include "zbxcomms.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxstr.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>

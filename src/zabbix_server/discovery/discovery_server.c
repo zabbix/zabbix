@@ -19,10 +19,9 @@
 
 #include "discovery_server.h"
 
-#include "zbxdiscovery.h"
-
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
 
 static zbx_db_result_t	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
