@@ -114,7 +114,7 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 			config_source_ip)) ||
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_TIMEOUT,
 			(long)timeout)) ||
-			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING,
+			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_ACCEPT_ENCODING,
 			"")))
 	{
 		*error = zbx_dsprintf(*error, "cannot set cURL option [%d]: %s", (int)opt, curl_easy_strerror(err));
