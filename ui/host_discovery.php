@@ -539,11 +539,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$enabled_lifetime = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
 		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
 
-		if (timeUnitToSeconds($lifetime) == 0) {
+		if ($lifetime[0] !== '{' && timeUnitToSeconds($lifetime) == 0) {
 			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
 		}
 
-		if (timeUnitToSeconds($enabled_lifetime) == 0) {
+		if ($enabled_lifetime[0] !== '{' && timeUnitToSeconds($enabled_lifetime) == 0) {
 			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
 		}
 
