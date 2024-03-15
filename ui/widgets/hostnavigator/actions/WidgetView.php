@@ -102,17 +102,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
-			// Get hosts based on filter configurations.
+			// Get hosts from host pattern and search narrowing criteria.
 			$hosts = API::Host()->get([
-				'output' => $output,
+				'output' => ['hostid'],
 				'groupids' => $groupids,
 				'evaltype' => $this->fields_values['host_tags_evaltype'],
 				'tags' => $this->fields_values['host_tags'] ?: null,
 				'search' => [
 					'name' => in_array('*', $this->fields_values['hosts'], true) ? null : $this->fields_values['hosts']
 				],
+				'searchByAny' => true,
 				'searchWildcardsEnabled' => true,
 				'severities' => $this->fields_values['severities'] ?: null,
+				'preservekeys' => true
+			]);
+
+			$hostids = array_keys($hosts);
+
+			// Get additional info for narrowed down hosts and filter them by status and maintenance status.
+			$hosts = API::Host()->get([
+				'output' => $output,
+				'hostids' => $hostids,
 				'filter' => [
 					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
