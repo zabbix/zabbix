@@ -58,13 +58,11 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		short		revents;
 	};
 #endif
-
+	static void		*handle;
 	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
 
 	if (NULL == fptr)
 	{
-		void	*handle;
-
 		/* this check must be performed before calling this function */
 		if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
 		{
@@ -84,6 +82,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		if (NULL == (*(void **)(&fptr) = dlsym(handle, "curl_multi_wait")))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_multi_wait(): %s", dlerror());
+			dlclose(handle);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -139,6 +138,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		void		*anchor;
 	};
 #endif
+	static void		*handle;
 	static CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int, struct curl_header **) = NULL;
 
 	struct curl_header	*type;
@@ -152,8 +152,6 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 
 	if (NULL == fptr)
 	{
-		void	*handle;
-
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
@@ -164,6 +162,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		if (NULL == (*(void **)(&fptr) = dlsym(handle, "curl_easy_header")))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_easy_header(): %s", dlerror());
+			dlclose(handle);
 			exit(EXIT_FAILURE);
 		}
 	}

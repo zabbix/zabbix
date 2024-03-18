@@ -743,7 +743,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	if (SMTP_SECURITY_SSL == smtp_security)
 	{
 		if (SUCCEED != zbx_curl_protocol("smtps", error))
-			goto out;
+			goto clean;
 
 		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtps://");
 	}

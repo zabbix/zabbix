@@ -3710,6 +3710,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Widget with several columns, common item (value mapping), different aggregation functions and time periods.
 			[
 				[
+					'widget_name' => 'Widget with multiple columns',
 					'column_fields' => [
 						[
 							'Name' => 'Min',
@@ -3843,6 +3844,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Value mapping with aggregation function 'not used'.
 			[
 				[
+					'widget_name' => 'Value mapping with aggreagation Not used',
 					'column_fields' => [
 						[
 							// 'not used' is default value for aggregation function field.
@@ -3878,6 +3880,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric items with aggregation function 'min' and 'max', decimal places and Custom time period.
 			[
 				[
+					'widget_name' => 'Aggregation min and max + decimal + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned)',
@@ -3939,6 +3942,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (unsigned) item with aggregation function 'avg', default decimal places and Custom time period.
 			[
 				[
+					'widget_name' => 'Avg aggregation + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) with avg',
@@ -3981,6 +3985,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Item with units, aggregation function 'count' and Custom time period.
 			[
 				[
+					'widget_name' => 'Item with units + count aggregation + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Units should not appear',
@@ -4013,6 +4018,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Item with units, aggregation function 'sum' and Custom time period.
 			[
 				[
+					'widget_name' => 'Item with units + sum aggregation + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Units should appear',
@@ -4045,6 +4051,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (float) item with aggregation function 'first' and Custom time period.
 			[
 				[
+					'widget_name' => 'Float item + first aggregation + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'First',
@@ -4092,6 +4099,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (float) item with aggregation function 'last' and Custom time period with absolute time.
 			[
 				[
+					'widget_name' => 'Float item + last aggregation + custom time period + absolute time',
 					'column_fields' => [
 						[
 							'Name' => 'Last',
@@ -4135,6 +4143,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Non-numeric (Text) item with aggregation function 'count' and Custom time period with relative time.
 			[
 				[
+					'widget_name' => 'Text item + count aggregation + custom time period + relative time',
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item with aggregation function count',
@@ -4177,6 +4186,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Non-numeric items with aggregation function 'min'/'max'/'avg'/'sum' and Custom time period.
 			[
 				[
+					'widget_name' => 'Non-numeric items with min, max, avg, sum aggregation',
 					'no_data_found' => true,
 					'column_fields' => [
 						[
@@ -4249,6 +4259,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Non-numeric (Character) item with aggregation function 'first' and Custom time period.
 			[
 				[
+					'widget_name' => 'Char item + first aggregation + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item with aggregation function first',
@@ -4286,6 +4297,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Non-numeric (Text) item with aggregation function 'last' and Custom time period.
 			[
 				[
+					'widget_name' => 'Text item + last aggregation + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item with aggregation function last',
@@ -4323,6 +4335,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (unsigned) item with aggregation function 'avg', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + avg aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with trends and aggregation function avg',
@@ -4370,6 +4383,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (float) item with aggregation function 'min', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + min aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function min',
@@ -4429,6 +4443,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (float) item with aggregation function 'max', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + max aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function max',
@@ -4476,6 +4491,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (unsigned) item with aggregation function 'count', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + count aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with trends and aggregation function count',
@@ -4523,6 +4539,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (float) item with aggregation function 'sum', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + sum aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function sum',
@@ -4570,6 +4587,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (unsigned) item with aggregation function 'first', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + first aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with trends and aggregation function first',
@@ -4617,6 +4635,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric (float) item with aggregation function 'last', trends history data and Custom time period.
 			[
 				[
+					'widget_name' => 'Numeric item + last aggregation + trends + custom time period',
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function last',
@@ -4664,6 +4683,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Check that widget with bar/indicators returns 'No data found' if non-numeric data is selected.
 			[
 				[
+					'widget_name' => 'Not displaying non-numeric data for bar indicators',
 					'no_data_found' => true,
 					'column_fields' => [
 						[
@@ -4777,6 +4797,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Check that widget displays bar/idnicators when aggregation function 'count' is used for non-numeric item.
 			[
 				[
+					'widget_name' => 'Displaying count for non-numeric data via bar indicators',
 					'column_fields' => [
 						[
 							'Name' => 'Count Log',
@@ -4843,6 +4864,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Non-numeric items without data but with aggregation function count (return 0) that are displayed as bar/indicators.
 			[
 				[
+					'widget_name' => 'Displaying 0 count for item without data via bar indicators',
 					'column_fields' => [
 						[
 							'Name' => 'Count Log',
@@ -4883,6 +4905,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric items without data that are displayed as bar/indicators.
 			[
 				[
+					'widget_name' => 'Display data for numeric items as bar indicators',
 					'column_fields' => [
 						[
 							'Name' => 'Min',
@@ -4952,6 +4975,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric items with data and aggregation function min/max/avg/count that are displayed as bar/indicators.
 			[
 				[
+					'widget_name' => 'Display data with min, max, avg, count aggregation as bar indicators',
 					'column_fields' => [
 						[
 							'Name' => 'Min',
@@ -5025,6 +5049,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Numeric items with data and aggregation function sum/first/last that are displayed as bar/indicators.
 			[
 				[
+					'widget_name' => 'Display data with sum, first, last aggregation as bar indicators',
 					'column_fields' => [
 						[
 							'Name' => 'Sum',
@@ -5104,21 +5129,19 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 
-		$widget_name = 'Aggregation check widget '.microtime();
-		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_AGGREGATION], $widget_name);
+		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_AGGREGATION], $data['widget_name']);
 		$dashboard = CDashboardElement::find()->one();
 
 		if (array_key_exists('screen_name', $data)) {
-			$widget = $dashboard->getWidget($widget_name);
-			$this->assertScreenshotExcept($widget, $widget->query('xpath:.//h4')->one(), $data['screen_name']);
+			$this->assertScreenshot($dashboard->getWidget($data['widget_name']), $data['screen_name']);
 		}
 		else {
 			$table_data = (array_key_exists('no_data_found', $data)) ? '' : $data['result'];
-			$this->assertTableData($table_data, 'xpath://h4[text()='.CXPathHelper::escapeQuotes($widget_name).']/../..//table');
+			$this->assertTableData($table_data, 'xpath://h4[text()='.CXPathHelper::escapeQuotes($data['widget_name']).']/../..//table');
 		}
 
 		// Necessary not to fill dashboard with widgets and, therefore, avoid slowing down dashboard performance during test.
-		$dashboard->edit()->deleteWidget($widget_name)->save();
+		$dashboard->edit()->deleteWidget($data['widget_name'])->save();
 	}
 
 	/**
