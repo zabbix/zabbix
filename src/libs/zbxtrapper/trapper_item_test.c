@@ -252,6 +252,11 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 	ts[(*values_num)++] = ts_now;
 	*bypass_first = 0;
 
+	if (NULL == jp_steps->start) {
+		ret = SUCCEED;
+		goto out;
+	}
+
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(jp_steps, ptr));)
 	{
 		zbx_pp_step_t	*step;
@@ -868,10 +873,10 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
-	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN];
+	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN], *key = NULL;
 	zbx_uint64_t		proxyid;
-	int			ret = FAIL, state = 0;
-	size_t			value_size = 0;
+	int			ret = FAIL, state = 0, value_found;
+	size_t			value_size = 0, key_size = 0;
 
 	zbx_user_init(&user);
 
@@ -902,26 +907,33 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
 		jp_steps.end = jp_steps.start = NULL;
 
-	if (NULL != jp_steps.start)
+	if (SUCCEED == zbx_json_value_by_name(&jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
+		state = atoi(buffer);
+
+	if (ZBX_STATE_NOT_SUPPORTED == state)
 	{
-		int	value_found;
+		value_found = try_find_preproc_value(&jp_options, ZBX_PROTO_TAG_RUNTIME_ERROR, &jp_item,
+				ZBX_PROTO_TAG_VALUE, &value, &value_size);
+	}
+	else
+	{
+		value_found = try_find_preproc_value(&jp_item, ZBX_PROTO_TAG_VALUE, &jp_options,
+				ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size);
+	}
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
-			state = atoi(buffer);
-
-		if (ZBX_STATE_NOT_SUPPORTED == state)
+	if (FAIL != value_found) {
+		goto preproc_test;
+	}
+	else
+	{
+		// Get value from host is not checked, yet no value was provided
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_KEY, &key, &key_size, NULL))
 		{
-			value_found = try_find_preproc_value(&jp_options, ZBX_PROTO_TAG_RUNTIME_ERROR, &jp_item,
-					ZBX_PROTO_TAG_VALUE, &value, &value_size);
-		}
-		else
-		{
-			value_found = try_find_preproc_value(&jp_item, ZBX_PROTO_TAG_VALUE, &jp_options,
-					ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size);
+			*error = zbx_strdup(NULL, "Value was not provided for the preprocessing test.");
+			goto out;
 		}
 
-		if (FAIL != value_found)
-			goto preproc_test;
+		zbx_free(key);
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
@@ -958,9 +970,6 @@ preproc_test:
 		value_size = strlen(value);
 		ret = SUCCEED;
 	}
-
-	if (NULL == jp_steps.start)
-		goto out;
 
 	zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
 	ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, state, json, error);
