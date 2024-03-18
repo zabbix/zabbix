@@ -11,7 +11,7 @@ Bug fixes:
 .....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
 ..F....... [ZBX-23567] fixed PHP error during first time setup when no user is yet created (gcalenko, Ivo)
 .......PS. [ZBX-24103] improved configuration sync, history sync and pollers performance (vso)
-..F....... [ZBX-23488] fixed severity checkbox list column width and added an option to add title attribute to checkbox labels (dfofanovs)
+..F....... [ZBX-23488] fixed severity checkbox area width issue when editing widgets and added an option to add title attribute to checkbox labels (dfofanovs)
 ..F....... [ZBX-23852] fixed template import failing with unexpected server error when trying to import template dashboards with items or graphs from unexisting hosts (agriscenko)
 ........S. [ZBX-24043] fixed extensive locking when retrieving Zabbix server statistics (dgoloscapov)
 .........T [ZBX-24143] fixed swap space trigger prototype name in Proxmox VE by HTTP template (drasikhov)
@@ -2973,8 +2973,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42rc1
-
-New features:
 
 Bug fixes:
 .....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
