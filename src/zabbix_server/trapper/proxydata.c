@@ -19,9 +19,9 @@
 
 #include "proxydata.h"
 
-#include "../taskmanager/taskmanager_server.h"
-#include "../cachehistory/cachehistory_server.h"
-#include "../discovery/discovery_server.h"
+#include "taskmanager/taskmanager_server.h"
+#include "cachehistory/cachehistory_server.h"
+#include "discovery/discovery_server.h"
 
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"

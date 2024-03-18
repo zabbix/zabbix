@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcachehistory.h"
-//#include "dbcache.h"
+
 #include "zbxcachevalue.h"
 #include "zbxmutexs.h"
 #include "zbxexpression.h"
@@ -164,7 +164,6 @@ static size_t		item_values_alloc = 0, item_values_num = 0;
 static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
-//static int	hc_get_history_compression_age(void);
 
 void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
 {

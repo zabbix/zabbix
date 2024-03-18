@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxcachehistory_proxy.a
 
 libzbxcachehistory_proxy_a_SOURCES = \
+	cachehistory_proxy.h \
 	cachehistory_proxy.c
 
 libzbxcachehistory_proxy_a_CFLAGS = \
