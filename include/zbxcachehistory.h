@@ -108,6 +108,10 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 #define ZBX_PP_VALUE_OPT_META		0x0001	/* 'zbx_pp_value_opt_t' has log metadata ('mtime' and 'lastlogsize') */
 #define ZBX_PP_VALUE_OPT_LOG		0x0002	/* 'zbx_pp_value_opt_t' has 'timestamp', 'severity', 'logeventid' and */
 						/* 'source' data */
+#define ZBX_DC_FLAGS_NOT_FOR_HISTORY	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOHISTORY)
+#define ZBX_DC_FLAGS_NOT_FOR_TRENDS	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOTRENDS)
+#define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
+#define ZBX_DC_FLAGS_NOT_FOR_EXPORT	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)
 
 /* This structure is complementary data if value comes from preprocessing. */
 typedef struct
@@ -159,11 +163,6 @@ int	zbx_dbcache_get_history_num(void);
 void	zbx_hc_proxyqueue_clear(void);
 int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid);
 void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid);
-
-void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
-		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
-		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
-		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num);
 
 void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
 		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,

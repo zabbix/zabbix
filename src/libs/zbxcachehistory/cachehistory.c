@@ -78,11 +78,6 @@ static zbx_history_sync_f	sync_history_cb = NULL;
 /* the maximum number of characters for history cache values */
 #define ZBX_HISTORY_VALUE_LEN	(1024 * 64)
 
-#define ZBX_DC_FLAGS_NOT_FOR_HISTORY	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOHISTORY)
-#define ZBX_DC_FLAGS_NOT_FOR_TRENDS	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOTRENDS)
-#define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
-#define ZBX_DC_FLAGS_NOT_FOR_EXPORT	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)
-
 typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
@@ -2734,113 +2729,6 @@ void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *
 	zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: prepare history data to share them with loadable modules, sort    *
- *          data by type skipping low-level discovery data, meta information  *
- *          updates and notsupported items                                    *
- *                                                                            *
- * Parameters: history            - [IN] array of history data                *
- *             history_num        - [IN] number of history structures         *
- *             history_<type>     - [OUT] array of historical data of a       *
- *                                  specific data type                        *
- *             history_<type>_num - [OUT] number of values of a specific      *
- *                                  data type                                 *
- *                                                                            *
- ******************************************************************************/
-void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
-		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
-		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
-		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num)
-{
-	zbx_dc_history_t	*h;
-	ZBX_HISTORY_FLOAT	*h_float;
-	ZBX_HISTORY_INTEGER	*h_integer;
-	ZBX_HISTORY_STRING	*h_string;
-	ZBX_HISTORY_TEXT	*h_text;
-	ZBX_HISTORY_LOG		*h_log;
-	int			i;
-	const zbx_log_value_t	*log;
-
-	*history_float_num = 0;
-	*history_integer_num = 0;
-	*history_string_num = 0;
-	*history_text_num = 0;
-	*history_log_num = 0;
-
-	for (i = 0; i < history_num; i++)
-	{
-		h = &history[i];
-
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
-			continue;
-
-		switch (h->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				if (NULL == history_float_cbs)
-					continue;
-
-				h_float = &history_float[(*history_float_num)++];
-				h_float->itemid = h->itemid;
-				h_float->clock = h->ts.sec;
-				h_float->ns = h->ts.ns;
-				h_float->value = h->value.dbl;
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				if (NULL == history_integer_cbs)
-					continue;
-
-				h_integer = &history_integer[(*history_integer_num)++];
-				h_integer->itemid = h->itemid;
-				h_integer->clock = h->ts.sec;
-				h_integer->ns = h->ts.ns;
-				h_integer->value = h->value.ui64;
-				break;
-			case ITEM_VALUE_TYPE_STR:
-				if (NULL == history_string_cbs)
-					continue;
-
-				h_string = &history_string[(*history_string_num)++];
-				h_string->itemid = h->itemid;
-				h_string->clock = h->ts.sec;
-				h_string->ns = h->ts.ns;
-				h_string->value = h->value.str;
-				break;
-			case ITEM_VALUE_TYPE_TEXT:
-				if (NULL == history_text_cbs)
-					continue;
-
-				h_text = &history_text[(*history_text_num)++];
-				h_text->itemid = h->itemid;
-				h_text->clock = h->ts.sec;
-				h_text->ns = h->ts.ns;
-				h_text->value = h->value.str;
-				break;
-			case ITEM_VALUE_TYPE_LOG:
-				if (NULL == history_log_cbs)
-					continue;
-
-				log = h->value.log;
-				h_log = &history_log[(*history_log_num)++];
-				h_log->itemid = h->itemid;
-				h_log->clock = h->ts.sec;
-				h_log->ns = h->ts.ns;
-				h_log->value = log->value;
-				h_log->source = ZBX_NULL2EMPTY_STR(log->source);
-				h_log->timestamp = log->timestamp;
-				h_log->logeventid = log->logeventid;
-				h_log->severity = log->severity;
-				break;
-			case ITEM_VALUE_TYPE_BIN:
-			case ITEM_VALUE_TYPE_NONE:
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
-		}
-	}
 }
 
 /******************************************************************************
