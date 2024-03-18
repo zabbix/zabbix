@@ -889,10 +889,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		$this->assertTrue($form->getField('History')->isDisplayed());
 		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
-		$this->assertEquals('90d', $form->getField('History')->getAttribute('value'));
+		$this->assertEquals('31d', $form->getField('History')->getAttribute('value'));
 
 		if (!isset($itemid)) {
-			$this->assertEquals('90d', $form->getField('History')->getAttribute('value'));
+			$this->assertEquals('31d', $form->getField('History')->getAttribute('value'));
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {

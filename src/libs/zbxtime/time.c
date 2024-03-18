@@ -324,6 +324,29 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get broken-down representation of the time and cache result       *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *                                                                            *
+ * Return value: broken-down representation of the time                       *
+ *                                                                            *
+ ******************************************************************************/
+const struct tm	*zbx_localtime_now(const time_t *time)
+{
+	static ZBX_THREAD_LOCAL struct tm	tm_last;
+	static ZBX_THREAD_LOCAL time_t		time_last;
+
+	if (time_last != *time)
+	{
+		time_last = *time;
+		localtime_r(time, &tm_last);
+	}
+
+	return &tm_last;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get UTC time from broken down time elements                       *
  *                                                                            *
  * Parameters:                                                                *

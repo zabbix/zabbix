@@ -3252,17 +3252,31 @@ out:
 
 static int	DBpatch_6050211(void)
 {
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050212(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("lld_override_ophistory", &field);
+}
+
+static int	DBpatch_6050213(void)
+{
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("media", &field);
 }
 
-static int	DBpatch_6050212(void)
+static int	DBpatch_6050214(void)
 {
 	return DBcreate_index("media", "media_3", "userdirectory_mediaid", 0);
 }
 
-static int	DBpatch_6050213(void)
+static int	DBpatch_6050215(void)
 {
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, "userdirectory_media", "userdirectory_mediaid",
 			0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -3270,28 +3284,28 @@ static int	DBpatch_6050213(void)
 	return DBadd_foreign_key("media", 3, &field);
 }
 
-static int	DBpatch_6050214(void)
+static int	DBpatch_6050216(void)
 {
 	const zbx_db_field_t	field = {"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050215(void)
+static int	DBpatch_6050217(void)
 {
 	const zbx_db_field_t	field = {"severity", "63", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050216(void)
+static int	DBpatch_6050218(void)
 {
 	const zbx_db_field_t	field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050217(void)
+static int	DBpatch_6050219(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -3601,5 +3615,7 @@ DBPATCH_ADD(6050214, 0, 1)
 DBPATCH_ADD(6050215, 0, 1)
 DBPATCH_ADD(6050216, 0, 1)
 DBPATCH_ADD(6050217, 0, 1)
+DBPATCH_ADD(6050218, 0, 1)
+DBPATCH_ADD(6050219, 0, 1)
 
 DBPATCH_END()

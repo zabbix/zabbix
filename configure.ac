@@ -1713,9 +1713,11 @@ AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
 AC_SUBST(LDAP_CPPFLAGS)
 
+dnl Currently required cURL library version is 7.19.1 . When it is
+dnl increased all the functionality in zbxcurl.h must be revised.
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+LIBCURL_CHECK_CONFIG(, [7.19.1], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])
@@ -2005,6 +2007,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxcrypto/Makefile
+	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbsyncer/Makefile
 	src/libs/zbxcacheconfig/Makefile
@@ -2015,6 +2018,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxdbschema/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
+	src/libs/zbxdiscoverer/Makefile
 	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxeval/Makefile
@@ -2075,15 +2079,18 @@ AC_CONFIG_FILES([
 	src/libs/zbxstats/Makefile
 	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
+	src/libs/zbxhttppoller/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile
+	src/libs/zbxtrapper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
+	src/libs/zbxpinger/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2095,6 +2102,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
+	src/zabbix_proxy/discovery/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
@@ -2103,6 +2111,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
+	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/actions/Makefile
@@ -2111,15 +2120,13 @@ AC_CONFIG_FILES([
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/diag/Makefile
-	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/discovery/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/events/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
-	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/operations/Makefile
-	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile

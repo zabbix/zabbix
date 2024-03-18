@@ -853,6 +853,7 @@ function getConditionFormula(conditions, evalType) {
 
 		const sortable_options = options.sortable
 			? {
+				selector_span: options.sortable_options.selector_span,
 				selector_handle: options.sortable_options.selector_handle,
 				freeze_start: options.sortable_options.freeze_start,
 				freeze_end: options.sortable_options.freeze_end,

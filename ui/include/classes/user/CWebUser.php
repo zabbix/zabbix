@@ -222,4 +222,13 @@ class CWebUser {
 	public static function getIp(): string {
 		return $_SERVER['REMOTE_ADDR'];
 	}
+
+	/**
+	 * Check whether user has enabled autologin.
+	 *
+	 * @return bool
+	 */
+	public static function isAutologinEnabled(): bool {
+		return (CWebUser::$data['autologin'] === '1');
+	}
 }

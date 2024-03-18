@@ -20,11 +20,14 @@
 #include "proxydata.h"
 
 #include "../taskmanager/taskmanager_server.h"
+#include "../discovery/discovery_server.h"
 
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
+#include "zbxjson.h"
+#include "zbxtasks.h"
 
 int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status, int config_timeout)
@@ -163,7 +166,8 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 	if (SUCCEED == ret)
 	{
 		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE, events_cbs,
-				proxydata_frequency, NULL, &error)))
+				proxydata_frequency, zbx_discovery_update_host_server,
+				zbx_discovery_update_service_server, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.name, sock->peer, error);

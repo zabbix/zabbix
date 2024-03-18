@@ -1049,7 +1049,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '90d'
+				'default' => '31d'
 			],
 			'trends' => [
 				'null' => false,
@@ -8385,7 +8385,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '90d'
+				'default' => '31d'
 			]
 		]
 	],
