@@ -38,6 +38,15 @@
 #include "zbxeval.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
+#include "zbxshmem.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
