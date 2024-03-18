@@ -2056,7 +2056,7 @@ void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
  * Parameters: history     - [IN] history data                                *
  *                                                                            *
  ******************************************************************************/
-void	dc_history_clean_value(zbx_dc_history_t *history)
+void	zbx_dc_history_clean_value(zbx_dc_history_t *history)
 {
 	if (ITEM_STATE_NOTSUPPORTED == history->state)
 	{
@@ -2097,12 +2097,12 @@ void	dc_history_clean_value(zbx_dc_history_t *history)
  *             history_num - [IN] number of values in history data            *
  *                                                                            *
  ******************************************************************************/
-void	hc_free_item_values(zbx_dc_history_t *history, int history_num)
+void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num)
 {
 	int	i;
 
 	for (i = 0; i < history_num; i++)
-		dc_history_clean_value(&history[i]);
+		zbx_dc_history_clean_value(&history[i]);
 }
 
 /******************************************************************************
@@ -2118,7 +2118,7 @@ void	hc_free_item_values(zbx_dc_history_t *history, int history_num)
  ******************************************************************************/
 static void	dc_history_set_error(zbx_dc_history_t *hdata, char *errmsg)
 {
-	dc_history_clean_value(hdata);
+	zbx_dc_history_clean_value(hdata);
 	hdata->value.err = errmsg;
 	hdata->state = ITEM_STATE_NOTSUPPORTED;
 	hdata->flags |= ZBX_DC_FLAG_UNDEF;
@@ -2146,32 +2146,32 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			dc_history_clean_value(hdata);
+			zbx_dc_history_clean_value(hdata);
 			hdata->value.dbl = value->data.dbl;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			dc_history_clean_value(hdata);
+			zbx_dc_history_clean_value(hdata);
 			hdata->value.ui64 = value->data.ui64;
 			break;
 		case ITEM_VALUE_TYPE_STR:
-			dc_history_clean_value(hdata);
+			zbx_dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			dc_history_clean_value(hdata);
+			zbx_dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_BIN:
-			dc_history_clean_value(hdata);
+			zbx_dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_BIN_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
 			{
-				dc_history_clean_value(hdata);
+				zbx_dc_history_clean_value(hdata);
 				hdata->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 				memset(hdata->value.log, 0, sizeof(zbx_log_value_t));
 			}
@@ -2453,7 +2453,7 @@ static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t
 		{
 			zbx_dc_history_t	*cached_value = (zbx_dc_history_t *)history_index->values[idx_cached];
 
-			dc_history_clean_value(cached_value);
+			zbx_dc_history_clean_value(cached_value);
 			cached_value->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
 		}
 	}
@@ -4067,10 +4067,10 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
  * Parameters: history_items - [OUT] the locked history items                 *
  *                                                                            *
  * Comments: The history_items must be returned back to history cache with    *
- *           hc_push_items() function after they have been processed.         *
+ *           zbx_hc_push_items() function after they have been processed.         *
  *                                                                            *
  ******************************************************************************/
-void	hc_pop_items(zbx_vector_ptr_t *history_items)
+void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
 {
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
@@ -4093,7 +4093,7 @@ void	hc_pop_items(zbx_vector_ptr_t *history_items)
  *             history_items - [IN] the history items                         *
  *                                                                            *
  ******************************************************************************/
-void	hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items)
+void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items)
 {
 	int		i, history_num = 0;
 	zbx_hc_item_t	*item;
@@ -4123,7 +4123,7 @@ void	hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_ite
  *           removed from history index.                                      *
  *                                                                            *
  ******************************************************************************/
-void	hc_push_items(zbx_vector_ptr_t *history_items)
+void	zbx_hc_push_items(zbx_vector_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
@@ -4627,12 +4627,12 @@ void	zbx_dbcache_unlock(void)
 	UNLOCK_CACHE;
 }
 
-void	dbcache_set_history_num(int num)
+void	zbx_dbcache_set_history_num(int num)
 {
 	cache->history_num = num;
 }
 
-int	dbcache_get_history_num(void)
+int	zbx_dbcache_get_history_num(void)
 {
 	return cache->history_num;
 }

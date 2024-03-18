@@ -147,14 +147,14 @@ void	zbx_dc_flush_history(void);
 void	zbx_dbcache_lock(void);
 void	zbx_dbcache_unlock(void);
 
-void	hc_pop_items(zbx_vector_ptr_t *history_items);
-void	hc_push_items(zbx_vector_ptr_t *history_items);
-void	hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items);
+void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items);
+void	zbx_hc_push_items(zbx_vector_ptr_t *history_items);
+void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items);
 int	hc_queue_get_size(void);
-void	hc_free_item_values(zbx_dc_history_t *history, int history_num);
-void	dc_history_clean_value(zbx_dc_history_t *history);
-void	dbcache_set_history_num(int num);
-int	dbcache_get_history_num(void);
+void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num);
+void	zbx_dc_history_clean_value(zbx_dc_history_t *history);
+void	zbx_dbcache_set_history_num(int num);
+int	zbx_dbcache_get_history_num(void);
 
 void	zbx_hc_proxyqueue_clear(void);
 int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid);
