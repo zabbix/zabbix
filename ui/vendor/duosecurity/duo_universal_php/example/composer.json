@@ -1,0 +1,15 @@
+{
+  "require": {
+    "slim/slim": "4.7.1",
+    "slim/psr7": "1.3.0",
+    "slim/php-view": "3.0.0",
+    "bryanjhv/slim-session": "4.0",
+    "duosecurity/duo_universal_php": "@dev"
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../"
+    }
+  ]
+}

@@ -62,7 +62,9 @@ class CControllerUsergroupEdit extends CController {
 
 		if ($this->hasInput('usrgrpid')) {
 			$user_groups = API::UserGroup()->get([
-				'output' => ['name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid'],
+				'output' => ['name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid', 'mfa_status',
+					'mfaid'
+				],
 				'selectTagFilters' => ['groupid', 'tag', 'value'],
 				'usrgrpids' => $this->getInput('usrgrpid'),
 				'editable' => true
@@ -80,6 +82,7 @@ class CControllerUsergroupEdit extends CController {
 
 	protected function doAction() {
 		$db_defaults = DB::getDefaults('usrgrp');
+		$mfa_config_status = CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS);
 		$data = [
 			'usrgrpid' => 0,
 			'name' => $db_defaults['name'],
@@ -87,7 +90,9 @@ class CControllerUsergroupEdit extends CController {
 			'userdirectoryid' => 0,
 			'users_status' => $db_defaults['users_status'],
 			'debug_mode' => $db_defaults['debug_mode'],
-			'form_refresh' => 0
+			'form_refresh' => 0,
+			'group_mfa_status' => $mfa_config_status ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
+			'mfaid' => 0
 		];
 
 		if ($this->hasInput('usrgrpid')) {
@@ -97,6 +102,8 @@ class CControllerUsergroupEdit extends CController {
 			$data['users_status'] = $this->user_group['users_status'];
 			$data['debug_mode'] = $this->user_group['debug_mode'];
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
+			$data['group_mfa_status'] = $this->user_group['mfa_status'];
+			$data['mfaid'] = $this->user_group['mfaid'];
 		}
 
 		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
@@ -151,7 +158,16 @@ class CControllerUsergroupEdit extends CController {
 			]);
 			CArrayHelper::sort($userdirectories, ['name']);
 			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');
+
+			$data['ldap_status'] = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED);
 		}
+
+		$mfas = API::Mfa()->get([
+			'output' => ['mfaid', 'name'],
+			'sortfield' => ['name']
+		]);
+		$data['mfas'] = array_column($mfas, 'name', 'mfaid');
+		$data['mfa_config_status'] = $mfa_config_status;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user groups'));

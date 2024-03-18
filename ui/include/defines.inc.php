@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0beta2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050212);
+define('ZABBIX_DB_VERSION',		6050227);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -103,6 +103,22 @@ define('IDP_TYPE_SAML',	2);
 
 define('JIT_PROVISIONING_DISABLED',	0);
 define('JIT_PROVISIONING_ENABLED',	1);
+
+define('MFA_DISABLED',	0);
+define('MFA_ENABLED',	1);
+
+define('MFA_TYPE_TOTP',	1);
+define('MFA_TYPE_DUO',	2);
+
+define('TOTP_HASH_SHA1',	1);
+define('TOTP_HASH_SHA256',	2);
+define('TOTP_HASH_SHA512',	3);
+
+define('TOTP_CODE_LENGTH_6',	6);
+define('TOTP_CODE_LENGTH_8',	8);
+
+define('TOTP_VERIFICATION_DELAY_WINDOW', 1);
+define('TOTP_SECRET_LENGTH_32', 32);
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
@@ -223,8 +239,9 @@ define('PAGE_TYPE_JSON_RPC',			7); // api call
 define('PAGE_TYPE_TEXT',				9); // simple text
 define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
-define('ZBX_SESSION_ACTIVE',	0);
-define('ZBX_SESSION_PASSIVE',	1);
+define('ZBX_SESSION_ACTIVE',				0);
+define('ZBX_SESSION_PASSIVE',				1);
+define('ZBX_SESSION_CONFIRMATION_REQUIRED',	2);
 
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
@@ -1014,6 +1031,9 @@ define('USER_TYPE_SUPER_ADMIN',		3);
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
+define('GROUP_MFA_DISABLED', 0);
+define('GROUP_MFA_ENABLED', 1);
+
 define('LINE_TYPE_NORMAL',	0);
 define('LINE_TYPE_BOLD',	1);
 
@@ -1801,6 +1821,7 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
+define('TAB_INDICATOR_AUTH_MFA', 'mfa');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');

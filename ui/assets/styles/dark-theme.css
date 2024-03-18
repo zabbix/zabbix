@@ -5609,6 +5609,16 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   padding: 9px 5px;
   width: 100%; }
 
+.qr-code {
+  height: 190px;
+  width: 190px;
+  margin: 20px auto;
+  color: #f2f2f2;
+  background-color: #2b2b2b; }
+
+.qr-code img {
+  image-rendering: pixelated; }
+
 .menu-popup-overlay {
   position: fixed;
   top: 0;

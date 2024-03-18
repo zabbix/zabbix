@@ -25,7 +25,6 @@
 
 #include "postinit/postinit.h"
 #include "dbconfig/dbconfig.h"
-#include "discoverer/discoverer.h"
 #include "housekeeper/housekeeper.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
@@ -49,7 +48,10 @@
 #include "preproc/preproc_server.h"
 #include "lld/lld_protocol.h"
 #include "cachehistory/cachehistory_server.h"
+#include "discovery/discovery_server.h"
 
+#include "zbxdiscovery.h"
+#include "zbxdiscoverer.h"
 #include "zbxexport.h"
 #include "zbxself.h"
 
@@ -83,7 +85,6 @@
 #include "zbxtrends.h"
 #include "zbxrtc.h"
 #include "zbxstats.h"
-#include "zbxdiscovery.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
 #ifdef HAVE_OPENIPMI
@@ -1478,7 +1479,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_zbx_program_type, get_zbx_progname,
 							zbx_config_timeout, CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
-							zbx_config_source_ip, &events_cbs};
+							zbx_config_source_ip, &events_cbs, zbx_discovery_open_server,
+							zbx_discovery_close_server, zbx_discovery_update_host_server,
+							zbx_discovery_update_service_server};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, zbx_config_source_ip,
 							zbx_config_webservice_url};
@@ -1710,7 +1713,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &discoverer_args;
-				zbx_thread_start(discoverer_thread, &thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;

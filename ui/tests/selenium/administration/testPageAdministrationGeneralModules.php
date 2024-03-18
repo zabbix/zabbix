@@ -538,7 +538,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Test CSRF token support for modules',
 					'Directory' => 'modules/module_number_7',
 					'Namespace' => 'Modules\CSRF',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			]

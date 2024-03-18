@@ -2018,6 +2018,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxdbschema/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
+	src/libs/zbxdiscoverer/Makefile
 	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxeval/Makefile
@@ -2102,6 +2103,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/cachehistory/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
+	src/zabbix_proxy/discovery/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
@@ -2120,7 +2122,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/diag/Makefile
-	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/discovery/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/events/Makefile
 	src/zabbix_server/ha/Makefile
