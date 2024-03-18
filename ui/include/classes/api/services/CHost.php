@@ -1096,26 +1096,27 @@ class CHost extends CHostGeneral {
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
 			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
-		$discovered_hosts = DB::select('hosts', [
-			'output' => [],
-			'hostids' => $hostids,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED, 'status' => HOST_STATUS_MONITORED],
-			'preservekeys' => true
-		]);
-
 		if ($data) {
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
 			]);
 
-			// Update disable_source in host_discovery table when discovered host status is changed to disabled.
-			if ($discovered_hosts && array_key_exists('status', $data)
-					&& $data['status'] == HOST_STATUS_NOT_MONITORED) {
-				DB::update('host_discovery', [
-					'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
-					'where' => ['hostid' => array_keys($discovered_hosts)]
-				]);
+			if (array_key_exists('status', $data) && $data['status'] == HOST_STATUS_NOT_MONITORED) {
+				$discovered_hostids = [];
+
+				foreach ($db_hosts as $db_host) {
+					if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $data['status'] != $db_host['status']) {
+						$discovered_hostids[] = $db_host['hostid'];
+					}
+				}
+
+				if ($discovered_hostids) {
+					DB::update('host_discovery', [
+						'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
+						'where' => ['hostid' => $discovered_hostids]
+					]);
+				}
 			}
 		}
 
