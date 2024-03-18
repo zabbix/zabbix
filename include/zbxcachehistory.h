@@ -36,7 +36,6 @@
 #define ZBX_HC_TIMER_MAX	(ZBX_HC_SYNC_MAX / 2)
 #define ZBX_HC_TIMER_SOFT_MAX	(ZBX_HC_TIMER_MAX - 10)
 
-
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
 
