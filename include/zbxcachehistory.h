@@ -164,11 +164,7 @@ void	zbx_hc_proxyqueue_clear(void);
 int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid);
 void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid);
 
-int	DBmass_add_history(zbx_dc_history_t *history, int history_num);
-
 void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
-
-void	DCinventory_value_free(zbx_inventory_value_t *inventory_value);
 
 void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
@@ -198,4 +194,5 @@ void	zbx_dbcache_setproxyqueue_state(int proxyqueue_state);
 int	zbx_dbcache_getproxyqueue_state(void);
 
 zbx_uint64_t	zbx_hc_proxyqueue_peek(void);
+
 #endif
