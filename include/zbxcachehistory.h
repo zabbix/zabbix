@@ -177,9 +177,6 @@ void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_
 
 void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff);
 
-void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
-		zbx_vector_uint64_pair_t *trends_diff);
-
 int	hc_get_history_compression_age(void);
 
 void	DCexport_history_and_trends(const zbx_dc_history_t *history, int history_num,
@@ -194,5 +191,9 @@ void	zbx_dbcache_setproxyqueue_state(int proxyqueue_state);
 int	zbx_dbcache_getproxyqueue_state(void);
 
 zbx_uint64_t	zbx_hc_proxyqueue_peek(void);
+
+int	zbx_trend_compare(const void *d1, const void *d2);
+
+void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
 
 #endif

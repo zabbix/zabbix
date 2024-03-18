@@ -828,8 +828,6 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
@@ -868,11 +866,37 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 	return ret;
 }
 
-
 static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 {
 	zbx_free(inventory_value->value);
 	zbx_free(inventory_value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare history data using items from configuration cache         *
+ *                                                                            *
+ * Parameters: trends      - [IN] trends from cache to be added to database   *
+ *             trends_num  - [IN] number of trends to add to database         *
+ *             trends_diff - [OUT] disable_from updates                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
+		zbx_vector_uint64_pair_t *trends_diff)
+{
+	ZBX_DC_TREND	*trends_tmp;
+
+	if (0 != trends_num)
+	{
+		trends_tmp = (ZBX_DC_TREND *)zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
+		memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
+		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
+
+		while (0 < trends_num)
+			DBflush_trends(trends_tmp, &trends_num, trends_diff);
+
+		zbx_free(trends_tmp);
+	}
 }
 
 /******************************************************************************

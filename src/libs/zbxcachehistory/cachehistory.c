@@ -674,7 +674,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  * Purpose: flush trend to the database                                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
+void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
 	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	unsigned char	value_type;
@@ -969,7 +969,7 @@ void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	zbx_trend_compare(const void *d1, const void *d2)
+int	zbx_trend_compare(const void *d1, const void *d2)
 {
 	const ZBX_DC_TREND	*p1 = (const ZBX_DC_TREND *)d1;
 	const ZBX_DC_TREND	*p2 = (const ZBX_DC_TREND *)d2;
@@ -978,33 +978,6 @@ static int	zbx_trend_compare(const void *d1, const void *d2)
 	ZBX_RETURN_IF_NOT_EQUAL(p1->clock, p2->clock);
 
 	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: prepare history data using items from configuration cache         *
- *                                                                            *
- * Parameters: trends      - [IN] trends from cache to be added to database   *
- *             trends_num  - [IN] number of trends to add to database         *
- *             trends_diff - [OUT] disable_from updates                       *
- *                                                                            *
- ******************************************************************************/
-void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
-		zbx_vector_uint64_pair_t *trends_diff)
-{
-	ZBX_DC_TREND	*trends_tmp;
-
-	if (0 != trends_num)
-	{
-		trends_tmp = (ZBX_DC_TREND *)zbx_malloc(NULL, trends_num * sizeof(ZBX_DC_TREND));
-		memcpy(trends_tmp, trends, trends_num * sizeof(ZBX_DC_TREND));
-		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
-
-		while (0 < trends_num)
-			DBflush_trends(trends_tmp, &trends_num, trends_diff);
-
-		zbx_free(trends_tmp);
-	}
 }
 
 typedef struct
