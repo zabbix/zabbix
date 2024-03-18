@@ -67,8 +67,7 @@
 		.svg-honeycomb-label {
 			overflow: hidden;
 
-			> span {
-				display: block;
+			> div {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;

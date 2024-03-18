@@ -3581,8 +3581,7 @@ section {
   .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label {
     overflow: hidden;
     transition: max-height 0.3s, font-size 0.3s; }
-    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label > span {
-      display: block;
+    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label > div {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }

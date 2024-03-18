@@ -634,7 +634,7 @@ class CSVGHoneycomb {
 				.call(label_container => {
 					for (const line of label.lines.values()) {
 						label_container
-							.append('span')
+							.append('div')
 							.text(line);
 					}
 				});
