@@ -686,7 +686,12 @@ class CSVGHoneycomb {
 	#resizeLabels(cell, box = {}) {
 		const d = cell.datum();
 
-		box = {...d.position, width: this.#cell_width - this.#cells_gap, height: this.#cell_height  / 2, ...box};
+		box = {
+			...d.position,
+			width: this.#cell_width - this.#cells_gap * 1.25,
+			height: this.#cell_height / 2.25,
+			...box
+		};
 
 		cell
 			.call(cell => cell.select('foreignObject')
