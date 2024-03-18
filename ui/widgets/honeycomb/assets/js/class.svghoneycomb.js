@@ -835,7 +835,11 @@ class CSVGHoneycomb {
 				continue;
 			}
 
-			let font_scale = height_limit / (p_height + s_height);
+			const p_scalable = primary?.is_custom_size ? 1 : 0;
+			const s_scalable = secondary?.is_custom_size ? 1 : 0;
+
+			const font_scale = (height_limit - p_height * p_scalable - s_height * s_scalable)
+				/ (p_height * (1 - p_scalable) + s_height * (1 - s_scalable));
 
 			if (primary !== null) {
 				primary.font_size = Math.max(font_size_min,
