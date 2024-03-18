@@ -29,6 +29,7 @@ class CControllerUsergroupCreate extends CController {
 			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
 			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 			'userdirectoryid' =>		'db usrgrp.userdirectoryid',
+			'mfaid' =>					'int32',
 			'ms_hostgroup_right' =>		'array',
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
@@ -72,7 +73,8 @@ class CControllerUsergroupCreate extends CController {
 			'tag_filters' => []
 		];
 
-		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
+		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid']);
+		$user_group['name'] = trim($this->getInput('name'));
 
 		$db_hostgroups = API::HostGroup()->get([
 			'output' => ['groupid', 'name']
@@ -117,6 +119,16 @@ class CControllerUsergroupCreate extends CController {
 				$this->getErrorResponse(true);
 
 				return;
+			}
+		}
+
+		if (array_key_exists('mfaid', $user_group)) {
+			if ($user_group['mfaid'] == -1) {
+				$user_group['mfa_status'] = GROUP_MFA_DISABLED;
+				unset($user_group['mfaid']);
+			}
+			else {
+				$user_group['mfa_status'] = GROUP_MFA_ENABLED;
 			}
 		}
 

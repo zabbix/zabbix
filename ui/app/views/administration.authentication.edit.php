@@ -32,6 +32,7 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('authentication')))->removeId())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+	->addVar('mfa_removed_mfaids', $data['mfa_removed_mfaids'])
 	->setId('authentication-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->disablePasswordAutofill();
@@ -557,12 +558,52 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-provision-status')
 	]);
 
+$form->addVar('mfa_default_row_index', $data['mfa_default_row_index']);
+$mfa_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Enable multi-factor authentication'), 'mfa_status'),
+		new CFormField(
+			(new CCheckBox('mfa_status', MFA_ENABLED))
+				->setChecked($data['mfa_status'] == MFA_ENABLED)
+				->setUncheckedValue(MFA_DISABLED)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Methods')))->setAsteriskMark(),
+		new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('mfa-methods')
+					->setHeader(
+						(new CRowHeader([
+							new CColHeader(_('Name')),
+							new CColHeader(_('Type')),
+							(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
+							_('Default'),
+							_('Action')
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CButtonLink(_('Add')))->addClass('js-add')
+								))->setColSpan(5)
+							)
+					)->addStyle('width: 100%')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	]);
+
 	$form->addItem((new CTabView())
 		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)
 		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
 		->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
+		->addTab('mfa', _('MFA settings'), $mfa_tab, TAB_INDICATOR_AUTH_MFA)
 		->setFooter(makeFormFooter(
 			(new CSubmit('update', _('Update')))
 		))
@@ -643,6 +684,31 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 
+$templates['mfa_methods_row'] = (string) (new CRow([
+	[
+		(new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass('js-edit'),
+		(new CVar('mfa_methods[#{row_index}][mfaid]', '#{mfaid}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][type]', '#{type}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][name]', '#{name}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][hash_function]', '#{hash_function}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][code_length]', '#{code_length}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][api_hostname]', '#{api_hostname}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][clientid]', '#{clientid}'))->removeId(),
+		(new CVar('mfa_methods[#{row_index}][client_secret]', '#{client_secret}'))->removeId()
+	],
+	(new CCol('#{type_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CCol('#{usrgrps}'))->addClass('js-mfa-usergroups'),
+	[
+		(new CInput('radio', 'mfa_default_row_index', '#{row_index}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setId('mfa_default_row_index_#{row_index}'),
+		(new CLabel(new CSpan(), 'mfa_default_row_index_#{row_index}'))->addClass(ZBX_STYLE_WORDWRAP)
+	],
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
+]))->setAttribute('data-row_index', '#{row_index}');
+
 (new CScriptTag(
 	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
@@ -650,7 +716,9 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		'db_authentication_type' => $data['db_authentication_type'],
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media'],
-		'templates' => $templates
+		'templates' => $templates,
+		'mfa_methods' => $data['mfa_methods'],
+		'mfa_default_row_index' => $data['mfa_default_row_index']
 	]).');'
 ))
 	->setOnDocumentReady()

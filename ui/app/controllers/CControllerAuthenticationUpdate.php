@@ -77,13 +77,18 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
 			'passwd_min_length' =>				'int32',
-			'passwd_check_rules' =>				'array'
+			'passwd_check_rules' =>				'array',
+			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
+			'mfa_methods' =>					'array',
+			'mfa_default_row_index' =>			'int32',
+			'mfa_removed_mfaids' =>				'array_id'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth();
+			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth()
+				&& $this->validateMfa();
 		}
 
 		if (!$ret) {
@@ -223,6 +228,23 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
+	 * Validate MFA settings.
+	 *
+	 * @return bool
+	 */
+	private function validateMfa(): bool {
+		$default_mfa = $this->hasInput('mfa_default_row_index') ? $this->getInput('mfa_default_row_index') : null;
+		$error = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
+			&& !array_key_exists($default_mfa, $this->getInput('mfa_methods', []));
+
+		if ($error) {
+			error(_('Default MFA method must be specified.'));
+		}
+
+		return !$error;
+	}
+
+	/**
 	 * Validate is user allowed to change configuration.
 	 *
 	 * @return bool
@@ -280,12 +302,32 @@ class CControllerAuthenticationUpdate extends CController {
 				}
 			}
 
+			$mfaid = 0;
 			if ($result) {
-				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid);
+				$mfa_methods = $this->getInput('mfa_methods', []);
+
+				if ($mfa_methods) {
+					$mfaids = $this->processMfaMethods($mfa_methods);
+
+					if (!$mfaids) {
+						$result = false;
+					}
+					else {
+						$mfaid = $mfaids[$this->getInput('mfa_default_row_index', 0)];
+					}
+				}
+			}
+
+			if ($result) {
+				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid, $mfaid);
 			}
 
 			if ($result && $this->hasInput('ldap_removed_userdirectoryids')) {
 				$result = (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'));
+			}
+
+			if ($result && $this->hasInput('mfa_removed_mfaids')) {
+				$result = (bool) API::Mfa()->delete($this->getInput('mfa_removed_mfaids'));
 			}
 
 			if (!$result) {
@@ -311,7 +353,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$this->setResponse($this->response);
 	}
 
-	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
+	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid, int $mfaid): bool {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'disabled_usrgrpid' => 0,
@@ -320,7 +362,9 @@ class CControllerAuthenticationUpdate extends CController {
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
-			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
+			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
+			'mfa_status' => MFA_DISABLED,
+			'mfaid' => $mfaid
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
@@ -365,7 +409,9 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::SAML_JIT_STATUS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
-			CAuthenticationHelper::PASSWD_CHECK_RULES
+			CAuthenticationHelper::PASSWD_CHECK_RULES,
+			CAuthenticationHelper::MFA_STATUS,
+			CAuthenticationHelper::MFAID
 		];
 
 		$auth = [];
@@ -440,6 +486,47 @@ class CControllerAuthenticationUpdate extends CController {
 		else {
 			return [];
 		}
+	}
+
+	/**
+	 * Updates existing MFA methods, creates new ones, removes deleted ones.
+	 *
+	 * @param array $mfa_methods
+	 *
+	 * @return array
+	 */
+	private function processMfaMethods(array $mfa_methods): array {
+		$ins_mfa_methods = [];
+		$upd_mfa_methods = [];
+		$mfaid_map = [];
+
+		foreach ($mfa_methods as $row_index => $mfa_method) {
+			if (array_key_exists('mfaid', $mfa_method)) {
+				$mfaid_map[$row_index] = $mfa_method['mfaid'];
+				$upd_mfa_methods[] = $mfa_method;
+			}
+			else {
+				$mfaid_map[$row_index] = null;
+				$ins_mfa_methods[] = $mfa_method;
+			}
+		}
+
+		$result = $upd_mfa_methods ? API::Mfa()->update($upd_mfa_methods) : [];
+		$result = ($result !== false && $ins_mfa_methods) ? API::Mfa()->create($ins_mfa_methods) : $result;
+
+		if (!$result) {
+			return [];
+		}
+
+		if ($ins_mfa_methods) {
+			foreach ($mfaid_map as $row_index => $mfaid) {
+				if ($mfaid === null) {
+					$mfaid_map[$row_index] = array_shift($result['mfaids']);
+				}
+			}
+		}
+
+		return $mfaid_map;
 	}
 
 	/**

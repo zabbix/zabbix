@@ -78,6 +78,23 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 		]);
 	}
 
+	if (CWebUser::$data['mfaid']) {
+		CSessionHelper::set('confirmid', CWebUser::$data['sessionid']);
+
+		// In case user has not finished their Duo authentication, need to unset data saved into session by Duo.
+		if (CSessionHelper::has('state')) {
+			CSessionHelper::unset(['state', 'username']);
+		}
+
+		$mfa_url = (new CUrl('index_mfa.php'));
+
+		if ($request !== '') {
+			$mfa_url->setArgument('request', $request);
+		}
+
+		redirect($mfa_url->toString());
+	}
+
 	$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 	redirect(reset($redirect));
 }
