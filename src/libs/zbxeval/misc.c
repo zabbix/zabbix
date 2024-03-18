@@ -370,14 +370,15 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 /******************************************************************************
  *                                                                            *
  * Purpose: composes expression by replacing processed macro tokens           *
- *          (with values) in part of original expression                      *
+ *          (with values) starting from definite position of                  *
+ *          original expression                                               *
  *                                                                            *
  * Parameters: ctx        - [IN] evaluation context                           *
  *             expression - [OUT] composed expression                         *
  *             shift_pos  - [IN] position which to start from                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_compose_expression_by_token(const zbx_eval_context_t *ctx, char **expression, size_t shift_pos)
+void	zbx_eval_compose_expression_from_pos(const zbx_eval_context_t *ctx, char **expression, size_t pos)
 {
 	zbx_vector_ptr_t	tokens;
 	const zbx_eval_token_t	*token;
@@ -388,9 +389,12 @@ void	zbx_eval_compose_expression_by_token(const zbx_eval_context_t *ctx, char **
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
-		if ((0 != (ctx->stack.values[i].type & ZBX_EVAL_TOKEN_VAR_MACRO)) ||
-				(0 != (ctx->stack.values[i].type & ZBX_EVAL_TOKEN_VAR_USERMACRO)) ||
-				(0 != (ctx->stack.values[i].type & ZBX_EVAL_TOKEN_VAR_LLDMACRO)))
+		if (ctx->stack.values[i].loc.l < pos)
+			continue;
+
+		if (ZBX_EVAL_TOKEN_VAR_MACRO == ctx->stack.values[i].type ||
+				ZBX_EVAL_TOKEN_VAR_USERMACRO == ctx->stack.values[i].type ||
+				ZBX_EVAL_TOKEN_VAR_STR == ctx->stack.values[i].type)
 		{
 			if (ZBX_VARIANT_NONE != ctx->stack.values[i].value.type)
 				zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
@@ -403,16 +407,16 @@ void	zbx_eval_compose_expression_by_token(const zbx_eval_context_t *ctx, char **
 	{
 		token = (const zbx_eval_token_t *)tokens.values[i];
 
-		zbx_strncpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + shift_pos,
-				token->loc.l - shift_pos);
+		zbx_strncpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos,
+				token->loc.l - pos);
 
-		shift_pos = token->loc.r + 1;
+		pos = token->loc.r + 1;
 
 		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token);
 	}
 
-	if ('\0' != ctx->expression[shift_pos])
-		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + shift_pos);
+	if ('\0' != ctx->expression[pos])
+		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos);
 
 	zbx_vector_ptr_destroy(&tokens);
 }

@@ -236,7 +236,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 
 void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
 
-void	zbx_eval_compose_expression_by_token(const zbx_eval_context_t *ctx, char **expression, size_t shift_pos);
+void	zbx_eval_compose_expression_from_pos(const zbx_eval_context_t *ctx, char **expression, size_t pos);
 
 #define ZBX_EVAL_EXTRACT_FUNCTIONID	0x0001
 #define ZBX_EVAL_EXTRACT_VAR_STR	0x0002

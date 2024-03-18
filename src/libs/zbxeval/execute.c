@@ -2439,7 +2439,7 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	{
 		char	*composed_expr = NULL;
 
-		zbx_eval_compose_expression_by_token(ctx, &composed_expr, token->loc.l);
+		zbx_eval_compose_expression_from_pos(ctx, &composed_expr, token->loc.l);
 		*error = zbx_dsprintf(*error, "%s at \"%s\".", errmsg, composed_expr);
 		zbx_free(errmsg);
 		zbx_free(composed_expr);
