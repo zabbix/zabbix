@@ -79,8 +79,8 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		}
 
 		$dst_items = [];
-		$dst_host_statuses = DB::select('hosts', [
-			'output' => ['status'],
+		$dst_hosts = DB::select('hosts', [
+			'output' => ['host', 'status'],
 			'hostids' => $dst_hostids,
 			'preservekeys' => true
 		]);
@@ -98,9 +98,9 @@ class CLldRuleHelper extends CItemGeneralHelper {
 				}
 
 				$dst_item = ['hostid' => $dst_hostid] + getSanitizedItemFields([
+					'templateid' => 0,
 					'flags' => ZBX_FLAG_DISCOVERY_RULE,
-					'hosts' => [$dst_host_statuses[$dst_hostid]],
-					'templateid' => 0
+					'hosts' => [$dst_hosts[$dst_hostid]]
 				] + $dst_item);
 
 				if (array_key_exists('filter', $dst_item)) {
@@ -126,8 +126,8 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			}
 		}
 
-		return CItemPrototypeHelper::copy($src_options, $dst_options, $dst_itemids, $dst_host_statuses)
-			&& CTriggerPrototypeHelper::copy($src_options, $dst_options)
+		return CItemPrototypeHelper::copy($src_options, $dst_options, $dst_itemids, $dst_hosts)
+			&& CTriggerPrototypeHelper::copy($src_options, $dst_hosts)
 			&& CGraphPrototypeHelper::copy($src_options, $dst_options)
 			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);
 	}

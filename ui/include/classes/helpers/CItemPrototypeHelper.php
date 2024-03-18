@@ -84,11 +84,11 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 * @param array $src_options
 	 * @param array $dst_options
 	 * @param array $dst_ruleids
-	 * @param array $dst_host_statuses
+	 * @param array $dst_hosts
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options, array $dst_ruleids, array $dst_host_statuses): bool {
+	public static function copy(array $src_options, array $dst_options, array $dst_ruleids, array $dst_hosts): bool {
 		$src_items = self::getSourceItemPrototypes($src_options);
 
 		if (!$src_items) {
@@ -142,9 +142,9 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 						'hostid' => $dst_hostid,
 						'ruleid' => $dst_ruleids[$src_item['discoveryRule']['itemid']][$dst_hostid]
 					] + getSanitizedItemFields([
+						'templateid' => 0,
 						'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						'hosts' => [$dst_host_statuses[$dst_hostid]],
-						'templateid' => 0
+						'hosts' => [$dst_hosts[$dst_hostid]]
 					] + $dst_item);
 				}
 			}

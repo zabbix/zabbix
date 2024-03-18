@@ -148,9 +148,11 @@ class CItemHelper extends CItemGeneralHelper {
 			return false;
 		}
 
-		$dst_item_hosts = [
-			['status' => key($dst_options) === 'templateids' ? HOST_STATUS_TEMPLATE : HOST_STATUS_MONITORED]
-		];
+		$dst_hosts = DB::select('hosts', [
+			'output' => ['status'],
+			'hostids' => $dst_hostids,
+			'preservekeys' => true
+		]);
 
 		do {
 			$dst_items = [];
@@ -172,9 +174,9 @@ class CItemHelper extends CItemGeneralHelper {
 					}
 
 					$dst_items[] = ['hostid' => $dst_hostid] + getSanitizedItemFields([
+						'templateid' => 0,
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-						'hosts' => $dst_item_hosts,
-						'templateid' => 0
+						'hosts' => [$dst_hosts[$dst_hostid]]
 					] + $dst_item);
 
 				}

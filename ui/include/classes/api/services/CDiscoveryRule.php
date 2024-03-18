@@ -3362,9 +3362,9 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$dstDiscovery = ['hostid' => $dstDiscovery['hostid']] + getSanitizedItemFields([
+			'templateid' => 0,
 			'flags' => ZBX_FLAG_DISCOVERY_RULE,
-			'hosts' => [$dst_host],
-			'templateid' => 0
+			'hosts' => [$dst_host]
 		] + $dstDiscovery);
 
 		if (array_key_exists('filter', $dstDiscovery)) {
@@ -3694,9 +3694,9 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				$dst_items[] = ['hostid' => $dst_host['hostid'], 'ruleid' => $dst_ruleid] + getSanitizedItemFields([
+					'templateid' => 0,
 					'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-					'hosts' => [$dst_host],
-					'templateid' => 0
+					'hosts' => [$dst_host]
 				] + $dst_item);
 			}
 

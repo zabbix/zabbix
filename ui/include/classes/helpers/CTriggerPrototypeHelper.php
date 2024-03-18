@@ -23,11 +23,11 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 
 	/**
 	 * @param array $src_options
-	 * @param array $dst_options
+	 * @param array $dst_hosts
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options): bool {
+	public static function copy(array $src_options, array $dst_hosts): bool {
 		$src_triggers = self::getSourceTriggerPrototypes($src_options);
 
 		if (!$src_triggers) {
@@ -54,16 +54,6 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 				}
 			}
 		}
-
-		$dst_hosts = array_key_exists('templateids', $dst_options)
-			? API::Template()->get([
-				'output' => ['host'],
-				'preservekeys' => true
-			] + $dst_options)
-			: API::Host()->get([
-				'output' => ['host', 'status'],
-				'preservekeys' => true
-			] + $dst_options);
 
 		$dst_master_triggerids = self::getDestinationMasterTriggers($src_hosts, $dst_hosts);
 
