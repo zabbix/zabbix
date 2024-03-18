@@ -727,7 +727,7 @@ class CSVGHoneycomb {
 			const font_weight = this.#config[c_param].is_bold ? 'bold' : null;
 
 			for (const d of data) {
-				const lines = d[c_param].replace('\r', '').split('\n');
+				const lines = d[c_param].split('\n');
 				const lines_count = lines.length;
 
 				d.labels[d_param] = {

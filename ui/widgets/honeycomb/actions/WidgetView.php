@@ -34,6 +34,9 @@ use Widgets\Honeycomb\Includes\WidgetForm;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	private const LABEL_MAX_LINES = 10;
+	private const LABEL_MAX_LINE_LENGTH = 250;
+
 	protected function init(): void {
 		parent::init();
 
@@ -131,7 +134,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$last_value = $history[$item['itemid']][0]['value'];
 
 			$primary_label = array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)
-				? self::getCellLabel($item, $last_value, [
+				? $this->getCellLabel($item, $last_value, [
 					'label' =>					$this->fields_values['primary_label'],
 					'label_decimal_places' =>	$this->fields_values['primary_label_decimal_places'],
 					'label_type' =>				$this->fields_values['primary_label_type'],
@@ -142,7 +145,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: '';
 
 			$secondary_label = array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)
-				? self::getCellLabel($item, $last_value, [
+				? $this->getCellLabel($item, $last_value, [
 					'label' =>					$this->fields_values['secondary_label'],
 					'label_decimal_places' =>	$this->fields_values['secondary_label_decimal_places'],
 					'label_type' =>				$this->fields_values['secondary_label_type'],
@@ -178,7 +181,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$label = $resolved_label[$item['itemid']]['label'];
 			}
 
-			return $label;
+			return $this->trimCellLabel($label);
 		}
 
 		switch ($item['value_type']) {
@@ -209,8 +212,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 				return $formatted_value['value'];
 
 			default:
-				return formatHistoryValue($last_value, $item, false);
+				return $this->trimCellLabel(formatHistoryValue($last_value, $item, false));
 		}
+	}
+
+	private function trimCellLabel(string $label): string {
+		$lines = [];
+
+		foreach (array_slice(explode("\n", str_replace("\r", '', $label)), 0, self::LABEL_MAX_LINES) as $line) {
+			$lines[] = mb_substr($line, 0, self::LABEL_MAX_LINE_LENGTH);
+		}
+
+		return implode("\n", $lines);
 	}
 
 	private function getConfig(): array {
