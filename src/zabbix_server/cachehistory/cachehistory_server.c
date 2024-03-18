@@ -155,17 +155,17 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 		*more = ZBX_SYNC_DONE;
 
-		dbcache_lock();
+		zbx_dbcache_lock();
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
-		dbcache_unlock();
+		zbx_dbcache_unlock();
 
 		if (0 != history_items.values_num)
 		{
 			if (0 == (history_num = zbx_dc_config_lock_triggers_by_history_items(&history_items, &triggerids)))
 			{
-				dbcache_lock();
+				zbx_dbcache_lock();
 				hc_push_items(&history_items);
-				dbcache_unlock();
+				zbx_dbcache_unlock();
 				zbx_vector_ptr_clear(&history_items);
 			}
 		}
@@ -343,7 +343,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 		if (0 != history_num)
 		{
-			dbcache_lock();
+			zbx_dbcache_lock();
 			hc_push_items(&history_items);	/* return items to history cache */
 			dbcache_set_history_num(dbcache_get_history_num() - history_num);
 
@@ -358,7 +358,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					*more = ZBX_SYNC_MORE;
 			}
 
-			dbcache_unlock();
+			zbx_dbcache_unlock();
 
 			*values_num += history_num;
 		}
@@ -510,7 +510,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64, __func__, proxyid);
 
-	dbcache_lock();
+	zbx_dbcache_lock();
 
 	hc_pused = 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
 			zbx_dbcache_get_hc_mem()->total_size;
@@ -558,7 +558,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 	ret = zbx_hc_proxyqueue_dequeue(proxyid);
 
 out:
-	dbcache_unlock();
+	zbx_dbcache_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

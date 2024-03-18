@@ -379,12 +379,12 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	{
 		*more = ZBX_SYNC_DONE;
 
-		dbcache_lock();
+		zbx_dbcache_lock();
 
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
 		history_num = history_items.values_num;
 
-		dbcache_unlock();
+		zbx_dbcache_unlock();
 
 		if (0 == history_num)
 			break;
@@ -404,7 +404,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 		}
 
-		dbcache_lock();
+		zbx_dbcache_lock();
 
 		hc_push_items(&history_items);	/* return items to history cache */
 
@@ -418,7 +418,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 			if (0 != hc_queue_get_size())
 				*more = ZBX_SYNC_MORE;
 
-			dbcache_unlock();
+			zbx_dbcache_unlock();
 
 			*values_num += history_num;
 
@@ -427,7 +427,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 		else
 		{
 			*more = ZBX_SYNC_MORE;
-			dbcache_unlock();
+			zbx_dbcache_unlock();
 		}
 
 		zbx_vector_ptr_clear(&history_items);

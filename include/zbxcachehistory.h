@@ -144,8 +144,8 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
 void	zbx_dc_flush_history(void);
 
-void	dbcache_lock(void);
-void	dbcache_unlock(void);
+void	zbx_dbcache_lock(void);
+void	zbx_dbcache_unlock(void);
 
 void	hc_pop_items(zbx_vector_ptr_t *history_items);
 void	hc_push_items(zbx_vector_ptr_t *history_items);

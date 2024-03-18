@@ -4617,12 +4617,12 @@ void	zbx_hc_proxyqueue_clear(void)
 	zbx_hashset_clear(&cache->proxyqueue.index);
 }
 
-void	dbcache_lock(void)
+void	zbx_dbcache_lock(void)
 {
 	LOCK_CACHE;
 }
 
-void	dbcache_unlock(void)
+void	zbx_dbcache_unlock(void)
 {
 	UNLOCK_CACHE;
 }
