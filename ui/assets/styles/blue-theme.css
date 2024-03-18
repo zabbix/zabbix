@@ -3572,9 +3572,12 @@ section {
     color: var(--color); }
   .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label {
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     transition: max-height 0.3s, font-size 0.3s; }
+    .svg-honeycomb .svg-honeycomb-cell .svg-honeycomb-label > span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
   .svg-honeycomb .svg-honeycomb-cell:hover {
     --stroke: var(--stroke-selected); }
   .svg-honeycomb .svg-honeycomb-cell.svg-honeycomb-cell-selected {

@@ -629,16 +629,11 @@ class CSVGHoneycomb {
 		cell.call(cell => cell.select('foreignObject')?.remove());
 
 		const makeLabel = (label) => {
-			return d3.create('span')
+			return d3.create('div')
 				.attr('class', CSVGHoneycomb.ZBX_STYLE_LABEL)
-				.call(span => {
-					for (const [i, line] of label.lines.entries()) {
-						span
-							.call(line => {
-								if (i > 0) {
-									line.append('br');
-								}
-							})
+				.call(label_container => {
+					for (const line of label.lines.values()) {
+						label_container
 							.append('span')
 							.text(line);
 					}

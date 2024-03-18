@@ -66,8 +66,13 @@
 
 		.svg-honeycomb-label {
 			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+
+			> span {
+				display: block;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
 
 			@if $ui-transitions {
 				transition: max-height $ui-transition-duration,
