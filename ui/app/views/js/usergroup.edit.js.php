@@ -27,9 +27,12 @@
 <script>
 	const view = new class {
 
-		init({templategroup_rights, hostgroup_rights, tag_filters}) {
+		init({templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status, can_update_group}) {
 			this.tag_filters = tag_filters;
 			this.templategroup_rights = templategroup_rights;
+			this.can_update_group = can_update_group;
+			this.ldap_status = ldap_status;
+			this.mfa_status = mfa_status;
 			this.template_permission_template = new Template(
 				document.getElementById('templategroup-right-row-template').innerHTML
 			);
@@ -73,9 +76,27 @@
 				}
 			});
 
+			document.getElementById('user-group-form').addEventListener('change', event => {
+				if (event.target.name == 'gui_access') {
+					this.#toggleUserdirectoryAndMfa(event.target.value);
+				}
+				if (event.target.name == 'mfaid') {
+					this.#toggleMfaWarningIcon(event.target.value);
+				}
+				if (event.target.name == 'userdirectoryid') {
+					this.#toggleLdapWarningIcon(event.target.value);
+				}
+			})
+
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
 			this.#setMultiselectDisabling('ms_templategroup');
+
+			if (this.can_update_group) {
+				this.#toggleUserdirectoryAndMfa(document.querySelector('[name="gui_access"]').value);
+				this.#toggleMfaWarningIcon(document.querySelector('[name="mfaid"]').value);
+				this.#toggleLdapWarningIcon(document.querySelector('[name="userdirectoryid"]').value);
+			}
 		}
 
 		/**
@@ -104,7 +125,8 @@
 			if (!groups.length) {
 				if (group_type === 'templategroup') {
 					this.#setMultiselectDisabling('ms_templategroup');
-				} else if (group_type === 'hostgroup') {
+				}
+				else if (group_type === 'hostgroup') {
 					this.#setMultiselectDisabling('ms_hostgroup');
 				}
 			}
@@ -115,9 +137,10 @@
 							'id': groups[id]['groupid'],
 							'name': groups[id]['name']
 						};
-					$(ms).multiSelect('addData', [group]);
 
-					disable_groupids.push(group['id']);
+						$(ms).multiSelect('addData', [group]);
+
+						disable_groupids.push(group['id']);
 					}
 				}
 
@@ -267,30 +290,48 @@
 					document.dispatchEvent(new Event('tab-indicator-update'));
 			});
 		}
-	};
 
-	jQuery(function($) {
-		const $form = $('form[name="user_group_form"]'),
-			$userdirectory = $form.find('[name="userdirectoryid"]'),
-			$gui_access = $form.find('[name="gui_access"]');
+		#toggleUserdirectoryAndMfa(gui_access) {
+			const userdirectory = document.querySelector('[name="userdirectoryid"]');
+			const mfa = document.querySelector('[name="mfaid"]');
 
-		$gui_access.on('change', onFrontendAccessChange);
-		onFrontendAccessChange.apply($gui_access);
+			switch (parseInt(gui_access)) {
+				case GROUP_GUI_ACCESS_DISABLED:
+					userdirectory.disabled = true;
+					mfa.disabled = true;
+					break;
 
-		$form.submit(function() {
-			$form.trimValues(['#name']);
-		});
+				case GROUP_GUI_ACCESS_INTERNAL:
+					userdirectory.disabled = true;
+					mfa.disabled = false;
+					break;
 
-		// Handle "Frontend access" selector change.
-		function onFrontendAccessChange() {
-			const gui_access = $(this).val();
-
-			if (gui_access == <?= GROUP_GUI_ACCESS_INTERNAL ?> || gui_access == <?= GROUP_GUI_ACCESS_DISABLED ?>) {
-				$userdirectory.attr('disabled', 'disabled');
-			}
-			else {
-				$userdirectory.removeAttr('disabled');
+				default:
+					userdirectory.disabled = false;
+					mfa.disabled = false;
 			}
 		}
-	});
+
+		#toggleMfaWarningIcon(mfa_value) {
+			const icon = document.getElementById('mfa-warning');
+
+			if (this.mfa_status == <?= MFA_DISABLED ?> && mfa_value != -1) {
+				icon.style.display = '';
+			}
+			else {
+				icon.style.display = 'none';
+			}
+		}
+
+		#toggleLdapWarningIcon(userdirectory_value) {
+			const icon = document.getElementById('ldap-warning');
+
+			if (this.ldap_status == <?= ZBX_AUTH_LDAP_DISABLED ?> && userdirectory_value != 0) {
+				icon.style.display = '';
+			}
+			else {
+				icon.style.display = 'none';
+			}
+		}
+	};
 </script>
