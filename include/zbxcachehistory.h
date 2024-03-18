@@ -164,16 +164,16 @@ void	zbx_hc_proxyqueue_clear(void);
 int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid);
 void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid);
 
-void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
+void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
 
-void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
+void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age);
 
-void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff);
+void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff);
 
-int	hc_get_history_compression_age(void);
+int	zbx_hc_get_history_compression_age(void);
 
-void	DCexport_history_and_trends(const zbx_dc_history_t *history, int history_num,
+void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
 		const ZBX_DC_TREND *trends, int trends_num, int history_export_enabled,
 		zbx_vector_connector_filter_t *connector_filters, unsigned char **data, size_t *data_alloc,
@@ -188,6 +188,6 @@ zbx_uint64_t	zbx_hc_proxyqueue_peek(void);
 
 int	zbx_trend_compare(const void *d1, const void *d2);
 
-void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
 
 #endif

@@ -894,7 +894,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
-			DBflush_trends(trends_tmp, &trends_num, trends_diff);
+			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff);
 
 		zbx_free(trends_tmp);
 	}
@@ -1278,7 +1278,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
 
-	compression_age = hc_get_history_compression_age();
+	compression_age = zbx_hc_get_history_compression_age();
 
 	zbx_vector_connector_filter_create(&connector_filters_history);
 	zbx_vector_connector_filter_create(&connector_filters_events);
@@ -1374,7 +1374,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
 				zbx_dc_config_items_apply_changes(&item_diff);
-				DCmass_update_trends(history, history_num, &trends, &trends_num, compression_age);
+				zbx_dc_mass_update_trends(history, history_num, &trends, &trends_num, compression_age);
 
 				if (0 != trends_num)
 					zbx_tfc_invalidate_trends(trends, trends_num);
@@ -1386,7 +1386,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					DBmass_update_trends(trends, trends_num, &trends_diff);
 
 					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
-						DCupdate_trends(&trends_diff);
+						zbx_dc_update_trends(&trends_diff);
 
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
@@ -1396,7 +1396,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				{
 					zbx_db_begin();
 
-					DBmass_update_items(&item_diff, &inventory_values);
+					zbx_db_mass_update_items(&item_diff, &inventory_values);
 
 					if (NULL != events_cbs->process_events_cb)
 					{
@@ -1561,7 +1561,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				if (NULL != phistory || NULL != ptrends)
 				{
 					data_offset = 0;
-					DCexport_history_and_trends(phistory, history_num_loc, &itemids, items,
+					zbx_dc_export_history_and_trends(phistory, history_num_loc, &itemids, items,
 							errcodes, ptrends, trends_num_loc, history_export_enabled,
 							&connector_filters_history, &data, &data_alloc, &data_offset);
 

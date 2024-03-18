@@ -363,7 +363,7 @@ void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids)
  * Purpose: apply disable_from changes to cache                               *
  *                                                                            *
  ******************************************************************************/
-void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff)
+void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff)
 {
 	int	i;
 
@@ -674,7 +674,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  * Purpose: flush trend to the database                                       *
  *                                                                            *
  ******************************************************************************/
-void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
 	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	unsigned char	value_type;
@@ -867,7 +867,7 @@ static void	DCadd_trend(const zbx_dc_history_t *history, ZBX_DC_TREND **trends, 
  *             compression_age - [IN]  history compression age                *
  *                                                                            *
  ******************************************************************************/
-void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
+void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age)
 {
 	static int		last_trend_discard = 0;
@@ -1461,7 +1461,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
  *             trends_num  - [IN] number of trends                            *
  *                                                                            *
  ******************************************************************************/
-void	DCexport_history_and_trends(const zbx_dc_history_t *history, int history_num,
+void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
 		const ZBX_DC_TREND *trends, int trends_num, int history_export_enabled,
 		zbx_vector_connector_filter_t *connector_filters, unsigned char **data, size_t *data_alloc,
@@ -1606,7 +1606,7 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, num,
 				ZBX_ITEM_GET_SYNC_EXPORT);
 
-		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, FAIL, NULL, NULL, 0,
+		zbx_dc_export_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, FAIL, NULL, NULL, 0,
 				0);
 
 		zbx_dc_config_clean_history_sync_items(items, errcodes, num);
@@ -1634,7 +1634,7 @@ static void	DCsync_trends(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, cache->trends_num);
 
-	compression_age = hc_get_history_compression_age();
+	compression_age = zbx_hc_get_history_compression_age();
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trend data...");
 
@@ -1662,7 +1662,7 @@ static void	DCsync_trends(void)
 	zbx_db_begin();
 
 	while (trends_num > 0)
-		DBflush_trends(trends, &trends_num, NULL);
+		zbx_db_flush_trends(trends, &trends_num, NULL);
 
 	zbx_db_commit();
 
@@ -2968,7 +2968,7 @@ int	zbx_hc_queue_get_size(void)
 	return cache->history_queue.elems_num;
 }
 
-int	hc_get_history_compression_age(void)
+int	zbx_hc_get_history_compression_age(void)
 {
 #if defined(HAVE_POSTGRESQL)
 	zbx_config_t	cfg;
@@ -3465,7 +3465,7 @@ int	zbx_dbcache_getproxyqueue_state(void)
  *             inventory_values - inventory values                            *
  *                                                                            *
  ******************************************************************************/
-void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
+void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
 {
 	size_t	sql_offset = 0;
 	int	i;
