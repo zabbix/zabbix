@@ -367,6 +367,16 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: composes expression by replacing processed macro tokens           *
+ *          (with values) in part of original expression                      *
+ *                                                                            *
+ * Parameters: ctx        - [IN] evaluation context                           *
+ *             expression - [OUT] composed expression                         *
+ *             shift_pos  - [IN] position which to start from                 *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_eval_compose_expression_by_token(const zbx_eval_context_t *ctx, char **expression, size_t shift_pos)
 {
 	zbx_vector_ptr_t	tokens;
