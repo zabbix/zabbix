@@ -1,8 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = 			\
-	libzbxcachehistory.a 		\
-	libzbxcachehistory_proxy.a
+noinst_LIBRARIES = libzbxcachehistory.a
 
 # common
 libzbxcachehistory_a_SOURCES = \

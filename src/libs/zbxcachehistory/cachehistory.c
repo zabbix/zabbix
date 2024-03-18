@@ -65,9 +65,6 @@ static zbx_history_sync_f	sync_history_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the minimum processed item percentage of item candidates to continue synchronizing */
-#define ZBX_HC_SYNC_MIN_PCNT	10
-
 /* the maximum number of characters for history cache values */
 #define ZBX_HISTORY_VALUE_LEN	(1024 * 64)
 
@@ -75,9 +72,6 @@ static zbx_history_sync_f	sync_history_cb = NULL;
 #define ZBX_DC_FLAGS_NOT_FOR_TRENDS	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF | ZBX_DC_FLAG_NOTRENDS)
 #define ZBX_DC_FLAGS_NOT_FOR_MODULES	(ZBX_DC_FLAGS_NOT_FOR_HISTORY | ZBX_DC_FLAG_LLD)
 #define ZBX_DC_FLAGS_NOT_FOR_EXPORT	(ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_UNDEF)
-
-#define ZBX_HC_PROXYQUEUE_STATE_NORMAL 0
-#define ZBX_HC_PROXYQUEUE_STATE_WAIT 1
 
 typedef struct
 {
@@ -170,7 +164,7 @@ static size_t		item_values_alloc = 0, item_values_num = 0;
 static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
-static int	hc_get_history_compression_age(void);
+//static int	hc_get_history_compression_age(void);
 
 void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
 {
@@ -365,7 +359,7 @@ void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids)
  * Purpose: apply disable_from changes to cache                               *
  *                                                                            *
  ******************************************************************************/
-static void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff)
+void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff)
 {
 	int	i;
 
@@ -848,7 +842,7 @@ static void	DCadd_trend(const zbx_dc_history_t *history, ZBX_DC_TREND **trends, 
  *             compression_age - [IN]  history compression age                *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
+void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age)
 {
 	static int		last_trend_discard = 0;
@@ -970,7 +964,7 @@ static int	zbx_trend_compare(const void *d1, const void *d2)
  *             trends_diff - [OUT] disable_from updates                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
+void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 		zbx_vector_uint64_pair_t *trends_diff)
 {
 	ZBX_DC_TREND	*trends_tmp;
@@ -1469,7 +1463,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
  *             trends_num  - [IN] number of trends                            *
  *                                                                            *
  ******************************************************************************/
-static void	DCexport_history_and_trends(const zbx_dc_history_t *history, int history_num,
+void	DCexport_history_and_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
 		const ZBX_DC_TREND *trends, int trends_num, int history_export_enabled,
 		zbx_vector_connector_filter_t *connector_filters, unsigned char **data, size_t *data_alloc,
@@ -1894,7 +1888,7 @@ out:
  *             trigger_order     - [OUT] pointer to the list of triggers      *
  *                                                                            *
  ******************************************************************************/
-static void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
+void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
 		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
 		zbx_vector_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
@@ -2040,7 +2034,7 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_
 	}
 }
 
-static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
+void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 {
 	zbx_free(inventory_value->value);
 	zbx_free(inventory_value);
@@ -2374,7 +2368,7 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
  *             inventory_values - inventory values                            *
  *                                                                            *
  ******************************************************************************/
-static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
+void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
 {
 	size_t	sql_offset = 0;
 	int	i;
@@ -2584,7 +2578,7 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
  *             history_num - number of history structures                     *
  *                                                                            *
  ******************************************************************************/
-static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
+int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 {
 	int			ret, ret_flush = FLUSH_SUCCEED, num;
 	zbx_vector_ptr_t	history_values;
@@ -2633,7 +2627,7 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
  *             proxy_subscriptions - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
+void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
 		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,
 		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscriptions)
 {
@@ -2747,7 +2741,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
  *                                  data type                                 *
  *                                                                            *
  ******************************************************************************/
-static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
+void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
 		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
 		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
 		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num)
@@ -2840,7 +2834,7 @@ static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num,
 	}
 }
 
-static void	DCmodule_sync_history(int history_float_num, int history_integer_num, int history_string_num,
+void	DCmodule_sync_history(int history_float_num, int history_integer_num, int history_string_num,
 		int history_text_num, int history_log_num, ZBX_HISTORY_FLOAT *history_float,
 		ZBX_HISTORY_INTEGER *history_integer, ZBX_HISTORY_STRING *history_string,
 		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log)
@@ -4545,7 +4539,7 @@ void	zbx_db_trigger_queue_unlock(void)
  * Return value: proxyid at the top a queue                                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	zbx_hc_proxyqueue_peek(void)
+zbx_uint64_t	zbx_hc_proxyqueue_peek(void)
 {
 	zbx_uint64_t	*p_val;
 
@@ -4564,7 +4558,7 @@ static zbx_uint64_t	zbx_hc_proxyqueue_peek(void)
  * Parameters: proxyid   - [IN] the proxy id                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
+void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
 {
 	if (NULL == zbx_hashset_search(&cache->proxyqueue.index, &proxyid))
 	{
@@ -4585,7 +4579,7 @@ static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
+int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
 {
 	zbx_uint64_t	top_val;
 	void		*rem_val = 0;
@@ -4608,7 +4602,7 @@ static int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid)
  * Purpose: remove all proxies from proxy priority queue                      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_hc_proxyqueue_clear(void)
+void	zbx_hc_proxyqueue_clear(void)
 {
 	zbx_list_destroy(&cache->proxyqueue.list);
 	zbx_hashset_clear(&cache->proxyqueue.index);
@@ -4632,4 +4626,19 @@ void	dbcache_set_history_num(int num)
 int	dbcache_get_history_num(void)
 {
 	return cache->history_num;
+}
+
+zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void)
+{
+	return hc_mem;
+}
+
+void	zbx_dbcache_setproxyqueue_state(int proxyqueue_state)
+{
+	cache->proxyqueue.state = proxyqueue_state;
+}
+
+int	zbx_dbcache_getproxyqueue_state(void)
+{
+	return cache->proxyqueue.state;
 }

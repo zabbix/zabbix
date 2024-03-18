@@ -24,7 +24,7 @@
 #include "zbxhistory.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
-#include "dbcache.h"
+//#include "dbcache.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"

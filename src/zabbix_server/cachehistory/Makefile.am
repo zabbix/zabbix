@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = 			\
-	libzbxcachehistory_server.a 		\
+noinst_LIBRARIES = libzbxcachehistory_server.a
 
 libzbxcachehistory_server_a_SOURCES = \
 	cachehistory_server.c \

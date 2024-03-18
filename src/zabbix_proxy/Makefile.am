@@ -19,6 +19,7 @@ sbin_PROGRAMS = zabbix_proxy
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
+	cachehistory/libzbxcachehistory_proxy.a \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \

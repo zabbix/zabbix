@@ -2,6 +2,7 @@
 
 SUBDIRS = \
 	actions \
+	cachehistory \
 	dbconfig \
 	diag \
 	discoverer \
@@ -45,6 +46,7 @@ zabbix_server_SOURCES = \
 	server.c
 
 zabbix_server_LDADD = \
+	cachehistory/libzbxcachehistory_server.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	dbconfig/libzbxdbconfig.a \

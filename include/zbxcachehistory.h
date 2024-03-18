@@ -20,8 +20,13 @@
 #ifndef ZABBIX_CACHEHISTORY_H
 #define ZABBIX_CACHEHISTORY_H
 
+#include "zbxtrends.h"
+#include "zbxhistory.h"
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
+
+#define ZBX_HC_PROXYQUEUE_STATE_NORMAL 0
+#define ZBX_HC_PROXYQUEUE_STATE_WAIT 1
 
 /* the maximum time spent synchronizing history */
 #define ZBX_HC_SYNC_TIME_MAX	10
@@ -152,4 +157,60 @@ void	dc_history_clean_value(zbx_dc_history_t *history);
 void	dbcache_set_history_num(int num);
 int	dbcache_get_history_num(void);
 
+void    zbx_hc_proxyqueue_clear(void);
+int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid);
+
+
+void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid);
+
+void	DCmodule_sync_history(int history_float_num, int history_integer_num, int history_string_num,
+		int history_text_num, int history_log_num, ZBX_HISTORY_FLOAT *history_float,
+		ZBX_HISTORY_INTEGER *history_integer, ZBX_HISTORY_STRING *history_string,
+		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log);
+
+void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
+		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
+		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
+		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num);
+
+
+void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
+		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,
+		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscriptions);
+
+int	DBmass_add_history(zbx_dc_history_t *history, int history_num);
+
+void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
+
+void	DCinventory_value_free(zbx_inventory_value_t *inventory_value);
+
+void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
+		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
+		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
+		zbx_vector_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
+		zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order);
+
+void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
+		int *trends_num, int compression_age);
+
+void	DCupdate_trends(zbx_vector_uint64_pair_t *trends_diff);
+
+void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
+		zbx_vector_uint64_pair_t *trends_diff);
+
+int	hc_get_history_compression_age(void);
+
+
+void	DCexport_history_and_trends(const zbx_dc_history_t *history, int history_num,
+		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
+		const ZBX_DC_TREND *trends, int trends_num, int history_export_enabled,
+		zbx_vector_connector_filter_t *connector_filters, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset);
+
+zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
+
+void    zbx_dbcache_setproxyqueue_state(int proxyqueue_state);
+int     zbx_dbcache_getproxyqueue_state(void);
+
+zbx_uint64_t	zbx_hc_proxyqueue_peek(void);
 #endif
