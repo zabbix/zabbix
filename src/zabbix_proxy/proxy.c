@@ -23,7 +23,6 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
-#include "zbxcachehistory_proxy.h"
 #include "zbxdbupgrade.h"
 #include "zbxlog.h"
 #include "zbxgetopt.h"
@@ -48,6 +47,7 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
+#include "cachehistory/cachehistory_proxy.h"
 
 #include "zbxcomms.h"
 #include "zbxvault.h"

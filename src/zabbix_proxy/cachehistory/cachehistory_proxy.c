@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "cachehistory_proxy.h"
 #include "zbxcachehistory.h"
-#include "zbxcachehistory_proxy.h"
-#include "zbxcommon.h"
+
 #include "zbxdb.h"
 #include "zbxhistory.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
-//#include "dbcache.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
