@@ -432,27 +432,6 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_clean(&db_insert);
 }
 
-static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
-{
-	char	*value_esc;
-	int	i;
-
-	for (i = 0; i < inventory_values->values_num; i++)
-	{
-		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
-
-		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-				inventory_value->field_name, value_esc, inventory_value->hostid);
-
-		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, sql_offset);
-
-		zbx_free(value_esc);
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Update trends disable_until for items without trends data past or *
@@ -1569,6 +1548,27 @@ clean:
 	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
+{
+	char	*value_esc;
+	int	i;
+
+	for (i = 0; i < inventory_values->values_num; i++)
+	{
+		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+
+		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
+				inventory_value->field_name, value_esc, inventory_value->hostid);
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+
+		zbx_free(value_esc);
+	}
 }
 
 /******************************************************************************
