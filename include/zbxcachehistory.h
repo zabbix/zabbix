@@ -23,6 +23,15 @@
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
 
+/* the maximum time spent synchronizing history */
+#define ZBX_HC_SYNC_TIME_MAX	10
+
+/* the maximum number of items in one synchronization batch */
+#define ZBX_HC_SYNC_MAX		1000
+#define ZBX_HC_TIMER_MAX	(ZBX_HC_SYNC_MAX / 2)
+#define ZBX_HC_TIMER_SOFT_MAX	(ZBX_HC_TIMER_MAX - 10)
+
+
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
 
@@ -65,8 +74,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history
 		char **error);
 
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
-
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -127,12 +134,22 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
-
 void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
 void	zbx_dc_flush_history(void);
+
+void	dbcache_lock(void);
+void	dbcache_unlock(void);
+
+void	hc_pop_items(zbx_vector_ptr_t *history_items);
+void	hc_push_items(zbx_vector_ptr_t *history_items);
+void	hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items);
+int	hc_queue_get_size(void);
+void	hc_free_item_values(zbx_dc_history_t *history, int history_num);
+void	dc_history_clean_value(zbx_dc_history_t *history);
+void	dbcache_set_history_num(int num);
+int	dbcache_get_history_num(void);
 
 #endif
