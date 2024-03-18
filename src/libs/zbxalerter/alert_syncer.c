@@ -670,17 +670,22 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 {
 	int				results_num;
 	zbx_vector_events_tags_t	update_events_tags;
-	zbx_ipc_message_t		*message;
+	zbx_ipc_message_t		*message = NULL;
 	zbx_am_result_t			**results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0);
-	if (SUCCEED != zbx_ipc_async_socket_recv(&amdb->am, 1, &message) || NULL == message)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve alert results");
-		return 0;
+	do {
+		zbx_ipc_message_free(message);
+
+		if (SUCCEED != zbx_ipc_async_socket_recv(&amdb->am, 1, &message) || NULL == message)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve alert results");
+			return 0;
+		}
 	}
+	while (ZBX_IPC_ALERTER_RESULTS != message->code);
 
 	zbx_vector_events_tags_create(&update_events_tags);
 
