@@ -161,7 +161,6 @@ $filter = (new CFilter())
 						'name' => 'filter_proxyids[]',
 						'object_name' => 'proxies',
 						'data' => $data['proxies_ms'],
-					//	'disabled' => $data['filter']['monitored_by'] != ZBX_MONITORED_BY_PROXY,
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'proxies',
@@ -181,7 +180,6 @@ $filter = (new CFilter())
 						'name' => 'filter_proxy_groupids[]',
 						'object_name' => 'proxy_groups',
 						'data' => $data['proxy_groups_ms'],
-					//	'disabled' => $data['filter']['monitored_by'] != ZBX_MONITORED_BY_PROXY_GROUP,
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'proxy_groups',
