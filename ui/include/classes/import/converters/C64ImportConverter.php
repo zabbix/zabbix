@@ -257,13 +257,12 @@ class C64ImportConverter extends CConverter {
 			}
 
 			$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
-			$discovery_rule['enabled_lifetime'] = '0';
+			$discovery_rule['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
 
 			if (array_key_exists('lifetime', $discovery_rule)) {
 				if ($discovery_rule['lifetime'] === '0') {
 					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_IMMEDIATELY;
 					$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_IMMEDIATELY;
-					$discovery_rule['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
 				}
 				else {
 					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_AFTER;
