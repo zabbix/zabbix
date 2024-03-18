@@ -160,11 +160,6 @@ void	zbx_hc_proxyqueue_clear(void);
 int	zbx_hc_proxyqueue_dequeue(zbx_uint64_t proxyid);
 void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid);
 
-void	DCmodule_sync_history(int history_float_num, int history_integer_num, int history_string_num,
-		int history_text_num, int history_log_num, ZBX_HISTORY_FLOAT *history_float,
-		ZBX_HISTORY_INTEGER *history_integer, ZBX_HISTORY_STRING *history_string,
-		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log);
-
 void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
 		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
 		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
