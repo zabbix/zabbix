@@ -347,7 +347,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 			zbx_hc_push_items(&history_items);	/* return items to history cache */
 			zbx_dbcache_set_history_num(zbx_dbcache_get_history_num() - history_num);
 
-			if (0 != hc_queue_get_size())
+			if (0 != zbx_hc_queue_get_size())
 			{
 				/* Continue sync if enough of sync candidates were processed       */
 				/* (meaning most of sync candidates are not locked by triggers).   */

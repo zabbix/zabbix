@@ -415,7 +415,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 
 			zbx_dbcache_set_history_num(zbx_dbcache_get_history_num() - history_num);
 
-			if (0 != hc_queue_get_size())
+			if (0 != zbx_hc_queue_get_size())
 				*more = ZBX_SYNC_MORE;
 
 			zbx_dbcache_unlock();

@@ -2975,7 +2975,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 		}
 	}
 
-	if (0 != hc_queue_get_size())
+	if (0 != zbx_hc_queue_get_size())
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
@@ -2986,7 +2986,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)values_num / (cache->history_num + values_num) * 100);
 		}
-		while (0 != hc_queue_get_size());
+		while (0 != zbx_hc_queue_get_size());
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}
@@ -4159,7 +4159,7 @@ void	zbx_hc_push_items(zbx_vector_ptr_t *history_items)
  * Purpose: retrieve the size of history queue                                *
  *                                                                            *
  ******************************************************************************/
-int	hc_queue_get_size(void)
+int	zbx_hc_queue_get_size(void)
 {
 	return cache->history_queue.elems_num;
 }

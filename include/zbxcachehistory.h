@@ -150,7 +150,7 @@ void	zbx_dbcache_unlock(void);
 void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items);
 void	zbx_hc_push_items(zbx_vector_ptr_t *history_items);
 void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items);
-int	hc_queue_get_size(void);
+int	zbx_hc_queue_get_size(void);
 void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num);
 void	zbx_dc_history_clean_value(zbx_dc_history_t *history);
 void	zbx_dbcache_set_history_num(int num);
