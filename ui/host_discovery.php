@@ -539,17 +539,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$enabled_lifetime = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
 		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
 
-		if ($lifetime[0] !== '{' && timeUnitToSeconds($lifetime) == 0) {
-			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
-		}
-
-		if ($enabled_lifetime[0] !== '{' && timeUnitToSeconds($enabled_lifetime) == 0) {
-			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
-		}
-
-		if ($lifetime_type == ZBX_LLD_DELETE_IMMEDIATELY) {
-			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
-		}
+		$converted_lifetime = timeUnitToSeconds($lifetime);
+		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
 
 		// Set the values to '0', if 'immediately' or 'never' values are set to lifetime/enabled_lifetime types.
 		if ($lifetime_type != ZBX_LLD_DELETE_AFTER) {
@@ -569,34 +560,51 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = true;
 
-		if (hasRequest('add')) {
-			$item = ['hostid' => $hostid];
+		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $lifetime[0] !== '{'
+				&& $enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $enabled_lifetime[0] !== '{') {
 
-			$item += getSanitizedItemFields($input + [
-					'templateid' => 0,
-					'flags' => ZBX_FLAG_DISCOVERY_RULE,
-					'hosts' => $hosts
-				]);
+			if ($converted_enabled_lifetime && $converted_lifetime
+					&& $converted_enabled_lifetime >= $converted_lifetime) {
+				$result = false;
 
-			$response = API::DiscoveryRule()->create($item);
-
-			if ($response === false) {
-				throw new Exception();
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'Disable lost resources',
+						_s('cannot be greater than or equal to the value of field "%1$s"', 'Delete lost resources')
+					)
+				);
 			}
 		}
 
-		if (hasRequest('update')) {
-			$item = getSanitizedItemFields($input + $db_item + [
-					'flags' => ZBX_FLAG_DISCOVERY_RULE,
-					'hosts' => $hosts
-				]);
+		if (!hasErrorMessages()) {
+			if (hasRequest('add')) {
+				$item = ['hostid' => $hostid];
 
-			$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
+				$item += getSanitizedItemFields($input + [
+						'templateid' => 0,
+						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'hosts' => $hosts
+					]);
 
-			if ($response === false) {
-				throw new Exception();
+				$response = API::DiscoveryRule()->create($item);
+
+				if ($response === false) {
+					throw new Exception();
+				}
+			}
+
+			if (hasRequest('update')) {
+				$item = getSanitizedItemFields($input + $db_item + [
+						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'hosts' => $hosts
+					]);
+
+				$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
+
+				if ($response === false) {
+					throw new Exception();
+				}
 			}
 		}
+
 	}
 	catch (Exception $e) {
 		$result = false;
@@ -761,13 +769,37 @@ if (hasRequest('form')) {
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['lifetime_type'] = $item['lifetime_type'];
-		$data['lifetime'] = $item['lifetime_type'] == ZBX_LLD_DELETE_AFTER
-			? $item['lifetime']
+		$lifetime_type = $item['lifetime_type'];
+		$lifetime = $item['lifetime'];
+		$enabled_lifetime_type = $item['enabled_lifetime_type'];
+		$enabled_lifetime = $item['enabled_lifetime'];
+
+		$converted_lifetime = timeUnitToSeconds($lifetime);
+		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
+
+		if ($lifetime[0] !== '{' && $converted_lifetime !== null && $converted_lifetime == 0) {
+			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
+		}
+
+		if ($enabled_lifetime[0] !== '{' && $converted_enabled_lifetime !== null && $converted_enabled_lifetime == 0) {
+			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
+		}
+
+		if ($lifetime_type == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_IMMEDIATELY) {
+			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		$data['lifetime_type'] = $lifetime_type;
+		$data['lifetime'] = $lifetime_type == ZBX_LLD_DELETE_AFTER
+			? $lifetime
 			: DB::getDefault('items', 'lifetime');
-		$data['enabled_lifetime_type'] = $item['enabled_lifetime_type'];
-		$data['enabled_lifetime'] = $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER
-			? $item['enabled_lifetime']
+		$data['enabled_lifetime_type'] = $enabled_lifetime_type;
+		$data['enabled_lifetime'] = $enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER
+			? $enabled_lifetime
 			: ZBX_LLD_RULE_ENABLED_LIFETIME;
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];

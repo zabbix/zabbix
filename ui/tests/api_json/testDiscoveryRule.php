@@ -129,7 +129,7 @@ class testDiscoveryRule extends CAPITest {
 					'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY,
 					'lifetime' => '14d'
 				],
-				'expected_error' => 'Invalid parameter "/1/lifetime": value must be "0".'
+				'expected_error' => 'Invalid parameter "/1/lifetime": value must be 0.'
 			],
 			'Test invalid lifetime value' => [
 				'discoveryrule' => [
@@ -201,7 +201,7 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
 					'enabled_lifetime' => '24h'
 				],
-				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be "0".'
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be 0.'
 			],
 			'Test invalid enabled_lifetime parameter with disable immediately' => [
 				'discoveryrule' => [
@@ -213,7 +213,7 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY,
 					'enabled_lifetime' => '24h'
 				],
-				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be "0".'
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": value must be 0.'
 			],
 			'Test invalid lifetime and enabled_lifetime values' => [
 				'discoveryrule' => [
@@ -228,7 +228,7 @@ class testDiscoveryRule extends CAPITest {
 					'enabled_lifetime' => '77h',
 					'delay' => '30s'
 				],
-				'expected_error' => 'Invalid parameter "/1": "Delete lost resources" value must be greater than "Disable lost resources" value.'
+				'expected_error' => 'Invalid parameter "/1/enabled_lifetime": cannot be greater than or equal to the value of parameter "/1/lifetime".'
 			]
 		];
 
