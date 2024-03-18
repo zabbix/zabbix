@@ -294,7 +294,10 @@ void	dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges)
 
 static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, time_t now, zbx_uint64_t unique_dcheckid,
-		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb)
+		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb,
+		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
+		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
 	int			host_status = -1;
 	zbx_vector_uint64_t	dserviceids;
@@ -309,7 +312,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
 			host_status = service->status;
 
-		zbx_discovery_update_service(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
 				ip, dns, service->port, service->status, service->value, now, &dserviceids,
 				add_event_cb);
 
@@ -317,12 +320,12 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 
 	if (0 == services->values_num)
 	{
-		zbx_discovery_find_host(druleid, ip, dhost);
+		discovery_find_host_cb(druleid, ip, dhost);
 		host_status = DOBJECT_STATUS_DOWN;
 	}
 
 	if (0 != dhost->dhostid)
-		zbx_discovery_update_service_down(dhost->dhostid, now, &dserviceids);
+		discovery_update_service_down_cb(dhost->dhostid, now, &dserviceids);
 
 	zbx_vector_uint64_destroy(&dserviceids);
 
@@ -497,7 +500,12 @@ static void	process_results_incompleteresult_remove(zbx_discoverer_manager_t *ma
 
 static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
 		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks,
-		zbx_vector_discoverer_drule_error_t *drule_errors, const zbx_events_funcs_t *events_cbs)
+		zbx_vector_discoverer_drule_error_t *drule_errors, const zbx_events_funcs_t *events_cbs,
+		zbx_discovery_open_func_t discovery_open_cb, zbx_discovery_close_func_t discovery_close_cb,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb,
+		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
+		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
 	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
@@ -585,7 +593,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
 					result->now, result->unique_dcheckid, &result->services,
-					events_cbs->add_event_cb, discovery_update_service_cb);
+					events_cbs->add_event_cb, discovery_update_service_cb,
+					discovery_update_service_down_cb, discovery_find_host_cb);
 
 			discovery_update_host_cb(handle, result->druleid, &dhost, result->ip, result->dnsname,
 					host_status, result->now, events_cbs->add_event_cb);
@@ -615,7 +624,9 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 }
 
 static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_discoverer_drule_error_t *drule_errors,
-		zbx_hashset_t *incomplete_druleids)
+		zbx_hashset_t *incomplete_druleids, zbx_discovery_open_func_t discovery_open_cb,
+		zbx_discovery_close_func_t discovery_close_cb,
+		zbx_discovery_update_drule_func_t discovery_udpate_drule_cb)
 {
 	void	*handle;
 	int	i;
@@ -629,7 +640,7 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 	zbx_vector_uint64_uniq(del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	now = time(NULL);
-	handle = zbx_discovery_open();
+	handle = discovery_open_cb();
 
 	for (i = del_jobs->values_num; i != 0; i--)
 	{
@@ -647,12 +658,12 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 			zbx_vector_discoverer_drule_error_remove(drule_errors, j);
 		}
 
-		zbx_discovery_update_drule(handle, derror.druleid, err, now);
+		discovery_udpate_drule_cb(handle, derror.druleid, err, now);
 		zbx_free(err);
 		zbx_vector_uint64_remove(del_jobs, i - 1);
 	}
 
-	zbx_discovery_close(handle);
+	discovery_close_cb(handle);
 }
 
 static int	drule_delay_get(const char *delay, char **delay_resolved, int *delay_int)
@@ -673,7 +684,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts,
 		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids)
 {
-	int				rule_count = 0, delay, i, k, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
+	int				rule_count = 0, delay, i, tmt_simple = 0, tmt_agent = 0, tmt_snmp = 0;
 	char				*delay_str = NULL;
 	zbx_dc_um_handle_t		*um_handle;
 	time_t				now, nextcheck_loc;
@@ -893,8 +904,8 @@ static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_d
 	return dst;
 }
 
-ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
-ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
+ZBX_PTR_VECTOR_DECL(fping_host, zbx_fping_host_t)
+ZBX_PTR_VECTOR_IMPL(fping_host, zbx_fping_host_t)
 
 static int	discoverer_icmp_result_merge(zbx_hashset_t *incomplete_checks_count, zbx_hashset_t *results,
 		const zbx_uint64_t druleid, const zbx_uint64_t dcheckid, const zbx_uint64_t unique_dcheckid,
@@ -908,7 +919,7 @@ static int	discoverer_icmp_result_merge(zbx_hashset_t *incomplete_checks_count, 
 	{
 		zbx_discoverer_dservice_t	*service;
 		zbx_discoverer_results_t	*result;
-		ZBX_FPING_HOST			*h = &hosts->values[i];
+		zbx_fping_host_t		*h = &hosts->values[i];
 		char				*ip = h->addr;
 
 		if (FAIL == discoverer_check_count_decrease(incomplete_checks_count, druleid, ip, 1))
@@ -945,7 +956,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	zbx_uint64_t			count = 0;
 	zbx_vector_fping_host_t		hosts;
 	const zbx_dc_dcheck_t		*dcheck = &task->ds_dchecks.values[dcheck_idx]->dcheck;
-	ZBX_FPING_HOST			host;
+	zbx_fping_host_t		host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d range id:%d dcheck_idx:%d task state count:%d",
 			log_worker_id, __func__, task->range.ipranges->values_num, task->range.id,
@@ -1677,7 +1688,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int		processing_rules_num, i, more_results, is_drules_rev_updated;
+		int		processing_rules_num, more_results, is_drules_rev_updated;
 		zbx_uint64_t	unsaved_checks;
 
 		sec = zbx_time();
@@ -1693,7 +1704,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 		if (SUCCEED == is_drules_rev_updated)
 		{
-			for (i = 0; i < dmanager.job_refs.values_num; i++)
+			for (int i = 0; i < dmanager.job_refs.values_num; i++)
 			{
 				int			k;
 				zbx_uint64_pair_t	revision;
@@ -1730,9 +1741,15 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks,
-				&drule_errors, discoverer_args_in->events_cbs);
+				&drule_errors, discoverer_args_in->events_cbs, discoverer_args_in->discovery_open_cb,
+				discoverer_args_in->discovery_close_cb, discoverer_args_in->discovery_update_host_cb,
+				discoverer_args_in->discovery_update_service_cb,
+				discoverer_args_in->discovery_update_service_down_cb,
+				discoverer_args_in->discovery_find_host_cb);
 
-		process_job_finalize(&del_jobs, &drule_errors, &incomplete_druleids);
+		process_job_finalize(&del_jobs, &drule_errors, &incomplete_druleids,
+				discoverer_args_in->discovery_open_cb, discoverer_args_in->discovery_close_cb,
+				discoverer_args_in->discovery_update_drule_cb);
 
 		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_UI64 " unsaved checks]",
 				get_process_type_string(info->process_type), info->process_num, processing_rules_num,

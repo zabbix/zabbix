@@ -55,14 +55,14 @@ void	zbx_discovery_update_service_proxy(void *handle, zbx_uint64_t druleid, zbx_
 			value, (int)now);
 }
 
-void	zbx_discovery_find_host(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost)
+void	zbx_discovery_find_host_proxy(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost)
 {
 	ZBX_UNUSED(druleid);
 	ZBX_UNUSED(ip);
 	ZBX_UNUSED(dhost);
 }
 
-void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t now,
+void	zbx_discovery_update_service_down_proxy(const zbx_uint64_t dhostid, const time_t now,
 		zbx_vector_uint64_t *dserviceids)
 {
 	ZBX_UNUSED(dhostid);
@@ -75,7 +75,7 @@ void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t 
  * Purpose: send drule error info                                             *
  *                                                                            *
 ******************************************************************************/
-void	zbx_discovery_update_drule(void *handle, zbx_uint64_t druleid, const char *error, time_t now)
+void	zbx_discovery_update_drule_proxy(void *handle, zbx_uint64_t druleid, const char *error, time_t now)
 {
 	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, "", "", DOBJECT_STATUS_FINALIZED,
 			(int)now, error);

@@ -484,7 +484,7 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
  * Purpose: find host by ip                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_find_host(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost)
+void	zbx_discovery_find_host_server(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -582,7 +582,7 @@ void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx
  * Purpose: mark service status DOWN for all not received service statuses    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t now,
+void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const time_t now,
 		zbx_vector_uint64_t *dserviceids)
 {
 	char	buffer[MAX_STRING_LEN], *sql = NULL;
@@ -615,7 +615,7 @@ void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t 
  * Purpose: update drule error info                                           *
  *                                                                            *
 ******************************************************************************/
-void	zbx_discovery_update_drule(void *handle, zbx_uint64_t druleid, const char *error, time_t now)
+void	zbx_discovery_update_drule_server(void *handle, zbx_uint64_t druleid, const char *error, time_t now)
 {
 	char		buffer[MAX_STRING_LEN], *sql = NULL;
 	zbx_db_result_t	result;
@@ -673,7 +673,7 @@ void	zbx_discovery_update_drule(void *handle, zbx_uint64_t druleid, const char *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	*zbx_discovery_open(void)
+void	*zbx_discovery_open_server(void)
 {
 	return NULL;
 }
