@@ -901,26 +901,19 @@ class CUser extends CApiService {
 			$check = false;
 
 			if ($db_users === null) {
-				if (!array_key_exists('passwd', $user)
-						&& (!array_key_exists('userdirectoryid', $user) || $user['userdirectoryid'] == 0)) {
-					$check = true;
-				}
+				$check = !array_key_exists('passwd', $user);
 			}
 			else {
 				$db_user = $db_users[$user['userid']];
 
 				if (!array_key_exists('passwd', $user) && $db_user['passwd'] === ''
-						&& ((!array_key_exists('userdirectoryid', $user) && $db_user['userdirectoryid'] == 0)
-							|| (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] == 0))) {
-					$userdirectory_changed = array_key_exists('userdirectoryid', $user)
-						&& bccomp($user['userdirectoryid'], $db_user['userdirectoryid']) != 0;
-
+						&&  $db_user['userdirectoryid'] == 0) {
 					$user_groups_changed = array_key_exists('usrgrps', $user)
 						&& self::userGroupsChanged($user, $db_user);
 
 					$user_groups_empty = array_key_exists('usrgrps', $user) ? !$user['usrgrps'] : !$db_user['usrgrps'];
 
-					if (!$userdirectory_changed && !$user_groups_changed && !$user_groups_empty) {
+					if (!$user_groups_changed && !$user_groups_empty) {
 						continue;
 					}
 
