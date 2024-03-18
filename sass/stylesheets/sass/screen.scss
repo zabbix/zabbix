@@ -1607,6 +1607,18 @@ select {
 	width: 100%;
 }
 
+.qr-code {
+	height: 190px;
+	width: 190px;
+	margin: 20px auto;
+	color: #{$font-color};
+	background-color: #{$ui-bg-color};
+}
+
+.qr-code img {
+	image-rendering: pixelated;
+}
+
 // Action Menus, Pop-up Menus.
 .menu-popup-overlay {
 	position: fixed;
