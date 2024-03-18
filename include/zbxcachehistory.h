@@ -166,12 +166,6 @@ void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid);
 
 void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
 
-void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
-		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
-		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
-		zbx_vector_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
-		zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order);
-
 void	DCmass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age);
 
