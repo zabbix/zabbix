@@ -206,11 +206,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($group_by_item_tags) {
-			self::filter_tags($items, $item_tags_to_keep);
+			self::filterTags($items, $item_tags_to_keep);
 		}
 
 		if ($group_by_host_tags) {
-			self::filter_tags($hosts, $host_tags_to_keep);
+			self::filterTags($hosts, $host_tags_to_keep);
 		}
 
 		if ($this->fields_values['problems'] !== WidgetForm::PROBLEMS_NONE) {
@@ -299,7 +299,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 *
 	 * @return void
 	 */
-	private static function filter_tags(array &$entities, array $tags_to_keep): void {
+	private static function filterTags(array &$entities, array $tags_to_keep): void {
 		foreach ($entities as &$entity) {
 			$entity['tags'] = array_values(array_filter($entity['tags'], function($tag) use ($tags_to_keep) {
 				return in_array($tag['tag'], $tags_to_keep, true);
