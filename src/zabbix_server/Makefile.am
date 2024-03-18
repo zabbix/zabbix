@@ -36,9 +36,6 @@ libzbxserver_a_SOURCES = \
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-I$(top_srcdir)/src/libs/zbxcacheconfig \
-	-I$(top_srcdir)/src/libs/zbxcachehistory \
-	-I$(top_srcdir)/src/libs/zbxcachevalue \
 	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = \

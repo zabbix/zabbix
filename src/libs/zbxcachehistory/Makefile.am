@@ -2,10 +2,8 @@
 
 noinst_LIBRARIES = libzbxcachehistory.a
 
-# common
 libzbxcachehistory_a_SOURCES = \
-	cachehistory.c \
-	cachehistory.h
+	cachehistory.c
 
 libzbxcachehistory_a_CFLAGS = \
 	$(TLS_CFLAGS) \
