@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-12-18 21:04+0000\n"
+"PO-Revision-Date: 2024-03-14 20:21+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11050,7 +11050,7 @@ msgstr "Largeur de ligne"
 #: app/views/popup.massupdate.template.php:47
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
-msgstr "Lien"
+msgstr "Lier"
 
 #: include/classes/api/services/CMap.php:1006
 #: include/classes/api/services/CMap.php:1476
@@ -21638,6 +21638,10 @@ msgstr "défaut"
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Convertit une valeur de radians en degrés"
 
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr "délimiteur"
+
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
@@ -22516,6 +22520,10 @@ msgstr "power() - La puissance d'une valeur"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "modèle de problème"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr "qualificatif"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

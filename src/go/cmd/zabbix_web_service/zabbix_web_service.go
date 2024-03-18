@@ -33,8 +33,8 @@ import (
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxflag"
+	"git.zabbix.com/ap/plugin-support/zbxnet"
 	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxnet"
 )
 
 const usageMessageFormat = //

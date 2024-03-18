@@ -115,7 +115,7 @@ class CWidgetConfig {
 			WIDGET_SVG_GRAPH			=> 'CWidgetSvgGraph',
 			WIDGET_SYSTEM_INFO			=> 'CWidget',
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
-			WIDGET_URL					=> 'CWidget',
+			WIDGET_URL					=> 'CWidgetUrl',
 			WIDGET_WEB					=> 'CWidget',
 			WIDGET_TOP_HOSTS			=> 'CWidget'
 		];

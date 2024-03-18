@@ -44,7 +44,7 @@ class CEncryptHelper {
 	private static function getKey(): ?string {
 		if (!self::$key) {
 			// This if contain copy in CEncryptedCookieSession class.
-			if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
+			if (CSettingsHelper::getPrivate(CSettingsHelper::SESSION_KEY) === '') {
 				self::$key = self::generateKey();
 
 				if (!self::updateKey(self::$key)) {
@@ -54,7 +54,7 @@ class CEncryptHelper {
 				return self::$key;
 			}
 
-			self::$key = CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY);
+			self::$key = CSettingsHelper::getPrivate(CSettingsHelper::SESSION_KEY);
 		}
 
 		return self::$key;

@@ -21781,6 +21781,10 @@ msgstr "predvolené"
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "stupne() - Prevedie hodnotu z radiánov na stupne"
 
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
@@ -22659,6 +22663,10 @@ msgstr "power() – mocnina základnej hodnoty na hodnotu mocniny"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "problémový vzor"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"
