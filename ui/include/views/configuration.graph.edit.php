@@ -373,6 +373,7 @@ else {
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
+	->addClass('list-numbered')
 	->setColumns([
 		(new CTableColumn())->addClass('table-col-handle'),
 		(new CTableColumn())->addClass('table-col-no'),

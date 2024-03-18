@@ -31,13 +31,11 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
-
 /******************************************************************************
  *                                                                            *
- * Purpose: return string value of vmware job types                           *
+ * Purpose: returns string value of vmware job types                          *
  *                                                                            *
- * Parameters: job - [IN] the vmware job                                      *
+ * Parameters: job - [IN]                                                     *
  *                                                                            *
  * Return value: job type string                                              *
  *                                                                            *
@@ -59,16 +57,17 @@ static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: pick the next job from the queue and service ttl check            *
+ * Purpose: picks next job from queue and service ttl check                   *
  *                                                                            *
- * Parameters: vmw      - [IN] the vmware object                              *
- *             time_now - [IN] the current time                               *
+ * Parameters: vmw      - [IN] vmware object                                  *
+ *             time_now - [IN]                                                *
  *                                                                            *
  * Return value: job for object or NULL                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 {
+#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 	zbx_binary_heap_elem_t	*elem;
 	zbx_vmware_job_t	*job = NULL;
 
@@ -99,11 +98,12 @@ unlock:
 			NULL == job ? "none" : vmware_job_type_string(job));
 
 	return job;
+#undef ZBX_VMWARE_SERVICE_TTL
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute task of job                                               *
+ * Purpose: executes task of job                                              *
  *                                                                            *
  * Parameters: job                     - [IN] job object                      *
  *             config_source_ip        - [IN]                                 *
@@ -147,11 +147,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set time of next job execution and return job to the queue        *
+ * Purpose: sets time of next job execution and returns job to queue          *
  *                                                                            *
- * Parameters: vmw                 - [IN] the vmware object                   *
- *             job                 - [IN] the job object                      *
- *             time_now            - [IN] the current time                    *
+ * Parameters: vmw                 - [IN] vmware object                       *
+ *             job                 - [IN] job object                          *
+ *             time_now            - [IN] current time                        *
  *             cache_update_period - [IN]                                     *
  *             perf_update_period  - [IN]                                     *
  *                                                                            *
@@ -189,10 +189,10 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: the vmware collector main loop                                    *
+ * Purpose: vmware collector main loop                                        *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(vmware_thread, args)
+ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	int				services_updated = 0, services_removed = 0,
@@ -245,7 +245,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 			services_updated += vmware_job_exec(job, vmware_args_in->config_source_ip,
 					vmware_args_in->config_vmware_timeout, vmware_args_in->config_vmware_frequency);
-			vmware_job_schedule(zbx_vmware_get_vmware(), job, (time_t)time_now, vmware_args_in->config_vmware_frequency,
+			vmware_job_schedule(zbx_vmware_get_vmware(), job, (time_t)time_now,
+					vmware_args_in->config_vmware_frequency,
 					vmware_args_in->config_vmware_perf_frequency);
 		}
 

@@ -1,7 +1,11 @@
 .checkbox-list {
 	display: grid;
 	grid-column-gap: 10px;
-	grid-template-columns: repeat(var(--columns), minmax(max-content, 1fr));
+	grid-template-columns: repeat(var(--columns), auto);
+
+	&.fixed {
+		grid-template-columns: repeat(var(--columns), 1fr);
+	}
 
 	&.vertical {
 		grid-template-rows: repeat(var(--rows), 1fr);

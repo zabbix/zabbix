@@ -35,8 +35,11 @@ class COverlayDialogElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
-	public static function find() {
-		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'))->asOverlayDialog();
+	public static function find($index = null) {
+		$suffix = ($index !== null) ? '['.($index + 1).']' : '';
+
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'.
+				$suffix))->asOverlayDialog();
 	}
 
 	/**
@@ -45,7 +48,7 @@ class COverlayDialogElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		return $this->query('xpath:./div[@class="dashboard-widget-head"]/h4')->one()->getText();
+		return $this->query('xpath:./div[@class="overlay-dialogue-header"]/h4')->one()->getText();
 	}
 
 	/**

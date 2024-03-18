@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
+#include "poller_server.h"
+
+#include "../ha/ha.h"
+#include "../lld/lld_protocol.h"
+
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
-#include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxconnector.h"
-#include "../ha/ha.h"
 #include "zbxproxybuffer.h"
-
-#include "checks_internal.h"
-#include "../lld/lld_protocol.h"
 
 /******************************************************************************
  *                                                                            *
@@ -45,7 +44,7 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_server(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
 	const char	*param2;

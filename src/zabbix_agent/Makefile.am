@@ -55,6 +55,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(AGENT_LIBS)
 
 zabbix_agentd_LDFLAGS = $(AGENT_LDFLAGS)

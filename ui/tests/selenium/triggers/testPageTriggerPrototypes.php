@@ -19,130 +19,162 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
-class testPageTriggerPrototypes extends CLegacyWebTest {
+/**
+ * @backup hosts
+ *
+ * @onBefore prepareTriggerPrototypeData
+ */
+class testPageTriggerPrototypes extends testPagePrototypes {
 
-	// Returns all trigger protos
-	public static function data() {
-		return CDBHelper::getDataProvider(
-				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
-				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
-					' WHERE f.itemid = i.itemid'.
-					' AND t.triggerid = f.triggerid'.
-					' AND d.parent_itemid=di.itemid'.
-					' AND i.itemid=d.itemid'.
-					' AND h.hostid=i.hostid'.
-					' AND i.name LIKE \'%-layout-test%\''
-		);
-	}
+	public $source = 'trigger';
+	public $tag = 'a3 Trigger prototype monitored not discovered_{#KEY}';
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
+	protected $link = 'zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&';
+	protected static $prototype_triggerids;
+	protected static $host_druleids;
 
-	/**
-	 * @dataProvider data
-	 */
-	public function testPageTriggerPrototypes_CheckLayout($data) {
-		$drule = $data['d_name'];
-		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
-				$data['parent_itemid'].'&context=host');
-
-		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->zbxTestTextPresent($drule);
-		$this->zbxTestTextPresent($data['description']);
-		$this->zbxTestTextPresent('Displaying');
-
-		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$this->zbxTestTextPresent('All hosts');
-		}
-		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->zbxTestTextPresent('All templates');
-		}
-		$this->zbxTestTextPresent(
+	public function prepareTriggerPrototypeData() {
+		$host_result = CDataHelper::createHosts([
 			[
-				'Severity',
-				'Name',
-				'Expression',
-				'Create enabled'
+				'host' => 'Host for prototype check',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_SNMP,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '161',
+						'details' => [
+							'version' => 1,
+							'community' => 'test'
+						]
+					]
+				],
+				'groups' => [['groupid' => 4]], // Zabbix server
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for prototype check',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
 			]
-		);
-		$this->zbxTestTextNotPresent('Info');
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent(['Create disabled', 'Mass update', 'Delete']);
+		]);
+		$hostids = $host_result['hostids']['Host for prototype check'];
+		self::$host_druleids = $host_result['discoveryruleids']['Host for prototype check:drule'];
+
+		$item_prototype = CDataHelper::call('itemprototype.create', [
+			[
+				'name' => '1 Item prototype for trigger',
+				'key_' => '1_key[{#KEY}]',
+				'hostid' => $hostids,
+				'ruleid' => self::$host_druleids,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => 0
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $item_prototype );
+
+		CDataHelper::call('triggerprototype.create', [
+			[
+				'description' => '3a Trigger prototype monitored discovered_{#KEY}',
+				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'opdata' => '12345',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+			],
+			[
+				'description' => '15 Trigger prototype not monitored discovered_{#KEY}',
+				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'status' => TRIGGER_STATUS_DISABLED,
+				'opdata' => '{#PROT_MAC}',
+				'priority' => TRIGGER_SEVERITY_INFORMATION
+			],
+			[
+				'description' => '33b4 Trigger prototype not monitored not discovered_{#KEY}',
+				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'status' => TRIGGER_STATUS_DISABLED,
+				'discover' => TRIGGER_NO_DISCOVER,
+				'opdata' => 'test',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			],
+			[
+				'description' => 'a3 Trigger prototype monitored not discovered_{#KEY}',
+				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'discover' => TRIGGER_NO_DISCOVER,
+				'tags' => [
+					[
+						'tag' => 'name_1',
+						'value' => 'value_1'
+					],
+					[
+						'tag' => 'name_2',
+						'value' => 'value_2'
+					]
+				],
+				'opdata' => '!@#$%^&*',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'oO75 Trigger prototype for high severity_{#KEY}',
+				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'opdata' => '{$TEST}',
+				'priority' => TRIGGER_SEVERITY_HIGH
+			],
+			[
+				'description' => 'Yw Trigger prototype for disaster severity_{#KEY}',
+				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
+				'opdata' => '🙂🙃',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			]
+		]);
+		self::$prototype_triggerids = CDataHelper::getIds('description');
+		self::$entity_count = count(self::$prototype_triggerids);
+	}
+
+	public function testPageTriggerPrototypes_Layout() {
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+		$this->checkLayout();
 	}
 
 	/**
-	 * @dataProvider data
-	 * @backupOnce triggers
+	 * Sort trigger prototypes by Severity, Name, Create enabled and Discover columns.
+	 *
+	 * @dataProvider getTriggerPrototypesSortingData
 	 */
-	public function testPageTriggerPrototypes_SimpleDelete($data) {
-		$triggerid = $data['triggerid'];
-
-		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
-				$data['parent_itemid'].'&context=host');
-
-		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
-		$this->query('button:Delete')->one()->click();
-
-		$this->zbxTestAcceptAlert();
-		$this->assertMessage(TEST_GOOD, 'Trigger prototype deleted');
-		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->zbxTestTextPresent($data['d_name']);
-
-		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-	}
-
-	// Returns all discovery rules
-	public static function rule() {
-		return CDBHelper::getDataProvider(
-				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
-				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
-					' WHERE f.itemid = i.itemid'.
-					' AND t.triggerid = f.triggerid'.
-					' AND d.parent_itemid=di.itemid'.
-					' AND i.itemid=d.itemid'.
-					' AND h.hostid=i.hostid'.
-					' AND h.host LIKE \'%-layout-test%\''
-		);
+	public function testPageTriggerPrototypes_Sorting($data) {
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+		$this->executeSorting($data);
 	}
 
 	/**
-	 * @dataProvider rule
-	 * @backupOnce triggers
+	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
+	 *
+	 * @dataProvider getTriggerPrototypesButtonLinkData
 	 */
-	public function testPageTriggerPrototypes_MassDelete($rule) {
-		$druleid = $rule['parent_itemid'];
-		$triggerids = CDBHelper::getAll(
-				'SELECT i.itemid'.
-				' FROM item_discovery id, items i'.
-				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid'
-		);
-		$triggerids = zbx_objectValues($triggerids, 'itemid');
+	public function testPageTriggerPrototypes_ButtonLink($data) {
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+		$this->checkTableAction($data);
+	}
 
-		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$druleid.'&context=host');
-		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestCheckboxSelect('all_triggers');
-		$this->query('button:Delete')->one()->click();
+	/**
+	 * Check delete scenarios.
+	 *
+	 * @dataProvider getTriggerPrototypesDeleteData
+	 */
+	public function testPageTriggerPrototypes_Delete($data) {
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 
-		$this->zbxTestAcceptAlert();
+		$ids = [];
+		foreach ($data['name'] as $name) {
+			$ids[] = self::$prototype_triggerids[$name];
+		}
 
-		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->assertMessage(TEST_GOOD, 'Trigger prototype deleted');
-
-		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerid', $triggerids);
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->checkDelete($data, $ids);
 	}
 }
