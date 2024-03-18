@@ -497,7 +497,7 @@ class testFormConnectors extends CWebTest {
 						'URL' => '{$URL}',
 						'Advanced configuration' => true,
 						'Attempts' => '2',
-						'Name' => 'Connector with emty attempt interval field',
+						'Name' => 'Connector with empty attempt interval field',
 						'Attempt interval' => ''
 					],
 					'error' => [

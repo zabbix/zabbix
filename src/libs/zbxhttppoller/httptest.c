@@ -28,6 +28,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxcurl.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
@@ -39,9 +40,9 @@
 
 typedef struct
 {
-	long					rspcode;
-	double					total_time;
-	ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	speed_download;
+	long		rspcode;
+	double		total_time;
+	curl_off_t	speed_download;
 }
 zbx_httpstat_t;
 
@@ -225,7 +226,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	size_t		num = 0;
 	AGENT_RESULT	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_CURLINFO_SPEED_DOWNLOAD_FMT,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:%" CURL_FORMAT_CURL_OFF_T,
 			__func__, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = zbx_db_select("select type,itemid from httpstepitem where httpstepid=" ZBX_FS_UI64, httpstepid);
@@ -282,7 +283,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 					SET_DBL_RESULT(&value, stat->total_time);
 					break;
 				case ZBX_HTTPITEM_TYPE_SPEED:
-					SET_DBL_RESULT(&value, stat->speed_download);
+					SET_DBL_RESULT(&value, (double)stat->speed_download);
 					break;
 			}
 
@@ -636,25 +637,14 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(easyhandle, &err_str))
 		goto clean;
-	}
-#endif
 
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file,
 			httptest->httptest.ssl_key_file, httptest->httptest.ssl_key_password,
@@ -893,14 +883,14 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 
-			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, ZBX_CURLINFO_SPEED_DOWNLOAD,
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD_T,
 					&stat.speed_download)) && NULL == err_str)
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else
 			{
-				speed_download += stat.speed_download;
+				speed_download += (double)stat.speed_download;
 				speed_download_num++;
 			}
 

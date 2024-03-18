@@ -222,6 +222,10 @@ class C64ImportConverter extends CConverter {
 			if (array_key_exists('triggers', $item)) {
 				$item['triggers'] = self::convertTriggers($item['triggers']);
 			}
+
+			if (!array_key_exists('history', $item)) {
+				$item['history'] = '90d';
+			}
 		}
 		unset($item);
 

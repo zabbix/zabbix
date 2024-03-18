@@ -216,6 +216,8 @@ class TabIndicatorFactory {
 				return new MediatypeOptionsTabIndicatorItem;
 			case 'MessageTemplate':
 				return new MessageTemplateTabIndicatorItem;
+			case 'Mfa':
+				return new MfaTabIndicatorItem;
 			case 'Http':
 				return new HttpTabIndicatorItem;
 			case 'Inventory':
@@ -597,6 +599,33 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver() {
 		const target_node = document.querySelector('#saml_auth_enabled');
+
+		if (target_node !== null) {
+			target_node.addEventListener('click', () => {
+				this.addAttributes();
+			});
+		}
+	}
+}
+
+class MfaTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('#mfa_status');
+
+		if (element !== null) {
+			return element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#mfa_status');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {

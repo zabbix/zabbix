@@ -34,7 +34,6 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
-#include "zbxcrypto.h"
 #include "zbxhash.h"
 #include "../server_constants.h"
 

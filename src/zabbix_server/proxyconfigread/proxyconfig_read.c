@@ -27,6 +27,15 @@
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
 #include "zbx_item_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxversion.h"
+#include "zbxcomms.h"
+#include "zbxvault.h"
 
 typedef struct
 {
