@@ -970,7 +970,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 		if (concurrency_max > hosts.values_num)
 			continue;
 
-		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout,
+		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout * 1000,
 				dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s",
@@ -1002,7 +1002,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 
 	if (0 == *stop && 0 != hosts.values_num && ret == SUCCEED)
 	{
-		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout,
+		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout * 1000,
 				dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s", log_worker_id,
