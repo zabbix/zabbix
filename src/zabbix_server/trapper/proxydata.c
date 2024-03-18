@@ -20,6 +20,7 @@
 #include "proxydata.h"
 
 #include "../taskmanager/taskmanager_server.h"
+#include "../cachehistory/cachehistory_server.h"
 
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
