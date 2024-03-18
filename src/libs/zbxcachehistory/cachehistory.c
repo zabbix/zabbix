@@ -25,7 +25,6 @@
 #include "zbxmodules.h"
 #include "module.h"
 #include "zbxexport.h"
-#include "zbxnix.h"
 #include "zbxavailability.h"
 #include "zbxconnector.h"
 #include "zbxtrends.h"
@@ -37,6 +36,8 @@
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
+#include "zbxalgo.h"
+#include "zbxhistory.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;

@@ -26,7 +26,6 @@
 
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxdbhigh.h"

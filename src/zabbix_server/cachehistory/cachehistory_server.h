@@ -21,7 +21,6 @@
 #define ZABBIX_DBSYNCER_SERVER_H
 
 #include "zbxdbhigh.h"
-#include "zbxhistory.h"
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 

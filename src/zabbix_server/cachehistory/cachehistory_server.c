@@ -24,6 +24,13 @@
 #include "zbxexport.h"
 #include "zbxnix.h"
 #include "zbxconnector.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxhistory.h"
+#include "zbxshmem.h"
+#include "zbxtime.h"
+#include "zbxtrends.h"
 
 /******************************************************************************
  *                                                                            *
