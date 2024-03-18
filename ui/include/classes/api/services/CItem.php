@@ -868,7 +868,7 @@ class CItem extends CItemGeneral {
 
 				if (array_key_exists('flags', $item) && $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 						&& array_key_exists('status', $item) && $item['status'] == ITEM_STATUS_DISABLED
-						&& $db_items[$item['itemid']]['status'] == ITEM_STATUS_ACTIVE) {
+						&& $item['status'] != $db_items[$item['itemid']]['status']) {
 					$upd_item_discoveries[] = $item['itemid'];
 				}
 			}

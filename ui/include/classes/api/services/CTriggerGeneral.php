@@ -1765,7 +1765,7 @@ abstract class CTriggerGeneral extends CApiService {
 			if (array_key_exists('flags', $db_trigger) && $db_trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 					&& array_key_exists('status', $upd_trigger['values'])
 					&& $upd_trigger['values']['status'] == TRIGGER_STATUS_DISABLED
-					&& $db_trigger['status'] == TRIGGER_STATUS_ENABLED) {
+					&& $upd_trigger['values']['status'] != $db_trigger['status']) {
 				$upd_discovered_triggers[] = $db_trigger['triggerid'];
 			}
 		}
