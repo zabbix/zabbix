@@ -202,7 +202,7 @@ class Google2FA
         return [
             Constants::SHA1,
             Constants::SHA256,
-            Constants::SHA512,
+            Constants::SHA512
         ];
     }
 
