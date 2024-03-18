@@ -963,7 +963,7 @@ class CDiscoveryRule extends CItemGeneral {
 			]],
 			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
 												['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
 											]],
 											['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
@@ -1102,12 +1102,10 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::addInternalFields($db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['lifetime_type', 'enabled_lifetime_type']);
-		self::addRequiredFieldsByType($items, $db_items);
-
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
 			$item['host_status'] = $db_item['host_status'];
+			$item += array_intersect_key($db_item, array_flip(['lifetime_type', 'enabled_lifetime_type']));
 
 			$api_input_rules = $db_item['templateid'] == 0
 				? self::getValidationRules()
@@ -1139,23 +1137,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
-	}
-
-	private static function addRequiredFieldsByType(array &$items, array $db_items): void {
-		foreach ($items as &$item) {
-			$db_item = $db_items[$item['itemid']];
-
-			if ($item['lifetime_type'] != $db_item['lifetime_type'] && $item['lifetime_type'] == ZBX_LLD_DELETE_AFTER) {
-				$item += array_intersect_key($db_items, array_flip(['lifetime']));
-			}
-
-			if ($item['lifetime_type'] == ZBX_LLD_DELETE_AFTER
-					&& $item['enabled_lifetime_type'] != $db_item['enabled_lifetime_type']
-					&& $item['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER) {
-				$item += array_intersect_key($db_items, array_flip(['enabled_lifetime']));
-			}
-		}
-		unset($item);
 	}
 
 	/**
@@ -1680,6 +1661,10 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
 			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+
+			if ($item['lifetime'] == 0 && $item['enabled_lifetime'] == 0) {
+				continue;
+			}
 
 			if ($item['enabled_lifetime'] >= $item['lifetime']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
