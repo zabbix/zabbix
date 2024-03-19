@@ -349,7 +349,7 @@ class CSVGHoneycomb {
 		}
 
 		this.#calculateLabelsParams(data.filter(d => d.has_more !== true && d.no_data !== true),
-			this.#cell_width - this.#cells_gap, this.#cell_height / 2, false
+			this.#cell_width - this.#cells_gap, this.#cell_height / 2.25
 		);
 
 		this.#leaveAll();
@@ -556,12 +556,12 @@ class CSVGHoneycomb {
 
 		d.stored_labels = d.labels;
 
-		this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2, true);
+		this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2.25);
 		this.#resizeLabels(cell, {
 			x: scaled_position.dx + d.position.x,
 			y: scaled_position.dy + d.position.y,
-			width: scaled_size.width,
-			height: (scaled_size.height + this.#cells_gap) / 2
+			width: scaled_size.width * .975,
+			height: (scaled_size.height + this.#cells_gap) / 2.25
 		});
 
 		this.#svg
@@ -715,7 +715,7 @@ class CSVGHoneycomb {
 			);
 	}
 
-	#calculateLabelsParams(data, cell_width, container_height, is_scaled) {
+	#calculateLabelsParams(data, cell_width, container_height) {
 		if (!data.length) {
 			return;
 		}
@@ -746,16 +746,30 @@ class CSVGHoneycomb {
 				};
 			}
 
-			if (container_width * this.#container_params.scale < CSVGHoneycomb.LABEL_WIDTH_MIN) {
+			if (container_width * this.#container_params.scale < CSVGHoneycomb.LABEL_WIDTH_MIN * .875) {
 				return;
 			}
 
 			for (const d of data) {
-				d.labels[d_param] = {...d.labels[d_param],
-					font_size: is_custom_size
-						? this.#getFontSizeByPercent(this.#config[c_param].size, container_height)
-						: this.#getFontSizeByWidth(d.labels[d_param].lines, container_width * .9, font_weight ?? '')
-				};
+				if (is_custom_size) {
+					const label_height = container_height * this.#config[c_param].size / 100;
+					const temp_font_size = Math.max(
+						CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale,
+						label_height / d.labels[d_param].lines_count
+					);
+
+					d.labels[d_param].lines_count = Math.max(1, Math.floor(label_height / temp_font_size));
+					d.labels[d_param].font_size = label_height / d.labels[d_param].lines_count;
+				}
+				else {
+					d.labels[d_param].font_size = this.#getFontSizeByWidth(d.labels[d_param].lines, container_width,
+						font_weight ?? ''
+					);
+				}
+			}
+
+			if (is_custom_size) {
+				return;
 			}
 
 			const thresholds = new Map();
@@ -775,7 +789,7 @@ class CSVGHoneycomb {
 						CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale,
 						Math.min(
 							thresholds.get(d.labels[d_param].line_max_length),
-							Math.floor(container_height / (d.labels[d_param].lines_count * CSVGHoneycomb.LINE_HEIGHT))
+							Math.floor(container_height / d.labels[d_param].lines_count)
 						)
 					);
 				}
@@ -783,6 +797,7 @@ class CSVGHoneycomb {
 		}
 
 		const container_width = cell_width - this.#container_params.cell_padding * 2;
+		container_height /= CSVGHoneycomb.LINE_HEIGHT;
 
 		if (this.#config.primary_label.show) {
 			calculateLabelParams(data, container_width, container_height, true)
@@ -792,7 +807,6 @@ class CSVGHoneycomb {
 			calculateLabelParams(data, container_width, container_height, false)
 		}
 
-		const height_limit = container_height / CSVGHoneycomb.LINE_HEIGHT;
 		const font_size_min = CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale;
 
 		for (const d of data) {
@@ -801,61 +815,56 @@ class CSVGHoneycomb {
 			let p_height = primary !== null ? primary.font_size * primary.lines_count : 0;
 			let s_height = secondary !== null ? secondary.font_size * secondary.lines_count : 0;
 
-			while ((primary?.lines_count || 0) > 1 || (secondary?.lines_count || 0) > 1) {
-				if (p_height + s_height <= height_limit) {
+			while ((primary?.lines_count ?? 0) > 1 && (secondary?.lines_count ?? 0) > 1) {
+				if (p_height + s_height <= container_height) {
 					break;
 				}
 
-				if (primary !== null) {
-					const p_font_size = p_height * height_limit / (p_height + s_height) / primary.lines_count;
+				if (primary !== null && !this.#config['primary_label'].is_custom_size) {
+					const p_font_size = (container_height - s_height) / primary.lines_count;
 
 					if (p_font_size < font_size_min) {
-						if (primary.lines_count > 1) {
-							primary.lines_count--;
-						}
+						primary.lines_count = Math.max(1, primary.lines_count - 1);
 					}
 					else {
 						primary.font_size = p_font_size;
 					}
+
+					p_height = primary.font_size * primary.lines_count;
 				}
 
-				if (secondary !== null) {
-					const s_font_size = s_height * height_limit / (p_height + s_height) / secondary.lines_count;
+				if (secondary !== null && !this.#config['secondary_label'].is_custom_size) {
+					const s_font_size = (container_height - p_height) / secondary.lines_count;
 
 					if (s_font_size < font_size_min) {
-						if (secondary.lines_count > 1) {
-							secondary.lines_count--;
-						}
+						secondary.lines_count = Math.max(1, secondary.lines_count - 1);
 					}
 					else {
 						secondary.font_size = s_font_size;
 					}
+
+					s_height = secondary.font_size * secondary.lines_count;
+				}
+			}
+
+			if (p_height + s_height > container_height) {
+				const p_scalable = primary?.is_custom_size ? 1 : 0;
+				const s_scalable = secondary?.is_custom_size ? 1 : 0;
+
+				const font_scale = (container_height - p_height * p_scalable - s_height * s_scalable)
+					/ (p_height * (1 - p_scalable) + s_height * (1 - s_scalable));
+
+				if (primary !== null) {
+					primary.font_size = Math.max(font_size_min,
+						primary.font_size * (primary.is_custom_size ? 1 : font_scale)
+					);
 				}
 
-				p_height = primary !== null ? primary.font_size * primary.lines_count : 0;
-				s_height = secondary !== null ? secondary.font_size * secondary.lines_count : 0;
-			}
-
-			if (p_height + s_height <= height_limit) {
-				continue;
-			}
-
-			const p_scalable = primary?.is_custom_size ? 1 : 0;
-			const s_scalable = secondary?.is_custom_size ? 1 : 0;
-
-			const font_scale = (height_limit - p_height * p_scalable - s_height * s_scalable)
-				/ (p_height * (1 - p_scalable) + s_height * (1 - s_scalable));
-
-			if (primary !== null) {
-				primary.font_size = Math.max(font_size_min,
-					primary.font_size * (primary.is_custom_size ? 1 : font_scale)
-				);
-			}
-
-			if (secondary !== null) {
-				secondary.font_size = Math.max(font_size_min,
-					secondary.font_size * (secondary.is_custom_size ? 1 : font_scale)
-				);
+				if (secondary !== null) {
+					secondary.font_size = Math.max(font_size_min,
+						secondary.font_size * (secondary.is_custom_size ? 1 : font_scale)
+					);
+				}
 			}
 		}
 	}
@@ -975,18 +984,11 @@ class CSVGHoneycomb {
 		return this.#canvas_context.measureText(text).width;
 	}
 
-	#getFontSizeByPercent(font_size, fit_height) {
-		return Math.max(
-			CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale,
-			fit_height * font_size / (100 * CSVGHoneycomb.LINE_HEIGHT)
-		);
-	}
-
 	#getFontSizeByWidth(lines, fit_width, font_weight = '') {
 		return Math.max(CSVGHoneycomb.FONT_SIZE_MIN / this.#container_params.scale,
 			Math.min(...lines
 				.filter(line => line !== '')
-				.map(line => fit_width / this.#getMeasuredTextWidth(line, 10, font_weight) * 9)
+				.map(line => fit_width * .875 / this.#getMeasuredTextWidth(line, 10, font_weight) * 9)
 			)
 		);
 	}

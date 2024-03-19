@@ -3567,6 +3567,7 @@ section {
     align-content: stretch;
     align-items: center;
     height: 100%;
+    padding: 0 2em;
     text-align: center;
     line-height: var(--line-height);
     color: var(--color); }
