@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$table->addRow([
 		[$host_name, $maintenance_icon],
 		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
-		getHostAvailabilityTable($host['interfaces']),
+		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
 		$host['tags'],
 		($host['status'] == HOST_STATUS_MONITORED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)

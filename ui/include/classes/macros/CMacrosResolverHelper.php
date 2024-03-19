@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -647,32 +647,36 @@ class CMacrosResolverHelper {
 	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
 	 * and user data macros.
 	 *
-	 * @param array $data                        Array of unersolved macros.
-	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
-	 * @param array $data[<hostid>][<scriptid>]  Script fields to resolve macros for.
+	 * @param array  $data                          Array of unresolved macros.
+	 * @param array  $data[<hostid>]                Array of scripts. Contains script ID as keys.
+	 * @param array  $data[<hostid>][<scriptid>]    Script fields to resolve macros for.
+	 * @param array  $manualinput_values
+	 * @param string $manualinput_values[<hostid>]  Value for resolving {MANUALINPUT} macros.
 	 *
 	 * @return array
 	 */
-	public static function resolveManualHostActionScripts(array $data): array {
-		return CMacrosResolver::resolveManualHostActionScripts($data);
+	public static function resolveManualHostActionScripts(array $data, array $manualinput_values = []): array {
+		return CMacrosResolver::resolveManualHostActionScripts($data, $manualinput_values);
 	}
 
 	/**
 	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
 	 * inventory<1-9> macros, user macros, event macros and user data macros.
 	 *
-	 * @param array $data                                  Array of unersolved macros.
-	 * @param array $data[<eventid>]                       Array of scripts. Contains script ID as keys.
-	 * @param array $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
-	 * @param array $events                                Array of events.
-	 * @param array $events[<eventid>]                     Event fields.
-	 * @param array $events[<eventid>][hosts]              Array of hosts that created the event.
-	 * @param array $events[<eventid>][hosts][][<hostid>]  Host ID.
-	 * @param array $events[<eventid>][objectid]           Trigger ID.
-	 *
+	 * @param array  $data                                  Array of unresolved macros.
+	 * @param array  $data[<eventid>]                       Array of scripts. Contains script ID as keys.
+	 * @param array  $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
+	 * @param array  $events                                Array of events.
+	 * @param array  $events[<eventid>]                     Event fields.
+	 * @param array  $events[<eventid>][hosts]              Array of hosts that created the event.
+	 * @param array  $events[<eventid>][hosts][][<hostid>]  Host ID.
+	 * @param array  $events[<eventid>][objectid]           Trigger ID.
+	 * @param array  $manualinput_values
+	 * @param string $manualinput_values[<eventid>]         Value for resolving {MANUALINPUT} macros.
 	 * @return array
 	 */
-	public static function resolveManualEventActionScripts(array $data, array $events): array {
-		return CMacrosResolver::resolveManualEventActionScripts($data, $events);
+	public static function resolveManualEventActionScripts(array $data, array $events,
+			array $manualinput_values = []): array {
+		return CMacrosResolver::resolveManualEventActionScripts($data, $events, $manualinput_values);
 	}
 }

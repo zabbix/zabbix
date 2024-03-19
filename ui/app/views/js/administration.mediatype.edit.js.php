@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -244,7 +244,7 @@
 			$('#name').focus();
 		});
 
-		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
+		// Trim spaces on submit. Spaces for script parameters should not be trimmed.
 		$('#media-type-form').submit(function() {
 			var maxattempts = $('#maxattempts'),
 				maxsessions_type = $('#maxsessions_type :radio:checked').val(),
@@ -294,7 +294,7 @@
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.
 		 */
 		function toggleSecurityOptions() {
-			if ($('input[name=smtp_security]:checked').val() == <?= SMTP_CONNECTION_SECURITY_NONE ?>) {
+			if ($('input[name=smtp_security]:checked').val() == <?= SMTP_SECURITY_NONE ?>) {
 				$('#smtp_verify_peer, #smtp_verify_host').prop('checked', false).closest('li').hide();
 			}
 			else {

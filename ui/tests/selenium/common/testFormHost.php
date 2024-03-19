@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,7 +298,7 @@ class testFormHost extends CWebTest {
 			);
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
-				$field_lenghts = [
+				$field_lengths = [
 					'Max repetition count' =>  20,
 					'Context name' => 255,
 					'Security name' => 64,
@@ -306,7 +306,7 @@ class testFormHost extends CWebTest {
 					'Privacy passphrase' => 64
 				];
 
-				foreach ($field_lenghts as $label => $length) {
+				foreach ($field_lengths as $label => $length) {
 					$this->assertEquals($length, $snmp_form->getField($label)->getAttribute('maxlength'));
 				}
 			}
@@ -387,7 +387,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Existen visible name',
+						'Host name' => 'Existed visible name',
 						'Host groups' => 'Zabbix servers',
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
@@ -2032,7 +2032,7 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);

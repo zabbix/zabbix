@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,46 +23,21 @@
 #include "zbxcacheconfig.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
-
-void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
-
-	if (0 == strcmp(s->buffer, ZBX_NOTSUPPORTED))
-	{
-		/* 'ZBX_NOTSUPPORTED\0<error message>' */
-		if (sizeof(ZBX_NOTSUPPORTED) < s->read_bytes)
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s->buffer + sizeof(ZBX_NOTSUPPORTED)));
-		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
-
-		*ret = NOTSUPPORTED;
-	}
-	else if (0 == strcmp(s->buffer, ZBX_ERROR))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
-		*ret = AGENT_ERROR;
-	}
-	else if (0 == received_len)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
-				" Assuming that agent dropped connection because of access permissions.",
-				addr));
-		*ret = NETWORK_ERROR;
-	}
-	else
-		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s->buffer);
-}
+#include "zbxtypes.h"
+#include <stddef.h>
+#include "zbxagentget.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve data from Zabbix agent                                   *
+ * Purpose: retrieves data from Zabbix agent                                  *
  *                                                                            *
  * Parameters: item             - [IN] item we are interested in              *
  *             config_source_ip - [IN]                                        *
  *             program_type     - [IN]                                        *
  *             result           - [OUT]                                       *
- *                                                                            *
+ *             version          - [IN/OUT] if 7.0.0 or higher, connect using, *
+ *                                         JSON protocol, fallback and retry  *
+ *                                         with plaintext protocol            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NETWORK_ERROR - network related error occurred               *
@@ -74,11 +49,11 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  *                                                                            *
  ******************************************************************************/
 int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,
-		AGENT_RESULT *result)
+		AGENT_RESULT *result, int *version)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
-	int		ret = SUCCEED;
+	int		ret = SUCCEED, retry = 0;
 	ssize_t		received_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
@@ -119,10 +94,27 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
 			item->timeout + 1, item->host.tls_connect, tls_arg1, tls_arg2))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
+		struct zbx_json	j;
+		char		*ptr;
+		size_t		len;
 
-		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)item->timeout,
-				ZBX_TCP_PROTOCOL, 0))
+		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+		if (ZBX_COMPONENT_VERSION(7, 0, 0) <= *version)
+		{
+			zbx_agent_prepare_request(&j, item->key, item->timeout);
+			ptr = j.buffer;
+			len = j.buffer_size;
+		}
+		else
+		{
+			ptr = item->key;
+			len = strlen(item->key);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", ptr);
+
+		if (SUCCEED != zbx_tcp_send_ext(&s, ptr, len, 0, ZBX_TCP_PROTOCOL, 0))
 		{
 			ret = NETWORK_ERROR;
 		}
@@ -136,6 +128,8 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		}
 		else
 			ret = NETWORK_ERROR;
+
+		zbx_json_free(&j);
 	}
 	else
 	{
@@ -144,13 +138,23 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	}
 
 	if (SUCCEED == ret)
-		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result);
+	{
+		if (FAIL == (ret = zbx_agent_handle_response(s.buffer, s.read_bytes, received_len,
+				item->interface.addr, result, version)))
+		{
+			retry = 1;
+		}
+	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 
 	zbx_tcp_close(&s);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	/* retry with other protocol */
+	if (1 == retry)
+		return zbx_agent_get_value(item, config_source_ip, program_type, result, version);
 
 	return ret;
 }

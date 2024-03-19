@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "zbxmockjson.h"
 #include "zbxembed.h"
 #include "libs/zbxpreproc/pp_execute.h"
-#include "zabbix_server/trapper/trapper_preproc.h"
+#include "libs/zbxtrapper/trapper_preproc.h"
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;

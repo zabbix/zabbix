@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -730,7 +730,9 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
 						result->alertid);
 
-				if (EVENT_SOURCE_TRIGGERS == result->source && NULL != result->value)
+				if ((EVENT_SOURCE_TRIGGERS == result->source ||
+						EVENT_SOURCE_INTERNAL == result->source ||
+						EVENT_SOURCE_SERVICE == result->source) && NULL != result->value)
 				{
 					mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid);
 					if (NULL != mediatype && 0 != mediatype->process_tags)

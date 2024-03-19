@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,9 +56,8 @@ class Manager extends CRegistryFactory {
 
 		if ($instance === null) {
 			$instance = self::getInstance()->getObject('history');
-			$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
-			foreach ($dbversion_status as $dbversion) {
+			foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 				if (array_key_exists('history_pk', $dbversion)) {
 					if ($dbversion['history_pk'] == 1) {
 						$instance->setPrimaryKeysEnabled();

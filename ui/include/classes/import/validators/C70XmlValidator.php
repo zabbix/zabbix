@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -482,7 +482,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
-							'history' =>				['type' => XML_STRING, 'default' => '90d'],
+							'history' =>				['type' => XML_STRING, 'default' => '31d'],
 							'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
@@ -628,7 +628,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
-									'history' =>				['type' => XML_STRING, 'default' => '90d'],
+									'history' =>				['type' => XML_STRING, 'default' => '31d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
@@ -1171,7 +1171,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
-							'history' =>				['type' => XML_STRING, 'default' => '90d'],
+							'history' =>				['type' => XML_STRING, 'default' => '31d'],
 							'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
@@ -1318,7 +1318,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
-									'history' =>				['type' => XML_STRING, 'default' => '90d'],
+									'history' =>				['type' => XML_STRING, 'default' => '31d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],

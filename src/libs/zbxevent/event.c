@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,6 +254,21 @@ void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, cha
 				*replace_to = zbx_strdup(*replace_to, "unknown");
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
+		{
+			zbx_event_get_str_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
+		{
+			zbx_event_get_json_tags(event, replace_to);
+		}
+		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
+		{
+			zbx_event_get_tag(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
+		}
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		if (0 == strcmp(macro, MVAR_EVENT_TAGS))
 		{
 			zbx_event_get_str_tags(event, replace_to);
 		}

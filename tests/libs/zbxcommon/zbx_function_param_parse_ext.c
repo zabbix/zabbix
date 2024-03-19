@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,10 @@ static void	get_parameters(const char *path, zbx_vector_str_t *params)
 		const char	*param;
 
 		if (ZBX_MOCK_SUCCESS != err || ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hparam, &param)))
+		{
+			param = NULL;
 			fail_msg("Cannot read param #%d: %s", params_num, zbx_mock_error_string(err));
+		}
 
 		zbx_vector_str_append(params, (char *)param);
 

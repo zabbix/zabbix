@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
-int	zbx_function_param_quote(char **param, int forced);
+char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted);
+int	zbx_function_param_quote(char **param, int forced, int esc_bs);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
 #define ZBX_BACKSLASH_ESC_OFF		0
@@ -54,6 +55,7 @@ void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros,
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+int	zbx_function_param_parse_count(const char *expr);
 
 typedef enum
 {
@@ -83,6 +85,7 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 #define ZBX_TOKEN_REFERENCE		0x00040
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 #define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
+#define ZBX_TOKEN_USER_FUNC_MACRO	0x00200
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000

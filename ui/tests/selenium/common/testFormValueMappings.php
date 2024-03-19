@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ class testFormValueMappings extends CWebTest {
 		$this->assertEquals('64', $mapping_form->query('id:name')->one()->getAttribute('maxlength'));
 
 		// Check mappings table layout.
-		$mappings_table = $mapping_form->query('id:mappings_table')->asTable()->one();
+		$mappings_table = $mapping_form->query('id:mappings-table')->asTable()->one();
 		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', 'Action', ''], $mappings_table->getHeadersText());
 		$row = $mappings_table->getRow(0);
 		foreach (['Value', 'Mapped to'] as $mapping_column) {
@@ -106,7 +106,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check types.
 		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
-		$dropdown = $row->query('name:mappings[1][type]')->asDropdown()->one();
+		$dropdown = $row->query('name:mappings[0][type]')->asDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
 
@@ -839,7 +839,7 @@ class testFormValueMappings extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
 
-		$mapping_table = $dialog->query('id:mappings_table')->asMultifieldTable()->one();
+		$mapping_table = $dialog->query('id:mappings-table')->asMultifieldTable()->one();
 		if (CTestArrayHelper::get($data, 'remove_all')) {
 			$mapping_table->clear();
 		}
@@ -881,7 +881,7 @@ class testFormValueMappings extends CWebTest {
 				// Take a screenshot to test draggable object position in overlay dialog.
 				if ($action === 'create') {
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$this->assertScreenshot($dialog->query('id:mappings_table')->asMultifieldTable()->one(),
+					$this->assertScreenshot($dialog->query('id:mappings-table')->asMultifieldTable()->one(),
 							'Value mappings popup'.$data['screenshot_id']);
 				}
 
@@ -901,7 +901,7 @@ class testFormValueMappings extends CWebTest {
 	 */
 	private function checkMappings($data) {
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
-		$mappings_table = $this->query('id:mappings_table')->asMultifieldTable()->one();
+		$mappings_table = $this->query('id:mappings-table')->asMultifieldTable()->one();
 
 		// Check value mapping name.
 		$this->assertEquals($data['name'], $dialog->query('xpath:.//input[@id="name"]')->one()->getValue());
@@ -1006,7 +1006,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query('link', self::UPDATE_VALUEMAP2)->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($fields['name']);
-		$dialog->query('id:mappings_table')->asMultifieldTable()->one()->fill($fields['mappings']);
+		$dialog->query('id:mappings-table')->asMultifieldTable()->one()->fill($fields['mappings']);
 
 		// Submit the value mapping configuration dialog, but Cancel the update of the host/template.
 		$dialog->submit()->waitUntilNotVisible();
@@ -1079,7 +1079,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query('name:valuemap_add')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($valuemap['name']);
-		$dialog->query('id:mappings_table')->asMultifieldTable()->one()->fill($valuemap['mappings']);
+		$dialog->query('id:mappings-table')->asMultifieldTable()->one()->fill($valuemap['mappings']);
 		$dialog->submit()->waitUntilNotVisible();
 
 		// Submit host/template configuration and wait for the error message to appear.
@@ -1111,6 +1111,6 @@ class testFormValueMappings extends CWebTest {
 
 		// It is necessary because of unexpected viewport shift.
 		$this->page->updateViewport();
-		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilVisible()->one(), 'Value mapping mass update');
+		$this->assertScreenshot($mapping_form->query('id:mappings-table')->waitUntilVisible()->one(), 'Value mapping mass update');
 	}
 }

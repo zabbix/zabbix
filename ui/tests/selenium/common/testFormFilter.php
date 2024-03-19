@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class testFormFilter extends CWebTest {
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, null, $data['error_message']);
 				$this->page->refresh()->waitUntilReady();
-				$this->assertEquals($this->query('xpath://li/ul[@class="ui-sortable-container ui-sortable"]/li')->count(), 1);
+				$this->assertEquals($this->query('xpath://li/ul[contains(@class, "tabfilter-tabs sortable")]/li')->count(), 1);
 				break;
 		}
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,52 +29,58 @@ import (
 
 const StateNotSupported = 1
 
-func ValueToString(u interface{}) string {
+func ValueToString(u interface{}) *string {
+	var s string
+
 	switch v := u.(type) {
 	case string:
-		return u.(string)
+		s = v
 	case *string:
-		return *u.(*string)
+		return v
 	case int:
-		return strconv.FormatInt(int64(v), 10)
+		s = strconv.FormatInt(int64(v), 10)
 	case int8:
-		return strconv.FormatInt(int64(v), 10)
+		s = strconv.FormatInt(int64(v), 10)
 	case int16:
-		return strconv.FormatInt(int64(v), 10)
+		s = strconv.FormatInt(int64(v), 10)
 	case int32:
-		return strconv.FormatInt(int64(v), 10)
+		s = strconv.FormatInt(int64(v), 10)
 	case int64:
-		return strconv.FormatInt(v, 10)
+		s = strconv.FormatInt(v, 10)
 	case uint:
-		return strconv.FormatUint(uint64(v), 10)
+		s = strconv.FormatUint(uint64(v), 10)
 	case uint8:
-		return strconv.FormatUint(uint64(v), 10)
+		s = strconv.FormatUint(uint64(v), 10)
 	case uint16:
-		return strconv.FormatUint(uint64(v), 10)
+		s = strconv.FormatUint(uint64(v), 10)
 	case uint32:
-		return strconv.FormatUint(uint64(v), 10)
+		s = strconv.FormatUint(uint64(v), 10)
 	case uint64:
-		return strconv.FormatUint(v, 10)
+		s = strconv.FormatUint(v, 10)
 	case float32:
-		return strconv.FormatFloat(float64(v), 'f', 6, 64)
+		s = strconv.FormatFloat(float64(v), 'f', 6, 64)
 	case float64:
-		return strconv.FormatFloat(v, 'f', 6, 64)
+		s = strconv.FormatFloat(v, 'f', 6, 64)
 	default:
 		// note that this conversion is slow and it's better to return known value type
-		return fmt.Sprintf("%v", u)
+		s = fmt.Sprintf("%v", u)
 	}
+
+	return &s
 }
 
 func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.Result) {
-	var value string
+	var value *string
 	switch v := u.(type) {
 	case *plugin.Result:
 		return v
 	case plugin.Result:
 		return &v
+	case nil:
+		return &plugin.Result{Itemid: itemid, Value: nil, Ts: ts}
 	default:
 		value = ValueToString(u)
 	}
 
-	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}
+	return &plugin.Result{Itemid: itemid, Value: value, Ts: ts}
 }

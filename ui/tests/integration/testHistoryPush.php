@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -479,6 +479,8 @@ class testHistoryPush extends CIntegrationTest {
 		]);
 
 		$this->reloadConfigurationCache();
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_dc_sync_configuration()', true);
 
 		$response = $this->call('history.push', [
 			'itemid' => self::$itemids['trapper_uint_non_monitored_host'],
@@ -515,12 +517,14 @@ class testHistoryPush extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'End of zbx_dc_sync_configuration()', true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_dc_update_maintenances() started:1 stopped:0 running:1', true);
 
 		$response = $this->call('history.push', [
 			'itemid' => self::$itemids['trapper_uint_maintained_host'],
 			'value' => 12345,
-			'clock' => time() - 25,
+			'clock' => $maint_start_tm,
 			'ns' => 255
 		]);
 

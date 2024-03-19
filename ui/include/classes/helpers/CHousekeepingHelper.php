@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Housekeeping API object.
  */
-class CHousekeepingHelper extends CConfigGeneralHelper {
+class CHousekeepingHelper {
 
 	public const COMPRESS_OLDER = 'compress_older';
 	public const COMPRESSION_STATUS = 'compression_status';
@@ -52,37 +52,44 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 	private const DBVERSION_COMPRESSED_CHUNKS_HISTORY = 'compressed_chunks_history';
 	private const DBVERSION_COMPRESSED_CHUNKS_TRENDS = 'compressed_chunks_trends';
 
-	/**
-	 * Housekeeping API object parameters array.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
 	protected static $params = [];
 
 	/**
-	 * @inheritdoc
+	 * Get the value of the given Housekeeping API object's field.
+	 *
+	 * @param string $field
+	 *
+	 * @throws Exception
+	 *
+	 * @return string
 	 */
-	protected static function loadParams(?string $param = null, bool $is_global = false): void {
+	public static function get(string $field): string {
 		if (!self::$params) {
-			self::$params = API::Housekeeping()->get(['output' => 'extend']);
+			self::$params = API::Housekeeping()->get([
+				'output' => [
+					'hk_events_mode', 'hk_events_trigger', 'hk_events_service', 'hk_events_internal',
+					'hk_events_discovery', 'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode',
+					'hk_audit', 'hk_sessions_mode', 'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history',
+					'hk_trends_mode', 'hk_trends_global', 'hk_trends', 'db_extension', 'compression_status',
+					'compress_older'
+				]
+			]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load housekeeping API parameters.'));
 			}
 		}
+
+		return self::$params[$field];
 	}
 
 	/**
-	 * @param array $dbversion_status
-	 *
 	 * @return array
 	 */
-	public static function getWarnings(array $dbversion_status): array {
+	public static function getWarnings(): array {
 		$warnings = [];
 
-		foreach ($dbversion_status as $dbversion) {
+		foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 			if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$compression_available = array_key_exists('compression_availability', $dbversion)
 					&& $dbversion['compression_availability'];

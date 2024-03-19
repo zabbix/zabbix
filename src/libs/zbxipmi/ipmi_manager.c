@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -306,25 +306,6 @@ static void	ipmi_poller_free_request(zbx_ipmi_poller_t *poller)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees IPMI poller                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	ipmi_poller_free(zbx_ipmi_poller_t *poller)
-{
-	zbx_ipmi_request_t	*request;
-
-	zbx_ipc_client_close(poller->client);
-
-	while (NULL != (request = ipmi_poller_pop_request(poller)))
-		ipmi_request_free(request);
-
-	zbx_binary_heap_destroy(&poller->requests);
-
-	zbx_free(poller);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: initializes IPMI manager                                          *
  *                                                                            *
  * Parameters: manager - [IN] the manager to initialize                       *
@@ -364,22 +345,6 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 	zbx_hashset_create(&manager->hosts, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: destroys IPMI manager                                             *
- *                                                                            *
- * Parameters: manager - [IN] the manager to destroy                          *
- *                                                                            *
- ******************************************************************************/
-static void	ipmi_manager_destroy(zbx_ipmi_manager_t *manager)
-{
-	zbx_hashset_destroy(&manager->hosts);
-	zbx_binary_heap_destroy(&manager->pollers_load);
-	zbx_hashset_destroy(&manager->pollers_client);
-	zbx_vector_ptr_clear_ext(&manager->pollers, (zbx_clean_func_t)ipmi_poller_free);
-	zbx_vector_ptr_destroy(&manager->pollers);
 }
 
 /******************************************************************************
@@ -641,7 +606,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	if (SUCCEED == errcode)
 	{
-		zbx_activate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, &data,
+		zbx_activate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, 0, &data,
 				&data_alloc, &data_offset);
 		ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 	}
@@ -1094,9 +1059,6 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&ipmi_service);
-	ipmi_manager_destroy(&ipmi_manager);
 #undef STAT_INTERVAL
 }
 

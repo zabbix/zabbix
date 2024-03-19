@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef ZABBIX_PB_DISCOVERY_H
 #define ZABBIX_PB_DISCOVERY_H
 
-#include "zbxproxybuffer.h"
 #include "proxybuffer.h"
+#include "zbxalgo.h"
 #include "zbxtypes.h"
 
 void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -249,12 +249,13 @@ zbx_log_value_t;
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
+/* value for item not having any data */
+#define ZBX_NODATA		"ZBX_NODATA"
 /* the error message for not supported items when reason is unknown */
 #define ZBX_NOTSUPPORTED_MSG	"Unknown error."
 
 /* Zabbix Agent non-critical error (agents older than 2.0) */
 #define ZBX_ERROR		"ZBX_ERROR"
-
 
 /* program type */
 #define ZBX_PROGRAM_TYPE_SERVER		0x01

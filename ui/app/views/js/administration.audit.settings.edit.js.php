@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,10 @@
 
 		$form.on('submit', function() {
 			$form.trimValues(['#hk_audit']);
+		});
+
+		$('#auditlog_enabled').change(function() {
+			$('#auditlog_mode').prop('disabled', !this.checked);
 		});
 
 		$('#hk_audit_mode').change(function() {
@@ -61,6 +65,10 @@
 									<?= (DB::getDefault('config', 'auditlog_enabled') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
+							$('#auditlog_mode').prop('checked',
+								<?= DB::getDefault('config', 'auditlog_mode') == 1 ? 'true' : 'false' ?>
+							);
+
 							$('#hk_audit_mode')
 								.prop('checked',
 									<?= (DB::getDefault('config', 'hk_audit_mode') == 1) ? 'true' : 'false' ?>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -349,6 +349,7 @@ class testPageHostInterfaces extends CWebTest {
 			[
 				[
 					'host' => 'Available host',
+					'filter' => ['Name' => 'Available host'],
 					'interfaces' => [
 						'ZBX' => [
 							'color' => self::GREEN,
@@ -446,12 +447,19 @@ class testPageHostInterfaces extends CWebTest {
 	 * @param boolean   $navigation    is it upper navigation block or not
 	 */
 	private function checkInterfaces($data, $link, $selector = null, $navigation = false) {
+		$this->page->login()->open($link)->waitUntilReady();
+
+		// Unstable test ConfigurationHosts#3 on Jenkins due to insufficient table width and horizontal scroll appears.
+		if (CTestArrayHelper::get($data, 'filter', false) && $selector === 'hosts') {
+			$filter_form = CFilterElement::find()->one()->getForm();
+			$filter_form->fill($data['filter']);
+			$filter_form->submit();
+		}
+
 		if ($navigation) {
-			$this->page->login()->open($link)->waitUntilReady();
 			$availability = $this->query('xpath://div[@class="status-container"]')->waitUntilPresent()->one();
 		}
 		else {
-			$this->page->login()->open($link)->waitUntilReady();
 			$table = $this->query('xpath://form[@name='.zbx_dbstr($selector).']/table[@class="list-table"]')
 					->waitUntilReady()->asTable()->one();
 			$availability = $table->findRow('Name', $data['host'])->getColumn('Availability');
@@ -465,7 +473,7 @@ class testPageHostInterfaces extends CWebTest {
 			// Check interface color in availability column.
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
 			// Open interface popup.
-			$interface->click();
+			$interface->waitUntilClickable()->click();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.
@@ -484,9 +492,12 @@ class testPageHostInterfaces extends CWebTest {
 			}
 
 			$overlay->close();
-			$overlay->waitUntilNotPresent();
 		}
 		// Assert interface names in Availability column.
 		$this->assertEquals(array_keys($data['interfaces']), $host_interfaces);
+
+		if (CTestArrayHelper::get($data, 'filter', false) && $selector === 'hosts') {
+			$this->query('button:Reset')->one()->click();
+		}
 	}
 }

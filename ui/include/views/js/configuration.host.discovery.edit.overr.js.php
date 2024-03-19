@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@
 				->addClass(ZBX_STYLE_NOWRAP)
 				->setWidth('50')
 		]))
-			->addClass('sortable')
 			->toString()
 	?>
 </script>
@@ -147,10 +146,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
-			templated:                           <?= $data['limited'] ? 1 : 0 ?>,
-			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
-			ZBX_STYLE_TD_DRAG_ICON:              <?= zbx_jsvalue(ZBX_STYLE_TD_DRAG_ICON) ?>,
-			ZBX_STYLE_DISABLED:                  <?= zbx_jsvalue(ZBX_STYLE_DISABLED) ?>,
+			templated:                      <?= $data['limited'] ? 1 : 0 ?>,
 			msg: {
 				yes:                        <?= json_encode(_('Yes')) ?>,
 				no:                         <?= json_encode(_('No')) ?>,
@@ -198,26 +194,6 @@
 	});
 
 	/**
-	 * Returns common $.sortable options.
-	 *
-	 * @return {object}
-	 */
-	function sortableOpts() {
-		return {
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: 'div.' + lldoverrides.ZBX_STYLE_DRAG_ICON,
-			tolerance: 'pointer',
-			opacity: 0.6,
-			start: function(e, ui) {
-				ui.placeholder.height(ui.item.height());
-			}
-		};
-	}
-
-	/**
 	 * Writes data index as new nodes attribute. Bind remove event.
 	 */
 	function dynamicRowsBindNewRow($el) {
@@ -232,24 +208,6 @@
 					$el.trigger('dynamic_rows.updated', dynamic_rows);
 				});
 			});
-		});
-	}
-
-	/**
-	 * Implements disabling sortable if less than two data rows.
-	 */
-	function dynamicRowsBindSortableDisable($el) {
-		$el.on('dynamic_rows.updated', function(e, dynamic_rows) {
-			if (dynamic_rows.length < 2) {
-				dynamic_rows.$element.sortable('option', 'disabled', true);
-				dynamic_rows.$element.find('.' + lldoverrides.ZBX_STYLE_DRAG_ICON)
-					.addClass(lldoverrides.ZBX_STYLE_DISABLED);
-			}
-			else {
-				dynamic_rows.$element.sortable('option', 'disabled', false);
-				dynamic_rows.$element.find('.' + lldoverrides.ZBX_STYLE_DRAG_ICON)
-					.removeClass(lldoverrides.ZBX_STYLE_DISABLED);
-			}
 		});
 	}
 
@@ -480,14 +438,11 @@
 		});
 
 		if (!lldoverrides.templated) {
-			this.$container.sortable(sortableOpts());
-			this.$container.sortable('option', 'update', this.onSortOrderChange.bind(this));
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
 				this.onSortOrderChange();
 			}.bind(this));
 
-			dynamicRowsBindSortableDisable(this.$container);
 			dynamicRowsBindNewRow(this.$container);
 		}
 		else {
@@ -495,6 +450,13 @@
 				e.new_node.setAttribute('data-index', e.data_index);
 			});
 		}
+
+		new CSortable(this.$container[0].querySelector('tbody'), {
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 1,
+			enable_sorting: <?= json_encode(!$data['limited']) ?>
+		})
+			.on(CSortable.EVENT_SORT, () => this.onSortOrderChange());
 
 		this.renderData();
 	}

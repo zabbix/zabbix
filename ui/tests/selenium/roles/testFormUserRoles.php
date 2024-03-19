@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -943,11 +943,12 @@ class testFormUserRoles extends CWebTest {
 						'item.get', 'item.update', 'itemprototype.create', 'itemprototype.delete', 'itemprototype.get',
 						'itemprototype.update', 'maintenance.create', 'maintenance.delete', 'maintenance.get',
 						'maintenance.update', 'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.create',
-						'mediatype.delete', 'mediatype.get', 'mediatype.update', 'module.create', 'module.delete', 'module.get',
-						'module.update', 'problem.get', 'proxy.create', 'proxy.delete', 'proxy.get', 'proxy.update', 'regexp.create',
-						'regexp.delete', 'regexp.get', 'regexp.update', 'report.create', 'report.delete', 'report.get',
-						'report.update', 'role.create', 'role.delete', 'role.get', 'role.update', 'script.create',
-						'script.delete', 'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
+						'mediatype.delete', 'mediatype.get', 'mediatype.update','mfa.create', 'mfa.delete', 'mfa.get',
+						'mfa.update', 'module.create', 'module.delete', 'module.get', 'module.update', 'problem.get',
+						'proxy.create', 'proxy.delete', 'proxy.get', 'proxy.update', 'regexp.create', 'regexp.delete',
+						'regexp.get', 'regexp.update', 'report.create', 'report.delete', 'report.get','report.update',
+						'role.create', 'role.delete', 'role.get', 'role.update', 'script.create', 'script.delete',
+						'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
 						'script.update', 'service.create', 'service.delete', 'service.get', 'service.update',
 						'settings.get', 'settings.update', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update',
 						'task.create', 'task.get', 'template.create', 'template.delete', 'template.get', 'template.massadd',
@@ -1494,7 +1495,7 @@ class testFormUserRoles extends CWebTest {
 			$multiselect->edit();
 			$dialog->invalidate();
 
-			// Filter out all unwanted services befoce checking table content.
+			// Filter out all unwanted services before checking table content.
 			$dialog->query('name:filter_name')->one()->fill('Service for delete');
 			$dialog->query('button:Filter')->one()->click();
 			$dialog->waitUntilReady();

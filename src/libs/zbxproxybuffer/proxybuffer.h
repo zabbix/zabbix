@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,15 @@
 #ifndef ZABBIX_PROXYBUFFER_H
 #define ZABBIX_PROXYBUFFER_H
 
-#include "zbxproxybuffer.h"
 #include "proxybuffer.h"
+#include "zbxalgo.h"
+#include "zbxcommon.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
-#include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 #define ZBX_MAX_HRECORDS	1000
 #define ZBX_MAX_HRECORDS_TOTAL	10000

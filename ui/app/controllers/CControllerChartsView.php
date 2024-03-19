@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,16 +23,6 @@
  * Class to handle "charts.view" requests.
  */
 class CControllerChartsView extends CControllerCharts {
-
-	/**
-	 * @var string  Time from.
-	 */
-	private $from;
-
-	/**
-	 * @var string  Time till.
-	 */
-	private $to;
 
 	protected function init() {
 		$this->disableCsrfValidation();
@@ -68,11 +58,6 @@ class CControllerChartsView extends CControllerCharts {
 	}
 
 	protected function doAction() {
-		$this->from = $this->getInput('from', CProfile::get('web.charts.filter.from',
-			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-		));
-		$this->to = $this->getInput('to', CProfile::get('web.charts.filter.to', 'now'));
-
 		if ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.charts.filter.hostids');
 			CProfile::deleteIdx('web.charts.filter.name');
@@ -90,8 +75,6 @@ class CControllerChartsView extends CControllerCharts {
 			CProfile::update('web.charts.filter.show',
 				$this->getInput('filter_show', GRAPH_FILTER_ALL), PROFILE_TYPE_INT
 			);
-			CProfile::update('web.charts.filter.from', $this->from, PROFILE_TYPE_STR);
-			CProfile::update('web.charts.filter.to', $this->to, PROFILE_TYPE_STR);
 		}
 
 		$filter_hostids = CProfile::getArray('web.charts.filter.hostids', []);
@@ -101,15 +84,18 @@ class CControllerChartsView extends CControllerCharts {
 		$subfilter_tagnames = CProfile::getArray('web.charts.subfilter.tagnames', []);
 		$subfilter_tags = json_decode(CProfile::get('web.charts.subfilter.tags', '{}'), true);
 
+		$timeselector_options = [
+			'profileIdx' => 'web.charts.filter',
+			'profileIdx2' => 0,
+			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+		];
+		updateTimeSelectorPeriod($timeselector_options);
+
 		$data = [
 			'view_as' => $this->getInput('view_as', HISTORY_GRAPH),
 			'ms_hosts' => [],
-			'timeline' => getTimeSelectorPeriod([
-				'profileIdx' => 'web.charts.filter',
-				'profileIdx2' => 0,
-				'from' => $this->from,
-				'to' => $this->to
-			]),
+			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'active_tab' => CProfile::get('web.charts.filter.active', 1),
 			'filter_hostids' => $filter_hostids,
 			'filter_name' => $filter_name,

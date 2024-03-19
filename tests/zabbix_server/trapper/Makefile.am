@@ -59,6 +59,7 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
@@ -78,8 +79,8 @@ TRAPPER_LIBS = \
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
-	../../../src/zabbix_server/trapper/trapper_preproc.c  \
-	../../../src/zabbix_server/trapper/trapper_auth.c  \
+	../../../src/libs/zbxtrapper/trapper_preproc.c  \
+	../../../src/libs/zbxtrapper/trapper_auth.c  \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)

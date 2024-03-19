@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@
 #define ZBX_EVAL_PARSE_FUNCTION_NAME	__UINT64_C(0x00008000)
 #define ZBX_EVAL_PARSE_PROP_TAG		__UINT64_C(0x00010000)	/* 'tag' keyword in item query filter */
 #define ZBX_EVAL_PARSE_PROP_GROUP	__UINT64_C(0x00020000)	/* 'group' keyword in item query filter */
+#define ZBX_EVAL_PARSE_STR_V64_COMPAT	__UINT64_C(0x00040000)	/* no backslash escaping for history functions */
 
 #define ZBX_EVAL_PARSE_FUNCTION		(ZBX_EVAL_PARSE_FUNCTION_NAME | ZBX_EVAL_PARSE_FUNCTION_ARGS	|\
 					ZBX_EVAL_PARSE_GROUP)
@@ -257,6 +258,7 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 		const char *parameter, const char *error);
 
 void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs);
+int	zbx_eval_compare_tokens_by_loc(const void *d1, const void *d2);
 
 typedef struct
 {

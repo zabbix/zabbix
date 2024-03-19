@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1338,7 +1338,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
-				zbx_thread_start(collector_thread, thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_collector_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listener_args;

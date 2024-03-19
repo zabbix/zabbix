@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
 class CTabFilter extends CDiv {
 
 	const ZBX_STYLE_CLASS = 'tabfilter-container';
+	const CSS_TABS = 'tabfilter-tabs';
 	const CSS_TAB_SELECTED = 'selected';
 	const CSS_TAB_EXPANDED = 'expanded';
-	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
 	const CSS_TABFILTER_ITEM = 'tabfilter-item-label';
 
@@ -214,6 +214,10 @@ class CTabFilter extends CDiv {
 			'disabled' => true
 		];
 
+		$this->options['timeselector']['label'] = relativeDateToText($this->options['timeselector']['from'],
+			$this->options['timeselector']['to']
+		);
+
 		return $this;
 	}
 
@@ -374,11 +378,13 @@ class CTabFilter extends CDiv {
 			}
 		}
 
-		return new CTag('nav', true , new CList([
-			(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
-			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
-			$static ?: null,
-			$nav_list
-		]));
+		return new CTag('nav', true,
+			new CList([
+				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
+				$sortable ? (new CList($sortable))->addClass(static::CSS_TABS) : null,
+				$static ?: null,
+				$nav_list
+			])
+		);
 	}
 }

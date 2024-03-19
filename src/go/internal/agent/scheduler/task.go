@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -275,6 +275,10 @@ func (t *exporterTask) Timeout() int {
 	return t.item.timeout
 }
 
+func (t *exporterTask) Delay() string {
+	return t.item.delay
+}
+
 // directExporterTask provides access to plugin Exporter interaface.
 // It's used for non-recurring exporter requests - single passive checks
 // and internal requests to obtain HostnameItem, HostMetadataItem,
@@ -326,7 +330,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 		var err error
 
 		if now.After(t.expire) {
-			err = errors.New("No data available.")
+			err = errors.New("Timeout while waiting for item in queue.")
 			log.Debugf("direct exporter task expired for key '%s' error: '%s'", itemkey, err.Error())
 		} else {
 			if key, params, err = itemutil.ParseKey(itemkey); err == nil {
@@ -388,6 +392,10 @@ func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 
 func (t *directExporterTask) Timeout() int {
 	return t.item.timeout
+}
+
+func (t *directExporterTask) Delay() string {
+	return t.item.delay
 }
 
 // starterTask provides access to plugin Exporter interaface Start() method.
@@ -499,6 +507,10 @@ func (t *watcherTask) Timeout() int {
 	return 0
 }
 
+func (t *watcherTask) Delay() string {
+	return ""
+}
+
 // configuratorTask provides access to plugin Configurator interaface.
 type configuratorTask struct {
 	taskBase
@@ -549,7 +561,7 @@ func (t *commandTask) perform(s Scheduler) {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,
-					Result: itemutil.ValueToString(ret),
+					Result: *itemutil.ValueToString(ret),
 				}
 			}
 		} else {

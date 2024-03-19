@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/procfs"
@@ -69,6 +70,23 @@ var impl Plugin = Plugin{
 var implExport PluginExport = PluginExport{}
 
 type historyIndex int
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+
+	err = plugin.RegisterMetrics(
+		&implExport, "ProcExporter",
+		"proc.mem", "Process memory utilization values.",
+		"proc.num", "The number of processes.",
+		"proc.get", "List of OS processes with statistics.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (h historyIndex) inc() historyIndex {
 	h++
@@ -487,10 +505,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		p.queries[query] = stats
 		p.Debugf("registered new CPU utilization query: %s, %s, %s", name, user, cmdline)
 	} else {
-		p.Debugf("cannot register CPU utilization query: %s", err)
+		err = fmt.Errorf("cannot register CPU utilization query: %s", err)
 	}
 	return
 }
+
 func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags int, err error) {
 	regxp, err := regexp.Compile(q.cmdline)
 	if err != nil {
@@ -597,8 +616,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	if cmdline != "" {
 		cmdRgx, err = regexp.Compile(cmdline)
 		if err != nil {
-			p.Debugf("Failed to compile provided regex expression '%s': %s", cmdline, err.Error())
-			return 0, nil
+			return nil, fmt.Errorf("Failed to compile regular expression '%s': %s", cmdline, err.Error())
 		}
 	}
 
@@ -606,9 +624,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	if usr != nil {
 		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
 		if err != nil {
-			p.Logger.Tracef(
-				"failed to convert user id '%s' to uint64 for user '%s'", usr.Uid, usr.Username)
-			return 0, nil
+			return nil, fmt.Errorf("Failed to parse userid '%s' for user '%s", usr.Uid, usr.Username)
 		}
 	}
 
@@ -747,8 +763,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 
 	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
 	if err != nil {
-		p.Debugf("Failed to prepare query: %s", err.Error())
-		return count, nil
+		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
 	}
 
 	procs, err := getProcesses(flags)
@@ -815,8 +830,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
 	if err != nil {
-		p.Debugf("Failed to prepare query: %s", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
 	}
 
 	if mode != "thread" {
@@ -860,19 +874,21 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 			pi := procInfo{int64(data.Pid), data.Name, data.UserID, data.Cmdline, data.Name, ""}
 			if query.match(&pi) {
-				threadArray = append(threadArray, thread{data.Tgid, data.Ppid,
+				threadArray = append(threadArray, thread{
+					data.Tgid, data.Ppid,
 					data.Name, data.User, data.Group, data.UserID, data.GroupID,
 					data.Pid, data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem,
-					data.State, data.CtxSwitches, data.PageFaults})
-				}
+					data.State, data.CtxSwitches, data.PageFaults,
+				})
 			}
 		}
+	}
 
 	var jsonArray []byte
 	switch mode {
 	case "summary":
 		var processed []string
-		processes:
+	processes:
 		for i, proc := range array {
 			for _, j := range processed {
 				if j == proc.Name {
@@ -880,13 +896,15 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				}
 			}
 
-			procSum := procSummary{proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
+			procSum := procSummary{
+				proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
 				proc.Exe, proc.Lck, proc.Lib, proc.Pin, proc.Pte, proc.Size, proc.Stk,
 				proc.Swap, proc.CpuTimeUser, proc.CpuTimeSystem, proc.CtxSwitches, proc.Threads,
-				proc.PageFaults}
+				proc.PageFaults,
+			}
 
-			if len(array) > i + 1 {
-				for _, procCmp := range array[i + 1:] {
+			if len(array) > i+1 {
+				for _, procCmp := range array[i+1:] {
 					if procCmp.Name != proc.Name {
 						continue
 					}
@@ -1038,13 +1056,4 @@ func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx 
 	}
 
 	return true
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
-	plugin.RegisterMetrics(&implExport, "ProcExporter",
-		"proc.mem", "Process memory utilization values.",
-		"proc.num", "The number of processes.",
-		"proc.get", "List of OS processes with statistics.",
-	)
 }

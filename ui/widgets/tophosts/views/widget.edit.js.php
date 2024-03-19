@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,43 +27,13 @@ window.widget_tophosts_form = new class {
 		this._templateid = templateid;
 
 		this._list_columns = document.getElementById('list_columns');
-		this.initSortable(this._list_columns);
 
-		this._list_columns.addEventListener('click', (e) => this.processColumnsAction(e));
-	}
-
-	initSortable(element) {
-		const is_disabled = element.querySelectorAll('tr.sortable').length < 2;
-
-		$(element).sortable({
-			disabled: is_disabled,
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			helper: function(e, ui) {
-				for (let td of ui.find('>td')) {
-					let $td = $(td);
-					$td.attr('width', $td.width())
-				}
-
-				return ui;
-			},
-			stop: function(e, ui) {
-				ui.item.find('>td').removeAttr('width');
-				ui.item.removeAttr('style');
-			},
-			start: function(e, ui) {
-				$(ui.placeholder).height($(ui.helper).height());
-			}
+		new CSortable(this._list_columns.querySelector('tbody'), {
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 1
 		});
 
-		for (const drag_icon of element.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-			drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
-		}
+		this._list_columns.addEventListener('click', (e) => this.processColumnsAction(e));
 	}
 
 	processColumnsAction(e) {
@@ -131,6 +101,16 @@ window.widget_tophosts_form = new class {
 			}
 
 			delete data.thresholds;
+		}
+
+		if (data.time_period) {
+			for (const [key, value] of Object.entries(data.time_period)) {
+				input.setAttribute('name', `columns[${this._column_index}][time_period][${key}]`);
+				input.setAttribute('value', value);
+				this._form.appendChild(input.cloneNode());
+			}
+
+			delete data.time_period;
 		}
 
 		for (const [key, value] of Object.entries(data)) {

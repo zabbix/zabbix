@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,215 +18,148 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+
+require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
+ *
+ * @onBefore prepareHostPrototypeData
  */
-class testPageHostPrototypes extends CLegacyWebTest {
+class testPageHostPrototypes extends testPagePrototypes {
 
-	/**
-	 * Attach TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CTableBehavior::class];
-	}
+	public $source = 'host';
+	public $tag = '3a Host prototype monitored discovered {#H}';
 
-	const DICROVERY_RULE_ID = 90001;
-	const HOST_PROTOTYPES_COUNT = 8;
+	protected $link = 'host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
+	protected static $prototype_hostids;
+	protected static $host_druleids;
 
-	public function testPageHostPrototypes_CheckLayout() {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID.'&context=host');
-		$this->zbxTestCheckTitle('Configuration of host prototypes');
-		$this->zbxTestCheckHeader('Host prototypes');
-
-		$table = $this->query('xpath://form[@name="hosts"]/table[@class="list-table"]')->asTable()->one();
-		$headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
-		$this->assertSame($headers, $table->getHeadersText());
-
-		foreach (['Create enabled', 'Create disabled', 'Delete'] as $button) {
-			$element = $this->query('button', $button)->one();
-			$this->assertTrue($element->isPresent());
-			$this->assertFalse($element->isEnabled());
-		}
-
-		$this->assertTableStats(self::HOST_PROTOTYPES_COUNT);
-
-		// Check tags on the specific host prototype.
-		$tags = $table->findRow('Name', 'Host prototype {#1}')->getColumn('Tags')->query('class:tag')->all();
-		$this->assertEquals(['host_proto_tag_1: value1', 'host_proto_tag_2: value2'], $tags->asText());
-
-		foreach ($tags as $tag) {
-			$tag->click();
-			$hint = $this->query('xpath://div[@data-hintboxid]')
-					->asOverlayDialog()->waitUntilPresent()->all()->last();
-			$this->assertEquals($tag->getText(), $hint->getText());
-			$hint->close();
-		}
-	}
-
-	public static function getSelectedData() {
-		return [
+	public function prepareHostPrototypeData() {
+		$host_result = CDataHelper::createHosts([
 			[
-				[
-					'item' => 'Discovery rule 1',
-					'hosts' => [
-						'Host prototype {#1}'
+				'host' => 'Host for prototype check',
+				'groups' => [['groupid' => 4]], // Zabbix server
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for prototype check',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
+			]
+		]);
+		self::$host_druleids = $host_result['discoveryruleids'];
+
+		$response = CDataHelper::createTemplates([
+			[
+				'host' => 'Template for host prototype',
+				'groups' => [
+					['groupid' => '1'] // template group 'Templates'
+				]
+			]
+		]);
+		$template_id = $response['templateids']['Template for host prototype'];
+
+		CDataHelper::call('hostprototype.create', [
+			[
+				'host' => '3a Host prototype monitored discovered {#H}',
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
+				'groupLinks' => [
+					[
+						'groupid'=> 4 // Zabbix server
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'name_1',
+						'value' => 'value_1'
+					],
+					[
+						'tag' => 'name_2',
+						'value' => 'value_2'
 					]
 				]
 			],
 			[
-				[
-					'item' => 'Discovery rule 2',
-					'hosts' => 'all'
-				]
-			],
-			[
-				[
-					'item' => 'Discovery rule 3',
-					'hosts' => [
-						'Host prototype {#7}',
-						'Host prototype {#9}',
-						'Host prototype {#10}'
+				'host' => '21 Host prototype not monitored discovered {#H}',
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
+				'groupLinks' => [
+					[
+						'groupid'=> 4 // Zabbix server
 					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * Select specified hosts from host prototype page.
-	 *
-	 * @param array $data	test case data from data provider
-	 */
-	private function selectHostPrototype($data) {
-		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid'].'&context=host');
-
-		if ($data['hosts'] === 'all') {
-			$this->zbxTestCheckboxSelect('all_hosts');
-			return;
-		}
-
-		foreach ($data['hosts'] as $host) {
-			$result = DBselect('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-			while ($row = DBfetch($result)) {
-				$this->zbxTestCheckboxSelect('group_hostid_'.$row['hostid']);
-			}
-		}
-	}
-
-	/**
-	 * Check specific page action.
-	 * Actions are defined by buttons pressed on page.
-	 *
-	 * @param array  $data		test case data from data provider
-	 * @param string $action	button text (action to be executed)
-	 * @param int    $status	host status to be checked in DB
-	 */
-	protected function checkPageAction($data, $action, $status = null) {
-		// Click on button with required action.
-		if ($action === 'Click on state') {
-			foreach ($data['hosts'] as $host) {
-				$id = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host)));
-				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid%5B%5D=".$id['hostid']."')]");
-			}
-		}
-		else {
-			$this->selectHostPrototype($data);
-			$this->zbxTestClickButtonText($action);
-			$this->zbxTestAcceptAlert();
-		}
-
-		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
-		$this->zbxTestCheckTitle('Configuration of host prototypes');
-		$this->zbxTestCheckHeader('Host prototypes');
-
-		// Create query part for status (if any).
-		$status_criteria = ($status !== null) ? (' AND status='.$status) : '';
-
-		// Check the results in DB.
-		if ($data['hosts'] === 'all') {
-			$sql = 'SELECT NULL'.
-						' FROM hosts'.
-						' WHERE hostid IN ('.
-							'SELECT hostid'.
-							' FROM host_discovery'.
-							' WHERE parent_itemid IN ('.
-								'SELECT itemid'.
-								' FROM items'.
-								' WHERE name='.zbx_dbstr($data['item']).
-							')'.
-						')';
-		}
-		else {
-			$names = [];
-			foreach ($data['hosts'] as $host) {
-				$names[] = zbx_dbstr($host);
-			}
-
-			$sql = 'SELECT NULL'.
-					' FROM hosts'.
-					' WHERE host IN ('.implode(',', $names).')';
-		}
-
-		$this->assertEquals(0, CDBHelper::getCount($sql.$status_criteria));
-	}
-
-	/**
-	 * @dataProvider getSelectedData
-	 */
-	public function testPageHostPrototypes_DisableSelected($data) {
-		$this->checkPageAction($data, 'Create disabled', HOST_STATUS_MONITORED);
-	}
-
-	/**
-	 * @dataProvider getSelectedData
-	 */
-	public function testPageHostPrototypes_EnableSelected($data) {
-		$this->checkPageAction($data, 'Create enabled', HOST_STATUS_NOT_MONITORED);
-	}
-
-	/**
-	 * @dataProvider getSelectedData
-	 */
-	public function testPageHostPrototypes_DeleteSelected($data) {
-		$this->checkPageAction($data, 'Delete');
-	}
-
-	public static function getHostPrototypeData() {
-		return [
-			[
-				[
-					'item' => 'Discovery rule 1',
-					'hosts' => [
-						'Host prototype {#2}'
-					],
-					'status' => HOST_STATUS_NOT_MONITORED
-				]
+				],
+				'status' => HOST_STATUS_NOT_MONITORED
 			],
 			[
-				[
-					'item' => 'Discovery rule 1',
-					'hosts' => [
-						'Host prototype {#3}'
-					],
-					'status' => HOST_STATUS_MONITORED
+				'host' => 'a3 Host prototype not monitored not discovered {#H}',
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
+				'groupLinks' => [
+					[
+						'groupid'=> 4 // Zabbix server
+					]
+				],
+				'status' => HOST_STATUS_NOT_MONITORED,
+				'discover' => HOST_NO_DISCOVER
+			],
+			[
+				'host' => 'Yw Host prototype monitored not discovered {#H}',
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
+				'groupLinks' => [
+					[
+						'groupid'=> 4 // Zabbix server
+					]
+				],
+				'discover' => HOST_NO_DISCOVER,
+				'templates' => [
+					'templateid' => $template_id
 				]
 			]
-		];
+		]);
+		self::$prototype_hostids = CDataHelper::getIds('host');
+		self::$entity_count = count(self::$prototype_hostids);
+	}
+
+	public function testPageHostPrototypes_Layout() {
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->checkLayout();
 	}
 
 	/**
-	 * @dataProvider getHostPrototypeData
+	 * Sort host prototypes by Name, Create enabled and Discover column.
+	 *
+	 * @dataProvider getHostPrototypesSortingData
 	 */
-	public function testPageHostPrototypes_SingleEnableDisable($data) {
-		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid'].'&context=host');
+	public function testPageHostPrototypes_Sorting($data) {
+		$this->page->login()->open('host_prototypes.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->executeSorting($data);
+	}
 
-		$this->checkPageAction($data, 'Click on state', $data['status']);
+	/**
+	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
+	 *
+	 * @dataProvider getHostPrototypesButtonLinkData
+	 */
+	public function testPageHostPrototypes_ButtonLink($data) {
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->checkTableAction($data);
+	}
+
+	/**
+	 * Check delete scenarios.
+	 *
+	 * @dataProvider getHostPrototypesDeleteData
+	 */
+	public function testPageHostPrototypes_Delete($data) {
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+
+		$ids = [];
+		foreach ($data['name'] as $name) {
+			$ids[] = self::$prototype_hostids[$name];
+		}
+
+		$this->checkDelete($data, $ids);
 	}
 }

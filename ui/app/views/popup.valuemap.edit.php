@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('valuemap')))->removeId())
@@ -28,8 +29,7 @@ $form = (new CForm())
 	->setName('valuemap-edit-form')
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
-	->addVar('source-name', $data['name'])
-	->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
+	->addVar('source-name', $data['name']);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -46,55 +46,7 @@ foreach (array_values($data['valuemap_names']) as $index => $name) {
 	$form->addVar('valuemap_names['.$index.']', $name);
 }
 
-$form_grid = new CFormGrid();
-
-$header_row = ['', _('Type'), _('Value'), '', _('Mapped to'), _('Action'), ''];
-$mappings = (new CDiv([
-	(new CTable())
-		->setId('mappings_table')
-		->addClass(ZBX_STYLE_TABLE_FORMS)
-		->setHeader($header_row)
-		->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
-		->setFooter(new CRow(
-			(new CCol(
-				(new CButtonLink(_('Add')))->setAttribute('data-row-action', 'add_row')
-			))->setColSpan(count($header_row))
-		))
-]))->setAttribute('data-sortable-pairs-table', '1');
-
-// Value map mapping template.
-$mappings->addItem(
-	(new CTag('script', true))
-		->setAttribute('type', 'text/x-jquery-tmpl')
-		->addItem((new CRow([
-			(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSelect('mappings[#{index}][type]'))
-				->setValue('#{type}')
-				->addOptions(CSelect::createOptionsFromArray([
-					VALUEMAP_MAPPING_TYPE_EQUAL => _('equals'),
-					VALUEMAP_MAPPING_TYPE_GREATER_EQUAL => _('is greater than or equals'),
-					VALUEMAP_MAPPING_TYPE_LESS_EQUAL => _('is less than or equals'),
-					VALUEMAP_MAPPING_TYPE_IN_RANGE => _('in range'),
-					VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp'),
-					VALUEMAP_MAPPING_TYPE_DEFAULT => _('default')
-				])),
-			(new CTextBox('mappings[#{index}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			RARR(),
-			(new CTextBox('mappings[#{index}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired(),
-			(new CButton('mappings[#{index}][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->setAttribute('data-row-action', 'remove_row')
-		])))
-);
-
-$mappings_data = (new CTag('script', true))->setAttribute('type', 'text/json');
-$mappings_data->items = [json_encode($data['mappings'])];
-$mappings->addItem($mappings_data);
-
-$form_grid
+$form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
@@ -105,9 +57,47 @@ $form_grid
 		)
 	])
 	->addItem([
-		(new CLabel(_('Mappings'), 'mappings'))->setAsteriskMark(),
+		(new CLabel(_('Mappings'), 'mappings-table'))->setAsteriskMark(),
 		new CFormField(
-			(new CDiv($mappings))->addClass('table-forms-separator')
+			(new CDiv([
+				(new CTable())
+					->setId('mappings-table')
+					->addClass(ZBX_STYLE_TABLE_FORMS)
+					->setHeader(['', _('Type'), _('Value'), '', _('Mapped to'), _('Action'), ''])
+					->setFooter(
+						(new CCol(
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
+						))->setColSpan(7)
+					),
+				new CTemplateTag('mapping-row-tmpl',
+					(new CRow([
+						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CSelect('mappings[#{rowNum}][type]'))
+							->setValue('#{type}')
+							->addOptions(CSelect::createOptionsFromArray([
+								VALUEMAP_MAPPING_TYPE_EQUAL => _('equals'),
+								VALUEMAP_MAPPING_TYPE_GREATER_EQUAL => _('is greater than or equals'),
+								VALUEMAP_MAPPING_TYPE_LESS_EQUAL => _('is less than or equals'),
+								VALUEMAP_MAPPING_TYPE_IN_RANGE => _('in range'),
+								VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp'),
+								VALUEMAP_MAPPING_TYPE_DEFAULT => _('default')
+							])),
+						(new CTextBox('mappings[#{rowNum}][value]', '#{value}', false,
+							DB::getFieldLength('valuemap_mapping', 'value')
+						))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+						RARR(),
+						(new CTextBox('mappings[#{rowNum}][newvalue]', '#{newvalue}', false,
+							DB::getFieldLength('valuemap_mapping', 'newvalue')
+						))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+							->setAriaRequired(),
+						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+					]))->addClass('form_row')
+				)
+			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		)
 	]);
 
@@ -115,7 +105,7 @@ $form->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.valuemap.edit.js.php', []),
+	'script_inline' => $this->readJsFile('popup.valuemap.edit.js.php', $data),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

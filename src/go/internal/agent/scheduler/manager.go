@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,7 +120,7 @@ type Scheduler interface {
 		key string,
 		timeout time.Duration,
 		clientID uint64,
-	) (result string, err error)
+	) (result *string, err error)
 	Query(command string) (status string)
 	QueryUserParams() (status string)
 }
@@ -226,6 +226,28 @@ func parseItemTimeout(s string) (seconds int, e error) {
 	return
 }
 
+func ParseItemTimeoutAny(timeoutIn any) (timeout int, err error) {
+	switch v := timeoutIn.(type) {
+	case nil:
+		timeout = agent.Options.Timeout
+	case float64:
+		timeout = int(v)
+	case int:
+		timeout = v
+	case string:
+		timeout, err = parseItemTimeout(v)
+	default:
+		err = fmt.Errorf("unexpected timeout %q of type %T", timeoutIn, timeoutIn)
+	}
+	if err == nil {
+		if timeout > 600 || timeout < 1 {
+			err = fmt.Errorf("Unsupported timeout value.")
+		}
+	}
+
+	return timeout, err
+}
+
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requets (single passive and internal checks).
 func (m *Manager) processUpdateRequestRun(update *updateRequest) {
@@ -263,19 +285,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
 				var timeout int
-
-				switch v := r.Timeout.(type) {
-				case nil:
-					timeout = agent.Options.Timeout
-				case float64:
-					timeout = int(v)
-				case int:
-					timeout = v
-				case string:
-					timeout, err = parseItemTimeout(v)
-				default:
-					err = fmt.Errorf("unexpected timeout %q of type %T", r.Timeout, r.Timeout)
-				}
+				timeout, err = ParseItemTimeoutAny(r.Timeout)
 
 				if err == nil {
 					err = c.addRequest(p, r, timeout, update.sink, update.now, update.firstActiveChecksRefreshed)
@@ -821,7 +831,7 @@ func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
 	clientID uint64,
-) (string, error) {
+) (*string, error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -843,21 +853,8 @@ func (m *Manager) PerformTask(
 		time.Now(),
 	)
 
-	var result string
-
 	r := <-w
-	if r.Error == nil {
-		if r.Value != nil {
-			result = *r.Value
-		} else {
-			// single metric requests do not support empty values, return error instead
-			return "", errors.New("No values have been gathered yet.")
-		}
-	} else {
-		return "", r.Error
-	}
-
-	return result, nil
+	return r.Value, r.Error
 }
 
 func (m *Manager) FinishTask(task performer) {

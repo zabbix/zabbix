@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,57 +140,134 @@ class CAction extends CApiService {
 
 		// PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			// conditions are checked here by sql, operations after, by api queries
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			// condition hostgroup
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM conditions cc'.
-						' LEFT JOIN rights r'.
-							' ON r.id='.zbx_dbcast_2bigint('cc.value').
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE a.actionid=cc.actionid'.
-						' AND cc.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
-					' GROUP BY cc.value'.
-					' HAVING MIN(r.permission) IS NULL'.
-						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.PERM_READ.
-					')';
+			$usrgrpids = getUserGroupsByUserId(self::$userData['userid']);
 
-			// condition host or template
+			// Check permissions of host groups used in filter conditions.
 			$sqlParts['where'][] = 'NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM conditions cc,hosts_groups hgg'.
-						' LEFT JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE a.actionid=cc.actionid'.
-						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
-						' AND cc.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
-					' GROUP BY cc.value'.
-					' HAVING MIN(r.permission) IS NULL'.
-						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.PERM_READ.
-					')';
+				'SELECT NULL'.
+				' FROM conditions c'.
+				' LEFT JOIN rights r ON r.id='.zbx_dbcast_2bigint('c.value').
+					' AND '.dbConditionId('r.groupid', $usrgrpids).
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
+				' GROUP BY c.value'.
+				' HAVING MIN(r.permission) IS NULL'.
+					' OR MIN(r.permission)='.PERM_DENY.
+			')';
 
-			// condition trigger
+			// Check permissions of hosts and templates used in filter conditions.
 			$sqlParts['where'][] = 'NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM conditions cc,functions f,items i,hosts_groups hgg'.
-						' LEFT JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE a.actionid=cc.actionid'.
-						' AND '.zbx_dbcast_2bigint('cc.value').'=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-						' AND cc.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
-					' GROUP BY cc.value'.
-					' HAVING MIN(r.permission) IS NULL'.
-						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.PERM_READ.
-					')';
+				'SELECT NULL'.
+				' FROM conditions c'.
+				' JOIN host_hgset hh ON '.zbx_dbcast_2bigint('c.value').'=hh.hostid'.
+				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
+					' AND p.ugsetid='.self::$userData['ugsetid'].
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
+					' AND p.permission IS NULL'.
+			')';
+
+			// Check permissions of triggers used in filter conditions.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM conditions c'.
+				' JOIN functions f ON '.zbx_dbcast_2bigint('c.value').'=f.triggerid'.
+				' JOIN items i ON f.itemid=i.itemid'.
+				' JOIN host_hgset hh ON i.hostid=hh.hostid'.
+				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
+					' AND p.ugsetid='.self::$userData['ugsetid'].
+				' WHERE a.actionid=c.actionid'.
+					' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+					' AND p.permission IS NULL'.
+			')';
+
+			// Check permissions of user groups mentioned for "send message" operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN opmessage_grp omg ON o.operationid=omg.operationid'.
+					' AND '.dbConditionId('omg.usrgrpid', $usrgrpids, true).
+				' WHERE a.actionid=o.actionid'.
+			')';
+
+			// Check permissions of users mentioned for "send message" operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN opmessage_usr omu ON o.operationid=omu.operationid'.
+				' JOIN users_groups ug ON omu.userid=ug.userid'.
+					' AND '.dbConditionId('ug.usrgrpid', $usrgrpids, true).
+				' WHERE a.actionid=o.actionid'.
+			')';
+
+			// Check permissions of scripts used in operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN opcommand oc ON o.operationid=oc.operationid'.
+				' JOIN scripts s ON oc.scriptid=s.scriptid'.
+					' AND s.groupid IS NOT NULL'.
+				' LEFT JOIN rights r ON s.groupid=r.id'.
+					' AND '.dbConditionId('r.groupid', $usrgrpids).
+				' WHERE a.actionid=o.actionid'.
+				' GROUP BY s.groupid'.
+				' HAVING MIN(r.permission) IS NULL'.
+					' OR MIN(r.permission)='.PERM_DENY.
+			')';
+
+			// Check permissions of host groups mentioned for "execute script" operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN opcommand_grp ocg ON o.operationid=ocg.operationid'.
+				' LEFT JOIN rights r ON ocg.groupid=r.id'.
+					' AND '.dbConditionId('r.groupid', $usrgrpids).
+				' WHERE a.actionid=o.actionid'.
+				' GROUP BY ocg.groupid'.
+				' HAVING MIN(r.permission) IS NULL'.
+					' OR MIN(r.permission)='.PERM_DENY.
+			')';
+
+			// Check permissions of hosts mentioned for "execute script" operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN opcommand_hst och ON o.operationid=och.operationid'.
+				' JOIN host_hgset hh ON och.hostid=hh.hostid'.
+				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
+					' AND p.ugsetid='.self::$userData['ugsetid'].
+				' WHERE a.actionid=o.actionid'.
+					' AND p.permission IS NULL'.
+			')';
+
+			// Check permissions of host groups used in discovery and autoregistration operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN opgroup og ON o.operationid=og.operationid'.
+				' LEFT JOIN rights r ON og.groupid=r.id'.
+					' AND '.dbConditionId('r.groupid', $usrgrpids).
+				' WHERE a.actionid=o.actionid'.
+				' GROUP BY og.groupid'.
+				' HAVING MIN(r.permission) IS NULL'.
+					' OR MIN(r.permission)='.PERM_DENY.
+			')';
+
+			// Check permissions of templates used in discovery and autoregistration operations.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM operations o'.
+				' JOIN optemplate ot ON o.operationid=ot.operationid'.
+				' JOIN host_hgset hh ON ot.templateid=hh.hostid'.
+				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
+					' AND p.ugsetid='.self::$userData['ugsetid'].
+				' WHERE a.actionid=o.actionid'.
+					' AND p.permission IS NULL'.
+			')';
 		}
 
 		// actionids
@@ -308,197 +385,6 @@ class CAction extends CApiService {
 				$actionIds[$action['actionid']] = $action['actionid'];
 
 				$result[$action['actionid']] = $action;
-			}
-		}
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			// check hosts, templates
-			$hosts = [];
-			$hostIds = [];
-			$sql = 'SELECT o.actionid,och.hostid'.
-					' FROM operations o,opcommand_hst och'.
-					' WHERE o.operationid=och.operationid'.
-						' AND och.hostid<>0'.
-						' AND '.dbConditionInt('o.actionid', $actionIds);
-			$dbHosts = DBselect($sql);
-			while ($host = DBfetch($dbHosts)) {
-				if (!isset($hosts[$host['hostid']])) {
-					$hosts[$host['hostid']] = [];
-				}
-				$hosts[$host['hostid']][$host['actionid']] = $host['actionid'];
-				$hostIds[$host['hostid']] = $host['hostid'];
-			}
-
-			$dbTemplates = DBselect(
-				'SELECT o.actionid,ot.templateid'.
-				' FROM operations o,optemplate ot'.
-				' WHERE o.operationid=ot.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds)
-			);
-			while ($template = DBfetch($dbTemplates)) {
-				if (!isset($hosts[$template['templateid']])) {
-					$hosts[$template['templateid']] = [];
-				}
-				$hosts[$template['templateid']][$template['actionid']] = $template['actionid'];
-				$hostIds[$template['templateid']] = $template['templateid'];
-			}
-
-			$allowedHosts = API::Host()->get([
-				'hostids' => $hostIds,
-				'output' => ['hostid'],
-				'templated_hosts' => true,
-				'preservekeys' => true
-			]);
-			foreach ($hostIds as $hostId) {
-				if (isset($allowedHosts[$hostId])) {
-					continue;
-				}
-				foreach ($hosts[$hostId] as $actionId) {
-					unset($result[$actionId], $actionIds[$actionId]);
-				}
-			}
-			unset($allowedHosts);
-
-			// check hostgroups
-			$groups = [];
-			$groupIds = [];
-			$dbGroups = DBselect(
-				'SELECT o.actionid,ocg.groupid'.
-				' FROM operations o,opcommand_grp ocg'.
-				' WHERE o.operationid=ocg.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds)
-			);
-			while ($group = DBfetch($dbGroups)) {
-				if (!isset($groups[$group['groupid']])) {
-					$groups[$group['groupid']] = [];
-				}
-				$groups[$group['groupid']][$group['actionid']] = $group['actionid'];
-				$groupIds[$group['groupid']] = $group['groupid'];
-			}
-
-			$dbGroups = DBselect(
-				'SELECT o.actionid,og.groupid'.
-				' FROM operations o,opgroup og'.
-				' WHERE o.operationid=og.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds)
-			);
-			while ($group = DBfetch($dbGroups)) {
-				if (!isset($groups[$group['groupid']])) {
-					$groups[$group['groupid']] = [];
-				}
-				$groups[$group['groupid']][$group['actionid']] = $group['actionid'];
-				$groupIds[$group['groupid']] = $group['groupid'];
-			}
-
-			$allowedGroups = API::HostGroup()->get([
-				'groupids' => $groupIds,
-				'output' => ['groupid'],
-				'preservekeys' => true
-			]);
-			foreach ($groupIds as $groupId) {
-				if (isset($allowedGroups[$groupId])) {
-					continue;
-				}
-				foreach ($groups[$groupId] as $actionId) {
-					unset($result[$actionId], $actionIds[$actionId]);
-				}
-			}
-			unset($allowedGroups);
-
-			// check scripts
-			$scripts = [];
-			$scriptIds = [];
-			$dbScripts = DBselect(
-				'SELECT o.actionid,oc.scriptid'.
-				' FROM operations o,opcommand oc'.
-				' WHERE o.operationid=oc.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds)
-			);
-			while ($script = DBfetch($dbScripts)) {
-				if (!isset($scripts[$script['scriptid']])) {
-					$scripts[$script['scriptid']] = [];
-				}
-				$scripts[$script['scriptid']][$script['actionid']] = $script['actionid'];
-				$scriptIds[$script['scriptid']] = $script['scriptid'];
-			}
-
-			$allowedScripts = API::Script()->get([
-				'output' => ['scriptid'],
-				'scriptids' => $scriptIds,
-				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
-				'preservekeys' => true
-			]);
-			foreach ($scriptIds as $scriptId) {
-				if (isset($allowedScripts[$scriptId])) {
-					continue;
-				}
-				foreach ($scripts[$scriptId] as $actionId) {
-					unset($result[$actionId], $actionIds[$actionId]);
-				}
-			}
-			unset($allowedScripts);
-
-			// check users
-			$users = [];
-			$userIds = [];
-			$dbUsers = DBselect(
-				'SELECT o.actionid,omu.userid'.
-				' FROM operations o,opmessage_usr omu'.
-				' WHERE o.operationid=omu.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds)
-			);
-			while ($user = DBfetch($dbUsers)) {
-				if (!isset($users[$user['userid']])) {
-					$users[$user['userid']] = [];
-				}
-				$users[$user['userid']][$user['actionid']] = $user['actionid'];
-				$userIds[$user['userid']] = $user['userid'];
-			}
-
-			$allowedUsers = API::User()->get([
-				'userids' => $userIds,
-				'output' => ['userid'],
-				'preservekeys' => true
-			]);
-			foreach ($userIds as $userId) {
-				if (isset($allowedUsers[$userId])) {
-					continue;
-				}
-				foreach ($users[$userId] as $actionId) {
-					unset($result[$actionId], $actionIds[$actionId]);
-				}
-			}
-
-			// check usergroups
-			$userGroups = [];
-			$userGroupIds = [];
-			$dbUserGroups = DBselect(
-				'SELECT o.actionid,omg.usrgrpid'.
-				' FROM operations o,opmessage_grp omg'.
-				' WHERE o.operationid=omg.operationid'.
-					' AND '.dbConditionInt('o.actionid', $actionIds)
-			);
-			while ($userGroup = DBfetch($dbUserGroups)) {
-				if (!isset($userGroups[$userGroup['usrgrpid']])) {
-					$userGroups[$userGroup['usrgrpid']] = [];
-				}
-				$userGroups[$userGroup['usrgrpid']][$userGroup['actionid']] = $userGroup['actionid'];
-				$userGroupIds[$userGroup['usrgrpid']] = $userGroup['usrgrpid'];
-			}
-
-			$allowedUserGroups = API::UserGroup()->get([
-				'usrgrpids' => $userGroupIds,
-				'output' => ['usrgrpid'],
-				'preservekeys' => true
-			]);
-
-			foreach ($userGroupIds as $userGroupId) {
-				if (isset($allowedUserGroups[$userGroupId])) {
-					continue;
-				}
-				foreach ($userGroups[$userGroupId] as $actionId) {
-					unset($result[$actionId], $actionIds[$actionId]);
-				}
 			}
 		}
 

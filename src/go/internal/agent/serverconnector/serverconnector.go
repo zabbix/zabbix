@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -492,10 +492,15 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 		}
 
 		var err error
-		value, err = taskManager.PerformTask(item, timeout, clientID)
+		var taskResult *string
+		taskResult, err = taskManager.PerformTask(item, timeout, clientID)
 		if err != nil {
 			return "", err
+		} else if taskResult == nil {
+			return "", fmt.Errorf("no values was received")
 		}
+
+		value = *taskResult
 
 		if !utf8.ValidString(value) {
 			return "", fmt.Errorf("value is not a UTF-8 string")

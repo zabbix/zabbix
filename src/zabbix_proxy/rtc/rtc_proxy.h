@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #define ZABBIX_RTC_PROXY_H
 
 #include "zbxrtc.h"
+#include "zbxtypes.h"
 
 int	rtc_process_request_ex_proxy(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data, char **result);
 int	rtc_process_request_ex_proxy_passive(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data,

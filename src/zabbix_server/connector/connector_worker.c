@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "connector_worker.h"
 
-#include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -30,6 +29,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {
@@ -61,7 +61,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
 #define ATTEMPT_DELAY_MAX	10
-	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
+	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201";
 	zbx_http_context_t	context;
 	int			ret, timeout_seconds, attempt_interval_sec;
 
@@ -92,6 +92,9 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	{
 		long		response_code;
 		CURLcode	err;
+
+		if (!ZBX_IS_RUNNING())
+			attempt_interval_sec = 0;
 
 		err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec,
 				ZBX_HTTP_CHECK_RESPONSE_CODE);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,15 +96,11 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 
 		this.initial_form_fields = this.#getFormFields(this.form);
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	initForm(field_switches) {
-		const updateSortOrder = function() {
-			let index = 0;
-
-			this.querySelectorAll('[name$="[sortorder]"]').forEach(node => node.value = index++);
-		}
-
 		new CViewSwitcher('allow_traps', 'change', field_switches.for_traps);
 		new CViewSwitcher('authtype', 'change', field_switches.for_authtype);
 		new CViewSwitcher('http_authtype', 'change', field_switches.for_http_auth_type);
@@ -146,19 +142,29 @@ window.item_edit_form = new class {
 			allow_empty: true
 		});
 		jQuery('#query-fields-table').dynamicRows({
-			sortable: true,
-			sortableOptions: {update: updateSortOrder},
 			template: '#query-field-row-tmpl',
 			rows: this.form_data.query_fields,
-			allow_empty: true
-		}).sortable({disabled: this.form_readonly});
-		jQuery('#headers-table').dynamicRows({
+			allow_empty: true,
 			sortable: true,
-			sortableOptions: {update: updateSortOrder},
+			sortable_options: {
+				target: 'tbody',
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1,
+				enable_sorting: !this.form_readonly
+			}
+		});
+		jQuery('#headers-table').dynamicRows({
 			template: '#item-header-row-tmpl',
 			rows: this.form_data.headers,
-			allow_empty: true
-		}).sortable({disabled: this.form_readonly});
+			allow_empty: true,
+			sortable: true,
+			sortable_options: {
+				target: 'tbody',
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1,
+				enable_sorting: !this.form_readonly
+			}
+		});
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
 			rows: this.form_data.delay_flex,
@@ -249,6 +255,16 @@ window.item_edit_form = new class {
 			}
 		});
 		this.form.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
+
+		const updateSortOrder = (table, field_name) => {
+			table.querySelectorAll('.form_row').forEach((row, index) => {
+				for (const field of row.querySelectorAll(`[name^="${field_name}["]`)) {
+					field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+				}
+			});
+		};
+		jQuery('#query-fields-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'query_fields'));
+		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
 
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')

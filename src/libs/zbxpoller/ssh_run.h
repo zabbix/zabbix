@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,7 @@
 #ifndef ZABBIX_SSH_RUN_H
 #define ZABBIX_SSH_RUN_H
 
-#include "config.h"
-#include "module.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcacheconfig.h"
@@ -32,7 +31,7 @@
 #define KEY_MACS_STR		"MACs"
 
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
-		const char *config_source_ip);
+		const char *config_source_ip, const char *config_ssh_key_location);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 
 #endif

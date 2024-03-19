@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,6 +147,15 @@ class CControllerUserList extends CController {
 			$user['role_name'] = $user['role'] ? $user['role']['name'] : '';
 		}
 		unset($user);
+
+		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
+			$userids_with_totp = CUser::getUseridsWithMfaTotpSecrets();
+
+			foreach ($data['users'] as &$user) {
+				$user['totp_enabled'] = in_array($user['userid'], $userids_with_totp);
+			}
+			unset($user);
+		}
 
 		// data sort and pager
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);

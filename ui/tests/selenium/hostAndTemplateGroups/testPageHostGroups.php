@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -165,6 +165,25 @@ class testPageHostGroups extends testPageGroups {
 						'Count' => '1',
 						'Hosts' => self::DISCOVERED_HOST,
 						'Info' => ''
+					],
+					[
+						'Name' => '1st LLD, ..., sixth LLD: グループプロトタイプ番号 1 KEY',
+						'Count' => '6',
+						'Hosts' => 'KEY host prototype number 0, KEY host prototype number 1, KEY host prototype number 2,'.
+								' KEY host prototype number 3, KEY host prototype number 4, KEY host prototype number 5',
+						'Info' => ''
+					],
+					[
+						'Name' => 'LLD number 8, ..., sevenths LLD: Trešais grupu prototips KEY',
+						'Count' => '3',
+						'Hosts' => 'KEY host prototype number 6, KEY host prototype number 7, KEY host prototype number 8',
+						'Info' => ''
+					],
+					[
+						'Name' => '15th LLD 🙃^天!, 16th LLD: Two prototype group KEY',
+						'Count' => '2',
+						'Hosts' => 'KEY host prototype number 14, KEY host prototype number 15',
+						'Info' => ''
 					]
 				]
 			]
@@ -225,7 +244,7 @@ class testPageHostGroups extends testPageGroups {
 				[
 					'Name' => ' enabled ',
 					'expected' => ['Group with enabled host testPageHostGroup',
-						'Group with two enabled hosts testPageHostGroup', 'ZBX6648 Enabled Triggers'
+						'Group with two enabled hosts testPageHostGroup'
 					]
 				]
 			],
@@ -494,5 +513,60 @@ class testPageHostGroups extends testPageGroups {
 	 */
 	public function testPageHostGroups_Delete($data) {
 		$this->delete($data);
+	}
+
+	public static function getLLDLinksData() {
+		return [
+			[
+				[
+					'name' => 'Single prototype group KEY',
+					'links' => ['17th LLD']
+				]
+			],
+			[
+				[
+					'name' => 'Two prototype group KEY',
+					'links' => ['15th LLD 🙃^天!', '16th LLD']
+				]
+			],
+			[
+				[
+					'name' => 'Trešais grupu prototips KEY',
+					'links' => ['LLD number 8', 'sevenths LLD'],
+					'ellipsis' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLLDLinksData
+	 */
+	public function testPageHostGroups_CheckLLDLinks($data) {
+		$link_ids = CDataHelper::get('HostTemplateGroups.lld_host_prototype_ids');
+		$this->page->login()->open($this->link)->waitUntilReady();
+
+		// Locate the table cell that corresponds to the desired hostgroup name.
+		$table_cell = $this->query('link', $data['name'])->one()->parents('class:nowrap')->one();
+
+		foreach ($data['links'] as $lld_name) {
+			$link = $table_cell->query('link', $lld_name)->one();
+			$this->assertTrue($link->isClickable());
+
+			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].'&hostid='.
+					$link_ids[$lld_name]['host_prototype_id'].'&context=host';
+			$this->assertEquals($link_url, $link->getAttribute('href'));
+		}
+
+		// Check that 3 dots are added after 1st LLD name, if there's more than 2 parent LLDs and no more LLDs are shown.
+		$name_parts = preg_split('/(,|:) /', $table_cell->getText());
+
+		if (array_key_exists('ellipsis', $data)) {
+			$this->assertEquals([$data['links'][0], '...', $data['links'][1], $data['name']], $name_parts);
+		}
+		else {
+			array_push($data['links'], $data['name']);
+			$this->assertEquals($data['links'], $name_parts);
+		}
 	}
 }

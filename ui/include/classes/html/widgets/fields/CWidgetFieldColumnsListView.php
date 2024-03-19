@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,14 +70,12 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 				$label = '';
 			}
 
-			$view->addRow(
-				(new CRow([
-					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CDiv($column['name']))->addClass('text'),
-					(new CDiv($label))->addClass('text'),
-					(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
-				]))->addClass('sortable')
-			);
+			$view->addRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CDiv($column['name']))->addClass('text'),
+				(new CDiv($label))->addClass('text'),
+				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
+			]);
 		}
 
 		$view->addRow(

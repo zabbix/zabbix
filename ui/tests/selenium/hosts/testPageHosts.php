@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 /**
  * @dataSource TagFilter, Proxies, WebScenarios
  *
- * @backup hosts
+ * @backup hosts, httptest
  *
  * @onBefore prepareHostsData
  */
@@ -93,7 +93,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
-		$this->zbxTestTextNotPresent('ZBX6648 All Triggers Host');
+		$this->zbxTestTextNotPresent('Empty host');
 
 		// Check that proxy field is disabled.
 		$this->zbxTestAssertElementNotPresentId('filter_proxyids__ms');

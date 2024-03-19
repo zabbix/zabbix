@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,16 +24,6 @@
  */
 
 class CControllerActionLogList extends CController {
-
-	/**
-	 * @var string  Time from.
-	 */
-	private $from;
-
-	/**
-	 * @var string  Time till.
-	 */
-	private $to;
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -67,17 +57,22 @@ class CControllerActionLogList extends CController {
 	}
 
 	protected function doAction(): void {
-		$this->from = $this->getInput('from', CProfile::get('web.actionlog.filter.from',
-			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-		));
-		$this->to = $this->getInput('to', CProfile::get('web.actionlog.filter.to', 'now'));
-
 		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
 		}
+
+		$timeselector_options = [
+			'profileIdx' => 'web.actionlog.filter',
+			'profileIdx2' => 0,
+			'from' => null,
+			'to' => null
+		];
+
+		$this->getInputs($timeselector_options, ['from', 'to']);
+		updateTimeSelectorPeriod($timeselector_options);
 
 		$data = [
 			'page' => $this->getInput('page', 1),
@@ -92,12 +87,7 @@ class CControllerActionLogList extends CController {
 			'messages' => CProfile::get('web.actionlog.filter.messages', ''),
 			'alerts' => [],
 			'action' => $this->getAction(),
-			'timeline' => getTimeSelectorPeriod([
-				'profileIdx' => 'web.actionlog.filter',
-				'profileIdx2' => 0,
-				'from' => $this->from,
-				'to' => $this->to
-			]),
+			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'active_tab' => CProfile::get('web.actionlog.filter.active', 1)
 		];
 
@@ -225,8 +215,6 @@ class CControllerActionLogList extends CController {
 			PROFILE_TYPE_ID);
 		CProfile::updateArray('web.actionlog.filter.statuses', $this->getInput('filter_statuses', []), PROFILE_TYPE_ID);
 		CProfile::update('web.actionlog.filter.messages', $this->getInput('filter_messages', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.actionlog.filter.from', $this->from, PROFILE_TYPE_STR);
-		CProfile::update('web.actionlog.filter.to', $this->to, PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {

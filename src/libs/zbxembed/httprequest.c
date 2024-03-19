@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,19 +25,16 @@
 #include "zbxhttp.h"
 #include "duktape.h"
 #include "zbxalgo.h"
+#include "zbxcurl.h"
 #include "global.h"
 
 #ifdef HAVE_LIBCURL
 
-#define ZBX_HTTPAUTH_NONE		CURLAUTH_NONE
-#define ZBX_HTTPAUTH_BASIC		CURLAUTH_BASIC
-#define ZBX_HTTPAUTH_DIGEST		CURLAUTH_DIGEST
-#if LIBCURL_VERSION_NUM >= 0x072600
-#	define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_NEGOTIATE
-#else
-#	define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_GSSNEGOTIATE
-#endif
-#define ZBX_HTTPAUTH_NTLM		CURLAUTH_NTLM
+#define ZBX_HTTPAUTH_NONE	CURLAUTH_NONE
+#define ZBX_HTTPAUTH_BASIC	CURLAUTH_BASIC
+#define ZBX_HTTPAUTH_DIGEST	CURLAUTH_DIGEST
+#define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_NEGOTIATE
+#define ZBX_HTTPAUTH_NTLM	CURLAUTH_NTLM
 
 typedef struct
 {
@@ -287,7 +284,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
 {
 	zbx_es_httprequest_t	*request;
-	char			*url = NULL, *contents = NULL;
+	char			*url = NULL, *contents = NULL, *error = NULL;
 	CURLcode		err;
 	int			err_index = -1;
 	zbx_es_env_t		*env;
@@ -358,16 +355,13 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
 
-	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS", err);
-#	else
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS, err);
-#	endif
-#endif
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_ACCEPT_ENCODING, "", err);
+
+	if (SUCCEED != zbx_curl_setopt_https(request->handle, &error))
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "%s", error);
+		goto out;
+	}
 
 	request->data_offset = 0;
 	request->headers_in_offset = 0;
@@ -384,6 +378,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 out:
 	zbx_free(url);
 	zbx_free(contents);
+	zbx_free(error);
 
 	if (-1 != err_index)
 		return duk_throw(ctx);

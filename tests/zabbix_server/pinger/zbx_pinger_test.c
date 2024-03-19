@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 #include "zbxmockutil.h"
 #include "zbxcommon.h"
 
-#include "../../../src/zabbix_server/pinger/pinger.c"
+#include "zbxicmpping.h"
+
+#include "../../../src/libs/zbxpinger/pinger.c"
 
 #define MAX_ERR_LEN 256
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);

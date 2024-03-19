@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ out:
 #undef ZBX_DBCONFIG_BATCH_SIZE
 }
 
-ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
+ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 {
 #define ZBX_DBCONFIG_WORKER_DELAY		1
 	zbx_ipc_service_t	service;
@@ -172,7 +172,7 @@ ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
 		double	time_now;
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		if (NULL != message)

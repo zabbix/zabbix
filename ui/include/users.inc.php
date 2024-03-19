@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,17 +27,9 @@
  * @return string
  */
 function getUserTheme($userData) {
-	if (null !== CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_THEME)) {
-		$css = CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME);
-	}
-	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT) {
-		$css = $userData['theme'];
-	}
-	if (!isset($css)) {
-		$css = ZBX_DEFAULT_THEME;
-	}
-
-	return $css;
+	return isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT
+		? $userData['theme']
+		: CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_THEME);
 }
 
 /**

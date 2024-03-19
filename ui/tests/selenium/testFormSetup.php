@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,8 @@ class testFormSetup extends CWebTest {
 			'PHP session',
 			'PHP option "session.auto_start"',
 			'PHP gettext',
-			'PHP option "arg_separator.output"'
+			'PHP option "arg_separator.output"',
+			'PHP curl'
 		];
 		$this->assertTableDataColumn($prerequisites, '');
 		$this->checkSections('Check of pre-requesties');
@@ -578,7 +579,7 @@ class testFormSetup extends CWebTest {
 		// MySQL database error depends on php version.
 		$mapping = [
 			'Error connecting to database. Empty cipher.' => [
-				'8.1.0' => '(trying to connect via (null))'
+				'8.1.0' => 'Cannot connect to MySQL using SSL'
 			],
 			'php_network_getaddresses: getaddrinfo failed: Name or service not known' => [
 				'8.1.0' => 'php_network_getaddresses: getaddrinfo for incorrect_DB_host failed: Name or service not known'

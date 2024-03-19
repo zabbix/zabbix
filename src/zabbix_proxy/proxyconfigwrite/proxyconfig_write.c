@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,13 @@
 #include "zbxcommshigh.h"
 #include "zbxrtc.h"
 #include "zbx_host_constants.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 /*
  * The configuration sync is split into 4 parts for each table:

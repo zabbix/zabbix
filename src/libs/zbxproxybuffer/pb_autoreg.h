@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 #ifndef ZABBIX_PB_AUTOREG_H
 #define ZABBIX_PB_AUTOREG_H
 
-#include "zbxproxybuffer.h"
 #include "proxybuffer.h"
+#include "zbxalgo.h"
+#include "zbxtypes.h"
 
 void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row);
 size_t	pb_autoreg_estimate_row_size(const char *host, const char *host_metadata, const char *ip, const char *dns);

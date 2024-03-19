@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,8 +96,9 @@ class CControllerPopupTabFilterUpdate extends CController {
 		];
 
 		if ($this->getInput('support_custom_time', 0) && $properties['filter_custom_time']) {
-			$properties['from'] = $this->getInput('tabfilter_from', '');
-			$properties['to'] = $this->getInput('tabfilter_to', '');
+			$properties['from'] = $this->getInput('tabfilter_from');
+			$properties['to'] = $this->getInput('tabfilter_to');
+			$properties['filter_custom_time_label'] = relativeDateToText($properties['from'], $properties['to']);
 		}
 
 		$filter = (new CTabFilterProfile($idx, []))->read();

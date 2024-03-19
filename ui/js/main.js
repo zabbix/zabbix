@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,6 @@ var jqBlink = {
  */
 var hintBox = {
 
-	preload_hint_timer: null,
 	show_hint_timer: null,
 
 	/**
@@ -283,45 +282,6 @@ var hintBox = {
 				e.clientX = offset.left - w.scrollLeft();
 				e.clientY = offset.top - w.scrollTop() + ($target.height() / 2);
 				e.preventDefault();
-			}
-
-			if ($target[0].dataset.hintboxPreload !== '' && $target[0].dataset.hintboxContents === '') {
-				if (e.type === 'mousemove') {
-					return;
-				}
-
-				clearTimeout(hintBox.preload_hint_timer);
-
-				// Manually trigger preloaderCloseHandler for the previous preloader.
-				if (jQuery('#hintbox-preloader').length) {
-
-					// Prevent loading restart on repetitive click and keydown events.
-					if (e.type === 'click' || e.type === 'keydown') {
-						return false;
-					}
-
-					jQuery(document).trigger('click');
-				}
-
-				if (e.type === 'mouseleave') {
-					hintBox.hideHint($target[0], false);
-					$target.blur();
-
-					return false;
-				}
-
-				var preloadHintHandler = function() {
-					hintBox.preloadHint(e, $target);
-				}
-
-				if (e.type === 'mouseenter') {
-					hintBox.preload_hint_timer = setTimeout(preloadHintHandler, 400);
-				}
-				else {
-					preloadHintHandler();
-				}
-
-				return false;
 			}
 
 			hintBox.displayHint(e, $target, $target.data('hintbox-delay') !== undefined
@@ -391,32 +351,25 @@ var hintBox = {
 		}
 	},
 
-	preloadHint: function(e, $target) {
-		var url = new Curl('zabbix.php'),
-			data = $target.data('hintbox-preload');
+	preloadHint: function(e, target, box) {
+		const url = new Curl('zabbix.php');
+		const data = jQuery(target).data('hintbox-preload');
 
 		url.setArgument('action', hintBox.getHintboxAction(data.type));
 
-		var xhr = jQuery.ajax({
+		const xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: data.data,
 			dataType: 'json'
 		});
 
-		var $preloader = hintBox.createPreloader();
-
-		var preloader_timer = setTimeout(function() {
-			$preloader.fadeIn(200);
-			hintBox.positionElement(e, $target[0], $preloader);
-		}, 500);
-
-		addToOverlaysStack($preloader.prop('id'), $target[0], 'preloader', xhr);
+		const $preloader = jQuery('<div>', {
+			'id': 'hintbox-preloader',
+			'class': 'is-loading hintbox-preloader'
+		}).appendTo(box);
 
 		xhr.done(function(resp) {
-			clearTimeout(preloader_timer);
-			overlayPreloaderDestroy($preloader.prop('id'));
-
 			let hintbox_contents = '';
 
 			if ('error' in resp) {
@@ -434,36 +387,25 @@ var hintBox = {
 				}
 			}
 
-			$target[0].dataset.hintboxContents = hintbox_contents;
+			target.dataset.hintboxContents = hintbox_contents;
 
-			hintBox.displayHint(e, $target);
+			$preloader.remove();
+
+			if (target.hintBoxItem !== undefined) {
+				box.append(hintbox_contents);
+
+				// Reset hintbox position.
+				box.css({
+					width: '',
+					height: '',
+					top: '',
+					right: '',
+					left: ''
+				});
+
+				hintBox.positionElement(e, target, target.hintBoxItem);
+			}
 		});
-
-		jQuery(document)
-			.off('click', hintBox.preloaderCloseHandler)
-			.on('click', {id: $preloader.prop('id')}, hintBox.preloaderCloseHandler);
-	},
-
-	/**
-	 * Create preloader elements for the hint box.
-	 */
-	createPreloader: function() {
-		return jQuery('<div>', {
-			'id': 'hintbox-preloader',
-			'class': 'is-loading hintbox-preloader'
-		})
-			.appendTo($('.wrapper'))
-			.on('click', function(e) {
-				e.stopPropagation();
-			})
-			.hide();
-	},
-
-	/**
-	 * Event handler for the preloader elements destroy.
-	 */
-	preloaderCloseHandler: function(event) {
-		overlayPreloaderDestroy(event.data.id);
 	},
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
@@ -510,6 +452,10 @@ var hintBox = {
 					hintBox.hideHint(target, true);
 				});
 			box.prepend(close_link);
+		}
+
+		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
+			hintBox.preloadHint(e, target, box);
 		}
 
 		jQuery(appendTo).append(box);
@@ -875,8 +821,8 @@ function getConditionFormula(conditions, evalType) {
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
-	 * - sortable				- enable jQuery UI sortable initialization
-	 * - sortableOptions		- additional options to pass to jQuery UI sortable initialization
+	 * - sortable				- enable CSortable class initialization
+	 * - sortable_options		- additional options to pass to CSortable class constructor
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -902,45 +848,30 @@ function getConditionFormula(conditions, evalType) {
 				return {};
 			},
 			sortable: false,
-			sortableOptions: {}
+			sortable_options: {}
 		}, options);
 
-		if (options.sortable) {
-			options.sortableOptions = $.extend({}, {
-				disabled: false,
-				items: options.row,
-				axis: 'y',
-				containment: 'parent',
-				cursor: 'grabbing',
-				handle: '.drag-icon',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				helper: function(e, ui) {
-					for (let td of ui.find('>td')) {
-						const $td = jQuery(td);
-						$td.attr('width', $td.width());
-					}
-
-					// When dragging element on safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
-					}
-
-					return ui;
-				},
-				start: function(e, ui) {
-					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-				},
-				stop: function(e, ui) {
-					ui.item.find('>td').removeAttr('style');
-					ui.item.removeAttr('style');
-				}
-			}, options.sortableOptions);
-		}
+		const sortable_options = options.sortable
+			? {
+				selector_span: options.sortable_options.selector_span,
+				selector_handle: options.sortable_options.selector_handle,
+				freeze_start: options.sortable_options.freeze_start,
+				freeze_end: options.sortable_options.freeze_end,
+				enable_sorting: options.sortable_options.enable_sorting
+			}
+			: {};
 
 		return this.each(function() {
 			var table = $(this);
+
+			if (options.sortable) {
+				const sortable_target = 'target' in options.sortable_options
+					? table[0].querySelector(options.sortable_options.target)
+					: table[0];
+
+				table.sortable = new CSortable(sortable_target, sortable_options);
+				table.sortable.on(CSortable.EVENT_SORT, () => table.trigger('tableupdate.dynamicRows'));
+			}
 
 			// If options.remove_next_sibling is true, counter counts each row making the next index twice as large (bug).
 			table.data('dynamicRows', {
@@ -975,6 +906,11 @@ function getConditionFormula(conditions, evalType) {
 					table.trigger('change');
 
 					return table;
+				},
+				enableSorting: (enable_sorting = true) => {
+					if (options.sortable) {
+						table.sortable.enableSorting(enable_sorting);
+					}
 				}
 			});
 
@@ -992,10 +928,6 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', false);
 				}
 
-				if (options.sortable) {
-					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
-				}
-
 				table.trigger('afteradd.dynamicRows', options);
 			});
 
@@ -1011,10 +943,6 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', true);
 
 					table.trigger('afteradd.dynamicRows', options);
-				}
-
-				if (options.sortable) {
-					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 			});
 
@@ -1035,22 +963,6 @@ function getConditionFormula(conditions, evalType) {
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
 				initRows(table, before_row, options);
-			}
-
-			if (options.sortable) {
-				table
-					.sortable(options.sortableOptions)
-					.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
-						const drag_icons = table[0].querySelectorAll(options.sortableOptions.handle);
-						const disabled = drag_icons.length < 2;
-
-						for (const drag_icon of drag_icons) {
-							drag_icon.classList.toggle('disabled', disabled);
-						}
-
-						table.sortable({disabled});
-					})
-					.trigger('afteradd.dynamicRows');
 			}
 		});
 	};

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1579,7 +1579,7 @@ int	main(int argc, char **argv)
 #if defined(_WINDOWS)
 			zbx_tls_init_parent(get_zbx_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type);
+			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type, NULL);
 		}
 #else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"

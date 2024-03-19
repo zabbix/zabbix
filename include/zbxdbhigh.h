@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -671,6 +671,7 @@ int	zbx_db_lock_ids(const char *table_name, const char *field_name, zbx_vector_u
 #define zbx_db_lock_triggerids(ids)		zbx_db_lock_records("triggers", ids)
 #define zbx_db_lock_itemids(ids)		zbx_db_lock_records("items", ids)
 #define zbx_db_lock_group_prototypeids(ids)	zbx_db_lock_records("group_prototype", ids)
+#define zbx_db_lock_hgsetids(ids)		zbx_db_lock_records("hgset", ids)
 
 void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
@@ -714,11 +715,13 @@ typedef struct
 	int			value;
 	int			severity;
 
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_t	tags;
 	int			suppressed;
 	int			mtime;
 }
 zbx_event_t;
+
+ZBX_PTR_VECTOR_DECL(events_ptr, zbx_event_t *)
 
 int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);

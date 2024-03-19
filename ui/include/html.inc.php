@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,14 +266,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$db_host = reset($db_host);
 
 	if (!$is_template) {
-		// Get count for item type ITEM_TYPE_ZABBIX_ACTIVE (7).
-		$db_item_active_count = API::Item()->get([
-			'countOutput' => true,
-			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-			'hostids' => [$hostid]
-		]);
-
-		if ($db_item_active_count > 0) {
+		if (getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
 				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
@@ -282,6 +275,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			];
 			unset($db_host['active_available']);
 		}
+
+		$db_host['has_passive_checks'] = (bool) getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, [$hostid]);
 	}
 
 	// get lld-rules
@@ -358,7 +353,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete'])];
@@ -629,8 +624,13 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 
 /**
  * Create HTML helper element for host interfaces availability.
+ *
+ * @param array $host_interfaces
+ * @param bool $passive_checks
+ *
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks = true): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -649,7 +649,9 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 		];
 	}
 
-	return (new CHostAvailability())->setInterfaces($interfaces);
+	return (new CHostAvailability())
+		->setInterfaces($interfaces)
+		->enablePassiveChecks($passive_checks);
 }
 
 /**
@@ -1065,12 +1067,12 @@ function getTriggerSeverityCss(): string {
 	$css = '';
 
 	$severities = [
-		ZBX_STYLE_NA_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_0),
-		ZBX_STYLE_INFO_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_1),
-		ZBX_STYLE_WARNING_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_2),
-		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_3),
-		ZBX_STYLE_HIGH_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_4),
-		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_5)
+		ZBX_STYLE_NA_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_0),
+		ZBX_STYLE_INFO_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_1),
+		ZBX_STYLE_WARNING_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_2),
+		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_3),
+		ZBX_STYLE_HIGH_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_4),
+		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_5)
 	];
 
 	$css .= ':root {'."\n";
@@ -1093,12 +1095,12 @@ function getTriggerSeverityCss(): string {
 function getTriggerStatusCss(): string {
 	$css = '';
 
-	if (CSettingsHelper::getGlobal(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
+	if (CSettingsHelper::getPublic(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
 		$event_statuses = [
-			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_COLOR),
-			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_COLOR),
-			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::get(CSettingsHelper::OK_UNACK_COLOR),
-			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::get(CSettingsHelper::OK_ACK_COLOR)
+			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::getPublic(CSettingsHelper::PROBLEM_UNACK_COLOR),
+			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::getPublic(CSettingsHelper::PROBLEM_ACK_COLOR),
+			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::getPublic(CSettingsHelper::OK_UNACK_COLOR),
+			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::getPublic(CSettingsHelper::OK_ACK_COLOR)
 		];
 
 		foreach ($event_statuses as $class => $color) {

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ class CControllerProxyList extends CController {
 		}
 		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
-		$server_version = CSettingsHelper::getGlobal(CSettingsHelper::SERVER_STATUS);
+		$server_version = CSettingsHelper::getPrivate(CSettingsHelper::SERVER_STATUS);
 		if ($server_version !== '') {
 			$data['server_version'] = preg_split('/[a-z]/i', json_decode($server_version, true)['version'], 2)[0];
 		}

@@ -52,9 +52,9 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value),
-                      res = metrics.avg_election_time || metrics['election_time{quantile="0.5"}'];
+                  	res = metrics.avg_election_time || metrics['election_time{quantile="0.5"}'];
                   if (isNaN(res)) {
-                      return 0;
+                  	return 0;
                   }
                   return res;
           master_item:
@@ -76,9 +76,9 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value),
-                      res = metrics.avg_fsynctime || metrics['fsynctime{quantile="0.5"}'];
+                  	res = metrics.avg_fsynctime || metrics['fsynctime{quantile="0.5"}'];
                   if (isNaN(res)) {
-                      return 0;
+                  	return 0;
                   }
                   return res;
           master_item:
@@ -118,9 +118,9 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value),
-                      res = metrics['snapshottime{quantile="0.5"}'] || metrics.avg_snapshottime ;
+                  	res = metrics['snapshottime{quantile="0.5"}'] || metrics.avg_snapshottime ;
                   if (isNaN(res)) {
-                      return 0;
+                  	return 0;
                   }
                   return res;
           master_item:
@@ -162,10 +162,10 @@ zabbix_export:
                 - |
                   var metrics = JSON.parse(value);
                   if (metrics.server_state === "standalone") {
-                      return 0
-                      }
+                  	return 0
+                  	}
                   else {
-                      return metrics.cnt_election_time || metrics.election_time_count
+                  	return metrics.cnt_election_time || metrics.election_time_count
                   }
           master_item:
             key: zookeeper.get_metrics
@@ -945,20 +945,20 @@ zabbix_export:
               parameters:
                 - |
                   var source = JSON.parse(value),
-                      data = [];
+                  	data = [];
                   
                   source.connections.forEach(function(v){
-                      data.push({
-                          "{#ADDRESS}": v.remote_socket_address,
-                          "{#CLIENT}": v.remote_socket_address.split(':')[0],
-                          "{#TYPE}": "connections"})
+                  	data.push({
+                  		"{#ADDRESS}": v.remote_socket_address,
+                  		"{#CLIENT}": v.remote_socket_address.split(':')[0],
+                  		"{#TYPE}": "connections"})
                   });
                   
                   source.secure_connections.forEach(function(v){
                   data.push({
-                      "{#ADDRESS}": v.remote_socket_address,
-                      "{#CLIENT}":v.remote_socket_address.split(':')[0],
-                      "{#TYPE}": "secure_connections"})
+                  	"{#ADDRESS}": v.remote_socket_address,
+                  	"{#CLIENT}":v.remote_socket_address.split(':')[0],
+                  	"{#TYPE}": "secure_connections"})
                   });
                   
                   return JSON.stringify(data);

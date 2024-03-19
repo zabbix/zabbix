@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,15 @@
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
 #include "zbx_item_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxversion.h"
+#include "zbxcomms.h"
+#include "zbxvault.h"
 
 typedef struct
 {
@@ -315,7 +324,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			keys_path->path = path;
 
 			zbx_hashset_create(&keys_path->keys, 0, keys_hash, keys_compare);
-			zbx_hashset_insert(&keys_path->keys, &key, sizeof(char *));
+			zbx_hashset_insert(&keys_path->keys, &key, sizeof(key));
 
 			zbx_vector_keys_path_ptr_append(keys_paths, keys_path);
 			path = key = NULL;
@@ -325,7 +334,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			keys_path = keys_paths->values[i];
 			if (NULL == zbx_hashset_search(&keys_path->keys, &key))
 			{
-				zbx_hashset_insert(&keys_path->keys, &key, sizeof(char **));
+				zbx_hashset_insert(&keys_path->keys, &key, sizeof(key));
 				key = NULL;
 			}
 		}

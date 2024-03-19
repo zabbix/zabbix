@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 
 namespace Widgets\PieChart;
 
-use Widgets\PieChart\Includes\WidgetForm;
-
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
@@ -38,7 +36,9 @@ class Widget extends CWidget {
 			],
 			'class.widget.js' => [
 				'Actions' => _('Actions'),
-				'Download image' => _('Download image')
+				'Download image' => _('Download image'),
+				'Value' => _('Value'),
+				'no data' => _('no data')
 			]
 		];
 	}

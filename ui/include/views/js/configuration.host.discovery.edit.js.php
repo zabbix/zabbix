@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 include __DIR__.'/common.item.edit.js.php';
 include __DIR__.'/item.preprocessing.js.php';
-include __DIR__.'/editabletable.js.php';
 include __DIR__.'/itemtest.js.php';
 include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 ?>
@@ -101,7 +100,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
@@ -182,6 +181,44 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			if (button instanceof Element) {
 				button.addEventListener('click', e => this.executeNow(e.target));
 			}
+
+			const updateSortOrder = (table, field_name) => {
+				table.querySelectorAll('.form_row').forEach((row, index) => {
+					for (const field of row.querySelectorAll(`[name^="${field_name}["]`)) {
+						field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+					}
+				});
+			};
+
+			jQuery('#query-fields-table')
+				.dynamicRows({
+					template: '#query-field-row-tmpl',
+					rows: query_fields,
+					allow_empty: true,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1,
+						enable_sorting: !readonly
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'query_fields'));
+
+			jQuery('#headers-table')
+				.dynamicRows({
+					template: '#item-header-row-tmpl',
+					rows: headers,
+					allow_empty: true,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1,
+						enable_sorting: !readonly
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
 		},
 
 		updateExpression() {

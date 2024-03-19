@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "lld_worker.h"
 #include "lld.h"
+#include "lld_protocol.h"
 
 #include "../events/events.h"
 
@@ -26,11 +27,12 @@
 #include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "lld_protocol.h"
 #include "zbxtime.h"
-#include "zbxdbwrap.h"
 #include "zbx_item_constants.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *
@@ -111,7 +113,10 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 						NULL, NULL, error);
 			}
 
+			zbx_db_begin();
 			zbx_process_events(NULL, NULL);
+			zbx_db_commit();
+
 			zbx_clean_events();
 		}
 
@@ -247,8 +252,4 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_db_close();
-
-	zbx_ipc_socket_close(&lld_socket);
 }

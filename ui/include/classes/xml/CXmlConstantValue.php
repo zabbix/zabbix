@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -307,8 +307,8 @@ class CXmlConstantValue {
 	const OFFICE365 = CMediatypeHelper::EMAIL_PROVIDER_OFFICE365;
 	const OFFICE365_RELAY = CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY;
 
-	const STARTTLS = SMTP_CONNECTION_SECURITY_STARTTLS;
-	const SSL_OR_TLS = SMTP_CONNECTION_SECURITY_SSL_TLS;
+	const STARTTLS = SMTP_SECURITY_STARTTLS;
+	const SSL_OR_TLS = SMTP_SECURITY_SSL;
 
 	const SMTP_AUTHENTICATION_NONE = SMTP_AUTHENTICATION_NONE;
 	const SMTP_AUTHENTICATION_PASSWORD = SMTP_AUTHENTICATION_NORMAL;

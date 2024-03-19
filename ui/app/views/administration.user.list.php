@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,9 +215,18 @@ foreach ($data['users'] as $user) {
 			->setArgument('action', 'user.edit')
 			->setArgument('userid', $userid)
 	);
+	$btn_actions = [];
 
 	if ($user['userdirectoryid'] && $data['idp_names'][$user['userdirectoryid']]['idp_type'] == IDP_TYPE_LDAP) {
-		$checkbox->setAttribute('data-actions', 'ldap');
+		$btn_actions[] = 'ldap';
+	}
+
+	if (array_key_exists('totp_enabled', $user) && $user['totp_enabled']) {
+		$btn_actions[] = 'totp';
+	}
+
+	if ($btn_actions) {
+		$checkbox->setAttribute('data-actions', implode(' ', $btn_actions));
 	}
 
 	if ($user['userdirectoryid']) {
@@ -303,6 +312,13 @@ $form->addItem([
 			'attributes' => ['data-required' => 'ldap'],
 			'confirm_singular' => _('Provision selected LDAP user?'),
 			'confirm_plural' => _('Provision selected LDAP users?'),
+			'csrf_token' => $csrf_token
+		],
+		'user.reset.totp' => [
+			'name' => _('Reset TOTP secret'),
+			'attributes' => ['data-required' => 'totp'],
+			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
+			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
 			'csrf_token' => $csrf_token
 		],
 		'user.unblock' => [

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,12 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxnet"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxcomms"
-	"zabbix.com/pkg/zbxnet"
 )
 
 type ServerListener struct {
@@ -63,7 +63,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
 
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
-	go response.handleCheck(data, conn.ReservedData())
+	go response.handleCheck(data)
 
 	return nil
 }

@@ -8,7 +8,8 @@ libzbxreporter_a_SOURCES = \
 	report_writer.c \
 	report_writer.h \
 	report_protocol.c \
-	report_protocol.h
+	report_protocol.h \
+	report.h
 
 libzbxreporter_a_CFLAGS = \
 	$(TLS_CFLAGS)

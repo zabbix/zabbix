@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ class testFormApiTokens extends CWebTest {
 
 		$expires_at = $form->getField('Expires at')->query('id:expires_at')->one();
 		$this->assertEquals('',$field->getValue());
-		$this->assertEquals('19', $expires_at->getAttribute('maxlength'));
+		$this->assertEquals('255', $expires_at->getAttribute('maxlength'));
 		$this->assertEquals('YYYY-MM-DD hh:mm:ss', $expires_at->getAttribute('placeholder'));
 		$calendar = $form->query('id:expires_at_calendar')->one();
 		$this->assertTrue($calendar->isClickable());

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ class CFilterElement extends CElement {
 	public function getFilterType() {
 		if ($this->context === self::CONTEXT_LEFT) {
 			return [
-				'selected_tab' => $this->query('xpath:./nav/ul/li/ul['.CXPathHelper::fromClass('ui-sortable-container').
+				'selected_tab' => $this->query('xpath:./nav/ul/li/ul['.CXPathHelper::fromClass('tabfilter-tabs sortable').
 						']/li['.CXPathHelper::fromClass('selected').']')->one(),
 				'attribute' => 'data-target',
 				'is_expanded' => function ($target) {
@@ -162,7 +162,8 @@ class CFilterElement extends CElement {
 	 * @return array
 	 */
 	public function getTabsText() {
-		$tabs = $this->query('xpath:.//a[@class="tabfilter-item-link"]')->all();
+		$tabs = $this->query('xpath:.//li[not(@data-target="tabfilter_timeselector")]/a[contains(@class, '.
+				'"tabfilter-item-link") and not(@aria-label="Home")]')->all();
 		if ($tabs->count() > 0) {
 			return $tabs->asText();
 		}

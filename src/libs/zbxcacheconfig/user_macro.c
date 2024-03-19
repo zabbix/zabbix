@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1067,7 +1067,7 @@ static void	um_cache_get_macro(const zbx_um_cache_t *cache, const zbx_uint64_t *
  *                                  0 - secure                                   *
  *                                  1 - non-secure (secure macros are resolved   *
  *                                                  to ***** )                   *
- *             value       - [OUT] macro value, must be freed by the caller      *
+ *             value       - [OUT] macro value, must not be freed by the caller  *
  *                                                                               *
  *********************************************************************************/
 void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,

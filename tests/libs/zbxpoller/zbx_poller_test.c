@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,11 +58,14 @@ void	zbx_mock_test_entry(void **state)
 	}
 	else if (0 == zbx_strcmp_null("ZBX_TEST_GET_VALUE_TELNET", test_type))
 	{
+		const char	*config_ssh_key_location = NULL;
+
 		item.interface.addr = (char *)zbx_mock_get_parameter_string("in.item.interface");
 		item.key = (char *)zbx_mock_get_parameter_string("in.item.key");
 		item.timeout = 3;
 
-		returned_code = zbx_get_value_telnet_test_run(&item, &error);
+		returned_code = zbx_get_value_telnet_test_run(&item, config_ssh_key_location, &error);
+
 		if (SUCCEED != returned_code && NULL != error)
 			printf("zbx_get_value_telnet_test_run error: %s\n", error);
 

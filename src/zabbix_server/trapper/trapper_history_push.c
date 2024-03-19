@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 **/
 
 #include "trapper_history_push.h"
+#include "zbxtrapper.h"
 #include "zbxjson.h"
 #include "zbxcommshigh.h"
 #include "zbxcomms.h"
 #include "zbxstr.h"
-#include "trapper_auth.h"
 #include "zbxcacheconfig.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
@@ -30,6 +30,11 @@
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
 #include "audit/zbxaudit.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
 
@@ -55,15 +60,15 @@ static void	hp_item_value_free(zbx_hp_item_value_t *hp)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create item value from json data                                  *
+ * Purpose: creates item value from json data                                 *
  *                                                                            *
  * Parameters: pnext     - [IN] json data                                     *
  *             now       - [IN] current time                                  *
  *             ns_offset - [IN/OUT] nanosecond offset to apply when json data *
- *                         does not include ns tag                            *
+ *                                  does not include ns tag                   *
  *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: The created value or NULL in the case of an error            *
+ * Return value: created value or NULL in case of error                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_hp_item_value_t	*create_item_value(const char *pnext, time_t now, int *ns_offset, char **error)
@@ -205,7 +210,7 @@ zbx_host_permission_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate item configuration if it can accept history              *
+ * Purpose: validates item configuration if it can accept history             *
  *                                                                            *
  * Return value: SUCCEED - item can accept history values                     *
  *               FAIL    - item configuration error                           *
@@ -295,7 +300,7 @@ static int	validate_item_config(ZBX_SOCKADDR *peer_addr, ZBX_SOCKADDR *client_ad
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate item value for duplicate timestamps                      *
+ * Purpose: validates item value for duplicate timestamps                     *
  *                                                                            *
  * Return value: SUCCEED - value can be pushed to history                     *
  *               FAIL    - duplicate timestamp detected                       *
@@ -332,7 +337,7 @@ static int	validate_item_value(zbx_hashset_t *item_timestamps, const zbx_history
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send item value to preprocessing                                  *
+ * Purpose: sends item value to preprocessing                                 *
  *                                                                            *
  ******************************************************************************/
 static void	push_item_value_to_history(const zbx_history_recv_item_t *item, zbx_hp_item_value_t *value)
@@ -371,14 +376,14 @@ static int	hk_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process received item values                                      *
+ * Purpose: processes received item values                                    *
  *                                                                            *
- * Parameters: userid        - [IN] user identifier                           *
+ * Parameters: userid        - [IN]                                           *
  *             peer_addr     - [IN] connection source address                 *
  *             client_addr   - [IN] clientip address                          *
  *             values        - [IN] parsed values                             *
- *             itemids_num   - [IN] values with itemids                       *
- *             hostkeys_num  - [IN] values with host/key pairs                *
+ *             itemids_num   - [IN]                                           *
+ *             hostkeys_num  - [IN]                                           *
  *             processed_num - [OUT] number of processed values               *
  *             failed_num    - [OUT] number of failed values                  *
  *             j             - [OUT] json response buffer                     *
@@ -474,7 +479,8 @@ static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr,
 		{
 			int	index;
 
-			if (FAIL == (index = zbx_vector_host_key_bsearch(&hostkeys, values->values[i]->hk, hk_compare)))
+			if (FAIL == (index = zbx_vector_host_key_bsearch(&hostkeys, values->values[i]->hk,
+					hk_compare)))
 			{
 				zbx_json_addobject(j, NULL);
 				zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, 0);
@@ -588,7 +594,7 @@ static void	process_item_values(const zbx_user_t *user, ZBX_SOCKADDR *peer_addr,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the user has access to history.push api method           *
+ * Purpose: checks if user has access to history.push api method              *
  *                                                                            *
  * Return value:  SUCCEED - user has access                                   *
  *                FAIL    - otherwise                                         *
@@ -657,9 +663,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process history push request                                      *
+ * Purpose: processes history push request                                    *
  *                                                                            *
- * Parameters: jp    - [IN] history push request in json format               *
+ * Parameters:                                                                *
+ *             sock  - [IN]                                                   *
+ *             jp    - [IN] history push request in json format               *
  *             j     - [OUT] json response buffer                             *
  *             error - [OUT] error message                                    *
  *                                                                            *
@@ -672,11 +680,10 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 {
 	zbx_user_t			user;
 	struct zbx_json_parse		jp_data;
-	int				ret = FAIL;
 	char				clientip[MAX_STRING_LEN];
 	struct addrinfo			hints, *ai = NULL;
-	int				ns_offset = 0, hostkeys_num = 0, itemids_num = 0, processed_num = 0,
-					failed_num = 0;
+	int				ret = FAIL, ns_offset = 0, hostkeys_num = 0, itemids_num = 0,
+					processed_num = 0, failed_num = 0;
 	const char			*pnext = NULL;
 	time_t				now;
 	zbx_vector_hp_item_value_ptr_t	values;
@@ -765,7 +772,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process history push request                                      *
+ * Purpose: processes history push request                                    *
  *                                                                            *
  * Parameters: sock    - [IN] client socket                                   *
  *             jp      - [IN] history push request in json format             *

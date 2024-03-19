@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,6 +190,8 @@ class CRouter {
 		'mediatype.test.send'						=> ['CControllerMediatypeTestSend',						'layout.json',			null],
 		'mediatype.update'							=> ['CControllerMediatypeUpdate',						'layout.json',			null],
 		'menu.popup'								=> ['CControllerMenuPopup',								'layout.json',			null],
+		'mfa.edit'									=> ['CControllerMfaEdit',								'layout.json',			'mfa.edit'],
+		'mfa.check'									=> ['CControllerMfaCheck',								'layout.json',			null],
 		'miscconfig.edit'							=> ['CControllerMiscConfigEdit',						'layout.htmlpage',		'administration.miscconfig.edit'],
 		'miscconfig.update'							=> ['CControllerMiscConfigUpdate',						null,					null],
 		'module.disable'							=> ['CControllerModuleDisable',							'layout.json',			null],
@@ -201,6 +203,7 @@ class CRouter {
 		'notifications.get'							=> ['CControllerNotificationsGet',						'layout.json',			null],
 		'notifications.mute'						=> ['CControllerNotificationsMute',						'layout.json',			null],
 		'notifications.read'						=> ['CControllerNotificationsRead',						'layout.json',			null],
+		'notifications.snooze'						=> ['CControllerNotificationsSnooze',					'layout.json',			null],
 		'popup'										=> ['CControllerPopup',									'layout.htmlpage',		'popup.view'],
 		'popup.acknowledge.create'					=> ['CControllerPopupAcknowledgeCreate',				'layout.json',			null],
 		'popup.acknowledge.edit'					=> ['CControllerPopupAcknowledgeEdit',					'layout.json',			'popup.acknowledge.edit'],
@@ -287,6 +290,8 @@ class CRouter {
 		'script.edit'								=> ['CControllerScriptEdit',							'layout.json',			'administration.script.edit'],
 		'script.list'								=> ['CControllerScriptList',							'layout.htmlpage',		'administration.script.list'],
 		'script.update'								=> ['CControllerScriptUpdate',							'layout.json',			null],
+		'script.userinput.edit'						=> ['CControllerScriptUserInputEdit',					'layout.json',			'script.userinput.edit'],
+		'script.userinput.check'					=> ['CControllerScriptUserInputCheck',					'layout.json',			null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
 		'service.create'							=> ['CControllerServiceCreate',							'layout.json',			null],
 		'service.delete'							=> ['CControllerServiceDelete',							'layout.json',			null],
@@ -359,6 +364,7 @@ class CRouter {
 		'user.unblock'								=> ['CControllerUserUnblock',							null,					null],
 		'user.update'								=> ['CControllerUserUpdate',							null,					null],
 		'user.provision'							=> ['CControllerUserProvision',							null,					null],
+		'user.reset.totp'							=> ['CControllerUserResetTotp',							null,					null],
 		'usergroup.create'							=> ['CControllerUsergroupCreate',						null,					null],
 		'usergroup.delete'							=> ['CControllerUsergroupDelete',						null,					null],
 		'usergroup.edit'							=> ['CControllerUsergroupEdit',							'layout.htmlpage',		'usergroup.edit'],
@@ -400,6 +406,7 @@ class CRouter {
 		'imgstore.php'					=> ['CLegacyAction', null, null],
 		'index.php'						=> ['CLegacyAction', null, null],
 		'index_http.php'				=> ['CLegacyAction', null, null],
+		'index_mfa.php'					=> ['CLegacyAction', null, null],
 		'index_sso.php'					=> ['CLegacyAction', null, null],
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],

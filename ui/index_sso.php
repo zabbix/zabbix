@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ if (hasRequest('request')) {
 	}
 }
 
-if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
+if (CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
 	CSessionHelper::unset(['request']);
 
 	redirect($redirect_to->toString());
@@ -72,7 +72,7 @@ $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 $provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 $provisioning_enabled = ($provisioning->isProvisioningEnabled()
-	&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
+	&& CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
 );
 
 if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
@@ -275,42 +275,43 @@ try {
 
 		if ($saml_data['provisioned_user'] && $provisioning_enabled) {
 			$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
-			$user_data = API::User()->findAccessibleUser($saml_data['username_attribute'],
-				(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-				CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), false
+
+			$db_users = CUser::findUsersByUsername($saml_data['username_attribute'],
+				CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
 			);
 
-			if (array_key_exists('db_user', $user_data)) {
-				$deprovisioned = $user_data['permissions']['deprovisioned'];
-
-				if ($user_data['db_user']['userdirectoryid'] == $userdirectoryid) {
-					$saml_data['provisioned_user']['userid'] = $user_data['db_user']['userid'];
-					$deprovisioned = !API::User()->updateProvisionedUser($saml_data['provisioned_user']);
-					ScimGroup::createScimGroupsFromSamlAttributes($saml_data['idp_groups'],
-						$user_data['db_user']['userid']
-					);
-				}
-
-				if ($deprovisioned) {
-					throw new Exception(_('GUI access disabled.'));
-				}
-			}
-			elseif ($saml_data['provisioned_user']['roleid']) {
+			if (!$db_users && $saml_data['provisioned_user']['roleid']) {
 				$saml_data['provisioned_user'] += [
-					'userdirectoryid'	=> $userdirectoryid,
-					'username'			=> $saml_data['username_attribute']
+					'userdirectoryid' => $userdirectoryid,
+					'username' => $saml_data['username_attribute']
 				];
 				$user = API::User()->createProvisionedUser($saml_data['provisioned_user']);
 				ScimGroup::createScimGroupsFromSamlAttributes($saml_data['idp_groups'], $user['userid']);
+			}
+
+			if (count($db_users) > 1) {
+				throw new Exception(_s('Authentication failed: %1$s.', _('supplied credentials are not unique')));
+			}
+
+			if ($db_users) {
+				$db_user = $db_users[0];
+
+				CUser::addUserGroupFields($db_user, $group_status);
+
+				if (($group_status == GROUP_STATUS_ENABLED || $db_user['deprovisioned'])
+						&& bccomp($db_user['userdirectoryid'], $userdirectoryid) == 0) {
+					$saml_data['provisioned_user']['userid'] = $db_user['userid'];
+					API::User()->updateProvisionedUser($saml_data['provisioned_user']);
+					ScimGroup::createScimGroupsFromSamlAttributes($saml_data['idp_groups'], $db_user['userid']);
+				}
 			}
 
 			unset($saml_data['provisioned_user'], $saml_data['idp_groups']);
 			CSessionHelper::set('saml_data', $saml_data);
 		}
 
-		CWebUser::$data = API::User()->loginByUsername($saml_data['username_attribute'],
-			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
+		CWebUser::$data = CUser::loginByUsername($saml_data['username_attribute'],
+			CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
 		);
 		API::setWrapper($wrapper);
 

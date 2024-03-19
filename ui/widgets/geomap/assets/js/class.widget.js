@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 
 class CWidgetGeoMap extends CWidget {
+
 	static SEVERITY_NO_PROBLEMS = -1;
 	static SEVERITY_NOT_CLASSIFIED = 0;
 	static SEVERITY_INFORMATION = 1;
@@ -33,6 +34,19 @@ class CWidgetGeoMap extends CWidget {
 		this._initial_load = true;
 		this._home_coords = {};
 		this._severity_levels = new Map();
+	}
+
+	promiseReady() {
+		if (this._map === null){
+			return super.promiseReady();
+		}
+
+		return new Promise(resolve => {
+			this._map.whenReady(() => {
+				super.promiseReady()
+					.then(() => setTimeout(resolve, 300));
+			});
+		});
 	}
 
 	getUpdateRequestData() {

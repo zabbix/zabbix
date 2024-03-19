@@ -75,7 +75,7 @@ Test availability: `zabbix_get -s redis-master -k redis.ping`
 |Redis: AOF last bgrewrite status|<p>Status of the last AOF rewrite operation</p>|Dependent item|redis.persistence.aof_last_bgrewrite_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_last_bgrewrite_status`</p></li><li>Boolean to decimal</li></ul>|
 |Redis: AOF last rewrite time sec|<p>Duration of the last AOF rewrite</p>|Dependent item|redis.persistence.aof_last_rewrite_time_sec<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_last_rewrite_time_sec`</p></li></ul>|
 |Redis: AOF last write status|<p>Status of the last write operation to the AOF</p>|Dependent item|redis.persistence.aof_last_write_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_last_write_status`</p></li><li>Boolean to decimal</li></ul>|
-|Redis: AOF rewrite in progress|<p>Flag indicating a AOF rewrite operation is on-going</p>|Dependent item|redis.persistence.aof_rewrite_in_progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_rewrite_in_progress`</p></li></ul>|
+|Redis: AOF rewrite in progress|<p>Flag indicating an AOF rewrite operation is on-going</p>|Dependent item|redis.persistence.aof_rewrite_in_progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_rewrite_in_progress`</p></li></ul>|
 |Redis: AOF rewrite scheduled|<p>Flag indicating an AOF rewrite operation will be scheduled once the on-going RDB save is complete</p>|Dependent item|redis.persistence.aof_rewrite_scheduled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.aof_rewrite_scheduled`</p></li></ul>|
 |Redis: Dump loading|<p>Flag indicating if the load of a dump file is on-going</p>|Dependent item|redis.persistence.loading<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.loading`</p></li></ul>|
 |Redis: RDB bgsave in progress|<p>"1" if bgsave is in progress and "0" otherwise</p>|Dependent item|redis.persistence.rdb_bgsave_in_progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rdb_bgsave_in_progress`</p></li></ul>|
@@ -145,7 +145,7 @@ Test availability: `zabbix_get -s redis-master -k redis.ping`
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|DB {#DB}: Get Keyspace info|<p>The item gets information about keyspace of {#DB} database.</p>|Dependent item|redis.db.info_raw["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Keyspace["{#DB}"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DB {#DB}: Get Keyspace info|<p>The item gets information about keyspace of {#DB} database.</p>|Dependent item|redis.db.info_raw["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DB}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB {#DB}: Average TTL|<p>Average TTL</p>|Dependent item|redis.db.avg_ttl["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.avg_ttl`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |DB {#DB}: Expires|<p>Number of keys with an expiration</p>|Dependent item|redis.db.expires["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expires`</p></li></ul>|
 |DB {#DB}: Keys|<p>Total number of keys</p>|Dependent item|redis.db.keys["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.keys`</p></li></ul>|

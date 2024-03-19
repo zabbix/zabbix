@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
 			'smtp_email' =>				'db media_type.smtp_email',
-			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_CONNECTION_SECURITY_NONE.','.SMTP_CONNECTION_SECURITY_STARTTLS.','.SMTP_CONNECTION_SECURITY_SSL_TLS,
+			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_SECURITY_NONE.','.SMTP_SECURITY_STARTTLS.','.SMTP_SECURITY_SSL,
 			'smtp_verify_peer' =>		'db media_type.smtp_verify_peer|in 0,1',
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,

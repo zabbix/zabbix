@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2023 Zabbix SIA
+dnl Copyright (C) 2001-2024 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha9])
+AC_INIT([Zabbix],[7.0.0beta2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -53,12 +53,11 @@ AC_PROG_EGREP
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
-  mtent.h fcntl.h sys/param.h arpa/inet.h \
+  fcntl.h sys/param.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
-  sys/socket.h sys/loadavg.h arpa/inet.h \
-  sys/vmmeter.h strings.h vm/vm_param.h \
+  sys/loadavg.h sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
-  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
+  stdint.h mach/host_info.h mach/mach_host.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
@@ -1025,9 +1024,6 @@ freebsd*)
 netbsd*)
 	ARCH="netbsd"
 	;;
-osf*)
-	ARCH="osf"
-	;;
 openbsd*)
 	ARCH="openbsd"
 	;;
@@ -1632,6 +1628,9 @@ if test "x$want_openssl" = "xyes"; then
 fi
 AC_SUBST(TLS_CFLAGS)
 
+AM_CONDITIONAL(HAVE_OPENSSL, [test "x$have_tls" = "xOpenSSL" || test "x$have_tls" = "xOpenSSL (PSK not supported)"])
+AM_CONDITIONAL(HAVE_GNUTLS, [test "x$have_tls" = "xGnuTLS"])
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $TLS_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $TLS_LIBS"
 
@@ -1659,11 +1658,12 @@ if test "x$agent" = "xyes"; then
 	if test "x$want_libmodbus" = "xyes"; then
 		if test "x$found_libmodbus" = "xyes"; then
 			have_libmodbus="yes"
+
+			AGENT_CFLAGS="$AGENT_CFLAGS $LIBMODBUS_CFLAGS"
+			AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBMODBUS_LDFLAGS"
+			AGENT_LIBS="$AGENT_LIBS $LIBMODBUS_LIBS"
 		fi
 	fi
-	LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
-	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
-	LIBS="$LIBS $LIBMODBUS_LIBS"
 fi
 AM_CONDITIONAL(HAVE_LIBMODBUS, [test "x$have_libmodbus" = "xyes"])
 
@@ -1713,9 +1713,11 @@ AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
 AC_SUBST(LDAP_CPPFLAGS)
 
+dnl Currently required cURL library version is 7.19.1 . When it is
+dnl increased all the functionality in zbxcurl.h must be revised.
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+LIBCURL_CHECK_CONFIG(, [7.19.1], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])
@@ -2005,6 +2007,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxcrypto/Makefile
+	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbsyncer/Makefile
 	src/libs/zbxcacheconfig/Makefile
@@ -2015,6 +2018,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxdbschema/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
+	src/libs/zbxdiscoverer/Makefile
 	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxeval/Makefile
@@ -2043,6 +2047,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
 	src/libs/zbxpoller/Makefile
+	src/libs/zbxagentget/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile
@@ -2056,6 +2061,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
+	src/libs/zbxvmware/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
 	src/libs/zbxsysinfo/aix/Makefile
@@ -2066,7 +2072,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/linux/Makefile
 	src/libs/zbxsysinfo/netbsd/Makefile
 	src/libs/zbxsysinfo/openbsd/Makefile
-	src/libs/zbxsysinfo/osf/Makefile
 	src/libs/zbxsysinfo/osx/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/solaris/Makefile
@@ -2074,15 +2079,18 @@ AC_CONFIG_FILES([
 	src/libs/zbxstats/Makefile
 	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
+	src/libs/zbxhttppoller/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
 	src/libs/zbxtimekeeper/Makefile
+	src/libs/zbxtrapper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
 	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
+	src/libs/zbxpinger/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2094,27 +2102,31 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
+	src/zabbix_proxy/discovery/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
+	src/zabbix_proxy/poller/Makefile
 	src/zabbix_proxy/preproc/Makefile
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
+	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/actions/Makefile
+	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/diag/Makefile
-	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/discovery/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/events/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
-	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/lld/Makefile
-	src/zabbix_server/pinger/Makefile
+	src/zabbix_server/operations/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile
@@ -2126,7 +2138,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/vmware/Makefile
 	man/Makefile
 	])
 AC_OUTPUT

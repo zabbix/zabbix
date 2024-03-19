@@ -61,12 +61,8 @@ else
 
 PROXY_SUBDIRS = \
 	zabbix_server/dbconfig \
-	zabbix_server/discoverer \
-	zabbix_server/httppoller \
-	zabbix_server/pinger \
 	zabbix_server/poller \
 	zabbix_server/trapper \
-	zabbix_server/vmware \
 	zabbix_server/preproc \
 	zabbix_server/service \
 	zabbix_proxy \

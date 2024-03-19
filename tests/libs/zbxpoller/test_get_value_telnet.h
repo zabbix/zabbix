@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, char **error);
+int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, const char *config_ssh_key_location, char **error);
 
 #endif /*POLLER_GET_VALUE_TELNET_TEST_H*/

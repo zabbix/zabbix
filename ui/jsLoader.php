@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,11 +66,12 @@ $available_js = [
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
-	'jquery.js' => 'vendors/',
-	'jquery-ui.js' => 'vendors/',
-	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
-	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
-	'd3.v7.min.js' => 'vendors/',
+	'jquery.js' => 'vendors/jQuery/',
+	'jquery-ui.js' => 'vendors/jQueryUI/',
+	'leaflet.js' => 'vendors/Leaflet/',
+	'leaflet.markercluster.js' => 'vendors/Leaflet.markercluster/',
+	'd3.js' => 'vendors/D3/',
+	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
@@ -96,12 +97,12 @@ $available_js = [
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
-	'class.csvggauge.js' => '',
 	'class.curl.js' => '',
 	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
+	'class.script.js' => '',
 	'class.scrollable.js' => '',
 	'class.sidebar.js' => '',
 	'class.sortable.js' => '',
@@ -283,14 +284,14 @@ $translate_strings = [
 		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
 	],
 	'class.notifications.js' => [
+		'Mute for %1$s' => _('Mute for %1$s'),
 		'S_PROBLEM_ON' => _('Problem on'),
 		'S_RESOLVED' => _('Resolved'),
-		'S_MUTE' => _('Mute'),
 		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
-		'S_UNMUTE' => _('Unmute'),
 		'S_CLOSE' => _('Close'),
-		'S_SNOOZE' => _('Snooze'),
-		'Unexpected server error.' => _('Unexpected server error.')
+		'Snooze for %1$s' => _('Snooze for %1$s'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'Unmute for %1$s' => _('Unmute for %1$s')
 	],
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
@@ -392,7 +393,8 @@ $translate_strings = [
 		'Values' => _('Values'),
 		'View' => _('View'),
 		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
@@ -427,6 +429,16 @@ $translate_strings = [
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),
 		'value' => _('value')
+	],
+	'class.script.js' => [
+		'Cancel' => _('Cancel'),
+		'Cannot open URL' => _('Cannot open URL'),
+		'Execute' => _('Execute'),
+		'Execution confirmation' => _('Execution confirmation'),
+		'Invalid URL: %1$s' => _('Invalid URL: %1$s'),
+		'Open URL' => _('Open URL'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'URL opening confirmation' => _('URL opening confirmation')
 	]
 ];
 
@@ -452,8 +464,10 @@ if (empty($_GET['files'])) {
 		'class.menu-item.js',
 		'class.rpc.js',
 		'class.csuggest.js',
+		'class.script.js',
 		'class.scrollable.js',
 		'class.sidebar.js',
+		'class.sortable.js',
 		'class.template.js',
 		'chkbxrange.js',
 		'functions.js',

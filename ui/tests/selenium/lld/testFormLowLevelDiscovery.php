@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -423,7 +423,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				if (!isset($data['form'])) {
-					$this->zbxTestAssertElementValue('delay', '1m');
+					$this->zbxTestAssertElementValue('delay', '1h');
 				}
 				break;
 			default:

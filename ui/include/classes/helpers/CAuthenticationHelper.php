@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Authentication API object.
  */
-class CAuthenticationHelper extends CConfigGeneralHelper {
+class CAuthenticationHelper {
 
 	public const AUTHENTICATION_TYPE = 'authentication_type';
 	public const DISABLED_USER_GROUPID = 'disabled_usrgrpid';
@@ -40,15 +40,11 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
 	public const SAML_JIT_STATUS = 'saml_jit_status';
+	public const MFA_STATUS = 'mfa_status';
+	public const MFAID = 'mfaid';
 
-	/**
-	 * Authentication API object parameters array.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
-	protected static array $params = [];
+	private static $params = [];
+	private static $params_public = [];
 
 	/**
 	 * Userdirectory API object parameters array.
@@ -60,16 +56,43 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	protected static array $userdirectory_params = [];
 
 	/**
-	 * @inheritdoc
+	 * @throws Exception
+	 *
+	 * @return string
 	 */
-	protected static function loadParams(?string $param = null, bool $is_global = false): void {
+	public static function get(string $field): string {
 		if (!self::$params) {
-			self::$params = API::Authentication()->get(['output' => 'extend']);
+			self::$params = API::Authentication()->get([
+				'output' => [
+					'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
+					'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
+					'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
+					'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid', 'mfa_status',
+					'mfaid'
+				]
+			]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load authentication API parameters.'));
 			}
 		}
+
+		return self::$params[$field];
+	}
+
+	/**
+	 * Get the value of the given Authentication API object's field available to parts of the UI without authentication.
+	 *
+	 * @param string $field
+	 *
+	 * @return string
+	 */
+	public static function getPublic(string $field): string {
+		if (!self::$params_public) {
+			self::$params_public = CAuthentication::getPublic();
+		}
+
+		return self::$params_public[$field];
 	}
 
 	/**

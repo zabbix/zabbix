@@ -1,0 +1,274 @@
+---
+test case: Add new host and new hgset
+in:
+  hosts:
+    - hostid: 0
+      hgsetid_orig: 0
+      old_groupids: []
+      res_groupids:
+        - 1
+out:
+  hosts:
+    - hostid: 0
+      hgsetid: 0
+      hash_str: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      host_hgset_action: add
+  hgsets:
+    - hash_str: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      hgsetid: 0
+      opt: ZBX_LLD_HGSET_OPT_INSERT
+      hgroupids:
+        - 1
+  del_hgsetids: []
+db data:
+  hgset: []
+  host_hgset: []
+---
+test case: Add new host and reuse existing (in db) hgset
+in:
+  hosts:
+    - hostid: 0
+      hgsetid_orig: 0
+      old_groupids: []
+      res_groupids:
+        - 1
+out:
+  hosts:
+    - hostid: 0
+      hgsetid: 1
+      host_hgset_action: add
+  hgsets:
+    - hash_str: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 1
+  del_hgsetids: []
+db data:
+  hgset:
+    - [1, '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b']
+  host_hgset: []
+---
+test case: Reuse existing (in db) and delete old hgset
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+        - 2
+      res_groupids:
+        - 2
+out:
+  hosts:
+    - hostid: 1
+      hgsetid: 2
+      host_hgset_action: update
+  hgsets:
+    - hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_DELETE
+      hgroupids:
+        - 1
+        - 2
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 2
+  del_hgsetids:
+    - 1
+db data:
+  hgset:
+    - [2, 'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35']
+  host_hgset: []
+---
+test case: Reuse existing (in vector) and add new hgset
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+        - 2
+      res_groupids:
+        - 1
+        - 2
+        - 3
+    - hostid: 2
+      hgsetid_orig: 2
+      old_groupids:
+        - 2
+      res_groupids:
+        - 1
+        - 2
+out:
+  hosts:
+    - hostid: 1
+      hgsetid: 0
+      hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      host_hgset_action: update
+    - hostid: 2
+      hgsetid: 1
+      host_hgset_action: update
+  hgsets:
+    - hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 1
+        - 2
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
+      opt: ZBX_LLD_HGSET_OPT_DELETE
+      hgroupids:
+        - 2
+    - hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      hgsetid: 0
+      opt: ZBX_LLD_HGSET_OPT_INSERT
+      hgroupids:
+        - 1
+        - 2
+        - 3
+  del_hgsetids:
+    - 2
+db data:
+  hgset: []
+  host_hgset: []
+---
+test case: Keep hgset which is used by some other hosts
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+        - 2
+      res_groupids:
+        - 1
+        - 2
+        - 3
+    - hostid: 2
+      hgsetid_orig: 2
+      old_groupids:
+        - 2
+      res_groupids:
+        - 1
+        - 2
+out:
+  hosts:
+    - hostid: 1
+      hgsetid: 0
+      hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      host_hgset_action: update
+    - hostid: 2
+      hgsetid: 1
+      host_hgset_action: update
+  hgsets:
+    - hash_str: 22074227d8462b39403011e0bc4c5e7a3f1ee1bae54ae2deb0943dece537f93f
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 1
+        - 2
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
+      opt: ZBX_LLD_HGSET_OPT_DELETE
+      hgroupids:
+        - 2
+    - hash_str: 7ee74ca6db4b367eec57934b47ce1e5b6df3bec871194875b45bb7de23168c0b
+      hgsetid: 0
+      opt: ZBX_LLD_HGSET_OPT_INSERT
+      hgroupids:
+        - 1
+        - 2
+        - 3
+  del_hgsetids: []
+db data:
+  hgset: []
+  host_hgset:
+    - [2]
+---
+test case: Swap host's hgsets
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 1
+      old_groupids:
+        - 1
+      res_groupids:
+        - 2
+    - hostid: 2
+      hgsetid_orig: 2
+      old_groupids:
+        - 2
+      res_groupids:
+        - 1
+out:
+  hosts:
+    - hostid: 1
+      hgsetid: 2
+      hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      host_hgset_action: update
+    - hostid: 2
+      hgsetid: 1
+      hash_str: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      host_hgset_action: update
+  hgsets:
+    - hash_str: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      hgsetid: 1
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 1
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 2
+      opt: ZBX_LLD_HGSET_OPT_REUSE
+      hgroupids:
+        - 2
+  del_hgsetids: []
+db data:
+  hgset: []
+  host_hgset: []
+---
+test case: Add new host without groups
+in:
+  hosts:
+    - hostid: 0
+      hgsetid_orig: 0
+      old_groupids: []
+      res_groupids: []
+out:
+  hosts:
+    - hostid: 0
+      host_hgset_action: idle
+  hgsets: []
+  del_hgsetids: []
+db data:
+  hgset: []
+  host_hgset: []
+---
+test case: Update host without groups
+in:
+  hosts:
+    - hostid: 1
+      hgsetid_orig: 0
+      old_groupids: []
+      res_groupids:
+        - 2
+out:
+  hosts:
+    - hostid: 1
+      hgsetid: 0
+      hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      host_hgset_action: add
+  hgsets:
+    - hash_str: d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+      hgsetid: 0
+      opt: ZBX_LLD_HGSET_OPT_INSERT
+      hgroupids:
+        - 2
+  del_hgsetids: []
+db data:
+  hgset: []
+  host_hgset: []
+...

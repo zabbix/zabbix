@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -370,17 +370,19 @@ function PopUp(action, parameters, {
 						buttons.push({
 							'title': t('Ok'),
 							'cancel': true,
-							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+							'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
 						});
 						break;
 
 					default:
-						buttons.push({
-							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel',
-							'cancel': true,
-							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-						});
+						if (!buttons.some(button => button.cancel)) {
+							buttons.push({
+								'title': t('Cancel'),
+								'class': 'btn-alt js-cancel',
+								'cancel': true,
+								'action': (resp.cancel_action !== undefined) ? resp.cancel_action : () => {}
+							});
+						}
 				}
 
 				overlay.setProperties({
@@ -394,17 +396,27 @@ function PopUp(action, parameters, {
 					data: resp.data || null
 				});
 
-				for (const grid of overlay.$dialogue.$body[0].querySelectorAll('form .form-grid')) {
-					new ResizeObserver(() => {
-						for (const label of grid.querySelectorAll(':scope > label')) {
-							const rect = label.getBoundingClientRect();
+				const resizeHandler = (grid) => {
+					for (const label of grid.querySelectorAll(':scope > label')) {
+						const rect = label.getBoundingClientRect()
 
-							if (rect.width > 0) {
-								grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
-								break;
-							}
+						if (rect.width > 0) {
+							// Use of setTimeout() to prevent ResizeObserver observation error in Safari.
+							setTimeout(() => {
+								grid.style.setProperty('--label-width', `${Math.ceil(rect.width)}px`);
+							});
+							break;
 						}
-					}).observe(grid);
+					}
+				}
+
+				for (const grid of overlay.$dialogue.$body[0].querySelectorAll(`form .${ZBX_STYLE_FORM_GRID}`)) {
+					new ResizeObserver(() => resizeHandler(grid)).observe(grid);
+
+					const labels = grid.querySelectorAll(`:scope > label, :scope > .${ZBX_STYLE_COLLAPSIBLE} > label`);
+					for (const label of labels) {
+						new MutationObserver(() => resizeHandler(grid)).observe(label, {childList: true});
+					}
 				}
 			}
 

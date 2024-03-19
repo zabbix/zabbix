@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,13 @@
 **/
 
 #include "pb_discovery.h"
-#include "zbxproxybuffer.h"
-#include "zbxcommon.h"
-#include "zbxdbhigh.h"
 #include "zbxcachehistory.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
 
 static zbx_history_table_t	dht = {
 	"proxy_dhistory", "dhistory_lastid",
@@ -609,7 +612,7 @@ int	zbx_pb_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
 {
 	int	state, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, *lastid);
 
 	pb_lock();
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -939,17 +939,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees alerter                                                     *
- *                                                                            *
- ******************************************************************************/
-static void	am_alerter_free(zbx_am_alerter_t *alerter)
-{
-	zbx_ipc_client_close(alerter->client);
-	zbx_free(alerter);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: registers alerter                                                 *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
@@ -1170,44 +1159,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: destroys alert manager                                            *
- *                                                                            *
- * Parameters: manager - [IN]                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	am_destroy(zbx_am_t *manager)
-{
-	zbx_am_alert_t		*alert;
-	zbx_hashset_iter_t	iter;
-	zbx_am_media_t		*media;
-
-	zbx_es_destroy(&manager->es);
-
-	zbx_hashset_destroy(&manager->alerters_client);
-	zbx_queue_ptr_destroy(&manager->free_alerters);
-	zbx_vector_am_alerter_ptr_clear_ext(&manager->alerters, am_alerter_free);
-	zbx_vector_am_alerter_ptr_destroy(&manager->alerters);
-
-	while (NULL != (alert = am_pop_alert(manager)))
-		am_remove_alert(manager, alert);
-
-	zbx_binary_heap_destroy(&manager->queue);
-
-	zbx_hashset_iter_reset(&manager->watchdog, &iter);
-	while (NULL != (media = (zbx_am_media_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_free(media->sendto);
-		zbx_hashset_iter_remove(&iter);
-	}
-	zbx_hashset_destroy(&manager->watchdog);
-
-	zbx_hashset_destroy(&manager->results);
-	zbx_hashset_destroy(&manager->alertpools);
-	zbx_hashset_destroy(&manager->mediatypes);
 }
 
 /******************************************************************************
@@ -2389,7 +2340,11 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
-			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager), scripts_path))
+			zbx_am_alert_t	*alert;
+			if (NULL == (alert = am_pop_alert(&manager)))
+				break;
+
+			if (FAIL == am_process_alert(&manager, alerter, alert, scripts_path))
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 
@@ -2474,9 +2429,6 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&manager.ipc);
-	am_destroy(&manager);
 #undef ZBX_DB_PING_FREQUENCY
 #undef ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY
 }

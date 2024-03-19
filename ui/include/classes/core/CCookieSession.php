@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,11 @@ class CCookieSession implements SessionHandlerInterface {
 	 * Cookie name.
 	 */
 	public const COOKIE_NAME = ZBX_SESSION_NAME;
+
+	/**
+	 * Cookie lifetime.
+	 */
+	public $lifetime = 0;
 
 	/**
 	 * Class constructor. Set session handlers and start session.
@@ -123,9 +128,7 @@ class CCookieSession implements SessionHandlerInterface {
 		session_decode($data);
 		$data = $this->prepareData(CSessionHelper::getAll());
 
-		return CCookieHelper::set(self::COOKIE_NAME, $data,
-			$this->isAutologinEnabled() ? time() + SEC_PER_MONTH : 0
-		);
+		return CCookieHelper::set(self::COOKIE_NAME, $data, $this->lifetime);
 	}
 
 	/**
@@ -188,9 +191,5 @@ class CCookieSession implements SessionHandlerInterface {
 		}
 
 		return '';
-	}
-
-	protected function isAutologinEnabled(): bool {
-		return (CWebUser::$data['autologin'] === '1');
 	}
 }

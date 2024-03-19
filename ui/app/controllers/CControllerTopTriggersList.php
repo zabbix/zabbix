@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,16 +20,6 @@
 
 
 class CControllerTopTriggersList extends CController {
-
-	/**
-	 * @var string  Time from.
-	 */
-	private $from;
-
-	/**
-	 * @var string  Time till.
-	 */
-	private $to;
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -63,11 +53,6 @@ class CControllerTopTriggersList extends CController {
 	}
 
 	protected function doAction(): void {
-		$this->from = $this->getInput('from', CProfile::get('web.toptriggers.filter.from',
-			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-		));
-		$this->to = $this->getInput('to', CProfile::get('web.toptriggers.filter.to', 'now'));
-
 		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.toptriggers.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
@@ -82,8 +67,6 @@ class CControllerTopTriggersList extends CController {
 			CProfile::update('web.toptriggers.filter.evaltype',
 				$this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT
 			);
-			CProfile::update('web.toptriggers.filter.from', $this->from, PROFILE_TYPE_STR);
-			CProfile::update('web.toptriggers.filter.to', $this->to, PROFILE_TYPE_STR);
 
 			$filter_tags = ['tags' => [], 'operators' => [], 'values' => []];
 
@@ -112,6 +95,16 @@ class CControllerTopTriggersList extends CController {
 			CProfile::deleteIdx('web.toptriggers.filter.tags.value');
 		}
 
+		$timeselector_options = [
+			'profileIdx' => 'web.toptriggers.filter',
+			'profileIdx2' => 0,
+			'from' => null,
+			'to' => null
+		];
+
+		$this->getInputs($timeselector_options, ['from', 'to']);
+		updateTimeSelectorPeriod($timeselector_options);
+
 		$filter = [
 			'groups' => [],
 			'hosts' => [],
@@ -119,12 +112,7 @@ class CControllerTopTriggersList extends CController {
 			'severities' => CProfile::getArray('web.toptriggers.filter.severities', []),
 			'evaltype' => CProfile::get('web.toptriggers.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 			'tags' => [],
-			'timeline' => getTimeSelectorPeriod([
-				'profileIdx' => 'web.toptriggers.filter',
-				'profileIdx2' => 0,
-				'from' => $this->from,
-				'to' => $this->to
-			]),
+			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)
 		];
 

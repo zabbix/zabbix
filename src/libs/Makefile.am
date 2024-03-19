@@ -16,11 +16,13 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
+	zbxcurl \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
 	zbxdbhigh \
+	zbxdiscoverer \
 	zbxdbwrap \
 	zbxdbsyncer \
 	zbxdbschema \
@@ -38,6 +40,7 @@ DIST_SUBDIRS = \
 	zbxhash \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxipcservice \
@@ -52,7 +55,9 @@ DIST_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxpoller \
+	zbxagentget \
 	zbxpreproc \
 	zbxprometheus \
 	zbxproxybuffer \
@@ -73,10 +78,12 @@ DIST_SUBDIRS = \
 	zbxthreads \
 	zbxtime \
 	zbxtimekeeper \
+	zbxtrapper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxprof \
 	zbxxml
 
@@ -90,6 +97,8 @@ SERVER_SUBDIRS = \
 	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -106,6 +115,7 @@ SERVER_SUBDIRS = \
 	zbxexpr \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxkvs \
@@ -113,6 +123,7 @@ SERVER_SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
@@ -132,9 +143,11 @@ SERVER_SUBDIRS = \
 	zbxtime \
 	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
 if HAVE_IPMI
 SERVER_SUBDIRS += zbxipmi
@@ -148,6 +161,8 @@ PROXY_SUBDIRS = \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -163,12 +178,14 @@ PROXY_SUBDIRS = \
 	zbxexport \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
 	zbxip \
 	zbxkvs \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
 	zbxprometheus \
@@ -187,9 +204,11 @@ PROXY_SUBDIRS = \
 	zbxtime \
 	zbxtimekeeper \
 	zbxtrends \
+	zbxtrapper \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
 if HAVE_IPMI
 PROXY_SUBDIRS += zbxipmi
@@ -208,6 +227,7 @@ SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
+	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxexec \
@@ -216,6 +236,7 @@ SUBDIRS = \
 	zbxgetopt \
 	zbxhash \
 	zbxhttp \
+	zbxhttppoller \
 	zbxip \
 	zbxipcservice \
 	zbxjson \
@@ -227,6 +248,7 @@ SUBDIRS = \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
+	zbxpinger \
 	zbxregexp \
 	zbxscripts \
 	zbxsysinfo \
@@ -234,8 +256,11 @@ SUBDIRS = \
 	zbxthreads \
 	zbxtime \
 	zbxvariant \
+	zbxtrapper \
 	zbxversion \
+	zbxvmware \
 	zbxxml \
+	zbxagentget \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $html_page = new CHtmlPage();
@@ -372,6 +373,7 @@ else {
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
+	->addClass('list-numbered')
 	->setColumns([
 		(new CTableColumn())->addClass('table-col-handle'),
 		(new CTableColumn())->addClass('table-col-no'),
