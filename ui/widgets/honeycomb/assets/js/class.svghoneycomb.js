@@ -815,7 +815,7 @@ class CSVGHoneycomb {
 			let p_height = primary !== null ? primary.font_size * primary.lines_count : 0;
 			let s_height = secondary !== null ? secondary.font_size * secondary.lines_count : 0;
 
-			while ((primary?.lines_count ?? 0) > 1 && (secondary?.lines_count ?? 0) > 1) {
+			while ((primary?.lines_count ?? 0) > 1 || (secondary?.lines_count ?? 0) > 1) {
 				if (p_height + s_height <= container_height) {
 					break;
 				}
