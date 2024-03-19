@@ -1550,27 +1550,6 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
-{
-	char	*value_esc;
-	int	i;
-
-	for (i = 0; i < inventory_values->values_num; i++)
-	{
-		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
-
-		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-				inventory_value->field_name, value_esc, inventory_value->hostid);
-
-		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, sql_offset);
-
-		zbx_free(value_esc);
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: export all trends                                                 *
@@ -1673,6 +1652,27 @@ static void	DCsync_trends(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
+{
+	char	*value_esc;
+	int	i;
+
+	for (i = 0; i < inventory_values->values_num; i++)
+	{
+		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+
+		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
+				inventory_value->field_name, value_esc, inventory_value->hostid);
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+
+		zbx_free(value_esc);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees resources allocated to store str/text/log/bin value         *
@@ -1727,6 +1727,54 @@ void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 		zbx_dc_history_clean_value(&history[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update item data and inventory in database                        *
+ *                                                                            *
+ * Parameters: item_diff        - item changes                                *
+ *             inventory_values - inventory values                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
+{
+	size_t	sql_offset = 0;
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (i = 0; i < item_diff->values_num; i++)
+	{
+		zbx_item_diff_t	*diff;
+
+		diff = (zbx_item_diff_t *)item_diff->values[i];
+		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
+			break;
+	}
+
+	if (i != item_diff->values_num || 0 != inventory_values->values_num)
+	{
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (i != item_diff->values_num)
+		{
+			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
+					ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
+		}
+
+		if (0 != inventory_values->values_num)
+			DCadd_update_inventory_sql(&sql_offset, inventory_values);
+
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			zbx_db_execute("%s", sql);
+
+		zbx_dc_config_update_inventory_values(inventory_values);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3457,50 +3505,3 @@ int	zbx_dbcache_getproxyqueue_state(void)
 }
 
 
-/******************************************************************************
- *                                                                            *
- * Purpose: update item data and inventory in database                        *
- *                                                                            *
- * Parameters: item_diff        - item changes                                *
- *             inventory_values - inventory values                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
-{
-	size_t	sql_offset = 0;
-	int	i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	for (i = 0; i < item_diff->values_num; i++)
-	{
-		zbx_item_diff_t	*diff;
-
-		diff = (zbx_item_diff_t *)item_diff->values[i];
-		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
-			break;
-	}
-
-	if (i != item_diff->values_num || 0 != inventory_values->values_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (i != item_diff->values_num)
-		{
-			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
-					ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		}
-
-		if (0 != inventory_values->values_num)
-			DCadd_update_inventory_sql(&sql_offset, inventory_values);
-
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-
-		zbx_dc_config_update_inventory_values(inventory_values);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
