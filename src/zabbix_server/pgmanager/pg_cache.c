@@ -211,6 +211,10 @@ void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uin
 		host->proxyid = proxyid;
 }
 
+
+#define PG_REMOVE_DELETED_PROXY		0
+#define PG_REMOVE_REASSIGNED_PROXY	1
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove proxy from group                                           *
@@ -220,26 +224,24 @@ void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uin
  *             proxy - [IN] proxy to remove                                   *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy)
+static void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy, int flags)
 {
 	int	i;
 
 	for (i = 0; i < proxy->hosts.values_num; i++)
 	{
-		zbx_vector_uint64_append(&group->unassigned_hostids, proxy->hosts.values[i]->hostid);
-		pg_cache_set_host_proxy(cache, proxy->hosts.values[i]->hostid, 0);
+
+		zbx_vector_uint64_append(&proxy->group->unassigned_hostids, proxy->hosts.values[i]->hostid);
+		if (PG_REMOVE_REASSIGNED_PROXY == flags)
+			pg_cache_set_host_proxy(cache, proxy->hosts.values[i]->hostid, 0);
+		else
+			zbx_hashset_remove(&cache->hostmap, &proxy->hosts.values[i]->hostid);
 	}
 
-	if (NULL != proxy->group)
-	{
-		if (FAIL != (i = zbx_vector_pg_proxy_ptr_search(&proxy->group->proxies, proxy,
-				ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-		{
-			zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
-		}
-	}
+	if (FAIL != (i = zbx_vector_pg_proxy_ptr_search(&proxy->group->proxies, proxy, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+		zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
 
-	pg_cache_queue_group_update(cache, group);
+	pg_cache_queue_group_update(cache, proxy->group);
 }
 
 void	pg_cache_proxy_free(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy)
@@ -980,7 +982,7 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 		if (proxy->revision == cache->proxy_revision)
 			continue;
 
-		pg_cache_group_remove_proxy(cache, proxy->group, proxy);
+		pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
 		pg_proxy_clear(proxy);
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -1001,7 +1003,7 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 		if (reloc->srcid != reloc->dstid)
 		{
 			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->srcid)))
-				pg_cache_group_remove_proxy(cache, group, proxy);
+				pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_REASSIGNED_PROXY);
 		}
 
 		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->dstid)))
