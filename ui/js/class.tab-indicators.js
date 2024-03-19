@@ -216,6 +216,8 @@ class TabIndicatorFactory {
 				return new MediatypeOptionsTabIndicatorItem;
 			case 'MessageTemplate':
 				return new MessageTemplateTabIndicatorItem;
+			case 'Mfa':
+				return new MfaTabIndicatorItem;
 			case 'Http':
 				return new HttpTabIndicatorItem;
 			case 'Inventory':
@@ -606,6 +608,33 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
+class MfaTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('#mfa_status');
+
+		if (element !== null) {
+			return element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#mfa_status');
+
+		if (target_node !== null) {
+			target_node.addEventListener('click', () => {
+				this.addAttributes();
+			});
+		}
+	}
+}
+
 class InventoryTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
@@ -726,7 +755,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#preprocessing .preprocessing-list-item:not(.ui-sortable-placeholder)')
+			.querySelectorAll('#preprocessing .preprocessing-list-item')
 			.length;
 	}
 
@@ -1754,6 +1783,12 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend = document.getElementById('legend');
 
 		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_value = document.getElementById('legend_value');
+
+		if (legend_value !== null && legend_value.checked) {
 			return true;
 		}
 

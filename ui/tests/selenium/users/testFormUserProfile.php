@@ -465,7 +465,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	public function testFormUserProfile_MessagesTimeout($data) {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
-		$this->zbxTestTabSwitch('Messaging');
+		$this->zbxTestTabSwitch('Frontend notifications');
 
 		if (array_key_exists('messages_disabled', $data)) {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");

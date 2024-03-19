@@ -43,13 +43,13 @@ zbx_dservice_t;
 
 void	zbx_discoverer_init(void);
 
-void	*zbx_discovery_open(void);
-void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+typedef	void*(*zbx_discovery_open_func_t)(void);
+typedef	void(*zbx_discovery_close_func_t)(void *handle);
+typedef void(*zbx_discovery_update_host_func_t)(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
 		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb);
-void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+typedef	void(*zbx_discovery_update_service_func_t)(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
 		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb);
-void	zbx_discovery_close(void *handle);
 
 void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck);
 void	zbx_discovery_drule_free(zbx_dc_drule_t *drule);
@@ -58,4 +58,5 @@ int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error);
 zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 void	zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg);
 void	zbx_discovery_get_worker_info(zbx_process_info_t *info);
+
 #endif

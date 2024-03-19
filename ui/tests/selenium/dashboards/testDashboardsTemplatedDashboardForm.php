@@ -3487,8 +3487,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #51 Item value widget with minimal set of parameters.
@@ -4341,7 +4342,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			'class:clock',
 			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
-			'xpath://footer'
+			'xpath://footer',
+			// Cover Geomap widget, because it's screenshots are not stable.
+			'xpath://div[contains(@class, "leaflet-container")]'
 		];
 		$skip_elements = [];
 
@@ -4457,6 +4460,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$this->assertEquals($filled_data, $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 				$form->checkValue($reference_data);
 			}
+
+			// Count of days mentioned in error depends ot presence of leap year february in selected period.
+			if (CTestArrayHelper::get($data, 'days_count')) {
+				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
+			}
+
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			$this->closeDialogue();
 		}

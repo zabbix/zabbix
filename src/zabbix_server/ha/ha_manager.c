@@ -19,6 +19,9 @@
 
 #include "ha.h"
 
+#include "../rtc/rtc_server.h"
+
+#include "zbx_ha_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
@@ -31,7 +34,6 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
-#include "../rtc/rtc_server.h"
 #include "zbxstr.h"
 #include "zbxrtc.h"
 #include "zbxjson.h"

@@ -22,6 +22,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxdiscovery.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1
@@ -71,8 +72,9 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
-		char **error);
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb, int *more, char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,

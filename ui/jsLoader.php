@@ -71,6 +71,7 @@ $available_js = [
 	'leaflet.js' => 'vendors/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet.markercluster/',
 	'd3.js' => 'vendors/D3/',
+	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
@@ -466,6 +467,7 @@ if (empty($_GET['files'])) {
 		'class.script.js',
 		'class.scrollable.js',
 		'class.sidebar.js',
+		'class.sortable.js',
 		'class.template.js',
 		'chkbxrange.js',
 		'functions.js',

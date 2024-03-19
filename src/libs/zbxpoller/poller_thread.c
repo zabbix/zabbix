@@ -78,10 +78,11 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 	zbx_free(result);
 }
 
-static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
+static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent_result_ptr_t *add_results,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
+		const char *config_ssh_key_location)
 {
 	int	res = FAIL, version = item->interface.version;
 
@@ -115,14 +116,15 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			res = zbx_ssh_get_value(item, config_comms->config_source_ip, result);
+			res = zbx_ssh_get_value(item, config_comms->config_source_ip, config_ssh_key_location, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			res = zbx_telnet_get_value(item, config_comms->config_source_ip, result);
+			res = zbx_telnet_get_value(item, config_comms->config_source_ip, config_ssh_key_location,
+					result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
@@ -544,10 +546,11 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 /* Actually this could be called by trapper, without poller being initialized, */
 /* so cannot call poller_get_progname(), need progname to be passed directly. */
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
-		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, unsigned char program_type, const char *progname,
-		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
+		zbx_vector_agent_result_ptr_t *add_results, unsigned char poller_type,
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -580,7 +583,8 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		{
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
 					config_startup_time, program_type, get_config_forks, config_java_gateway,
-					config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb);
+					config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
+					config_ssh_key_location);
 		}
 	}
 	else
@@ -639,6 +643,8 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 	}
 }
 
+ZBX_PTR_VECTOR_IMPL(agent_result_ptr, AGENT_RESULT*)
+
 /***********************************************************************************
  *                                                                                 *
  * Purpose: retrieves values of metrics from monitored hosts                       *
@@ -657,6 +663,8 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  *             config_java_gateway        - [IN]                                   *
  *             config_java_gateway_port   - [IN]                                   *
  *             config_externalscripts     - [IN]                                   *
+ *             get_value_internal_ext_cb  - [IN]                                   *
+ *             config_ssh_key_location    - [IN]                                   *
  *                                                                                 *
  * Return value: number of items processed                                         *
  *                                                                                 *
@@ -668,16 +676,17 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
 		int config_unreachable_delay, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
+		const char *config_ssh_key_location)
 {
-	zbx_dc_item_t		item, *items;
-	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
-	int			errcodes[ZBX_MAX_POLLER_ITEMS];
-	zbx_timespec_t		timespec;
-	int			num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
-	zbx_vector_ptr_t	add_results;
-	unsigned char		*data = NULL;
-	size_t			data_alloc = 0, data_offset = 0;
+	zbx_dc_item_t			item, *items;
+	AGENT_RESULT			results[ZBX_MAX_POLLER_ITEMS];
+	int				errcodes[ZBX_MAX_POLLER_ITEMS];
+	zbx_timespec_t			timespec;
+	int				num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
+	zbx_vector_agent_result_ptr_t	add_results;
+	unsigned char			*data = NULL;
+	size_t				data_alloc = 0, data_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -690,12 +699,12 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		goto exit;
 	}
 
-	zbx_vector_ptr_create(&add_results);
+	zbx_vector_agent_result_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
 			program_type, progname, get_config_forks, config_java_gateway, config_java_gateway_port,
-			config_externalscripts, get_value_internal_ext_cb);
+			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location);
 
 	zbx_timespec(&timespec);
 
@@ -795,8 +804,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	zbx_dc_config_clean_items(items, NULL, (size_t)num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
-	zbx_vector_ptr_destroy(&add_results);
+	zbx_vector_agent_result_ptr_clear_ext(&add_results, zbx_free_agent_result_ptr);
+	zbx_vector_agent_result_ptr_destroy(&add_results);
 
 	if (NULL != data)
 	{
@@ -812,7 +821,7 @@ exit:
 	return num;
 }
 
-ZBX_THREAD_ENTRY(poller_thread, args)
+ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
@@ -882,7 +891,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					poller_args_in->zbx_get_progname_cb_arg(), poller_args_in->get_config_forks,
 					poller_args_in->config_java_gateway, poller_args_in->config_java_gateway_port,
 					poller_args_in->config_externalscripts,
-					poller_args_in->zbx_get_value_internal_ext_cb);
+					poller_args_in->zbx_get_value_internal_ext_cb,
+					poller_args_in->config_ssh_key_location);
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}
