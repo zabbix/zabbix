@@ -365,7 +365,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VNIC [{#NAME}]: VNIC is not attached|<p>Virtual network interface card attachment status.</p>|`min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.attachment[{#ID}],5m) >= 2`|High||
+|VNIC [{#NAME}]: VNIC is not attached|<p>Virtual network interface card attachment status.</p>|`min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.attachment[{#ID}],5m) >= 3`|High||
 |VNIC [{#NAME}]: Current conntrack table utilization is too high|<p>Current conntrack table utilization has exceeded `{$OCI.COMPUTE.VNIC.CONNTRACK.UTIL.HIGH}`% of the max available value.</p>|`min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.net.conntrack.util[{#ID}],5m) >= {$OCI.COMPUTE.VNIC.CONNTRACK.UTIL.HIGH}`|High||
 |VNIC [{#NAME}]: Current conntrack table utilization is high|<p>Current conntrack table utilization has exceeded `{$OCI.COMPUTE.VNIC.CONNTRACK.UTIL.WARN}`% of the max available value.</p>|`min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.net.conntrack.util[{#ID}],5m) >= {$OCI.COMPUTE.VNIC.CONNTRACK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>VNIC [{#NAME}]: Current conntrack table utilization is too high</li></ul>|
 |VNIC [{#NAME}]: Conntrack table full|<p>Virtual network interface card connection tracking table is full.</p>|`min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.net.conntrack.full[{#ID}],5m) = 1`|High||
@@ -544,10 +544,10 @@ The LLD filter values and trigger threshold values can be changed with the respe
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OCI Autonomous DB: Restore has failed|<p>Autonomous database restore has failed.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 8`|Warning||
-|OCI Autonomous DB: Database is not available or accessible|<p>Autonomous database is not available or accessible.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 18 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19`|High||
-|OCI Autonomous DB: Available, needs attention|<p>Autonomous database is available, but needs attention.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 11`|Warning||
-|OCI Autonomous DB: State unknown|<p>Autonomous database state is unknown.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 30`|Warning||
+|OCI Autonomous DB: Restore has failed|<p>Autonomous database restore has failed.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 9`|Warning||
+|OCI Autonomous DB: Database is not available or accessible|<p>Autonomous database is not available or accessible.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20`|High||
+|OCI Autonomous DB: Available, needs attention|<p>Autonomous database is available, but needs attention.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 12`|Warning||
+|OCI Autonomous DB: State unknown|<p>Autonomous database state is unknown.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 0`|Warning||
 |OCI Autonomous DB: State has changed|<p>Autonomous database state has changed.</p>|`last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state,#1)<>last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state,#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>OCI Autonomous DB: Restore has failed</li><li>OCI Autonomous DB: Database is not available or accessible</li><li>OCI Autonomous DB: Available, needs attention</li><li>OCI Autonomous DB: State unknown</li></ul>|
 |OCI Autonomous DB: Current CPU utilization is too high|<p>Current CPU utilization has exceeded `{$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}`% of the max available value.</p>|`min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.cpu.util,5m) >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}`|High||
 |OCI Autonomous DB: Current CPU utilization is high|<p>Current CPU utilization has exceeded `{$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}`% of the max available value.</p>|`min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.cpu.util,5m) >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>OCI Autonomous DB: Current CPU utilization is too high</li></ul>|
@@ -623,8 +623,8 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OCI Block Volume: Block volume terminated or faulty|<p>Block volume state is "terminated"/"terminating" or "faulty".</p>|`min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 3`|High||
-|OCI Block Volume: Block volume state unknown|<p>Block volume state is unknown.</p>|`min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) = 10`|Warning|**Depends on**:<br><ul><li>OCI Block Volume: Block volume terminated or faulty</li></ul>|
+|OCI Block Volume: Block volume terminated or faulty|<p>Block volume state is "terminated"/"terminating" or "faulty".</p>|`min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 4`|High||
+|OCI Block Volume: Block volume state unknown|<p>Block volume state is unknown.</p>|`min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) = 0`|Warning|**Depends on**:<br><ul><li>OCI Block Volume: Block volume terminated or faulty</li></ul>|
 
 # Oracle Cloud Boot Volume by HTTP
 
@@ -694,8 +694,8 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OCI Boot Volume: Boot volume terminated or faulty|<p>Boot volume state is "terminated"/"terminating" or "faulty".</p>|`min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 3`|High||
-|OCI Boot Volume: Boot volume state unknown|<p>Boot volume state is unknown.</p>|`min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) = 10`|Warning|**Depends on**:<br><ul><li>OCI Boot Volume: Boot volume terminated or faulty</li></ul>|
+|OCI Boot Volume: Boot volume terminated or faulty|<p>Boot volume state is "terminated"/"terminating" or "faulty".</p>|`min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 4`|High||
+|OCI Boot Volume: Boot volume state unknown|<p>Boot volume state is unknown.</p>|`min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) = 0`|Warning|**Depends on**:<br><ul><li>OCI Boot Volume: Boot volume terminated or faulty</li></ul>|
 
 # Oracle Cloud Networking by HTTP
 
@@ -760,8 +760,8 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OCI VCN: VCN state terminated|<p>Virtual cloud network state is "terminated" or "terminating".</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 2 or min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 3`|High||
-|OCI VCN: VCN state unknown|<p>Virtual cloud network state is unknown.</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 10`|Warning||
+|OCI VCN: VCN state terminated|<p>Virtual cloud network state is "terminated" or "terminating".</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 3 or min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 4`|High||
+|OCI VCN: VCN state unknown|<p>Virtual cloud network state is unknown.</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 0`|Warning||
 
 ### LLD rule Subnet discovery
 
@@ -779,8 +779,8 @@ LLD filter values and trigger threshold values can be changed with respective us
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Subnet [{#NAME}]: Subnet state terminated|<p>Virtual cloud network subnet state is "terminated" or "terminating".</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 2 or min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 3`|High||
-|Subnet [{#NAME}]: Subnet state unknown|<p>Virtual cloud network subnet state is unknown.</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 10`|Warning||
+|Subnet [{#NAME}]: Subnet state terminated|<p>Virtual cloud network subnet state is "terminated" or "terminating".</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 3 or min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 4`|High||
+|Subnet [{#NAME}]: Subnet state unknown|<p>Virtual cloud network subnet state is unknown.</p>|`min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 0`|Warning||
 
 ## Feedback
 

@@ -63,7 +63,7 @@ zabbix_export:
               description: 'Autonomous database is not available.'
               dependencies:
                 - name: 'OCI Autonomous DB: Database is not available or accessible'
-                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 18 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19'
+                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20'
               tags:
                 - tag: scope
                   value: availability
@@ -1436,30 +1436,31 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [
-                  	'PROVISIONING',
-                  	'AVAILABLE',
-                  	'STOPPING',
-                  	'STOPPED',
-                  	'STARTING',
-                  	'TERMINATING',
-                  	'TERMINATED',
-                  	'RESTORE_IN_PROGRESS',
-                  	'RESTORE_FAILED',
-                  	'BACKUP_IN_PROGRESS',
-                  	'SCALE_IN_PROGRESS',
-                  	'AVAILABLE_NEEDS_ATTENTION',
-                  	'UPDATING',
-                  	'MAINTENANCE_IN_PROGRESS',
-                  	'RESTARTING',
-                  	'RECREATING',
-                  	'ROLE_CHANGE_IN_PROGRESS',
-                  	'UPGRADING',
-                  	'UNAVAILABLE',
-                  	'INACCESSIBLE',
-                  	'STANDBY'
-                  ].indexOf(value);
-                  return idx !== -1 ? idx : 30;
+                  const idx = {
+                  	'PROVISIONING': 1,
+                  	'AVAILABLE': 2,
+                  	'STOPPING': 3,
+                  	'STOPPED': 4,
+                  	'STARTING': 5,
+                  	'TERMINATING': 6,
+                  	'TERMINATED': 7,
+                  	'RESTORE_IN_PROGRESS': 8,
+                  	'RESTORE_FAILED': 9,
+                  	'BACKUP_IN_PROGRESS': 10,
+                  	'SCALE_IN_PROGRESS': 11,
+                  	'AVAILABLE_NEEDS_ATTENTION': 12,
+                  	'UPDATING': 13,
+                  	'MAINTENANCE_IN_PROGRESS': 14,
+                  	'RESTARTING': 15,
+                  	'RECREATING': 16,
+                  	'ROLE_CHANGE_IN_PROGRESS': 17,
+                  	'UPGRADING': 18,
+                  	'UNAVAILABLE': 19,
+                  	'INACCESSIBLE': 20,
+                  	'STANDBY': 21
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1486,7 +1487,7 @@ zabbix_export:
               value: environment
           triggers:
             - uuid: bb790262359f4e35af895b1a69ad511c
-              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 11'
+              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 12'
               name: 'OCI Autonomous DB: Available, needs attention'
               priority: WARNING
               description: 'Autonomous database is available, but needs attention.'
@@ -1494,7 +1495,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 18594a88549843c498d0e037f51afc59
-              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 18 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19'
+              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20'
               name: 'OCI Autonomous DB: Database is not available or accessible'
               priority: HIGH
               description: 'Autonomous database is not available or accessible.'
@@ -1502,7 +1503,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 4ee1a96f29ef461c8830667e19637911
-              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 8'
+              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 9'
               name: 'OCI Autonomous DB: Restore has failed'
               priority: WARNING
               description: 'Autonomous database restore has failed.'
@@ -1519,18 +1520,18 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'OCI Autonomous DB: Available, needs attention'
-                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 11'
+                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 12'
                 - name: 'OCI Autonomous DB: Database is not available or accessible'
-                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 18 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19'
+                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20'
                 - name: 'OCI Autonomous DB: Restore has failed'
-                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 8'
+                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 9'
                 - name: 'OCI Autonomous DB: State unknown'
-                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 30'
+                  expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 0'
               tags:
                 - tag: scope
                   value: notice
             - uuid: 2bc79a5a19a544d39c6de861b94564af
-              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 30'
+              expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 0'
               name: 'OCI Autonomous DB: State unknown'
               priority: WARNING
               description: 'Autonomous database state is unknown.'
@@ -4211,49 +4212,49 @@ zabbix_export:
           name: 'Autonomous database state'
           mappings:
             - value: '0'
-              newvalue: Provisioning
-            - value: '1'
-              newvalue: Available
-            - value: '2'
-              newvalue: Stopping
-            - value: '3'
-              newvalue: Stopped
-            - value: '4'
-              newvalue: Starting
-            - value: '5'
-              newvalue: Terminating
-            - value: '6'
-              newvalue: Terminated
-            - value: '7'
-              newvalue: 'Restore in progress'
-            - value: '8'
-              newvalue: 'Restore failed'
-            - value: '9'
-              newvalue: 'Backup in progress'
-            - value: '10'
-              newvalue: 'Scale in progress'
-            - value: '11'
-              newvalue: 'Available needs attention'
-            - value: '12'
-              newvalue: Updating
-            - value: '13'
-              newvalue: 'Maintenance in progress'
-            - value: '14'
-              newvalue: Restarting
-            - value: '15'
-              newvalue: Recreating
-            - value: '16'
-              newvalue: 'Role change in progress'
-            - value: '17'
-              newvalue: Upgrading
-            - value: '18'
-              newvalue: Unavailable
-            - value: '19'
-              newvalue: Inaccessible
-            - value: '20'
-              newvalue: Standby
-            - value: '30'
               newvalue: Unknown
+            - value: '1'
+              newvalue: Provisioning
+            - value: '2'
+              newvalue: Available
+            - value: '3'
+              newvalue: Stopping
+            - value: '4'
+              newvalue: Stopped
+            - value: '5'
+              newvalue: Starting
+            - value: '6'
+              newvalue: Terminating
+            - value: '7'
+              newvalue: Terminated
+            - value: '8'
+              newvalue: 'Restore in progress'
+            - value: '9'
+              newvalue: 'Restore failed'
+            - value: '10'
+              newvalue: 'Backup in progress'
+            - value: '11'
+              newvalue: 'Scale in progress'
+            - value: '12'
+              newvalue: 'Available needs attention'
+            - value: '13'
+              newvalue: Updating
+            - value: '14'
+              newvalue: 'Maintenance in progress'
+            - value: '15'
+              newvalue: Restarting
+            - value: '16'
+              newvalue: Recreating
+            - value: '17'
+              newvalue: 'Role change in progress'
+            - value: '18'
+              newvalue: Upgrading
+            - value: '19'
+              newvalue: Unavailable
+            - value: '20'
+              newvalue: Inaccessible
+            - value: '21'
+              newvalue: Standby
         - uuid: 3b30e8a71ef342e78f9f29243aafd992
           name: 'Database availability'
           mappings:
@@ -4727,15 +4728,16 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [
-                  	'PROVISIONING',
-                  	'RESTORING',
-                  	'AVAILABLE',
-                  	'TERMINATING',
-                  	'TERMINATED',
-                  	'FAULTY'
-                  ].indexOf(value);
-                  return idx !== -1 ? idx : 10;
+                  const idx = {
+                  	'PROVISIONING': 1,
+                  	'RESTORING': 2,
+                  	'AVAILABLE': 3,
+                  	'TERMINATING': 4,
+                  	'TERMINATED': 5,
+                  	'FAULTY': 6
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -4762,18 +4764,18 @@ zabbix_export:
               value: storage
           triggers:
             - uuid: 4ea859d86e29455aa4bdd2f3667894f6
-              expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) = 10'
+              expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) = 0'
               name: 'OCI Block Volume: Block volume state unknown'
               priority: WARNING
               description: 'Block volume state is unknown.'
               dependencies:
                 - name: 'OCI Block Volume: Block volume terminated or faulty'
-                  expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 3'
+                  expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 4'
               tags:
                 - tag: scope
                   value: availability
             - uuid: b8d9491d762f40c58fb1094fa0468d9e
-              expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 3'
+              expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 4'
               name: 'OCI Block Volume: Block volume terminated or faulty'
               priority: HIGH
               description: 'Block volume state is "terminated"/"terminating" or "faulty".'
@@ -5272,19 +5274,19 @@ zabbix_export:
           name: 'Block volume state'
           mappings:
             - value: '0'
-              newvalue: Provisioning
-            - value: '1'
-              newvalue: Restoring
-            - value: '2'
-              newvalue: Available
-            - value: '3'
-              newvalue: Terminating
-            - value: '4'
-              newvalue: Terminated
-            - value: '5'
-              newvalue: Faulty
-            - value: '10'
               newvalue: Unknown
+            - value: '1'
+              newvalue: Provisioning
+            - value: '2'
+              newvalue: Restoring
+            - value: '3'
+              newvalue: Available
+            - value: '4'
+              newvalue: Terminating
+            - value: '5'
+              newvalue: Terminated
+            - value: '6'
+              newvalue: Faulty
     - uuid: e5486d98ff414c1391de1bd369a7f9db
       template: 'Oracle Cloud Boot Volume by HTTP'
       name: 'Oracle Cloud Boot Volume by HTTP'
@@ -5751,15 +5753,16 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [
-                  	'PROVISIONING',
-                  	'RESTORING',
-                  	'AVAILABLE',
-                  	'TERMINATING',
-                  	'TERMINATED',
-                  	'FAULTY'
-                  ].indexOf(value);
-                  return idx !== -1 ? idx : 10;
+                  const idx = {
+                  	'PROVISIONING': 1,
+                  	'RESTORING': 2,
+                  	'AVAILABLE': 3,
+                  	'TERMINATING': 4,
+                  	'TERMINATED': 5,
+                  	'FAULTY': 6
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -5786,18 +5789,18 @@ zabbix_export:
               value: storage
           triggers:
             - uuid: b31f698c5b164afc85a14acc813f463d
-              expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) = 10'
+              expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) = 0'
               name: 'OCI Boot Volume: Boot volume state unknown'
               priority: WARNING
               description: 'Boot volume state is unknown.'
               dependencies:
                 - name: 'OCI Boot Volume: Boot volume terminated or faulty'
-                  expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 3'
+                  expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 4'
               tags:
                 - tag: scope
                   value: availability
             - uuid: 6525eef6dd6c4cb0a22a6442773c3cfa
-              expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 3'
+              expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 4'
               name: 'OCI Boot Volume: Boot volume terminated or faulty'
               priority: HIGH
               description: 'Boot volume state is "terminated"/"terminating" or "faulty".'
@@ -6297,19 +6300,19 @@ zabbix_export:
           name: 'Boot volume state'
           mappings:
             - value: '0'
-              newvalue: Provisioning
-            - value: '1'
-              newvalue: Restoring
-            - value: '2'
-              newvalue: Available
-            - value: '3'
-              newvalue: Terminating
-            - value: '4'
-              newvalue: Terminated
-            - value: '5'
-              newvalue: Faulty
-            - value: '10'
               newvalue: Unknown
+            - value: '1'
+              newvalue: Provisioning
+            - value: '2'
+              newvalue: Restoring
+            - value: '3'
+              newvalue: Available
+            - value: '4'
+              newvalue: Terminating
+            - value: '5'
+              newvalue: Terminated
+            - value: '6'
+              newvalue: Faulty
     - uuid: 057558a26d934b4683d73a7058499d62
       template: 'Oracle Cloud by HTTP'
       name: 'Oracle Cloud by HTTP'
@@ -8608,18 +8611,19 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [
-                  	'MOVING',
-                  	'PROVISIONING',
-                  	'RUNNING',
-                  	'STARTING',
-                  	'STOPPING',
-                  	'STOPPED',
-                  	'CREATING_IMAGE',
-                  	'TERMINATING',
-                  	'TERMINATED'
-                  ].indexOf(value);
-                  return idx !== -1 ? idx : 20;
+                  const idx = {
+                  	'MOVING': 1,
+                  	'PROVISIONING': 2,
+                  	'RUNNING': 3,
+                  	'STARTING': 4,
+                  	'STOPPING': 5,
+                  	'STOPPED': 6,
+                  	'CREATING_IMAGE': 7,
+                  	'TERMINATING': 8,
+                  	'TERMINATED': 9
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -8886,13 +8890,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [
-                      	'ATTACHING',
-                      	'ATTACHED',
-                      	'DETACHING',
-                      	'DETACHED'
-                      ].indexOf(value);
-                      return idx !== -1 ? idx : 10;
+                      const idx = {
+                      	'ATTACHING': 1,
+                      	'ATTACHED': 2,
+                      	'DETACHING': 3,
+                      	'DETACHED': 4
+                      };
+                      
+                      return typeof idx[value] === 'undefined' ? 0 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -8905,7 +8910,7 @@ zabbix_export:
                   value: '{#ID}'
               trigger_prototypes:
                 - uuid: 7176da6364464cfcacadfcfe7e81fdb3
-                  expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.attachment[{#ID}],5m) >= 2'
+                  expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.vnic.attachment[{#ID}],5m) >= 3'
                   name: 'VNIC [{#NAME}]: VNIC is not attached'
                   priority: HIGH
                   description: 'Virtual network interface card attachment status.'
@@ -10994,25 +10999,25 @@ zabbix_export:
           name: 'Compute instance state'
           mappings:
             - value: '0'
-              newvalue: Moving
-            - value: '1'
-              newvalue: Provisioning
-            - value: '2'
-              newvalue: Running
-            - value: '3'
-              newvalue: Starting
-            - value: '4'
-              newvalue: Stopping
-            - value: '5'
-              newvalue: Stopped
-            - value: '6'
-              newvalue: 'Creating image'
-            - value: '7'
-              newvalue: Terminating
-            - value: '8'
-              newvalue: Terminated
-            - value: '20'
               newvalue: Unknown
+            - value: '1'
+              newvalue: Moving
+            - value: '2'
+              newvalue: Provisioning
+            - value: '3'
+              newvalue: Running
+            - value: '4'
+              newvalue: Starting
+            - value: '5'
+              newvalue: Stopping
+            - value: '6'
+              newvalue: Stopped
+            - value: '7'
+              newvalue: 'Creating image'
+            - value: '8'
+              newvalue: Terminating
+            - value: '9'
+              newvalue: Terminated
         - uuid: dce0b4413ede4dbca55f89cbc86736b3
           name: 'Generic Bool'
           mappings:
@@ -11024,15 +11029,15 @@ zabbix_export:
           name: 'VNIC attachment state'
           mappings:
             - value: '0'
-              newvalue: Attaching
-            - value: '1'
-              newvalue: Attached
-            - value: '2'
-              newvalue: Detaching
-            - value: '3'
-              newvalue: Detached
-            - value: '10'
               newvalue: Unknown
+            - value: '1'
+              newvalue: Attaching
+            - value: '2'
+              newvalue: Attached
+            - value: '3'
+              newvalue: Detaching
+            - value: '4'
+              newvalue: Detached
     - uuid: 62d99b55585e41dd89736f5f46074dcb
       template: 'Oracle Cloud Networking by HTTP'
       name: 'Oracle Cloud Networking by HTTP'
@@ -11225,14 +11230,15 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [
-                  	'PROVISIONING',
-                  	'AVAILABLE',
-                  	'TERMINATING',
-                  	'TERMINATED',
-                  	'UPDATING'
-                  ].indexOf(value);
-                  return idx !== -1 ? idx : 10;
+                  const idx = {
+                  	'PROVISIONING': 1,
+                  	'AVAILABLE': 2,
+                  	'TERMINATING': 3,
+                  	'TERMINATED': 4,
+                  	'UPDATING': 5
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -11259,7 +11265,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 8a5a94ea28db43df93e85d26703f9e7c
-              expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 2 or min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 3'
+              expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 3 or min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 4'
               name: 'OCI VCN: VCN state terminated'
               priority: HIGH
               description: 'Virtual cloud network state is "terminated" or "terminating".'
@@ -11267,7 +11273,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 80c3f4d6696c40a78ddb2c00378eeae1
-              expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 10'
+              expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 0'
               name: 'OCI VCN: VCN state unknown'
               priority: WARNING
               description: 'Virtual cloud network state is unknown.'
@@ -11503,13 +11509,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [
-                      	'PROVISIONING',
-                      	'AVAILABLE',
-                      	'TERMINATING',
-                      	'TERMINATED'
-                      ].indexOf(value);
-                      return idx !== -1 ? idx : 10;
+                      const idx = {
+                      	'PROVISIONING': 1,
+                      	'AVAILABLE': 2,
+                      	'TERMINATING': 3,
+                      	'TERMINATED': 4
+                      };
+                      
+                      return typeof idx[value] === 'undefined' ? 0 : idx[value];
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -11522,7 +11529,7 @@ zabbix_export:
                   value: '{#ID}'
               trigger_prototypes:
                 - uuid: f048db860c0c4134acdbcbf19ea554eb
-                  expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 2 or min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 3'
+                  expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 3 or min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 4'
                   name: 'Subnet [{#NAME}]: Subnet state terminated'
                   priority: HIGH
                   description: 'Virtual cloud network subnet state is "terminated" or "terminating".'
@@ -11530,7 +11537,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
                 - uuid: d34e5b8c571b41f9ba5dc11453431860
-                  expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 10'
+                  expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.subnet.state[{#ID}],5m) = 0'
                   name: 'Subnet [{#NAME}]: Subnet state unknown'
                   priority: WARNING
                   description: 'Virtual cloud network subnet state is unknown.'
@@ -11582,17 +11589,17 @@ zabbix_export:
           name: 'Lifecycle state'
           mappings:
             - value: '0'
-              newvalue: Provisioning
-            - value: '1'
-              newvalue: Available
-            - value: '2'
-              newvalue: Terminating
-            - value: '3'
-              newvalue: Terminated
-            - value: '4'
-              newvalue: Updating
-            - value: '10'
               newvalue: Unknown
+            - value: '1'
+              newvalue: Provisioning
+            - value: '2'
+              newvalue: Available
+            - value: '3'
+              newvalue: Terminating
+            - value: '4'
+              newvalue: Terminated
+            - value: '5'
+              newvalue: Updating
     - uuid: e8f89476695848e99ba900a5664d290b
       template: 'Oracle Cloud Object Storage by HTTP'
       name: 'Oracle Cloud Object Storage by HTTP'
