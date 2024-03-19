@@ -46,8 +46,6 @@ zbx_lld_item_link_t;
 
 ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
 
-int	lld_item_link_compare_func(const void *d1, const void *d2);
-
 /* lld rule filter condition (item_condition table record) */
 typedef struct
 {
