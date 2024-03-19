@@ -253,18 +253,15 @@ $form->addItem(
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(
-					(new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy')
-				)
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)
 	->addItem($form)
 	->show();
 
-(new CScriptTag('
-	view.init();
-'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

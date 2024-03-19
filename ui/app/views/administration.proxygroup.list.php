@@ -164,10 +164,9 @@ $form
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_GROUP_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(
-					(new CSimpleButton(_('Create proxy group')))->addClass('js-create-proxy-group')
-				)
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create proxy group')))->addClass('js-create-proxy-group')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)
