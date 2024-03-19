@@ -330,6 +330,7 @@ class testTimeoutsLinkedTemplates extends testTimeoutsDisplay {
 						]
 					]
 				],
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'proxyid' => $proxyid['Proxy assigned to host'],
 				'templates' => [
 					'templateid' => $linked_template

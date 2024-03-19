@@ -124,6 +124,7 @@ class testTimeoutsHosts extends testTimeoutsDisplay {
 		CDataHelper::call('host.update', [
 			[
 				'hostid' => self::$hostids['Host for timeouts check with proxy'],
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'proxyid' => $proxyid['Proxy assigned to host']
 			]
 		]);
