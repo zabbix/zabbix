@@ -355,10 +355,10 @@ class CProxy extends CApiService {
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 */
-	private static function updateHosts(array &$proxies, array $db_proxies = null): void {
+	private static function updateHosts(array $proxies, array $db_proxies = null): void {
 		$upd_hosts = [];
 
-		foreach ($proxies as &$proxy) {
+		foreach ($proxies as $proxy) {
 			if (!array_key_exists('hosts', $proxy)) {
 				continue;
 			}
@@ -368,7 +368,11 @@ class CProxy extends CApiService {
 			foreach ($proxy['hosts'] as $host) {
 				if (!array_key_exists($host['hostid'], $db_hosts)) {
 					$upd_hosts[$host['hostid']] = [
-						'values' => ['proxyid' => $proxy['proxyid']],
+						'values' => [
+							'monitored_by' => ZBX_MONITORED_BY_PROXY,
+							'proxyid' => $proxy['proxyid'],
+							'proxy_groupid' => 0
+						],
 						'where' => ['hostid' => $host['hostid']]
 					];
 				}
@@ -380,13 +384,15 @@ class CProxy extends CApiService {
 			foreach ($db_hosts as $db_host) {
 				if (!array_key_exists($db_host['hostid'], $upd_hosts)) {
 					$upd_hosts[$db_host['hostid']] = [
-						'values' => ['proxyid' => 0],
+						'values' => [
+							'monitored_by' => ZBX_MONITORED_BY_SERVER,
+							'proxyid' => 0
+						],
 						'where' => ['hostid' => $db_host['hostid']]
 					];
 				}
 			}
 		}
-		unset($proxy);
 
 		if ($upd_hosts) {
 			DB::update('hosts', array_values($upd_hosts));
