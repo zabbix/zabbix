@@ -542,8 +542,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = true;
 
-		$converted_lifetime = timeUnitToSeconds($input['lifetime']);
-		$converted_enabled_lifetime = timeUnitToSeconds($input['enabled_lifetime']);
+		$converted_lifetime = timeUnitToSeconds($input['lifetime'], true);
+		$converted_enabled_lifetime = timeUnitToSeconds($input['enabled_lifetime'], true);
 		$lifetime_valid = $input['lifetime_type'] == ZBX_LLD_DELETE_AFTER && $input['lifetime'] !== ''
 			&& $input['lifetime'][0] !== '{';
 		$enabled_lifetime_valid = $input['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER
@@ -760,8 +760,8 @@ if (hasRequest('form')) {
 		$enabled_lifetime_type = $item['enabled_lifetime_type'];
 		$enabled_lifetime = $item['enabled_lifetime'];
 
-		$converted_lifetime = timeUnitToSeconds($lifetime);
-		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
+		$converted_lifetime = timeUnitToSeconds($lifetime, true);
+		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime, true);
 
 		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $converted_lifetime === 0) {
 			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
