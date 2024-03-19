@@ -31,7 +31,7 @@
 
 static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option, AGENT_RESULT *result)
 {
-	if (0 == strcmp(option, "status"))
+	if (0 == strcmp(option, "state"))
 	{
 		SET_UI64_RESULT(result, stats->status);
 		return SUCCEED;
