@@ -2518,6 +2518,10 @@ function getTypeItemFieldNames(array $input): array {
 function getConditionalItemFieldNames(array $field_names, array $input): array {
 	return array_filter($field_names, static function ($field_name) use ($input): bool {
 		switch ($field_name) {
+			case 'lifetime':
+				return $input['lifetime_type'] == ZBX_LLD_DELETE_AFTER;
+			case 'enabled_lifetime':
+				return $input['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER;
 			case 'units':
 			case 'trends':
 				return in_array($input['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);

@@ -475,6 +475,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'conditions' => getRequest('conditions', [])
 			]),
 			'overrides' => prepareLldOverrides($overrides, $db_item),
+			'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
+			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
+			'enabled_lifetime_type' => getRequest('enabled_lifetime_type',
+				DB::getDefault('items', 'enabled_lifetime_type')
+			),
+			'enabled_lifetime' => getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime')),
 
 			// Type fields.
 			// The fields used for multiple item types.
@@ -534,34 +540,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
 
-		$lifetime = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
-		$lifetime_type = getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type'));
-		$enabled_lifetime = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
-		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
-
-		// Set the values to '0', if 'immediately' or 'never' values are set to lifetime/enabled_lifetime types.
-		if ($lifetime_type != ZBX_LLD_DELETE_AFTER) {
-			$lifetime = '0';
-		}
-
-		if ($enabled_lifetime_type != ZBX_LLD_DISABLE_AFTER) {
-			$enabled_lifetime = '0';
-		}
-
-		$input += [
-			'lifetime_type' => $lifetime_type,
-			'lifetime' => $lifetime,
-			'enabled_lifetime_type' => $enabled_lifetime_type,
-			'enabled_lifetime' => $enabled_lifetime
-		];
-
 		$result = true;
 
-		$converted_lifetime = timeUnitToSeconds($lifetime);
-		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
-		$lifetime_valid = $lifetime_type == ZBX_LLD_DELETE_AFTER && $lifetime !== '' && $lifetime[0] !== '{';
-		$enabled_lifetime_valid = $enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $enabled_lifetime !== ''
-			&& $enabled_lifetime[0] !== '{';
+		$converted_lifetime = timeUnitToSeconds($input['lifetime']);
+		$converted_enabled_lifetime = timeUnitToSeconds($input['enabled_lifetime']);
+		$lifetime_valid = $input['lifetime_type'] == ZBX_LLD_DELETE_AFTER && $input['lifetime'] !== ''
+			&& $input['lifetime'][0] !== '{';
+		$enabled_lifetime_valid = $input['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER
+			&& $input['enabled_lifetime'] !== '' && $input['enabled_lifetime'][0] !== '{';
 
 		if ($lifetime_valid && $enabled_lifetime_valid
 				&& $converted_enabled_lifetime !== null && $converted_lifetime !== null
@@ -777,13 +763,11 @@ if (hasRequest('form')) {
 		$converted_lifetime = timeUnitToSeconds($lifetime);
 		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
 
-		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $lifetime[0] !== '{' && $converted_lifetime !== null
-				&& $converted_lifetime == 0) {
+		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $converted_lifetime === 0) {
 			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
 		}
 
-		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $enabled_lifetime[0] !== '{'
-				&& $converted_enabled_lifetime !== null && $converted_enabled_lifetime == 0) {
+		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $converted_enabled_lifetime === 0) {
 			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
 		}
 
