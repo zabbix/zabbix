@@ -124,7 +124,7 @@ foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 		array_pop($proxies);
 
 		if ($proxy_group['proxy_count_total'] > count($proxy_group['proxies'])) {
-			$proxies[] = [' ', HELLIP()];
+			$proxies[] = [', ', HELLIP()];
 		}
 
 		$proxy_count_total = (new CSpan($proxy_group['proxy_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);

@@ -189,7 +189,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		array_pop($hosts);
 
 		if ($proxy['host_count_total'] > count($proxy['hosts'])) {
-			$hosts[] = [' ', HELLIP()];
+			$hosts[] = [', ', HELLIP()];
 		}
 
 		$host_count_total = (new CSpan($proxy['host_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);

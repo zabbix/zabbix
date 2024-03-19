@@ -87,7 +87,7 @@ if ($data['proxies']) {
 	array_pop($proxies);
 
 	if ($data['proxy_count_total'] > count($data['proxies'])) {
-		$proxies[] = [' ', HELLIP()];
+		$proxies[] = [', ', HELLIP()];
 	}
 
 	$form_grid->addItem([
