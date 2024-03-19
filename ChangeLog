@@ -1,6 +1,8 @@
 Changes for 7.0.0beta2
 
 New features:
+.......PS. [ZBXNEXT-8670] added support of async snmp to network discovery subsystem (MVekslers)
+A.F.....S. [ZBXNEXT-6876] added multi-factor authentication support for zabbix ui (akozlovs, epulke, vmaksimovs)
 ...GI..PS. [ZBXNEXT-3623] moved the cURL library feature detection from build-time to runtime, increased required built-time cURL library version to 7.19.1 (dimir)
 ..F.I..... [ZBXNEXT-8754] changed item history period default value to 31 days (esekace, mprihodko)
 ..F....... [ZBXNEXT-8907] implemented fixed/variable lines count selection in svg graph and pie chart widgets legend (dfofanovs)
