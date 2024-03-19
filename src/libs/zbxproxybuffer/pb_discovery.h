@@ -25,7 +25,7 @@
 #include "zbxtypes.h"
 
 void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row);
-size_t	pb_discovery_estimate_row_size(const char *value, const char *ip, const char *dns);
+size_t	pb_discovery_estimate_row_size(const char *value, const char *ip, const char *dns, const char *error);
 void	pb_discovery_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_discovery_flush(zbx_pb_t *pb);
 void	pb_discovery_set_lastid(zbx_uint64_t lastid);

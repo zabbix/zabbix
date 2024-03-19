@@ -382,30 +382,6 @@
 
 #ifdef HAVE_LIBCURL
 #	include <curl/curl.h>
-#	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
-#		define curl_easy_escape(handle, string, length) curl_escape(string, length)
-#	endif
-#	if 0x071004 >= LIBCURL_VERSION_NUM	/* version 7.16.4 */
-#		define CURLOPT_KEYPASSWD	CURLOPT_SSLKEYPASSWD
-#	endif
-#	if 0x071400 <= LIBCURL_VERSION_NUM	/* version 7.20.0 */
-#		define HAVE_SMTP_AUTHENTICATION	1
-#	endif
-#	if 0x071501 <= LIBCURL_VERSION_NUM	/* version 7.21.6 */
-#		define ZBX_CURLOPT_ACCEPT_ENCODING	CURLOPT_ACCEPT_ENCODING
-#	else
-#		define ZBX_CURLOPT_ACCEPT_ENCODING	CURLOPT_ENCODING
-#	endif
-#	if 0x073700 <= LIBCURL_VERSION_NUM	/* version 7.55.0 */
-#		define ZBX_CURLINFO_SPEED_DOWNLOAD	CURLINFO_SPEED_DOWNLOAD_T
-#		define ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	curl_off_t
-#		define ZBX_CURLINFO_SPEED_DOWNLOAD_FMT	"%" CURL_FORMAT_CURL_OFF_T
-#	else
-#		define ZBX_CURLINFO_SPEED_DOWNLOAD	CURLINFO_SPEED_DOWNLOAD
-#		define ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	double
-#		define ZBX_CURLINFO_SPEED_DOWNLOAD_FMT	ZBX_FS_DBL
-#	endif
-#	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
 /* Required for advanced sigaction */

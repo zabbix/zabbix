@@ -188,6 +188,7 @@ typedef struct
 zbx_vmware_dsname_t;
 
 int	zbx_vmware_dsname_compare(const void *d1, const void *d2);
+int	zbx_vmware_dsname_compare_uuid(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_dsname_ptr, zbx_vmware_dsname_t *)
 
 typedef struct
@@ -576,7 +577,7 @@ typedef struct
 }
 zbx_thread_vmware_args;
 
-ZBX_THREAD_ENTRY(vmware_thread, args);
+ZBX_THREAD_ENTRY(zbx_vmware_thread, args);
 
 void	zbx_vmware_destroy(void);
 

@@ -25,7 +25,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_NORMAL ?>">
-	<tr id="items_#{number}" class="sortable">
+	<tr id="items_#{number}" class="graph-item">
 		<!-- icon + hidden -->
 		<?php if ($readonly): ?>
 			<td>
@@ -45,7 +45,7 @@
 
 		<!-- row number -->
 		<td>
-			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+			<span class="list-numbered-item">:</span>
 		</td>
 
 		<!-- name -->
@@ -104,7 +104,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_STACKED ?>">
-	<tr id="items_#{number}" class="sortable">
+	<tr id="items_#{number}" class="graph-item">
 		<!-- icon + hidden -->
 		<?php if ($readonly): ?>
 			<td>
@@ -124,7 +124,7 @@
 
 		<!-- row number -->
 		<td>
-			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+			<span class="list-numbered-item">:</span>
 		</td>
 
 		<!-- name -->
@@ -174,7 +174,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_PIE ?>">
-	<tr id="items_#{number}" class="sortable">
+	<tr id="items_#{number}" class="graph-item">
 		<!-- icon + hidden -->
 		<?php if ($readonly): ?>
 			<td>
@@ -194,7 +194,7 @@
 
 		<!-- row number -->
 		<td>
-			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+			<span class="list-numbered-item">:</span>
 		</td>
 
 		<!-- name -->
@@ -245,7 +245,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_EXPLODED ?>">
-	<tr id="items_#{number}" class="sortable">
+	<tr id="items_#{number}" class="graph-item">
 		<!-- icon + hidden -->
 		<?php if ($readonly): ?>
 			<td>
@@ -265,7 +265,7 @@
 
 		<!-- row number -->
 		<td>
-			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+			<span class="list-numbered-item">:</span>
 		</td>
 
 		<!-- name -->
@@ -331,7 +331,6 @@
 
 			items.forEach((item, i) => {
 				item.number = i;
-				item.number_nr = i + 1;
 				item.name = item.host + '<?= NAME_DELIMITER ?>' + item.name;
 
 				this.loadItem(item);
@@ -391,7 +390,7 @@
 						src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
 					}
 
-					$('#itemsTable tr.sortable').each((i, node) => {
+					$('#itemsTable tbody tr.graph-item').each((i, node) => {
 						const short_fmt = [];
 
 						$(node).find('*[name]').each((_, input) => {
@@ -424,10 +423,10 @@
 			});
 
 			if (this.graphs.readonly) {
-				$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
+				$('#itemsTable').find('input').prop('readonly', true);
 				$('z-select', '#itemsTable').prop('disabled', true);
 
-				const size = $('#itemsTable tr.sortable').length;
+				const size = $('#itemsTable tbody tr.graph-item').length;
 
 				for (let i = 0; i < size; i++) {
 					$('#items_' + i + '_color').removeAttr('onchange');
@@ -481,7 +480,14 @@
 				$('form[name="' + view.form_name + '"]').submit();
 			});
 
-			!this.graphs.readonly && this.initSortable();
+			new CSortable(document.querySelector('#itemsTable tbody'), {
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1,
+				enable_sorting: !this.graphs.readonly
+			})
+				.on(CSortable.EVENT_SORT, this.recalculateSortOrder);
+
+			!this.graphs.readonly && this.rewriteNameLinks();
 		},
 
 		loadItem(item) {
@@ -514,10 +520,9 @@
 					}
 				}
 
-				const number = $('#itemsTable tr.sortable').length;
+				const number = $('#itemsTable tbody tr.graph-item').length;
 				const item = {
 					number: number,
-					number_nr: number + 1,
 					gitemid: null,
 					itemid: list.values[i].itemid,
 					calc_fnc: null,
@@ -535,10 +540,7 @@
 				$(`#items_${number}_color`).colorpicker();
 			}
 
-			if (!this.graphs.readonly) {
-				this.activateSortable();
-				this.rewriteNameLinks();
-			}
+			!this.graphs.readonly && this.rewriteNameLinks();
 		},
 
 		getOnlyHostParam() {
@@ -548,7 +550,7 @@
 		},
 
 		rewriteNameLinks() {
-			const size = $('#itemsTable tr.sortable').length;
+			const size = $('#itemsTable tbody tr.graph-item').length;
 
 			for (let i = 0; i < size; i++) {
 				const parameters = {
@@ -593,27 +595,26 @@
 			$('#items_' + number).remove();
 
 			this.recalculateSortOrder();
-			!this.graphs.readonly && this.activateSortable();
 		},
 
 		recalculateSortOrder() {
 			let i = 0;
 
 			// Rewrite IDs, set "tmp" prefix.
-			$('#itemsTable tr.sortable').find('*[id]').each(function() {
+			$('#itemsTable tbody tr.graph-item').find('*[id]').each(function() {
 				const $obj = $(this);
 
 				$obj.attr('id', 'tmp' + $obj.attr('id'));
 			});
 
-			$('#itemsTable tr.sortable').each(function() {
+			$('#itemsTable tbody tr.graph-item').each(function() {
 				const $obj = $(this);
 
 				$obj.attr('id', 'tmp' + $obj.attr('id'));
 			});
 
 			// Rewrite IDs to new order.
-			$('#itemsTable tr.sortable').each(function() {
+			$('#itemsTable tbody tr.graph-item').each(function() {
 				const $obj = $(this);
 
 				// Rewrite IDs in input fields.
@@ -644,10 +645,7 @@
 
 			i = 0;
 
-			$('#itemsTable tr.sortable').each(function() {
-				// Set row number.
-				$('.items_number', this).text((i + 1) + ':');
-
+			$('#itemsTable tbody tr.graph-item').each(function() {
 				// Set remove number.
 				$('#items_' + i + '_remove').data('remove', i);
 
@@ -655,38 +653,6 @@
 			});
 
 			!view.graphs.readonly && view.rewriteNameLinks();
-		},
-
-		initSortable() {
-			$('#itemsTable').sortable({
-				disabled: ($('#itemsTable .sortable').length < 2),
-				items: '.sortable',
-				axis: 'y',
-				containment: 'parent',
-				cursor: 'grabbing',
-				handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				update: this.recalculateSortOrder,
-				helper: (e, ui) => {
-					for (const td of ui.find('>td')) {
-						const $td = $(td);
-						$td.attr('width', $td.width())
-					}
-
-					return ui;
-				},
-				stop: (e, ui) => {
-					ui.item.find('>td').removeAttr('width');
-				},
-				start: (e, ui) => {
-					$(ui.placeholder).height($(ui.helper).height());
-				}
-			});
-		},
-
-		activateSortable() {
-			$('#itemsTable').sortable({disabled: ($('#itemsTable tr.sortable').length < 2)});
 		},
 
 		editHost(e, hostid) {
@@ -757,7 +723,7 @@
 					}
 				}
 
-				if (curl == null) {
+				if (curl === null) {
 					view.refresh();
 				}
 				else {

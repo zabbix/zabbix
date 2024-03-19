@@ -341,6 +341,33 @@ check_fill:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: converts IP address (v4 or v6) into IP string                     *
+ *                                                                            *
+ * Parameters: type      - [IN] type of IP                                    *
+ *             ipaddress - [IN] IP address as number array                    *
+ *             ip        - [IN/OUT] string with current address from IP range *
+ *             len       - [IN] size of string buffer for ip address          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
+{
+	if (ZBX_IPRANGE_V6 == type)
+	{
+		zbx_snprintf(ip, len, "%x:%x:%x:%x:%x:%x:%x:%x", (unsigned int)ipaddress[0],
+				(unsigned int)ipaddress[1], (unsigned int)ipaddress[2],
+				(unsigned int)ipaddress[3], (unsigned int)ipaddress[4],
+				(unsigned int)ipaddress[5], (unsigned int)ipaddress[6],
+				(unsigned int)ipaddress[7]);
+	}
+	else
+	{
+		zbx_snprintf(ip, len, "%u.%u.%u.%u", (unsigned int)ipaddress[0], (unsigned int)ipaddress[1],
+				(unsigned int)ipaddress[2], (unsigned int)ipaddress[3]);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: parses IP address (v4 or v6) into IP range structure              *
  *                                                                            *
  * Parameters: iprange - [OUT]                                                *
@@ -379,7 +406,7 @@ void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = 0; i < groups; i++)
 		address[i] = iprange->range[i].from;
@@ -408,7 +435,7 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 {
 	int	i, groups;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = groups - 1; i >= 0; i--)
 	{
@@ -440,6 +467,92 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets next unique IP address from specified range                  *
+ *                                                                            *
+ * Parameters: ipranges - [IN] array of ipranges                              *
+ *             num      - [IN] size of ipranges array                         *
+ *             ip       - [IN/OUT] string with current address from IP range  *
+ *             len      - [IN] size of string buffer for ip address           *
+ *                                                                            *
+ * Return value: SUCCEED - next IP address was in specified range             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip, const size_t len)
+{
+	static ZBX_THREAD_LOCAL int	idx, ipaddress[8];
+
+	if ('\0' == *ip)
+	{
+		idx = 0;
+		zbx_iprange_first(&ipranges[idx], ipaddress);
+		zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+
+		return SUCCEED;
+	}
+
+	if (FAIL == zbx_iprange_uniq_iter(ipranges, num, &idx, ipaddress))
+		return FAIL;
+
+	zbx_iprange_ip2str(ipranges[idx].type, ipaddress, ip, len);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets next unique digital IP address from specified range          *
+ *                                                                            *
+ * Parameters: ipranges  - [IN] array of ipranges                             *
+ *             num       - [IN] size of ipranges array                        *
+ *             idx       - [IN/OUT] current index of ipranges                 *
+ *             ipaddress - [IN/OUT] current ip address from range             *
+ *                                                                            *
+ * Return value: SUCCEED - next IP address was in specified range             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx, int *ipaddress)
+{
+	int	i, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+	if (0 == num)
+		return FAIL;
+
+	if (0 == memcmp(ipaddress, z, sizeof(int) * (ZBX_IPRANGE_V4 == ipranges->type ?
+			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6)))
+	{
+		*idx = 0;
+		zbx_iprange_first(ipranges, ipaddress);
+		return SUCCEED;
+	}
+
+	if (*idx == num)
+		return FAIL;
+
+	do
+	{
+		if (FAIL == zbx_iprange_next(&ipranges[*idx], ipaddress))
+		{
+			if (++(*idx) == num)
+				return FAIL;
+
+			zbx_iprange_first(&ipranges[*idx], ipaddress);
+		}
+
+		for (i = 0; i < *idx; i++)
+		{
+			if (SUCCEED == zbx_iprange_validate(&ipranges[i], ipaddress))
+				break;
+		}
+	}
+	while (i != *idx);	/* skipping ip from overlapping ipranges */
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks if IP address is in specified range                        *
  *                                                                            *
  * Parameters: iprange - [IN]                                                 *
@@ -454,7 +567,7 @@ int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address)
 {
 	int	i, groups;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = 0; i < groups; i++)
 	{
@@ -481,7 +594,7 @@ zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange)
 	int		i, groups;
 	zbx_uint64_t	n, volume = 1;
 
-	groups = (ZBX_IPRANGE_V4 == iprange->type ? 4 : 8);
+	groups = (ZBX_IPRANGE_V4 == iprange->type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6);
 
 	for (i = 0; i < groups; i++)
 	{
@@ -498,4 +611,94 @@ zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange)
 		volume -= 2;
 
 	return volume;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets next unique port value from specified range                  *
+ *                                                                            *
+ * Parameters: ranges - [IN] array of port ranges                             *
+ *             num    - [IN] size of port ranges array                        *
+ *             port   - [IN/OUT] port with current value from port range      *
+ *                                                                            *
+ * Return value: SUCCEED - next port value was in specified range             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_portrange_uniq_next(const zbx_range_t *ranges, const int num, int *port)
+{
+	static ZBX_THREAD_LOCAL int	idx, current_port;
+
+	if (0 == num)
+		return FAIL;
+
+	if (ZBX_PORTRANGE_INIT_PORT == *port)
+	{
+		idx = 0;
+		current_port = ranges[idx].from;
+		*port = current_port;
+		return SUCCEED;
+	}
+
+	if (num == idx)
+		return FAIL;
+
+	if (FAIL == zbx_portrange_uniq_iter(ranges, num, &idx, &current_port))
+		return FAIL;
+
+	*port = current_port;
+
+	return SUCCEED;
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets next unique port value from specified range                  *
+ *                                                                            *
+ * Parameters: ranges - [IN] array of port ranges                             *
+ *             num    - [IN] size of port ranges array                        *
+ *             idx    - [IN/OUT] index of range in array                      *
+ *             port   - [IN/OUT] port with current value from port range      *
+ *                                                                            *
+ * Return value: SUCCEED - next port value was in specified range             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_portrange_uniq_iter(const zbx_range_t *ranges, const int num, int *idx, int *port)
+{
+	int	i;
+
+	if (0 == num)
+		return FAIL;
+
+	if (ZBX_PORTRANGE_INIT_PORT == *port)
+	{
+		*idx = 0;
+		*port = ranges->from;
+		return SUCCEED;
+	}
+
+	if (num == *idx)
+		return FAIL;
+
+	do
+	{
+		if (++(*port) > ranges[*idx].to)
+		{
+			if (++(*idx) == num)
+				return FAIL;
+
+			*port = ranges[*idx].from;
+		}
+
+		for (i = 0; i < *idx; i++)
+		{
+			if (*port >= ranges[i].from && *port <= ranges[i].to)
+				break;
+		}
+	}
+	while (i != *idx);	/* skipping port from overlapping port ranges */
+
+	return SUCCEED;
 }

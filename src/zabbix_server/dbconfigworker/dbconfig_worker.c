@@ -133,7 +133,7 @@ out:
 #undef ZBX_DBCONFIG_BATCH_SIZE
 }
 
-ZBX_THREAD_ENTRY(dbconfig_worker_thread, args)
+ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 {
 #define ZBX_DBCONFIG_WORKER_DELAY		1
 	zbx_ipc_service_t	service;

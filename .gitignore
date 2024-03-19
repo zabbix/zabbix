@@ -200,6 +200,7 @@ tests/libs/zbxeval/zbx_eval_parse_expression
 tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_serialize
+tests/libs/zbxexpression/macro_functions
 tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxicmpping/get_interval_option
@@ -222,6 +223,7 @@ tests/libs/zbxexpression/macro_fmttime
 tests/libs/zbxexpression/substitute_lld_macros
 tests/libs/zbxexpression/valuemaps
 tests/libs/zbxsysinfo/check_key_access_rules
+tests/libs/zbxsysinfo/common/zbx_ip_reverse
 tests/libs/zbxsysinfo/zbx_execute_agent_check
 tests/libs/zbxsysinfo/zbx_execute_agent_check_http
 tests/libs/zbxsysinfo/check_get_fqdn
