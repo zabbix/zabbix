@@ -145,7 +145,7 @@ Test availability: `zabbix_get -s redis-master -k redis.ping`
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|DB {#DB}: Get Keyspace info|<p>The item gets information about keyspace of {#DB} database.</p>|Dependent item|redis.db.info_raw["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Keyspace["{#DB}"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DB {#DB}: Get Keyspace info|<p>The item gets information about keyspace of {#DB} database.</p>|Dependent item|redis.db.info_raw["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DB}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB {#DB}: Average TTL|<p>Average TTL</p>|Dependent item|redis.db.avg_ttl["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.avg_ttl`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |DB {#DB}: Expires|<p>Number of keys with an expiration</p>|Dependent item|redis.db.expires["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expires`</p></li></ul>|
 |DB {#DB}: Keys|<p>Total number of keys</p>|Dependent item|redis.db.keys["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.keys`</p></li></ul>|

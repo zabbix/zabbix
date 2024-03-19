@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-11-04 18:46+0000\n"
+"PO-Revision-Date: 2022-12-20 18:24+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -5586,7 +5586,7 @@ msgstr "Depende de"
 
 #: include/hosts.inc.php:264
 msgid "Deployment status"
-msgstr "Status de desenvolvimento"
+msgstr "Status de implantação"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
@@ -21646,6 +21646,10 @@ msgstr "padrão"
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Converte um valor de radianos para graus"
 
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
@@ -22525,6 +22529,10 @@ msgstr "power() - A potência de um valor base para um valor de potência"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "padrão de incidente"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

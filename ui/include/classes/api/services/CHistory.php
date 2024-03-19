@@ -347,9 +347,7 @@ class CHistory extends CApiService {
 	 * Returns true if database supports data compression. False otherwise.
 	 */
 	private static function checkCompressionAvailability(): bool {
-		$dbversion_status = CSettingsHelper::getDbVersionStatus();
-
-		foreach ($dbversion_status as $dbversion) {
+		foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 			if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				return array_key_exists('compression_availability', $dbversion)
 					&& (bool) $dbversion['compression_availability'];

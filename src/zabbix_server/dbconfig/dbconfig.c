@@ -24,6 +24,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxrtc.h"
+#include "../../libs/zbxdbcache/valuecache.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -68,6 +69,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_rtc_notify_finished_sync(&rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type));
 
 	nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+
+	zbx_vc_enable();
 
 	while (ZBX_IS_RUNNING())
 	{

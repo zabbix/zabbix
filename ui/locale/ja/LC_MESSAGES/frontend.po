@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-10-08 12:33+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2024-01-26 09:48+0000\n"
+"Last-Translator: JK <kim.jongkwon@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -210,7 +210,7 @@ msgstr "%1$s件が選択されています、上下矢印キーとエンター�
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] "%1$sで障害発生"
+msgstr[0] ""
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
@@ -21496,6 +21496,10 @@ msgstr "デフォルト"
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - 値をラジアンから角度に変換"
 
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
@@ -22374,6 +22378,10 @@ msgstr "power() - ベースの値に指数を指定したべき乗値"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "障害パターン"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

@@ -294,7 +294,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 88
+					'rows' => 93
 				]
 			],
 			[
@@ -459,11 +459,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Type' => 'Database monitor',
 						'Update interval' => '1h',
-						'Name'=> 'Non-local database'
+						'Name'=> 'PDB'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Non-local database discovery'
+						'PDB discovery'
 					]
 				]
 			],
