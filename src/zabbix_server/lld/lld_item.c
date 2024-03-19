@@ -283,6 +283,16 @@ zbx_item_discovery_t;
 ZBX_PTR_VECTOR_DECL(item_discovery_ptr, zbx_item_discovery_t *)
 ZBX_PTR_VECTOR_IMPL(item_discovery_ptr, zbx_item_discovery_t *)
 
+static int	item_discovery_compare_func(const void *d1, const void *d2)
+{
+	const zbx_item_discovery_t  *item_discovery_1 = *(const zbx_item_discovery_t **)d1;
+	const zbx_item_discovery_t  *item_discovery_2 = *(const zbx_item_discovery_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(item_discovery_1->itemid, item_discovery_2->itemid);
+
+	return 0;
+}
+
 static void	zbx_item_discovery_free(zbx_item_discovery_t *data)
 {
 	zbx_free(data->key_proto);
@@ -386,7 +396,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 	if (0 == item_discoveries.values_num)
 		goto out;
 
-	zbx_vector_item_discovery_ptr_sort(&item_discoveries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_item_discovery_ptr_sort(&item_discoveries, item_discovery_compare_func);
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	batch_index = 0;
 
@@ -414,8 +424,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[0]);
 
-			if (FAIL == (index = zbx_vector_item_discovery_ptr_bsearch(&item_discoveries,
-					(zbx_item_discovery_t *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			const zbx_item_discovery_t	cmp = {.itemid = itemid};
+
+			if (FAIL == (index = zbx_vector_item_discovery_ptr_bsearch(&item_discoveries, &cmp,
+					item_discovery_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -636,7 +648,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 	if (0 == items->values_num)
 		goto out;
 
-	zbx_vector_lld_item_full_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 
 	for (i = items->values_num - 1; i >= 0; i--)
 	{
@@ -646,7 +658,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 		zbx_lld_item_full_t	cmp = {.itemid = master_itemid};
 
 		if (0 != master_itemid && FAIL != (index = zbx_vector_lld_item_full_ptr_bsearch(items,
-				&cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				&cmp, lld_item_full_compare_func)))
 		{
 			/* dependent items based on prototypes should contain prototype itemid */
 			master = items->values[index];
@@ -691,8 +703,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)items,
-					(const void *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_item_full_t	cmp = {.itemid = itemid};
+
+			if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+					lld_item_full_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -727,8 +741,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)items,
-					(const void *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_item_full_t	cmp = {.itemid = itemid};
+
+			if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+					lld_item_full_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -762,8 +778,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)items,
-					(const void *)&itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_item_full_t	cmp = {.itemid = itemid};
+
+			if (FAIL == (index = zbx_vector_lld_item_full_ptr_bsearch(items, &cmp,
+					lld_item_full_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -2439,7 +2457,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
 		}
 	}
 
-	zbx_vector_lld_item_full_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d items", __func__, items->values_num);
 }
@@ -3493,7 +3511,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 
-		zbx_vector_lld_item_full_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_lld_item_full_ptr_sort(items, lld_item_full_compare_func);
 	}
 
 	if (0 != upd_items)
@@ -4177,7 +4195,7 @@ void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows)
 	{
 		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
-		zbx_vector_lld_item_link_ptr_sort(&lld_row->item_links, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_lld_item_link_ptr_sort(&lld_row->item_links, lld_item_link_compare_func);
 	}
 }
 

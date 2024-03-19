@@ -70,6 +70,16 @@ zbx_lld_gitem_t;
 ZBX_PTR_VECTOR_DECL(lld_gitem_ptr, zbx_lld_gitem_t*)
 ZBX_PTR_VECTOR_IMPL(lld_gitem_ptr, zbx_lld_gitem_t*)
 
+static int      lld_gitem_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_gitem_t  *lld_gitem_1 = *(const zbx_lld_gitem_t **)d1;
+	const zbx_lld_gitem_t  *lld_gitem_2 = *(const zbx_lld_gitem_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(lld_gitem_1->gitemid, lld_gitem_2->gitemid);
+
+	return 0;
+}
+
 typedef struct
 {
 	zbx_uint64_t			graphid;
@@ -128,6 +138,16 @@ zbx_lld_graph_t;
 
 ZBX_PTR_VECTOR_DECL(lld_graph_ptr, zbx_lld_graph_t*)
 ZBX_PTR_VECTOR_IMPL(lld_graph_ptr, zbx_lld_graph_t*)
+
+static int      lld_graph_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_graph_t  *lld_graph_1 = *(const zbx_lld_graph_t **)d1;
+	const zbx_lld_graph_t  *lld_graph_2 = *(const zbx_lld_graph_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(lld_graph_1->graphid, lld_graph_2->graphid);
+
+	return 0;
+}
 
 static void	lld_item_free(zbx_lld_item_t *item)
 {
@@ -275,7 +295,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_lld_graph_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_graph_ptr_sort(graphs, lld_graph_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -357,7 +377,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 			zbx_vector_lld_gitem_ptr_append(gitems_proto, gitem);
 		}
 		else if (FAIL != (index = zbx_vector_lld_graph_ptr_bsearch(graphs, &cmp,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				lld_graph_compare_func)))
 		{
 			graph = graphs->values[index];
 
@@ -371,13 +391,13 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_lld_gitem_ptr_sort(gitems_proto, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_gitem_ptr_sort(gitems_proto, lld_gitem_compare_func);
 
 	for (i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
-		zbx_vector_lld_gitem_ptr_sort(&graph->gitems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_lld_gitem_ptr_sort(&graph->gitems, lld_gitem_compare_func);
 	}
 
 	zbx_vector_uint64_destroy(&graphids);
@@ -451,7 +471,7 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 		}
 		zbx_db_free_result(result);
 
-		zbx_vector_lld_item_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_lld_item_ptr_sort(items, lld_item_compare_func);
 	}
 
 	zbx_vector_uint64_destroy(&itemids);
@@ -532,7 +552,7 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_lld_item_ptr
 	zbx_lld_item_link_t	*item_link;
 
 	if (FAIL == (index = zbx_vector_lld_item_ptr_bsearch(items, &lld_item_cmp,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			lld_item_compare_func)))
 	{
 		return FAIL;
 	}
@@ -544,7 +564,7 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_lld_item_ptr
 		zbx_lld_item_link_t	lld_item_link_cmp = {.parent_itemid = item_proto->itemid};
 
 		index = zbx_vector_lld_item_link_ptr_bsearch(item_links, &lld_item_link_cmp,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+				lld_item_link_compare_func);
 
 		if (FAIL == index)
 			return FAIL;
@@ -789,7 +809,7 @@ static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_
 				discover_proto, lld_row, lld_macro_paths);
 	}
 
-	zbx_vector_lld_graph_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_graph_ptr_sort(graphs, lld_graph_compare_func);
 }
 
 static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char **field_orig, zbx_uint64_t flag,

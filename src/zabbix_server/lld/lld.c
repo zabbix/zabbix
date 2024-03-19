@@ -34,6 +34,36 @@ ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 
+int      lld_item_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_t  *lld_item_1 = *(const zbx_lld_item_t **)d1;
+	const zbx_lld_item_t  *lld_item_2 = *(const zbx_lld_item_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(lld_item_1->itemid, lld_item_2->itemid);
+
+	return 0;
+}
+
+int      lld_item_link_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_link_t  *lld_item_link_1 = *(const zbx_lld_item_link_t **)d1;
+	const zbx_lld_item_link_t  *lld_item_link_2 = *(const zbx_lld_item_link_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(lld_item_link_1->parent_itemid, lld_item_link_2->parent_itemid);
+
+	return 0;
+}
+
+int     lld_item_full_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_full_t  *lld_item_full_1 = *(const zbx_lld_item_full_t **)d1;
+	const zbx_lld_item_full_t  *lld_item_full_2 = *(const zbx_lld_item_full_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(lld_item_full_1->itemid, lld_item_full_2->itemid);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: release resources allocated by filter condition                   *
@@ -463,6 +493,16 @@ static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json
 	return FAIL;
 }
 
+static int      lld_override_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_override_t  *lld_override_1 = *(const zbx_lld_override_t **)d1;
+	const zbx_lld_override_t  *lld_override_2 = *(const zbx_lld_override_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(lld_override_1->overrideid, lld_override_2->overrideid);
+
+	return 0;
+}
+
 static int	lld_override_conditions_load(zbx_vector_lld_override_ptr_t *overrides,
 		const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc, const zbx_dc_item_t *item,
 		char **error)
@@ -492,7 +532,7 @@ static int	lld_override_conditions_load(zbx_vector_lld_override_ptr_t *overrides
 		const zbx_lld_override_t	cmp = {.overrideid = overrideid};
 
 		if (FAIL == (i = zbx_vector_lld_override_ptr_bsearch(overrides, &cmp,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				lld_override_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -538,7 +578,7 @@ static void	lld_override_operations_load(zbx_vector_lld_override_ptr_t *override
 		zbx_lld_override_t		*override, cmp = {.overrideid = op->overrideid};
 
 		if (FAIL == (index = zbx_vector_lld_override_ptr_bsearch(overrides,
-				&cmp, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				&cmp, lld_override_compare_func)))
 		{
 			zbx_lld_override_operation_free(op);
 			THIS_SHOULD_NEVER_HAPPEN;
