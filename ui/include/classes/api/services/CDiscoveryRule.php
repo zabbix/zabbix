@@ -1659,8 +1659,8 @@ class CDiscoveryRule extends CItemGeneral {
 				continue;
 			}
 
-			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
-			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+			$item['lifetime'] = timeUnitToSeconds($item['lifetime'], true);
+			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime'], true);
 
 			if ($item['lifetime'] == 0 && $item['enabled_lifetime'] == 0) {
 				continue;
