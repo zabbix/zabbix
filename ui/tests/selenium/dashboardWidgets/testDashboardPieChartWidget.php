@@ -1164,7 +1164,9 @@ class testDashboardPieChartWidget extends CWebTest {
 		sleep(1);
 
 		// Assert Pie chart sectors.
-		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
+		$expected_sectors = CTestArrayHelper::get($data, 'expected_sectors', []);
+
+		foreach ($expected_sectors as $item_name => $expected_sector) {
 			// The name shown in the legend and in the hintbox.
 			$legend_name = self::HOST_NAME_SCREENSHOTS.': '.$item_name;
 
@@ -1179,34 +1181,24 @@ class testDashboardPieChartWidget extends CWebTest {
 			}
 
 			// Special case - custom legend name.
-			if (CTestArrayHelper::get($data, 'expected_dataset_name')) {
-				$legend_name = $data['expected_dataset_name'];
-			}
+			$legend_name = CTestArrayHelper::get($data, 'expected_dataset_name', $legend_name);
 
-			// Check if any visible sector matches the expected sector.
-			foreach ($sectors as $sector) {
-				// Check the correct sector by hintbox attribute.
-				if (strpos($sector->getAttribute('data-hintbox-contents'), $legend_name)) {
-					// Assert sector fill color.
-					$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
+			// Locate the correct sector by class and then by the hintbox content.
+			$sector = $widget->query('class:svg-pie-chart-arcs')->
+					query('xpath:./*[contains(@data-hintbox-contents, "'.$legend_name.'")]')->one();
 
-					// Open and assert the hintbox.
-					$sector->click();
-					$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
-					$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
-					$this->assertEquals('background-color: '.$expected_sector['color'].';',
-							$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
-					);
-					$hintbox->close();
-
-					// Assertion successful, continue to the next expected sector.
-					continue 2;
-				}
-			}
-
-			// Fail test if no match found.
-			$this->fail('Expected sector "'.$legend_name.': '.$expected_sector['value'].'" not found.');
+			// Open and assert the hintbox.
+			$sector->click();
+			$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
+			$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
+			$this->assertEquals('background-color: '.$expected_sector['color'].';',
+				$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
+			);
+			$hintbox->close();
 		}
+
+		// Assert the total count of sectors.
+		$this->assertEquals(count($expected_sectors), $widget->query('class:svg-pie-chart-arc')->all()->count());
 
 		// Assert expected Total value.
 		if (CTestArrayHelper::get($data, 'expected_total')) {
@@ -1221,7 +1213,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Screenshot the widget.
 		$this->page->removeFocus();
-		$this->assertScreenshot($widget, 'Pie chart display - '.$data['widget_name']);
+		$this->assertScreenshot($widget, $data['widget_name']);
 	}
 
 	/**
