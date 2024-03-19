@@ -43,8 +43,8 @@ class CWidgetSvgGraph extends CWidget {
 		this._deactivateGraph();
 	}
 
-	onFeedback({type, value, descriptor}) {
-		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
+	onFeedback({type, value}) {
+		if (type === '_timeperiod') {
 			this._startUpdating();
 
 			this.feedback({time_period: value});
@@ -52,12 +52,26 @@ class CWidgetSvgGraph extends CWidget {
 			return true;
 		}
 
-		return super.onFeedback({type, value, descriptor});
+		return super.onFeedback({type, value});
 	}
 
 	promiseUpdate() {
-		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		const time_period = this.getFieldsData().time_period;
+
+		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: time_period});
+		}
+
+		if (time_period === null) {
+			this._destroyGraph();
+
+			this._updateMessages([
+				t('Invalid parameter "%1$s": %2$s.')
+					.replace('%1$s', t('Time period'))
+					.replace('%2$s', t('no data received'))
+			]);
+
+			return Promise.resolve();
 		}
 
 		return super.promiseUpdate();
@@ -115,7 +129,7 @@ class CWidgetSvgGraph extends CWidget {
 	_destroyGraph() {
 		if (this._has_contents) {
 			this._deactivateGraph();
-			this._svg.remove();
+			this._body.innerHTML = '';
 		}
 	}
 

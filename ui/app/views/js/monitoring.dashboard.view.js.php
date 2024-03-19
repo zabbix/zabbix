@@ -506,7 +506,7 @@
 			},
 
 			feedback(e) {
-				if (e.detail.type === '_timeperiod') {
+				if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
 					view.skip_time_selector_range_update = true;
 
 					$.publish('timeselector.rangechange', {

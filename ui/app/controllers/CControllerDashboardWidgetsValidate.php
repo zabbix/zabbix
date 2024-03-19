@@ -1,7 +1,7 @@
-<?php declare(strict_types = 0);
+<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@
 use Zabbix\Core\CModule;
 
 /**
- * Controller for sanitizing fields of widgets before pasting previously copied widgets or dashboard pages.
+ * Controller for performing widgets' configuration validation.
  */
-class CControllerDashboardWidgetsSanitize extends CController {
+class CControllerDashboardWidgetsValidate extends CController {
 
 	private array $widgets_data = [];
 
@@ -36,13 +36,13 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>	'db dashboard.templateid',
-			'widgets' =>	'array'
+			'widgets' =>	'required|array',
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			foreach ($this->getInput('widgets', []) as $widget) {
+			foreach ($this->getInput('widgets') as $widget) {
 				$validator = new CNewValidator($widget, [
 					'type' =>	'required|string',
 					'fields' =>	'required|array'
@@ -100,10 +100,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 			foreach ($this->widgets_data as $index => $widget_data) {
 				if ($widget_data !== null) {
-					$form = $widget_data['widget']->getForm($widget_data['fields'],
-						$this->hasInput('templateid') ? $this->getInput('templateid') : null
-					);
-
+					$form = $widget_data['widget']->getForm($widget_data['fields'], null);
 					$form->validate();
 
 					$widgets_api[$index] = ['fields' => $form->fieldsToApi()];
@@ -141,10 +138,13 @@ class CControllerDashboardWidgetsSanitize extends CController {
 			$form = $widget_data['widget']->getForm($widgets_fields[$index],
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
-			$form->validate();
+
+			$messages = $form->validate();
+			$fields = $form->getFieldsValues();
 
 			$output['widgets'][$index] = [
-				'fields' => $form->getFieldsValues()
+				'fields' => $fields,
+				'messages' => $messages
 			];
 		}
 

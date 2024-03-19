@@ -148,6 +148,7 @@ $translate_strings = [
 		'Page %1$d' => _('Page %1$d'),
 		'Paste widget' => _('Paste widget'),
 		'Properties' => _('Properties'),
+		'Referred widget became unavailable. Please update configuration.' => _('Referred widget became unavailable. Please update configuration.'),
 		'Start slideshow' => _('Start slideshow'),
 		'Stop slideshow' => _('Stop slideshow')
 	],

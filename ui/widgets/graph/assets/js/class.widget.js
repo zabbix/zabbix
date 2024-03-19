@@ -86,16 +86,6 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating();
-		}
-
-		this._is_graph_mode = false;
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	onEdit() {
 		if (this._is_graph_mode && this._graph_url !== null) {
 			this._flickerfreescreen_container.href = 'javascript:void(0)';
@@ -103,22 +93,39 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	onFeedback({type, value, descriptor}) {
-		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
-			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], value);
-			timeControl.refreshObject(`graph_${this._unique_id}`);
+	onFeedback({type, value}) {
+		if (type === '_timeperiod') {
+			this._startUpdating();
 
 			this.feedback({time_period: value});
 
 			return true;
 		}
 
-		return super.onFeedback({type, value, descriptor});
+		return super.onFeedback({type, value});
 	}
 
 	promiseUpdate() {
-		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		const time_period = this.getFieldsData().time_period;
+
+		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: time_period});
+		}
+
+		if (time_period === null) {
+			if (this._is_graph_mode) {
+				this._is_graph_mode = false;
+				this._deactivateGraph();
+				this._body.innerHTML = '';
+			}
+
+			this._updateMessages([
+				t('Invalid parameter "%1$s": %2$s.')
+					.replace('%1$s', t('Time period'))
+					.replace('%2$s', t('no data received'))
+			]);
+
+			return Promise.resolve();
 		}
 
 		if (this._is_graph_mode) {
@@ -135,9 +142,7 @@ class CWidgetGraph extends CWidget {
 				}
 			}
 
-			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`],
-				this.getFieldsData().time_period
-			);
+			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], time_period);
 			timeControl.refreshObject(`graph_${this._unique_id}`);
 
 			return Promise.resolve();
@@ -180,7 +185,11 @@ class CWidgetGraph extends CWidget {
 	setContents(response) {
 		super.setContents(response);
 
-		if (!this._is_graph_mode && response.async_data !== undefined) {
+		if (this.getFieldsData().time_period === null) {
+			return;
+		}
+
+		if (!this._is_graph_mode && 'async_data' in response) {
 			this._is_graph_mode = true;
 
 			this._graph_url = response.async_data.graph_url;

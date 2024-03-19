@@ -1797,12 +1797,6 @@ button {
     z-index: 5; }
   .dashboard-grid-widget.dashboard-grid-widget-focus .dashboard-grid-widget-actions {
     opacity: 1; }
-  .dashboard-grid-widget.ui-resizable-resizing.resizing-top .dashboard-grid-widget-container {
-    top: auto;
-    bottom: 0; }
-  .dashboard-grid-widget.ui-resizable-resizing.resizing-left .dashboard-grid-widget-container {
-    left: auto;
-    right: 0; }
 
 .dashboard-grid-iterator-container {
   position: absolute;
@@ -1923,12 +1917,6 @@ button {
     .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
       margin-top: calc(-4rem - 8px);
       height: calc(4rem + 8px); }
-  .dashboard-grid-iterator.ui-resizable-resizing.resizing-top .dashboard-grid-iterator-container {
-    top: auto;
-    bottom: 0; }
-  .dashboard-grid-iterator.ui-resizable-resizing.resizing-left .dashboard-grid-iterator-container {
-    left: auto;
-    right: 0; }
   .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents {
     position: absolute;
     top: .25rem;
@@ -2006,8 +1994,8 @@ button {
     border-color: #909090; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #909090; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
-  transition-property: width, height, left, top;
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
+  transition-property: height, top;
   transition-duration: 0.15s; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
@@ -2051,6 +2039,12 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #8b8b8b;
     border-top: 0; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
+  transition-property: height, top;
+  transition-duration: 0.15s; }
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
+  transition-property: height, top;
+  transition-duration: 0s; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder {
   position: absolute;
   z-index: 999; }
