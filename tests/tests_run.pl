@@ -121,10 +121,10 @@ my $target_suite;
 my $help = 0;
 
 GetOptions(
-	'help|?' => \$help,
-	'xml:s' => \$xml,
-	'suite=s' => \$target_suite,
-	'v' => \$valgrind
+	'suite=s'  => \$target_suite,
+	'xml:s'    => \$xml,
+	'valgrind' => \$valgrind,
+	'help|?'   => \$help
 ) or pod2usage(2);
 
 pod2usage(-verbose => 2, -noperldoc => 1) if ($help);
@@ -416,6 +416,7 @@ tests_run.pl [options]
 
     -s|--suite <suite>        run specific test suite instead of all
     -x|--xml                  output in XML format
+    -v|--valgrind             run tests with valgrind
     -h|--help                 show help message
 
 =head1 OPTIONS

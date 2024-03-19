@@ -25,11 +25,11 @@ zabbix_export:
               var params = JSON.parse(value);
               var req = new HttpRequest();
               req.addHeader('Authorization: PVEAPIToken=' + params.token + '=' + params.secret);
-              req.get(encodeURI('https://' + params.url + ':' + params.port + '/api2/json/version'));  
+              req.get(encodeURI('https://' + params.url + ':' + params.port + '/api2/json/version'));
             } catch (error) {
-                Zabbix.log(3, "Proxmox API failed: " + params.url + " Error: " + error);
-                if (!Number.isInteger(error))
-                    return 520;
+            	Zabbix.log(3, "Proxmox API failed: " + params.url + " Error: " + error);
+            	if (!Number.isInteger(error))
+            		return 520;
             }
             return req.getStatus();
           description: 'Get API service status.'
@@ -1099,8 +1099,8 @@ zabbix_export:
                   value: capacity
             - uuid: f38ccc2e0e40430e801bf98b488e12e4
               expression: 'min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0'
-              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage'
-              event_name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              name: 'Proxmox: Node [{#NODE.NAME}] high swap space usage'
+              event_name: 'Proxmox: Node [{#NODE.NAME}] high swap space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'If there is no swap configured, this trigger is ignored.'

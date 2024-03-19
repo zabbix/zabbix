@@ -325,6 +325,10 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 					zbx_rtrim(result.msg, "\r\n");
 					printf("%s: %s\n", ZBX_NOTSUPPORTED, result.msg);
 				}
+				else if (0 == ZBX_ISSET_VALUE(&result))
+				{
+					puts(ZBX_NODATA ": No value was received.");
+				}
 				else
 				{
 					zbx_rtrim(result.text, "\r\n");
@@ -586,7 +590,7 @@ int	main(int argc, char **argv)
 #if defined(_WINDOWS)
 			zbx_tls_init_parent(get_zbx_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type);
+			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type, NULL);
 		}
 #else
 		ZBX_UNUSED(get_zbx_program_type);

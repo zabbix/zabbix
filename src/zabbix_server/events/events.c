@@ -19,8 +19,8 @@
 
 #include "events.h"
 
-#include "../db_lengths.h"
-#include "../actions.h"
+#include "../db_lengths_constants.h"
+#include "../actions/actions.h"
 
 #include "zbxexpression.h"
 #include "zbxexport.h"
@@ -726,15 +726,14 @@ static const char	*correlation_condition_match_new_event(const zbx_corr_conditio
 			return (SUCCEED == old_value) ? ZBX_UNKNOWN_STR "0" : "0";
 	}
 
+	int	ret;
+
 	switch (condition->type)
 	{
-		int		i, ret;
-		const zbx_tag_t	*tag;
-
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-			for (i = 0; i < event->tags.values_num; i++)
+			for (int i = 0; i < event->tags.values_num; i++)
 			{
-				tag = event->tags.values[i];
+				const zbx_tag_t	*tag = event->tags.values[i];
 
 				if (0 == strcmp(tag->tag, condition->data.tag.tag))
 					return "1";
@@ -742,11 +741,10 @@ static const char	*correlation_condition_match_new_event(const zbx_corr_conditio
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-			for (i = 0; i < event->tags.values_num; i++)
+			for (int i = 0; i < event->tags.values_num; i++)
 			{
 				const zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
-
-				tag = event->tags.values[i];
+				const zbx_tag_t				*tag = event->tags.values[i];
 
 				if (0 == strcmp(tag->tag, cond->tag) &&
 					SUCCEED == zbx_strmatch_condition(tag->value, cond->value, cond->op))
@@ -765,9 +763,9 @@ static const char	*correlation_condition_match_new_event(const zbx_corr_conditio
 			return (SUCCEED == ret ? "1" : "0");
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-			for (i = 0; i < event->tags.values_num; i++)
+			for (int i = 0; i < event->tags.values_num; i++)
 			{
-				tag = event->tags.values[i];
+				const zbx_tag_t	*tag = event->tags.values[i];
 
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
 					return (SUCCEED == old_value) ? ZBX_UNKNOWN_STR "0" : "0";

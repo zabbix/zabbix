@@ -88,7 +88,7 @@ class testPageServicesSlaReport extends testSlaReport {
 
 		foreach (['From', 'To'] as $field_label) {
 			$field = $filter_form->getField($field_label)->query('xpath:./input')->one();
-			$this->assertEquals(10, $field->getAttribute('maxlength'));
+			$this->assertEquals(255, $field->getAttribute('maxlength'));
 			$this->assertEquals('YYYY-MM-DD', $field->getAttribute('placeholder'));
 		}
 

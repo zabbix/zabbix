@@ -86,7 +86,7 @@ class testToken extends CAPITest {
 					],
 					[
 						'name' => static::uniqueName(),
-						'description' => 'test desctiption'
+						'description' => 'test description'
 					]
 				],
 				'expected_error' => null

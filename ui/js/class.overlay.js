@@ -32,7 +32,7 @@
 function Overlay(type, dialogueid) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
-	this.headerid = 'dashboard-widget-head-title-' + this.dialogueid;
+	this.headerid =  'overlay-dialogue-header-title-' + this.dialogueid;
 	this.$backdrop = jQuery('<div>', {
 		'class': 'overlay-bg',
 		'data-dialogueid': this.dialogueid
@@ -57,7 +57,7 @@ function Overlay(type, dialogueid) {
 	}.bind(this));
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
-	this.$dialogue.$head = jQuery('<div>', {class: 'dashboard-widget-head'});
+	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
@@ -278,11 +278,16 @@ Overlay.prototype.unmount = function() {
 		cancelAnimationFrame(this.center_dialog_animation_frame);
 	}
 
-	var $wrapper = jQuery('.wrapper');
+	const $wrapper = jQuery('.wrapper');
 
 	if (!jQuery('[data-dialogueid]').length) {
 		$wrapper.css('overflow', $wrapper.data('overflow'));
 		$wrapper.removeData('overflow');
+
+		$wrapper[0].scrollTo($wrapper[0].dataset.scroll_x, $wrapper[0].dataset.scroll_y);
+
+		delete $wrapper[0].dataset.scroll_x;
+		delete $wrapper[0].dataset.scroll_y;
 	}
 };
 
@@ -290,7 +295,10 @@ Overlay.prototype.unmount = function() {
  * Appends associated nodes to document body.
  */
 Overlay.prototype.mount = function() {
-	var $wrapper = jQuery('.wrapper');
+	const $wrapper = jQuery('.wrapper');
+
+	$wrapper[0].dataset.scroll_x = $wrapper[0].scrollLeft;
+	$wrapper[0].dataset.scroll_y = $wrapper[0].scrollTop;
 
 	if (!jQuery('[data-dialogueid]').length) {
 		$wrapper.data('overflow', $wrapper.css('overflow'));

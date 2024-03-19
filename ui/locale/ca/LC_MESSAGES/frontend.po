@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-06 12:07+0000\n"
+"PO-Revision-Date: 2024-02-19 09:23+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -8429,6 +8429,11 @@ msgstr "Accés a la interfície"
 msgid "Frontend messaging"
 msgstr "Missatges de la interfície"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr "Notificacions del frontend"
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -12268,6 +12273,10 @@ msgstr "Longitud de la ubicació"
 msgid "Log"
 msgstr "Registre"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr "Enregistra els canvis per descoberta de baix nivell, descoberta de xarxa i autoregistre"
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Supervisió de fitxers de registre amb suport de rotació de registre. Retorna un registre"
@@ -12275,6 +12284,10 @@ msgstr "Supervisió de fitxers de registre amb suport de rotació de registre. R
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Supervisió del fitxer de registre. Retorna un registre"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr "Enregistra les accions del sistema"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -13310,6 +13323,11 @@ msgstr "Múltiples PROBLEM"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "Silenciar"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr "Silenciar durant %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -18461,6 +18479,11 @@ msgstr "Eslovac (sk_SK)"
 msgid "Snooze"
 msgstr "Migdiada"
 
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr "Posposar durant %1$s"
+
 #: include/hosts.inc.php:174
 msgid "Software"
 msgstr "Programari"
@@ -20838,6 +20861,11 @@ msgstr "Desenllaçar plantilles"
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "Activa el so"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr "Activa el so durant %1$s"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -24445,9 +24473,29 @@ msgstr "now() - Nombre de segons des de l'època"
 msgid "number"
 msgstr "nombre"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr "l'objecte no existeix pas"
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "l'objecte no existeix pas o pertany a un altre objecte"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr "l'objecte no existeix, o no hi teniu pas permisos"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"

@@ -34,17 +34,19 @@
 }
 
 .svg-pie-chart-legend {
-	$legend-line-height: 18px;
+	$svg-legend-line-height: 18px;
 
+	position: relative;
+	top: 4px;
 	box-sizing: border-box;
 	display: grid;
 	grid-template-columns: repeat(var(--columns, 4), auto);
 	grid-gap: 0 10px;
 	justify-content: start;
-	max-height: calc(var(--lines) * #{$legend-line-height});
+	max-height: calc(var(--lines) * #{$svg-legend-line-height});
 	margin: 0 10px;
 	overflow: hidden;
-	line-height: $legend-line-height;
+	line-height: $svg-legend-line-height;
 
 	.svg-pie-chart-legend-item {
 		min-width: 100%;
@@ -61,6 +63,31 @@
 			height: 4px;
 			margin-right: 4px;
 			background: var(--color);
+		}
+	}
+
+	.svg-pie-chart-legend-header {
+		grid-column-start: 2;
+		color: $font-alt-color;
+	}
+
+	.svg-pie-chart-legend-no-data {
+		color: $font-alt-color;
+	}
+
+	.svg-pie-chart-legend-header,
+	.svg-pie-chart-legend-value,
+	.svg-pie-chart-legend-no-data {
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	&.svg-pie-chart-legend-show-value {
+		grid-template-columns: auto max-content;
+		justify-content: stretch;
+
+		.svg-pie-chart-legend-item {
+			grid-column-start: 1;
 		}
 	}
 }

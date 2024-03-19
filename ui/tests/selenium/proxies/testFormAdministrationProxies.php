@@ -1974,6 +1974,8 @@ class testFormAdministrationProxies extends CWebTest {
 		$form->fill(['Proxy name' => $new_name]);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Proxy added');
+		// The next message 'Proxy updated' may not update on time.
+		CMessageElement::find()->one()->close();
 
 		// Check cloned proxy form fields.
 		$this->query('link', $new_name)->one()->waitUntilClickable()->click();

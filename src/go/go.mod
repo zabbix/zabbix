@@ -3,7 +3,7 @@ module zabbix.com
 go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20240104135616-a285384a6042
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20240227101402-ef513f9a06bf
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Microsoft/go-winio v0.6.1
@@ -19,7 +19,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.34.0
 	github.com/google/go-cmp v0.6.0
-	github.com/mattn/go-sqlite3 v1.14.15
+	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/mediocregopher/radix/v3 v3.8.1
 	github.com/memcachier/mc/v3 v3.0.3
 	github.com/miekg/dns v1.1.55

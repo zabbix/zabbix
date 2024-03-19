@@ -20,6 +20,7 @@
 #define ZABBIX_VMWARE_SHMEM_H
 
 #include "zbxvmware.h"
+#include "vmware_internal.h"
 
 #include "zbxshmem.h"
 #include "zbxalgo.h"
@@ -31,13 +32,14 @@ void	vmware_shmem_set_vmware_mem_NULL(void);
 #define VMWARE_SHMEM_VECTOR_CREATE_DECL(ref,type) void	vmware_shmem_vector_##type##_create_ext(ref);
 
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_str_t*, str)
-VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_entity_tags_t*, vmware_entity_tags)
+VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_entity_tags_ptr_t*, vmware_entity_tags_ptr)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_custquery_param_t*, custquery_param)
-VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_ptr_t*, ptr)
-VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_tag_t*, vmware_tag)
+VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_tag_ptr_t*, vmware_tag_ptr)
+VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_perf_counter_ptr)
 
 void	vmware_shmem_perf_counter_free(zbx_vmware_perf_counter_t *counter);
-void	vmware_perf_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t counterid, unsigned char state);
+void	vmware_perf_counters_add_new(zbx_vector_vmware_perf_counter_ptr_t *counters, zbx_uint64_t counterid,
+		unsigned char state);
 void	vmware_perf_counters_vector_ptr_create_ext(zbx_vmware_perf_entity_t *pentity);
 void	vmware_shmem_diskextent_free(zbx_vmware_diskextent_t *diskextent);
 void	vmware_shmem_free_datastore(zbx_vmware_datastore_t *datastore);
@@ -63,24 +65,24 @@ void	vmware_shmem_service_free(zbx_vmware_service_t *service);
 void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src);
 void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value);
 
-zbx_vmware_event_t		*vmware_shmem_event_dup(const zbx_vmware_event_t *src);
-zbx_vmware_diskextent_t		*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent_t *src);
-zbx_vmware_resourcepool_t	*vmware_shmem_resourcepool_dup(const zbx_vmware_resourcepool_t *src);
-zbx_vmware_dvswitch_t		*vmware_shmem_dvswitch_dup(const zbx_vmware_dvswitch_t *src);
-zbx_vmware_fs_t			*vmware_shmem_fs_dup(const zbx_vmware_fs_t *src);
-zbx_vmware_custom_attr_t	*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t *src);
-zbx_vmware_dev_t		*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src);
-zbx_vmware_vm_t			*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src);
-zbx_vmware_data_t		*vmware_shmem_data_dup(zbx_vmware_data_t *src);
-zbx_vmware_service_t		*vmware_shmem_vmware_service_malloc(void);
-void				vmware_shmem_service_hashset_create(zbx_vmware_service_t *service);
-zbx_vector_custquery_param_t	*vmware_shmem_custquery_malloc(void);
-zbx_vmware_job_t		*vmware_shmem_vmware_job_malloc(void);
-void				vmware_shmem_vmware_job_free(zbx_vmware_job_t *job);
-zbx_vmware_entity_tags_t	*vmware_shmem_entity_tags_malloc(void);
-zbx_vmware_tag_t		*vmware_shmem_tag_malloc(void);
+zbx_vmware_event_t			*vmware_shmem_event_dup(const zbx_vmware_event_t *src);
+zbx_vmware_diskextent_t			*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent_t *src);
+zbx_vmware_resourcepool_t		*vmware_shmem_resourcepool_dup(const zbx_vmware_resourcepool_t *src);
+zbx_vmware_dvswitch_t			*vmware_shmem_dvswitch_dup(const zbx_vmware_dvswitch_t *src);
+zbx_vmware_fs_t				*vmware_shmem_fs_dup(const zbx_vmware_fs_t *src);
+zbx_vmware_custom_attr_t		*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t *src);
+zbx_vmware_dev_t			*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src);
+zbx_vmware_vm_t				*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src);
+zbx_vmware_data_t			*vmware_shmem_data_dup(zbx_vmware_data_t *src);
+zbx_vmware_service_t			*vmware_shmem_vmware_service_malloc(void);
+void					vmware_shmem_service_hashset_create(zbx_vmware_service_t *service);
+zbx_vector_custquery_param_t		*vmware_shmem_custquery_malloc(void);
+zbx_vmware_job_t			*vmware_shmem_vmware_job_malloc(void);
+void					vmware_shmem_vmware_job_free(zbx_vmware_job_t *job);
+zbx_vmware_entity_tags_t		*vmware_shmem_entity_tags_malloc(void);
+zbx_vmware_tag_t			*vmware_shmem_tag_malloc(void);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
-int				vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware,
-					zbx_hashset_t *evt_msg_strpool, char **error);
+int					vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware,
+							zbx_hashset_t *evt_msg_strpool, char **error);
 
 #endif	/* ZABBIX_VMWARE_SHMEM_H */

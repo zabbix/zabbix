@@ -19,8 +19,8 @@
 **/
 
 
-if (version_compare(PHP_VERSION, '7.4.0', '<')) {
-	echo sprintf('Minimum required PHP version is %1$s.', '7.4.0');
+if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+	echo sprintf('Minimum required PHP version is %1$s.', '8.0.0');
 	exit;
 }
 

@@ -99,20 +99,19 @@ class CTemplate extends CHostGeneral {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE h.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'h.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// groupids
@@ -347,6 +346,7 @@ class CTemplate extends CHostGeneral {
 		$this->checkTemplatesLinks($templates);
 
 		$this->updateGroups($templates);
+		$this->updateHgSets($templates);
 		$this->updateTags($templates);
 		$this->updateMacros($templates);
 		$this->updateTemplates($templates);
@@ -468,30 +468,7 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function update(array $templates): array {
 		$this->validateUpdate($templates, $db_templates);
-
-		$upd_templates =[];
-
-		foreach ($templates as $template) {
-			$upd_template = DB::getUpdatedValues('hosts', $template, $db_templates[$template['templateid']]);
-
-			if ($upd_template) {
-				$upd_templates[] = [
-					'values' => $upd_template,
-					'where' => ['hostid' => $template['templateid']]
-				];
-			}
-		}
-
-		if ($upd_templates) {
-			DB::update('hosts', $upd_templates);
-		}
-
-		$this->updateGroups($templates, $db_templates);
-		$this->updateTags($templates, $db_templates);
-		$this->updateMacros($templates, $db_templates);
-		$this->updateTemplates($templates, $db_templates);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
+		$this->updateForce($templates, $db_templates);
 
 		return ['templateids' => array_column($templates, 'templateid')];
 	}
@@ -590,6 +567,33 @@ class CTemplate extends CHostGeneral {
 				));
 			}
 		}
+	}
+
+	public function updateForce(array $templates, array $db_templates): void {
+		$upd_templates =[];
+
+		foreach ($templates as $template) {
+			$upd_template = DB::getUpdatedValues('hosts', $template, $db_templates[$template['templateid']]);
+
+			if ($upd_template) {
+				$upd_templates[] = [
+					'values' => $upd_template,
+					'where' => ['hostid' => $template['templateid']]
+				];
+			}
+		}
+
+		if ($upd_templates) {
+			DB::update('hosts', $upd_templates);
+		}
+
+		$this->updateGroups($templates, $db_templates);
+		$this->updateHgSets($templates, $db_templates);
+		$this->updateTags($templates, $db_templates);
+		$this->updateMacros($templates, $db_templates);
+		$this->updateTemplates($templates, $db_templates);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 	}
 
 	/**
@@ -771,6 +775,9 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		self::deleteHgSets($db_templates);
+		DB::delete('hosts_groups', ['hostid' => $templateids]);
+
 		// Finally delete the template.
 		DB::delete('host_tag', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);
@@ -850,17 +857,76 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function massAdd(array $data) {
-		$this->validateMassAdd($data, $db_templates);
+		$this->validateMassAdd($data, $templates, $db_templates);
 
-		$templates = $this->getObjectsByData($data, $db_templates);
-
-		$this->updateGroups($templates, $db_templates);
-		$this->updateMacros($templates, $db_templates);
-		$this->updateTemplates($templates, $db_templates);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
+		$this->updateForce($templates, $db_templates);
 
 		return ['templateids' => array_column($data['templates'], 'templateid')];
+	}
+
+	private function validateMassAdd(array &$data, ?array &$templates, ?array &$db_templates): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'templates' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
+											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
+				]],
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+			]],
+			'templates_link' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_templates = $this->get([
+			'output' => ['templateid', 'host'],
+			'templateids' => array_column($data['templates'], 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($data['templates'] as $i => $template) {
+			if (!array_key_exists($template['templateid'], $db_templates)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/templates/'.($i + 1), _('object does not exist, or you have no permissions to it')
+				));
+			}
+		}
+
+		$templates = $data['templates'];
+
+		$this->addObjectsByData($data, $templates);
+		$this->addAffectedObjects($templates, $db_templates);
+		$this->addUnchangedObjects($templates, $db_templates);
+
+		if (array_key_exists('groups', $data) && $data['groups']) {
+			$this->checkGroups($templates, $db_templates, '/groups',
+				array_flip(array_column($data['groups'], 'groupid'))
+			);
+		}
+
+		if (array_key_exists('macros', $data) && $data['macros']) {
+			$templates = $this->validateHostMacros($templates, $db_templates);
+		}
+
+		if (array_key_exists('templates_link', $data) && $data['templates_link']) {
+			$this->checkTemplates($templates, $db_templates, '/templates_link',
+				array_flip(array_column($data['templates_link'], 'templateid'))
+			);
+			$this->checkTemplatesLinks($templates, $db_templates);
+		}
 	}
 
 	/**
@@ -871,17 +937,92 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function massUpdate(array $data) {
-		$this->validateMassUpdate($data, $db_templates);
+		$this->validateMassUpdate($data, $templates, $db_templates);
 
-		$templates = $this->getObjectsByData($data, $db_templates);
-
-		$this->updateGroups($templates, $db_templates);
-		$this->updateMacros($templates, $db_templates);
-		$this->updateTemplates($templates, $db_templates);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
+		$this->updateForce($templates, $db_templates);
 
 		return ['templateids' => array_column($data['templates'], 'templateid')];
+	}
+
+	private function validateMassUpdate(array &$data, ?array &$templates, ?array &$db_templates): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'templates' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
+											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
+				]],
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+			]],
+			'templates_link' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_templates = $this->get([
+			'output' => ['templateid', 'host'],
+			'templateids' => array_column($data['templates'], 'templateid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($data['templates'] as $i => $template) {
+			if (!array_key_exists($template['templateid'], $db_templates)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/templates/'.($i + 1), _('object does not exist, or you have no permissions to it')
+				));
+			}
+		}
+
+		$templates = $data['templates'];
+
+		$this->addObjectsByData($data, $templates);
+		$this->addAffectedObjects($templates, $db_templates);
+
+		if (array_key_exists('groups', $data)) {
+			$this->checkGroups($templates, $db_templates, '/groups',
+				array_flip(array_column($data['groups'], 'groupid'))
+			);
+			$this->checkHostsWithoutGroups($templates, $db_templates);
+		}
+
+		if (array_key_exists('macros', $data) && $data['macros']) {
+			self::addHostMacroIds($templates, $db_templates);
+		}
+
+		if (array_key_exists('templates_link', $data)
+				|| (array_key_exists('templates_clear', $data) && $data['templates_clear'])) {
+			$path = array_key_exists('templates_link', $data) ? '/templates_link' : null;
+			$template_indexes = array_key_exists('templates_link', $data)
+				? array_flip(array_column($data['templates_link'], 'templateid'))
+				: null;
+
+			$path_clear = array_key_exists('templates_clear', $data) && $data['templates_clear']
+				? '/templates_clear'
+				: null;
+			$template_clear_indexes = array_key_exists('templates_clear', $data) && $data['templates_clear']
+				? array_flip(array_column($data['templates_clear'], 'templateid'))
+				: null;
+
+			$this->checkTemplates($templates, $db_templates, $path, $template_indexes, $path_clear,
+				$template_clear_indexes
+			);
+			$this->checkTemplatesLinks($templates, $db_templates);
+		}
 	}
 
 	/**
@@ -892,297 +1033,14 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function massRemove(array $data) {
-		$this->validateMassRemove($data, $db_templates);
+		$this->validateMassRemove($data, $templates, $db_templates);
 
-		$templates = $this->getObjectsByData($data, $db_templates);
-
-		$this->updateGroups($templates, $db_templates);
-		$this->updateMacros($templates, $db_templates);
-		$this->updateTemplates($templates, $db_templates);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
+		$this->updateForce($templates, $db_templates);
 
 		return ['templateids' => $data['templateids']];
 	}
 
-	/**
-	 * @param array      $data
-	 * @param array|null $db_templates
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private function validateMassAdd(array &$data, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'groups' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'macros' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
-				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
-				]],
-				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]],
-			'templates_link' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_templates = $this->get([
-			'output' => ['templateid', 'host'],
-			'templateids' => array_column($data['templates'], 'templateid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if (count($db_templates) != count($data['templates'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		if (array_key_exists('groups', $data) && $data['groups']) {
-			$groupids = array_column($data['groups'], 'groupid');
-
-			$count = API::TemplateGroup()->get([
-				'countOutput' => true,
-				'groupids' => $groupids,
-				'editable' => true
-			]);
-
-			if ($count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$this->massAddAffectedObjects('groups', $groupids, $db_templates);
-		}
-
-		if (array_key_exists('macros', $data) && $data['macros']) {
-			$macros = [];
-
-			foreach ($data['macros'] as $macro) {
-				$macros[CApiInputValidator::trimMacro($macro['macro'])] = $macro['macro'];
-			}
-
-			$options = [
-				'output' => ['hostid', 'macro'],
-				'filter' => ['hostid' => array_keys($db_templates)]
-			];
-			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
-
-			while ($db_macro = DBfetch($db_macros)) {
-				$trimmed_db_macro = CApiInputValidator::trimMacro($db_macro['macro']);
-
-				if (array_key_exists($trimmed_db_macro, $macros)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Macro "%1$s" already exists on "%2$s".', $macros[$trimmed_db_macro],
-							$db_templates[$db_macro['hostid']]['host']
-						)
-					);
-				}
-			}
-
-			foreach ($db_templates as &$db_template) {
-				$db_template['macros'] = [];
-			}
-			unset($db_host);
-		}
-
-		if (array_key_exists('templates_link', $data) && $data['templates_link']) {
-			$templateids = array_column($data['templates_link'], 'templateid');
-
-			$count = API::Template()->get([
-				'countOutput' => true,
-				'templateids' => $templateids
-			]);
-
-			if ($count != count($templateids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
-
-			$this->massCheckTemplatesLinks('massadd', $templateids, $db_templates);
-		}
-	}
-
-	/**
-	 * @param array      $data
-	 * @param array|null $db_templates
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private function validateMassUpdate(array &$data, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'groups' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'macros' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
-				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
-				]],
-				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]],
-			'templates_link' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_templates = $this->get([
-			'output' => ['templateid', 'host'],
-			'templateids' => array_column($data['templates'], 'templateid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if (count($db_templates) != count($data['templates'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		if (array_key_exists('groups', $data)) {
-			$groupids = array_column($data['groups'], 'groupid');
-
-			$count = API::TemplateGroup()->get([
-				'countOutput' => true,
-				'groupids' => $groupids
-			]);
-
-			if ($count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$this->massAddAffectedObjects('groups', [], $db_templates);
-
-			$groupids = array_flip($groupids);
-			$edit_groupids = [];
-
-			foreach ($db_templates as $db_template) {
-				$_groupids = $groupids;
-
-				foreach ($db_template['groups'] as $db_group) {
-					if (array_key_exists($db_group['groupid'], $_groupids)) {
-						unset($_groupids[$db_group['groupid']]);
-					} else {
-						$edit_groupids[$db_group['groupid']] = true;
-					}
-				}
-
-				$edit_groupids += $_groupids;
-			}
-
-			if ($edit_groupids) {
-				$count = API::TemplateGroup()->get([
-					'countOutput' => true,
-					'groupids' => array_keys($edit_groupids),
-					'editable' => true
-				]);
-
-				if ($count != count($edit_groupids)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-		}
-
-		if (array_key_exists('macros', $data)) {
-			$this->massAddAffectedObjects('macros', [], $db_templates);
-		}
-
-		if (array_key_exists('templates_link', $data)
-				|| (array_key_exists('templates_clear', $data) && $data['templates_clear'])) {
-			if (array_key_exists('templates_link', $data) && array_key_exists('templates_clear', $data)) {
-				$path_clear = '/templates_clear';
-				$path = '/templates_link';
-
-				foreach ($data['templates_clear'] as $i1_clear => $template_clear) {
-					foreach ($data['templates_link'] as $i1 => $template) {
-						if (bccomp($template['templateid'], $template_clear['templateid']) == 0) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								$path_clear.'/'.($i1_clear + 1).'/templateid',
-								_s('cannot be specified the value of parameter "%1$s"',
-									$path.'/'.($i1 + 1).'/templateid'
-								)
-							));
-						}
-					}
-				}
-			}
-
-			$this->massAddAffectedObjects('templates', [], $db_templates);
-
-			$templateids_link = array_key_exists('templates_link', $data)
-				? array_column($data['templates_link'], 'templateid')
-				: [];
-			$templateids_clear = array_key_exists('templates_clear', $data)
-				? array_column($data['templates_clear'], 'templateid')
-				: [];
-
-			$edit_templateids = array_flip($templateids_clear);
-
-			if ($templateids_link) {
-				foreach ($db_templates as $db_template) {
-					$edit_templateids += array_flip(array_diff(array_column($db_template['templates'], 'templateid'),
-						$templateids_link
-					));
-				}
-			}
-
-			if ($edit_templateids) {
-				$count = $this->get([
-					'countOutput' => true,
-					'templateids' => array_keys($edit_templateids)
-				]);
-
-				if ($count != count($edit_templateids)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-
-				if (array_key_exists('templates_link', $data)) {
-					$this->massCheckTemplatesLinks('massupdate', $templateids_link, $db_templates, $templateids_clear);
-				}
-				else {
-					$this->massCheckTemplatesLinks('massremove', $templateids_clear, $db_templates, $templateids_clear);
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param array      $data
-	 * @param array|null $db_templates
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private function validateMassRemove(array &$data, ?array &$db_templates): void {
+	private function validateMassRemove(array &$data, ?array &$templates, ?array &$db_templates): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'templateids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			'groupids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
@@ -1202,62 +1060,56 @@ class CTemplate extends CHostGeneral {
 			'preservekeys' => true
 		]);
 
-		if (count($db_templates) != count($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		foreach ($data['templateids'] as $i => $templateid) {
+			if (!array_key_exists($templateid, $db_templates)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
+					'/templateids/'.($i + 1), _('object does not exist, or you have no permissions to it')
+				));
+			}
 		}
+
+		$templates = [];
+
+		foreach ($data['templateids'] as $templateid) {
+			$templates[] = ['templateid' => $templateid];
+		}
+
+		$data = CArrayHelper::renameKeys($data, ['macros' => 'macro_names']);
+
+		$this->addObjectsByData($data, $templates);
+		$this->addAffectedObjects($templates, $db_templates);
+		$this->addUnchangedObjects($templates, $db_templates, $data);
 
 		if (array_key_exists('groupids', $data) && $data['groupids']) {
-			$count = API::TemplateGroup()->get([
-				'countOutput' => true,
-				'groupids' => $data['groupids'],
-				'editable' => true
-			]);
-
-			if ($count != count($data['groupids'])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			CTemplateGroup::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
-
-			$this->massAddAffectedObjects('groups', $data['groupids'], $db_templates);
-		}
-
-		if (array_key_exists('macros', $data) && $data['macros']) {
-			$this->massAddAffectedObjects('macros', $data['macros'], $db_templates);
+			$this->checkGroups($templates, $db_templates, '/groupids', array_flip($data['groupids']));
+			$this->checkHostsWithoutGroups($templates, $db_templates);
 		}
 
 		if ((array_key_exists('templateids_link', $data) && $data['templateids_link'])
 				|| (array_key_exists('templateids_clear', $data) && $data['templateids_clear'])) {
-			if (array_key_exists('templateids_link', $data) && $data['templateids_link']
-					&& array_key_exists('templateids_clear', $data) && $data['templateids_clear']) {
-				$templateids = array_unique(array_merge($data['templateids_link'], $data['templateids_clear']));
-			}
-			elseif (array_key_exists('templateids_link', $data) && $data['templateids_link']) {
-				$templateids = $data['templateids_link'];
-			}
-			else {
-				$templateids = $data['templateids_clear'];
-			}
+			$path_clear = array_key_exists('templateids_clear', $data) && $data['templateids_clear']
+				? '/templateids_clear'
+				: null;
+			$template_clear_indexes = array_key_exists('templateids_clear', $data) && $data['templateids_clear']
+				? array_flip($data['templateids_clear'])
+				: null;
 
-			$count = $this->get([
-				'countOutput' => true,
-				'templateids' => $templateids
-			]);
-
-			if ($count != count($templateids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
-
-			$this->massCheckTemplatesLinks('massremove', $templateids, $db_templates,
-				array_key_exists('templateids_clear', $data) ? $data['templateids_clear'] : []
-			);
+			$this->checkTemplates($templates, $db_templates, null, null, $path_clear, $template_clear_indexes);
+			$this->checkTemplatesLinks($templates, $db_templates);
 		}
+	}
+
+	private function addObjectsByData(array $data, array &$templates): void {
+		self::addGroupsByData($data, $templates);
+		self::addMacrosByData($data, $templates);
+		$this->addTemplatesByData($data, $templates);
+		self::addTemplatesClearByData($data, $templates);
+	}
+
+	private function addUnchangedObjects(array &$templates, array $db_templates, array $del_objectids = []): void {
+		$this->addUnchangedGroups($templates, $db_templates, $del_objectids);
+		$this->addUnchangedMacros($templates, $db_templates, $del_objectids);
+		$this->addUnchangedTemplates($templates, $db_templates, $del_objectids);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
