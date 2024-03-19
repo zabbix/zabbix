@@ -97,17 +97,11 @@ class CLldRuleHelper extends CItemGeneralHelper {
 					$dst_item['master_itemid'] = $dst_master_itemids[$src_item['itemid']][$dst_hostid];
 				}
 
-				$dst_item = ['hostid' => $dst_hostid] + getSanitizedItemFields([
+				$dst_items[] = ['hostid' => $dst_hostid] + getSanitizedItemFields([
 					'templateid' => 0,
 					'flags' => ZBX_FLAG_DISCOVERY_RULE,
 					'hosts' => [$dst_hosts[$dst_hostid]]
 				] + $dst_item);
-
-				if (array_key_exists('filter', $dst_item)) {
-					$dst_item['filter'] = prepareLldFilter($dst_item['filter']);
-				}
-
-				$dst_items[] = $dst_item;
 			}
 		}
 

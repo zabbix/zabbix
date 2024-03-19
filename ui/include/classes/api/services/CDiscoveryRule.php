@@ -3367,10 +3367,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'hosts' => [$dst_host]
 		] + $dstDiscovery);
 
-		if (array_key_exists('filter', $dstDiscovery)) {
-			$dstDiscovery['filter'] = prepareLldFilter($dstDiscovery['filter']);
-		}
-
 		// save new discovery
 		$newDiscovery = $this->create([$dstDiscovery]);
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
