@@ -58,13 +58,13 @@ $form
 		: null
 	)
 	->addField(
+		new CWidgetFieldSeveritiesView($data['fields']['severities'])
+	)
+	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['problems'])
-	)
-	->addField(
-		new CWidgetFieldSeveritiesView($data['fields']['severities'])
 	)
 	->addField(
 		new CWidgetFieldHostGroupingView($data['fields']['group_by'])

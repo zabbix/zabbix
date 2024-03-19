@@ -117,6 +117,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'preservekeys' => true
 			]);
 
+			if (!$hosts) {
+				return $no_data;
+			}
+
 			$hostids = array_keys($hosts);
 
 			// Get additional info for narrowed down hosts and filter them by status and maintenance status.

@@ -85,6 +85,9 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldTags('host_tags')
 			)
 			->addField(
+				new CWidgetFieldSeverities('severities', _('Severity'))
+			)
+			->addField(
 				new CWidgetFieldCheckBox('maintenance',
 					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
 				)
@@ -95,9 +98,6 @@ class WidgetForm extends CWidgetForm {
 					self::PROBLEMS_UNSUPPRESSED => _('Unsuppressed'),
 					self::PROBLEMS_NONE => _('None')
 				]))->setDefault(self::PROBLEMS_UNSUPPRESSED)
-			)
-			->addField(
-				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
 				new CWidgetFieldHostGrouping('group_by', _('Group by'))
