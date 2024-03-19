@@ -112,12 +112,12 @@ $fields = [
 									IN([ZBX_LLD_DELETE_AFTER.','.ZBX_LLD_DELETE_NEVER.','.ZBX_LLD_DELETE_IMMEDIATELY]),
 									'(isset({add}) || isset({update}))'
 								],
-	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})'],
+	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_LLD_DISABLE_AFTER.','.ZBX_LLD_DISABLE_NEVER.','.ZBX_LLD_DISABLE_IMMEDIATELY]),
 									'(isset({add}) || isset({update}))'
 								],
-	'enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})'],
+	'enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
@@ -539,9 +539,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$enabled_lifetime = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
 		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
 
-		$converted_lifetime = timeUnitToSeconds($lifetime);
-		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
-
 		// Set the values to '0', if 'immediately' or 'never' values are set to lifetime/enabled_lifetime types.
 		if ($lifetime_type != ZBX_LLD_DELETE_AFTER) {
 			$lifetime = '0';
@@ -560,18 +557,21 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = true;
 
-		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $lifetime[0] !== '{'
-				&& $enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $enabled_lifetime[0] !== '{') {
+		$converted_lifetime = timeUnitToSeconds($lifetime);
+		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
+		$lifetime_valid = $lifetime_type == ZBX_LLD_DELETE_AFTER && $lifetime !== '' && $lifetime[0] !== '{';
+		$enabled_lifetime_valid = $enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $enabled_lifetime !== ''
+			&& $enabled_lifetime[0] !== '{';
 
-			if ($converted_enabled_lifetime && $converted_lifetime
-					&& $converted_enabled_lifetime >= $converted_lifetime) {
-				$result = false;
+		if ($lifetime_valid && $enabled_lifetime_valid
+				&& $converted_enabled_lifetime !== null && $converted_lifetime !== null
+				&& $converted_enabled_lifetime >= $converted_lifetime) {
+			$result = false;
 
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'Disable lost resources',
-						_s('cannot be greater than or equal to the value of field "%1$s"', 'Delete lost resources')
-					)
-				);
-			}
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'Disable lost resources',
+					_s('cannot be greater than or equal to the value of field "%1$s"', 'Delete lost resources')
+				)
+			);
 		}
 
 		if (!hasErrorMessages()) {
@@ -777,11 +777,13 @@ if (hasRequest('form')) {
 		$converted_lifetime = timeUnitToSeconds($lifetime);
 		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
 
-		if ($lifetime[0] !== '{' && $converted_lifetime !== null && $converted_lifetime == 0) {
+		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $lifetime[0] !== '{' && $converted_lifetime !== null
+				&& $converted_lifetime == 0) {
 			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
 		}
 
-		if ($enabled_lifetime[0] !== '{' && $converted_enabled_lifetime !== null && $converted_enabled_lifetime == 0) {
+		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $enabled_lifetime[0] !== '{'
+				&& $converted_enabled_lifetime !== null && $converted_enabled_lifetime == 0) {
 			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
 		}
 
