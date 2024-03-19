@@ -34,8 +34,8 @@ class testDashboardPieChartWidget extends CWebTest {
 	const TYPE_ITEM_PATTERN = 'Item pattern';
 	const TYPE_ITEM_LIST = 'Item list';
 	const TYPE_DATA_SET_CLONE = 'Clone';
-	const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
-	const HOST_NAME_SCREENSHOTS = 'pie-chart-';
+	const HOST_NAME_ITEM_LIST = 'pie-chart-item-list';
+	const HOST_NAME_SCREENSHOTS = 'pie-chart-display';
 
 	/**
 	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
@@ -381,18 +381,21 @@ class testDashboardPieChartWidget extends CWebTest {
 		$form->invalidate();
 		$expected_values = [
 			'Show legend' => true,
+			'Show value' => false,
 			'Show aggregation function' => false,
+			'Rows' => 'Fixed',
 			'Number of rows' => 1,
 			'Number of columns' => 4
 		];
 		$form->checkValue($expected_values);
 		$this->assertAllVisibleLabels($legend_tab, array_keys($expected_values));
+		$this->assertEquals(['Fixed', 'Variable'], $form->getField('Rows')->getLabels()->asText());
 		$this->assertRangeSliderParameters($form, 'Number of rows', ['min' => '1', 'max' => '10', 'step' => '1']);
 		$this->assertRangeSliderParameters($form, 'Number of columns', ['min' => '1', 'max' => '4', 'step' => '1']);
 
 		$form->fill(['Show legend' => false]);
 
-		foreach (['Show aggregation function', 'Number of rows', 'Number of columns'] as $label) {
+		foreach (['Show value', 'Show aggregation function', 'Rows', 'Number of rows', 'Number of columns'] as $label) {
 			$field = $form->getField($label);
 			$this->assertFalse($field->isEnabled());
 			$this->assertTrue($field->isVisible());
@@ -486,9 +489,10 @@ class testDashboardPieChartWidget extends CWebTest {
 						],
 						'Legend' => [
 							'Show legend' => true,
+							'Show value' => true,
 							'Show aggregation function' => true,
-							'Number of rows' => 2,
-							'Number of columns' => 3
+							'Rows' => 'Variable',
+							'Maximum number of rows' => 2
 						]
 					]
 				]
@@ -1076,9 +1080,9 @@ class testDashboardPieChartWidget extends CWebTest {
 						'item-4' => 4.4
 					],
 					'expected_sectors' => [
-						'item-1' => ['value' => '1', 'color' => 'rgb(191, 103, 0)'],
-						'item-2' => ['value' => '2', 'color' => 'rgb(255, 167, 38)'],
-						'item-3' => ['value' => '3', 'color' => 'rgb(255, 230, 101)'],
+						'item-1' => ['value' => '1', 'color' => 'rgb(212, 124, 0)'],
+						'item-2' => ['value' => '2', 'color' => 'rgb(255, 209, 80)'],
+						'item-3' => ['value' => '3', 'color' => 'rgb(255, 252, 123)'],
 						'item-4' => ['value' => '4.4', 'color' => 'rgb(255, 255, 165)']
 					]
 				]
@@ -1117,8 +1121,10 @@ class testDashboardPieChartWidget extends CWebTest {
 						['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
 						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'B71C1C'],
-						['name' => 'legend_lines', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
-						['name' => 'legend_columns', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
+						// Legend with values.
+						['name' => 'legend_value', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'legend_lines_mode', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
+						['name' => 'legend_lines', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
 					],
 					'item_data' => [
 						'item-1' => 100,
@@ -1182,20 +1188,20 @@ class testDashboardPieChartWidget extends CWebTest {
 				// Check the correct sector by hintbox attribute.
 				if (strpos($sector->getAttribute('data-hintbox-contents'), $legend_name)) {
 					// Assert sector fill color.
-			$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
+					$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
 
-			// Open and assert the hintbox.
-			$sector->click();
-			$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
-			$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
-			$this->assertEquals('background-color: '.$expected_sector['color'].';',
-					$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
-			);
-			$hintbox->close();
+					// Open and assert the hintbox.
+					$sector->click();
+					$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
+					$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
+					$this->assertEquals('background-color: '.$expected_sector['color'].';',
+							$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
+					);
+					$hintbox->close();
 
 					// Assertion successful, continue to the next expected sector.
 					continue 2;
-		}
+				}
 			}
 
 			// Fail test if no match found.
@@ -1364,7 +1370,7 @@ class testDashboardPieChartWidget extends CWebTest {
 				// Check data set label.
 				$label = CTestArrayHelper::get($data_set, 'Data set label', 'Data set #'.$i + 1);
 				$this->assertEquals($label,
-						$form->query('xpath:.//li[@data-set="'.$i.'"]//label[@class="sortable-drag-handle js-dataset-label"]')->
+						$form->query('xpath:.//li[@data-set="'.$i.'"]//label[contains(@class, "js-dataset-label")]')->
 						one()->getText()
 				);
 
@@ -1631,9 +1637,9 @@ class testDashboardPieChartWidget extends CWebTest {
 	 */
 	protected function assertAllVisibleLabels($element, $expected_labels) {
 		// There are weird labels in this form but at the same time we don't need to match all labels, for example radio buttons.
-		$label_selector = 'xpath:.//div[@class="form-grid"]/label'. // standard case
-				' | .//div[@class="form-field"]/label'. // when the label is a child of the actual field
-				' | .//label[@class="sortable-drag-handle js-dataset-label"]'; // this matches data set labels
+		$label_selector = 'xpath:.//div[@class="form-grid"]/label'.  // standard case
+				' | .//div[@class="form-field"]/label'.              // when the label is a child of the field
+				' | .//label[contains(@class, "js-dataset-label")]'; // this matches data set labels
 		$actual_labels = $element->query($label_selector)->all()->filter(CElementFilter::VISIBLE)->asText();
 
 		// Remove empty labels (checkbox styling is a label) from the list.
