@@ -31,6 +31,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
+#include "zbxcurl.h"
 
 typedef struct
 {
@@ -61,16 +62,6 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	buf->offset += r_size;
 
 	return r_size;
-}
-
-static char	*rw_curl_error(CURLcode err)
-{
-	char	*error;
-
-	error = zbx_strdup(NULL,  curl_easy_strerror(err));
-	*error = tolower((unsigned char)*error);
-
-	return error;
 }
 #endif
 
@@ -117,7 +108,7 @@ static int	rw_get_report(const char *url, const char *cookie, char **report,
 	return FAIL;
 #else
 	struct zbx_json		j;
-	char			*cookie_value, buffer[MAX_ID_LEN + 1], *curl_error = NULL;
+	char			*cookie_value, buffer[MAX_ID_LEN + 1];
 	int			ret = FAIL;
 	long			httpret;
 	zbx_buffer_t		response = {NULL, 0, 0};
@@ -161,28 +152,18 @@ static int	rw_get_report(const char *url, const char *cookie, char **report,
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_webservice_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_ACCEPT_ENCODING, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_INTERFACE, config_source_ip)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
-				(curl_error = rw_curl_error(err)));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
-				(curl_error = rw_curl_error(err)));
+	if (SUCCEED != zbx_curl_setopt_https(curl, error))
 		goto out;
-	}
-#endif
+
+	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, error))
+		goto out;
 
 	if (NULL != config_tls_ca_file && '\0' != *config_tls_ca_file)
 	{
@@ -191,21 +172,20 @@ static int	rw_get_report(const char *url, const char *cookie, char **report,
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
-					(curl_error = rw_curl_error(err)));
+					curl_easy_strerror(err));
 			goto out;
 		}
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot connect to web service: %s", (curl_error = rw_curl_error(err)));
+		*error = zbx_dsprintf(*error, "Cannot connect to web service: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpret)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot obtain web service response code: %s",
-				(curl_error = rw_curl_error(err)));
+		*error = zbx_dsprintf(*error, "Cannot obtain web service response code: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -247,7 +227,6 @@ static int	rw_get_report(const char *url, const char *cookie, char **report,
 
 	ret = SUCCEED;
 out:
-	zbx_free(curl_error);
 	zbx_free(response.data);
 
 	curl_slist_free_all(headers);

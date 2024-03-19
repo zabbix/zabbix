@@ -332,7 +332,6 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
-require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -654,7 +653,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');
-		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
 
 		return $suite;

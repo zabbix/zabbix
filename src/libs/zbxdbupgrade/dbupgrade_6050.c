@@ -3249,6 +3249,140 @@ out:
 
 	return ret;
 }
+
+static int	DBpatch_6050211(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050212(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("lld_override_ophistory", &field);
+}
+
+static int	DBpatch_6050213(void)
+{
+	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6050214(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6050215(void)
+{
+	return DBcreate_index("usrgrp", "usrgrp_3", "mfaid", 0);
+}
+
+static int	DBpatch_6050216(void)
+{
+	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050217(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050218(void)
+{
+	return DBcreate_index("config", "config_5", "mfaid", 0);
+}
+
+static int	DBpatch_6050219(void)
+{
+	const zbx_db_table_t	table =
+			{"mfa", "mfaid", 0,
+				{
+					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"hash_function", "1", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"code_length", "6", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"api_hostname", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, 0, 0},
+					{"clientid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
+					{"client_secret", "", NULL, NULL, 64, ZBX_TYPE_CHAR, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050220(void)
+{
+	return DBcreate_index("mfa", "mfa_1", "name", 1);
+}
+
+static int	DBpatch_6050221(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("usrgrp", 3, &field);
+}
+
+static int	DBpatch_6050222(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("config", 5, &field);
+}
+
+static int	DBpatch_6050223(void)
+{
+	const zbx_db_table_t	table =
+			{"mfa_totp_secret", "mfa_totp_secretid", 0,
+				{
+					{"mfa_totp_secretid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"totp_secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050224(void)
+{
+	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_1", "mfaid", 0);
+}
+
+static int	DBpatch_6050225(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("mfa_totp_secret", 1, &field);
+}
+
+static int	DBpatch_6050226(void)
+{
+	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_2", "userid", 0);
+}
+
+static int	DBpatch_6050227(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("mfa_totp_secret", 2, &field);
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3464,5 +3598,22 @@ DBPATCH_ADD(6050207, 0, 1)
 DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
 DBPATCH_ADD(6050210, 0, 1)
+DBPATCH_ADD(6050211, 0, 1)
+DBPATCH_ADD(6050212, 0, 1)
+DBPATCH_ADD(6050213, 0, 1)
+DBPATCH_ADD(6050214, 0, 1)
+DBPATCH_ADD(6050215, 0, 1)
+DBPATCH_ADD(6050216, 0, 1)
+DBPATCH_ADD(6050217, 0, 1)
+DBPATCH_ADD(6050218, 0, 1)
+DBPATCH_ADD(6050219, 0, 1)
+DBPATCH_ADD(6050220, 0, 1)
+DBPATCH_ADD(6050221, 0, 1)
+DBPATCH_ADD(6050222, 0, 1)
+DBPATCH_ADD(6050223, 0, 1)
+DBPATCH_ADD(6050224, 0, 1)
+DBPATCH_ADD(6050225, 0, 1)
+DBPATCH_ADD(6050226, 0, 1)
+DBPATCH_ADD(6050227, 0, 1)
 
 DBPATCH_END()

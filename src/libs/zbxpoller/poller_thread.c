@@ -663,6 +663,8 @@ ZBX_PTR_VECTOR_IMPL(agent_result_ptr, AGENT_RESULT*)
  *             config_java_gateway        - [IN]                                   *
  *             config_java_gateway_port   - [IN]                                   *
  *             config_externalscripts     - [IN]                                   *
+ *             get_value_internal_ext_cb  - [IN]                                   *
+ *             config_ssh_key_location    - [IN]                                   *
  *                                                                                 *
  * Return value: number of items processed                                         *
  *                                                                                 *
@@ -819,7 +821,7 @@ exit:
 	return num;
 }
 
-ZBX_THREAD_ENTRY(poller_thread, args)
+ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
