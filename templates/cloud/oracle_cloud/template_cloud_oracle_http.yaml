@@ -2015,9 +2015,6 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
-                    - type: STRING
                       name: bg_color
                       value: 2196F3
                     - type: STRING
@@ -2063,6 +2060,9 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: units_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
                       value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
@@ -2168,9 +2168,6 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
-                    - type: STRING
                       name: bg_color
                       value: 00D936
                     - type: STRING
@@ -2216,6 +2213,9 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: units_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
                       value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
@@ -2322,9 +2322,6 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
-                    - type: STRING
                       name: bg_color
                       value: 2196F3
                     - type: STRING
@@ -2371,6 +2368,9 @@ zabbix_export:
                     - type: STRING
                       name: units_color
                       value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
+                      value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
                       value: '35'
@@ -2401,9 +2401,6 @@ zabbix_export:
                   height: '3'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
                     - type: STRING
                       name: bg_color
                       value: 2196F3
@@ -2451,6 +2448,9 @@ zabbix_export:
                     - type: STRING
                       name: units_color
                       value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
+                      value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
                       value: '35'
@@ -2484,9 +2484,6 @@ zabbix_export:
                   height: '3'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
                     - type: STRING
                       name: bg_color
                       value: 00D936
@@ -2533,6 +2530,9 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: units_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
                       value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
@@ -10029,9 +10029,6 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
-                    - type: STRING
                       name: bg_color
                       value: 2196F3
                     - type: STRING
@@ -10077,6 +10074,9 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: units_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
                       value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
@@ -10139,9 +10139,6 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
-                    - type: STRING
                       name: bg_color
                       value: 2196F3
                     - type: STRING
@@ -10188,6 +10185,9 @@ zabbix_export:
                     - type: STRING
                       name: units_color
                       value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
+                      value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
                       value: '35'
@@ -10206,9 +10206,6 @@ zabbix_export:
                   height: '3'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
                     - type: STRING
                       name: bg_color
                       value: 2196F3
@@ -10256,6 +10253,9 @@ zabbix_export:
                     - type: STRING
                       name: units_color
                       value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
+                      value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
                       value: '35'
@@ -10286,9 +10286,6 @@ zabbix_export:
                   height: '3'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: value_arc_color
-                      value: FFFFFF
                     - type: STRING
                       name: bg_color
                       value: 2196F3
@@ -10335,6 +10332,9 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: units_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_arc_color
                       value: FFFFFF
                     - type: INTEGER
                       name: value_arc_size
