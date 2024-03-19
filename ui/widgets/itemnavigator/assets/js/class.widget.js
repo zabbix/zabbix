@@ -49,6 +49,10 @@ class CWidgetItemNavigator extends CWidget {
 		this.#contents_scroll_top = this._contents.scrollTop;
 	}
 
+	onEdit() {
+		this.#updateProfiles(false, [], this._widgetid);
+	}
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
@@ -89,42 +93,7 @@ class CWidgetItemNavigator extends CWidget {
 
 			groupToggle: e => {
 				if (this._widgetid) {
-					const data = {
-						is_open: e.detail.is_open,
-						group_identifier: e.detail.group_identifier,
-						widgetid: this._widgetid
-					}
-
-					const curl = new Curl('zabbix.php');
-
-					curl.setArgument('action', 'widget.navigation.tree.toggle');
-
-					fetch(curl.getUrl(), {
-						method: 'POST',
-						headers: {'Content-Type': 'application/json'},
-						body: JSON.stringify(data)
-					})
-						.then((response) => response.json())
-						.then((response) => {
-							if ('error' in response) {
-								throw {error: response.error};
-							}
-
-							return response;
-						})
-						.catch((exception) => {
-							let title;
-							let messages = [];
-
-							if (typeof exception === 'object' && 'error' in exception) {
-								title = exception.error.title;
-								messages = exception.error.messages;
-							} else {
-								title = t('Unexpected server error.');
-							}
-
-							this._updateMessages(messages, title);
-						});
+					this.#updateProfiles(e.detail.is_open, e.detail.group_identifier, this._widgetid);
 				}
 			}
 		};
@@ -133,6 +102,51 @@ class CWidgetItemNavigator extends CWidget {
 	#activateEvents() {
 		// this.#item_navigator.getContainer().addEventListener('item.select', this.#events.itemSelect);
 		// this.#item_navigator.getContainer().addEventListener('group.toggle', this.#events.groupToggle);
+	}
+
+	/**
+	 * Update expanded and collapsed group state in user profile.
+	 *
+	 * @param {boolean} is_open          Indicator whether the group is open or closed.
+	 * @param {array}   group_identifier Group path identifier.
+	 * @param {string}  widgetid         Widget ID.
+	 */
+	#updateProfiles(is_open, group_identifier, widgetid) {
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'widget.navigation.tree.toggle');
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				is_open: is_open,
+				group_identifier: group_identifier,
+				widgetid: widgetid
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response;
+			})
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Unexpected server error.');
+				}
+
+				this._updateMessages(messages, title);
+			});
 	}
 
 	hasPadding() {
