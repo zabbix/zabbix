@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,19 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PB_DISCOVERY_H
-#define ZABBIX_PB_DISCOVERY_H
+#ifndef ZABBIX_DISCOVERER_TASKPREP_H_
+#define ZABBIX_DISCOVERER_TASKPREP_H_
 
-#include "proxybuffer.h"
+#include "discoverer_job.h"
 #include "zbxalgo.h"
-#include "zbxtypes.h"
+#include "zbxcacheconfig.h"
 
-void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row);
-size_t	pb_discovery_estimate_row_size(const char *value, const char *ip, const char *dns, const char *error);
-void	pb_discovery_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
-void	pb_discovery_flush(zbx_pb_t *pb);
-void	pb_discovery_set_lastid(zbx_uint64_t lastid);
-int	pb_discovery_check_age(zbx_pb_t *pb);
-int	pb_discovery_has_mem_rows(zbx_pb_t *pb);
+void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
+		zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common, zbx_vector_iprange_t *ipranges,
+		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids);
 
-#endif
+#endif /* ZABBIX_DISCOVERER_TASKPREP_H_ */

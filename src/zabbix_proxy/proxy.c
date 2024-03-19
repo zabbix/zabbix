@@ -1440,8 +1440,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs,
 								zbx_discovery_open_proxy, zbx_discovery_close_proxy,
+								zbx_discovery_find_host_proxy,
 								zbx_discovery_update_host_proxy,
-								zbx_discovery_update_service_proxy};
+								zbx_discovery_update_service_proxy,
+								zbx_discovery_update_service_down_proxy,
+								zbx_discovery_update_drule_proxy};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,
