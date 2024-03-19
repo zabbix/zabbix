@@ -231,7 +231,8 @@ class testAgentJsonProtocol extends CIntegrationTest {
 			'item' => [
 				'type' => ITEM_TYPE_ZABBIX,
 				'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
-				'timeout' => '6s'
+				'timeout' => '6s',
+				"value_type" => "4"
 			],
 			'host' => [
 				'tls_connect' => HOST_ENCRYPTION_NONE,
