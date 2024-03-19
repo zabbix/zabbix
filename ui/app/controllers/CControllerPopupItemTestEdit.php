@@ -34,6 +34,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'data'					=> 'array',
 			'delay'					=> 'string',
 			'get_value'				=> 'in 0,1',
+			'test_with'				=> 'in '.implode(',', [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]),
+			'proxyid'				=> 'id',
 			'headers'				=> 'array',
 			'hostid'				=> 'db hosts.hostid',
 			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
@@ -429,6 +431,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
+		if (array_key_exists('proxyid', $data)) {
+			$proxyid = $data['proxyid'];
+		}
+		elseif ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+			$proxyid = $this->host['proxyid'];
+		}
+		else {
+			$proxyid = 0;
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
@@ -451,7 +463,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				: $this->getInput('get_value', 0),
 			'is_item_testable' => $this->is_item_testable,
 			'inputs' => $inputs,
-			'proxies' => in_array($this->item_type, $this->items_support_proxy) ? $this->getHostProxies() : [],
+			'test_with' => array_key_exists('test_with', $data)
+				? $data['test_with']
+				: $this->getInput('test_with', $proxyid == 0 ? self::TEST_WITH_SERVER : self::TEST_WITH_PROXY),
+			'ms_proxy' => in_array($this->item_type, $this->items_support_proxy) && $proxyid != 0
+				? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
+					'output' => ['proxyid', 'name'],
+					'proxyids' => [$proxyid]
+				]), ['proxyid' => 'id'])
+				: [],
 			'proxies_enabled' => in_array($this->item_type, $this->items_support_proxy),
 			'interface_address_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['address']

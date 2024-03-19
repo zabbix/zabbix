@@ -52,6 +52,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	const ZBX_DEFAULT_VALUE_TYPE = ITEM_VALUE_TYPE_TEXT;
 
+	public const TEST_WITH_SERVER = 0;
+	public const TEST_WITH_PROXY = 1;
+
 	/**
 	 * Item types requiring interface.
 	 *
@@ -303,13 +306,21 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'status', 'proxyid', 'tls_subject', 'maintenance_status',
-					'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-					'tls_issuer', 'tls_connect'
+				'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status',
+					'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+					'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
 				],
 				'hostids' => [$hostid],
 				'editable' => true
 			]);
+
+			if ($hosts) {
+				if ($hosts[0]['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+					$hosts[0]['proxyid'] = $hosts[0]['assigned_proxyid'];
+				}
+
+				unset($hosts[0]['monitored_by'], $hosts[0]['assigned_proxyid']);
+			}
 
 			if (!$hosts) {
 				$hosts = API::Template()->get([
@@ -327,27 +338,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * Function returns list of proxies.
-	 *
-	 * @return array
-	 */
-	protected function getHostProxies() {
-		$proxies = API::Proxy()->get([
-			'output' => ['name'],
-			'preservekeys' => true
-		]);
-
-		CArrayHelper::sort($proxies, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
-
-		foreach ($proxies as &$proxy) {
-			$proxy = $proxy['name'];
-		}
-		unset($proxy);
-
-		return $proxies;
 	}
 
 	/**
