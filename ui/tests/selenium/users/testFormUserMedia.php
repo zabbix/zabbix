@@ -64,39 +64,25 @@ class testFormUserMedia extends CWebTest {
 				'userid' => 1,
 				'medias' => [
 					[
-						'mediatypeid' => 1,
+						'mediatypeid' => 1, // Email.
 						'sendto' => ['test@zabbix.com'],
-						'active' => 0,
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 63,
 						'period' => '1-7,00:00-24:00'
 					],
 					[
-						'mediatypeid' => 1,
+						'mediatypeid' => 1, // Email.
 						'sendto' => ['test2@zabbix.com'],
-						'active' => 1,
+						'active' => MEDIA_TYPE_STATUS_DISABLED,
 						'severity' => 63,
 						'period' => '1-7,00:00-24:00'
 					],
 					[
-						'mediatypeid' => 3,
-						'sendto' => '123456789',
-						'active' => 0,
-						'severity' => 32,
-						'period' => '1-7,00:00-24:00'
-					],
-					[
-						'mediatypeid' => 10,
-						'sendto' => 'test@jabber.com',
-						'active' => 0,
+						'mediatypeid' => 10, // Discord.
+						'sendto' => 'user@test.domain1.com',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 16,
 						'period' => '1-7,00:00-24:00'
-					],
-					[
-						'mediatypeid' => 12,
-						'sendto' => 'test_account',
-						'active' => 0,
-						'severity' => 63,
-						'period' => '6-7,09:00-18:00'
 					]
 				]
 			]

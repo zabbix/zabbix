@@ -58,7 +58,7 @@ class Actions {
 		]);
 		$reboot_scriptid = $scripts['scriptids'][0];
 
-			CDataHelper::call('action.create', [
+		CDataHelper::call('action.create', [
 			// Service action.
 			[
 				'name' => 'Service action',

@@ -48,20 +48,19 @@ class testPageLowLevelDiscovery extends CWebTest {
 	const SELECTOR = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
 
 	public static function prepareLLDData() {
-		$hosts = CDataHelper::call('host.create', [
+		CDataHelper::createHosts([
 			[
 				'host' => 'Host with LLD',
-				'groups' => ['groupid' => 4], // Zabbix servers.
-			]
-		]);
-		$hostid = $hosts['hostids'][0];
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'discoveryrules' => [
+					[
 
-		// Create discovery rule.
-		CDataHelper::call('discoveryrule.create', [
-			'name' => 'LLD for Deleting',
-			'key_' => 'key_lld_trapper',
-			'hostid' => $hostid,
-			'type' => ITEM_TYPE_TRAPPER
+						'name' => 'Trapper LLD for filter',
+						'key_' => 'key_lld_trapper',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
+			]
 		]);
 	}
 
@@ -381,7 +380,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'expected' => [
-						'LLD for Deleting',
+						'Trapper LLD for filter',
 						'Test discovery rule'
 					]
 				]
@@ -397,7 +396,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Key' => 'key'
 					],
 					'expected' => [
-						'LLD for Deleting'
+						'Trapper LLD for filter'
 					]
 				]
 			],
@@ -473,7 +472,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'fifth LLD',
 						'forth LLD',
 						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
-						'LLD for Deleting',
+						'Trapper LLD for filter',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'LLD number 8',

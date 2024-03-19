@@ -38,16 +38,16 @@ class testPageUsers extends CLegacyWebTest {
 				'userid' => 1,
 				'medias' => [
 					[
-						'mediatypeid' => 10,
-						'sendto' => 'test@jabber.com',
-						'active' => 0,
+						'mediatypeid' => 10, // Discord.
+						'sendto' => 'test@zabbix.com',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 16,
 						'period' => '1-7,00:00-24:00'
 					],
 					[
-						'mediatypeid' => 12,
+						'mediatypeid' => 12, // Jira.
 						'sendto' => 'test_account',
-						'active' => 0,
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
 						'severity' => 63,
 						'period' => '6-7,09:00-18:00'
 					]
