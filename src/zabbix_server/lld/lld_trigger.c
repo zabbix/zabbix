@@ -128,8 +128,6 @@ struct zbx_lld_trigger_s
 ZBX_PTR_VECTOR_FUNC_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
 ZBX_PTR_VECTOR_IMPL(lld_trigger_ptr, zbx_lld_trigger_t*)
 
-static void	lld_trigger_free(zbx_lld_trigger_t *trigger);
-
 struct zbx_lld_dependency_s
 {
 	zbx_uint64_t		triggerdepid;
