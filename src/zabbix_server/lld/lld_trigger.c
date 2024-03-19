@@ -469,7 +469,7 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
 		zbx_lld_trigger_prototype_t	cmp = {.triggerid = parent_triggerid};
 
 		if (FAIL == (index = zbx_vector_lld_trigger_prototype_ptr_bsearch(trigger_prototypes, &cmp,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -2442,9 +2442,9 @@ out:
  *                                                                            *
  * Purpose: add or update triggers in database based on discovery rule        *
  *                                                                            *
- * Parameters: hostid            - [IN] parent host id                        *
- *             lld_triggers_save - [IN] trigger prototypes                    *
- *             triggers          - [IN/OUT] triggers to save                  *
+ * Parameters: hostid             - [IN] parent host id                       *
+ *             trigger_prototypes - [IN]                                      *
+ *             triggers           - [IN/OUT] triggers to save                 *
  *                                                                            *
  * Return value: SUCCEED - if triggers was successfully saved or saving       *
  *                         was not necessary                                  *
@@ -3592,12 +3592,11 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_n
  ******************************************************************************/
 static void	lld_trigger_dependencies_validate(zbx_vector_lld_trigger_ptr_t *triggers, char **error)
 {
-	zbx_hashset_t			cache;
-	zbx_hashset_iter_t		iter;
-	zbx_lld_trigger_node_t		*trigger_node, *trigger_node_up;
-	zbx_lld_trigger_node_iter_t	node_iter = {0};
-	zbx_vector_lld_trigger_node_ptr_t		nodes;
-	int				i;
+	zbx_hashset_t				cache;
+	zbx_hashset_iter_t			iter;
+	zbx_lld_trigger_node_t			*trigger_node, *trigger_node_up;
+	zbx_lld_trigger_node_iter_t		node_iter = {0};
+	zbx_vector_lld_trigger_node_ptr_t	nodes;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3612,7 +3611,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_lld_trigger_ptr_t *trig
 	zbx_hashset_iter_reset(&cache, &iter);
 	while (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_iter_next(&iter)))
 	{
-		for (i = 0; i < trigger_node->dependencies.values_num; i++)
+		for (int i = 0; i < trigger_node->dependencies.values_num; i++)
 		{
 			if (NULL == (trigger_node_up = (zbx_lld_trigger_node_t *)zbx_hashset_search(&cache,
 					trigger_node->dependencies.values[i])))
@@ -3628,7 +3627,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_lld_trigger_ptr_t *trig
 
 	zbx_vector_lld_trigger_node_ptr_sort(&nodes, zbx_lld_trigger_node_compare_func);
 
-	for (i = 0; i < nodes.values_num; i++)
+	for (int i = 0; i < nodes.values_num; i++)
 	{
 		if (NULL == (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_search(&cache,
 				(zbx_lld_trigger_node_t *)nodes.values[i])))
@@ -3679,13 +3678,13 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
-	zbx_vector_lld_trigger_prototype_ptr_t		trigger_prototypes;
-	zbx_vector_lld_trigger_ptr_t			triggers;
-	zbx_vector_lld_item_ptr_t			items;
-	zbx_lld_trigger_t				*trigger;
-	zbx_lld_trigger_prototype_t			*trigger_prototype;
+	zbx_vector_lld_trigger_prototype_ptr_t	trigger_prototypes;
+	zbx_vector_lld_trigger_ptr_t		triggers;
+	zbx_vector_lld_item_ptr_t		items;
+	zbx_lld_trigger_t			*trigger;
+	zbx_lld_trigger_prototype_t		*trigger_prototype;
 
-	int	ret = SUCCEED, i;
+	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3708,7 +3707,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 
 	/* simplifying trigger expressions */
 
-	for (i = 0; i < trigger_prototypes.values_num; i++)
+	for (int i = 0; i < trigger_prototypes.values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes.values[i];
 
@@ -3716,7 +3715,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 		lld_eval_expression_simplify(&trigger_prototype->eval_ctx_r, NULL, &trigger_prototype->functions);
 	}
 
-	for (i = 0; i < triggers.values_num; i++)
+	for (int i = 0; i < triggers.values_num; i++)
 	{
 		trigger = triggers.values[i];
 
