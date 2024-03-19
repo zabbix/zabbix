@@ -19,10 +19,7 @@
 
 #include "zbxcachehistory.h"
 
-#include "zbxcachevalue.h"
 #include "zbxmutexs.h"
-#include "zbxexpression.h"
-#include "zbxmodules.h"
 #include "module.h"
 #include "zbxexport.h"
 #include "zbxavailability.h"
@@ -30,12 +27,9 @@
 #include "zbxtrends.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-#include "zbx_host_constants.h"
-#include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
-#include "zbxeval.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxcacheconfig.h"
@@ -1324,8 +1318,9 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
-				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].item_value_type,
-						item) && SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
+				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].
+						item_value_type, item) && SUCCEED ==
+						zbx_match_tags(connector_filters->values[k].tags_evaltype,
 						&connector_filters->values[k].connector_tags, &item_info->item_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
@@ -1585,8 +1580,8 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, num,
 				ZBX_ITEM_GET_SYNC_EXPORT);
 
-		zbx_dc_export_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, FAIL, NULL, NULL, 0,
-				0);
+		zbx_dc_export_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, FAIL, NULL, NULL,
+				0, 0);
 
 		zbx_dc_config_clean_history_sync_items(items, errcodes, num);
 		zbx_vector_uint64_destroy(&itemids);
@@ -1661,7 +1656,8 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_
 	{
 		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
 
-		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
+		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name,
+				inventory_value->value);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",

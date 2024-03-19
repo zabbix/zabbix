@@ -36,6 +36,10 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbxexpression.h"
+#include "zbxeval.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxvariant.h"
 
 /******************************************************************************
  *                                                                            *
@@ -672,6 +676,14 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 	return diff;
 }
 
+typedef struct
+{
+	char	*table_name;
+	char	*sql;
+	size_t	sql_alloc, sql_offset;
+}
+zbx_history_dupl_select_t;
+
 static int	history_value_compare_func(const void *d1, const void *d2)
 {
 	const zbx_dc_history_t	*i1 = *(const zbx_dc_history_t * const *)d1;
@@ -707,14 +719,6 @@ static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
-typedef struct
-{
-	char	*table_name;
-	char	*sql;
-	size_t	sql_alloc, sql_offset;
-}
-zbx_history_dupl_select_t;
 
 static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char value_type,
 		zbx_vector_ptr_t *duplicates)
@@ -814,7 +818,8 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values, int *ret_flush)
+static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values,
+		int *ret_flush)
 {
 	int	i, ret = SUCCEED;
 
@@ -1308,7 +1313,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 		if (0 != history_items.values_num)
 		{
-			if (0 == (history_num = zbx_dc_config_lock_triggers_by_history_items(&history_items, &triggerids)))
+			if (0 == (history_num = zbx_dc_config_lock_triggers_by_history_items(&history_items,
+					&triggerids)))
 			{
 				zbx_dbcache_lock();
 				zbx_hc_push_items(&history_items);
@@ -1429,7 +1435,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 			{
 				for (i = 0; i < trigger_timers.values_num; i++)
 				{
-					zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)trigger_timers.values[i];
+					zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)
+							trigger_timers.values[i];
 
 					if (0 != timer->lock)
 						zbx_vector_uint64_append(&triggerids, timer->triggerid);
@@ -1523,14 +1530,15 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 				if (SUCCEED == module_enabled)
 				{
-					DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
-							history_integer, &history_integer_num, history_string,
-							&history_string_num, history_text, &history_text_num, history_log,
-							&history_log_num);
+					DCmodule_prepare_history(history, history_num, history_float,
+							&history_float_num, history_integer, &history_integer_num,
+							history_string, &history_string_num, history_text,
+							&history_text_num, history_log, &history_log_num);
 
-					DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-							history_text_num, history_log_num, history_float,
-							history_integer, history_string, history_text, history_log);
+					DCmodule_sync_history(history_float_num, history_integer_num,
+							history_string_num, history_text_num, history_log_num,
+							history_float, history_integer, history_string, history_text,
+							history_log);
 				}
 
 				if (SUCCEED == (history_export_enabled =
