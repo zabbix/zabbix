@@ -22,8 +22,8 @@
 
 #include "zbxdbhigh.h"
 
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
-
 void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
+
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
 #endif

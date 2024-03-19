@@ -343,8 +343,6 @@ static void	dc_history_set_error(zbx_dc_history_t *hdata, char *errmsg)
 	hdata->flags |= ZBX_DC_FLAG_UNDEF;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: sets history data value                                           *
@@ -408,7 +406,6 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 	hdata->value_type = value_type;
 	zbx_variant_set_none(value);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -541,9 +538,6 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const zbx_
 
 	zbx_vector_ptr_append(inventory_values, inventory_value);
 }
-
-
-
 
 /******************************************************************************
  *                                                                            *
@@ -1188,7 +1182,6 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 /******************************************************************************
  *                                                                            *
