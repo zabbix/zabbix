@@ -248,31 +248,28 @@ class C64ImportConverter extends CConverter {
 				unset($discovery_rule['timeout']);
 			}
 
+			$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
+
+			if (array_key_exists('lifetime', $discovery_rule)) {
+				if ($discovery_rule['lifetime'][0] !== '{') {
+					$converted_lifetime = timeUnitToSeconds($discovery_rule['lifetime']);
+
+					if ($converted_lifetime !== null && $converted_lifetime == 0) {
+						$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_IMMEDIATELY;
+						$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_IMMEDIATELY;
+					}
+				}
+			}
+			else {
+				$discovery_rule['lifetime'] = '30d';
+			}
+
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
 				$discovery_rule['item_prototypes'] = self::convertItemPrototypes($discovery_rule['item_prototypes']);
 			}
 
 			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
 				$discovery_rule['trigger_prototypes'] = self::convertTriggers($discovery_rule['trigger_prototypes']);
-			}
-
-			$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
-			$discovery_rule['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
-
-			if (array_key_exists('lifetime', $discovery_rule)) {
-				$converted_lifetime = timeUnitToSeconds($discovery_rule['lifetime']);
-
-				if ($discovery_rule['lifetime'][0] !== '{' && $converted_lifetime !== null
-						&& $converted_lifetime == 0) {
-					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_IMMEDIATELY;
-					$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_IMMEDIATELY;
-				}
-				else {
-					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_AFTER;
-				}
-			}
-			else {
-				$discovery_rule['lifetime'] = '30d';
 			}
 		}
 		unset($discovery_rule);
