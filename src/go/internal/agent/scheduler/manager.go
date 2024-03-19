@@ -675,7 +675,7 @@ type pluginOptions struct {
 	Capacity int `conf:"optional"`
 	System   struct {
 		ForceActiveChecksOnStart *int `conf:"optional"`
-		Capacity                 int  `conf:"optional"`
+		Capacity                 int  `conf:"default=1000"`
 	} `conf:"optional"`
 }
 
@@ -988,8 +988,11 @@ func getPluginOpts(
 	name string,
 ) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
 	var opt pluginOptions
+	const defaultSysCapacity = 1000
 
 	if optsRaw == nil {
+		pluginSystemCap = defaultSysCapacity
+
 		return
 	}
 
@@ -1000,7 +1003,11 @@ func getPluginOpts(
 	}
 
 	pluginCap = opt.Capacity
-	pluginSystemCap = opt.System.Capacity
+	if opt.System.Capacity == 0 {
+		pluginSystemCap = defaultSysCapacity
+	} else {
+		pluginSystemCap = opt.System.Capacity
+	}
 	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
