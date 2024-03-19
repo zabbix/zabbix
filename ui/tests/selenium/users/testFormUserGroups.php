@@ -162,7 +162,7 @@ class testFormUserGroups extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => ' ',
 					'error_msg' => 'Cannot update user group',
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
 			[

@@ -37,25 +37,6 @@
 
 AC_DEFUN([LIBCURL_CHECK_CONFIG],
 [
-  AH_TEMPLATE([LIBCURL_FEATURE_SSL],[Defined if libcurl supports SSL])
-  AH_TEMPLATE([LIBCURL_FEATURE_KRB4],[Defined if libcurl supports KRB4])
-  AH_TEMPLATE([LIBCURL_FEATURE_IPV6],[Defined if libcurl supports IPv6])
-  AH_TEMPLATE([LIBCURL_FEATURE_LIBZ],[Defined if libcurl supports libz])
-  AH_TEMPLATE([LIBCURL_FEATURE_ASYNCHDNS],[Defined if libcurl supports AsynchDNS])
-  AH_TEMPLATE([LIBCURL_FEATURE_IDN],[Defined if libcurl supports IDN])
-  AH_TEMPLATE([LIBCURL_FEATURE_SSPI],[Defined if libcurl supports SSPI])
-  AH_TEMPLATE([LIBCURL_FEATURE_NTLM],[Defined if libcurl supports NTLM])
-
-  AH_TEMPLATE([LIBCURL_PROTOCOL_HTTP],[Defined if libcurl supports HTTP])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_HTTPS],[Defined if libcurl supports HTTPS])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_FTP],[Defined if libcurl supports FTP])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_FTPS],[Defined if libcurl supports FTPS])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_FILE],[Defined if libcurl supports FILE])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_TELNET],[Defined if libcurl supports TELNET])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_LDAP],[Defined if libcurl supports LDAP])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_DICT],[Defined if libcurl supports DICT])
-  AH_TEMPLATE([LIBCURL_PROTOCOL_TFTP],[Defined if libcurl supports TFTP])
-
   _libcurl_config="no"
 
   AC_ARG_WITH(libcurl,
@@ -218,14 +199,6 @@ AS_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 					esac
 				fi # "x$LIBCURL_LIBS" = "x"
 
-				# All curl-config scripts support --feature
-				_libcurl_features=`$_libcurl_config --feature`
-
-				# Is it modern enough to have --protocols? (7.12.4)
-				if test $_libcurl_version -ge 461828; then
-					_libcurl_protocols=`$_libcurl_config --protocols`
-				fi
-
 				_libcurl_try_link=yes
 			fi # $_libcurl_wanted -eq 0 || "x$libcurl_cv_lib_version_ok" = "xyes"
 
@@ -285,23 +258,12 @@ x=CURLOPT_VERBOSE;
 				AC_MSG_ERROR([libcurl is not available for ${link_mode} linking])
 			fi
 
-			# Does curl_free() exist in this version of libcurl?
-			# If not, fake it with free()
-
 			_save_curl_libs="${LIBS}"
 			_save_curl_ldflags="${LDFLAGS}"
 			_save_curl_cflags="${CFLAGS}"
 			LIBS="${LIBS} ${LIBCURL_LIBS}"
 			LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 			CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
-
-			AC_CHECK_FUNC(curl_free,,
-				AC_DEFINE(curl_free,free,
-					[Define curl_free() as free() if our version of curl lacks curl_free.]))
-
-			AC_CHECK_FUNC(curl_easy_escape,
-				AC_DEFINE(HAVE_FUNCTION_CURL_EASY_ESCAPE,1,
-					[Define to 1 if function 'curl_easy_escape' exists.]))
 
 			LIBS="${_save_curl_libs}"
 			LDFLAGS="${_save_curl_ldflags}"
@@ -316,32 +278,6 @@ x=CURLOPT_VERBOSE;
 			AC_SUBST(LIBCURL_LDFLAGS)
 			AC_SUBST(LIBCURL_LIBS)
 			found_curl="yes"
-
-			for _libcurl_feature in $_libcurl_features ; do
-				AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_feature_$_libcurl_feature),[1])
-				eval AS_TR_SH(libcurl_feature_$_libcurl_feature)=yes
-			done
-
-			if test "x$_libcurl_protocols" = "x"; then
-				# We don't have --protocols, so just assume that all
-				# protocols are available
-				_libcurl_protocols="HTTP FTP FILE TELNET LDAP DICT"
-
-				if test "x$libcurl_feature_SSL" = "xyes"; then
-					_libcurl_protocols="$_libcurl_protocols HTTPS"
-
-					# FTPS wasn't standards-compliant until version
-					# 7.11.0
-					if test $_libcurl_version -ge 461568; then
-						_libcurl_protocols="$_libcurl_protocols FTPS"
-					fi
-				fi
-			fi
-
-			for _libcurl_protocol in $_libcurl_protocols ; do
-				AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_protocol_$_libcurl_protocol),[1])
-				eval AS_TR_SH(libcurl_protocol_$_libcurl_protocol)=yes
-			done
 		else
 			unset LIBCURL_LIBS
 			unset LIBCURL_CFLAGS
@@ -350,10 +286,6 @@ x=CURLOPT_VERBOSE;
 		unset _libcurl_try_link
 		unset _libcurl_version_parse
 		unset _libcurl_config
-		unset _libcurl_feature
-		unset _libcurl_features
-		unset _libcurl_protocol
-		unset _libcurl_protocols
 		unset _libcurl_version
 		unset _libcurl_libs
 	fi # "x$want_curl" != "xno"

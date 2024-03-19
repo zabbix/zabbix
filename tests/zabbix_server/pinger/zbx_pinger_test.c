@@ -22,6 +22,8 @@
 #include "zbxmockutil.h"
 #include "zbxcommon.h"
 
+#include "zbxicmpping.h"
+
 #include "../../../src/libs/zbxpinger/pinger.c"
 
 #define MAX_ERR_LEN 256

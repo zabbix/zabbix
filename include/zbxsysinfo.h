@@ -150,7 +150,7 @@ int		zbx_init_modbus(char **error);
 void		zbx_deinit_modbus(void);
 
 /* stats */
-ZBX_THREAD_ENTRY(collector_thread, args);
+ZBX_THREAD_ENTRY(zbx_collector_thread, args);
 
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);

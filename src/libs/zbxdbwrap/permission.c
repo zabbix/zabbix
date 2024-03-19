@@ -21,6 +21,8 @@
 
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
 
 const char	*zbx_permission_string(int perm)
 {

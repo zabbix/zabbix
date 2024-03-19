@@ -1,1 +1,0 @@
-..F....... [ZBX-23617] fixed item test form not showing values for macros with a backslash character used in a string parameter of a calculated item formula function (jfreibergs)

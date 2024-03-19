@@ -4,10 +4,9 @@ SUBDIRS = \
 	actions \
 	dbconfig \
 	diag \
-	discoverer \
+	discovery \
 	events \
 	housekeeper \
-	httppoller \
 	poller \
 	timer \
 	escalator \
@@ -51,18 +50,18 @@ zabbix_server_LDADD = \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
-	discoverer/libzbxdiscoverer.a \
+	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	actions/libzbxactions.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
+	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
-	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
@@ -74,7 +73,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
-	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_server.a \
+	discovery/libzbxdiscovery_server.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
@@ -163,7 +162,9 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a
+	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
+	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a
+
 if HAVE_IPMI
 zabbix_server_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a
 endif

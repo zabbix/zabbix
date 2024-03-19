@@ -86,7 +86,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&(get_config())->numitems, &src_item->itemid);
+			numitem = src_item->itemvaluetype.numitem;
 
 			dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
 
@@ -568,15 +568,10 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 
 	if (ITEM_VALUE_TYPE_LOG == src_item->value_type)
 	{
-		if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&(get_config())->logitems,
-				&src_item->itemid)))
-		{
+		if (NULL != (logitem = src_item->itemvaluetype.logitem))
 			zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
-		}
 		else
-		{
 			*dst_item->logtimefmt = '\0';
-		}
 	}
 
 	if (ZBX_ITEM_GET_INTERFACE & mode)
@@ -595,8 +590,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	switch (src_item->type)
 	{
 		case ITEM_TYPE_TRAPPER:
-			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&(get_config())->trapitems,
-					&src_item->itemid)))
+			if (NULL != (trapitem = src_item->itemtype.trapitem))
 			{
 				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
 			}
@@ -604,8 +598,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 				*dst_item->trapper_hosts = '\0';
 			break;
 		case ITEM_TYPE_HTTPAGENT:
-			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&(get_config())->httpitems,
-					&src_item->itemid)))
+			if (NULL != (httpitem = src_item->itemtype.httpitem))
 			{
 				dst_item->allow_traps = httpitem->allow_traps;
 				zbx_strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
