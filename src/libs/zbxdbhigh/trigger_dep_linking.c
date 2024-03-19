@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -271,14 +271,16 @@ clean:
 
 /**********************************************************************************************************
  *                                                                                                        *
- * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
- *          already present on the target host to generate a new list (links_processed). Also, prepare    *
+ * Purpose: Takes a list of pending trigger dependencies (links) and excludes entries that are            *
+ *          already present on the target host to generate a new list (links_processed). Also, prepares   *
  *          the list of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the     *
  *          target host, since they are not present on the template trigger.                              *
  *                                                                                                        *
- * Parameters: trids               - [IN] vector of trigger identifiers from database                     *
- *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
- *                                         links that we want to be present on the target host            *
+ * Parameters:                                                                                            *
+ *             trids               - [IN] vector of host trigger ids, whose descriptions match at least   *
+ *                                        one of triggers from templates                                  *
+ *             links               - [OUT] pairs of template trigger dependencies, list of links_up and   *
+ *                                         links_down, links that we want to be present on target host    *
  *             links_processed     - [OUT] processed links with entries that are already present excluded *
  *             trigger_dep_ids_del - [OUT] list of triggers dependencies that need to be deleted          *
  *                                                                                                        *
@@ -316,6 +318,7 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		goto clean;
 	}
 
+	/* create a list of target host trigger dependencies */
 	while (NULL != (row = DBfetch(result)))
 	{
 		int				flags;
@@ -354,6 +357,9 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 
 	DBfree_result(result);
 
+	/* Go through the list of template trigger dependencies and if there is match between host triggers up and  */
+	/* down then mark host pair dependency with "preserve status". If target host does not have this dependency */
+	/* pair - then add the source trigger dependency (from template) list of dependencies.                      */
 	for (i = 0; i < links->values_num; i++)
 	{
 		zbx_trigger_dep_entry_t	temp_t;
@@ -523,7 +529,8 @@ clean:
  * Purpose: update trigger dependencies for specified host                      *
  *                                                                              *
  * Parameters: hostid    - [IN] host identifier from database                   *
- *             trids     - [IN] vector of trigger identifiers from database     *
+ *             trids     - [IN] vector of host trigger ids, which descriptions  *
+ *                              match at least one of triggers from templates   *
  *             is_update - [IN] flag. Values:                                   *
  *                              TRIGGER_DEP_SYNC_INSERT_OP - 'trids' contains   *
  *                               identifiers of new triggers,                   *

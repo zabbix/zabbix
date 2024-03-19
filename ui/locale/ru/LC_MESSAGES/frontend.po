@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-11-22 13:44+0000\n"
-"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
+"PO-Revision-Date: 2024-01-12 04:04+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -208,6 +208,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s из %2$s элемента в состоянии проблемы"
 msgstr[1] "%1$s из %2$s элементов в состоянии проблемы"
 msgstr[2] "%1$s из %2$s элементов в состоянии проблемы"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
 
 #: jsLoader.php:348
 #, c-format
@@ -890,7 +900,7 @@ msgstr "Добавить узел сети"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr "Добавить колонку элементов данных"
+msgstr "Добавьте колонку элементов данных"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -1786,7 +1796,7 @@ msgstr "По нижнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr "Bottom N"
+msgstr "Последние N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -12547,7 +12557,7 @@ msgstr "Новое дополнительное правило"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "New column"
-msgstr "Новый столбец"
+msgstr "Новая колонка"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -13234,6 +13244,11 @@ msgstr "Без унаследованных элементов данных"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Не поддерживается"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -18298,7 +18313,7 @@ msgstr "По верхнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr "Top N"
+msgstr "Первые N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -19345,6 +19360,10 @@ msgstr "Время работы процесса Zabbix сервера в сек
 #: include/actions.inc.php:59
 msgid "Uptime/Downtime"
 msgstr "Доступен/Недоступен"
+
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20755,6 +20774,10 @@ msgstr "Ось X"
 msgid "X-Frame-Options HTTP header"
 msgstr "HTTP заголовок X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -21174,6 +21197,11 @@ msgstr "ожидается относительное время"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "спецсимвол"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -21751,6 +21779,10 @@ msgstr "по умолчанию"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Конвертация значения из радианов в градусы"
+
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -22630,6 +22662,10 @@ msgstr "power() - Степень основного значения к знач
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "шаблон проблем"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CControllerAuthenticationEdit extends CController {
 		$fields = [
 			'form_refresh' =>				'int32',
 			'ldap_test_user' =>				'string',
-			'ldap_test_password' =>			'password',
+			'ldap_test_password' =>			'string',
 			'change_bind_password' =>		'in 0,1',
 			'db_authentication_type' =>		'string',
 			'authentication_type' =>		'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
@@ -49,7 +49,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_base_dn' =>				'db config.ldap_base_dn',
 			'ldap_bind_dn' =>				'db config.ldap_bind_dn',
 			'ldap_search_attribute' =>		'db config.ldap_search_attribute',
-			'ldap_bind_password' =>			'db config.ldap_bind_password|password',
+			'ldap_bind_password' =>			'db config.ldap_bind_password',
 			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
 			'saml_sso_url' =>				'db config.saml_sso_url',

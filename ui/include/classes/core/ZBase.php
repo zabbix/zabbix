@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -488,6 +488,10 @@ class ZBase {
 		// Set the authentication token for the API.
 		API::getWrapper()->auth = CWebUser::$data['sessionid'];
 
+		if (CWebUser::isAutologinEnabled()) {
+			$session->lifetime = time() + SEC_PER_MONTH;
+		}
+
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}
@@ -574,34 +578,9 @@ class ZBase {
 
 			filter_messages();
 
-			// Add current controller name in error message.
 			CMessageHelper::addError('Controller: '.$router->getAction());
-
-			// Getting information from $_REQUEST is not correct, so instead get data from controller input instead.
-			$reflection_class = new ReflectionClass($router->getController());
-			$controller = $reflection_class->newInstance();
-			$input = $controller->getRawInput();
-
-			ksort($input);
-
-			// Get validation rules from controller and hide sensitive fields.
-			$rules = $controller::getValidationRules();
-			$rule_parser = new CValidationRule();
-
-			foreach ($rules as $field_name => $rule) {
-				$parsed_rules = $rule_parser->parse($rule);
-
-				foreach ($input as $key => $value) {
-					if ($field_name === $key) {
-						if (array_key_exists('password', $parsed_rules)) {
-							// Remove sensitive field from output. Alternatively password can be replaced with *****.
-							unset($input[$key]);
-						}
-					}
-				}
-			}
-
-			foreach ($input as $key => $value) {
+			ksort($_REQUEST);
+			foreach ($_REQUEST as $key => $value) {
 				if ($key !== 'sid') {
 					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,10 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 	else if (ZABBIX_MOCK_KERNEL_MAXFILES == kernel_func)
 		actual_result = KERNEL_MAXFILES(&request, &param_result);
 	else
+	{
+		actual_result = 0;
 		fail_msg("Invalid kernel_func");
+	}
 
 	if (expected_result != actual_result)
 	{

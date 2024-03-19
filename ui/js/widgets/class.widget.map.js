@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,11 @@ class CWidgetMap extends CWidget {
 		this._initial_load = true;
 
 		this._has_contents = false;
+
+		this._map_created_promise_resolve = null;
+		this._map_created_promise = new Promise(resolve => {
+			this._map_created_promise_resolve = resolve;
+		});
 	}
 
 	_doActivate() {
@@ -87,8 +92,49 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
+	updateProperties({name, view_mode, fields}) {
+		this._deactivateContentsEvents();
+
+		this._map_svg = null;
+
+		this._source_type = fields.source_type;
+		this._previous_maps = [];
+		this._sysmapid = null;
+
+		this._initial_load = true;
+		this._has_contents = false;
+
+		if (this._source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+			if (this._filter_widget !== null) {
+				this._filter_widget.off(WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
+				this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+			}
+
+			for (const widget of ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets()) {
+				if (widget instanceof CWidgetNavTree && widget._fields.reference === fields.filter_widget_reference) {
+					this._filter_widget = widget;
+
+					this._filter_widget.on(WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
+					this._filter_widget.on(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+				}
+			}
+
+			this._filter_itemid = this._filter_widget._navtree[this._filter_widget._navtree_item_selected]?.sysmapid;
+			this._sysmapid = this._filter_itemid;
+		}
+
+		super.updateProperties({name, view_mode, fields});
+	}
+
 	_promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
+			if (this._sysmapid === null
+					&& this._source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER
+					&& Object.keys(this._filter_widget?._navtree || {}).length > 0) {
+				this._filter_itemid = this._filter_widget._navtree[this._filter_widget._navtree_item_selected]?.sysmapid;
+				this._sysmapid = this._filter_itemid;
+			}
+
 			if (this._sysmapid !== null
 					|| this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP
 					|| this._filter_widget === null) {
@@ -97,29 +143,39 @@ class CWidgetMap extends CWidget {
 
 			return Promise.resolve();
 		}
-		else {
-			const curl = new Curl(this._map_svg.options.refresh);
 
-			return fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				},
-				body: urlEncodeData({
-					'curtime': new CDate().getTime(),
-					'initial_load': 0
-				})
+		const curl = new Curl(this._map_svg.options.refresh);
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({
+				'curtime': new CDate().getTime(),
+				'initial_load': 0
 			})
-				.then((response) => response.json())
-				.then((response) => {
-					if (response.mapid > 0 && this._map_svg) {
-						this._map_svg.update(response);
-					}
-					else {
-						this._restartUpdating();
-					}
-				});
-		}
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if (response.mapid > 0 && this._map_svg) {
+					this._map_svg.update(response);
+				}
+				else {
+					this._restartUpdating();
+				}
+			});
+	}
+
+	_promiseReady() {
+		const readiness = [super._promiseReady()];
+
+		readiness.push(
+			this._map_created_promise
+				.then(() => this._map_svg.promiseRendered())
+		);
+
+		return Promise.all(readiness);
 	}
 
 	_getUpdateRequestData() {
@@ -133,12 +189,6 @@ class CWidgetMap extends CWidget {
 	}
 
 	_processUpdateResponse(response) {
-		if (this._has_contents) {
-			this._deactivateContentsEvents();
-
-			this._has_contents = false;
-		}
-
 		super._processUpdateResponse(response);
 
 		if (response.sysmap_data !== undefined) {
@@ -214,6 +264,7 @@ class CWidgetMap extends CWidget {
 		options.container = this._target.querySelector('.sysmap-widget-container');
 
 		this._map_svg = new SVGMap(options);
+		this._map_created_promise_resolve();
 	}
 
 	navigateToSubmap(sysmapid) {

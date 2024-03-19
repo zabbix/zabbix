@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/procfs"
@@ -68,6 +69,22 @@ var impl Plugin = Plugin{
 var implExport PluginExport = PluginExport{}
 
 type historyIndex int
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+
+	err = plugin.RegisterMetrics(
+		&implExport, "ProcExporter",
+		"proc.mem", "Process memory utilization values.",
+		"proc.num", "The number of processes.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (h historyIndex) inc() historyIndex {
 	h++
@@ -413,10 +430,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		p.queries[query] = stats
 		p.Debugf("registered new CPU utilization query: %s, %s, %s", name, user, cmdline)
 	} else {
-		p.Debugf("cannot register CPU utilization query: %s", err)
+		err = fmt.Errorf("cannot register CPU utilization query: %s", err)
 	}
 	return
 }
+
 func (p *PluginExport) prepareQuery(q *procQuery) (query *cpuUtilQuery, flags int, err error) {
 	regxp, err := regexp.Compile(q.cmdline)
 	if err != nil {
@@ -521,8 +539,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	if cmdline != "" {
 		cmdRgx, err = regexp.Compile(cmdline)
 		if err != nil {
-			p.Debugf("Failed to compile provided regex expression '%s': %s", cmdline, err.Error())
-			return 0, nil
+			return nil, fmt.Errorf("Failed to compile regular expression '%s': %s", cmdline, err.Error())
 		}
 	}
 
@@ -530,9 +547,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 	if usr != nil {
 		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
 		if err != nil {
-			p.Logger.Tracef(
-				"failed to convert user id '%s' to uint64 for user '%s'", usr.Uid, usr.Username)
-			return 0, nil
+			return nil, fmt.Errorf("Failed to parse userid '%s' for user '%s", usr.Uid, usr.Username)
 		}
 	}
 
@@ -671,8 +686,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 
 	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
 	if err != nil {
-		p.Debugf("Failed to prepare query: %s", err.Error())
-		return count, nil
+		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
 	}
 
 	procs, err := getProcesses(flags)
@@ -774,12 +788,4 @@ func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx 
 	}
 
 	return true
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
-	plugin.RegisterMetrics(&implExport, "ProcExporter",
-		"proc.mem", "Process memory utilization values.",
-		"proc.num", "The number of processes.",
-	)
 }

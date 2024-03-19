@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1668,9 +1668,12 @@ class CUser extends CApiService {
 
 		$time = time();
 
+		$auth_method = $session['sessionid'] !== null ? 'sessionid' : 'token';
+
 		// Access DB only once per page load.
-		if (self::$userData !== null && self::$userData['sessionid'] === $session['sessionid']) {
-			return self::$userData;
+		if (self::$userData !== null && array_key_exists($auth_method, self::$userData)
+				&& self::$userData[$auth_method] === $session[$auth_method]) {
+			return array_diff_key(self::$userData, array_flip(['token']));
 		}
 
 		if ($session['sessionid'] !== null) {
@@ -2120,11 +2123,11 @@ class CUser extends CApiService {
 		$db_user['gui_access'] = $permissions['gui_access'];
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
-			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
+			$db_user['lang'] = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_LANG);
 		}
 
 		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
-			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
+			$db_user['timezone'] = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_TIMEZONE);
 		}
 
 		return $db_user;

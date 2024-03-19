@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-02 20:12+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2024-03-10 17:35+0000\n"
+"Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -198,6 +198,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s elemento de %2$s en estado de problema"
 msgstr[1] "%1$s elementos de %2$s en estado de problema"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr "%1$s o %2$s: permite que la página se muestre solo en un marco en el mismo origen que la misma página"
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr "%1$s o %2$s: evita que la página se muestre en un marco, independientemente del sitio que intente hacerlo"
 
 #: jsLoader.php:348
 #, c-format
@@ -1266,7 +1276,7 @@ msgstr "Aplicar permisos y filtros de etiquetas a todos los subgrupos"
 #: include/views/configuration.maintenance.list.php:101
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr "Acercamiento"
+msgstr "Acercándose"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -13118,6 +13128,11 @@ msgstr "No hay métricas heredadas"
 msgid "Not supported"
 msgstr "No soportado"
 
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr "Tenga en cuenta que %1$s o %2$s se considerarán nombres de equipo si se usan sin comillas simples."
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "Notas"
@@ -19211,6 +19226,10 @@ msgstr "Tiempo de actividad del proceso del servidor Zabbix en segundos."
 msgid "Uptime/Downtime"
 msgstr "Tiempo operativo/Tiempo inoperativo"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr "Utilice el encabezado HTTP X-Frame-Options"
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Utilice solicitudes masivas"
@@ -20613,6 +20632,10 @@ msgstr "Eje X"
 msgid "X-Frame-Options HTTP header"
 msgstr "Encabezado HTTP X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr "Valores admitidos del encabezado HTTP X-Frame-Options:"
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -21032,6 +21055,11 @@ msgstr "se esperaba un tiempo relativo"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "un caracter especial"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr "una cadena de nombres de equipo separados por espacios; agregar %1$s a la lista permite que la página se muestre en un marco en el mismo origen que la misma página"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -21609,6 +21637,10 @@ msgstr "por defecto"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Convierte un valor de radianes a grados"
+
+#: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
+msgid "delimiter"
+msgstr "delimitador"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -22488,6 +22520,10 @@ msgstr "power() - La potencia de un valor base a un valor de potencia"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 msgid "problem pattern"
 msgstr "patrón de problema"
+
+#: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
+msgid "qualifier"
+msgstr "calificador"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,178 +19,162 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
 /**
- * @backup graphs
+ * @backup hosts
+ *
+ * @onBefore prepareGraphPrototypeData
  */
-class testPageGraphPrototypes extends CLegacyWebTest {
+class testPageGraphPrototypes extends testPagePrototypes {
 
-	/**
-	 * Discovery rule "testFormDiscoveryRule" id used in test.
-	 */
-	const DISCOVERY_RULE_ID = 133800;
+	public $source = 'graph';
 
-	/**
-	 * Item prototype "testFormItemReuse" id used in test belong to discovery rule "testFormDiscoveryRule".
-	 */
-	const ITEM_PROTOTYPE_ID = 23804;
+	protected $link = 'graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
+	protected static $prototype_graphids;
+	protected static $host_druleids;
 
-	/**
-	 * Get all graph prototypes from Discovery rule "testFormDiscoveryRule"
-	 * with item prototype "testFormItemReuse".
-	 */
-	private $sql_graph_prototypes;
-
-	/**
-	 * @inheritdoc
-	 */
-	public function __construct($name = null, array $data = [], $data_name = '') {
-		parent::__construct($name, $data, $data_name);
-
-		$this->sql_graph_prototypes = 'SELECT name, graphid, width, height, graphtype FROM graphs WHERE graphid IN (SELECT graphid FROM graphs_items WHERE itemid='.self::ITEM_PROTOTYPE_ID.')';
-	}
-
-	/**
-	 * Get text of elements by xpath.
-	 *
-	 * @param string $xpath	xpath selector
-	 *
-	 * @return array
-	 */
-	private function getTextOfElements($xpath) {
-		$result = [];
-
-		foreach ($this->query('xpath', $xpath)->all() as $element) {
-			$result[] = $element->getText();
-		}
-
-		return $result;
-	}
-
-	public function testPageGraphPrototypes_CheckLayout() {
-		$this->zbxTestLogin('graphs.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
-		$this->zbxTestCheckTitle('Configuration of graph prototypes');
-		$this->zbxTestCheckHeader('Graph prototypes');
-		// Check create button.
-		$this->zbxTestAssertElementText('//button[contains(@data-url, "form")]', 'Create graph prototype');
-
-		// Check table headers.
-		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type', 'Discover'],
-				$this->getTextOfElements("//form[@name=\"graphForm\"]//thead/tr/th[not(@class)]")
-		);
-
-		// Check graph prototype number in breadcrumb.
-		$graphs = CDBHelper::getAll($this->sql_graph_prototypes);
-		$count = count($graphs);
-		$xpath = '//div[@class="header-navigation"]//a[text()="Graph prototypes"]/..//sup';
-		$get_number = $this->zbxTestGetText($xpath);
-		$this->assertEquals($get_number, $count);
-
-		// Check graph prototype configuration parameters in table.
-		$types = ['Normal', 'Stacked', 'Pie', 'Exploded'];
-		foreach ($graphs as $graph) {
-			// Check the graph names and get graph row in table.
-			$element = $this->query('xpath://table[@class="list-table"]/tbody//a[text()="'.$graph['name'].'"]/../..')->one();
-			// Check width value.
-			$this->assertEquals($graph['width'], $element->query('xpath:./td[3]')->one()->getText());
-			// Check height value.
-			$this->assertEquals($graph['height'], $element->query('xpath:./td[4]')->one()->getText());
-			// Check graph type value.
-			$this->assertEquals($types[$graph['graphtype']], $element->query('xpath:./td[5]')->one()->getText()
-			);
-		}
-
-		// Check table footer to make sure that results are found
-		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$count.' of '.$count.' found');
-		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
-	}
-
-	/**
-	 * Returns graph prototype ids.
-	 */
-	public static function getDeleteData() {
-		return [
+	public function prepareGraphPrototypeData() {
+		$host_result = CDataHelper::createHosts([
 			[
-				[
-					'graphs' => 2
+				'host' => 'Host for prototype check',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_SNMP,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '161',
+						'details' => [
+							'version' => 1,
+							'community' => 'test'
+						]
+					]
+				],
+				'groups' => [['groupid' => 4]], // Zabbix server
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for prototype check',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
+			]
+		]);
+		$hostids = $host_result['hostids']['Host for prototype check'];
+		self::$host_druleids = $host_result['discoveryruleids']['Host for prototype check:drule'];
+
+		$item_prototype = CDataHelper::call('itemprototype.create', [
+			[
+				'name' => '1 Item prototype for graphs',
+				'key_' => '1_key[{#KEY}]',
+				'hostid' => $hostids,
+				'ruleid' => self::$host_druleids,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => 0
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $item_prototype );
+		$prototype_itemid = CDataHelper::getIds('name')['1 Item prototype for graphs'];;
+
+		CDataHelper::call('graphprototype.create', [
+			[
+				'name' => '2a Graph prototype discovered_{#KEY}',
+				'width' => 100,
+				'height' => 100,
+				'graphtype' => 0,
+				'gitems' => [
+					[
+						'itemid' => $prototype_itemid,
+						'color' => '00AA00'
+					]
 				]
 			],
 			[
-				[
-					'graphs' => 'all'
+				'name' => '33b4 Graph prototype not discovered_{#KEY}',
+				'width' => 200,
+				'height' => 200,
+				'graphtype' => 1,
+				'discover' => GRAPH_NO_DISCOVER,
+				'gitems' => [
+					[
+						'itemid' => $prototype_itemid,
+						'color' => '00AA00'
+					]
+				]
+			],
+			[
+				'name' => 'a3 Graph prototype pie discovered_{#KEY}',
+				'width' => 300,
+				'height' => 300,
+				'graphtype' => 2,
+				'gitems' => [
+					[
+						'itemid' => $prototype_itemid,
+						'color' => '00AA00'
+					]
+				]
+			],
+			[
+				'name' => 'Yw Graph prototype exploded not discovered_{#KEY}',
+				'width' => 400,
+				'height' => 400,
+				'graphtype' => 3,
+				'discover' => GRAPH_NO_DISCOVER,
+				'gitems' => [
+					[
+						'itemid' => $prototype_itemid,
+						'color' => '00AA00'
+					]
 				]
 			]
-		];
+		]);
+		self::$prototype_graphids = CDataHelper::getIds('name');
+		self::$entity_count = count(self::$prototype_graphids);
+	}
+
+	public function testPageGraphPrototypes_Layout() {
+		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+		$this->checkLayout();
 	}
 
 	/**
-	 * Delete certain count of graph prototypes or all.
+	 * Sort graph prototypes by Name, Graph type and Discover columns.
 	 *
-	 * @dataProvider getDeleteData
+	 * @dataProvider getGraphPrototypesSortingData
+	 */
+	public function testPageGraphPrototypes_Sorting($data) {
+		$this->page->login()->open('graphs.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids)->waitUntilReady();
+		$this->executeSorting($data);
+	}
+
+	/**
+	 * Check link from Discover column.
+	 *
+	 * @dataProvider getGraphPrototypesButtonLinkData
+	 */
+	public function testPageGraphPrototypes_ButtonLink($data) {
+		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+		$this->checkTableAction($data);
+	}
+
+	/**
+	 * Check delete scenarios.
+	 *
+	 * @dataProvider getGraphPrototypesDeleteData
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
-		$this->zbxTestLogin('graphs.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
-		$this->zbxTestCheckTitle('Configuration of graph prototypes');
+		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
 
-		if ($data['graphs'] != 'all') {
-			// Get random N graph prototypes, where N is count.
-			$values = DBfetchArray(DBselect($this->sql_graph_prototypes));
-			shuffle($values);
-
-			// Select obtained graph prototypes.
-			foreach (array_slice($values, 0, (int)$data['graphs']) as $graph) {
-				$this->zbxTestCheckboxSelect('group_graphid_'.$graph['graphid']);
-				$graphids[] = $graph['graphid'];
-			}
-
-			$this->zbxTestAssertElementText("//span[@id='selected_count']", $data['graphs'].' selected');
-
-			$sql = 'SELECT NULL FROM graphs_items WHERE graphid IN ('.implode(',', $graphids).')';
-		}
-		else {
-			$this->zbxTestCheckboxSelect('all_graphs');
-			$sql = $this->sql_graph_prototypes;
-			$this->zbxTestAssertElementText("//span[@id='selected_count']", CDBHelper::getCount($sql).' selected');
+		$ids = [];
+		foreach ($data['name'] as $name) {
+			$ids[] = self::$prototype_graphids[$name];
 		}
 
-		$this->zbxTestClickButton('graph.massdelete');
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of graph prototypes');
-		$this->zbxTestCheckHeader('Graph prototypes');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
-
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-	}
-
-	/**
-	 * Test impossible deleting of templated graph.
-	 */
-	public function testPageGraphPrototypes_CannotDelete() {
-		$item_id = 15026;
-		$parent_discovery_id = 15016;
-
-		$sql_hash = 'SELECT *'.
-				' FROM graphs'.
-				' WHERE graphid IN ('.
-					'SELECT graphid'.
-					' FROM graphs_items'.
-					' WHERE itemid='.$item_id.
-				') ORDER BY graphid';
-
-		$old_hash = CDBHelper::getHash($sql_hash);
-
-		$this->zbxTestLogin('graphs.php?parent_discoveryid='.$parent_discovery_id.'&context=host');
-		$this->zbxTestCheckboxSelect('all_graphs');
-		$this->zbxTestClickButton('graph.massdelete');
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete graph prototypes');
-		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graph prototype.');
-
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
+		$this->checkDelete($data, $ids);
 	}
 }

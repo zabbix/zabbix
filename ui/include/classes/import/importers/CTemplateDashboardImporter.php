@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,6 +160,13 @@ class CTemplateDashboardImporter extends CImporter {
 						$item_key = $field['value']['key'];
 
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
+
+						if ($hostid === null) {
+							throw new Exception(_s('Cannot find host "%1$s" used in dashboard "%2$s".',
+								$host_name, $dashboard_name
+							));
+						}
+
 						$field['value'] = $this->referencer->findItemidByKey($hostid, $item_key, true);
 
 						if ($field['value'] === null) {
@@ -175,6 +182,13 @@ class CTemplateDashboardImporter extends CImporter {
 						$graph_name = $field['value']['name'];
 
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
+
+						if ($hostid === null) {
+							throw new Exception(_s('Cannot find host "%1$s" used in dashboard "%2$s".',
+								$host_name, $dashboard_name
+							));
+						}
+
 						$field['value'] = $this->referencer->findGraphidByName($hostid, $graph_name, true);
 
 						if ($field['value'] === null) {

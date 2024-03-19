@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,8 +148,9 @@ typedef struct
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
-
 int	vmware_dsname_compare(const void *d1, const void *d2);
+int	vmware_dsname_compare_uuid(const void *d1, const void *d2);
+
 ZBX_PTR_VECTOR_DECL(vmware_dsname, zbx_vmware_dsname_t *)
 
 typedef struct

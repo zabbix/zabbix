@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -224,7 +224,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 
 			/* uint64_t(double(UINT64_MAX)) conversion results in 0, to avoid      */
 			/* conversion issues require floating value to be less than UINT64_MAX */
-			if (ZBX_MAX_UINT64 <= value->data.dbl)
+			if (ZBX_MAX_UINT64 <= (zbx_uint64_t)(value->data.dbl))
 				return FAIL;
 
 			zbx_variant_set_ui64(value, value->data.dbl);

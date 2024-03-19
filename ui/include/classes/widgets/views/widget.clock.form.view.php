@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@
 
 /**
  * Clock widget form view.
+ *
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
@@ -32,21 +35,25 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.clock.form.view.js.php')];
 
 // Time type.
 $form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getSelect($fields['time_type']));
 
 // Item.
-if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts[] = $field_itemid->getPostJS();
-}
+$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid, null, 'js-row-itemid');
+$scripts[] = $field_itemid->getPostJS();
 
-$scripts[] = '$("#time_type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());';
-
-$form->addItem($form_list);
+$form
+	->addItem($form_list)
+	->addItem(
+		(new CScriptTag('
+			widget_clock_form.init('.json_encode([
+				'form_id' => $form->getId()
+			]).');
+		'))->setOnDocumentReady()
+	);
 
 return [
 	'form' => $form,

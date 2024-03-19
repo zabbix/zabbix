@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
 out1:
 	pclsObj->Release();
-out2:	
+out2:
 	return ret;
 }
 
@@ -403,7 +403,10 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		*error = zbx_strdup(*error, "Empty WMI search result.");
 exit:
 	if (0 != pEnumerator)
+	{
+		while (WBEM_S_NO_ERROR == pEnumerator->Skip((long)(1000 * timeout), 1)) {}
 		pEnumerator->Release();
+	}
 
 	if (0 != pService)
 		pService->Release();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,13 +158,6 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 				]
 			]
 		];
-	}
-
-	/**
-	 * TODO remove after DEV-1535 is fixed.
-	 */
-	public function cleanupProfile() {
-		DBexecute('DELETE FROM profiles WHERE idx LIKE \'web.popup.generic.%\'');
 	}
 
 	/**
@@ -375,10 +368,11 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$type = array_key_exists('Item prototype', $data['fields']) ? 'Item prototype' : 'Graph prototype';
 
 		if (!array_key_exists('Graph prototype', $data['fields']) && !array_key_exists('Item prototype', $data['fields'])) {
-			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->asMultiselect()->one()->clear();
+			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->all()->filter(CElementFilter::VISIBLE)
+					->asMultiselect()->clear();
 		}
 
-		$values = $form->getFields()->asValues();
+		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit();
 
 		switch ($data['expected']) {
@@ -399,6 +393,11 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 				// Check that Dashboard has been saved and that widget has been added.
 				$this->assertMessage($data['expected'], 'Dashboard updated');
 				$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+				// Write widget name to variable to use it in next Update test case.
+				if ($update) {
+					self::$previous_widget_name = CTestArrayHelper::get($data, 'fields.Name', 'Graph prototype widget for update');
+				}
 
 				// Check that widget is saved in DB.
 				$db_count = CDBHelper::getCount('SELECT * FROM widget w'.
@@ -430,12 +429,8 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 						'"Main filter"]')->one()->isPresent());
 				}
 				// Check widget form fields and values.
-				$this->assertEquals($values, $widget->edit()->getFields()->asValues());
+				$this->assertEquals($values, $widget->edit()->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 
-				// Write widget name to variable to use it in next Update test case.
-				if ($update) {
-					self::$previous_widget_name = CTestArrayHelper::get($data, 'fields.Name', 'Graph prototype widget for update');
-				}
 				break;
 			case TEST_BAD:
 				$this->assertMessage($data['expected'], null, $data['error']);

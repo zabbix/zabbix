@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -337,5 +337,100 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 		$host_link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::INHERITANCE_HOSTID;
 
 		$this->checkPreprocessingInheritance($data, $host_link, self::IS_LLD);
+	}
+
+	/**
+	 * Please note that this data provider consists only from ONE test case with an array of steps.
+	 */
+	public static function getLLDParametersData() {
+		return [
+			[
+				[
+					[
+						'type' => 'Regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern'],
+							['placeholder' => 'output']
+						]
+					],
+					[
+						'type' => 'Replace',
+						'parameters' => [
+							['placeholder' => 'search string'],
+							['placeholder' => 'replacement']
+						]
+					],
+					[
+						'type' => 'XML XPath',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'JSONPath',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'CSV to JSON',
+						'parameters' => [
+							['placeholder' => 'delimiter', 'value' => ','],
+							['placeholder' => 'qualifier', 'value' => '"'],
+							['value' => true]
+						]
+					],
+					[
+						'type' => 'XML to JSON'
+					],
+					[
+						'type' => 'JavaScript',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'placeholder' => 'script'
+							]
+						]
+					],
+					[
+						'type' => 'Does not match regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern']
+						]
+					],
+					[
+						'type' => 'Check for error in JSON',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'Check for error in XML',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'Discard unchanged with heartbeat',
+						'parameters' => [
+							['placeholder' => 'seconds']
+						]
+					],
+					[
+						'type' => 'Prometheus to JSON',
+						'parameters' => [
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>']
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLLDParametersData
+	 */
+	public function testFormPreprocessingLowLevelDiscovery_CheckParametersPlaceholders($data) {
+		$this->checkParameters($data);
 	}
 }

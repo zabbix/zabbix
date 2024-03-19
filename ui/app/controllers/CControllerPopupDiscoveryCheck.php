@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,14 +55,14 @@ class CControllerPopupDiscoveryCheck extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
-			error(_('Incorrect port range.'));
+			info(_('Incorrect port range.'));
 			$ret = false;
 		}
 
 		if ($ret && $this->hasInput('type') && $this->getInput('type') == SVC_AGENT) {
 			$item_key_parser = new CItemKey();
 			if ($item_key_parser->parse($this->getInput('key_')) != CParser::PARSE_SUCCESS) {
-				error(_s('Invalid key "%1$s": %2$s.', $this->getInput('key_'), $item_key_parser->getError()));
+				info(_s('Invalid key "%1$s": %2$s.', $this->getInput('key_'), $item_key_parser->getError()));
 				$ret = false;
 			}
 		}

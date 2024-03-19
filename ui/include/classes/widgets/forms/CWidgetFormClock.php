@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,17 +42,28 @@ class CWidgetFormClock extends CWidgetForm {
 		$this->fields[$field_time_type->getName()] = $field_time_type;
 
 		// Item field.
-		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
-			// Item multiselector with single value.
-			$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false);
+		$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setMultiple(false);
 
-			if (array_key_exists('itemid', $this->data)) {
-				$field_item->setValue($this->data['itemid']);
-			}
-
-			$this->fields[$field_item->getName()] = $field_item;
+		if (array_key_exists('itemid', $this->data)) {
+			$field_item->setValue($this->data['itemid']);
 		}
+
+		$this->fields[$field_item->getName()] = $field_item;
+	}
+
+	public function validate($strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->fields['time_type']->getValue() == TIME_TYPE_HOST && !$this->fields['itemid']->getValue()) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
+		}
+
+		return $errors;
 	}
 }

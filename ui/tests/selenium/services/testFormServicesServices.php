@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -616,7 +616,7 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Service for duplitate check'
+						'Name' => 'Service for duplicate check'
 					],
 					'duplicate' => true
 				]
@@ -877,7 +877,7 @@ class testFormServicesServices extends CWebTest {
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
-				// There are 3 tables with class list-table, so it is specifified that is should be in the service list.
+				// There are 3 tables with class list-table, so it is specified that is should be in the service list.
 				$table = $this->query('xpath://form[@name="service_list"]//table')->asTable()->one()->waitUntilPresent();
 				$table->findRow('Name', $data['fields']['Name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 						->one()->click();

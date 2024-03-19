@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@ const WIDGET_EVENT_AFTER_UPDATE = 'widget-after-update';
 const WIDGET_EVENT_COPY = 'widget-copy';
 const WIDGET_EVENT_PASTE = 'widget-paste';
 const WIDGET_EVENT_DELETE = 'widget-delete';
+
+// Widget ready event: informs the dashboard page that the widget has been fully loaded (fired once).
+const WIDGET_EVENT_READY = 'widget-ready';
 
 class CWidget extends CBaseComponent {
 
@@ -124,6 +127,8 @@ class CWidget extends CBaseComponent {
 		this._resizable_handles = [];
 
 		this._hide_preloader_animation_frame = null;
+
+		this._ready_promise = null;
 	}
 
 	// Logical state control methods.
@@ -574,7 +579,18 @@ class CWidget extends CBaseComponent {
 		}
 
 		new Promise((resolve) => resolve(this._promiseUpdate()))
-			.then(() => this._hidePreloader())
+			.then(() => {
+				this._hidePreloader();
+
+				if (this._ready_promise === null) {
+					this._ready_promise = this._promiseReady();
+					this._ready_promise.then(() => {
+						if (this._state !== WIDGET_STATE_DESTROYED) {
+							this.fire(WIDGET_EVENT_READY);
+						}
+					});
+				}
+			})
 			.catch((error) => {
 				console.log('Could not update widget:', error);
 
@@ -605,6 +621,40 @@ class CWidget extends CBaseComponent {
 		})
 			.then((response) => response.json())
 			.then((response) => this._processUpdateResponse(response));
+	}
+
+	/**
+	 * Resolve as soon as the widget is fully rendered (ready for printing).
+	 *
+	 * The method is called once, immediately after the promiseUpdate is resolved.
+	 * Custom implementation must also resolve the promise provided by the default implementation.
+	 *
+	 * @returns {Promise<any>}
+	 */
+	_promiseReady() {
+		return new Promise(resolve => {
+			let incomplete = 0;
+
+			const image_complete = () => {
+				if (--incomplete === 0) {
+					resolve();
+				}
+			};
+
+			for (const img of this._content_body.querySelectorAll('img')) {
+				if (!img.complete) {
+					img.addEventListener('load', image_complete);
+					img.addEventListener('error', image_complete);
+
+					incomplete++;
+				}
+			}
+
+			if (incomplete === 0) {
+				// Wait until preloader icon is removed on animation frame.
+				requestAnimationFrame(() => resolve());
+			}
+		});
 	}
 
 	_getUpdateRequestData() {

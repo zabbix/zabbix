@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,8 +77,10 @@ static int		db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
+static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static int			txn_begin = 0;	/* transaction begin statement is executed */
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -107,7 +109,6 @@ static ub4	OCI_DBserver_status(void);
 #define ZBX_PG_DEADLOCK		"40P01"
 
 static PGconn			*conn = NULL;
-static unsigned int		ZBX_PG_BYTEAOID = 0;
 int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
@@ -346,11 +347,35 @@ static int	is_recoverable_mysql_error(int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		case ER_CLIENT_INTERACTION_TIMEOUT:
+#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
 #ifdef ER_CONNECTION_KILLED
 		case ER_CONNECTION_KILLED:
+#endif
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	is_inhibited_mysql_error(int err_no)
+{
+	if (1 < mysql_err_cnt)
+		return FAIL;
+
+	if (0 < txn_level && 0 == txn_begin)
+		return FAIL;
+
+	switch (err_no)
+	{
+		case CR_SERVER_GONE_ERROR:
+		case CR_SERVER_LOST:
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		case ER_CLIENT_INTERACTION_TIMEOUT:
 #endif
 			return SUCCEED;
 	}
@@ -397,11 +422,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-#if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
-	bool		mysql_reconnect = 1;
-#else
-	my_bool		mysql_reconnect = 1;
-#endif
 	int		err_no = 0;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
@@ -581,15 +601,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	/* The RECONNECT option setting is placed here, AFTER the connection	*/
-	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
-	/* reset the options value to the default, regardless of what it was	*/
-	/* set to prior to the connection. MySQL allows changing connection	*/
-	/* options on an open connection, so setting it here is safe.		*/
-
-	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
-
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -619,6 +630,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err_no))
 		ret = ZBX_DB_DOWN;
 
+	mysql_err_cnt = ZBX_DB_OK == ret ? 0 : mysql_err_cnt + 1;
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(tls_connect);
@@ -820,18 +832,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret || ZBX_DB_DOWN == ret)
 		goto out;
-
-	result = zbx_db_select("select oid from pg_type where typname='bytea'");
-
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
-	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)))
-		ZBX_PG_BYTEAOID = atoi(row[0]);
-	DBfree_result(result);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
@@ -1060,7 +1060,9 @@ int	zbx_db_begin(void)
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
 		assert(0);
 	}
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 1;
+#endif
 	txn_level++;
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1072,7 +1074,9 @@ int	zbx_db_begin(void)
 
 	if (ZBX_DB_DOWN == rc)
 		txn_level--;
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 0;
+#endif
 	return rc;
 }
 
@@ -1500,7 +1504,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			err_no = (int)mysql_errno(conn);
 			errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-			zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
+				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
 
 			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
@@ -1523,7 +1530,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				{
 					err_no = (int)mysql_errno(conn);
 					errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-					zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+					mysql_err_cnt++;
+
+					if (FAIL == is_inhibited_mysql_error(err_no))
+						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
 
 					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
@@ -1680,10 +1690,12 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
-			int err_no;
+			int err_no = (int)mysql_errno(conn);
 
-			err_no = (int)mysql_errno(conn);
-			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
+				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			DBfree_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
@@ -1941,55 +1953,17 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 #endif
 }
 
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \\   == \                                                             *
- *                                                                            *
- * Parameters:                                                                *
- *      io - [IN/OUT] null terminated string / binary data                    *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_db_bytea_unescape(u_char *io)
+int	zbx_db_get_row_num(DB_RESULT result)
 {
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	while ('\0' != *i)
-	{
-		switch (*i)
-		{
-			case '\\':
-				i++;
-				if ('\\' == *i)
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
+#if defined(HAVE_POSTGRESQL)
+	return result->row_num;
+#elif defined(HAVE_MYSQL)
+	return (int)mysql_num_rows(result->result);
+#else
+	ZBX_UNUSED(result);
+	return 0;
 #endif
+}
 
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
@@ -2096,35 +2070,27 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)
-	/* free old data */
-	if (NULL != result->values)
-		zbx_free(result->values);
-
 	/* EOF */
 	if (result->cursor == result->row_num)
 		return NULL;
 
 	/* init result */
-	result->fld_num = PQnfields(result->pg_result);
+	if (0 == result->cursor)
+		result->fld_num = PQnfields(result->pg_result);
 
 	if (result->fld_num > 0)
 	{
 		int	i;
 
-		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
+		if (NULL == result->values)
+			result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
 
 		for (i = 0; i < result->fld_num; i++)
 		{
-			if (PQgetisnull(result->pg_result, result->cursor, i))
-			{
-				result->values[i] = NULL;
-			}
-			else
-			{
-				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_db_bytea_unescape((u_char *)result->values[i]);
-			}
+			result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+
+			if ('\0' == *result->values[i] && PQgetisnull(result->pg_result, result->cursor, i))
+					result->values[i] = NULL;
 		}
 	}
 

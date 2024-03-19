@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'username' =>		'required|db users.username|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
-			'password1' =>		'required|password',
-			'password2' =>		'required|password',
+			'password1' =>		'required|string',
+			'password2' =>		'required|string',
 			'user_groups' =>	'required|array_id|not_empty',
 			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),

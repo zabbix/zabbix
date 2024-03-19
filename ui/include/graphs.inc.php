@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -434,7 +434,7 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
  * @param string $graphid
  * @param string $hostid
  *
- * @return array|bool
+ * @return array
  */
 function copyGraphToHost($graphid, $hostid) {
 	$graphs = API::Graph()->get([
@@ -465,7 +465,7 @@ function copyGraphToHost($graphid, $hostid) {
 	if (!$graph['gitems']) {
 		$host = get_host_by_hostid($hostid);
 
-		error(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
+		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
 
 		return false;
 	}
