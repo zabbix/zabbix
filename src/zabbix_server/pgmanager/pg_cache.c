@@ -238,6 +238,8 @@ void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, z
 			zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
 		}
 	}
+
+	pg_cache_queue_group_update(cache, group);
 }
 
 void	pg_cache_proxy_free(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy)
@@ -999,10 +1001,7 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 		if (reloc->srcid != reloc->dstid)
 		{
 			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->srcid)))
-			{
 				pg_cache_group_remove_proxy(cache, group, proxy);
-				pg_cache_queue_group_update(cache, group);
-			}
 		}
 
 		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->dstid)))
