@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DBSYNCER_SERVER_H
-#define ZABBIX_DBSYNCER_SERVER_H
+#ifndef ZABBIX_CACHEHISTORY_SERVER_H
+#define ZABBIX_CACHEHISTORY_SERVER_H
 
 #include "zbxdbhigh.h"
 

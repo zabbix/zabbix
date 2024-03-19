@@ -64,7 +64,6 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Comments: helper function for process_triggers()                           *
@@ -111,7 +110,6 @@ static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)
 #define ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT		0x02
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
-
 
 /******************************************************************************
  *                                                                            *
@@ -224,7 +222,6 @@ out:
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *

@@ -3503,5 +3503,3 @@ int	zbx_dbcache_getproxyqueue_state(void)
 {
 	return cache->proxyqueue.state;
 }
-
-
