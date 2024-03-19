@@ -66,7 +66,6 @@ static int      lld_function_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-
 typedef struct zbx_lld_dependency_s zbx_lld_dependency_t;
 ZBX_VECTOR_STRUCT_DECL(lld_dependency_ptr, zbx_lld_dependency_t*)
 
