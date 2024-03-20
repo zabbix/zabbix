@@ -595,7 +595,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 		time_now = zbx_time();
 
-		if (PG_STATE_CHECK_INTERVAL >= time_update - time_now)
+		if (PG_STATE_CHECK_INTERVAL < time_now - time_update)
 		{
 			pgm_update(&cache);
 			time_update = time_now;
