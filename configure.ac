@@ -1683,7 +1683,7 @@ if test "x$webservice" = "xyes"; then
 	AC_DEFINE(ZBX_BUILD_WEBSERVICE,1,[Define to 1 if Web Service is being built.])
 fi
 
-if test "x$agent2" = "xyes" || "x$webservice" = "xyes"; then
+if test "x$agent2" = "xyes" || test "x$webservice" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
 	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
