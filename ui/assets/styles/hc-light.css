@@ -1776,8 +1776,7 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: 0;
-    transition: height 0.3s, margin-top 0.3s, box-shadow 0.3s; }
+    height: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
@@ -1821,7 +1820,6 @@ button {
   border-bottom: 0;
   background-color: #ffffff;
   opacity: 0;
-  transition: margin-top 0.3s ease-out, height 0.3s ease-out, opacity 0.15s 0.15s ease-out, box-shadow 0.3s ease-out;
   z-index: 3; }
   .dashboard-grid-iterator-header h4 {
     flex-grow: 1;
@@ -1859,8 +1857,7 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  overflow: visible;
-  transition: margin-top 0.3s ease-out; }
+  overflow: visible; }
 
 .dashboard-grid-iterator-placeholder {
   position: absolute;
@@ -1910,8 +1907,7 @@ button {
       margin-top: -2rem;
       height: 2rem;
       box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-      opacity: 1;
-      transition: margin-top 0.3s ease-out, height 0.3s ease-out, box-shadow 0.3s ease-out; }
+      opacity: 1; }
     .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
       opacity: 1; }
     .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
@@ -1994,9 +1990,6 @@ button {
     border-color: #909090; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #909090; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
-  transition-property: height, top;
-  transition-duration: 0.15s; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus .ui-resizable-handle {
@@ -2039,12 +2032,6 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #8b8b8b;
     border-top: 0; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
-  transition-property: height, top;
-  transition-duration: 0.15s; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
-  transition-property: height, top;
-  transition-duration: 0s; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder {
   position: absolute;
   z-index: 999; }
@@ -2055,16 +2042,6 @@ button {
     right: .25rem;
     bottom: .25rem;
     background-color: #f0f0f0; }
-
-@keyframes zoom-in-out {
-  0% {
-    transform: scale(1); }
-  50% {
-    transform: scale(1.05); }
-  100% {
-    transform: scale(1); } }
-.new-widget {
-  animation: zoom-in-out 0.2s linear; }
 
 .dashboard-widget {
   min-width: 250px;
