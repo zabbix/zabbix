@@ -566,6 +566,8 @@ switch ($data['popup_type']) {
 			unset($item);
 		}
 		else {
+			$records = [];
+
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
 				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];

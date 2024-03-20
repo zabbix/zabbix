@@ -1191,11 +1191,11 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'items':
-				foreach ($records as $itemid => $row) {
-					$key = $row['name'].'_'.$itemid;
-					$records[$key] = ['pattern' => $row['name']] + $row;
-					unset($records[$itemid]);
+				foreach ($records as &$row) {
+					$row['pattern'] = $row['name'];
 				}
+				unset($row);
+
 				break;
 
 			case 'graphs':

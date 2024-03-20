@@ -83,7 +83,7 @@ $form_grid->addItem([
 // Item.
 $parameters = [
 	'srctbl' => 'items',
-	'srcfld1' => 'itemid',
+	'srcfld1' => 'name',
 	'dstfrm' => $form->getName(),
 	'dstfld1' => 'item',
 	'value_types' => [
