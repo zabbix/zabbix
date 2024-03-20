@@ -23,7 +23,6 @@ A.F.....S. [ZBXNEXT-6876] added multi-factor authentication support for Zabbix U
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
-....I..... [ZBX-23441] fixed broken autoconf test when searching for go (jxl)
 .....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
 ..F....... [ZBX-23567] fixed PHP error during first time setup when no user is yet created (gcalenko, Ivo)
 ........S. [ZBX-24050] fixed snmpaddrs not getting updated when syncing interfaces (dgoloscapov)
@@ -585,12 +584,6 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
-
---------------------------------------------------------------------------------
-Changes for 6.4.13rc2
-
-Bug fixes:
-....I..... [ZBX-23441] fixed broken autoconf test when searching for go (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.13rc1
