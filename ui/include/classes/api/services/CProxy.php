@@ -323,9 +323,7 @@ class CProxy extends CApiService {
 
 		$this->validateUpdate($proxies, $db_proxies);
 
-		self::addFieldDefaultsByProxyGroupId($proxies, $db_proxies);
-		self::addFieldDefaultsByTls($proxies, $db_proxies);
-		self::addFieldDefaultsByCustomTimeouts($proxies, $db_proxies);
+		self::addFieldDefaultsByTypeFields($proxies, $db_proxies);
 
 		$upd_proxies = [];
 
@@ -539,7 +537,10 @@ class CProxy extends CApiService {
 			]],
 			'operating_mode' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE])],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+			'allowed_addresses' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'allowed_addresses')]
+			]],
 			'address' => 				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')],
 											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')]
@@ -827,7 +828,10 @@ class CProxy extends CApiService {
 			]],
 			'operating_mode' =>			['type' => API_ANY],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+			'allowed_addresses' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'allowed_addresses')]
+			]],
 			'address' => 				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')],
 											['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')]
@@ -1018,6 +1022,13 @@ class CProxy extends CApiService {
 		unset($proxy);
 	}
 
+	private static function addFieldDefaultsByTypeFields(array &$proxies, array $db_proxies): void {
+		self::addFieldDefaultsByProxyGroupId($proxies, $db_proxies);
+		self::addFieldDefaultsByOperatingMode($proxies, $db_proxies);
+		self::addFieldDefaultsByTls($proxies, $db_proxies);
+		self::addFieldDefaultsByCustomTimeouts($proxies, $db_proxies);
+	}
+
 	/**
 	 *  Add default values for fields that became unnecessary as the result of the change of "proxy_groupid".
 	 *
@@ -1029,6 +1040,19 @@ class CProxy extends CApiService {
 			if ($proxy['proxy_groupid'] !== $db_proxies[$proxy['proxyid']]['proxy_groupid']
 					&& $proxy['proxy_groupid'] == 0) {
 				$proxy += array_intersect_key(DB::getDefaults('proxy'), array_flip(['local_address', 'local_port']));
+			}
+		}
+		unset($proxy);
+	}
+
+	private static function addFieldDefaultsByOperatingMode(array &$proxies, array $db_proxies): void {
+		$db_defaults = DB::getDefaults('proxy');
+
+		foreach ($proxies as &$proxy) {
+			if ($proxy['operating_mode'] != $db_proxies[$proxy['proxyid']]['operating_mode']) {
+				$proxy += $proxy['operating_mode'] == PROXY_OPERATING_MODE_ACTIVE
+					? array_intersect_key($db_defaults, array_flip(['address', 'port']))
+					: array_intersect_key($db_defaults, array_flip(['allowed_addresses']));
 			}
 		}
 		unset($proxy);
