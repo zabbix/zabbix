@@ -481,10 +481,6 @@ function getSysmapResourceIds(array $selements, array &$sysmaps_data, bool $coll
 								case SYSMAP_ELEMENT_TYPE_HOST:
 									$hostid = $nested_sysmap_selement['elements'][0]['hostid'];
 									$hostids[$hostid] = $hostid;
-
-									if ($collect_iconmap_hosts && $nested_sysmap_selement['use_iconmap']) {
-										$hosts_to_get_inventories[] = $hostid;
-									}
 									break;
 
 								case SYSMAP_ELEMENT_TYPE_TRIGGER:
