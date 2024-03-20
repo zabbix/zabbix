@@ -21,8 +21,6 @@
 
 namespace Widgets\SvgGraph;
 
-use Widgets\SvgGraph\Includes\WidgetForm;
-
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {

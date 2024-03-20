@@ -21,6 +21,14 @@
 
 #include "zbxdbhigh.h"
 #include "zbxexpression.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 /* temporary cache of trigger related data */
 typedef struct
