@@ -27,12 +27,14 @@ import (
 	"testing"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/google/go-cmp/cmp"
 	"zabbix.com/plugins/smart/mock"
 )
 
+//nolint:paralleltest,tparallel
 func Test_runner_executeBase(t *testing.T) {
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 
@@ -257,6 +259,7 @@ func Test_runner_executeBase(t *testing.T) {
 					tt.wantErr,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantJsonDevices, r.jsonDevices,
 				cmp.AllowUnexported(jsonDevice{}),
@@ -266,6 +269,7 @@ func Test_runner_executeBase(t *testing.T) {
 					diff,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantDevices, r.devices,
 				cmp.AllowUnexported(deviceInfo{}),
@@ -275,6 +279,7 @@ func Test_runner_executeBase(t *testing.T) {
 					diff,
 				)
 			}
+
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
 					"runner.executeBase() expectations where not met, error = %v",
@@ -285,8 +290,39 @@ func Test_runner_executeBase(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest,tparallel
 func Test_runner_executeRaids(t *testing.T) {
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
+	cpuCount = 1
+
+	//nolint:lll
+	sampleFailedAllSmartInfoScan := []byte(
+		`{
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 3],
+          "svn_revision": "5338",
+          "platform_info": "x86_64-w64-mingw32-2016-1607",
+          "build_info": "(sf-7.3-1)",
+          "argv": ["smartctl", "-a", "/dev/sda", "-d", "3ware,0", "-j"],
+          "messages": [
+            {
+              "string": "/dev/sda: Unknown device type '3ware,0'",
+              "severity": "error"
+            },
+            {
+              "string": "=======> VALID ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], sat[,auto][,N][+TYPE], usbcypress[,X], usbjmicron[,p][,x][,N], usbprolific, usbsunplus, sntasmedia, sntjmicron[,NSID], sntrealtek, intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], auto, test <=======",
+              "severity": "error"
+            }
+          ],
+          "exit_status": 1
+        },
+        "local_time": {
+          "time_t": 1663357978,
+          "asctime": "Fri Sep 16 22:52:58 2022 BST"
+        }
+      }`,
+	)
 
 	type expectation struct {
 		args []string
@@ -313,32 +349,42 @@ func Test_runner_executeRaids(t *testing.T) {
 		wantDevices     map[string]deviceParser
 	}{
 		{
-			"+HBA_with_SAS_1",
+			"+valid",
 			[]expectation{
-				// {
-				// 	args: []string{
-				// 		"-a", "/dev/sda", "-d", "3ware,0", "-j",
-				// 	},
-				// 	out: mock.OutputEnv1GetRaidSda3Ware0,
-				// },
-				// {
-				// 	args: []string{
-				// 		"-a", "/dev/sda", "-d", "areca,1", "-j",
-				// 	},
-				// 	out: mock.OutputEnv1GetRaidSdaAreca1,
-				// },
-				// {
-				// 	args: []string{
-				// 		"-a", "/dev/sda", "-d", "cciss,0", "-j",
-				// 	},
-				// 	out: mock.OutputEnv1GetRaidSdaCciss0,
-				// },
-				// {
-				// 	args: []string{
-				// 		"-a", "/dev/sda", "-d", "sat", "-j",
-				// 	},
-				// 	out: mock.OutputEnv1GetRaidSdaSat,
-				// },
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "3ware,0", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d 3ware,0 -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "areca,1", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d areca,1 -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "cciss,0", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d cciss,0 -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "sat", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "scsi", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
 			},
 			fields{
 				jsonDevices: map[string]jsonDevice{},
@@ -346,38 +392,11 @@ func Test_runner_executeRaids(t *testing.T) {
 			},
 			args{
 				[]deviceInfo{
-					{Name: "/dev/sda", InfoName: "/dev/sda", DevType: "scsi"},
-					// {Name: "/dev/sdaa", InfoName: "/dev/sdaa", DevType: "scsi"},
-					// {Name: "/dev/sdab", InfoName: "/dev/sdab", DevType: "scsi"},
-					// {Name: "/dev/sdac", InfoName: "/dev/sdac", DevType: "scsi"},
-					// {Name: "/dev/sdad", InfoName: "/dev/sdad", DevType: "scsi"},
-					// {Name: "/dev/sdae", InfoName: "/dev/sdae", DevType: "scsi"},
-					// {Name: "/dev/sdaf", InfoName: "/dev/sdaf", DevType: "scsi"},
-					// {Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "scsi"},
-					// {Name: "/dev/sdc", InfoName: "/dev/sdc", DevType: "scsi"},
-					// {Name: "/dev/sdd", InfoName: "/dev/sdd", DevType: "scsi"},
-					// {Name: "/dev/sde", InfoName: "/dev/sde", DevType: "scsi"},
-					// {Name: "/dev/sdf", InfoName: "/dev/sdf", DevType: "scsi"},
-					// {Name: "/dev/sdg", InfoName: "/dev/sdg", DevType: "scsi"},
-					// {Name: "/dev/sdh", InfoName: "/dev/sdh", DevType: "scsi"},
-					// {Name: "/dev/sdi", InfoName: "/dev/sdi", DevType: "scsi"},
-					// {Name: "/dev/sdj", InfoName: "/dev/sdj", DevType: "scsi"},
-					// {Name: "/dev/sdk", InfoName: "/dev/sdk", DevType: "scsi"},
-					// {Name: "/dev/sdl", InfoName: "/dev/sdl", DevType: "scsi"},
-					// {Name: "/dev/sdm", InfoName: "/dev/sdm", DevType: "scsi"},
-					// {Name: "/dev/sdn", InfoName: "/dev/sdn", DevType: "scsi"},
-					// {Name: "/dev/sdo", InfoName: "/dev/sdo", DevType: "scsi"},
-					// {Name: "/dev/sdp", InfoName: "/dev/sdp", DevType: "scsi"},
-					// {Name: "/dev/sdq", InfoName: "/dev/sdq", DevType: "scsi"},
-					// {Name: "/dev/sdr", InfoName: "/dev/sdr", DevType: "scsi"},
-					// {Name: "/dev/sds", InfoName: "/dev/sds", DevType: "scsi"},
-					// {Name: "/dev/sdt", InfoName: "/dev/sdt", DevType: "scsi"},
-					// {Name: "/dev/sdu", InfoName: "/dev/sdu", DevType: "scsi"},
-					// {Name: "/dev/sdv", InfoName: "/dev/sdv", DevType: "scsi"},
-					// {Name: "/dev/sdw", InfoName: "/dev/sdw", DevType: "scsi"},
-					// {Name: "/dev/sdx", InfoName: "/dev/sdx", DevType: "scsi"},
-					// {Name: "/dev/sdy", InfoName: "/dev/sdy", DevType: "scsi"},
-					// {Name: "/dev/sdz", InfoName: "/dev/sdz", DevType: "scsi"},
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda [SAT]",
+						DevType:  "sat",
+					},
 				},
 				false,
 			},
@@ -395,7 +414,7 @@ func Test_runner_executeRaids(t *testing.T) {
 					},
 					Smartctl:    smartctlField{Version: []int{7, 3}},
 					SmartStatus: &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{
+					SmartAttributes: smartAttributes{ //nolint:dupl
 						Table: []table{
 							{Attrname: "Reallocated_Sector_Ct", ID: 5},
 							{Attrname: "Power_On_Hours", ID: 9},
@@ -440,178 +459,148 @@ func Test_runner_executeRaids(t *testing.T) {
 				},
 			},
 		},
-		// {
-		// 	"+env1",
-		// 	[]expectation{
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "3ware,0", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSda3Ware0,
-		// 		},
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "areca,1", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSdaAreca1,
-		// 		},
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "cciss,0", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSdaCciss0,
-		// 		},
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "sat", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSdaSat,
-		// 		},
-		// 	},
-		// 	fields{
-		// 		jsonDevices: map[string]jsonDevice{},
-		// 		devices:     map[string]deviceParser{},
-		// 	},
-		// 	args{
-		// 		[]deviceInfo{
-		// 			{
-		// 				Name:     "/dev/sda",
-		// 				InfoName: "/dev/sda [SAT]",
-		// 				DevType:  "sat",
-		// 			},
-		// 		},
-		// 		false,
-		// 	},
-		// 	map[string]jsonDevice{},
-		// 	map[string]deviceParser{
-		// 		"/dev/sda sat": {
-		// 			ModelName:    "INTEL SSDSC2BB120G6",
-		// 			SerialNumber: "PHWA619301M9120CGN",
-		// 			Info: deviceInfo{
-		// 				Name:     "/dev/sda sat",
-		// 				InfoName: "/dev/sda [SAT]",
-		// 				DevType:  "sat",
-		// 				name:     "/dev/sda",
-		// 				raidType: "sat",
-		// 			},
-		// 			Smartctl:    smartctlField{Version: []int{7, 3}},
-		// 			SmartStatus: &smartStatus{SerialNumber: true},
-		// 			SmartAttributes: smartAttributes{
-		// 				Table: []table{
-		// 					{Attrname: "Reallocated_Sector_Ct", ID: 5},
-		// 					{Attrname: "Power_On_Hours", ID: 9},
-		// 					{Attrname: "Power_Cycle_Count", ID: 12},
-		// 					{
-		// 						Attrname: "Available_Reservd_Space",
-		// 						ID:       170,
-		// 						Thresh:   10,
-		// 					},
-		// 					{Attrname: "Program_Fail_Count", ID: 171},
-		// 					{Attrname: "Erase_Fail_Count", ID: 172},
-		// 					{Attrname: "Unsafe_Shutdown_Count", ID: 174},
-		// 					{
-		// 						Attrname: "Power_Loss_Cap_Test",
-		// 						ID:       175,
-		// 						Thresh:   10,
-		// 					},
-		// 					{Attrname: "SATA_Downshift_Count", ID: 183},
-		// 					{Attrname: "End-to-End_Error", ID: 184, Thresh: 90},
-		// 					{Attrname: "Reported_Uncorrect", ID: 187},
-		// 					{Attrname: "Temperature_Case", ID: 190},
-		// 					{Attrname: "Unsafe_Shutdown_Count", ID: 192},
-		// 					{Attrname: "Temperature_Internal", ID: 194},
-		// 					{Attrname: "Current_Pending_Sector", ID: 197},
-		// 					{Attrname: "CRC_Error_Count", ID: 199},
-		// 					{Attrname: "Host_Writes_32MiB", ID: 225},
-		// 					{Attrname: "Workld_Media_Wear_Indic", ID: 226},
-		// 					{Attrname: "Workld_Host_Reads_Perc", ID: 227},
-		// 					{Attrname: "Workload_Minutes", ID: 228},
-		// 					{
-		// 						Attrname: "Available_Reservd_Space",
-		// 						ID:       232,
-		// 						Thresh:   10,
-		// 					},
-		// 					{Attrname: "Media_Wearout_Indicator", ID: 233},
-		// 					{Attrname: "Thermal_Throttle", ID: 234},
-		// 					{Attrname: "Host_Writes_32MiB", ID: 241},
-		// 					{Attrname: "Host_Reads_32MiB", ID: 242},
-		// 					{Attrname: "NAND_Writes_32MiB", ID: 243},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	"+env1JSON",
-		// 	[]expectation{
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "3ware,0", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSda3Ware0,
-		// 		},
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "areca,1", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSdaAreca1,
-		// 		},
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "cciss,0", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSdaCciss0,
-		// 		},
-		// 		{
-		// 			args: []string{
-		// 				"-a", "/dev/sda", "-d", "sat", "-j",
-		// 			},
-		// 			out: mock.OutputEnv1GetRaidSdaSat,
-		// 		},
-		// 	},
-		// 	fields{
-		// 		jsonDevices: map[string]jsonDevice{},
-		// 		devices:     map[string]deviceParser{},
-		// 	},
-		// 	args{
-		// 		[]deviceInfo{
-		// 			{
-		// 				Name:     "/dev/sda",
-		// 				InfoName: "/dev/sda [SAT]",
-		// 				DevType:  "sat",
-		// 			},
-		// 		},
-		// 		true,
-		// 	},
-		// 	map[string]jsonDevice{
-		// 		"/dev/sda sat": {
-		// 			serialNumber: "PHWA619301M9120CGN",
-		// 			jsonData:     string(mock.OutputEnv1GetRaidSdaSat),
-		// 		},
-		// 	},
-		// 	map[string]deviceParser{},
-		// },
-		//
-		// {
-		// 	"-noDevices",
-		// 	[]expectation{},
-		// 	fields{
-		// 		jsonDevices: map[string]jsonDevice{},
-		// 		devices:     map[string]deviceParser{},
-		// 	},
-		// 	args{[]deviceInfo{}, false},
-		// 	map[string]jsonDevice{},
-		// 	map[string]deviceParser{},
-		// },
+		{
+			"+env1JSON",
+			[]expectation{
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "3ware,0", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d 3ware,0 -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "areca,1", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d areca,1 -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "cciss,0", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d cciss,0 -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "sat", "-j",
+					},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "scsi", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+			},
+			fields{
+				jsonDevices: map[string]jsonDevice{},
+				devices:     map[string]deviceParser{},
+			},
+			args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda [SAT]",
+						DevType:  "sat",
+					},
+				},
+				true,
+			},
+			map[string]jsonDevice{
+				"/dev/sda sat": {
+					serialNumber: "PHWA619301M9120CGN",
+					jsonData: string(
+						mock.Outputs.Get("env_1").
+							AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+					),
+				},
+			},
+			map[string]deviceParser{},
+		},
+		{
+			"+HBA_with_SAS_1",
+			[]expectation{
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "3ware,0", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "areca,1", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "cciss,0", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "sat", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "scsi", "-j",
+					},
+					out: mock.Outputs.Get("HBA_with_SAS_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
+				},
+			},
+			fields{
+				jsonDevices: map[string]jsonDevice{},
+				devices:     map[string]deviceParser{},
+			},
+			args{
+				[]deviceInfo{
+					{Name: "/dev/sda", InfoName: "/dev/sda", DevType: "scsi"},
+				},
+				false,
+			},
+			map[string]jsonDevice{},
+			map[string]deviceParser{
+				"/dev/sda scsi": {
+					SerialNumber: "S5G1NC0W102239",
+					Info: deviceInfo{
+						Name:     "/dev/sda scsi",
+						InfoName: "/dev/sda",
+						DevType:  "scsi",
+						name:     "/dev/sda",
+						raidType: "scsi",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+				},
+			},
+		},
+		{
+			"-noDevices",
+			[]expectation{},
+			fields{
+				jsonDevices: map[string]jsonDevice{},
+				devices:     map[string]deviceParser{},
+			},
+			args{[]deviceInfo{}, false},
+			map[string]jsonDevice{},
+			map[string]deviceParser{},
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cpuCount = 1
-
-			m := &mock.MockController{}
+			m := mock.NewMockController(t)
 
 			for _, e := range tt.expectations {
 				m.ExpectExecute().
@@ -629,6 +618,7 @@ func Test_runner_executeRaids(t *testing.T) {
 				devices:     tt.fields.devices,
 				jsonDevices: tt.fields.jsonDevices,
 			}
+
 			r.executeRaids(tt.args.raids, tt.args.jsonRunner)
 
 			if diff := cmp.Diff(
@@ -636,22 +626,24 @@ func Test_runner_executeRaids(t *testing.T) {
 				cmp.AllowUnexported(jsonDevice{}),
 			); diff != "" {
 				t.Fatalf(
-					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
+					"runner.executeRaids() jsonDevices mismatch (-want +got):\n%s",
 					diff,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantDevices, r.devices,
 				cmp.AllowUnexported(deviceInfo{}),
 			); diff != "" {
 				t.Fatalf(
-					"runner.executeBase() devices mismatch (-want +got):\n%s",
+					"runner.executeRaids() devices mismatch (-want +got):\n%s",
 					diff,
 				)
 			}
+
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
-					"runner.executeBase() expectations where not met, error = %v",
+					"runner.executeRaids() expectations where not met, error = %v",
 					err,
 				)
 			}
@@ -659,6 +651,7 @@ func Test_runner_executeRaids(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest,tparallel
 func Test_runner_executeMegaRaids(t *testing.T) {
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 
@@ -818,6 +811,7 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 					diff,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantDevices, r.devices,
 				cmp.AllowUnexported(deviceInfo{}),
@@ -827,6 +821,7 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 					diff,
 				)
 			}
+
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
 					"runner.executeMegaRaids() expectations where not met, error = %v",
@@ -908,7 +903,10 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		},
 		{
 			"+rawRespErr",
-			fields{rawResp: mock.OutputEnv1GetRaidSda3Ware0},
+			fields{
+				rawResp: mock.Outputs.Get("env_1").
+					AllSmartInfoScans.Get("-a /dev/sda -d 3ware,0 -j"),
+			},
 			true,
 			"/dev/sda: Unknown device type '3ware,0', =======> VALID " +
 				"ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], " +
@@ -921,7 +919,10 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		},
 		{
 			"+rawRespNoErr",
-			fields{rawResp: mock.OutputEnv1GetRaidSdaSat},
+			fields{
+				rawResp: mock.Outputs.Get("env_1").
+					AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+			},
 			false,
 			"",
 		},
@@ -989,6 +990,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 
 			if tt.fields.rawResp != nil {
 				dpFromRaw := deviceParser{}
+
 				err := json.Unmarshal(tt.fields.rawResp, &dpFromRaw)
 				if err != nil {
 					t.Fatalf("deviceParser.checkErr() error = %v", err)
@@ -1018,6 +1020,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest
 func TestPlugin_checkVersion(t *testing.T) {
 	type expect struct {
 		exec bool
@@ -1071,11 +1074,12 @@ func TestPlugin_checkVersion(t *testing.T) {
 			true,
 		},
 	}
+	//nolint:paralleltest
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			lastVerCheck = tt.fields.lastVerCheck
 
-			m := &mock.MockController{}
+			m := mock.NewMockController(t)
 
 			if tt.expect.exec {
 				m.ExpectExecute().
@@ -1092,11 +1096,581 @@ func TestPlugin_checkVersion(t *testing.T) {
 					err, tt.wantErr,
 				)
 			}
+
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
 					"Plugin.checkVersion() expectations where not met, error = %v",
 					err,
 				)
+			}
+		})
+	}
+}
+
+func Test_getAllDeviceInfoByType(t *testing.T) {
+	t.Parallel()
+
+	sampleValidSmartInfoScan := []byte(`{
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 3],
+          "svn_revision": "5338",
+          "platform_info": "x86_64-linux-6.1.0-13-amd64",
+          "build_info": "(local build)",
+          "argv": ["smartctl", "-a", "-j", "/dev/sda", "-d", "scsi"],
+          "exit_status": 0
+        },
+        "local_time": {
+          "time_t": 1705569652,
+          "asctime": "Thu Jan 18 10:20:52 2024 CET"
+        },
+        "device": {
+          "name": "/dev/sda",
+          "info_name": "/dev/sda",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        "scsi_vendor": "SAMSUNG",
+        "scsi_product": "MZILT960HBHQ/007",
+        "scsi_model_name": "SAMSUNG MZILT960HBHQ/007",
+        "scsi_revision": "GXA0",
+        "scsi_version": "SPC-5",
+        "user_capacity": {
+          "blocks": 1875385008,
+          "bytes": 960197124096
+        },
+        "logical_block_size": 512,
+        "physical_block_size": 4096,
+        "scsi_lb_provisioning": {
+          "name": "resource provisioned",
+          "value": 1,
+          "management_enabled": {
+            "name": "LBPME",
+            "value": 1
+          },
+          "read_zeros": {
+            "name": "LBPRZ",
+            "value": 1
+          }
+        },
+        "rotation_rate": 0,
+        "form_factor": {
+          "scsi_value": 3,
+          "name": "2.5 inches"
+        },
+        "logical_unit_id": "0x5002538b731302a0",
+        "serial_number": "S5G1NC0W102239",
+        "device_type": {
+          "scsi_terminology": "Peripheral Device Type [PDT]",
+          "scsi_value": 0,
+          "name": "disk"
+        },
+        "scsi_transport_protocol": {
+          "name": "SAS (SPL-4)",
+          "value": 6
+        },
+        "smart_support": {
+          "available": true,
+          "enabled": true
+        },
+        "temperature_warning": {
+          "enabled": true
+        },
+        "smart_status": {
+          "passed": true
+        },
+        "scsi_percentage_used_endurance_indicator": 0,
+        "temperature": {
+          "current": 35,
+          "drive_trip": 74
+        },
+        "power_on_time": {
+          "hours": 3862,
+          "minutes": 30
+        },
+        "scsi_start_stop_cycle_counter": {
+          "year_of_manufacture": "2023",
+          "week_of_manufacture": "01",
+          "accumulated_start_stop_cycles": 5,
+          "specified_load_unload_count_over_device_lifetime": 0,
+          "accumulated_load_unload_cycles": 0
+        },
+        "scsi_grown_defect_list": 0,
+        "scsi_error_counter_log": {
+          "read": {
+            "errors_corrected_by_eccfast": 0,
+            "errors_corrected_by_eccdelayed": 0,
+            "errors_corrected_by_rereads_rewrites": 0,
+            "total_errors_corrected": 0,
+            "correction_algorithm_invocations": 0,
+            "gigabytes_processed": "12.699",
+            "total_uncorrected_errors": 0
+          },
+          "write": {
+            "errors_corrected_by_eccfast": 0,
+            "errors_corrected_by_eccdelayed": 0,
+            "errors_corrected_by_rereads_rewrites": 0,
+            "total_errors_corrected": 0,
+            "correction_algorithm_invocations": 0,
+            "gigabytes_processed": "6082.745",
+            "total_uncorrected_errors": 0
+          },
+          "verify": {
+            "errors_corrected_by_eccfast": 0,
+            "errors_corrected_by_eccdelayed": 0,
+            "errors_corrected_by_rereads_rewrites": 0,
+            "total_errors_corrected": 0,
+            "correction_algorithm_invocations": 0,
+            "gigabytes_processed": "0.001",
+            "total_uncorrected_errors": 0
+          }
+        },
+        "scsi_pending_defects": {
+          "count": 0
+        },
+        "scsi_self_test_0": {
+          "code": {
+            "value": 1,
+            "string": "Background short"
+          },
+          "result": {
+            "value": 0,
+            "string": "Completed"
+          },
+          "power_on_time": {
+            "hours": 5,
+            "aka": "accumulated_power_on_hours"
+          }
+        },
+        "scsi_extended_self_test_seconds": 3600
+      }`)
+	//nolint:lll
+	sampleFailedSmartInfoScan := []byte(`{
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 3],
+          "svn_revision": "5338",
+          "platform_info": "x86_64-w64-mingw32-2016-1607",
+          "build_info": "(sf-7.3-1)",
+          "argv": ["smartctl", "-a", "/dev/sda", "-d", "3ware,0", "-j"],
+          "messages": [
+            {
+              "string": "/dev/sda: Unknown device type '3ware,0'",
+              "severity": "error"
+            },
+            {
+              "string": "=======> VALID ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], sat[,auto][,N][+TYPE], usbcypress[,X], usbjmicron[,p][,x][,N], usbprolific, usbsunplus, sntasmedia, sntjmicron[,NSID], sntrealtek, intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], auto, test <=======",
+              "severity": "error"
+            }
+          ],
+          "exit_status": 1
+        },
+        "local_time": {
+          "time_t": 1663357978,
+          "asctime": "Fri Sep 16 22:52:58 2022 BST"
+        }
+      }`)
+	sampleMissingSmartStatusSmartInfoScan := []byte(`{
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 3],
+          "svn_revision": "5338",
+          "platform_info": "x86_64-linux-6.1.0-13-amd64",
+          "build_info": "(local build)",
+          "argv": ["smartctl", "-a", "-j", "/dev/sda", "-d", "scsi"],
+          "exit_status": 0
+        },
+        "local_time": {
+          "time_t": 1705569652,
+          "asctime": "Thu Jan 18 10:20:52 2024 CET"
+        },
+        "device": {
+          "name": "/dev/sda",
+          "info_name": "/dev/sda",
+          "type": "scsi",
+          "protocol": "SCSI"
+        },
+        "scsi_vendor": "SAMSUNG",
+        "scsi_product": "MZILT960HBHQ/007",
+        "scsi_model_name": "SAMSUNG MZILT960HBHQ/007",
+        "scsi_revision": "GXA0",
+        "scsi_version": "SPC-5",
+        "user_capacity": {
+          "blocks": 1875385008,
+          "bytes": 960197124096
+        },
+        "logical_block_size": 512,
+        "physical_block_size": 4096,
+        "scsi_lb_provisioning": {
+          "name": "resource provisioned",
+          "value": 1,
+          "management_enabled": {
+            "name": "LBPME",
+            "value": 1
+          },
+          "read_zeros": {
+            "name": "LBPRZ",
+            "value": 1
+          }
+        },
+        "rotation_rate": 0,
+        "form_factor": {
+          "scsi_value": 3,
+          "name": "2.5 inches"
+        },
+        "logical_unit_id": "0x5002538b731302a0",
+        "serial_number": "S5G1NC0W102239",
+        "device_type": {
+          "scsi_terminology": "Peripheral Device Type [PDT]",
+          "scsi_value": 0,
+          "name": "disk"
+        },
+        "scsi_transport_protocol": {
+          "name": "SAS (SPL-4)",
+          "value": 6
+        },
+        "smart_support": {
+          "available": true,
+          "enabled": true
+        },
+        "temperature_warning": {
+          "enabled": true
+        },
+        "scsi_percentage_used_endurance_indicator": 0,
+        "temperature": {
+          "current": 35,
+          "drive_trip": 74
+        },
+        "power_on_time": {
+          "hours": 3862,
+          "minutes": 30
+        },
+        "scsi_start_stop_cycle_counter": {
+          "year_of_manufacture": "2023",
+          "week_of_manufacture": "01",
+          "accumulated_start_stop_cycles": 5,
+          "specified_load_unload_count_over_device_lifetime": 0,
+          "accumulated_load_unload_cycles": 0
+        },
+        "scsi_grown_defect_list": 0,
+        "scsi_error_counter_log": {
+          "read": {
+            "errors_corrected_by_eccfast": 0,
+            "errors_corrected_by_eccdelayed": 0,
+            "errors_corrected_by_rereads_rewrites": 0,
+            "total_errors_corrected": 0,
+            "correction_algorithm_invocations": 0,
+            "gigabytes_processed": "12.699",
+            "total_uncorrected_errors": 0
+          },
+          "write": {
+            "errors_corrected_by_eccfast": 0,
+            "errors_corrected_by_eccdelayed": 0,
+            "errors_corrected_by_rereads_rewrites": 0,
+            "total_errors_corrected": 0,
+            "correction_algorithm_invocations": 0,
+            "gigabytes_processed": "6082.745",
+            "total_uncorrected_errors": 0
+          },
+          "verify": {
+            "errors_corrected_by_eccfast": 0,
+            "errors_corrected_by_eccdelayed": 0,
+            "errors_corrected_by_rereads_rewrites": 0,
+            "total_errors_corrected": 0,
+            "correction_algorithm_invocations": 0,
+            "gigabytes_processed": "0.001",
+            "total_uncorrected_errors": 0
+          }
+        },
+        "scsi_pending_defects": {
+          "count": 0
+        },
+        "scsi_self_test_0": {
+          "code": {
+            "value": 1,
+            "string": "Background short"
+          },
+          "result": {
+            "value": 0,
+            "string": "Completed"
+          },
+          "power_on_time": {
+            "hours": 5,
+            "aka": "accumulated_power_on_hours"
+          }
+        },
+        "scsi_extended_self_test_seconds": 3600
+      }`)
+
+	type fields struct {
+		out []byte
+		err error
+	}
+
+	type args struct {
+		deviceName string
+		deviceType string
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *SmartCtlDeviceData
+		wantErr bool
+	}{
+		{
+			"+valid",
+			fields{out: sampleValidSmartInfoScan},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			&SmartCtlDeviceData{
+				Device: &deviceParser{
+					SerialNumber: "S5G1NC0W102239",
+					Info: deviceInfo{
+						Name:     "/dev/sda raid,1,2,3",
+						InfoName: "/dev/sda",
+						DevType:  "scsi",
+						name:     "/dev/sda",
+						raidType: "raid,1,2,3",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+				},
+				Data: sampleValidSmartInfoScan,
+			},
+			false,
+		},
+		{
+			"-executeErr",
+			fields{out: sampleValidSmartInfoScan, err: errs.New("fail")},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+		{
+			"-unmarshalErr",
+			fields{out: []byte("{")},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+		{
+			"-smartctlErr",
+			fields{out: sampleFailedSmartInfoScan},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+		{
+			"-missingSmartStatus",
+			fields{out: sampleMissingSmartStatusSmartInfoScan},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := mock.NewMockController(t)
+
+			m.ExpectExecute().
+				WithArgs("-a", "/dev/sda", "-d", "raid,1,2,3", "-j").
+				WillReturnOutput(tt.fields.out).
+				WillReturnError(tt.fields.err)
+
+			got, err := getAllDeviceInfoByType(
+				m,
+				tt.args.deviceName,
+				tt.args.deviceType,
+			)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf(
+					"getAllDeviceInfoByType() error = %v, wantErr %v",
+					err, tt.wantErr,
+				)
+			}
+
+			if diff := cmp.Diff(
+				tt.want, got,
+				cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
+			); diff != "" {
+				t.Fatalf(
+					"getAllDeviceInfoByType() mismatch (-want +got):\n%s", diff,
+				)
+			}
+		})
+	}
+}
+
+//nolint:paralleltest,tparallel
+func Test_getRaidDevices(t *testing.T) {
+	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
+
+	type expectation struct {
+		args []string
+		err  error
+		out  []byte
+	}
+
+	type args struct {
+		deviceName string
+		deviceType DeviceType
+	}
+
+	tests := []struct {
+		name         string
+		expectations []expectation
+		args         args
+		want         []*SmartCtlDeviceData
+	}{
+		{
+			"+sat",
+			[]expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "sat", "-j"},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+				},
+			},
+			args{deviceName: "/dev/sda", deviceType: SAT},
+			[]*SmartCtlDeviceData{
+				{
+					Device: &deviceParser{
+						ModelName:    "INTEL SSDSC2BB120G6",
+						SerialNumber: "PHWA619301M9120CGN",
+						Info: deviceInfo{
+							Name:     "/dev/sda sat",
+							InfoName: "/dev/sda [SAT]",
+							DevType:  "sat",
+							name:     "/dev/sda",
+							raidType: "sat",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 3}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{ //nolint:dupl
+							Table: []table{
+								{Attrname: "Reallocated_Sector_Ct", ID: 5},
+								{Attrname: "Power_On_Hours", ID: 9},
+								{Attrname: "Power_Cycle_Count", ID: 12},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       170,
+									Thresh:   10,
+								},
+								{Attrname: "Program_Fail_Count", ID: 171},
+								{Attrname: "Erase_Fail_Count", ID: 172},
+								{Attrname: "Unsafe_Shutdown_Count", ID: 174},
+								{
+									Attrname: "Power_Loss_Cap_Test",
+									ID:       175,
+									Thresh:   10,
+								},
+								{Attrname: "SATA_Downshift_Count", ID: 183},
+								{
+									Attrname: "End-to-End_Error",
+									ID:       184,
+									Thresh:   90,
+								},
+								{Attrname: "Reported_Uncorrect", ID: 187},
+								{Attrname: "Temperature_Case", ID: 190},
+								{Attrname: "Unsafe_Shutdown_Count", ID: 192},
+								{Attrname: "Temperature_Internal", ID: 194},
+								{Attrname: "Current_Pending_Sector", ID: 197},
+								{Attrname: "CRC_Error_Count", ID: 199},
+								{Attrname: "Host_Writes_32MiB", ID: 225},
+								{Attrname: "Workld_Media_Wear_Indic", ID: 226},
+								{Attrname: "Workld_Host_Reads_Perc", ID: 227},
+								{Attrname: "Workload_Minutes", ID: 228},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       232,
+									Thresh:   10,
+								},
+								{Attrname: "Media_Wearout_Indicator", ID: 233},
+								{Attrname: "Thermal_Throttle", ID: 234},
+								{Attrname: "Host_Writes_32MiB", ID: 241},
+								{Attrname: "Host_Reads_32MiB", ID: 242},
+								{Attrname: "NAND_Writes_32MiB", ID: 243},
+							},
+						},
+					},
+					Data: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+				},
+			},
+		},
+		{
+			"+scsi",
+			[]expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "scsi", "-j"},
+					out: mock.Outputs.Get("HBA_with_SAS_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
+				},
+			},
+			args{deviceName: "/dev/sda", deviceType: SCSI},
+			[]*SmartCtlDeviceData{
+				{
+					Device: &deviceParser{
+						SerialNumber: "S5G1NC0W102239",
+						Info: deviceInfo{
+							Name:     "/dev/sda scsi",
+							InfoName: "/dev/sda",
+							DevType:  "scsi",
+							name:     "/dev/sda",
+							raidType: "scsi",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 3}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+					},
+					Data: mock.Outputs.Get("HBA_with_SAS_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
+				},
+			},
+		},
+		{
+			"-invalidType3ware",
+			[]expectation{
+				{
+					args: []string{"-a", "/dev/sda", "-d", "3ware,0", "-j"},
+					out: mock.Outputs.Get("env_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d 3ware,0 -j"),
+				},
+			},
+			args{deviceName: "/dev/sda", deviceType: ThreeWare},
+			nil,
+		},
+		// missing cases for:
+		// - 3ware
+		// - areca
+		// - cciss
+		// because of lack of test data
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := mock.NewMockController(t)
+
+			for _, e := range tt.expectations {
+				m.ExpectExecute().
+					WithArgs(e.args...).
+					WillReturnOutput(e.out).
+					WillReturnError(e.err)
+			}
+
+			got := getRaidDevices(
+				m, log.New(""), tt.args.deviceName, tt.args.deviceType,
+			)
+			if diff := cmp.Diff(
+				tt.want, got,
+				cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
+			); diff != "" {
+				t.Fatalf("getRaidDevices() = %s", diff)
 			}
 		})
 	}
@@ -1130,8 +1704,8 @@ func TestPlugin_getDevices(t *testing.T) {
 			"+env1",
 			expect{true},
 			fields{
-				basicScanOut: mock.OutputEnv1ScanBasic,
-				raidScanOut:  mock.OutputEnv1ScanRaid,
+				basicScanOut: mock.Outputs.Get("env_1").AllDevicesScan,
+				raidScanOut:  mock.Outputs.Get("env_1").RaidDevicesScan,
 			},
 			[]deviceInfo{
 				{
@@ -1188,7 +1762,9 @@ func TestPlugin_getDevices(t *testing.T) {
 			expect{true},
 			fields{
 				basicScanOut: mock.Outputs.Get("HBA_with_SAS_1").AllDevicesScan,
-				raidScanOut:  mock.Outputs.Get("HBA_with_SAS_1").RaidDevicesScan,
+				raidScanOut: mock.Outputs.Get(
+					"HBA_with_SAS_1",
+				).RaidDevicesScan,
 			},
 			nil,
 			[]deviceInfo{
@@ -1283,6 +1859,7 @@ func TestPlugin_getDevices(t *testing.T) {
 					tt.wantErr,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantBasic, gotBasic,
 				cmp.AllowUnexported(deviceInfo{}),
@@ -1292,6 +1869,7 @@ func TestPlugin_getDevices(t *testing.T) {
 					diff,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantRaid, gotRaid,
 				cmp.AllowUnexported(deviceInfo{}),
@@ -1301,6 +1879,7 @@ func TestPlugin_getDevices(t *testing.T) {
 					diff,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.wantMegaraid, gotMegaraid,
 				cmp.AllowUnexported(deviceInfo{}),
@@ -1310,6 +1889,7 @@ func TestPlugin_getDevices(t *testing.T) {
 					diff,
 				)
 			}
+
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
 					"Plugin.getDevices() expectations where not met, error = %v",
@@ -1533,11 +2113,13 @@ func TestPlugin_scanDevices(t *testing.T) {
 					err, tt.wantErr,
 				)
 			}
+
 			if diff := cmp.Diff(
 				tt.want, got, cmp.AllowUnexported(deviceInfo{}),
 			); diff != "" {
 				t.Fatalf("Plugin.scanDevices() = %s", diff)
 			}
+
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
 					"Plugin.scanDevices() expectations where not met, error = %v",

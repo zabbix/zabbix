@@ -3,7 +3,9 @@ package mock
 import (
 	"fmt"
 	"sync"
+	"testing"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -13,6 +15,7 @@ type MockController struct {
 	mu           sync.Mutex
 	count        int
 	expectations []*expectation
+	t            *testing.T
 }
 
 type expectation struct {
@@ -21,18 +24,29 @@ type expectation struct {
 	err  error
 }
 
+// NewMockController creates a new MockController.
+func NewMockController(t *testing.T) *MockController {
+	t.Helper()
+
+	return &MockController{t: t}
+}
+
 // Execute mock call to the SmartController.Execute method.
 func (c *MockController) Execute(args ...string) ([]byte, error) {
 	c.mu.Lock()
-
-	defer func() {
-		c.count++
-		c.mu.Unlock()
-	}()
+	defer c.mu.Unlock()
 
 	if c.count >= len(c.expectations) {
+		if c.t != nil {
+			c.t.Fatalf("Unexpected call to Execute with args: %v", args)
+
+			return nil, nil
+		}
+
 		panic(fmt.Sprintf("unexpected call to Execute with args: %v", args))
 	}
+
+	defer func() { c.count++ }()
 
 	e := c.expectations[c.count]
 
@@ -42,7 +56,13 @@ func (c *MockController) Execute(args ...string) ([]byte, error) {
 
 	if e.args != nil {
 		if diff := cmp.Diff(e.args, args); diff != "" {
-			panic(fmt.Errorf("Execute args mismatch (-want +got):\n%s", diff))
+			if c.t != nil {
+				c.t.Fatalf("Execute args mismatch (-want +got):\n%s", diff)
+
+				return nil, nil
+			}
+
+			panic("Execute args mismatch (-want +got):\n" + diff)
 		}
 	}
 
@@ -50,16 +70,17 @@ func (c *MockController) Execute(args ...string) ([]byte, error) {
 }
 
 // ExpectExecute adds a new expectation for the SmartController.Execute method.
-func (c *MockController) ExpectExecute() *expectation {
+func (c *MockController) ExpectExecute() *expectation { //nolint:revive
 	e := &expectation{}
 	c.expectations = append(c.expectations, e)
 
 	return e
 }
 
+// ExpectationsWhereMet checks if all expectations were met.
 func (c *MockController) ExpectationsWhereMet() error {
 	if c.count != len(c.expectations) {
-		return fmt.Errorf(
+		return errs.Errorf(
 			"not all expectations were met, expected %d, got %d",
 			len(c.expectations), c.count,
 		)
