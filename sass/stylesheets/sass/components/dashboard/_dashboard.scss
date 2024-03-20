@@ -846,11 +846,9 @@
 			}
 		}
 
-		@if $ui-transitions {
-			&:not(.dashboard-grid-widget-focus) {
-				transition-property: top;
-				transition-duration: 0.15s;
-			}
+		&:not(.dashboard-grid-widget-focus) {
+			transition-property: width, height, left, top;
+			transition-duration: 0.15s;
 		}
 	}
 
