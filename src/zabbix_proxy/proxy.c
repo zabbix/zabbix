@@ -77,6 +77,7 @@
 #include "zbxpreproc.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxautoreg.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"

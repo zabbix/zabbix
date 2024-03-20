@@ -1997,6 +1997,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxasyncpoller/Makefile
 	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
+	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxdbconfigworker/Makefile

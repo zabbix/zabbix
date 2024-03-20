@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxdiscovery.h"
+#include "zbxautoreg.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1

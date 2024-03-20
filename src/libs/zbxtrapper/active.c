@@ -38,6 +38,7 @@
 #include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxautoreg.h"
 
 /*************************************************************************************
  *                                                                                   *

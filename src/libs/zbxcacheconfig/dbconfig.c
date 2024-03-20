@@ -57,6 +57,7 @@
 #include "zbxcachevalue.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
+#include "zbxautoreg.h"
 
 int	sync_in_progress = 0;
 

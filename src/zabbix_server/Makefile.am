@@ -61,6 +61,7 @@ zabbix_server_LDADD = \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	autoreg/libzbxautoreg_server.a \
+	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	escalator/libzbxescalator.a \

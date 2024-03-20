@@ -31,6 +31,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_proxy.a \
 	autoreg/libzbxautoreg_proxy.a \
+	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \

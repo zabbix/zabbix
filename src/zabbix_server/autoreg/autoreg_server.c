@@ -23,6 +23,7 @@
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxautoreg.h"
 
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host)
 {
@@ -33,19 +34,17 @@ void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host)
 	zbx_free(autoreg_host);
 }
 
-static void	autoreg_get_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_vector_str_t *hosts)
+static void	autoreg_get_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, zbx_vector_str_t *hosts)
 {
-	int	i;
-
-	for (i = 0; i < autoreg_hosts->values_num; i++)
+	for (int i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		zbx_autoreg_host_t	*autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+		zbx_autoreg_host_t	*autoreg_host = autoreg_hosts->values[i];
 
 		zbx_vector_str_append(hosts, autoreg_host->host);
 	}
 }
 
-static void	autoreg_process_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid)
+static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, zbx_uint64_t proxyid)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -81,7 +80,7 @@ static void	autoreg_process_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_ui
 		{
 			for (i = 0; i < autoreg_hosts->values_num; i++)
 			{
-				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+				autoreg_host = autoreg_hosts->values[i];
 
 				if (0 != strcmp(autoreg_host->host, row[0]))
 					continue;
@@ -108,11 +107,14 @@ static void	autoreg_process_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_ui
 					if (ZBX_CONN_IP == autoreg_host->flag && 0 != strcmp(row[4], autoreg_host->ip))
 						break;
 
-					if (ZBX_CONN_DNS == autoreg_host->flag && 0 != strcmp(row[5], autoreg_host->dns))
+					if (ZBX_CONN_DNS == autoreg_host->flag && 0 != strcmp(row[5],
+							autoreg_host->dns))
+					{
 						break;
+					}
 				}
 
-				zbx_vector_ptr_remove(autoreg_hosts, i);
+				zbx_vector_autoreg_host_ptr_remove(autoreg_hosts, i);
 				zbx_autoreg_host_free_server(autoreg_host);
 
 				break;
@@ -171,7 +173,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 	return 0;
 }
 
-void	zbx_autoreg_flush_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
+void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
 		const zbx_events_funcs_t *events_cbs)
 {
 	zbx_autoreg_host_t	*autoreg_host;
@@ -188,7 +190,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+		autoreg_host = autoreg_hosts->values[i];
 
 		if (0 == autoreg_host->autoreg_hostid)
 			create++;
@@ -208,11 +210,11 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
-	zbx_vector_ptr_sort(autoreg_hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, zbx_autoreg_host_compare_func);
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+		autoreg_host = autoreg_hosts->values[i];
 
 		if (0 == autoreg_host->autoreg_hostid)
 		{
@@ -261,11 +263,11 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_
 		zbx_free(sql);
 	}
 
-	zbx_vector_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
+	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+		autoreg_host = autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
 
@@ -286,20 +288,19 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_autoreg_prepare_host_server(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
+void	zbx_autoreg_prepare_host_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, const char *host, const char *ip,
+		const char *dns, unsigned short port, unsigned int connection_type, const char *host_metadata,
+		unsigned short flag, int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	int			i;
 
-	for (i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
+	for (int i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
 	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+		autoreg_host = autoreg_hosts->values[i];
 
 		if (0 == strcmp(host, autoreg_host->host))
 		{
-			zbx_vector_ptr_remove(autoreg_hosts, i);
+			zbx_vector_autoreg_host_ptr_remove(autoreg_hosts, i);
 			zbx_autoreg_host_free_server(autoreg_host);
 			break;
 		}
@@ -316,16 +317,16 @@ void	zbx_autoreg_prepare_host_server(zbx_vector_ptr_t *autoreg_hosts, const char
 	autoreg_host->flag = flag;
 	autoreg_host->now = now;
 
-	zbx_vector_ptr_append(autoreg_hosts, autoreg_host);
+	zbx_vector_autoreg_host_ptr_append(autoreg_hosts, autoreg_host);
 }
 
 void	zbx_autoreg_update_host_server(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
 		int clock, const zbx_events_funcs_t *events_cbs)
 {
-	zbx_vector_ptr_t	autoreg_hosts;
+	zbx_vector_autoreg_host_ptr_t	autoreg_hosts;
 
-	zbx_vector_ptr_create(&autoreg_hosts);
+	zbx_vector_autoreg_host_ptr_create(&autoreg_hosts);
 
 	zbx_autoreg_prepare_host_server(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
 			clock);
@@ -333,7 +334,7 @@ void	zbx_autoreg_update_host_server(zbx_uint64_t proxyid, const char *host, cons
 	zbx_autoreg_flush_hosts_server(&autoreg_hosts, proxyid, events_cbs);
 	zbx_db_commit();
 
-	zbx_vector_ptr_clear_ext(&autoreg_hosts, (zbx_mem_free_func_t)zbx_autoreg_host_free_server);
-	zbx_vector_ptr_destroy(&autoreg_hosts);
+	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, zbx_autoreg_host_free_server);
+	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 }
 

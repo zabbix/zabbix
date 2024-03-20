@@ -26,6 +26,7 @@
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxpoller.h"
+#include "zbxautoreg.h"
 
 zbx_get_program_type_f trapper_get_program_type(void);
 

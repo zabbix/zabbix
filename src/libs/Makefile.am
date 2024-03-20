@@ -6,6 +6,7 @@ DIST_SUBDIRS = \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxdbconfigworker \
@@ -90,6 +91,7 @@ if SERVER
 SERVER_SUBDIRS = \
 	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxdbconfigworker \
@@ -154,6 +156,7 @@ else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \
