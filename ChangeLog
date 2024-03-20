@@ -23,6 +23,7 @@ A.F.....S. [ZBXNEXT-6876] added multi-factor authentication support for Zabbix U
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
+....I..... [ZBX-23441] fixed broken autoconf test when searching for go (jxl)
 .....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
 ..F....... [ZBX-23567] fixed PHP error during first time setup when no user is yet created (gcalenko, Ivo)
 ........S. [ZBX-24050] fixed snmpaddrs not getting updated when syncing interfaces (dgoloscapov)
