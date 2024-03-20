@@ -50,6 +50,7 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
+#include "autoreg/autoreg_proxy.h"
 
 #include "zbxcomms.h"
 #include "zbxvault.h"
@@ -1452,7 +1453,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_java_gateway, config_java_gateway_port,
 								config_externalscripts,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location, trapper_process_request_proxy};
+								config_ssh_key_location, trapper_process_request_proxy,
+								zbx_autoreg_update_host_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};

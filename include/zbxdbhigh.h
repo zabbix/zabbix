@@ -947,6 +947,19 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
+typedef void	(*zbx_autoreg_host_free_func_t)(zbx_autoreg_host_t *autoreg_host);
+
+typedef void	(*zbx_autoreg_update_host_func_t)(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
+		int clock, const zbx_events_funcs_t *events_cbs);
+
+typedef void	(*zbx_autoreg_flush_hosts_func_t)(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
+		const zbx_events_funcs_t *events_cbs);
+
+typedef void	(*zbx_autoreg_prepare_host_func_t)(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip,
+		const char *dns, unsigned short port, unsigned int connection_type, const char *host_metadata,
+		unsigned short flag, int now);
+
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1
 

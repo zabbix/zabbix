@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	autoreg \
 	actions \
 	dbconfig \
 	diag \
@@ -59,7 +60,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
+	autoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	escalator/libzbxescalator.a \

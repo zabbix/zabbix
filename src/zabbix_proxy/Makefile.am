@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	autoreg \
 	diag \
 	discovery \
 	housekeeper \
@@ -29,7 +30,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_proxy/poller/libzbxpoller_proxy.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_proxy.a \
-	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_proxy.a \
+	autoreg/libzbxautoreg_proxy.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \

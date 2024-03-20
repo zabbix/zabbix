@@ -1997,7 +1997,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxasyncpoller/Makefile
 	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
-	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxdbconfigworker/Makefile
@@ -2100,6 +2099,7 @@ AC_CONFIG_FILES([
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/autoreg/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/discovery/Makefile
@@ -2114,6 +2114,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/connector/Makefile
