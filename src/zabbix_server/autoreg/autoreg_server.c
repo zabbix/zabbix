@@ -20,6 +20,9 @@
 #include "autoreg_server.h"
 
 #include "zbx_trigger_constants.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host)
 {
