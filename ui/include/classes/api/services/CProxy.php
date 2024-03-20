@@ -192,7 +192,7 @@ class CProxy extends CApiService {
 		return $result;
 	}
 
-	protected function addRelatedAssignedHosts(array $options, array &$result): void {
+	private function addRelatedAssignedHosts(array $options, array &$result): void {
 		if ($options['selectAssignedHosts'] === null) {
 			return;
 		}
@@ -225,7 +225,7 @@ class CProxy extends CApiService {
 		}
 	}
 
-	protected function addRelatedHosts(array $options, array &$result): void {
+	private function addRelatedHosts(array $options, array &$result): void {
 		if ($options['selectHosts'] === null) {
 			return;
 		}
@@ -258,7 +258,7 @@ class CProxy extends CApiService {
 		}
 	}
 
-	protected function addRelatedProxyGroup(array $options, array &$result): void {
+	private function addRelatedProxyGroup(array $options, array &$result): void {
 		if ($options['selectProxyGroup'] === null) {
 			return;
 		}
@@ -1029,17 +1029,13 @@ class CProxy extends CApiService {
 		self::addFieldDefaultsByCustomTimeouts($proxies, $db_proxies);
 	}
 
-	/**
-	 *  Add default values for fields that became unnecessary as the result of the change of "proxy_groupid".
-	 *
-	 * @param array $proxies
-	 * @param array $db_proxies
-	 */
-	protected static function addFieldDefaultsByProxyGroupId(array &$proxies, array $db_proxies): void {
+	private static function addFieldDefaultsByProxyGroupId(array &$proxies, array $db_proxies): void {
+		$db_defaults = DB::getDefaults('proxy');
+
 		foreach ($proxies as &$proxy) {
 			if ($proxy['proxy_groupid'] !== $db_proxies[$proxy['proxyid']]['proxy_groupid']
 					&& $proxy['proxy_groupid'] == 0) {
-				$proxy += array_intersect_key(DB::getDefaults('proxy'), array_flip(['local_address', 'local_port']));
+				$proxy += array_intersect_key($db_defaults, array_flip(['local_address', 'local_port']));
 			}
 		}
 		unset($proxy);
@@ -1065,7 +1061,7 @@ class CProxy extends CApiService {
 	 * @param array $proxies
 	 * @param array $db_proxies
 	 */
-	protected static function addFieldDefaultsByTls(array &$proxies, array $db_proxies): void {
+	private static function addFieldDefaultsByTls(array &$proxies, array $db_proxies): void {
 		foreach ($proxies as &$proxy) {
 			$db_proxy = $db_proxies[$proxy['proxyid']];
 
@@ -1092,19 +1088,15 @@ class CProxy extends CApiService {
 		unset($proxy);
 	}
 
-	/**
-	 * Add default values for fields that became unnecessary as the result of the change of "custom_timeouts".
-	 *
-	 * @param array $proxies
-	 * @param array $db_proxies
-	 */
 	private static function addFieldDefaultsByCustomTimeouts(array &$proxies, array $db_proxies): void {
+		$db_defaults = DB::getDefaults('proxy');
+
 		foreach ($proxies as &$proxy) {
 			if ($proxy['custom_timeouts'] != $db_proxies[$proxy['proxyid']]['custom_timeouts']
 					&& $proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
-				$proxy += array_intersect_key(DB::getDefaults('proxy'), array_flip(['timeout_zabbix_agent',
-					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+				$proxy += array_intersect_key($db_defaults, array_flip(['timeout_zabbix_agent', 'timeout_simple_check',
+					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
 				]));
 			}
 		}
