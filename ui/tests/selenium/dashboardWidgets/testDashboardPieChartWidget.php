@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareData
  */
-class testDashboardPieChartWidget extends CWebTest {
+class testDashboardPieChartWidget extends testWidgets {
 	protected static $dashboard_id;
 	protected static $display_dashboard_id;
 	protected static $item_ids;
@@ -36,17 +36,6 @@ class testDashboardPieChartWidget extends CWebTest {
 	const TYPE_DATA_SET_CLONE = 'Clone';
 	const HOST_NAME_ITEM_LIST = 'pie-chart-item-list';
 	const HOST_NAME_SCREENSHOTS = 'pie-chart-display';
-
-	/**
-	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
-	 */
-	private $hash_sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -762,7 +751,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Create base widget.
 		$widget_name = 'Simple update pie chart';
 		$this->createCleanWidget($widget_name);
-		$old_hash = CDBHelper::getHash($this->hash_sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		// Open and do a simple update.
 		$dashboard = $this->openDashboard();
@@ -774,7 +763,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Assert that nothing changed.
 		$dashboard = $this->openDashboard(false);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->hash_sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -885,7 +874,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		// Get DB hash and widget count.
-		$old_hash = CDBHelper::getHash($this->hash_sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 		$dashboard = $this->openDashboard();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -929,7 +918,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Assert that widget count and DB data has not changed.
 		$dashboard = $this->openDashboard(false);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->hash_sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -1036,7 +1025,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'expected_dataset_name' => 'TEST SET ☺',
 					'expected_sectors' => [
-						'item-1' => ['value' => '99', 'color' => 'rgb(255, 70, 92)']
+						'item-1' => ['value' => '99', 'color' => '255, 70, 92']
 					]
 				]
 			],
@@ -1057,8 +1046,8 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'expected_legend_function' => 'max',
 					'expected_sectors' => [
-						'item-3' => ['value' => '3E-17', 'color' => 'rgb(255, 70, 92)'],
-						'item-4' => ['value' => '2E-17', 'color' => 'rgb(255, 197, 219)']
+						'item-3' => ['value' => '3E-17', 'color' => '255, 70, 92'],
+						'item-4' => ['value' => '2E-17', 'color' => '255, 197, 219']
 					]
 				]
 			],
@@ -1080,10 +1069,10 @@ class testDashboardPieChartWidget extends CWebTest {
 						'item-4' => 4.4
 					],
 					'expected_sectors' => [
-						'item-1' => ['value' => '1', 'color' => 'rgb(212, 124, 0)'],
-						'item-2' => ['value' => '2', 'color' => 'rgb(255, 209, 80)'],
-						'item-3' => ['value' => '3', 'color' => 'rgb(255, 252, 123)'],
-						'item-4' => ['value' => '4.4', 'color' => 'rgb(255, 255, 165)']
+						'item-1' => ['value' => '1', 'color' => '212, 124, 0'],
+						'item-2' => ['value' => '2', 'color' => '255, 209, 80'],
+						'item-3' => ['value' => '3', 'color' => '255, 252, 123'],
+						'item-4' => ['value' => '4.4', 'color' => '255, 255, 165']
 					]
 				]
 			],
@@ -1134,9 +1123,9 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'expected_total' => '100 ♥',
 					'expected_sectors' => [
-						'item-1' => ['value' => '100 ♥', 'color' => 'rgb(255, 235, 238)'],
-						'item-2' => ['value' => '41 ♥', 'color' => 'rgb(229, 57, 53)'],
-						'Other' => ['value' => '9 ♥', 'color' => 'rgb(183, 28, 28)']
+						'item-1' => ['value' => '100 ♥', 'color' => '255, 235, 238'],
+						'item-2' => ['value' => '41 ♥', 'color' => '229, 57, 53'],
+						'Other' => ['value' => '9 ♥', 'color' => '183, 28, 28']
 					]
 				]
 			]
@@ -1187,12 +1176,15 @@ class testDashboardPieChartWidget extends CWebTest {
 			$sector = $widget->query('class:svg-pie-chart-arcs')->
 					query('xpath:./*[contains(@data-hintbox-contents, "'.$legend_name.'")]')->one();
 
+			// Assert sector fill color.
+			$this->assertEquals('rgb('.$expected_sector['color'].')', $sector->getCSSValue('fill'));
+
 			// Open and assert the hintbox.
 			$sector->click();
 			$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
 			$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
-			$this->assertEquals('background-color: '.$expected_sector['color'].';',
-				$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
+			$this->assertEquals('rgba('.$expected_sector['color'].', 1)',
+					$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getCSSValue('background-color')
 			);
 			$hintbox->close();
 		}
