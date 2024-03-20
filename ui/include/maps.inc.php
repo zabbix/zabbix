@@ -926,6 +926,8 @@ function countSelementProblems(array $selement): array {
 		'latelyChanged' => false,
 		'priority' => 0
 	];
+	$counter_problems = [];
+	$counter_problems_unack = [];
 
 	foreach ($selement['triggers'] as $trigger) {
 		if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
@@ -934,10 +936,11 @@ function countSelementProblems(array $selement): array {
 
 		foreach ($trigger['problems'] as $problem) {
 			if ($problem['r_clock'] == 0) {
-				$selement_info['problem']++;
+				$eventid = $problem['eventid'];
+				$counter_problems[$eventid] = $eventid;
 
 				if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-					$selement_info['problem_unack']++;
+					$counter_problems_unack[$eventid] = $eventid;
 				}
 
 				if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
@@ -968,6 +971,9 @@ function countSelementProblems(array $selement): array {
 			}
 		}
 
+		$selement_info['problem'] = count($counter_problems);
+		$selement_info['problem_unack'] = count($counter_problems_unack);
+
 		if ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD))) {
 			$selement_info['latelyChanged'] = true;
 		}
@@ -997,7 +1003,7 @@ function countNestedMapSelementProblems(array $selement, array $sysmaps_data): a
 			}
 
 			if (array_key_exists('triggers', $lookup_sysmap_element)) {
-				$nested_triggers += $lookup_sysmap_element['triggers'];
+				$nested_triggers = array_merge($nested_triggers, $lookup_sysmap_element['triggers']);
 			}
 		}
 
