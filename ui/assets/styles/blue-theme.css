@@ -2037,7 +2037,7 @@ button {
   .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #ced5da; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
-  transition-property: top;
+  transition-property: width, height, left, top;
   transition-duration: 0.15s; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator .ui-resizable-handle {
   visibility: hidden; }
@@ -4068,9 +4068,6 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
-form.dashboard-widget-honeycomb #tags_table_item_tags .form_row td:nth-child(3) input[type="text"],
-form.dashboard-widget-honeycomb #tags_table_host_tags .form_row td:nth-child(3) input[type="text"] {
-  width: 159px !important; }
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
   grid-template-columns: minmax(85px, max-content) 1fr max-content minmax(110px, max-content);

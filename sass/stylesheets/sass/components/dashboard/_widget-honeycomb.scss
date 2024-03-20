@@ -1,17 +1,6 @@
 // Widget configuration.
 
 form.dashboard-widget-honeycomb {
-	#tags_table_item_tags,
-	#tags_table_host_tags {
-		.form_row {
-			td:nth-child(3) {
-				input[type="text"] {
-					width: 159px !important;
-				}
-			}
-		}
-	}
-
 	.fields-group {
 		&.fields-group-primary-label,
 		&.fields-group-secondary-label {
