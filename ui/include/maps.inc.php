@@ -937,10 +937,10 @@ function countSelementProblems(array $selement): array {
 		foreach ($trigger['problems'] as $problem) {
 			if ($problem['r_clock'] == 0) {
 				$eventid = $problem['eventid'];
-				$counter_problems[$eventid] = $eventid;
+				$counter_problems[$eventid] = true;
 
 				if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-					$counter_problems_unack[$eventid] = $eventid;
+					$counter_problems_unack[$eventid] = true;
 				}
 
 				if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
