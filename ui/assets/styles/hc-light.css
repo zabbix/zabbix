@@ -1386,6 +1386,8 @@ button {
 .zi-i-warning, .zi-i-warning.btn-icon {
   color: #ffffff;
   background-color: #af6b00; }
+.zi-i-warning.btn-breadcrumb-icon {
+  vertical-align: 5%; }
 
 .checkbox-list {
   display: grid;

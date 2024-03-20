@@ -356,8 +356,10 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-			$info_icons = [getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete'])];
-			$list->addItem(makeInformationList($info_icons));
+			$info_icons = getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete']);
+			$list->addItem(makeInformationList([
+				$info_icons->addClass(ZBX_STYLE_BTN_BREADCRUMB_ICON)
+			]));
 		}
 	}
 

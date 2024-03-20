@@ -1852,6 +1852,7 @@ define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN', 'btn');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
 define('ZBX_STYLE_BTN_ICON', 'btn-icon');
+define('ZBX_STYLE_BTN_BREADCRUMB_ICON', 'btn-breadcrumb-icon');
 define('ZBX_STYLE_BTN_TOGGLE_CHEVRON', 'btn-toggle-chevron');
 define('ZBX_STYLE_BTN_SPLIT', 'btn-split');
 define('ZBX_STYLE_BTN_TOGGLE', 'btn-dropdown-toggle');

@@ -146,6 +146,10 @@
 		color: $icon-content-color;
 		background-color: $warning-color;
 	}
+
+	&.btn-breadcrumb-icon {
+		vertical-align: 5%;
+	}
 }
 
 .zi-plus-small {
