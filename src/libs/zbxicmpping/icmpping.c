@@ -724,9 +724,9 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 		stats_calc(linebuf_p, host, args);
 	}
 
-	if (0 != args->rdns)
+	if (0 != args->rdns && (NULL == host->dnsname || ('\0' == *host->dnsname && 0 != dnsname_len)))
 	{
-		host->dnsname = zbx_dsprintf(NULL, "%.*s", (int)dnsname_len, resp->linebuf);
+		host->dnsname = zbx_dsprintf(host->dnsname, "%.*s", (int)dnsname_len, resp->linebuf);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -753,7 +753,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	{
 		zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
 	}
-	else
+	else if (NULL == strstr(resp->linebuf, " error:"))
 	{
 		for (i = 0; i < args->hosts_count; i++)
 		{

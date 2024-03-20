@@ -48,17 +48,6 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	}
 }
 
-static zbx_async_task_state_t	get_task_state_for_event(short event)
-{
-	if (POLLIN & event)
-		return ZBX_ASYNC_TASK_READ;
-
-	if (POLLOUT & event)
-		return ZBX_ASYNC_TASK_WRITE;
-
-	return ZBX_ASYNC_TASK_STOP;
-}
-
 static int	agent_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
@@ -71,14 +60,22 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 
 	ZBX_UNUSED(fd);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
+				get_agent_step_string(agent_context->step), event, agent_context->item.itemid, addr);
+
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
 		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-			get_agent_step_string(agent_context->step), event, agent_context->item.itemid);
+	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == agent_context->rdns_step)
+	{
+		if (NULL != addr)
+			agent_context->reverse_dns = zbx_strdup(NULL, addr);
+
+		goto stop;
+	}
 
 	if (0 != (event & EV_TIMEOUT))
 	{
@@ -184,8 +181,11 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						agent_context->tls_arg1, agent_context->tls_arg2,
 						agent_context->server_name, &event_new, &error))
 				{
-					if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+					if (ZBX_ASYNC_TASK_STOP != (
+							state = zbx_async_poller_get_task_state_for_event(event_new)))
+					{
 						return state;
+					}
 
 					SET_MSG_RESULT(&agent_context->item.result,
 							zbx_dsprintf(NULL, "Get value from agent failed:"
@@ -210,8 +210,11 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (SUCCEED != zbx_tcp_send_context(&agent_context->s, &agent_context->tcp_send_context,
 					&event_new))
 			{
-				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+				if (ZBX_ASYNC_TASK_STOP != (
+						state = zbx_async_poller_get_task_state_for_event(event_new)))
+				{
 					return state;
+				}
 
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: cannot send: %s", zbx_socket_strerror()));
@@ -246,10 +249,17 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 							0, &agent_context->item.result, &ts, ITEM_STATE_NORMAL, NULL);
 				}
 
+				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns &&
+						SUCCEED == agent_context->item.ret)
+				{
+					agent_context->rdns_step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
+					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+				}
+
 				break;
 			}
 
-			if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+			if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 				return state;
 
 			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed:"
@@ -274,12 +284,13 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free(agent_context->item.key);
 	zbx_free(agent_context->tls_arg1);
 	zbx_free(agent_context->tls_arg2);
+	zbx_free(agent_context->reverse_dns);
 	zbx_free_agent_result(&agent_context->item.result);
 }
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip)
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED;
@@ -297,9 +308,20 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	agent_context->item.interface = item->interface;
 	agent_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->item.interface.dns_orig : agent_context->item.interface.ip_orig);
-	agent_context->item.key = item->key;
 	agent_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
-	item->key = NULL;
+
+	if (item->key != item->key_orig)
+	{
+		agent_context->item.key = item->key;
+		item->key = NULL;
+	}
+	else
+		agent_context->item.key = zbx_strdup(NULL, item->key);
+
+	agent_context->resolve_reverse_dns = resolve_reverse_dns;
+	agent_context->rdns_step = ZABBIX_ASYNC_STEP_DEFAULT;
+	agent_context->reverse_dns = NULL;
+
 	agent_context->tls_connect = item->host.tls_connect;
 	zbx_strlcpy(agent_context->item.host, item->host.host, sizeof(agent_context->item.host));
 

@@ -6082,6 +6082,9 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		drule->delay = delay;
 		drule->revision = revision;
+
+		if (config->revision.drules != revision)
+			config->revision.drules = revision;
 	}
 
 	/* remove deleted discovery rules from cache and update proxy revision */
@@ -6101,6 +6104,9 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_strpool_release(drule->delay_str);
 		dc_strpool_release(drule->name);
 		zbx_hashset_remove_direct(&config->drules, drule);
+
+		if (config->revision.drules != revision)
+			config->revision.drules = revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -6154,6 +6160,9 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxyid)))
 			proxy->revision = revision;
+
+		if (config->revision.drules != revision)
+			config->revision.drules = revision;
 	}
 
 	/* remove deleted discovery checks from cache and update proxy revision */
@@ -6169,6 +6178,9 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				proxy->revision = revision;
 
 			drule->revision = revision;
+
+			if (config->revision.drules != revision)
+				config->revision.drules = revision;
 		}
 
 		dc_strpool_release(dcheck->key_);
@@ -16187,29 +16199,48 @@ void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay)
  *                                                                            *
  * Purpose: get discovery rules IDs with revisions in pairs                   *
  *                                                                            *
- * Parameter: revisions   - [IN/OUT] discovery rules ID/revisions pairs       *
+ * Parameters: rev_last   - [IN/OUT] discovery rules global revision          *
+ *             revisions  - [IN/OUT] discovery rules ID/revisions pairs       *
+ *                                                                            *
+ * Return value: SUCCEED - if discovery rules global revision differs from    *
+ *                            revision provided in argument rev_last          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: In case of FAIL the resulting ID/revisions pairs vector and      *
+ *              rev_last will not be updated                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions)
+int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_pair_t	revision;
-	zbx_dc_drule_t		*drule;
+	int	ret;
 
-	WRLOCK_CACHE;
+	RDLOCK_CACHE;
 
-	zbx_hashset_iter_reset(&config->drules, &iter);
-
-	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
+	if (config->revision.drules != *rev_last)
 	{
-		revision.first = drule->druleid;
-		revision.second = drule->revision;
-		zbx_vector_uint64_pair_append(revisions, revision);
+		zbx_hashset_iter_t	iter;
+		zbx_uint64_pair_t	revision;
+		zbx_dc_drule_t		*drule;
+
+		zbx_hashset_iter_reset(&config->drules, &iter);
+
+		while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
+		{
+			revision.first = drule->druleid;
+			revision.second = drule->revision;
+			zbx_vector_uint64_pair_append(revisions, revision);
+		}
+
+		*rev_last = config->revision.drules;
+		zbx_vector_uint64_pair_sort(revisions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		ret = SUCCEED;
 	}
+	else
+		ret = FAIL;
 
 	UNLOCK_CACHE;
 
-	zbx_vector_uint64_pair_sort(revisions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	return ret;
 }
 
 /******************************************************************************

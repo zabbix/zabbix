@@ -159,7 +159,8 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|iprange	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(255)	|'1h'	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|concurrency_max	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|concurrency_max|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|proxyid
 UNIQUE		|2		|name
 CHANGELOG	|9
@@ -1144,6 +1145,7 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|dcheckid	|t_id		|	|NULL		|0			|-|dchecks
 FIELD		|dns		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|0
 INDEX		|1		|clock
 INDEX		|2		|druleid
 
@@ -2275,4 +2277,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050250	|6050250
+ROW		|1		|6050250	|6050252

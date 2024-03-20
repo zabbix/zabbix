@@ -74,7 +74,10 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
-		zbx_discovery_update_service_func_t discovery_update_service_cb, int *more, char **error);
+		zbx_discovery_update_service_func_t discovery_update_service_cb,
+		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
+		zbx_discovery_find_host_func_t discovery_find_host_cb,
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb, int *more, char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
