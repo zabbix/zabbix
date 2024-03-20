@@ -217,13 +217,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function trimCellLabel(string $label): string {
-		$lines = [];
+		$result = '';
 
-		foreach (array_slice(explode("\n", str_replace("\r", '', $label)), 0, self::LABEL_MAX_LINES) as $line) {
-			$lines[] = mb_substr($line, 0, self::LABEL_MAX_LINE_LENGTH);
+		foreach (array_slice(explode("\n", $label, self::LABEL_MAX_LINES + 1), 0, self::LABEL_MAX_LINES) as $line) {
+			$result .= ($result === '' ?: "\n").mb_substr(trim($line), 0, self::LABEL_MAX_LINE_LENGTH);
 		}
 
-		return implode("\n", $lines);
+		return $result;
 	}
 
 	private function getConfig(): array {
