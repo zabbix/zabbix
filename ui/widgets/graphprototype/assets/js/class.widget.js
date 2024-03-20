@@ -31,18 +31,6 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 			this.broadcast({_timeperiod: time_period});
 		}
 
-		if (time_period === null) {
-			super.processUpdateResponse({
-				messages: [
-					t('Invalid parameter "%1$s": %2$s.')
-						.replace('%1$s', t('Time period'))
-						.replace('%2$s', t('no data received'))
-				]
-			});
-
-			return Promise.resolve();
-		}
-
 		return super.promiseUpdate();
 	}
 

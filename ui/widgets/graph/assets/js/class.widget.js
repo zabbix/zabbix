@@ -112,23 +112,14 @@ class CWidgetGraph extends CWidget {
 			this.broadcast({_timeperiod: time_period});
 		}
 
-		if (time_period === null) {
-			if (this._is_graph_mode) {
+		if (this._is_graph_mode) {
+			if (time_period === null) {
 				this._is_graph_mode = false;
 				this._deactivateGraph();
-				this._body.innerHTML = '';
+
+				return super.promiseUpdate();
 			}
 
-			this._updateMessages([
-				t('Invalid parameter "%1$s": %2$s.')
-					.replace('%1$s', t('Time period'))
-					.replace('%2$s', t('no data received'))
-			]);
-
-			return Promise.resolve();
-		}
-
-		if (this._is_graph_mode) {
 			if (this.getFieldsReferredData().has('override_hostid')) {
 				const override_hostid = this.getFieldsReferredData().get('override_hostid').value;
 

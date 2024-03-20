@@ -34,7 +34,7 @@ class Widget extends CWidget {
 			'class.widget.js' => [
 				'Invalid parameter "%1$s": %2$s.' => _('Invalid parameter "%1$s": %2$s.'),
 				'Time period' => _('Time period'),
-				'no data received' => _('no data received')
+				'empty data received' => _('empty data received')
 			]
 		];
 	}
