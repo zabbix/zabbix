@@ -67,8 +67,6 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setEnabled(!$this->isDisabled())
 			->setAriaRequired($this->isRequired());
-
-
 	}
 
 	public function getJavaScript(): string {
