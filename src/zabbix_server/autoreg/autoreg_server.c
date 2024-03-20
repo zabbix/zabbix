@@ -53,7 +53,6 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
-	int			i;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
@@ -78,7 +77,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < autoreg_hosts->values_num; i++)
+			for (int i = 0; i < autoreg_hosts->values_num; i++)
 			{
 				autoreg_host = autoreg_hosts->values[i];
 
@@ -143,9 +142,9 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < autoreg_hosts->values_num; i++)
+			for (int i = 0; i < autoreg_hosts->values_num; i++)
 			{
-				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+				autoreg_host = autoreg_hosts->values[i];
 
 				if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
 				{
@@ -179,7 +178,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid = 0;
 	zbx_db_insert_t		db_insert;
-	int			i, create = 0, update = 0;
+	int			create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_timespec_t		ts = {0, 0};
@@ -188,7 +187,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 	autoreg_process_hosts_server(autoreg_hosts, proxyid);
 
-	for (i = 0; i < autoreg_hosts->values_num; i++)
+	for (int i = 0; i < autoreg_hosts->values_num; i++)
 	{
 		autoreg_host = autoreg_hosts->values[i];
 
@@ -212,7 +211,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, zbx_autoreg_host_compare_func);
 
-	for (i = 0; i < autoreg_hosts->values_num; i++)
+	for (int i = 0; i < autoreg_hosts->values_num; i++)
 	{
 		autoreg_host = autoreg_hosts->values[i];
 
@@ -265,7 +264,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 
 	zbx_vector_autoreg_host_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
 
-	for (i = 0; i < autoreg_hosts->values_num; i++)
+	for (int i = 0; i < autoreg_hosts->values_num; i++)
 	{
 		autoreg_host = autoreg_hosts->values[i];
 
@@ -337,4 +336,3 @@ void	zbx_autoreg_update_host_server(zbx_uint64_t proxyid, const char *host, cons
 	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, zbx_autoreg_host_free_server);
 	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 }
-
