@@ -56,7 +56,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
-					_s('row #%1$d is not unique', $key + 1)
+					_s('each "%1$s" can be used only once', _('Group by'))
 				);
 			}
 			else {
@@ -64,9 +64,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 			}
 
 			if ($attribute == WidgetForm::GROUP_BY_TAG_VALUE && $tag_name === '') {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
-					_s('row #%1$d tag cannot be empty', $key + 1)
-				);
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _s('tag cannot be empty'));
 			}
 		}
 
