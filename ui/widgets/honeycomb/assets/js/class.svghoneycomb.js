@@ -820,19 +820,6 @@ class CSVGHoneycomb {
 					break;
 				}
 
-				if (primary !== null && !this.#config['primary_label'].is_custom_size) {
-					const p_font_size = (container_height - s_height) / primary.lines_count;
-
-					if (p_font_size < font_size_min) {
-						primary.lines_count = Math.max(1, primary.lines_count - 1);
-					}
-					else {
-						primary.font_size = p_font_size;
-					}
-
-					p_height = primary.font_size * primary.lines_count;
-				}
-
 				if (secondary !== null && !this.#config['secondary_label'].is_custom_size) {
 					const s_font_size = (container_height - p_height) / secondary.lines_count;
 
@@ -844,6 +831,19 @@ class CSVGHoneycomb {
 					}
 
 					s_height = secondary.font_size * secondary.lines_count;
+				}
+
+				if (primary !== null && !this.#config['primary_label'].is_custom_size) {
+					const p_font_size = (container_height - s_height) / primary.lines_count;
+
+					if (p_font_size < font_size_min) {
+						primary.lines_count = Math.max(1, primary.lines_count - 1);
+					}
+					else {
+						primary.font_size = p_font_size;
+					}
+
+					p_height = primary.font_size * primary.lines_count;
 				}
 			}
 
