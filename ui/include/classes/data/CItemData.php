@@ -381,6 +381,10 @@ final class CItemData {
 			'zabbix[proxy,<name>,<param>]',
 			'zabbix[proxy,discovery]',
 			'zabbix[proxy_history]',
+			'zabbix[proxy group,<name>,available]',
+			'zabbix[proxy group,<name>,pavailable]',
+			'zabbix[proxy group,<name>,proxies]',
+			'zabbix[proxy group,<name>,state]',
 			'zabbix[queue,<from>,<to>]',
 			'zabbix[rcache,<cache>,<mode>]',
 			'zabbix[requiredperformance]',
@@ -2870,7 +2874,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[proxy,discovery]' => [
-				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON.'),
+				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), state (online/offline) if proxy is monitored by proxy group, proxy_group (proxy group name). Returns JSON.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.discovery'
@@ -2881,6 +2885,34 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.history'
+				]
+			],
+			'zabbix[proxy group,<name>,available]' => [
+				'description' => _('Number of online proxies. Returns integer.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.group'
+				]
+			],
+			'zabbix[proxy group,<name>,pavailable]' => [
+				'description' => _('Percentage of online proxies. Returns float.'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.group'
+				]
+			],
+			'zabbix[proxy group,<name>,proxies]' => [
+				'description' => _('Proxy discovery data matching updated zabbix[proxy,discovery] key. Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.group'
+				]
+			],
+			'zabbix[proxy group,<name>,state]' => [
+				'description' => _('State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.group'
 				]
 			],
 			'zabbix[queue,<from>,<to>]' => [
