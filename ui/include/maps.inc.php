@@ -606,7 +606,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	}
 	unset($monitored_selement_triggers);
 
-	$monitored_hosts = array_filter($hosts, fn ($host) => $host['status'] == HOST_STATUS_MONITORED);
+	$monitored_hosts = array_filter($hosts, function ($host) {
+		return $host['status'] == HOST_STATUS_MONITORED;
+	});
 
 	$triggers = $monitored_hosts
 		? API::Trigger()->get([
@@ -652,7 +654,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$problems_by_trigger[$problem['objectid']][] = $problem;
 	}
 
-	// Assign dirrect hosts, triggers and problems to all sysmap elements. Both the opened and nested maps are procesed.
+	// Assign direct hosts, triggers and problems to all sysmap elements. Both the opened and nested maps are processed.
 	$all_sysmaps = [0 => $sysmap] + $sysmaps_data;
 
 	foreach ($all_sysmaps as &$_sysmap) {
@@ -979,14 +981,14 @@ function countSelementProblems(array $selement): array {
 	return $selement_info;
 }
 
-function countNestedMapSelementProblems(array $selement, array &$sysmaps_data): array {
+function countNestedMapSelementProblems(array $selement, array $sysmaps_data): array {
 	$lookup_sysmapids = [$selement['elements'][0]['sysmapid']];
 	$nested_triggers = [];
 
 	while ($sysmapid = current($lookup_sysmapids)) {
-		foreach ($sysmaps_data[$sysmapid]['selements'] as $selement) {
-			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-				$sysmapid = $selement['elements'][0]['sysmapid'];
+		foreach ($sysmaps_data[$sysmapid]['selements'] as $lookup_sysmap_element) {
+			if ($lookup_sysmap_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+				$sysmapid = $lookup_sysmap_element['elements'][0]['sysmapid'];
 
 				// Avoid lookup of same map being added multiple times.
 				if (!in_array($sysmapid, $lookup_sysmapids)) {
@@ -994,8 +996,8 @@ function countNestedMapSelementProblems(array $selement, array &$sysmaps_data): 
 				}
 			}
 
-			if (array_key_exists('triggers', $selement)) {
-				$nested_triggers += $selement['triggers'];
+			if (array_key_exists('triggers', $lookup_sysmap_element)) {
+				$nested_triggers += $lookup_sysmap_element['triggers'];
 			}
 		}
 
