@@ -426,14 +426,15 @@
 			});
 
 			if (this.graphs.readonly) {
-				$('#itemsTable').find('input').prop('readonly', true);
-				$('z-select', '#itemsTable').prop('disabled', true);
-
 				const size = $('#itemsTable tbody tr.graph-item').length;
 
 				for (let i = 0; i < size; i++) {
-					$('#items_' + i + '_color').removeAttr('onchange');
-					$('#lbl_items_' + i + '_color').removeAttr('onclick');
+					$('#items_' + i + '_color')
+						.removeAttr('onchange')
+						.prop('readonly', true);
+					$('#lbl_items_' + i + '_color')
+						.removeAttr('onclick')
+						.prop('readonly', true);
 				}
 			}
 
