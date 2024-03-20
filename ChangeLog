@@ -1,6 +1,7 @@
 Changes for 7.0.0beta2
 
 New features:
+..F.I...S. [ZBXNEXT-8827] implemented error handling for network discovery rules and added quick links to configuration forms in "Status of discovery" page (Ivo, MVekslers)
 .......PS. [ZBXNEXT-8670] added support of async SNMP to network discovery subsystem (MVekslers)
 A.F.....S. [ZBXNEXT-6876] added multi-factor authentication support for Zabbix UI (akozlovs, epulke, vmaksimovs)
 ...GI..PS. [ZBXNEXT-3623] moved cURL library feature detection from build-time to runtime, increased required built-time cURL library version to 7.19.1 (dimir)
