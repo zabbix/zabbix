@@ -10,17 +10,15 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxtrapper/libzbxtrapper.a \
-	$(top_srcdir)/src/zabbix_server/lld/libzbxlld.a \
-	$(top_srcdir)/src/zabbix_server/ha/libzbxha.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_srcdir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
-	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
-	$(top_srcdir)/src/libs/zbxversion/libzbxversion.a \
 	$(top_srcdir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_srcdir)/src/libs/zbxstats/libzbxstats.a \
-	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
+	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
+	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
+	$(top_srcdir)/src/libs/zbxversion/libzbxversion.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \

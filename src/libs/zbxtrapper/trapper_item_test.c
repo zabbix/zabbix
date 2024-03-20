@@ -36,11 +36,10 @@
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-//#include "trapper_auth.h"
 #include "zbxpreproc.h"
 #include "zbxpreprocbase.h"
-#include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxvariant.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 
@@ -157,21 +156,21 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
  *                                                                            *
  * Purpose: parses preprocessing test request                                 *
  *                                                                            *
- * Parameters: jp_item      - [IN] item object of the request                 *
- *             jp_options   - [IN] options object of the request              *
- *             jp_steps     - [IN] steps object of the request                *
+ * Parameters: jp_item      - [IN] item object of request                     *
+ *             jp_options   - [IN] options object of request                  *
+ *             jp_steps     - [IN] steps object of request                    *
  *             value        - [IN] item value for preprocessing               *
- *             value_size   - [IN] size of the item value for preprocessing   *
- *             state        - [IN] the item state                             *
- *             values       - [OUT] the values to test optional               *
+ *             value_size   - [IN] size of item value for preprocessing       *
+ *             state        - [IN] item state                                 *
+ *             values       - [OUT] values to test optional                   *
  *                                  (history + current)                       *
  *             ts           - [OUT] value timestamps                          *
- *             values_num   - [OUT] the number of values                      *
- *             value_type   - [OUT] the value type                            *
- *             steps        - [OUT] the preprocessing steps                   *
+ *             values_num   - [OUT]                                           *
+ *             value_type   - [OUT]                                           *
+ *             steps        - [OUT] preprocessing steps                       *
  *             single       - [OUT] is preproc step single                    *
- *             bypass_first - [OUT] the flag to bypass first step             *
- *             error        - [OUT] the error message                         *
+ *             bypass_first - [OUT] flag to bypass first step                 *
+ *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: SUCCEED - the request was parsed successfully                *
  *               FAIL    - otherwise                                          *
@@ -717,10 +716,17 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			&item.host.maintenance_status);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
 			&item.host.maintenance_type);
+
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
-		item.host.ipmi_authtype = (char)atoi(tmp);
+	{
+		item.host.ipmi_authtype = (signed char)atoi(tmp);
+	}
 	else
-		item.host.ipmi_authtype = (char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+	{
+		item.host.ipmi_authtype =
+				(signed char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+	}
+
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
 			&item.host.ipmi_privilege);
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
@@ -855,7 +861,7 @@ out:
 }
 
 static int	try_find_preproc_value(const struct zbx_json_parse *jp_first, const char *name_first,
-		const struct zbx_json_parse *jp_second, char *name_second, char **value, size_t *value_size)
+		const struct zbx_json_parse *jp_second, const char *name_second, char **value, size_t *value_size)
 {
 	int ret = zbx_json_value_by_name_dyn(jp_first, name_first, value, value_size, NULL);
 
@@ -921,11 +927,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 				ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size);
 	}
 
-	if (FAIL != value_found) {
-		goto preproc_test;
-	}
-	else
-	{
+	if (FAIL == value_found) {
 		// Get value from host is not checked, yet no value was provided
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_KEY, &key, &key_size, NULL))
 		{
@@ -935,6 +937,8 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 
 		zbx_free(key);
 	}
+	else
+		goto preproc_test;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);

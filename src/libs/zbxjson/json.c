@@ -251,7 +251,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 		}
 
 		if (NULL != cutoff)
-			*cutoff = (str_cutoff - string) - 1;
+			*cutoff = (size_t)((str_cutoff - string) - 1);
 	}
 
 	return (NULL != str_cutoff) ? len_cutoff : len;
@@ -403,7 +403,7 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 	*p++ = object ? '{' : '[';
 	*p = object ? '}' : ']';
 
-	j->buffer_offset = p - j->buffer;
+	j->buffer_offset = (size_t)(p - j->buffer);
 	j->buffer_size += len;
 	j->level++;
 	j->status = ZBX_JSON_EMPTY;
@@ -456,7 +456,7 @@ size_t	zbx_json_addstring_limit( struct zbx_json *j, const char *name, const cha
 	}
 	p = __zbx_json_insstring_limit(p, string, type, str_len);
 
-	j->buffer_offset = p - j->buffer;
+	j->buffer_offset = (size_t)(p - j->buffer);
 	j->buffer_size += len;
 	j->status = ZBX_JSON_COMMA;
 
@@ -507,7 +507,7 @@ void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data)
 	memcpy(p, data, len_data);
 	p += len_data;
 
-	j->buffer_offset = p - j->buffer;
+	j->buffer_offset = (size_t)(p - j->buffer);
 	j->buffer_size += len;
 	j->status = ZBX_JSON_COMMA;
 }
