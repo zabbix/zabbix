@@ -1139,17 +1139,11 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		$this->page->login()
-				->open('zabbix.php?action=dashboard.view&dashboardid='.self::$display_dashboard_id)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget($data['widget_name']);
+		$this->page->login()->
+				open('zabbix.php?action=dashboard.view&dashboardid='.self::$display_dashboard_id)->waitUntilReady();
+		$widget = CDashboardElement::find()->one()->getWidget($data['widget_name']);
 
-		// Only look sectors up if checking sectors at all.
-		if (CTestArrayHelper::get($data, 'expected_sectors')) {
-			$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
-		}
-
-		// Wait for the sector animation to end before clicking to increase test stability.
+		// Wait for the sector animation to end.
 		sleep(1);
 
 		// Assert Pie chart sectors.
