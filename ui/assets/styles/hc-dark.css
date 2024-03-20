@@ -3085,6 +3085,10 @@ output {
   font-style: italic;
   padding-left: 0.2em;
   padding-right: 0.2em; }
+.navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info {
+  cursor: pointer; }
+  .navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info .navigation-tree-node-info-name {
+    color: #f8f8f8; }
 .navigation-tree .navigation-tree-node-info-problems {
   display: flex; }
 

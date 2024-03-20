@@ -110,6 +110,16 @@
 		}
 	}
 
+	.navigation-tree-node:not(.navigation-tree-node-is-group) {
+		> .navigation-tree-node-info {
+			cursor: pointer;
+
+			.navigation-tree-node-info-name {
+				color: $link-color;
+			}
+		}
+	}
+
 	.navigation-tree-node-info-problems {
 		display: flex;
 	}

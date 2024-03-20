@@ -109,7 +109,7 @@ class CNavigationTree {
 
 		this.#tree_elements = {
 			nodes: [],
-			item_names: [],
+			items: [],
 			arrows: []
 		};
 
@@ -216,6 +216,8 @@ class CNavigationTree {
 		}
 		else {
 			container.dataset.id = node.id;
+
+			this.#tree_elements.items.push(info);
 		}
 
 		return container;
@@ -268,19 +270,13 @@ class CNavigationTree {
 	 * @returns {HTMLElement}
 	 */
 	#createName(node) {
-		let name;
+		const name = document.createElement('span');
 
 		if (node.children?.length > 0) {
-			name = document.createElement('span');
-
 			this.#setGroupHint(name, node);
 		}
 		else {
-			name = document.createElement('a');
-			name.href = '#';
 			name.title = node.name;
-
-			this.#tree_elements.item_names.push(name);
 		}
 
 		name.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_NAME);
@@ -450,7 +446,9 @@ class CNavigationTree {
 	#registerEvents() {
 		this.#events = {
 			itemSelect: (e) => {
-				e.preventDefault();
+				if (e.target.closest('[data-hintbox="1"]') !== null) {
+					return;
+				}
 
 				const selected_node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
 				const selected_id = selected_node.dataset.id;
@@ -512,8 +510,8 @@ class CNavigationTree {
 	 * Activate events of navigation tree.
 	 */
 	#activateEvents() {
-		for (const item_name of this.#tree_elements.item_names) {
-			item_name.addEventListener('click', this.#events.itemSelect);
+		for (const item of this.#tree_elements.items) {
+			item.addEventListener('click', this.#events.itemSelect);
 		}
 
 		for (const arrow of this.#tree_elements.arrows) {
