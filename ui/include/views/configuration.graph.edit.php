@@ -393,7 +393,7 @@ $items_table = (new CTable())
 			))
 				->addClass('table-col-y-axis-side')
 			: null,
-		(new CTableColumn(_('Color')))->addClass('table-col-colour'),
+		(new CTableColumn(_('Color')))->addClass('table-col-color'),
 		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
