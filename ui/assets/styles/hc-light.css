@@ -4127,9 +4127,6 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
 div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   background-color: transparent; }
 
-form.dashboard-widget-hostnavigator #tags_table_host_tags .form_row td:nth-child(3) input[type="text"] {
-  width: 159px !important; }
-
 div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
   display: flex;
   justify-content: flex-end;
