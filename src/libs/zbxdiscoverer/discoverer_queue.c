@@ -19,6 +19,8 @@
 
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
+#include "zbx_discoverer_constants.h"
+#include "discoverer_int.h"
 
 #define DISCOVERER_QUEUE_INIT_NONE	0x00
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01
@@ -82,7 +84,7 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: pops job from job queue                                           *
+ * Purpose: pops job from job queue and count control of snmpv3 workers       *
  *                                                                            *
  * Parameters: queue - [IN]                                                   *
  *                                                                            *
@@ -92,12 +94,52 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  ******************************************************************************/
 zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 {
-	void	*job;
+	zbx_discoverer_job_t	*job = NULL;
+	zbx_discoverer_task_t	*task;
+	zbx_vector_uint64_t	ids;
 
-	if (SUCCEED == zbx_list_pop(&queue->jobs, &job))
-		return (zbx_discoverer_job_t*)job;
+	zbx_vector_uint64_create(&ids);
 
-	return NULL;
+	while (SUCCEED == zbx_list_pop(&queue->jobs, (void*)&job))
+	{
+		if (SUCCEED != zbx_list_peek(&job->tasks, (void*)&task))
+			break;
+
+		if (SVC_SNMPv3 != GET_DTYPE(task))
+			break;
+
+		if (0 != queue->snmpv3_allowed_workers)
+		{
+			queue->snmpv3_allowed_workers--;
+			break;
+		}
+
+		if (job->tasks.head == job->tasks.tail)	/* just one snmpv3 task in the list */
+		{
+			zbx_uint64_t	id = job->druleid;
+
+			discoverer_queue_push(queue, job);
+			job = NULL;
+
+			if (queue->jobs.head == queue->jobs.tail)	/* just one snmpv3 job in the list */
+				break;
+
+			if (FAIL != zbx_vector_uint64_search(&ids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				break;
+
+			zbx_vector_uint64_append(&ids, id);
+			continue;
+		}
+
+		(void)zbx_list_pop(&job->tasks, (void*)&task);
+		(void)zbx_list_append(&job->tasks, (void*)task, NULL);
+
+		break;
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return job;
 }
 
 /******************************************************************************
@@ -141,6 +183,10 @@ void	discoverer_queue_destroy(zbx_discoverer_queue_t *queue)
 
 	discoverer_queue_clear_jobs(&queue->jobs);
 	zbx_list_destroy(&queue->jobs);
+
+	zbx_vector_uint64_destroy(&queue->del_jobs);
+	zbx_vector_discoverer_drule_error_clear_ext(&queue->errors, zbx_discoverer_drule_error_free);
+	zbx_vector_discoverer_drule_error_destroy(&queue->errors);
 
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 }
@@ -197,13 +243,18 @@ int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error)
+int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_workers, int checks_per_worker_max,
+		char **error)
 {
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
 	queue->pending_checks_count = 0;
+	queue->snmpv3_allowed_workers = snmpv3_allowed_workers;
+	queue->checks_per_worker_max = checks_per_worker_max;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
+	zbx_vector_discoverer_drule_error_create(&queue->errors);
+	zbx_vector_uint64_create(&queue->del_jobs);
 
 	zbx_list_create(&queue->jobs);
 
@@ -229,4 +280,26 @@ out:
 		discoverer_queue_destroy(queue);
 
 	return ret;
+}
+
+void	discoverer_queue_append_error(zbx_vector_discoverer_drule_error_t *errors, zbx_uint64_t druleid,
+		const char *error)
+{
+	zbx_discoverer_drule_error_t	*derror_ptr, derror = {.druleid = druleid};
+	int				i;
+
+	if (FAIL == (i = zbx_vector_discoverer_drule_error_search(errors, derror,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		derror.error = zbx_strdup(NULL, error);
+		zbx_vector_discoverer_drule_error_append(errors, derror);
+		return;
+	}
+
+	derror_ptr = &errors->values[i];
+
+	if (NULL != strstr(derror_ptr->error, error))
+		return;
+
+	derror_ptr->error = zbx_dsprintf(derror_ptr->error, "%s\n%s", derror_ptr->error, error);
 }

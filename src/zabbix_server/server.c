@@ -1480,8 +1480,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_zbx_program_type, get_zbx_progname,
 							zbx_config_timeout, CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 							zbx_config_source_ip, &events_cbs, zbx_discovery_open_server,
-							zbx_discovery_close_server, zbx_discovery_update_host_server,
-							zbx_discovery_update_service_server};
+							zbx_discovery_close_server, zbx_discovery_find_host_server,
+							zbx_discovery_update_host_server,
+							zbx_discovery_update_service_server,
+							zbx_discovery_update_service_down_server,
+							zbx_discovery_update_drule_server};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, zbx_config_source_ip,
 							zbx_config_webservice_url};

@@ -22,6 +22,7 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxvariant.h"
+#include "zbx_discoverer_constants.h"
 
 #define ZBX_EXPRESSION_NORMAL		0
 #define ZBX_EXPRESSION_AGGREGATE	1
@@ -188,4 +189,5 @@ void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, cha
 
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #endif
