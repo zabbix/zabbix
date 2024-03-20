@@ -33,10 +33,7 @@ class Widget extends CWidget {
 		return [
 			'class.widget.js' => [
 				'Actions' => _('Actions'),
-				'Download image' => _('Download image'),
-				'Invalid parameter "%1$s": %2$s.' => _('Invalid parameter "%1$s": %2$s.'),
-				'Time period' => _('Time period'),
-				'empty data received' => _('empty data received')
+				'Download image' => _('Download image')
 			]
 		];
 	}

@@ -28,14 +28,4 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Graph prototype');
 	}
-
-	public function getTranslationStrings(): array {
-		return [
-			'class.widget.js' => [
-				'Invalid parameter "%1$s": %2$s.' => _('Invalid parameter "%1$s": %2$s.'),
-				'Time period' => _('Time period'),
-				'empty data received' => _('empty data received')
-			]
-		];
-	}
 }
