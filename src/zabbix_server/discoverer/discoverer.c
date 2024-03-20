@@ -859,7 +859,7 @@ zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const z
 	result->druleid = druleid;
 	result->unique_dcheckid = unique_dcheckid;
 	result->ip = result->dnsname = NULL;
-	result->now = (int)time(NULL);
+	result->now = time(NULL);
 	result->processed_checks_per_ip = 0;
 
 	return result;
@@ -876,7 +876,7 @@ static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_d
 
 		zbx_vector_discoverer_services_ptr_create(&dst->services);
 		dst->ip = zbx_strdup(NULL, ip);
-		dst->now = (int)time(NULL);
+		dst->now = time(NULL);
 		dst->unique_dcheckid = unique_dcheckid;
 		dst->dnsname = zbx_strdup(NULL, "");
 	}
