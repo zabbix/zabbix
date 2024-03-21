@@ -54,7 +54,7 @@
 #include "zbxexport.h"
 #include "zbxself.h"
 
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxpinger.h"
 #include "zbxtrapper.h"
 #include "zbxdbupgrade.h"

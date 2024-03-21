@@ -25,7 +25,7 @@
 #include "zbxtasks.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxtypes.h"
 #include "zbxvault.h"

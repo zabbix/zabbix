@@ -22,7 +22,7 @@
 #include "../agent_conf/agent_conf.h"
 #include "../logfiles/logfiles.h"
 
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"

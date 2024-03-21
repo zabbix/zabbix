@@ -21,7 +21,7 @@
 #include "persistent_state.h"
 
 #include "zbxsysinfo.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxnum.h"

@@ -22,7 +22,7 @@
 
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 
 void	zbx_mock_test_entry(void **state)
 {

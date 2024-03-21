@@ -25,7 +25,7 @@
 #include "zbxhash.h"
 #include "zbxcomms.h"
 #include "zbxregexp.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 
 #define ZBX_MD5_PRINT_BUF_LEN	((ZBX_MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
 
