@@ -87,7 +87,7 @@ $form
 					)
 				],
 				[
-					new CLabel(_('Create enabled'), 'enabled'),
+					new CLabel(_('Create enabled'), 'active'),
 					new CFormField(
 						(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
 							->setChecked($data['active'] == MEDIA_STATUS_ACTIVE)
