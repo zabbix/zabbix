@@ -266,8 +266,8 @@ $item_tab
 			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 			->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 			->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-			->setEnabled(!$data['limited'])
-			->setModern(true)
+			->setReadonly($data['limited'])
+			->setModern()
 		))->setId('js-item-post-type-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT Request body to form list.
@@ -347,8 +347,8 @@ $item_tab
 			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-			->setEnabled(!($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD))
-			->setModern(true)
+			->setReadonly($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD)
+			->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT HTTP proxy to form list.
@@ -629,7 +629,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 	$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
 		->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 		->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
-		->setModern(true);
+		->setModern();
 
 	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))

@@ -123,6 +123,14 @@ class CRadioButtonList extends CList {
 			$this->addClass($this->orientation === self::ORIENTATION_HORIZONTAL ? ZBX_STYLE_HOR_LIST : null);
 		}
 
+		if ($this->readonly) {
+			$this->addItem(
+				(new CVar($this->name, $this->value))
+					->setEnabled($this->enabled)
+					->removeId()
+			);
+		}
+
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
