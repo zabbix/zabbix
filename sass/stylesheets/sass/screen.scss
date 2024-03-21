@@ -1128,6 +1128,12 @@ select {
 				background-color: $form-border-color !important;
 			}
 		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				background-color: $btn-bg-color !important;
+			}
+		}
 	}
 
 	&:focus + label span {

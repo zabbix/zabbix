@@ -5283,6 +5283,8 @@ select {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #888888 !important; }
+  .checkbox-radio[type="radio"]:checked[readonly] + label span::after {
+    background-color: #555555 !important; }
   .checkbox-radio:focus + label span {
     border-color: #000000; }
   .checkbox-radio:checked[disabled] + label span {

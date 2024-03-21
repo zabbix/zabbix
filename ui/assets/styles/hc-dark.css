@@ -5286,6 +5286,8 @@ select {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #666666 !important; }
+  .checkbox-radio[type="radio"]:checked[readonly] + label span::after {
+    background-color: #e0e0e0 !important; }
   .checkbox-radio:focus + label span {
     border-color: #bbbbbb; }
   .checkbox-radio:checked[disabled] + label span {
