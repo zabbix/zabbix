@@ -752,7 +752,7 @@ class testUserDirectory extends CAPITest {
 
 	/**
 	 * Test userdirectory provision_media userdirectory_mediaid field changes.
-	 * For update operation value of userdirectory_mediaid should stay unchanged.
+	 * For userdirectory.update operation value of provisioned media userdirectory_mediaid should stay unchanged.
 	 */
 	public function testProvisionMediaUpdateFieldUserdirectoryMediaId() {
 		$userdirectory = [
@@ -803,11 +803,69 @@ class testUserDirectory extends CAPITest {
 		$db_userdirectory = reset($db_userdirectory['result']);
 		$db_media_updated = array_column($db_userdirectory['provision_media'], 'userdirectory_mediaid', 'name');
 
+		// Deleting test data.
+		$this->call('userdirectory.delete', [$userdirectoryid]);
+
 		$this->assertTrue($db_media['Media #1'] === $db_media_updated['Media #1'], 'Property userdirectory_mediaid should not change after update operation if where passed');
 		$this->assertTrue($db_media['Media #2'] !== $db_media_updated['Media #2'], 'Property userdirectory_mediaid should change after update operation if where not passed');
+	}
+
+	/**
+	 * Test provision media update only sent fields when userdirectory_mediaid is sent.
+	 */
+	public function testProvisionMediaFieldsUpdate() {
+		$userdirectory = [
+			'name' => 'Validate provision media mapping update',
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap.forumsys.com',
+			'port' => 389,
+			'base_dn' => 'dc=example,dc=com',
+			'search_attribute' => 'uid',
+			'provision_status' => JIT_PROVISIONING_ENABLED,
+			'provision_groups' => [
+				['name' => 'zabbix-devs', 'roleid' => 1, 'user_groups' => [['usrgrpid' => 7]]]
+			],
+			'provision_media' => [
+				['name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1', 'active' => 0],
+				['name' => 'Media #2', 'mediatypeid' => 1, 'attribute' => 'attr_media2', 'period' => '{$A}']
+			]
+		];
+		$input = self::resolveIds([$userdirectory]);
+
+		// Create test userdirectory.
+		['result' => $result] = $this->call('userdirectory.create', $input);
+		$userdirectoryid = reset($result['userdirectoryids']);
+
+		// Get created provision media before update operation.
+		$db_userdirectory = $this->call('userdirectory.get', [
+			'output' => [],
+			'selectProvisionMedia' => API_OUTPUT_EXTEND,
+			'userdirectoryids' => [$userdirectoryid]
+		]);
+		$db_userdirectory = reset($db_userdirectory['result']);
+		$provision_medias = [];
+		$db_provision_medias = $db_userdirectory['provision_media'];
+
+		foreach ($db_provision_medias as $db_provision_media) {
+			$provision_medias[] = ['userdirectory_mediaid' => $db_provision_media['userdirectory_mediaid']];
+		}
+
+		// Update using only userdirectory_mediaid, fields should not be changed
+		$this->call('userdirectory.update', [
+			'userdirectoryid' => $userdirectoryid,
+			'provision_media' => $provision_medias
+		]);
+		$db_userdirectory = $this->call('userdirectory.get', [
+			'output' => [],
+			'selectProvisionMedia' => API_OUTPUT_EXTEND,
+			'userdirectoryids' => [$userdirectoryid]
+		]);
+		$db_userdirectory = reset($db_userdirectory['result']);
 
 		// Deleting test data.
 		$this->call('userdirectory.delete', [$userdirectoryid]);
+
+		$this->assertSame($db_provision_medias, $db_userdirectory['provision_media']);
 	}
 
 	public static function deleteValidDataProvider() {

@@ -1316,19 +1316,19 @@ class CUserDirectory extends CApiService {
 			return;
 		}
 
-		$db_provision_media = array_column($db_userdirectory['provision_media'], null, 'userdirectory_mediaid');
+		$db_provision_medias = array_column($db_userdirectory['provision_media'], null, 'userdirectory_mediaid');
 
 		foreach ($userdirectory['provision_media'] as $i => &$provision_media) {
 			$is_update = array_key_exists('userdirectory_mediaid', $provision_media);
 
 			if ($is_update) {
-				if (!array_key_exists($provision_media['userdirectory_mediaid'], $db_provision_media)) {
+				if (!array_key_exists($provision_media['userdirectory_mediaid'], $db_provision_medias)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/'.($i + 1),
 						_('referred object does not exist')
 					));
 				}
 
-				$db_provision_media = $db_provision_media[$provision_media['userdirectory_mediaid']];
+				$db_provision_media = $db_provision_medias[$provision_media['userdirectory_mediaid']];
 				$provision_media += array_intersect_key($db_provision_media, array_flip(['mediatypeid', 'attribute']));
 			}
 
