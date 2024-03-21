@@ -232,12 +232,12 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_library_cfg(ZBX_PROGRAM_TYPE_SERVER, cfg_file);
 
-	parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{
 		if (ZBX_MOCK_SUCCESS == error)
-			fail_msg("parse_cfg_file() was expected to call exit(%d), but has not.", exit_code);
+			fail_msg("zbx_parse_cfg_file() was expected to call exit(%d), but has not.", exit_code);
 		else
 			fail_msg("Cannot get exit code from test case data: %s", zbx_mock_error_string(error));
 	}

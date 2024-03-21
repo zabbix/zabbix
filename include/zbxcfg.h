@@ -74,7 +74,7 @@ void	zbx_addr_free(zbx_addr_t *addr);
 
 void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
+int	zbx_parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
 
 int	check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature);

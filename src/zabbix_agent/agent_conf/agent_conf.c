@@ -232,7 +232,7 @@ static int	load_config_user_params(const char *config_file, char **config_user_p
 		{NULL}
 	};
 
-	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
+	return zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
 void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,

@@ -624,7 +624,7 @@ void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 	main_cfg_file = cfg_file;
 }
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
+int	zbx_parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
 }
