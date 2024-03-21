@@ -286,6 +286,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	zbx_vector_uint64_t	dserviceids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&dserviceids);
 
 	for (i = 0; i < services->values_num; i++)
