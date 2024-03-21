@@ -122,6 +122,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwinservice\service.o \
 	..\..\..\src\zabbix_agent\active_checks\active_checks.o \
+	..\..\..\src\zabbix_agent\metrics\metrics.o \
 	..\..\..\src\zabbix_agent\eventlog\eventlog.o \
 	..\..\..\src\zabbix_agent\eventlog\process_eventslog.o \
 	..\..\..\src\zabbix_agent\eventlog\process_eventslog6.o \
