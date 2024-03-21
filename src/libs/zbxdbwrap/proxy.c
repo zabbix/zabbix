@@ -1717,13 +1717,13 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
-				"status", "dcheckid", "dns", (char *)NULL);
+				"status", "dcheckid", "dns", "error", (char *)NULL);
 
 		for (i = *processed_num; i < services->values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (int)service->itemtime, drule.druleid, ip,
 					service->port, service->value, service->status, service->dcheckid,
-					service->dns);
+					service->dns, "");
 		}
 
 		zbx_db_insert_autoincrement(&db_insert, "id");

@@ -302,8 +302,8 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
-		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
-				"dcheckid", "dns", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
+				"status", "dcheckid", "dns", "error", (char *)NULL);
 
 		do
 		{
@@ -500,7 +500,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 	else
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
-				"value", "status", "dcheckid", "dns", (char *)NULL);
+				"value", "status", "dcheckid", "dns", "error", (char *)NULL);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
