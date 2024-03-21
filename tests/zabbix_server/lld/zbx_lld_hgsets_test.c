@@ -24,6 +24,8 @@
 #include "zbxmockdb.h"
 #include "zbxcommon.h"
 
+#include "zbxalgo.h"
+
 #include "../../../src/zabbix_server/lld/lld_host.c"
 
 static void	host_free(zbx_lld_host_t *host)

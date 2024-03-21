@@ -83,6 +83,6 @@ void	zbx_init_library_mt_snmp(const char *progname);
 
 void	zbx_shutdown_library_mt_snmp(const char *progname);
 
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname);
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 
 #endif /* ZABBIX_ZBX_POLLER_H*/

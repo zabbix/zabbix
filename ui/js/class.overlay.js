@@ -32,7 +32,7 @@
 function Overlay(type, dialogueid) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
-	this.headerid = 'dashboard-widget-head-title-' + this.dialogueid;
+	this.headerid =  'overlay-dialogue-header-title-' + this.dialogueid;
 	this.$backdrop = jQuery('<div>', {
 		'class': 'overlay-bg',
 		'data-dialogueid': this.dialogueid
@@ -57,7 +57,7 @@ function Overlay(type, dialogueid) {
 	}.bind(this));
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
-	this.$dialogue.$head = jQuery('<div>', {class: 'dashboard-widget-head'});
+	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});

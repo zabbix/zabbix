@@ -1404,7 +1404,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 			{
 				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
 				{
-					zbx_clear_cache_snmp(process_type, process_num, trapper_args_in->progname);
+					zbx_clear_cache_snmp(process_type, process_num);
 					snmp_reload = 1;
 				}
 				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
