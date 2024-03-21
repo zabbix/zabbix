@@ -40,6 +40,6 @@ typedef struct
 }
 zbx_thread_dbconfig_worker_args;
 
-ZBX_THREAD_ENTRY(dbconfig_worker_thread, args);
+ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args);
 
 #endif /* ZABBIX_DBCONFIG_WORKER_H */

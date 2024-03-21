@@ -95,14 +95,14 @@ clean:
  * Purpose: processes new item values                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
+static void	process_values(icmpitem_t *items, int first_index, int last_index, zbx_fping_host_t *hosts,
 		int hosts_count, zbx_timespec_t *ts, int ping_result, char *error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (int h = 0; h < hosts_count; h++)
 	{
-		const ZBX_FPING_HOST	*host = &hosts[h];
+		const zbx_fping_host_t	*host = &hosts[h];
 
 		if (NOTSUPPORTED == ping_result)
 		{
@@ -498,9 +498,9 @@ static void	free_hosts(icmpitem_t **items, int *items_count)
 	*items_count = 0;
 }
 
-static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts_count, char *addr)
+static void	add_pinger_host(zbx_fping_host_t **hosts, int *hosts_alloc, int *hosts_count, char *addr)
 {
-	ZBX_FPING_HOST	*h;
+	zbx_fping_host_t	*h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
 
@@ -517,12 +517,12 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 		size_t	sz;
 
 		*hosts_alloc += 4;
-		sz = *hosts_alloc * sizeof(ZBX_FPING_HOST);
-		*hosts = (ZBX_FPING_HOST *)zbx_realloc(*hosts, sz);
+		sz = *hosts_alloc * sizeof(zbx_fping_host_t);
+		*hosts = (zbx_fping_host_t *)zbx_realloc(*hosts, sz);
 	}
 
 	h = &(*hosts)[*hosts_count - 1];
-	memset(h, 0, sizeof(ZBX_FPING_HOST));
+	memset(h, 0, sizeof(zbx_fping_host_t));
 	h->addr = addr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -532,7 +532,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 {
 	int			ping_result, first_index = 0;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
-	static ZBX_FPING_HOST	*hosts = NULL;
+	static zbx_fping_host_t	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;
 	zbx_timespec_t		ts;
@@ -540,7 +540,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == hosts)
-		hosts = (ZBX_FPING_HOST *)zbx_malloc(hosts, sizeof(ZBX_FPING_HOST) * hosts_alloc);
+		hosts = (zbx_fping_host_t *)zbx_malloc(hosts, sizeof(zbx_fping_host_t) * hosts_alloc);
 
 	for (int i = 0; i < items_count && ZBX_IS_RUNNING(); i++)
 	{
@@ -577,7 +577,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(pinger_thread, args)
+ZBX_THREAD_ENTRY(zbx_pinger_thread, args)
 {
 	int			nextcheck, sleeptime, itc, items_count = 0,
 				server_num = ((zbx_thread_args_t *)args)->info.server_num,

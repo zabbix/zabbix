@@ -24,6 +24,13 @@
 #include "zbxcommshigh.h"
 #include "zbxrtc.h"
 #include "zbx_host_constants.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 /*
  * The configuration sync is split into 4 parts for each table:

@@ -23,7 +23,6 @@
 #include "../events/events.h"
 #include "../actions/actions.h"
 
-#include "zbxservice.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
