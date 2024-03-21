@@ -22,12 +22,12 @@
 
 #include "zbxalgo.h"
 
-#define	TYPE_INT		0
-#define	TYPE_STRING		1
-#define	TYPE_MULTISTRING	2
-#define	TYPE_UINT64		3
-#define	TYPE_STRING_LIST	4
-#define	TYPE_CUSTOM		5
+#define	ZBX_CFG_TYPE_INT		0
+#define	ZBX_CFG_TYPE_STRING		1
+#define	ZBX_CFG_TYPE_MULTISTRING	2
+#define	ZBX_CFG_TYPE_UINT64		3
+#define	ZBX_CFG_TYPE_STRING_LIST	4
+#define	ZBX_CFG_TYPE_CUSTOM		5
 
 #define	ZBX_CONF_PARM_OPT	0
 #define	ZBX_CONF_PARM_MAND	1

@@ -510,7 +510,7 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 
 				switch (cfg[i].type)
 				{
-					case TYPE_INT:
+					case ZBX_CFG_TYPE_INT:
 						if (FAIL == zbx_str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
@@ -519,17 +519,17 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 
 						*((int *)cfg[i].variable) = (int)var;
 						break;
-					case TYPE_STRING_LIST:
+					case ZBX_CFG_TYPE_STRING_LIST:
 						zbx_trim_str_list(value, ',');
 						ZBX_FALLTHROUGH;
-					case TYPE_STRING:
+					case ZBX_CFG_TYPE_STRING:
 						*((char **)cfg[i].variable) =
 								zbx_strdup(*((char **)cfg[i].variable), value);
 						break;
-					case TYPE_MULTISTRING:
+					case ZBX_CFG_TYPE_MULTISTRING:
 						zbx_strarr_add((char ***)cfg[i].variable, value);
 						break;
-					case TYPE_UINT64:
+					case ZBX_CFG_TYPE_UINT64:
 						if (FAIL == zbx_str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
@@ -538,11 +538,12 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 
 						*((zbx_uint64_t *)cfg[i].variable) = var;
 						break;
-					case TYPE_CUSTOM:
+					case ZBX_CFG_TYPE_CUSTOM:
 						if (NULL != cfg[i].variable)
 						{
 							zbx_cfg_custom_parameter_parser_t	*p =
-									(zbx_cfg_custom_parameter_parser_t*)cfg[i].variable;
+									(zbx_cfg_custom_parameter_parser_t*)
+									cfg[i].variable;
 
 							if (SUCCEED != p->cfg_custom_parameter_parser_func(value,
 									&cfg[i]))
@@ -574,12 +575,12 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 
 		switch (cfg[i].type)
 		{
-			case TYPE_INT:
+			case ZBX_CFG_TYPE_INT:
 				if (0 == *((int *)cfg[i].variable))
 					goto missing_mandatory;
 				break;
-			case TYPE_STRING:
-			case TYPE_STRING_LIST:
+			case ZBX_CFG_TYPE_STRING:
+			case ZBX_CFG_TYPE_STRING_LIST:
 				if (NULL == (*(char **)cfg[i].variable))
 					goto missing_mandatory;
 				break;

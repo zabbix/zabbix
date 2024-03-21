@@ -138,7 +138,7 @@ void	zbx_mock_test_entry(void **state)
 			else
 				break;
 
-			cfg[parameter_count].type = TYPE_UINT64;	/* no separate treatment for TYPE_INT */
+			cfg[parameter_count].type = ZBX_CFG_TYPE_UINT64;	/* no separate treatment for ZBX_CFG_TYPE_INT */
 		}
 		else if (0 == strcmp(tmp, "string"))
 		{
@@ -158,7 +158,7 @@ void	zbx_mock_test_entry(void **state)
 			*(char **)cfg[parameter_count].variable = NULL;
 			cfg[parameter_count].min = 0;
 			cfg[parameter_count].max = 0;
-			cfg[parameter_count].type = TYPE_STRING;
+			cfg[parameter_count].type = ZBX_CFG_TYPE_STRING;
 		}
 		else if (0 == strcmp(tmp, "string list"))
 		{
@@ -178,7 +178,7 @@ void	zbx_mock_test_entry(void **state)
 			*(char **)cfg[parameter_count].variable = NULL;
 			cfg[parameter_count].min = 0;
 			cfg[parameter_count].max = 0;
-			cfg[parameter_count].type = TYPE_STRING_LIST;
+			cfg[parameter_count].type = ZBX_CFG_TYPE_STRING_LIST;
 		}
 		else if (0 == strcmp(tmp, "multi string"))
 		{
@@ -199,7 +199,7 @@ void	zbx_mock_test_entry(void **state)
 			zbx_strarr_init((char ***)cfg[parameter_count].variable);
 			cfg[parameter_count].min = 0;
 			cfg[parameter_count].max = 0;
-			cfg[parameter_count].type = TYPE_MULTISTRING;
+			cfg[parameter_count].type = ZBX_CFG_TYPE_MULTISTRING;
 		}
 		else
 			fail_msg("Invalid type \"%s\" of parameter #%d.", tmp, parameter_count + 1);
@@ -246,7 +246,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		switch (cfg[i].type)
 		{
-			case TYPE_MULTISTRING:
+			case ZBX_CFG_TYPE_MULTISTRING:
 				multi_string = *(const char ***)cfg[i].variable;
 				while (ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(
 						*(zbx_mock_handle_t *)expected_values[i], &handle)) &&
@@ -278,7 +278,7 @@ void	zbx_mock_test_entry(void **state)
 							" (and maybe more).", cfg[i].parameter, *multi_string);
 				}
 				break;
-			case TYPE_STRING_LIST:
+			case ZBX_CFG_TYPE_STRING_LIST:
 				string_list = *(const char **)cfg[i].variable;
 				while (ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(
 						*(zbx_mock_handle_t *)expected_values[i], &handle)) &&
@@ -322,7 +322,7 @@ void	zbx_mock_test_entry(void **state)
 							cfg[i].parameter, string_list);
 				}
 				break;
-			case TYPE_STRING:
+			case ZBX_CFG_TYPE_STRING:
 				if (NULL == *(char **)cfg[i].variable && NULL != *(char **)expected_values[i])
 				{
 					fail_msg("No value of string parameter \"%s\" while expected \"%s\".",
@@ -341,7 +341,7 @@ void	zbx_mock_test_entry(void **state)
 							*(char **)expected_values[i]);
 				}
 				break;
-			case TYPE_UINT64:
+			case ZBX_CFG_TYPE_UINT64:
 				if (*(zbx_uint64_t *)cfg[i].variable != *(zbx_uint64_t *)expected_values[i])
 				{
 					fail_msg("Value " ZBX_FS_UI64 " of numeric parameter \"%s\""
@@ -359,18 +359,18 @@ void	zbx_mock_test_entry(void **state)
 	{
 		switch (cfg[i].type)
 		{
-			case TYPE_MULTISTRING:
+			case ZBX_CFG_TYPE_MULTISTRING:
 				zbx_strarr_free((char ***)cfg[i].variable);
 				zbx_free(cfg[i].variable);
 				zbx_free(expected_values[i]);
 				break;
-			case TYPE_STRING_LIST:
-			case TYPE_STRING:
+			case ZBX_CFG_TYPE_STRING_LIST:
+			case ZBX_CFG_TYPE_STRING:
 				zbx_free(*(char **)cfg[i].variable);
 				zbx_free(cfg[i].variable);
 				zbx_free(expected_values[i]);
 				break;
-			case TYPE_UINT64:
+			case ZBX_CFG_TYPE_UINT64:
 				zbx_free(cfg[i].variable);
 				zbx_free(expected_values[i]);
 				break;

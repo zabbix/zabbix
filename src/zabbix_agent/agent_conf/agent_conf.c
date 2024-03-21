@@ -227,7 +227,7 @@ static int	load_config_user_params(const char *config_file, char **config_user_p
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,		MIN,			MAX */
-		{"UserParameter",		&config_user_parameters,		TYPE_MULTISTRING,
+		{"UserParameter",		&config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{NULL}
 	};
