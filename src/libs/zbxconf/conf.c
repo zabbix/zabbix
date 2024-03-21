@@ -569,7 +569,7 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 
 	for (i = 0; NULL != cfg[i].parameter; i++) /* check for mandatory parameters */
 	{
-		if (PARM_MAND != cfg[i].mandatory)
+		if (ZBX_CONF_PARM_MAND != cfg[i].mandatory)
 			continue;
 
 		switch (cfg[i].type)

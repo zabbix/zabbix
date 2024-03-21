@@ -212,9 +212,9 @@ void	zbx_mock_test_entry(void **state)
 		}
 
 		if (0 == strcmp(tmp, "yes"))
-			cfg[parameter_count].mandatory = PARM_MAND;
+			cfg[parameter_count].mandatory = ZBX_CONF_PARM_MAND;
 		else if (0 == strcmp(tmp, "no"))
-			cfg[parameter_count].mandatory = PARM_OPT;
+			cfg[parameter_count].mandatory = ZBX_CONF_PARM_OPT;
 		else
 			fail_msg("Invalid mandatory flag \"%s\" of parameter #%d.", tmp, parameter_count + 1);
 

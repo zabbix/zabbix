@@ -29,8 +29,8 @@
 #define	TYPE_STRING_LIST	4
 #define	TYPE_CUSTOM		5
 
-#define	PARM_OPT	0
-#define	PARM_MAND	1
+#define	ZBX_CONF_PARM_OPT	0
+#define	ZBX_CONF_PARM_MAND	1
 
 /* config file parsing options */
 #define	ZBX_CFG_FILE_REQUIRED	0
