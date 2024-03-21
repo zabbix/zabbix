@@ -179,6 +179,23 @@
 			&:hover {
 				background-color: $ui-bg-color;
 			}
+
+			div {
+				&.no-filter-set, &.no-data-found {
+					margin-top: 100px;
+					margin-bottom: 100px;
+
+					.first-message {
+						font-size: 16px;
+						margin-top: 10px;
+					}
+
+					.second-message {
+						font-size: 14px;
+						margin-top: 10px;
+					}
+				}
+			}
 		}
 	}
 

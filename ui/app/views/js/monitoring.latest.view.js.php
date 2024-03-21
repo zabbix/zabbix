@@ -41,11 +41,12 @@
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, mandatory_filter_set}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
+			this.mandatory_filter_set = mandatory_filter_set;
 
 			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
@@ -56,7 +57,7 @@
 			this.initListActions();
 			this.initItemFormEvents(this.getCurrentForm().get(0));
 
-			if (this.refresh_interval != 0) {
+			if (this.refresh_interval != 0 && this.mandatory_filter_set) {
 				this.running = true;
 				this.scheduleRefresh();
 			}
@@ -202,7 +203,15 @@
 		},
 
 		getCurrentSubfilter() {
-			return $('#latest-data-subfilter');
+			if ($('#latest-data-subfilter').length == 0) {
+				return $('<table>', {
+						class: 'list-table tabfilter-subfilter',
+						id: 'latest-data-subfilter'
+					}).appendTo('.tabfilter-content-container');
+			}
+			else {
+				return $('#latest-data-subfilter');
+			}
 		},
 
 		_addRefreshMessage(messages) {
@@ -275,9 +284,16 @@
 			this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
 		},
 
-		doRefresh(body, subfilter) {
+		doRefresh(body, subfilter = null) {
 			this.getCurrentForm().replaceWith(body);
-			this.getCurrentSubfilter().replaceWith(subfilter);
+
+			if (subfilter !== null) {
+				this.getCurrentSubfilter().replaceWith(subfilter);
+			}
+			else {
+				this.getCurrentSubfilter().remove();
+			}
+
 			chkbxRange.init();
 			this.initListActions();
 		},
@@ -300,7 +316,7 @@
 		onDataDone(response) {
 			this.clearLoading();
 			this._removeRefreshMessage();
-			this.doRefresh(response.body, response.subfilter);
+			this.doRefresh(response.body, response.subfilter ? response.subfilter : null);
 
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);

@@ -22,13 +22,13 @@
 class CTableInfo extends CTable {
 
 	protected $message;
-	protected $pageNavigation;
+	protected $page_navigation;
 
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
-		$this->setNoDataMessage(_('No data found.'));
+		$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE, ZBX_STYLE_NO_DATA_FOUND);
 	}
 
 	public function toString($destroy = true) {
@@ -43,28 +43,39 @@ class CTableInfo extends CTable {
 		return parent::toString($destroy);
 	}
 
-	public function setNoDataMessage($message) {
-		$this->message = $message;
+	public function setNoDataMessage($first_message, $second_message = null, $icon = null, $class = null) {
+		$this->message = new CCol(
+				(new CDiv([
+					$icon
+						? (new CDiv())->addClass($icon)
+						: null,
+					(new CDiv($first_message))->addClass('first-message'),
+					$second_message
+						? (new CDiv($second_message))->addClass('second-message')
+						: null
+			]))->addClass($class)
+		);
 
 		return $this;
 	}
 
-	public function setPageNavigation($pageNavigation) {
-		$this->pageNavigation = $pageNavigation;
+	public function setPageNavigation($page_navigation) {
+		$this->page_navigation = $page_navigation;
 
 		return $this;
 	}
+
 	protected function endToString() {
 		$ret = '';
 
 		if ($this->rownum == 0 && $this->message !== null) {
-			$ret .= $this->prepareRow(new CCol($this->message), ZBX_STYLE_NOTHING_TO_SHOW)->toString();
-		}
+			$ret .= $this->prepareRow($this->message, ZBX_STYLE_NOTHING_TO_SHOW)->toString();
+ 		}
 
 		$ret .= parent::endToString();
 
-		if ($this->pageNavigation && $this->getNumRows() != 0) {
-			$ret .= $this->pageNavigation;
+		if ($this->page_navigation && $this->getNumRows() != 0) {
+			$ret .= $this->page_navigation;
 		}
 
 		return $ret;

@@ -56,9 +56,16 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$filter = static::FILTER_FIELDS_DEFAULT;
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
+			$mandatory_filter_set = $this->isMandatoryFilterFieldSet($filter);
+			$prepared_data = [
+				'hosts' => [],
+				'items' => [],
+				'items_rw' => []
+			];
 
-			// make data
-			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+			if ($mandatory_filter_set) {
+				$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+			}
 
 			// Prepare subfilter data.
 			$subfilters_fields = self::getSubfilterFields($filter);
@@ -81,6 +88,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$data = [
 				'results' => [
 					'filter' => $filter,
+					'mandatory_filter_set' => $mandatory_filter_set,
 					'view_curl' => $view_url,
 					'sort_field' => $filter['sort'],
 					'sort_order' => $filter['sortorder'],

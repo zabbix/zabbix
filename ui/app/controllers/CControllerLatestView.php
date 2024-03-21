@@ -153,6 +153,7 @@ class CControllerLatestView extends CControllerLatest {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$mandatory_filter_set = $this->isMandatoryFilterFieldSet($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
@@ -161,7 +162,16 @@ class CControllerLatestView extends CControllerLatest {
 		// data sort and pager
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
-		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+
+		$prepared_data = [
+			'hosts' => [],
+			'items' => [],
+			'items_rw' => []
+		];
+
+		if ($mandatory_filter_set) {
+			$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+		}
 
 		// Prepare subfilter data.
 		$subfilters_fields = self::getSubfilterFields($filter);
@@ -206,6 +216,7 @@ class CControllerLatestView extends CControllerLatest {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'refresh_data' => $refresh_data,
 			'filter_defaults' => $profile->filter_defaults,
+			'mandatory_filter_set' => $mandatory_filter_set,
 			'filter_view' => 'monitoring.latest.filter',
 			'filter_tabs' => $filter_tabs,
 			'tabfilter_options' => [

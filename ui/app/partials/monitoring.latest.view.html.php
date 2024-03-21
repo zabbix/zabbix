@@ -32,6 +32,12 @@ $table = (new CTableInfo())
 	->addClass(ZBX_STYLE_LIST_TABLE_FIXED)
 	->setPageNavigation($data['paging']);
 
+if (!$data['mandatory_filter_set']) {
+	$table->setNoDataMessage(
+		_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE, ZBX_STYLE_NO_FILTER_SET
+	);
+}
+
 // Latest data header.
 $col_check_all = new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")

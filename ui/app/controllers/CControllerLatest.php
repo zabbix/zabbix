@@ -55,6 +55,9 @@ abstract class CControllerLatest extends CController {
 		'subfilter_data' => []
 	];
 
+	// Mandatory filter fields.
+	public const MANDATORY_FILTER_FIELDS = ['groupids', 'hostids', 'name', 'tags', 'state'];
+
 	/**
 	 * Prepare the latest data based on the given filter and sorting options.
 	 *
@@ -762,5 +765,26 @@ abstract class CControllerLatest extends CController {
 		CArrayHelper::sort($top_priority_fields, ['name']);
 
 		return $top_priority_fields;
+	}
+
+	/**
+	 * Check if at least one of mandatory filter fields is set.
+	 *
+	 * @param array $filter.
+	 *
+	 * @return bool
+	 */
+	public static function isMandatoryFilterFieldSet(array $filter): bool {
+		$mandatory_filter_fields_default_values = array_intersect_key(
+			self::FILTER_FIELDS_DEFAULT, array_flip(self::MANDATORY_FILTER_FIELDS)
+		);
+
+		foreach ($mandatory_filter_fields_default_values as $mandatory_filter_field => $filter_field_default_value) {
+			if ($filter[$mandatory_filter_field] != $filter_field_default_value) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

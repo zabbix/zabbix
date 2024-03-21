@@ -227,7 +227,7 @@ class CFilter extends CDiv {
 		return $this->addTab(
 			(new CLink($header, '#'.$anchor))
 				->addClass(ZBX_STYLE_BTN)
-				->addClass(ZBX_ICON_FILTER)
+				->addClass(ZBX_ICON_FILTER_THICK)
 				->addClass(ZBX_STYLE_FILTER_TRIGGER),
 			(new CDiv($body))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
