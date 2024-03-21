@@ -50,7 +50,7 @@ class testDashboardPieChartWidget extends testWidgets {
 	}
 
 	/**
-	 * Create the needed initial data in database and set static variables.
+	 * Create the initial data and set static variables.
 	 */
 	public function prepareData() {
 		// For faster tests set Pie chart as the default widget type.
@@ -114,7 +114,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		]);
 		self::$dashboard_id = $dashboards['dashboardids'][0];
 
-		// Create a disposable dashboard (this dashboard will have data reset sometimes).
+		// Create a disposable dashboard (this dashboard will have its data reset sometimes).
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Disposable pie chart dashboard',
 			'auto_start' => 0,
@@ -128,7 +128,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$response = CDataHelper::createHosts([
 			[
 				'host' => self::HOST_NAME_ITEM_LIST,
-				'groups' => [['groupid' => 6]], // Virtual machines.
+				'groups' => [['groupid' => 6]], // Virtual machines
 				'items' => [
 					[
 						'name' => 'item-1',
@@ -146,7 +146,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			],
 			[
 				'host' => self::HOST_NAME_SCREENSHOTS,
-				'groups' => [['groupid' => 6]], // Virtual machines.
+				'groups' => [['groupid' => 6]], // Virtual machines
 				'items' => [
 					[
 						'name' => 'item-1',
@@ -220,8 +220,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		// Check Data set - Item pattern.
 		$expected_values = [
 			'xpath:.//input[@id="ds_0_color"]/..' => 'FF465C', // data set color
-			'xpath:.//div[@id="ds_0_hosts_"]/..' => '', // host pattern
-			'xpath:.//div[@id="ds_0_items_"]/..' => '', // item pattern
+			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',        // host pattern
+			'xpath:.//div[@id="ds_0_items_"]/..' => '',        // item pattern
 			'Aggregation function' => 'last',
 			'Data set aggregation' => 'not used',
 			'Data set label' => ''
@@ -233,11 +233,11 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->validateDataSetHintboxes($form);
 
 		$buttons = [
-			'id:ds_0_hosts_', // host multiselect
-			'id:ds_0_items_', // item multiselect
+			'id:ds_0_hosts_',                                      // host multiselect
+			'id:ds_0_items_',                                      // item multiselect
 			'xpath:.//li[@data-set="0"]//button[@title="Delete"]', // first data set delete icon
-			'id:dataset-add', // button 'Add new data set'
-			'id:dataset-menu' // context menu of button 'Add new data set'
+			'id:dataset-add',                                      // button 'Add new data set'
+			'id:dataset-menu'                                      // context menu of button 'Add new data set'
 		];
 		foreach ($buttons as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isClickable());
@@ -272,8 +272,8 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		$buttons = [
 			'xpath:.//li[@data-set="1"]//button[@title="Delete"]', // second data set delete icon
-			'id:dataset-add', // button 'Add new data set'
-			'id:dataset-menu' // context menu of button 'Add new data set'
+			'id:dataset-add',                                      // button 'Add new data set'
+			'id:dataset-menu'                                      // context menu of button 'Add new data set'
 		];
 		foreach ($buttons as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isClickable());
@@ -293,8 +293,8 @@ class testDashboardPieChartWidget extends testWidgets {
 			'History data selection' => 'Auto',
 			'Draw' => 'Pie',
 			'Space between sectors' => '1',
-			'id:merge' => false, // 'Merge sectors smaller than' checkbox
-			'id:merge_percent' => '1', // 'Merge sectors smaller than' input
+			'id:merge' => false,         // 'Merge sectors smaller than' checkbox
+			'id:merge_percent' => '1',   // 'Merge sectors smaller than' input
 			'id:merge_color' => 'B0AF07' // 'Merge sectors smaller than' color picker
 		];
 		$form->checkValue($expected_values);
@@ -1018,7 +1018,7 @@ class testDashboardPieChartWidget extends testWidgets {
 	}
 
 	/**
-	 * Prepare a dashboard with widget for the Pie chart display scenario.
+	 * Prepare a widget for the Pie chart display scenario.
 	 */
 	public function preparePieChartDisplayData() {
 		$providedData = $this->getProvidedData();
@@ -1045,7 +1045,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			}
 		}
 
-		// Create a dashboard with widget for the display test.
+		// Set the disposable dashboard to contain the needed widget.
 		CDataHelper::call('dashboard.update', [
 			'dashboardid' => self::$disposable_dashboard_id,
 			'pages' => [
@@ -1201,13 +1201,6 @@ class testDashboardPieChartWidget extends testWidgets {
 	}
 
 	/**
-	 * Tests that only the correct item types can be used in the Pie chart widget.
-	 */
-	public function testDashboardPieChartWidget_CheckAvailableItems() {
-		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id, 'Pie chart');
-	}
-
-	/**
 	 * Generate different Pie charts and assert their display.
 	 *
 	 * @onBefore     preparePieChartDisplayData
@@ -1274,6 +1267,13 @@ class testDashboardPieChartWidget extends testWidgets {
 		// Screenshot the widget.
 		$this->page->removeFocus();
 		$this->assertScreenshot($widget, $data['widget_name']);
+	}
+
+	/**
+	 * Tests that only the correct item types can be used in the Pie chart widget.
+	 */
+	public function testDashboardPieChartWidget_CheckAvailableItems() {
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id, 'Pie chart');
 	}
 
 	/**
@@ -1640,9 +1640,11 @@ class testDashboardPieChartWidget extends testWidgets {
 	/**
 	 * Opens the Pie chart dashboard.
 	 *
-	 * @param bool $login           skips logging in if set to false
+	 * @param bool   $login          skips logging in if set to false
+	 * @param string $page           opens a page of this name if set
+	 * @param int    $dashboad_id    opens dashboard with this id
 	 *
-	 * @return CDashboardElement    dashboard element of the Pie chart dashboard
+	 * @return CDashboardElement     dashboard element of the Pie chart dashboard
 	 */
 	protected function openDashboard($login = true, $page = null, $dashboad_id = null) {
 		if ($login) {
