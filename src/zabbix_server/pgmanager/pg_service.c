@@ -257,6 +257,8 @@ static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 	}
 
 	pg_cache_unlock(pgs->cache);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

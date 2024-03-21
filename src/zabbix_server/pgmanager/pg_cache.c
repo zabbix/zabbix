@@ -743,7 +743,7 @@ void	pg_cache_get_group_and_proxy_updates(zbx_pg_cache_t *cache, zbx_vector_pg_u
 	{
 		zbx_pg_group_t	*group = cache->group_updates.values[i];
 
-		if (ZBX_PG_GROUP_STATE_RECOVERY == group->state || PG_GROUP_UNBALANCED_YES == group->unbalanced)
+		if (ZBX_PG_GROUP_STATE_RECOVERING == group->state || PG_GROUP_UNBALANCED_YES == group->unbalanced)
 		{
 			/* Recovery state change is also affected by time, not only proxy state changes - */
 			/* leave it in updates to periodically check until it changes state.              */
@@ -1204,9 +1204,9 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 		switch (group->state)
 		{
 			case ZBX_PG_GROUP_STATE_UNKNOWN:
-				state = ZBX_PG_GROUP_STATE_RECOVERY;
+				state = ZBX_PG_GROUP_STATE_RECOVERING;
 				ZBX_FALLTHROUGH;
-			case ZBX_PG_GROUP_STATE_RECOVERY:
+			case ZBX_PG_GROUP_STATE_RECOVERING:
 				if (total - offline < min_online)
 				{
 					state = ZBX_PG_GROUP_STATE_OFFLINE;
@@ -1223,7 +1223,7 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 						state = ZBX_PG_GROUP_STATE_OFFLINE;
 				}
 				break;
-			case ZBX_PG_GROUP_STATE_DECAY:
+			case ZBX_PG_GROUP_STATE_DEGRADING:
 				if (healthy >= min_online)
 					state = ZBX_PG_GROUP_STATE_ONLINE;
 				else if (online < min_online)
@@ -1231,11 +1231,13 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 				break;
 			case ZBX_PG_GROUP_STATE_OFFLINE:
 				if (online >= min_online)
-					state = ZBX_PG_GROUP_STATE_RECOVERY;
+					state = ZBX_PG_GROUP_STATE_RECOVERING;
 				break;
 			case ZBX_PG_GROUP_STATE_ONLINE:
-				if (healthy < min_online)
-					state = ZBX_PG_GROUP_STATE_DECAY;
+				if (total - offline < min_online)
+					state = ZBX_PG_GROUP_STATE_OFFLINE;
+				else if (healthy < min_online)
+					state = ZBX_PG_GROUP_STATE_DEGRADING;
 				break;
 		}
 

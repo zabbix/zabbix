@@ -212,19 +212,69 @@ static void	pgm_update(zbx_pg_cache_t *cache)
  *                                                                            *
  ******************************************************************************/
 static void	pgm_db_flush_group_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_vector_pg_update_t *groups)
+		zbx_vector_pg_update_t *group_updates)
 {
-	for (int i = 0; i < groups->values_num; i++)
+	zbx_vector_uint64_t	groupids;
+
+	zbx_vector_uint64_create(&groupids);
+
+	for (int i = 0; i < group_updates->values_num; i++)
 	{
-		if (0 == (groups->values[i].flags & ZBX_PG_GROUP_UPDATE_STATE))
+		if (0 == (group_updates->values[i].flags & ZBX_PG_GROUP_UPDATE_STATE))
 			continue;
 
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
-				"update proxy_group set state=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
-				groups->values[i].state, groups->values[i].objectid);
+		zbx_vector_uint64_append(&groupids, group_updates->values[i].objectid);
+	}
+
+	if (0 != groupids.values_num)
+	{
+		char	*sql_lock = NULL;
+		size_t	sql_lock_alloc = 0, sql_lock_offset = 0;
+
+		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql_lock, &sql_lock_alloc, &sql_lock_offset,
+				"select proxy_groupid from proxy_group where ");
+		zbx_db_add_condition_alloc(&sql_lock, &sql_lock_alloc, &sql_lock_offset, "proxy_groupid",
+				groupids.values, groupids.values_num);
+		zbx_strcpy_alloc(&sql_lock, &sql_lock_alloc, &sql_lock_offset, ZBX_FOR_UPDATE);
+
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
+		result = zbx_db_select("%s", sql_lock);
+		zbx_free(sql_lock);
+
+		zbx_vector_uint64_clear(&groupids);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	proxy_groupid;
+
+			ZBX_STR2UINT64(proxy_groupid, row[0]);
+			zbx_vector_uint64_append(&groupids, proxy_groupid);
+		}
+		zbx_db_free_result(result);
+
+		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (int i = 0; i < group_updates->values_num; i++)
+		{
+			if (FAIL == zbx_vector_uint64_bsearch(&groupids, group_updates->values[i].objectid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				continue;
+			}
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+					"update proxy_group_rtdata set state=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
+					group_updates->values[i].state, group_updates->values[i].objectid);
+		}
 
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
+
+	zbx_vector_uint64_destroy(&groupids);
 }
 
 /******************************************************************************
@@ -462,7 +512,7 @@ static void	pgm_db_flush_host_proxy_revision(zbx_uint64_t revision)
  ******************************************************************************/
 static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 {
-	zbx_vector_pg_update_t	groups, proxies;
+	zbx_vector_pg_update_t	group_updates, proxy_updates;
 	zbx_vector_pg_host_t	hosts_new, hosts_mod, hosts_del;
 	zbx_vector_uint64_t	groupids;
 	zbx_uint64_t		hostmap_revision;
@@ -470,8 +520,8 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_pg_update_create(&groups);
-	zbx_vector_pg_update_create(&proxies);
+	zbx_vector_pg_update_create(&group_updates);
+	zbx_vector_pg_update_create(&proxy_updates);
 	zbx_vector_pg_host_create(&hosts_new);
 	zbx_vector_pg_host_create(&hosts_mod);
 	zbx_vector_pg_host_create(&hosts_del);
@@ -483,7 +533,7 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 	hostmap_revision = cache->hostmap_revision;
 
 	pg_cache_rebalance_groups(cache, um_handle);
-	pg_cache_get_group_and_proxy_updates(cache, &groups, &proxies);
+	pg_cache_get_group_and_proxy_updates(cache, &group_updates, &proxy_updates);
 	pg_cache_get_hostmap_updates(cache, &hosts_new, &hosts_mod, &hosts_del, &groupids);
 	pg_cache_add_new_hostmaps(cache, &hosts_new, &groupids);
 	pg_cache_add_deleted_hostmaps(cache, &hosts_del);
@@ -491,7 +541,7 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 	pg_cache_unlock(cache);
 	zbx_dc_close_user_macros(um_handle);
 
-	if (0 != groups.values_num || 0 != proxies.values_num || 0 != hosts_new.values_num ||
+	if (0 != group_updates.values_num || 0 != proxy_updates.values_num || 0 != hosts_new.values_num ||
 			0 != hosts_mod.values_num || 0 != hosts_del.values_num)
 	{
 		char	*sql = NULL;
@@ -506,8 +556,8 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 
 			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-			pgm_db_flush_group_updates(&sql, &sql_alloc, &sql_offset, &groups);
-			pgm_db_flush_proxy_updates(&sql, &sql_alloc, &sql_offset, &proxies);
+			pgm_db_flush_group_updates(&sql, &sql_alloc, &sql_offset, &group_updates);
+			pgm_db_flush_proxy_updates(&sql, &sql_alloc, &sql_offset, &proxy_updates);
 			pgm_db_flush_host_proxy_updates(&sql, &sql_alloc, &sql_offset, &hosts_mod);
 			pgm_db_flush_host_proxy_deletes(&sql, &sql_alloc, &sql_offset, &hosts_del);
 
@@ -544,8 +594,8 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_pg_host_destroy(&hosts_del);
 	zbx_vector_pg_host_destroy(&hosts_mod);
 	zbx_vector_pg_host_destroy(&hosts_new);
-	zbx_vector_pg_update_destroy(&proxies);
-	zbx_vector_pg_update_destroy(&groups);
+	zbx_vector_pg_update_destroy(&proxy_updates);
+	zbx_vector_pg_update_destroy(&group_updates);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
