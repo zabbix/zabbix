@@ -594,6 +594,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
@@ -5159,6 +5165,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => ''
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
 				'default' => ''
 			]
 		]

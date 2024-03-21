@@ -27,7 +27,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',
+			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro,drule',
 			'data' => 'array'
 		];
 
@@ -95,6 +95,12 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger_macro':
 				$rules = [];
+				break;
+
+			case 'drule':
+				$rules = [
+					'druleid' => 'required|db drules.druleid'
+				];
 				break;
 		}
 
@@ -974,6 +980,28 @@ class CControllerMenuPopup extends CController {
 		return $menu_data;
 	}
 
+	private static function getMenuDataDRule(array $data): ?array {
+		$db_drules_count = API::DRule()->get([
+			'output' => [],
+			'druleids' => $data['druleid'],
+			'countOutput' => true
+		]);
+
+		if ($db_drules_count > 0) {
+			$menu_data = [
+				'type' => 'drule',
+				'druleid' => $data['druleid'],
+				'allowed_ui_conf_drules' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
+			];
+
+			return $menu_data;
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
 	protected function doAction() {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
@@ -1004,6 +1032,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'trigger_macro':
 				$menu_data = self::getMenuDataTriggerMacro();
+				break;
+
+			case 'drule':
+				$menu_data = self::getMenuDataDRule($data);
 				break;
 		}
 

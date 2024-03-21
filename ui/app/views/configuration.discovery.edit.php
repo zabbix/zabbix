@@ -82,7 +82,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Maximum concurrent checks'), 'concurrency_max_type'),
+		new CLabel(_('Maximum concurrent checks per type'), 'concurrency_max_type'),
 		(new CFormField([
 			(new CDiv(
 				(new CRadioButtonList('concurrency_max_type', (int) $data['concurrency_max_type']))

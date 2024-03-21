@@ -220,6 +220,7 @@ typedef struct
 	zbx_uint64_t	max_len;
 	unsigned char	expect;
 	int		protocol_version;
+	size_t		allocated;
 }
 zbx_tcp_recv_context_t;
 
@@ -311,6 +312,9 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
 void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv_context, unsigned char flags);
 ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);
+ssize_t	zbx_tcp_recv_context_raw(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events, int once);
+const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events);
+
 
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
