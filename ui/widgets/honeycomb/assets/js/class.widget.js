@@ -38,14 +38,23 @@ class CWidgetHoneycomb extends CWidget {
 	 */
 	#interacting_timeout_id;
 
+	/**
+	 * @type {number}
+	 */
+	#resize_timeout_id;
+
 	isUserInteracting() {
 		return this.#user_interacting || super.isUserInteracting();
 	}
 
 	onResize() {
-		if (this.getState() === WIDGET_STATE_ACTIVE && this.#honeycomb !== null) {
-			this.#honeycomb.setSize(super._getContentsSize());
-		}
+		clearTimeout(this.#resize_timeout_id);
+
+		this.#resize_timeout_id = setTimeout(() => {
+			if (this.getState() === WIDGET_STATE_ACTIVE && this.#honeycomb !== null) {
+				this.#honeycomb.setSize(super._getContentsSize());
+			}
+		}, 100);
 	}
 
 	getUpdateRequestData() {
