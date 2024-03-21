@@ -26,8 +26,7 @@ static zbx_metric_t	parameters_common_http[] =
 	{"web.page.get",	CF_HAVEPARAMS,	web_page_get,		"localhost,,80"},
 	{"web.page.perf",	CF_HAVEPARAMS,	web_page_perf,		"localhost,,80"},
 	{"web.page.regexp",	CF_HAVEPARAMS,	web_page_regexp,	"localhost,,80,OK"},
-
-	{NULL}
+	{NULL,			0,		NULL,			NULL}
 };
 
 zbx_metric_t	*get_parameters_common_http(void)

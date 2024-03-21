@@ -225,7 +225,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		{"MX",		T_MX},
 		{"TXT",		T_TXT},
 		{"SRV",		T_SRV},
-		{NULL}
+		{NULL,		0}
 	};
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

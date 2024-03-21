@@ -556,7 +556,7 @@ static zbx_metric_t	parameters_simple[] =
 	{"net.tcp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ssh,127.0.0.1,22"},
 	{"net.udp.service",	CF_HAVEPARAMS,	check_service,		"ntp,127.0.0.1,123"},
 	{"net.udp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ntp,127.0.0.1,123"},
-	{NULL}
+	{NULL,			0,		NULL,			NULL}
 };
 
 zbx_metric_t	*get_parameters_simple(void)
