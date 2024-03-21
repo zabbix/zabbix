@@ -2130,7 +2130,9 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
-	zbx_vector_ptr_t	autoreg_hosts;
+
+	zbx_vector_autoreg_host_ptr_t	autoreg_hosts;
+
 	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2142,7 +2144,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&autoreg_hosts);
+	zbx_vector_autoreg_host_ptr_create(&autoreg_hosts);
 	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
@@ -2253,8 +2255,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	}
 
 	zbx_free(host_metadata);
-	zbx_vector_ptr_clear_ext(&autoreg_hosts, (zbx_mem_free_func_t)autoreg_host_free_cb);
-	zbx_vector_ptr_destroy(&autoreg_hosts);
+	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, autoreg_host_free_cb);
+	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());

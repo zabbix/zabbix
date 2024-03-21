@@ -30,8 +30,6 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_proxy/poller/libzbxpoller_proxy.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_proxy.a \
-	autoreg/libzbxautoreg_proxy.a \
-	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
@@ -91,6 +89,8 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
+	autoreg/libzbxautoreg_proxy.a \
+	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
