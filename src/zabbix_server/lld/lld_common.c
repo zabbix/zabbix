@@ -124,7 +124,7 @@ static void	lld_prepare_object_delete(zbx_uint64_t id, const char *name, zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process lost resources                                            *
+ * Purpose: processes lost resources                                          *
  *                                                                            *
  ******************************************************************************/
 void	lld_process_lost_objects(const char *table, const char *table_obj, const char *id_name,
