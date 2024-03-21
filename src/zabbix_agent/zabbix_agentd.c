@@ -28,6 +28,9 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
+#include "zbxalgo.h"
+#include "zbxcfg.h"
+#include "zbxmutexs.h"
 
 static char	*config_pid_file = NULL;
 
@@ -87,8 +90,6 @@ int	zbx_config_heartbeat_frequency	= 60;
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif
-
-#include "zbxcrypto.h"
 
 /* application TITLE */
 static const char	title_message[] = "zabbix_agentd"
