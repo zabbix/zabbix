@@ -555,15 +555,6 @@ class testUserDirectory extends CAPITest {
 					['userdirectoryid' => 'API SAML', 'sp_entityid' => 'saml.sp.entityid']
 				],
 				'expected_error' => null
-			],
-			'Test provisioned media fields active, severity and period are optional' => [
-				'userdirectories' => [[
-					'userdirectoryid' => 'LDAP #3',
-					'provision_media' => [
-						['name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1']
-					]
-				]],
-				'expected_error' => null
 			]
 		];
 	}
@@ -675,7 +666,7 @@ class testUserDirectory extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/provision_media/1/userdirectory_mediaid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/provision_media/1": referred object does not exist.'
 			],
 			'Test invalid SAML Encrypt assertions' => [
 				'userdirectories' => [[

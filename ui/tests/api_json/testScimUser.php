@@ -469,6 +469,11 @@ class testScimUser extends CAPIScimTest {
 
 		$result = $this->call('users.get', $user);
 
+		if ($result && array_key_exists('Resources', $expected_result) && $expected_result['Resources']) {
+			$result['Resources'] = array_column($result['Resources'], null, 'userid');
+			$expected_result['Resources'] = array_column($expected_result['Resources'], null, 'userid');
+		}
+
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 	}
 
@@ -1455,10 +1460,11 @@ class testScimUser extends CAPIScimTest {
 		$db_result_user_groups = DBfetch($db_result_user_groups_data);
 		$this->assertEquals('9', $db_result_user_groups['usrgrpid']);
 
-		$db_media = DBselect('SELECT mediaid FROM media WHERE '
-			.dbConditionId('userid', [self::$data['userid']['new_user']])
-		);
-		$this->assertCount(0, $db_media, 'User should not have any media');
+		$db_media_count = DB::select('media', [
+			'filter' => ['userid' => self::$data['userid']['new_user']],
+			'countOutput' => true
+		]);
+		$this->assertEquals(0, $db_media_count, 'User should not have any media');
 	}
 
 	public function createInvalidGetAuthentication() {
