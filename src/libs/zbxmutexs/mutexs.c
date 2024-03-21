@@ -47,7 +47,7 @@ static int			shm_id, locks_disabled;
 #		define HAVE_SEMUN 1
 #	endif	/* HAVE_SEMUN */
 
-#	include "zbxconf.h"
+#	include "zbxcfg.h"
 #	include "zbxthreads.h"
 
 	static int		ZBX_SEM_LIST_ID = -1;

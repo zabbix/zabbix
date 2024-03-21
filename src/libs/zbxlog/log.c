@@ -20,7 +20,7 @@
 #include "zbxlog.h"
 
 #include "zbxmutexs.h"
-#include "zbxconf.h"
+#include "zbxcfg.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxcommon.h"

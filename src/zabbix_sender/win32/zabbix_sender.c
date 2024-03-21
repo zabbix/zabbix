@@ -23,7 +23,7 @@
 #include "zbxjson.h"
 #include "zbxcomms.h"
 #include "zbxcommshigh.h"
-#include "zbxconf.h"
+#include "zbxcfg.h"
 
 static const char	*progname = NULL;
 static const char	title_message[] = "";

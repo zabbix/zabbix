@@ -36,7 +36,7 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \

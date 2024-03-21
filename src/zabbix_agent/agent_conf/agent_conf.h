@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AGENT_CONF_H
 #define ZABBIX_AGENT_CONF_H
 
-#include "zbxconf.h"
+#include "zbxcfg.h"
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
 int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg);

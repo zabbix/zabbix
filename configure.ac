@@ -2006,7 +2006,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
-	src/libs/zbxconf/Makefile
+	src/libs/zbxcfg/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile

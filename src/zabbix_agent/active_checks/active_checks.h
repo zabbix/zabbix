@@ -23,7 +23,7 @@
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxcomms.h"
-#include "zbxconf.h"
+#include "zbxcfg.h"
 
 #define HOST_INTERFACE_LEN	255	/* UTF-8 characters, not bytes */
 

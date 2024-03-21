@@ -19,7 +19,7 @@
 
 #include "zbxdbwrap.h"
 
-#include "zbxconf.h"
+#include "zbxcfg.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"

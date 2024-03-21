@@ -21,7 +21,7 @@
 #define ZABBIX_PROXYCONFIG_H
 
 #include "zbxthreads.h"
-#include "zbxconf.h"
+#include "zbxcfg.h"
 #include "zbxvault.h"
 #include "zbxcomms.h"
 
