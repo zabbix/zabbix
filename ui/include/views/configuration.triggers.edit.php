@@ -113,7 +113,7 @@ $triggersFormList
 
 if ($discovered_trigger) {
 	$triggersFormList->addVar('priority', (int) $data['priority']);
-	$severity = new CSeverity('priority_names', (int) $data['priority'], false);
+	$severity = (new CSeverity('priority_names', (int) $data['priority'], false))->setReadonly($readonly);
 }
 else {
 	$severity = new CSeverity('priority', (int) $data['priority']);
