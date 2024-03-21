@@ -1090,7 +1090,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,	\
 				NULL, NULL, &lt_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);				\
 														\
-		if (SUCCEED != zbx_is_time_suffix(lt_str, &lt.duration, ZBX_LENGTH_UNLIMITED))			\
+		if (SUCCEED != zbx_is_time_suffix(lt_res, &lt.duration, ZBX_LENGTH_UNLIMITED))			\
 		{												\
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule "	\
 					" \"%s:%s\": \"%s\" is not a valid value", zbx_host_string(hostid),	\
