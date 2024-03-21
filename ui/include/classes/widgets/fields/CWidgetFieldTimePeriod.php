@@ -92,7 +92,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			}
 		}
 		elseif (($strict || array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)) && !$value) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name, _('empty data received'));
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name, _('data is missing'));
 		}
 		else {
 			$absolute_time_parser = new CAbsoluteTimeParser();
