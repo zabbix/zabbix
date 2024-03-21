@@ -1074,7 +1074,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'lifetime_type' => ['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -1105,7 +1106,12 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
 			$item['host_status'] = $db_item['host_status'];
-			$item += array_intersect_key($db_item, array_flip(['lifetime_type', 'enabled_lifetime_type']));
+
+			$item += ['lifetime_type' => $db_item['lifetime_type']];
+
+			$item += $item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY
+				? ['enabled_lifetime_type' => DB::getDefault('items', 'enabled_lifetime_type')]
+				: ['enabled_lifetime_type' => $db_item['enabled_lifetime_type']];
 
 			$api_input_rules = $db_item['templateid'] == 0
 				? self::getValidationRules()
@@ -1153,7 +1159,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>					['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>					['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
-			'lifetime_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])],
+			'lifetime_type' =>			['type' => API_ANY],
 			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
 											['else' => true, 'type' => API_TIME_UNIT, 'in' => '0']
@@ -1867,7 +1873,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 	private static function addFieldDefaultsByLifetimeType(array &$items, array $db_items): void {
 		$field_defaults = [
-			'enabled_lifetime_type' => DB::getDefault('items', 'enabled_lifetime_type'),
 			'enabled_lifetime' => DB::getDefault('items', 'enabled_lifetime')
 		];
 

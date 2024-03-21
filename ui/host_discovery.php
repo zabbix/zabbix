@@ -542,6 +542,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = true;
 
+		if ($input['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$input['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
+			$input['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
+		}
+
 		$converted_lifetime = timeUnitToSeconds($input['lifetime']);
 		$converted_enabled_lifetime = timeUnitToSeconds($input['enabled_lifetime']);
 		$lifetime_valid = $input['lifetime_type'] == ZBX_LLD_DELETE_AFTER && $input['lifetime'] !== ''
