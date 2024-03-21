@@ -53,6 +53,7 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxvault.h"
+#include "zbxautoreg.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"

@@ -24,6 +24,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxautoreg.h"
+#include "zbxalgo.h"
 
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host)
 {

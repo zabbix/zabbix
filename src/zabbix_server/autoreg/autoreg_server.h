@@ -20,9 +20,8 @@
 #ifndef ZABBIX_AUTOREG_SERVER_H
 #define ZABBIX_AUTOREG_SERVER_H
 
-#include "zbxdbhigh.h"
-#include "zbxalgo.h"
 #include "zbxautoreg.h"
+#include "zbxdbhigh.h"
 
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host);
 
