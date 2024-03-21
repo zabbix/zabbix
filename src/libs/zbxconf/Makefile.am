@@ -3,4 +3,4 @@
 noinst_LIBRARIES = libzbxconf.a
 
 libzbxconf_a_SOURCES = \
-	cfg.c
+	conf.c

@@ -30,7 +30,7 @@
 #include "zbxip.h"
 #include "zbxcomms.h"
 #include "zbxcurl.h"
-#include "zbxcfg.h"
+#include "zbxconf.h"
 #include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP

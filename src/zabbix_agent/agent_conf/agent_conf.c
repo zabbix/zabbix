@@ -22,7 +22,7 @@
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-#include "zbxcfg.h"
+#include "zbxconf.h"
 #ifdef _WINDOWS
 #include	"zbxparam.h"
 #endif

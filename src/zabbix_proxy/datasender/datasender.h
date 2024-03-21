@@ -21,7 +21,7 @@
 #define ZABBIX_DATASENDER_H
 
 #include "zbxthreads.h"
-#include "zbxcfg.h"
+#include "zbxconf.h"
 #include "zbxcomms.h"
 
 typedef struct

@@ -29,7 +29,7 @@
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
 #include "zbxalgo.h"
-#include "zbxcfg.h"
+#include "zbxconf.h"
 #include "zbxmutexs.h"
 
 static char	*config_pid_file = NULL;

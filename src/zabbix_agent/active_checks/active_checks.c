@@ -23,7 +23,7 @@
 #include "../logfiles/logfiles.h"
 #include "../metrics/metrics.h"
 
-#include "zbxcfg.h"
+#include "zbxconf.h"
 #include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"

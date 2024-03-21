@@ -20,7 +20,7 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "zbxcfg.h"
+#include "zbxconf.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
