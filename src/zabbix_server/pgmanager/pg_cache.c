@@ -1144,7 +1144,7 @@ void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
  ******************************************************************************/
 void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_handle, int now)
 {
-	const char		*group_state_str[] = {"unknown", "offline", "recovery", "online", "decay"};
+	const char		*group_state_str[] = {"unknown", "offline", "recovering", "online", "degrading"};
 
 	zbx_pg_group_t		*group;
 	char			*tmp;
