@@ -681,11 +681,11 @@ window.item_edit_form = new class {
 	#updateRetrieveModeVisibility() {
 		const disable = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
 
-		if (disable) {
-			this.field.retrieve_mode.item(1).checked = true;
-		}
-
 		this.field.retrieve_mode.forEach(radio => {
+			if (disable && radio.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
+				radio.checked = true;
+			}
+
 			radio.disabled = disable || this.form_readonly;
 
 			disable || this.form_readonly
