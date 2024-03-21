@@ -76,8 +76,8 @@ void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 
 int	zbx_parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
 
-int	check_cfg_feature_int(const char *parameter, int value, const char *feature);
-int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
+int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature);
+int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
 
 typedef int	(*add_serveractive_host_f)(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data);
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,

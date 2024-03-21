@@ -629,7 +629,7 @@ int	zbx_parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional,
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
 }
 
-int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
+int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature)
 {
 	if (0 != value)
 	{
@@ -641,7 +641,7 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 	return SUCCEED;
 }
 
-int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature)
+int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const char *feature)
 {
 	if (NULL != value)
 	{
