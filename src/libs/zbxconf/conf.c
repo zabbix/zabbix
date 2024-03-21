@@ -36,7 +36,7 @@
 static const char	*program_type_str = NULL;
 static const char	*main_cfg_file = NULL;
 
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
+static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int optional, int strict,
 		int noexit);
 
 ZBX_PTR_VECTOR_IMPL(addr_ptr, zbx_addr_t *)
@@ -214,7 +214,7 @@ trim:
  *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
-static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict,
+static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *cfg, int level, int strict,
 		int noexit)
 {
 	WIN32_FIND_DATAW	find_file_data;
@@ -261,7 +261,7 @@ clean:
 	return ret;
 }
 #else
-static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict,
+static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *cfg, int level, int strict,
 		int noexit)
 {
 	DIR		*dir;
@@ -364,7 +364,7 @@ static char	*expand_include_path(char *raw_path)
  *               FAIL - error processing object                               *
  *                                                                            *
  ******************************************************************************/
-static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict, int noexit)
+static int	parse_cfg_object(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int strict, int noexit)
 {
 	int		ret = FAIL;
 	char		*path = NULL, *pattern = NULL;
@@ -416,7 +416,7 @@ clean:
  *               FAIL - error processing config file                          *
  *                                                                            *
  ******************************************************************************/
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
+static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int optional, int strict,
 		int noexit)
 {
 #define ZBX_MAX_INCLUDE_LEVEL	10
@@ -624,7 +624,7 @@ void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 	main_cfg_file = cfg_file;
 }
 
-int	zbx_parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
+int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
 }

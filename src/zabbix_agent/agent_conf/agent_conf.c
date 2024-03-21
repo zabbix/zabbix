@@ -117,7 +117,7 @@ int	load_user_parameters(char **lines, char **err)
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
  ******************************************************************************/
-int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
+int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg)
 {
 	unsigned char	rule_type;
 
@@ -223,7 +223,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
  ******************************************************************************/
 static int	load_config_user_params(const char *config_file, char **config_user_parameters)
 {
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */

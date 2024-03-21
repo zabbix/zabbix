@@ -834,7 +834,7 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zb
  ******************************************************************************/
 static void	zbx_load_config(ZBX_TASK_EX *task)
 {
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */

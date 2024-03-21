@@ -30,7 +30,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle, parameters, parameter;
 	const char		*cfg_file, *validation, *tmp, **multi_string, *string_list;
 	int			strict = 42, exit_code, parameter_count = 0, i;
-	struct cfg_line		*cfg = NULL;
+	zbx_cfg_line_t		*cfg = NULL;
 	void			**expected_values = NULL;
 
 	ZBX_UNUSED(state);
@@ -59,7 +59,7 @@ void	zbx_mock_test_entry(void **state)
 
 	while (ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(parameters, &parameter)))
 	{
-		cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(struct cfg_line));
+		cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(zbx_cfg_line_t));
 		expected_values = zbx_realloc(expected_values, (parameter_count + 1) * sizeof(void *));
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_object_member(parameter, "name", &handle)) ||
@@ -227,7 +227,7 @@ void	zbx_mock_test_entry(void **state)
 				zbx_mock_error_string(error));
 	}
 
-	cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(struct cfg_line));
+	cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(zbx_cfg_line_t));
 	cfg[parameter_count].parameter = NULL;
 
 	zbx_init_library_cfg(ZBX_PROGRAM_TYPE_SERVER, cfg_file);

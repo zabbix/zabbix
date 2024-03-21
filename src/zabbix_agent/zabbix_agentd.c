@@ -845,7 +845,7 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
  ******************************************************************************/
-static int	load_enable_remote_commands(const char *value, const struct cfg_line *cfg)
+static int	load_enable_remote_commands(const char *value, const zbx_cfg_line_t *cfg)
 {
 	unsigned char	rule_type;
 	char		sysrun[] = "system.run[*]";
@@ -879,7 +879,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_vector_str_t		hostnames;
 	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */

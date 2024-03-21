@@ -837,7 +837,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
  ******************************************************************************/
 static void	zbx_load_config(ZBX_TASK_EX *task)
 {
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */

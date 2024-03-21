@@ -893,7 +893,7 @@ static void	zbx_load_config(const char *config_file_in)
 		*cfg_tls_cipher_cert13 = NULL, *cfg_tls_cipher_cert = NULL,
 		*cfg_tls_cipher_psk13 = NULL, *cfg_tls_cipher_psk = NULL;
 
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
