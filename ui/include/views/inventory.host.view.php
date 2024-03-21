@@ -102,6 +102,7 @@ foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 				(new CRadioButtonList('main['.$interface['interfaceid'].']', (int) $interface['main']))
 					->addValue(null, INTERFACE_PRIMARY)
 					->setEnabled(false)
+					->setReadonly(true)
 					->removeId()
 			]);
 		}
