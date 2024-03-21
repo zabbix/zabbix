@@ -826,7 +826,7 @@ class testItemTest extends CWebTest {
 								'test_with' => 'Server'
 							];
 						}
-						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
+						$fields_state = ['address' => true, 'port' => true, 'test_with' => true, 'proxy' => true];
 						break;
 
 					case 'SNMP agent':
@@ -984,6 +984,11 @@ class testItemTest extends CWebTest {
 				}
 				foreach ($fields_state as $field => $state) {
 					$this->assertTrue($elements[$field]->isEnabled($state));
+
+					// Check that proxy multiselect is not visible if "Test with" is set to "Server".
+					if ($field === 'test_with' && $fields_value[$field] === 'Server') {
+						$this->assertFalse($test_form->query('id:proxyid')->one()->isDisplayed());
+					}
 				}
 
 				// Check value fields.
