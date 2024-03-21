@@ -211,4 +211,20 @@ class CMenuPopupHelper {
 			'context' => $data['context']
 		];
 	}
+
+	/**
+	 * Prepare data for discovery rule configuration popup menu.
+	 *
+	 * @param string $druleid
+	 *
+	 * @return array
+	 */
+	public static function getDRule(string $druleid): array {
+		return [
+			'type' => 'drule',
+			'data' => [
+				'druleid' => $druleid
+			]
+		];
+	}
 }

@@ -57,7 +57,9 @@ class testPageNetworkDiscovery extends CWebTest {
 
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->page->assertHeader('Discovery rules');
-		$this->assertEquals(['', 'Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status'], $table->getHeadersText());
+		$this->assertEquals(['', 'Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status', 'Info'],
+				$table->getHeadersText()
+		);
 		$this->assertEquals(['Name'], $table->getSortableHeaders()->asText());
 		$this->assertEquals(['Name', 'Status'], $form->getLabels()->asText());
 
