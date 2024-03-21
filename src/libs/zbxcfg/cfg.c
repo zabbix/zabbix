@@ -49,10 +49,10 @@ void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: see whether a file (e.g., "parameter.conf")                       *
- *          matches a pattern (e.g., "p*.conf")                               *
+ * Purpose: Checks whether a file (e.g., "parameter.conf")                    *
+ *          matches a pattern (e.g., "p*.conf").                              *
  *                                                                            *
- * Return value: SUCCEED - file matches a pattern                             *
+ * Return value: SUCCEED - file matches pattern                               *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -136,8 +136,8 @@ static int	match_glob(const char *file, const char *pattern)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse a glob like "/usr/local/etc/zabbix_agentd.conf.d/p*.conf"   *
- *          into "/usr/local/etc/zabbix_agentd.conf.d" and "p*.conf" parts    *
+ * Purpose: Parses a glob like "/usr/local/etc/zabbix_agentd.conf.d/p*.conf"  *
+ *          into "/usr/local/etc/zabbix_agentd.conf.d" and "p*.conf" parts.   *
  *                                                                            *
  * Parameters: glob    - [IN] glob as specified in Include directive          *
  *             path    - [OUT] parsed path, either directory or file          *
@@ -206,14 +206,14 @@ trim:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse directory with configuration files                          *
+ * Purpose: parses directory with configuration files                         *
  *                                                                            *
- * Parameters: path    - full path to directory                               *
- *             pattern - pattern that files in the directory should match     *
- *             cfg     - pointer to configuration parameter structure         *
- *             level   - a level of included file                             *
- *             strict  - treat unknown parameters as error                    *
- *             noexit  - on error return FAIL instead of EXIT_FAILURE         *
+ * Parameters: path    - [IN] full path to directory                          *
+ *             pattern - [IN] pattern that files in directory should match    *
+ *             cfg     - [OUT] pointer to configuration parameter structure   *
+ *             level   - [IN] level of included file                          *
+ *             strict  - [IN] treat unknown parameters as error               *
+ *             noexit  - [INT] on error return FAIL instead of EXIT_FAILURE   *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing directory                            *
@@ -358,13 +358,13 @@ static char	*expand_include_path(char *raw_path)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse "Include=..." line in configuration file                    *
+ * Purpose: parses "Include=..." line in configuration file                   *
  *                                                                            *
- * Parameters: cfg_file - full name of config file                            *
- *             cfg      - pointer to configuration parameter structure        *
- *             level    - a level of included file                            *
- *             strict   - treat unknown parameters as error                   *
- *             noexit   - on error return FAIL instead of EXIT_FAILURE        *
+ * Parameters: cfg_file - [IN] full name of config file                       *
+ *             cfg      - [OUT] pointer to configuration parameter structure  *
+ *             level    - [IN] level of included file                         *
+ *             strict   - [IN] treat unknown parameters as error              *
+ *             noexit   - [IN] on error return FAIL instead of EXIT_FAILURE   *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing object                               *
@@ -407,21 +407,21 @@ clean:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parse configuration file                                          *
- *                                                                            *
- * Parameters: cfg_file - full name of config file                            *
- *             cfg      - pointer to configuration parameter structure        *
- *             level    - a level of included file                            *
- *             optional - do not treat missing configuration file as error    *
- *             strict   - treat unknown parameters as error                   *
- *             noexit   - on error return FAIL instead of EXIT_FAILURE        *
- *                                                                            *
- * Return value: SUCCEED - parsed successfully                                *
- *               FAIL - error processing config file                          *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: parses configuration file                                           *
+ *                                                                              *
+ * Parameters: cfg_file - [IN] full name of config file                         *
+ *             cfg      - [OUT] pointer to configuration parameter structure    *
+ *             level    - [IN] level of included file                           *
+ *             optional - [IN] do not treat missing configuration file as error *
+ *             strict   - [IN] treat unknown parameters as error                *
+ *             noexit   - [IN] on error return FAIL instead of EXIT_FAILURE     *
+ *                                                                              *
+ * Return value: SUCCEED - parsed successfully                                  *
+ *               FAIL - error processing config file                            *
+ *                                                                              *
+ ********************************************************************************/
 static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int optional, int strict,
 		int noexit)
 {
@@ -623,6 +623,10 @@ error:
 		exit(EXIT_FAILURE);
 
 	return FAIL;
+#undef ZBX_MAX_INCLUDE_LEVEL
+
+#undef ZBX_CFG_LTRIM_CHARS
+#undef ZBX_CFG_RTRIM_CHARS
 }
 
 int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit)
@@ -662,9 +666,7 @@ void	zbx_addr_free(zbx_addr_t *addr)
 
 void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *addr_from)
 {
-	int	j;
-
-	for (j = 0; j < addr_from->values_num; j++)
+	for (int j = 0; j < addr_from->values_num; j++)
 	{
 		const zbx_addr_t	*addr = addr_from->values[j];
 		zbx_addr_t		*addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
@@ -687,8 +689,8 @@ static int	addr_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse "ServerActive' parameter value and set destination servers  *
- *          using a callback function                                         *
+ * Purpose: Parses "ServerActive' parameter value and set destination servers *
+ *          using a callback function.                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
