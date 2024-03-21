@@ -759,6 +759,12 @@ function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_di
 		$delete_msg = _('will not be deleted');
 
 		switch (true) {
+			case $ts_disable != 0 && $current_time > $ts_disable:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_('will be disabled the next time discovery rule is processed'), $delete_msg
+				);
+				break;
+
 			case $ts_disable > 0:
 				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
 					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)), $delete_msg
@@ -768,12 +774,6 @@ function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_di
 			case $ts_disable == 0:
 				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
 					_('will not be disabled'), $delete_msg
-				);
-				break;
-
-			case $ts_disable != 0 && $current_time > $ts_disable:
-				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
-					_('will be disabled the next time discovery rule is processed'), $delete_msg
 				);
 				break;
 		}
