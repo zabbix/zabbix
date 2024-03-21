@@ -70,7 +70,7 @@ class CTableInfo extends CTable {
 
 		if ($this->rownum == 0 && $this->message !== null) {
 			$ret .= $this->prepareRow($this->message, ZBX_STYLE_NOTHING_TO_SHOW)->toString();
- 		}
+		}
 
 		$ret .= parent::endToString();
 
