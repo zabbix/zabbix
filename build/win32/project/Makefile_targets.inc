@@ -57,7 +57,7 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcompress}.c{..\..\..\src\libs\zbxcompress}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\libs\zbxconf}.c{..\..\..\src\libs\zbxconf}.o:
+{..\..\..\src\libs\zbxcfg}.c{..\..\..\src\libs\zbxcfg}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxcrypto}.c{..\..\..\src\libs\zbxcrypto}.o:
