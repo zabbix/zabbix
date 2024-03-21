@@ -70,6 +70,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \

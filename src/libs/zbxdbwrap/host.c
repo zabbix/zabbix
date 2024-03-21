@@ -22,6 +22,7 @@
 #include "template.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
+
 #include "zbxcacheconfig.h"
 #include "zbxexpression.h"
 #include "audit/zbxaudit_host.h"
@@ -33,6 +34,11 @@
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbxcrypto.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxhash.h"
+#include "zbxstr.h"
 
 typedef enum
 {

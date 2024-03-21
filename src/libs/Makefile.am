@@ -16,11 +16,13 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
+	zbxcurl \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
 	zbxdbhigh \
+	zbxdiscoverer \
 	zbxdbwrap \
 	zbxdbsyncer \
 	zbxdbschema \
@@ -96,6 +98,8 @@ SERVER_SUBDIRS = \
 	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -159,6 +163,8 @@ PROXY_SUBDIRS = \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -224,6 +230,7 @@ SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
+	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxexec \

@@ -40,6 +40,7 @@ COMMON_LIBS2 = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \

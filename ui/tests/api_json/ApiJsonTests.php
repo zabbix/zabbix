@@ -58,6 +58,7 @@ require_once dirname(__FILE__).'/testItemPrototype.php';
 require_once dirname(__FILE__).'/testItemPreprocessing.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testMap.php';
+require_once dirname(__FILE__).'/testMfa.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testProxyGroup.php';
 require_once dirname(__FILE__).'/testRole.php';
@@ -127,6 +128,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testItemPreprocessing');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testMap');
+		$suite->addTestSuite('testMfa');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testRole');
 		$suite->addTestSuite('testScimGroup');

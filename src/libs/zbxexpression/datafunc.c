@@ -31,6 +31,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *

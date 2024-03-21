@@ -1063,6 +1063,7 @@ typedef struct
 	zbx_uint64_t	config;			/* configuration cache revision, increased every sync */
 	zbx_uint64_t	expression;		/* global expression revision */
 	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
+	zbx_uint64_t	drules;			/* drules revision */
 	zbx_uint64_t	upstream;		/* configuration revision received from server */
 	zbx_uint64_t	upstream_hostmap;	/* host mapping configuration revision received from server */
 	zbx_uint64_t	config_table;		/* the global configuration revision (config table) */
@@ -1268,7 +1269,7 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
-void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
+int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);

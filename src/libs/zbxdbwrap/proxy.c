@@ -38,6 +38,14 @@
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
 #include "zbxautoreg.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxexpr.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -1759,12 +1767,17 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  ******************************************************************************/
 static int	process_services(const zbx_vector_dservice_ptr_t *services, const char *ip,
 		const zbx_add_event_func_t add_event_cb, zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids,
-		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
+		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb,
+		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
+		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
 	zbx_db_dhost			dhost;
 	zbx_dservice_t			*service;
 	int				services_num, ret = FAIL, i, dchecks = 0;
 	zbx_vector_dservice_ptr_t	services_old;
+	zbx_vector_uint64_t		dserviceids;
 	zbx_db_drule			drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1772,6 +1785,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 	memset(&dhost, 0, sizeof(dhost));
 
 	zbx_vector_dservice_ptr_create(&services_old);
+	zbx_vector_uint64_create(&dserviceids);
 
 	/* find host update */
 	for (i = *processed_num; i < services->values_num; i++)
@@ -1781,8 +1795,8 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu status:%d value:'%s'",
 				__func__, drule.druleid, service->dcheckid, drule.unique_dcheckid,
-				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip, service->dns,
-				service->port, service->status, service->value);
+				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip,
+				service->dns, service->port, service->status, service->value);
 
 		if (0 == service->dcheckid)
 			break;
@@ -1866,7 +1880,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_db_lock_ids("dchecks", "dcheckid", dcheckids))
+		if (0 != dchecks && SUCCEED != zbx_db_lock_ids("dchecks", "dcheckid", dcheckids))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "checks are not available for druleid:" ZBX_FS_UI64, drule.druleid);
 			goto fail;
@@ -1875,90 +1889,117 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 
 	if (0 == dchecks)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot process host update without services");
-		goto fail;
-	}
+		discovery_find_host_cb(druleid, ip, &dhost);	/* we will mark all services as DOWN */
 
-	for (i = 0; i < services_old.values_num; i++)
-	{
-		service = services_old.values[i];
-
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (0 == dhost.dhostid)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
-			continue;
+			(*processed_num)++;
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process update of unknown host without services");
+			goto out;
+		}
+	}
+	else
+	{
+		for (i = 0; i < services_old.values_num; i++)
+		{
+			service = services_old.values[i];
+
+			if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist",
+						service->dcheckid);
+				continue;
+			}
+
+			discovery_update_service_cb(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+					&dhost, ip, service->dns, service->port, service->status, service->value,
+					service->itemtime, &dserviceids, add_event_cb);
 		}
 
-		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime,
-				add_event_cb);
-	}
-
-	for (;*processed_num < services_num; (*processed_num)++)
-	{
-		service = services->values[*processed_num];
-
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		for (;*processed_num < services_num; (*processed_num)++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
-			continue;
-		}
+			service = services->values[*processed_num];
 
-		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime,
-				add_event_cb);
+			if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist",
+						service->dcheckid);
+				continue;
+			}
+
+			discovery_update_service_cb(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+					&dhost, ip, service->dns, service->port, service->status, service->value,
+					service->itemtime, &dserviceids, add_event_cb);
+		}
 	}
 
 	service = services->values[(*processed_num)++];
-	zbx_discovery_update_host(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
 
+	if (0 != dhost.dhostid)
+		discovery_update_service_down_cb(dhost.dhostid, service->itemtime, &dserviceids);
+
+	discovery_update_host_cb(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
+out:
 	ret = SUCCEED;
 fail:
 	zbx_vector_dservice_ptr_clear_ext(&services_old, zbx_dservice_ptr_free);
 	zbx_vector_dservice_ptr_destroy(&services_old);
+	zbx_vector_uint64_destroy(&dserviceids);
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parse discovery data contents and process it                      *
- *                                                                            *
- * Parameters: jp_data         - [IN] JSON with discovery data                *
- *             events_cbs      - [IN]                                         *
- *             error           - [OUT] address of a pointer to the info       *
- *                                     string (should be freed by the caller) *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: parses discovery data contents and processes it                      *
+ *                                                                               *
+ * Parameters:                                                                   *
+ *    jp_data                     - [IN] JSON with discovery data                *
+ *    events_cbs                  - [IN]                                         *
+ *    discovery_update_host_cb    - [IN]                                         *
+ *    discovery_update_service_cb - [IN]                                         *
+ *    error                       - [OUT] address of pointer to info string      *
+ *                                        (should be freed by the caller)        *
+ *                                                                               *
+ * Return value:  SUCCEED - processed successfully                               *
+ *                FAIL - error occurred                                          *
+ *                                                                               *
+ *********************************************************************************/
 static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_events_funcs_t *events_cbs,
-		char **error)
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb,
+		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
+		zbx_discovery_find_host_func_t discovery_find_host_cb,
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb, char **error)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_uint64_t		dcheckid, druleid;
-	struct zbx_json_parse	jp_row;
-	int			status, ret = SUCCEED, i, j;
-	unsigned short		port;
-	const char		*p = NULL;
-	char			ip[ZBX_INTERFACE_IP_LEN_MAX], tmp[MAX_STRING_LEN],
-				dns[ZBX_INTERFACE_DNS_LEN_MAX], *value = NULL;
-	time_t			itemtime;
-	size_t			value_alloc = ZBX_MAX_DISCOVERED_VALUE_SIZE;
-	zbx_vector_ptr_t	drules;
-	zbx_drule_t		*drule;
-	zbx_drule_ip_t		*drule_ip;
-	zbx_dservice_t		*service;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
+	zbx_uint64_t				dcheckid, druleid;
+	struct zbx_json_parse			jp_row;
+	int					status, ret = SUCCEED, i, j;
+	unsigned short				port;
+	const char				*p = NULL;
+	char					ip[ZBX_INTERFACE_IP_LEN_MAX], tmp[MAX_STRING_LEN],
+						dns[ZBX_INTERFACE_DNS_LEN_MAX], *value = NULL;
+	time_t					itemtime;
+	size_t					value_alloc = ZBX_MAX_DISCOVERED_VALUE_SIZE;
+	zbx_vector_ptr_t			drules;
+	zbx_drule_t				*drule;
+	zbx_drule_ip_t				*drule_ip;
+	zbx_dservice_t				*service;
+	zbx_vector_discoverer_drule_error_t	drule_errors;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
 	zbx_vector_ptr_create(&drules);
+	zbx_vector_discoverer_drule_error_create(&drule_errors);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -1974,6 +2015,25 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 			goto json_parse_error;
 
 		ZBX_STR2UINT64(druleid, tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
+			status = atoi(tmp);
+		else
+			status = 0;
+
+		if (DOBJECT_STATUS_FINALIZED == status)
+		{
+			zbx_discoverer_drule_error_t	dre_val = {.druleid = druleid, .error = NULL};
+
+			if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL) &&
+					'\0' != tmp[0])
+			{
+				dre_val.error = zbx_strdup(NULL, tmp);
+			}
+
+			zbx_vector_discoverer_drule_error_append(&drule_errors, dre_val);
+			continue;
+		}
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp), NULL))
 			goto json_parse_error;
@@ -2014,11 +2074,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __func__, dns);
 			continue;
 		}
-
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
-			status = atoi(tmp);
-		else
-			status = 0;
 
 		if (FAIL == (i = zbx_vector_ptr_search(&drules, &druleid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2090,7 +2145,9 @@ json_parse_error:
 			{
 				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip,
 						events_cbs->add_event_cb, drule->druleid, &drule->dcheckids,
-						unique_dcheckid, &processed_num, j)))
+						unique_dcheckid, &processed_num, j, discovery_update_host_cb,
+						discovery_update_service_cb, discovery_update_service_down_cb,
+						discovery_find_host_cb)))
 				{
 					break;
 				}
@@ -2105,11 +2162,19 @@ json_parse_error:
 
 		zbx_db_commit();
 	}
+
+	for (i = 0; i < drule_errors.values_num; i++)
+	{
+		discovery_update_drule_cb(NULL, drule_errors.values[i].druleid, drule_errors.values[i].error, 0);
+	}
+
 json_parse_return:
 	zbx_free(value);
 
 	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
 	zbx_vector_ptr_destroy(&drules);
+	zbx_vector_discoverer_drule_error_clear_ext(&drule_errors, zbx_discoverer_drule_error_free);
+	zbx_vector_discoverer_drule_error_destroy(&drule_errors);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2377,28 +2442,35 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
 	}
 }
 
-/***********************************************************************************
- *                                                                                 *
- * Purpose: process 'proxy data' request                                           *
- *                                                                                 *
- * Parameters: proxy               - [IN] source proxy                             *
- *             jp                  - [IN] JSON with proxy data                     *
- *             ts                  - [IN] timestamp when the proxy connection was  *
- *                                        established                              *
- *             proxy_status        - [IN] active or passive proxy mode             *
- *             events_cbs          - [IN]                                          *
- *             proxydata_frequency - [IN]                                          *
- *             more                - [OUT] available data flag                     *
- *             error               - [OUT] address of a pointer to the info string *
- *                                         (should be freed by the caller)         *
- *                                                                                 *
- * Return value:  SUCCEED - processed successfully                                 *
- *                FAIL - an error occurred                                         *
- *                                                                                 *
- ***********************************************************************************/
+/*****************************************************************************
+ *                                                                           *
+ * Purpose: processes 'proxy data' request                                   *
+ *                                                                           *
+ * Parameters:                                                               *
+ *    proxy                       - [IN] source proxy                        *
+ *    jp                          - [IN] JSON with proxy data                *
+ *    ts                          - [IN] timestamp when proxy connection was *
+ *                                       established                         *
+ *    proxy_status                - [IN] active or passive proxy mode        *
+ *    events_cbs                  - [IN]                                     *
+ *    proxydata_frequency         - [IN]                                     *
+ *    discovery_update_host_cb    - [IN]                                     *
+ *    discovery_update_service_cb - [IN]                                     *
+ *    more                        - [OUT] available data flag                *
+ *    error                       - [OUT] address of pointer to info string  *
+ *                                        (should be freed by the caller)    *
+ *                                                                           *
+ * Return value:  SUCCEED - processed successfully                           *
+ *                FAIL - error occurred                                      *
+ *                                                                           *
+ *****************************************************************************/
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
-		char **error)
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
+		zbx_discovery_update_host_func_t discovery_update_host_cb,
+		zbx_discovery_update_service_func_t discovery_update_service_cb,
+		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
+		zbx_discovery_find_host_func_t discovery_find_host_cb,
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old, lastaccess;
@@ -2499,8 +2571,12 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, events_cbs, &error_step)))
+		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, events_cbs,
+				discovery_update_host_cb, discovery_update_service_cb, discovery_update_service_down_cb,
+				discovery_find_host_cb, discovery_update_drule_cb, &error_step)))
+		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+		}
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
