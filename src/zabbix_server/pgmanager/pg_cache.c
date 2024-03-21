@@ -241,6 +241,8 @@ static void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_proxy_t *p
 	if (FAIL != (i = zbx_vector_pg_proxy_ptr_search(&proxy->group->proxies, proxy, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
 
+	zbx_vector_pg_host_ptr_clear(&proxy->hosts);
+
 	pg_cache_queue_group_update(cache, proxy->group);
 }
 
