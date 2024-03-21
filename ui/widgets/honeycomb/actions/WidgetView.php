@@ -220,7 +220,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$result = '';
 
 		foreach (array_slice(explode("\n", $label, self::LABEL_MAX_LINES + 1), 0, self::LABEL_MAX_LINES) as $line) {
-			$result .= ($result === '' ?: "\n").mb_substr(trim($line), 0, self::LABEL_MAX_LINE_LENGTH);
+			$result .= ($result !== '' ? "\n" : '').mb_substr(trim($line), 0, self::LABEL_MAX_LINE_LENGTH);
 		}
 
 		return $result;
