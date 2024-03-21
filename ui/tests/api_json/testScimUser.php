@@ -470,8 +470,8 @@ class testScimUser extends CAPIScimTest {
 		$result = $this->call('users.get', $user);
 
 		if ($result && array_key_exists('Resources', $expected_result) && $expected_result['Resources']) {
-			$result['Resources'] = array_column($result['Resources'], null, 'userid');
-			$expected_result['Resources'] = array_column($expected_result['Resources'], null, 'userid');
+			$result['Resources'] = array_column($result['Resources'], null, 'id');
+			$expected_result['Resources'] = array_column($expected_result['Resources'], null, 'id');
 		}
 
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
