@@ -43,7 +43,10 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -1195,6 +1198,13 @@ class testDashboardPieChartWidget extends testWidgets {
 				]
 			]
 		];
+	}
+
+	/**
+	 * Tests that only the correct item types can be used in the Pie chart widget.
+	 */
+	public function testDashboardPieChartWidget_CheckAvailableItems() {
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id, 'Pie chart');
 	}
 
 	/**

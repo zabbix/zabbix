@@ -77,7 +77,8 @@ class testWidgets extends CWebTest {
 
 			case 'Graph':
 			case 'Gauge':
-				// For Graph and Gauge only numeric items are available.
+			case 'Pie chart':
+				// For Graph, Gauge and Pie chart only numeric items are available.
 				$item_types = ['Float item', 'Unsigned item', 'Unsigned_dependent item'];
 				break;
 
@@ -90,7 +91,9 @@ class testWidgets extends CWebTest {
 				break;
 		}
 
-		$select_button = ($widget === 'Graph') ? 'xpath:(.//button[text()="Select"])[2]' : 'button:Select';
+		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
+			? 'xpath:(.//button[text()="Select"])[2]'
+			: 'button:Select';
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
