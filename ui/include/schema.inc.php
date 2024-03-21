@@ -10179,6 +10179,18 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '1'
+			]
+		]
+	],
+	'proxy_group_rtdata' => [
+		'key' => 'proxy_groupid',
+		'fields' => [
+			'proxy_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy_group',
+				'ref_field' => 'proxy_groupid'
 			],
 			'state' => [
 				'null' => false,

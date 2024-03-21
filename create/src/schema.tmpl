@@ -2254,8 +2254,11 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|failover_delay	|t_varchar(255)	|'1m'	|NOT NULL	|0
 FIELD		|min_online	|t_varchar(255)	|'1'	|NOT NULL	|0
-FIELD		|state		|t_integer	|'0'	|NOT NULL	|0
 CHANGELOG	|20
+
+TABLE|proxy_group_rtdata|proxy_groupid|0
+FIELD		|proxy_groupid	|t_id		|	|NOT NULL	|0		|1|proxy_group|proxy_groupid
+FIELD		|state		|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|host_proxy|hostproxyid|0
 FIELD		|hostproxyid	|t_id		|	|NOT NULL	|0
@@ -2296,4 +2299,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050254	|6050254
+ROW		|1		|6050256	|6050256

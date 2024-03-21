@@ -3407,7 +3407,6 @@ static int	DBpatch_6050230(void)
 				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{"failover_delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"min_online", "1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -3578,6 +3577,29 @@ static int	DBpatch_6050254(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6050255(void)
+{
+	const zbx_db_table_t	table = {"proxy_group_rtdata", "proxy_groupid", 0,
+			{
+				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050256(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("proxy_group_rtdata", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3837,5 +3859,7 @@ DBPATCH_ADD(6050251, 0, 1)
 DBPATCH_ADD(6050252, 0, 1)
 DBPATCH_ADD(6050253, 0, 1)
 DBPATCH_ADD(6050254, 0, 1)
+DBPATCH_ADD(6050255, 0, 1)
+DBPATCH_ADD(6050256, 0, 1)
 
 DBPATCH_END()
