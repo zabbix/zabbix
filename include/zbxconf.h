@@ -70,10 +70,10 @@ typedef struct
 	int	(*cfg_custom_parameter_parser_func)(const char *value, const zbx_cfg_line_t *cfg);
 }	cfg_custom_parameter_parser_t;
 
+void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
+
 void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *addr_from);
 void	zbx_addr_free(zbx_addr_t *addr);
-
-void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 
 int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit);
 

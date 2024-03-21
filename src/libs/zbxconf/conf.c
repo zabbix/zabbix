@@ -41,6 +41,12 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 
 ZBX_PTR_VECTOR_IMPL(addr_ptr, zbx_addr_t *)
 
+void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
+{
+	program_type_str = get_program_type_string(program_type);
+	main_cfg_file = cfg_file;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: see whether a file (e.g., "parameter.conf")                       *
@@ -616,12 +622,6 @@ error:
 		exit(EXIT_FAILURE);
 
 	return FAIL;
-}
-
-void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
-{
-	program_type_str = get_program_type_string(program_type);
-	main_cfg_file = cfg_file;
 }
 
 int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit)
