@@ -3759,7 +3759,7 @@ select {
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #acbbc2 !important; }
   .checkbox-radio[type="radio"]:checked[readonly] + label span::after {
-    background-color: #0275b8 !important; }
+    background-color: #1f2c33 !important; }
   .checkbox-radio:focus + label span {
     border-color: #02659f; }
   .checkbox-radio:checked:focus + label span {
