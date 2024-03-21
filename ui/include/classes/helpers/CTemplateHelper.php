@@ -57,4 +57,19 @@ class CTemplateHelper {
 
 		return array_keys($all_templateids);
 	}
+
+	static public function cloneTemplateDashboards(string $src_templateid, string $dst_templateid): bool {
+		$db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'templateids' => $src_templateid,
+			'selectPages' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		]);
+
+		return $db_template_dashboards
+			? (bool) API::TemplateDashboard()->create(
+				CDashboardHelper::prepareForClone($db_template_dashboards, $dst_templateid)
+			)
+			: true;
+	}
 }

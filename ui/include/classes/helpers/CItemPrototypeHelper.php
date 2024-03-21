@@ -82,25 +82,17 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 
 	/**
 	 * @param array $src_options
-	 * @param array $dst_options
-	 * @param array $dst_ruleids
 	 * @param array $dst_hosts
+	 * @param array $dst_ruleids
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options, array $dst_ruleids, array $dst_hosts): bool {
-		$src_items = self::getSourceItemPrototypes($src_options);
-
-		if (!$src_items) {
-			return true;
-		}
-
-		$dst_hostids = reset($dst_options);
-
+	private static function copy(array $src_items, array $dst_hosts, array $dst_ruleids): bool {
+		$dst_hostids = array_keys($dst_hosts);
 		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
 
 		try {
-			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_options);
+			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
@@ -117,7 +109,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			}
 		}
 
-		$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
+		$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
 
 		do {
 			$dst_items = [];
@@ -178,6 +170,19 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 		} while ($src_items);
 
 		return true;
+	}
+
+	/**
+	 * @param array $src_options
+	 * @param array $dst_hosts
+	 * @param array $dst_ruleids
+	 *
+	 * @return bool
+	 */
+	public static function cloneItems(array $src_options, array $dst_hosts, array $dst_ruleids): bool {
+		$src_items = self::getSourceItemPrototypes($src_options);
+
+		return $src_items ? self::copy($src_items, $dst_hosts, $dst_ruleids) : true;
 	}
 
 	/**

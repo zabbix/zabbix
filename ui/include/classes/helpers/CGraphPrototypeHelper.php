@@ -22,18 +22,12 @@
 class CGraphPrototypeHelper extends CGraphGeneralHelper {
 
 	/**
-	 * @param array $src_options
+	 * @param array $src_graphs
 	 * @param array $dst_options
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options): bool {
-		$src_graphs = self::getSourceGraphs($src_options);
-
-		if (!$src_graphs) {
-			return true;
-		}
-
+	private static function copy(array $src_graphs, array $dst_options): bool {
 		$dst_itemids = self::getDestinationItems($src_graphs, $dst_options);
 
 		$dst_hostids = reset($dst_options);
@@ -65,6 +59,22 @@ class CGraphPrototypeHelper extends CGraphGeneralHelper {
 		$response = API::GraphPrototype()->create($dst_graphs);
 
 		return $response !== false;
+	}
+
+	/**
+	 * @param array $src_options
+	 * @param array $dst_hosts
+	 *
+	 * @return bool
+	 */
+	public static function cloneGraphs(array $src_options, array $dst_hosts): bool {
+		$src_graphs = self::getSourceGraphs($src_options);
+
+		$dst_options = reset($dst_hosts)['status'] == HOST_STATUS_TEMPLATE
+			? ['templateids' => array_keys($dst_hosts)]
+			: ['hostids' => array_keys($dst_hosts)];
+
+		return $src_graphs ? self::copy($src_graphs, $dst_options) : true;
 	}
 
 	/**

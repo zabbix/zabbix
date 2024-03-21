@@ -61,8 +61,6 @@ class CControllerTemplateCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$clone = $this->hasInput('clone');
-
 		try {
 			DBstart();
 			$template_name = $this->getInput('template_name', '');
@@ -142,15 +140,19 @@ class CControllerTemplateCreate extends CController {
 
 			$result = API::Template()->create($template);
 
-			$src_templateid = $this->getInput('clone_templateid', 0);
-
-			if ($result === false
-					|| !$this->createValueMaps($result['templateids'][0], $this->getInput('valuemaps', []))
-					|| ($clone && !$this->copyFromCloneSourceTemplate($src_templateid, $result['templateids'][0]))) {
+			if ($result === false) {
 				throw new Exception();
 			}
 
-			$result = DBend();
+			$template = ['templateid' => $result['templateids'][0]] + $template;
+			$src_templateid = $this->getInput('clone_templateid', 0);
+
+			if (!$this->createValueMaps($template['templateid'], $this->getInput('valuemaps', []))
+					|| ($this->hasInput('clone') && !$this->copyFromCloneSourceTemplate($src_templateid, $template))) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
 		}
 		catch (Exception $e) {
 			$result = false;
@@ -197,37 +199,18 @@ class CControllerTemplateCreate extends CController {
 	 * Copy http tests, items, triggers, graphs, discovery rules and template dashboards from source template to target
 	 * template.
 	 *
-	 * @param string $src_templateid  Source templateid.
-	 * @param string $templateid      Target templateid.
+	 * @param string $src_templateid
+	 * @param array  $dst_template
 	 *
 	 * @return bool
 	 */
-	private function copyFromCloneSourceTemplate(string $src_templateid, string $templateid): bool {
+	private function copyFromCloneSourceTemplate(string $src_templateid, array $dst_template): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_templateid, $templateid)
-				|| !CItemHelper::cloneTemplateItems($src_templateid, $templateid)
-				|| !CTriggerHelper::cloneTemplateTriggers($src_templateid, $templateid)
-				|| !CGraphHelper::cloneTemplateGraphs($src_templateid, $templateid)
-				|| !CLldRuleHelper::cloneTemplateItems($src_templateid, $templateid)) {
-			return false;
-		}
-
-		// Copy template dashboards.
-		$db_template_dashboards = API::TemplateDashboard()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'templateids' => $src_templateid,
-			'selectPages' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-
-		if ($db_template_dashboards) {
-			$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $templateid);
-
-			if (!API::TemplateDashboard()->create($db_template_dashboards)) {
-				return false;
-			}
-		}
-
-		return true;
+		return copyHttpTests($src_templateid, $dst_template['templateid'])
+			&& CItemHelper::cloneTemplateItems($src_templateid, $dst_template)
+			&& CTriggerHelper::cloneTemplateTriggers($src_templateid, $dst_template['templateid'])
+			&& CGraphHelper::cloneTemplateGraphs($src_templateid, $dst_template['templateid'])
+			&& CLldRuleHelper::cloneTemplateItems($src_templateid, $dst_template)
+			&& CTemplateHelper::cloneTemplateDashboards($src_templateid, $dst_template['templateid']);
 	}
 }

@@ -541,24 +541,22 @@ class CItemGeneralHelper {
 
 	/**
 	 * @param array  $src_items
-	 * @param array  $dst_options
+	 * @param array  $dst_hosts
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationHostInterfaces(array $src_items, array $dst_options): array {
-		$dst_hostids = reset($dst_options);
+	protected static function getDestinationHostInterfaces(array $src_items, array $dst_hosts): array {
+		$dst_hostids = array_keys($dst_hosts);
 
-		if (!array_key_exists('hostids', $dst_options)) {
+		if (reset($dst_hosts)['status'] == HOST_STATUS_TEMPLATE) {
 			$dst_interfaceids = [];
 
 			if (in_array(reset($src_items)['hosts'][0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
 				foreach ($src_items as $src_item) {
 					if ($src_item['interfaceid'] != 0) {
-						foreach ($dst_hostids as $dst_hostid) {
-							$dst_interfaceids[$src_item['itemid']][$dst_hostid] = 0;
-						}
+						$dst_interfaceids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 					}
 				}
 			}
@@ -571,9 +569,7 @@ class CItemGeneralHelper {
 
 		foreach ($src_items as $src_item) {
 			if (itemTypeInterface($src_item['type']) !== false) {
-				foreach ($dst_hostids as $dst_hostid) {
-					$dst_interfaceids[$src_item['itemid']][$dst_hostid] = 0;
-				}
+				$dst_interfaceids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 			}
 
 			if ($src_item['interfaceid'] != 0) {
@@ -681,25 +677,21 @@ class CItemGeneralHelper {
 
 	/**
 	 * @param array  $src_items
-	 * @param array  $dst_options
+	 * @param array  $dst_hosts
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationMasterItems(array $src_items, array $dst_options): array {
-		$dst_hostids = reset($dst_options);
-
+	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts): array {
+		$dst_hostids = array_keys($dst_hosts);
 		$item_indexes = [];
 		$dst_master_itemids = [];
 
 		foreach ($src_items as $src_item) {
 			if ($src_item['master_itemid'] != 0) {
 				$item_indexes[$src_item['master_itemid']][] = $src_item['itemid'];
-
-				foreach ($dst_hostids as $dst_hostid) {
-					$dst_master_itemids[$src_item['itemid']][$dst_hostid] = 0;
-				}
+				$dst_master_itemids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 			}
 		}
 
@@ -713,13 +705,14 @@ class CItemGeneralHelper {
 			'webitems' => true,
 			'preservekeys' => true
 		]);
-
+		$host_filter = reset($dst_hosts)['status'] == HOST_STATUS_TEMPLATE
+			? ['templateids' => $dst_hostids]
+			: ['hostids' => $dst_hostids];
 		$dst_master_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_'],
 			'filter' => ['key_' => array_unique(array_column($src_master_items, 'key_'))],
 			'webitems' => true
-		] + $dst_options);
-
+		] + $host_filter);
 		$_dst_master_itemids = [];
 
 		foreach ($dst_master_items as $dst_master_item) {

@@ -142,18 +142,14 @@ class CControllerCopyCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$copy_targetids = $this->getTargetIds();
-		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
-			? ['templateids' => $copy_targetids]
-			: ['hostids' => $copy_targetids];
-
+		$dst_hosts = $this->getTargets();
 		$success = false;
 		DBstart();
 
 		switch ($this->getInput('source')) {
 			case 'items':
 				$src_options = ['itemids' => $this->getInput('itemids')];
-				$success = CItemHelper::copy($src_options, $dst_options);
+				$success = !$dst_hosts || CItemHelper::copy($src_options, $dst_hosts);
 
 				$items_count = count($src_options['itemids']);
 				$title = $success
@@ -164,7 +160,7 @@ class CControllerCopyCreate extends CController {
 			case 'triggers':
 				$src_options = ['triggerids' => $this->getInput('triggerids')]
 					+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
-				$success = CTriggerHelper::copy($src_options, $dst_options);
+				$success = !$dst_hosts || CTriggerHelper::copy($src_options, $dst_hosts);
 
 				$triggers_count = count($src_options['triggerids']);
 				$title = $success
@@ -175,7 +171,7 @@ class CControllerCopyCreate extends CController {
 			case 'graphs':
 				$src_options = ['graphids' => $this->getInput('graphids')]
 					+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
-				$success = CGraphHelper::copy($src_options, $dst_options);
+				$success = !$dst_hosts || CGraphHelper::copy($src_options, $dst_hosts);
 
 				$graphs_count = count($src_options['graphids']);
 				$title = $success
@@ -193,29 +189,40 @@ class CControllerCopyCreate extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
-	private function getTargetIds(): array {
-		$copy_targetids = $this->getInput('copy_targetids', []);
+	private function getTargets(): array {
+		$targetids = $this->getInput('copy_targetids', []);
 		$copy_type = $this->getInput('copy_type');
-		$targetids = [];
 
-		if ($copy_type == COPY_TYPE_TO_HOST || $copy_type == COPY_TYPE_TO_TEMPLATE) {
-			$targetids = $copy_targetids;
-		}
-		elseif ($copy_type == COPY_TYPE_TO_HOST_GROUP) {
-			$targetids = array_keys(API::Host()->get([
-				'output' => [],
-				'groupids' => $copy_targetids,
+		$dst_hosts = match ($copy_type) {
+			COPY_TYPE_TO_HOST => API::Host()->get([
+				'output' => ['host', 'status'],
+				'hostids' => $targetids,
 				'preservekeys' => true
-			]));
-		}
-		elseif ($copy_type == COPY_TYPE_TO_TEMPLATE_GROUP) {
-			$targetids = array_keys(API::Template()->get([
-				'output' => [],
-				'groupids' => $copy_targetids,
+			]),
+			COPY_TYPE_TO_HOST_GROUP => API::Host()->get([
+				'output' => ['host', 'status'],
+				'groupids' => $targetids,
 				'preservekeys' => true
-			]));
+			]),
+			COPY_TYPE_TO_TEMPLATE => API::Template()->get([
+				'output' => ['host'],
+				'templateids' => $targetids,
+				'preservekeys' => true
+			]),
+			COPY_TYPE_TO_TEMPLATE_GROUP => API::Template()->get([
+				'output' => ['host'],
+				'groupids' => $targetids,
+				'preservekeys' => true
+			])
+		};
+
+		if (in_array($copy_type, [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])) {
+			foreach ($dst_hosts as &$dst_host) {
+				$dst_host['status'] = HOST_STATUS_TEMPLATE;
+			}
+			unset($dst_host);
 		}
 
-		return $targetids;
+		return $dst_hosts;
 	}
 }

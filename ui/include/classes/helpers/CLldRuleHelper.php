@@ -23,68 +23,53 @@ class CLldRuleHelper extends CItemGeneralHelper {
 
 	/**
 	 * @param string $src_templateid
-	 * @param string $dst_templateid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneTemplateItems(string $src_templateid, string $dst_templateid): bool {
-		$src_options = [
+	public static function cloneTemplateItems(string $src_templateid, array $dst_host): bool {
+		$src_items = self::getSourceLldRules([
 			'templateids' => $src_templateid,
 			'inherited' => false
-		];
+		]);
 
-		$dst_options = ['templateids' => [$dst_templateid]];
-
-		return self::copy($src_options, $dst_options);
+		return $src_items
+			? self::copy($src_items, [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]])
+			: true;
 	}
 
 	/**
 	 * @param string $src_hostid
-	 * @param string $dst_hostid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneHostItems(string $src_hostid, string $dst_hostid): bool {
-		$src_options = [
+	public static function cloneHostItems(string $src_hostid, array $dst_host): bool {
+		$src_items = self::getSourceLldRules([
 			'hostids' => $src_hostid,
 			'inherited' => false
-		];
+		]);
 
-		$dst_options = ['hostids' => [$dst_hostid]];
-
-		return self::copy($src_options, $dst_options);
+		return $src_items ? self::copy($src_items, [$dst_host['hostid'] => $dst_host]) : true;
 	}
 
 	/**
-	 * @param array $src_options
-	 * @param array $dst_options
+	 * @param array $src_items
+	 * @param array $dst_hosts
 	 *
 	 * @return bool
 	 */
-	private static function copy(array $src_options, array $dst_options): bool {
-		$src_items = self::getSourceLldRules($src_options);
-
-		if (!$src_items) {
-			return true;
-		}
-
-		$dst_hostids = reset($dst_options);
-
+	private static function copy(array $src_items, array $dst_hosts): bool {
 		try {
-			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_options);
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
+			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
+			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
 		}
 
+		$dst_hostids = array_keys($dst_hosts);
 		$dst_items = [];
-		$dst_hosts = DB::select('hosts', [
-			'output' => ['host', 'status'],
-			'hostids' => $dst_hostids,
-			'preservekeys' => true
-		]);
-
 		foreach ($dst_hostids as $dst_hostid) {
 			foreach ($src_items as $src_item) {
 				$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts']));
@@ -111,19 +96,19 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			return false;
 		}
 
-		$src_options = ['discoveryids' => array_keys($src_items)];
 		$dst_itemids = [];
-
 		foreach ($dst_hostids as $dst_hostid) {
 			foreach ($src_items as $src_item) {
 				$dst_itemids[$src_item['itemid']][$dst_hostid] = array_shift($response['itemids']);
 			}
 		}
 
-		return CItemPrototypeHelper::copy($src_options, $dst_options, $dst_itemids, $dst_hosts)
-			&& CTriggerPrototypeHelper::copy($src_options, $dst_hosts)
-			&& CGraphPrototypeHelper::copy($src_options, $dst_options)
-			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);
+		$src_options = ['discoveryids' => array_keys($src_items)];
+
+		return CItemPrototypeHelper::cloneItems($src_options, $dst_hosts, $dst_itemids)
+			&& CTriggerPrototypeHelper::cloneTriggers($src_options, $dst_hosts)
+			&& CGraphPrototypeHelper::cloneGraphs($src_options, $dst_hosts)
+			&& CHostPrototypeHelper::cloneHosts($src_options, $dst_hostids, $dst_itemids);
 	}
 
 	/**

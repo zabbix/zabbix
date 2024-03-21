@@ -34,38 +34,30 @@ class CItemHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * @param string $src_templateid
-	 * @param string $dst_templateid
+	 * @param string $src_hostid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneTemplateItems(string $src_templateid, string $dst_templateid): bool {
-		$src_options = [
-			'templateids' => $src_templateid,
+	public static function cloneTemplateItems(string $src_hostid, array $dst_host): bool {
+		return self::copy([
+			'templateids' => $src_hostid,
 			'inherited' => false
-		];
-
-		$dst_options = ['templateids' => [$dst_templateid]];
-
-		return self::copy($src_options, $dst_options);
+		], [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]]);
 	}
 
 	/**
 	 * @param string $src_hostid
-	 * @param string $dst_hostid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneHostItems(string $src_hostid, string $dst_hostid): bool {
-		$src_options = [
+	public static function cloneHostItems(string $src_hostid, array $dst_host): bool {
+		return self::copy([
 			'hostids' => $src_hostid,
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		];
-
-		$dst_options = ['hostids' => [$dst_hostid]];
-
-		return self::copy($src_options, $dst_options);
+		], [$dst_host['hostid'] => $dst_host]);
 	}
 
 	/**
@@ -108,23 +100,22 @@ class CItemHelper extends CItemGeneralHelper {
 
 	/**
 	 * @param array $src_options
-	 * @param array $dst_options
+	 * @param array $dst_hosts
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options): bool {
+	public static function copy(array $src_options, array $dst_hosts): bool {
 		$src_items = self::getSourceItems($src_options);
 
 		if (!$src_items) {
 			return true;
 		}
 
-		$dst_hostids = reset($dst_options);
-
+		$dst_hostids = array_keys($dst_hosts);
 		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
 
 		try {
-			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_options);
+			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
@@ -142,17 +133,11 @@ class CItemHelper extends CItemGeneralHelper {
 		}
 
 		try {
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
+			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
 		}
-
-		$dst_hosts = DB::select('hosts', [
-			'output' => ['status'],
-			'hostids' => $dst_hostids,
-			'preservekeys' => true
-		]);
 
 		do {
 			$dst_items = [];

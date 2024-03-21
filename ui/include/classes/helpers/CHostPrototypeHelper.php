@@ -22,20 +22,13 @@
 class CHostPrototypeHelper {
 
 	/**
-	 * @param array $src_options
-	 * @param array $dst_options
+	 * @param array $src_host_prototypes
+	 * @param array $dst_hostids
 	 * @param array $dst_ruleids
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options, array $dst_ruleids): bool {
-		$src_host_prototypes = self::getSourceHostPrototypes($src_options);
-
-		if (!$src_host_prototypes) {
-			return true;
-		}
-
-		$dst_hostids = reset($dst_options);
+	private static function copy(array $src_host_prototypes, array $dst_hostids, array $dst_ruleids): bool {
 		$dst_host_prototypes = [];
 
 		foreach ($dst_hostids as $dst_hostid) {
@@ -58,6 +51,19 @@ class CHostPrototypeHelper {
 		$response = API::HostPrototype()->create($dst_host_prototypes);
 
 		return $response !== false;
+	}
+
+	/**
+	 * @param array $src_options
+	 * @param array $dst_hostids
+	 * @param array $dst_ruleids
+	 *
+	 * @return bool
+	 */
+	public static function cloneHosts(array $src_options, array $dst_hostids, array $dst_ruleids): bool {
+		$src_host_prototypes = self::getSourceHostPrototypes($src_options);
+
+		return $src_host_prototypes ? self::copy($src_host_prototypes, $dst_hostids, $dst_ruleids) : true;
 	}
 
 	/**
