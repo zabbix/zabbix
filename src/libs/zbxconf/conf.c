@@ -541,8 +541,8 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 					case TYPE_CUSTOM:
 						if (NULL != cfg[i].variable)
 						{
-							cfg_custom_parameter_parser_t	*p =
-									(cfg_custom_parameter_parser_t*)cfg[i].variable;
+							zbx_cfg_custom_parameter_parser_t	*p =
+									(zbx_cfg_custom_parameter_parser_t*)cfg[i].variable;
 
 							if (SUCCEED != p->cfg_custom_parameter_parser_func(value,
 									&cfg[i]))

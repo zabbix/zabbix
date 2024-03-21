@@ -877,7 +877,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #define MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY	SEC_PER_DAY
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
-	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
+	zbx_cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
 	zbx_cfg_line_t	cfg[] =
 	{

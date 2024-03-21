@@ -68,7 +68,8 @@ ZBX_PTR_VECTOR_DECL(addr_ptr, zbx_addr_t *)
 typedef struct
 {
 	int	(*cfg_custom_parameter_parser_func)(const char *value, const zbx_cfg_line_t *cfg);
-}	cfg_custom_parameter_parser_t;
+}
+zbx_cfg_custom_parameter_parser_t;
 
 void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 
