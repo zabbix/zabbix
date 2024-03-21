@@ -481,6 +481,7 @@ class HostInterfaceManager {
 
 		if (tag_name === 'INPUT') {
 			const type = el.getAttribute('type');
+			const {checked, name, value} = el;
 
 			switch (type) {
 				case 'text':
@@ -490,9 +491,17 @@ class HostInterfaceManager {
 				case 'radio':
 					el.readOnly = true;
 					el.disabled = true;
+
+					if (checked) {
+						const input = document.createElement('input');
+						input.type = 'hidden';
+						input.name = name;
+						input.value = value;
+
+						el.insertAdjacentElement('beforebegin', input);
+					}
 					break;
 				case 'checkbox':
-					const {checked, name, value} = el;
 					el.disabled = true;
 
 					if (checked) {
