@@ -559,7 +559,7 @@ $triggersFormList
 	->addRow(_('Allow manual close'),
 		(new CCheckBox('manual_close'))
 			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 
 // Append status to form list.

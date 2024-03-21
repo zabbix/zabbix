@@ -1816,6 +1816,12 @@ select {
 				border-color: $form-border-color !important;
 			}
 		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				border-color: $font-color !important;
+			}
+		}
 	}
 
 	&[type="radio"] {
