@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LOGFILES_H
 #define ZABBIX_LOGFILES_H
 
-#include "../metrics.h"
+#include "../metrics/metrics.h"
 #include "zbxalgo.h"
 #include "zbxhash.h"
 #include "zbxcomms.h"

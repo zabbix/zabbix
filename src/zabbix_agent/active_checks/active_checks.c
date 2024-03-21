@@ -21,6 +21,7 @@
 
 #include "../agent_conf/agent_conf.h"
 #include "../logfiles/logfiles.h"
+#include "../metrics/metrics.h"
 
 #include "zbxcfg.h"
 #include "zbxlog.h"
@@ -90,9 +91,6 @@ struct _zbx_active_command_t
 	char			*key;
 };
 ZBX_PTR_VECTOR_IMPL(active_command_ptr, zbx_active_command_t *)
-
-ZBX_PTR_VECTOR_DECL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
-ZBX_PTR_VECTOR_IMPL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
 
 static ZBX_THREAD_LOCAL active_buffer_t			buffer;
 static ZBX_THREAD_LOCAL	zbx_vector_command_result_ptr_t	command_results;

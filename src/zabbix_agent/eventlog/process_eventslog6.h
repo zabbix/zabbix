@@ -20,7 +20,7 @@
 #ifndef ZBX_EVENTLOG6_H
 #define ZBX_EVENTLOG6_H
 
-#include "../metrics.h"
+#include "../metrics/metrics.h"
 #include "../logfiles/logfiles.h"
 
 #include "zbxcomms.h"

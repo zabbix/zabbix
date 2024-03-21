@@ -4,7 +4,8 @@ SUBDIRS = \
 	listener \
 	active_checks \
 	agent_conf \
-	logfiles
+	logfiles \
+	metrics
 
 EXTRA_DIST = \
 	eventlog
@@ -18,6 +19,7 @@ zabbix_agentd_LDADD = \
 	listener/libzbxlistener.a \
 	agent_conf/libagent_conf.a \
 	logfiles/libzbxlogfiles.a \
+	metrics/libzbxmetrics.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_METRICS_H
 #define ZABBIX_METRICS_H
 
-#include "zbxtypes.h"
+#include "zbxalgo.h"
 
 /* define minimal and maximal values of lines to send by agent */
 /* per second for checks `log' and `eventlog', used to parse key parameters */
@@ -66,5 +66,7 @@ typedef struct
 	int			timeout;
 }
 ZBX_ACTIVE_METRIC;
+
+ZBX_PTR_VECTOR_DECL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
 
 #endif

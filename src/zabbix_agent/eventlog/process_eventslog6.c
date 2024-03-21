@@ -20,7 +20,7 @@
 #include "process_eventslog6.h"
 #include "severity_constants.h"
 
-#include "../metrics.h"
+#include "../metrics/metrics.h"
 #include "../logfiles/logfiles.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"

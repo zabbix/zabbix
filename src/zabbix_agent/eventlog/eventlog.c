@@ -20,7 +20,7 @@
 #include "process_eventslog.h"
 #include "process_eventslog6.h"
 
-#include "../metrics.h"
+#include "../metrics/metrics.h"
 
 #include "module.h"
 #include "zbxalgo.h"

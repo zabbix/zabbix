@@ -51,7 +51,7 @@ package zbxlib
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxlog.h"
-#include "../src/zabbix_agent/metrics.h"
+#include "../src/zabbix_agent/metrics/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;

@@ -24,7 +24,7 @@ package zbxlib
 
 #include "zbxsysinfo.h"
 #include "zbxlog.h"
-#include "../src/zabbix_agent/metrics.h"
+#include "../src/zabbix_agent/metrics/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 #include "zbx_item_constants.h"
 #include "../src/libs/zbxnix/fatal.h"
