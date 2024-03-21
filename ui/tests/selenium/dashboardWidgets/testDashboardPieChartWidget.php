@@ -111,7 +111,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		]);
 		self::$dashboard_id = $dashboards['dashboardids'][0];
 
-		// Create a disposable dashboard (for resetting when needed).
+		// Create a disposable dashboard (this dashboard will have data reset sometimes).
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Disposable pie chart dashboard',
 			'auto_start' => 0,
@@ -474,7 +474,7 @@ class testDashboardPieChartWidget extends testWidgets {
 				[
 					'fields' => [
 						'main_fields' => [
-							'Name' => 'Test all possible fields',
+							'Name' => 'Test most fields possible',
 							'Show header' => false,
 							'Refresh interval' => '30 seconds'
 						],
@@ -786,6 +786,9 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->createUpdatePieChart($data);
 	}
 
+	/**
+	 * Creates the base widget used for the update scenario.
+	 */
 	public function prepareUpdatePieChart(){
 		// Reset the "disposable" dashboard.
 		CDataHelper::call('dashboard.update', [
@@ -1040,7 +1043,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		}
 
 		// Create a dashboard with widget for the display test.
-		CDataHelper::call('dashboard.create', [
+		CDataHelper::call('dashboard.update', [
 			'dashboardid' => self::$disposable_dashboard_id,
 			'pages' => [
 				[
@@ -1049,8 +1052,8 @@ class testDashboardPieChartWidget extends testWidgets {
 							'name' => $data['widget_name'],
 							'view_mode' => CTestArrayHelper::get($data, 'view_mode', 0),
 							'type' => 'piechart',
-							'width' => 12,
-							'height' => 8,
+							'width' => 8,
+							'height' => 6,
 							'fields' => $data['widget_fields']
 						]
 					]
@@ -1201,8 +1204,7 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		$this->page->login()->
-				open('zabbix.php?action=dashboard.view&dashboardid='.self::$disposable_dashboard_id)->waitUntilReady();
+		$this->openDashboard(true, null, self::$disposable_dashboard_id);
 		$widget = CDashboardElement::find()->one()->getWidget($data['widget_name']);
 
 		// Wait for the sector animation to end.
@@ -1277,11 +1279,11 @@ class testDashboardPieChartWidget extends testWidgets {
 		$form = $update_widget_name
 			? $dashboard->edit()->getWidget($update_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
-		$this->fillForm($form, $data['fields']);
+		$this->fillForm($form, $data['fields'], isset($update_widget_name));
 		$form->submit();
 
 		// Assert the result.
-		$this->assertEditFormAfterSave($dashboard, $data);
+		$this->assertEditFormAfterSave($dashboard, $data, isset($update_widget_name));
 
 		// Check total Widget count.
 		$count_added = (!$update_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) ? 1 : 0;
@@ -1325,41 +1327,15 @@ class testDashboardPieChartWidget extends testWidgets {
 	}
 
 	/**
-	 * Resets the dashboard and creates a single Pie chart widget.
-	 *
-	 * @param string $widget_name    name of the widget to be created
-	 */
-	protected function createCleanWidget($widget_name){
-		CDataHelper::call('dashboard.update', [
-			'dashboardid' => self::$dashboard_id,
-			'pages' => [
-				[
-					'widgets' => [
-						[
-							'name' => $widget_name,
-							'type' => 'piechart',
-							'width' => 8,
-							'height' => 4,
-							'fields' => [
-								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
-								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Items'],
-								['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF465C']
-							]
-						]
-					]
-				]
-			]
-		]);
-	}
-
-	/**
 	 * Asserts that data is saved and displayed as expected in the edit form.
 	 *
 	 * @param CDashboardElement $dashboard    dashboard element
 	 * @param array             $data         data from data provider
+	 * @param bool              $update       add additional string to the 'Name' field, so it is unique
 	 */
-	protected function assertEditFormAfterSave($dashboard, $data) {
+	protected function assertEditFormAfterSave($dashboard, $data, $update = null) {
 		$widget_name = CTestArrayHelper::get($data['fields'], 'main_fields.Name', md5(serialize($data['fields'])));
+		$widget_name = $update ? $widget_name.' updated' : $widget_name;
 		$count_sql = 'SELECT NULL FROM widget WHERE name='.zbx_dbstr($widget_name);
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
@@ -1443,11 +1419,13 @@ class testDashboardPieChartWidget extends testWidgets {
 	 *
 	 * @param CFormElement $form      form to be filled
 	 * @param array        $fields    field data to fill
+	 * @param bool         $update    add additional string to the 'Name' field, so it is unique
 	 */
-	protected function fillForm($form, $fields) {
+	protected function fillForm($form, $fields, $update = false) {
 		// Fill main fields.
 		$main_fields = CTestArrayHelper::get($fields, 'main_fields', []);
 		$main_fields['Name'] = CTestArrayHelper::get($fields, 'main_fields.Name', md5(serialize($fields)));
+		$main_fields['Name'] = $update ? $main_fields['Name'].' updated' : $main_fields['Name'];
 		$form->fill($main_fields);
 
 		// Fill datasets.
