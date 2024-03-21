@@ -465,6 +465,7 @@ class CSVGHoneycomb {
 			.on('mouseenter', (e, d) => {
 				if (d.enter_timeout === undefined && d.scale_timeout === undefined && !d.scaled) {
 					d.enter_timeout = setTimeout(() => {
+						delete d.enter_timeout;
 						cell.raise();
 						this.#leaveAll();
 
@@ -820,7 +821,7 @@ class CSVGHoneycomb {
 					break;
 				}
 
-				if (secondary !== null && !this.#config['secondary_label'].is_custom_size) {
+				if (secondary !== null) {
 					const s_font_size = (container_height - p_height) / secondary.lines_count;
 
 					if (s_font_size < font_size_min) {
@@ -833,7 +834,7 @@ class CSVGHoneycomb {
 					s_height = secondary.font_size * secondary.lines_count;
 				}
 
-				if (primary !== null && !this.#config['primary_label'].is_custom_size) {
+				if (primary !== null) {
 					const p_font_size = (container_height - s_height) / primary.lines_count;
 
 					if (p_font_size < font_size_min) {
