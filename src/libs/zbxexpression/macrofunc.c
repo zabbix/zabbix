@@ -19,6 +19,7 @@
 /* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
 #include "macrofunc.h"
+#include "zbxexpression.h"
 
 #include "zbxregexp.h"
 #include "zbxnum.h"

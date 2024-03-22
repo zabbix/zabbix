@@ -47,6 +47,7 @@
 #include "diag/diag_server.h"
 #include "preproc/preproc_server.h"
 #include "lld/lld_protocol.h"
+#include "cachehistory/cachehistory_server.h"
 #include "discovery/discovery_server.h"
 
 #include "zbxdiscovery.h"

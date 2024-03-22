@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0beta2])
+AC_INIT([Zabbix],[7.0.0beta3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -2102,6 +2102,7 @@ AC_CONFIG_FILES([
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/cachehistory/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/discovery/Makefile
@@ -2118,6 +2119,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/postinit/Makefile
+	src/zabbix_server/cachehistory/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile

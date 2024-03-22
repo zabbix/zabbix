@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	cachehistory \
 	diag \
 	discovery \
 	housekeeper \
@@ -19,6 +20,7 @@ sbin_PROGRAMS = zabbix_proxy
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
+	cachehistory/libzbxcachehistory_proxy.a \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
@@ -56,7 +58,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
-	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory_proxy.a \
+	cachehistory/libzbxcachehistory_proxy.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
