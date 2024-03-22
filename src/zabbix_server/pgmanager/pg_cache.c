@@ -1123,7 +1123,9 @@ void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 				if (0 == proxy->firstaccess)
 					proxy->firstaccess = proxy->lastaccess;
 
-				if (ZBX_PG_PROXY_STATE_UNKNOWN == proxy->state ||
+				/* offline proxies in groups must be alive for failover */
+				/* delay time before they are switched to online        */
+				if (ZBX_PG_PROXY_STATE_UNKNOWN == proxy->state || 0 == group->proxy_groupid ||
 						now - proxy->firstaccess >= failover_delay)
 				{
 					state = ZBX_PG_PROXY_STATE_ONLINE;
