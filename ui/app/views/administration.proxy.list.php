@@ -103,7 +103,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY)
 				->addClass('js-edit-proxy-group')
-				->setAttribute('data-proxy_groupid', $proxy['proxyGroup']['proxy_groupid'])
+				->setAttribute('data-proxy_groupid', $proxy['proxy_groupid'])
 			: $proxy['proxyGroup']['name'];
 		$proxy_name_prefix[] = NAME_DELIMITER;
 	}

@@ -60,13 +60,13 @@ class CControllerPopupProxyEdit extends CController {
 
 		if ($this->hasInput('proxyid')) {
 			$db_proxies = API::Proxy()->get([
-				'output' => ['proxyid', 'name', 'local_address', 'local_port', 'operating_mode', 'allowed_addresses',
-					'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-					'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
-					'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-					'timeout_telnet_agent', 'timeout_script', 'compatibility'
+				'output' => ['proxyid', 'name', 'proxy_groupid', 'local_address', 'local_port', 'operating_mode',
+					'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+					'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
+					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'compatibility'
 				],
-				'selectProxyGroup' => ['proxy_groupid', 'name'],
+				'selectProxyGroup' => ['name'],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
 			]);
@@ -86,7 +86,7 @@ class CControllerPopupProxyEdit extends CController {
 			$data = [
 				'proxyid' => $this->proxy['proxyid'],
 				'ms_proxy_group' => $this->proxy['proxyGroup']
-					? [CArrayHelper::renameKeys($this->proxy['proxyGroup'], ['proxy_groupid' => 'id'])]
+					? [['id' => $this->proxy['proxy_groupid'], 'name' => $this->proxy['proxyGroup']['name']]]
 					: [],
 				'version_mismatch' => $this->proxy['compatibility'] == ZBX_PROXY_VERSION_OUTDATED
 					|| $this->proxy['compatibility'] == ZBX_PROXY_VERSION_UNSUPPORTED,

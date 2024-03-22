@@ -112,7 +112,7 @@ class CControllerProxyList extends CController {
 			],
 			'selectAssignedHosts' => ['hostid', 'name', 'status'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectProxyGroup' => ['proxy_groupid', 'name'],
+			'selectProxyGroup' => ['name'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,
 			'preservekeys' => true
