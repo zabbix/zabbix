@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.userrole.edit.js.php');
@@ -104,7 +105,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				->setVertical()
 				->setColumns(3)
 				->setLayoutFixed()
-				->setEnabled(!$data['readonly'])
+				->setReadonly($data['readonly'])
 		)
 	]);
 }
