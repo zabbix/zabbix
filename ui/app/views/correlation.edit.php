@@ -241,7 +241,6 @@ $form_grid
 		new CLabel(_('Operations')),
 		new CFormField(
 			(new CCheckBoxList())
-				->setVertical()
 				->setOptions([
 					[
 						'label' => _('Close old events'),

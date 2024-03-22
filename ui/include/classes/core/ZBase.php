@@ -562,6 +562,10 @@ class ZBase {
 			'auth' => CWebUser::$data['sessionid']
 		];
 
+		if (CWebUser::isAutologinEnabled()) {
+			$session->lifetime = time() + SEC_PER_MONTH;
+		}
+
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}

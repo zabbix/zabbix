@@ -2362,12 +2362,12 @@ const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *c
 
 	do
 	{
-		ssize_t		nbytes;
+		ssize_t	nbytes, nbytes_prev = (ssize_t)(context->buf_stat_bytes + context->buf_dyn_bytes);
 
 		if (ZBX_PROTO_ERROR == (nbytes = zbx_tcp_recv_context_raw(s, context, events, 1)))
 			goto out;
 
-		if (0 == nbytes)
+		if (nbytes == nbytes_prev)
 		{
 			/* socket was closed before newline was found, just return the data we have */
 			line = 0 != s->read_bytes ? s->buffer : NULL;

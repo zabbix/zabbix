@@ -1,0 +1,9 @@
+FROM php:7
+EXPOSE 8080
+RUN apt update && apt install -y unzip wget
+WORKDIR /root
+RUN wget https://raw.githubusercontent.com/composer/getcomposer.org/885ece8a6e1370b204b89b7a542169d25aa21177/web/installer -O - -q | php -- --quiet
+ADD . /src
+WORKDIR /src
+RUN /root/composer.phar update
+ENTRYPOINT ["php", "-S", "0.0.0.0:8080"]

@@ -476,7 +476,7 @@ static void	socket_read_event_cb(evutil_socket_t fd, short what, void *arg)
 	ZBX_UNUSED(arg);
 }
 
-ZBX_THREAD_ENTRY(async_poller_thread, args)
+ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 {
 	zbx_thread_poller_args		*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
