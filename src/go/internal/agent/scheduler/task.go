@@ -113,11 +113,12 @@ func (t *collectorTask) perform(s Scheduler) {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		start := time.Now()
 		err := collector.Collect()
-		elapsedSeconds := time.Since(start).Seconds()
 
 		if err != nil {
 			log.Warningf("plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
 		}
+
+		elapsedSeconds := time.Since(start).Seconds()
 
 		if elapsedSeconds > float64(collector.Period()) {
 			log.Warningf(
