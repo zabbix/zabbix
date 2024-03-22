@@ -896,7 +896,7 @@ static void	zbx_load_config(const char *config_file_in)
 	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,	MIN,			MAX */
+			MANDATORY,		MIN,			MAX */
 		{"SourceIP",			&cfg_source_ip,				ZBX_CFG_TYPE_STRING,
 			ZBX_CONF_PARM_OPT,	0,			0},
 		{"ServerActive",		&cfg_active_hosts,			ZBX_CFG_TYPE_STRING_LIST,
