@@ -206,7 +206,7 @@ static struct zbx_option	longopts[] =
 	{"test-config",		0,	NULL,	'T'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-	{NULL}
+	{NULL, 			0,	NULL,	0}
 };
 
 /* short options */
@@ -1073,7 +1073,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
 			PARM_OPT,	0,			ZBX_MEBIBYTE},
-	{NULL}
+		{NULL, NULL, 0, 0, 0, 0}
 	};
 
 	/* initialize multistrings */
@@ -1193,7 +1193,7 @@ int	main(int argc, char **argv)
 		get_zbx_config_tmpdir,
 		get_zbx_progname};
 
-	ZBX_TASK_EX			t = {ZBX_TASK_START};
+	ZBX_TASK_EX			t = {ZBX_TASK_START, 0, 0, NULL};
 	char				ch;
 	int				opt_c = 0, opt_r = 0, opt_t = 0, opt_f = 0;
 

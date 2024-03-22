@@ -175,7 +175,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
 	{"events",		&poption_mode_regular,	&poption_global_disabled},
-	{NULL}
+	{NULL,			NULL,			NULL}
 };
 
 /* The history item rules, used for housekeeping history and trends tables */
@@ -205,7 +205,7 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{.table = "trends_uint",	.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
 			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
 			.type = ITEM_VALUE_TYPE_UINT64},
-	{NULL}
+	{NULL, NULL, NULL, NULL, NULL, 0, {NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}, NULL}
 };
 
 static int	hk_history_rules_partition_is_table_name_excluded(const char *table_name)
@@ -1290,7 +1290,7 @@ static int	housekeeping_events(int now, int config_max_hk_delete)
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
 			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_service},
-		{NULL}
+		{NULL, NULL, NULL, 0, 0, NULL}
 	};
 
 	int		deleted = 0;

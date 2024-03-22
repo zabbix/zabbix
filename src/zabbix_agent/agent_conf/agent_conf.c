@@ -228,7 +228,7 @@ static int	load_config_user_params(const char *config_file, char **config_user_p
 			MANDATORY,	MIN,			MAX */
 		{"UserParameter",		&config_user_parameters,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{NULL}
+		{NULL, NULL, 0, 0, 0, 0}
 	};
 
 	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);

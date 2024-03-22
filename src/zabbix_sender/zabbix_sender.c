@@ -310,7 +310,7 @@ static struct zbx_option	longopts[] =
 	{"tls-psk-file",		1,	NULL,	'9'},
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
-	{NULL}
+	{NULL,				0,	NULL,	0}
 };
 
 /* short options */
@@ -931,7 +931,7 @@ static void	zbx_load_config(const char *config_file_in)
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{NULL}
+		{NULL, NULL, 0, 0, 0, 0}
 	};
 
 	/* do not complain about unknown parameters in agent configuration file */
