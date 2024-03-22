@@ -36,6 +36,10 @@ typedef struct
 	int				config_log_remote_commands;
 	const char			*config_hostname;
 	zbx_get_config_forks_f		get_process_forks_cb_arg;
+	const char			*config_java_gateway;
+	int				config_java_gateway_port;
+	const char			*config_externalscripts;
+	const char			*config_ssh_key_location;
 }
 zbx_thread_taskmanager_args;
 

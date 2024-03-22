@@ -127,6 +127,7 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
 int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf);
+int	zbx_check_service_validate(const unsigned char svc_type, const char *data);
 
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000
@@ -150,7 +151,7 @@ int		zbx_init_modbus(char **error);
 void		zbx_deinit_modbus(void);
 
 /* stats */
-ZBX_THREAD_ENTRY(collector_thread, args);
+ZBX_THREAD_ENTRY(zbx_collector_thread, args);
 
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
@@ -176,6 +177,8 @@ void	zbx_free_perf_collector(void);
 #define ZBX_CHECK_TIMEOUT_UNDEFINED	0
 int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len);
 
-int	sysinfo_get_config_timeout(void);
+int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout, AGENT_RESULT *result);
+int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
+		int timeout, AGENT_RESULT *result);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

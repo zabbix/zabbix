@@ -40,6 +40,8 @@ window.mediatype_edit_popup = new class {
 
 		this.#loadView(mediatype);
 		this.#initActions();
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 
 		this.form.querySelector('#type').dispatchEvent(new CustomEvent('change', {detail: {init: true}}));
 	}
@@ -609,7 +611,7 @@ window.mediatype_edit_popup = new class {
 
 		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
 			switch (parseInt(smtp_security)) {
-				case <?= SMTP_CONNECTION_SECURITY_NONE ?>:
+				case <?= SMTP_SECURITY_NONE ?>:
 					this.form.querySelector('#smtp_verify_peer').checked = false;
 					this.form.querySelector('#smtp_verify_host').checked = false;
 
@@ -620,8 +622,8 @@ window.mediatype_edit_popup = new class {
 					hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 					break;
 
-				case <?= SMTP_CONNECTION_SECURITY_STARTTLS ?>:
-				case <?= SMTP_CONNECTION_SECURITY_SSL_TLS ?>:
+				case <?= SMTP_SECURITY_STARTTLS ?>:
+				case <?= SMTP_SECURITY_SSL ?>:
 					const show_fields = ['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
 						'#verify-host-field'
 					];

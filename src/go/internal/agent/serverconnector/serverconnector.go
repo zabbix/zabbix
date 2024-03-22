@@ -492,10 +492,15 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 		}
 
 		var err error
-		value, err = taskManager.PerformTask(item, timeout, clientID)
+		var taskResult *string
+		taskResult, err = taskManager.PerformTask(item, timeout, clientID)
 		if err != nil {
 			return "", err
+		} else if taskResult == nil {
+			return "", fmt.Errorf("no values was received")
 		}
+
+		value = *taskResult
 
 		if !utf8.ValidString(value) {
 			return "", fmt.Errorf("value is not a UTF-8 string")

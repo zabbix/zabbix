@@ -1064,16 +1064,16 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var data = JSON.parse(value);
+                  	var data = JSON.parse(value);
                   }
                   catch (error) {
-                      throw 'Failed to parse JSON of EtherLike-MIB discovery.';
+                  	throw 'Failed to parse JSON of EtherLike-MIB discovery.';
                   }
                   var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
                   data.forEach(function (element) {
-                      fields.forEach(function (field) {
-                          element[field] = element[field] || '';
-                      });
+                  	fields.forEach(function (field) {
+                  		element[field] = element[field] || '';
+                  	});
                   });
                   return JSON.stringify(data);
       tags:
@@ -1102,7 +1102,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'

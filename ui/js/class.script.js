@@ -108,7 +108,7 @@ class Script {
 	 * @param {string|null} manualinput_default_value   Default value of manual input.
 	 */
 	static openUrl(scriptid, confirmation, trigger_element, hostid = null, eventid = null, url = null,
-			url_target = null, manualinput = null, manualinput_prompt = null, manualinput_validator_type = null,
+			url_target = '', manualinput = null, manualinput_prompt = null, manualinput_validator_type = null,
 			manualinput_validator = null, manualinput_default_value = null) {
 		if (manualinput == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 			const overlay = Script.#getManualInput(scriptid, confirmation, trigger_element, hostid, eventid,

@@ -22,7 +22,6 @@
 #include <signal.h>
 
 #include "zbxcomms.h"
-#include "zbxexec.h"
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"
@@ -52,15 +51,15 @@ static ZBX_THREAD_LOCAL char		tmpfile_uniq[255] = {'\0'};
 
 typedef struct
 {
-	ZBX_FPING_HOST	*hosts;
-	int		hosts_count;
-	int		requests_count;
-	unsigned char	allow_redirect;
-	int		rdns;
+	zbx_fping_host_t	*hosts;
+	int			hosts_count;
+	int			requests_count;
+	unsigned char		allow_redirect;
+	int			rdns;
 #ifdef HAVE_IPV6
 #	define FPING_EXISTS	0x1
 #	define FPING6_EXISTS	0x2
-	char		fping_existence;
+	char			fping_existence;
 #endif
 }
 zbx_fping_args;
@@ -346,7 +345,7 @@ out:
  *           "safe limits".                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_interval_option(const char *fping, const ZBX_FPING_HOST *hosts, int hosts_count, int *value,
+static int	get_interval_option(const char *fping, const zbx_fping_host_t *hosts, int hosts_count, int *value,
 		char *error, size_t max_error_len)
 {
 	char		*out = NULL;
@@ -503,8 +502,8 @@ static int	get_ipv6_support(const char *fping, const char *dst)
  *               NOTSUPPORTED - otherwise                                     *
  *                                                                            *
  ******************************************************************************/
-static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int hosts_count, const int rdns,
-		size_t *dnsname_len, ZBX_FPING_HOST **host)
+static int	check_hostip_response(char *resp, zbx_fping_host_t *hosts, const int hosts_count, const int rdns,
+		size_t *dnsname_len, zbx_fping_host_t **host)
 {
 	int	i, ret = FAIL;
 	char	*c, *tmp = resp;
@@ -565,7 +564,7 @@ static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int ho
  *               FAIL    - fping returned response for and unknown host       *
  *                                                                            *
  ******************************************************************************/
-static int	host_get(zbx_fping_resp *resp, zbx_fping_args *args, size_t *dnsname_len, ZBX_FPING_HOST **host)
+static int	host_get(zbx_fping_resp *resp, zbx_fping_args *args, size_t *dnsname_len, zbx_fping_host_t **host)
 {
 	int	ret;
 
@@ -590,7 +589,7 @@ static int	host_get(zbx_fping_resp *resp, zbx_fping_args *args, size_t *dnsname_
  *             args       -[IN/OUT] host data and fping settings              *
  *                                                                            *
  ******************************************************************************/
-static void	host_status_set(char *linebuf_p, ZBX_FPING_HOST *host, zbx_fping_args *args)
+static void	host_status_set(char *linebuf_p, zbx_fping_host_t *host, zbx_fping_args *args)
 {
 	int	response_idx;
 
@@ -634,7 +633,7 @@ static void	host_status_set(char *linebuf_p, ZBX_FPING_HOST *host, zbx_fping_arg
  *             args       -[IN/OUT] host data and fping settings              *
  *                                                                            *
  ******************************************************************************/
-static void	stats_calc(char *linebuf_p, ZBX_FPING_HOST *host, zbx_fping_args *args)
+static void	stats_calc(char *linebuf_p, zbx_fping_host_t *host, zbx_fping_args *args)
 {
 	int	response_idx = 0;
 	double	sec;
@@ -684,9 +683,9 @@ static void	stats_calc(char *linebuf_p, ZBX_FPING_HOST *host, zbx_fping_args *ar
  ******************************************************************************/
 static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
-	ZBX_FPING_HOST	*host;
-	char		*linebuf_p;
-	size_t		dnsname_len;
+	zbx_fping_host_t	*host;
+	char			*linebuf_p;
+	size_t			dnsname_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf: \"%s\"", __func__, resp->linebuf);
 
@@ -725,9 +724,9 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 		stats_calc(linebuf_p, host, args);
 	}
 
-	if (0 != args->rdns)
+	if (0 != args->rdns && (NULL == host->dnsname || ('\0' == *host->dnsname && 0 != dnsname_len)))
 	{
-		host->dnsname = zbx_dsprintf(NULL, "%.*s", (int)dnsname_len, resp->linebuf);
+		host->dnsname = zbx_dsprintf(host->dnsname, "%.*s", (int)dnsname_len, resp->linebuf);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -754,7 +753,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	{
 		zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
 	}
-	else
+	else if (NULL == strstr(resp->linebuf, " error:"))
 	{
 		for (i = 0; i < args->hosts_count; i++)
 		{
@@ -779,7 +778,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	return ret;
 }
 
-static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int interval, int size,
+static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int interval, int size,
 		int timeout, unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
@@ -886,7 +885,7 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
 			int			hsts_count = 1;
-			const ZBX_FPING_HOST	h = {.addr = "127.0.0.1"}, *hsts = &h;
+			const zbx_fping_host_t	h = {.addr = "127.0.0.1"}, *hsts = &h;
 
 			if (0 == rdns)
 			{
@@ -912,7 +911,7 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 		if (FPING_UNINITIALIZED_VALUE == packet_interval6)
 		{
 			int			hsts_count = 1;
-			const ZBX_FPING_HOST	h = {.addr = "::1"}, *hsts = &h;
+			const zbx_fping_host_t	h = {.addr = "::1"}, *hsts = &h;
 
 			if (0 == rdns)
 			{
@@ -938,7 +937,7 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
 			int			hsts_count = 1;
-			const ZBX_FPING_HOST	h = {.addr = "127.0.0.1"}, *hsts = &h;
+			const zbx_fping_host_t	h = {.addr = "127.0.0.1"}, *hsts = &h;
 
 			if (0 == rdns)
 			{
@@ -1205,7 +1204,7 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int period, int size, int timeout,
+int	zbx_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int period, int size, int timeout,
 		unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
 {
 	int	ret;

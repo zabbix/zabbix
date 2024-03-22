@@ -42,6 +42,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \

@@ -70,7 +70,7 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Graph prototype':
-				$widget_dialog->fill(['Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype')]);
+				$widget_dialog->fill(['Source' => 'Simple graph prototype']);
 				$this->assertTrue($widget_dialog->getField('Item prototype')->isVisible());
 
 				// For Graph prototype only numeric item prototypes are available.
@@ -92,5 +92,38 @@ class testWidgets extends CWebTest {
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
 		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
+	}
+
+	/**
+	 * Replace macro {date} with specified date in YYYY-MM-DD format for specified fields and for item data to be inserted in DB.
+	 *
+	 * @param array		$data				data provider
+	 * @param string	$new_date			dynamic date that is converted into YYYY-MM-DD format and replaces the {date} macro
+	 * @param array		$impacted_fields	array of fields that require to replace the {date} macro with a static date
+	 *
+	 * return array
+	 */
+	public function replaceDateMacroInData ($data, $new_date, $impacted_fields) {
+		$new_date = date('Y-m-d', strtotime($new_date));
+
+		if (array_key_exists('column_fields', $data)) {
+			foreach ($data['column_fields'] as &$column) {
+				foreach ($impacted_fields as $field) {
+					$column[$field] = str_replace('{date}', $new_date, $column[$field]);
+				}
+			}
+		}
+		else {
+			foreach ($impacted_fields as $field) {
+				$data['fields'][$field] = str_replace('{date}', $new_date, $data['fields'][$field]);
+			}
+		}
+
+		foreach ($data['item_data'] as &$item_value) {
+			$item_value['time'] = str_replace('{date}', $new_date, $item_value['time']);
+		}
+		unset($item_value);
+
+		return $data;
 	}
 }

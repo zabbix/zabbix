@@ -66,11 +66,16 @@ form.dashboard-widget-piechart {
 
 	.list-vertical-accordion {
 		position: relative;
+		overflow: visible;
+		margin-top: -5px;
+		margin-bottom: 5px;
 
-		&.sortable {
-			overflow: visible;
-			margin-top: -5px;
-			margin-bottom: 5px;
+		.sortable:not(.sortable-disabled) {
+			.list-accordion-item {
+				> .drag-icon + label {
+					cursor: grab;
+				}
+			}
 		}
 	}
 
@@ -85,12 +90,6 @@ form.dashboard-widget-piechart {
 		> .drag-icon {
 			height: 24px;
 			margin-left: -2px;
-
-			&:not(.disabled) {
-				& + label {
-					@extend %cursor-drag;
-				}
-			}
 		}
 
 		> label {
@@ -174,12 +173,12 @@ form.dashboard-widget-piechart {
 			}
 		}
 
-		.single-item-table-row:last-child td {
-			padding-bottom: 0;
-		}
-
 		tfoot td {
 			padding: 5px 5px 5px 10px;
+		}
+
+		tbody:not(:empty) + tfoot td {
+			padding-top: 0;
 		}
 	}
 

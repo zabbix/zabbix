@@ -114,9 +114,7 @@ class CControllerHousekeepingUpdate extends CController {
 		}
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$dbversion_status = CSettingsHelper::getDbVersionStatus();
-
-			foreach ($dbversion_status as $dbversion) {
+			foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 					if (array_key_exists('compression_availability', $dbversion)
 							&& (bool) $dbversion['compression_availability']) {

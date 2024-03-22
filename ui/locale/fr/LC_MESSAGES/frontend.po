@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-09 19:10+0000\n"
+"PO-Revision-Date: 2024-02-18 13:54+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -440,6 +440,10 @@ msgstr "RÉVEIL"
 #: app/views/administration.user.list.php:137
 msgid "API access"
 msgstr "Accès API"
+
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1108,6 +1112,10 @@ msgstr "Étiquettes avancées"
 msgid "Advanced options"
 msgstr "Options avancées"
 
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
@@ -1566,6 +1574,10 @@ msgstr "À (heure:minute)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Au moins un serveur LDAP doit exister."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2094,6 +2106,18 @@ msgstr "Pourcentage d'utilisation du processeur. Retourne un flottant"
 msgid "CRLF"
 msgstr "CRLF"
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr ""
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr "CSV vers JSON"
@@ -2537,6 +2561,11 @@ msgid_plural "Cannot delete API tokens"
 msgstr[0] "Impossible de supprimer le Token API"
 msgstr[1] "Impossible de supprimer les Tokens API"
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2571,6 +2600,10 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "Impossible de supprimer le tableau de bord"
 msgstr[1] "Impossible de supprimer les tableaux de bord"
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr ""
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3601,6 +3634,12 @@ msgstr "Impossible de supprimer le tag nommé \"%1$s\" et la valeur \"%2$s\", d�
 msgid "Cannot rename guest user."
 msgstr "Impossible de renommer l'utilisateur invité."
 
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
 msgid "Cannot save discovery rule without checks."
@@ -4152,6 +4191,10 @@ msgstr "Changer"
 msgid "Change PSK"
 msgstr "Changer PSK"
 
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr ""
+
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
 #: widgets/item/includes/WidgetForm.php:252
@@ -4363,6 +4406,14 @@ msgstr "Cliquez et faites glisser jusqu'à la taille désirée."
 msgid "Click to view or edit"
 msgstr "Cliquez pour voir ou éditer"
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr ""
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr ""
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "Horloge"
@@ -4446,6 +4497,10 @@ msgstr "Fermer le problème"
 #: include/classes/helpers/CRoleHelper.php:547
 msgid "Close problems"
 msgstr "Fermer les problèmes"
+
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr ""
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -5524,6 +5579,12 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "Nom DNS"
 
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/maintenance.timeperiod.edit.php:80 app/views/popup.sla.edit.php:75
@@ -5888,6 +5949,10 @@ msgstr "Par défaut (%1$s)"
 #: app/controllers/CControllerAuthenticationUpdate.php:145
 msgid "Default LDAP server must be specified."
 msgstr "Le serveur LDAP par défaut doit être spécifié."
+
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
@@ -6988,6 +7053,10 @@ msgstr "Afficher les déclencheurs OK pendant"
 msgid "Display graph"
 msgstr "Afficher le graphique"
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr "Affichage min/max/moy"
@@ -7142,6 +7211,10 @@ msgstr "Dérouler"
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
 msgstr "Options de liste déroulante"
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
+msgstr ""
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7417,6 +7490,10 @@ msgstr "Activer les hôtes surveillés par le proxy sélectionné ?"
 msgid "Enable internal housekeeping"
 msgstr "Activer le nettoyage interne"
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7657,6 +7734,10 @@ msgstr "Marge d'erreur"
 msgctxt "compact table header"
 msgid "Error budget"
 msgstr "Marge d'erreur"
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
+msgstr ""
 
 #: include/db.inc.php:554
 #, c-format
@@ -8430,6 +8511,11 @@ msgstr "Accès à l'interface"
 msgid "Frontend messaging"
 msgstr "Messages dans l'interface"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -8922,6 +9008,10 @@ msgstr "Matériel (détails complets)"
 #: include/classes/data/CItemData.php:1313
 msgid "Hardware sensor reading. Returns float"
 msgstr "Lecture d'un capteur matériel. Retourne un flottant"
+
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -11034,6 +11124,11 @@ msgstr "Configuration de correspondance de groupe d'utilisateurs de provisionnem
 msgid "Invalid LDAP configuration"
 msgstr "Configuration LDAP invalide"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Configuration de correspondance de type de média de provisionnement SAML JIT non valide."
@@ -11820,6 +11915,10 @@ msgstr "Serveur LDAP"
 msgid "LDAP authentication"
 msgstr "Authentification LDAP"
 
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
 msgstr "L'authentification LDAP est désactivée."
@@ -12101,7 +12200,7 @@ msgstr "Largeur de ligne"
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
-msgstr "Lien"
+msgstr "Lier"
 
 #: include/classes/api/services/CMap.php:1006
 #: include/classes/api/services/CMap.php:1476
@@ -12269,6 +12368,10 @@ msgstr "Longitude de l'emplacement"
 msgid "Log"
 msgstr "Journal"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr "Consigner les modifications par découverte de bas niveau, découverte de réseau et enregistrement automatique"
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Supervision d'un fichier de log avec support de la rotation. Retourne un log"
@@ -12276,6 +12379,10 @@ msgstr "Supervision d'un fichier de log avec support de la rotation. Retourne un
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Supervision d'un fichier de log. Retourne un log"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr "Consigner les actions du système"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12372,6 +12479,19 @@ msgstr "MD2"
 #: include/classes/data/CItemData.php:1639
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Checksum MD5 d'un fichier. Retourne une chaîne de caractères (le hash MD5 du fichier)"
+
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr ""
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -12774,6 +12894,10 @@ msgstr "Niveau de zoom maximal"
 msgid "Maximum concurrent checks"
 msgstr "Contrôles simultanés maximum"
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Nombre maximal de fichiers ouverts supporté par le SE. Retourne un entier"
@@ -12781,6 +12905,11 @@ msgstr "Nombre maximal de fichiers ouverts supporté par le SE. Retourne un enti
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Nombre maximal de processus supporté par le SE. Retourne un entier"
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
+msgstr ""
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13031,6 +13160,10 @@ msgstr "Messagerie"
 #: include/classes/core/CJsonRpc.php:210
 msgid "Method not found."
 msgstr "Méthode pas trouvée."
+
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13300,6 +13433,23 @@ msgstr "Le plus critiques des services enfants"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr ""
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr ""
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
 msgstr "Multiple"
@@ -13311,6 +13461,11 @@ msgstr "Événements PROBLÈME multiples"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "Sourdine"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr "Muet pendant %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -13609,6 +13764,10 @@ msgstr "Nouveau Token API"
 #: app/views/popup.ldap.edit.php:315
 msgid "New LDAP server"
 msgstr "Nouveau serveur LDAP"
+
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -14248,6 +14407,10 @@ msgstr "Aucun destinataire déclaré pour le message d'opération d'action."
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
 msgstr "Pas de rafraîchissement"
+
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
+msgstr ""
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -15116,6 +15279,14 @@ msgstr "ctype pour PHP"
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "L'extension PHP ctype manque (Paramètre de configuration de PHP --enable-ctype)."
 
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
 msgstr "support de bases de données par PHP"
@@ -15626,6 +15797,10 @@ msgstr "Veiullez créer la base de données manuellement et configurer les param
 #: include/classes/setup/CSetupWizard.php:240
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Veuillez activer la directive \"allow_url_fopen\"."
+
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
+msgstr ""
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -16817,6 +16992,10 @@ msgstr "Vps requis"
 msgid "Reset"
 msgstr "Réinitialiser"
 
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr ""
+
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
 #: app/views/js/administration.housekeeping.edit.js.php:85
@@ -17489,6 +17668,10 @@ msgstr "Taille de l'échelle"
 #: app/views/module.list.php:45
 msgid "Scan directory"
 msgstr "Analyser le répertoire"
+
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -18321,6 +18504,10 @@ msgstr "Afficher les cartes indisponibles"
 msgid "Show units"
 msgstr "Afficher les unités"
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr "Afficher une alerte si le serveur Zabbix est arrêté"
@@ -18332,6 +18519,10 @@ msgstr "Afficher les heures ouvrées"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Affiché"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18461,6 +18652,11 @@ msgstr "Slovaque (sk_SK)"
 #: jsLoader.php:288
 msgid "Snooze"
 msgstr "Reporter"
+
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr "Répéter pendant %1$s"
 
 #: include/hosts.inc.php:174
 msgid "Software"
@@ -18880,6 +19076,10 @@ msgstr "Sujet"
 msgid "Submap"
 msgstr "Sous-carte"
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr "Abonnement"
@@ -19051,6 +19251,21 @@ msgstr "agent TELNET"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "TOTAL"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19600,6 +19815,10 @@ msgstr "Le déclencheur n'est plus découvert et sera supprimé dans %1$s (le %2
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Le déclencheur n'est plus découvert et sera supprimé lors du prochain traitement de la règle de découverte."
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
+msgstr ""
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20590,6 +20809,11 @@ msgstr "Impossible de récupérer l'état de prise en charge de la compression d
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Impossible de récupérer la version de TimescaleDB."
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr ""
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "Impossible de sélectionner la configuration."
@@ -20839,6 +21063,11 @@ msgstr "Délier les modèles"
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "Enlever la sourdine"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr "Réactiver pendant %1$s"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -21150,6 +21379,11 @@ msgstr "L'utilisateur \"%1$s\" est utilisé dans l'action \"%2$s\"."
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "L'utilisateur \"%1$s\" est l'utilisateur pour le compte duquel le rapport \"%2$s\" est créé."
+
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
+msgstr ""
 
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
@@ -21960,7 +22194,7 @@ msgstr "La valeur \"%1$s\" est trop longue pour le champ \"%2$s\" - %3$d caract�
 #: widgets/gauge/includes/WidgetForm.php:243
 #: widgets/gauge/views/widget.edit.php:189
 msgid "Value arc"
-msgstr ""
+msgstr "Arc de valeur"
 
 #: include/classes/data/CItemData.php:2820
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -22049,6 +22283,11 @@ msgstr "Valeurs"
 msgid "Values without names are not allowed in form fields."
 msgstr "Des valeurs sans nom ne sont pas autorisées dans les champs de formulaire."
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -22110,6 +22349,10 @@ msgstr "Fournisseur et version"
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Verbeux"
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22694,6 +22937,10 @@ msgstr "Hier"
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Vous êtes connecté en tant que \"%1$s\"."
+
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
+msgstr ""
 
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
@@ -23579,6 +23826,10 @@ msgstr "défaut"
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Convertit une valeur de radians en degrés"
 
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
+msgstr ""
+
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
 #: widgets/actionlog/includes/WidgetForm.php:84
@@ -24446,9 +24697,33 @@ msgstr "now () - Nombre de secondes écoulées depuis le temps Epoch"
 msgid "number"
 msgstr "nombre"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr "l'objet n'existe pas"
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "l'objet n'existe pas ou appartient à un autre objet"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr "l'objet n'existe pas ou vous n'avez aucune autorisation sur celui-ci"
+
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
+msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -24541,6 +24816,10 @@ msgstr "power() - La puissance d'une valeur"
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
 msgstr "modèle de problème"
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"

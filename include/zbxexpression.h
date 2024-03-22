@@ -22,6 +22,7 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxvariant.h"
+#include "zbx_discoverer_constants.h"
 
 #define ZBX_EXPRESSION_NORMAL		0
 #define ZBX_EXPRESSION_AGGREGATE	1
@@ -60,7 +61,7 @@
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
-#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
+#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO | ZBX_TOKEN_USER_FUNC_MACRO)
 
 /* group - hostids cache */
 typedef struct
@@ -185,4 +186,8 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
+
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #endif

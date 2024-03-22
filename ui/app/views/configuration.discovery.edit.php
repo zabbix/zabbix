@@ -30,7 +30,8 @@ $csrf_token = CCsrfTokenHelper::get('discovery');
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('discoveryForm')
-	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addStyle('display: none;');
 
 if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
@@ -81,7 +82,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Maximum concurrent checks'), 'concurrency_max_type'),
+		new CLabel(_('Maximum concurrent checks per type'), 'concurrency_max_type'),
 		(new CFormField([
 			(new CDiv(
 				(new CRadioButtonList('concurrency_max_type', (int) $data['concurrency_max_type']))

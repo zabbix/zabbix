@@ -81,6 +81,26 @@ class JMXItemChecker extends ItemChecker
 			jmxc = null;
 			mbsc = null;
 
+			// "rmi" is the only JNDI service provider we support, for security reasons
+			// e. g. the second "rmi" in service:jmx:rmi:///jndi/rmi://
+			String[] parts = url.getURLPath().split(":", 2);
+
+			if (0 != parts.length && !parts[0].equals(""))
+			{
+				parts = parts[0].split("/", 0);
+
+				if (0 != parts.length && !parts[parts.length - 1].equals(""))
+				{
+					String serviceProvider = parts[parts.length - 1];
+
+					if (!serviceProvider.equals("rmi"))
+					{
+						throw new ZabbixException("unsupported JNDI service provider, \"%s\"",
+								serviceProvider);
+					}
+				}
+			}
+
 			username = request.optString(JSON_TAG_USERNAME, null);
 			password = request.optString(JSON_TAG_PASSWORD, null);
 		}

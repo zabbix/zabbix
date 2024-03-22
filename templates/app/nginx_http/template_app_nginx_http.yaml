@@ -122,7 +122,7 @@ zabbix_export:
                 - |
                   var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/)
                   if (a) {
-                      return a[1]-a[2]
+                  	return a[1]-a[2]
                   }
             - type: CHANGE_PER_SECOND
               parameters:
@@ -246,7 +246,7 @@ zabbix_export:
           triggers:
             - uuid: 78e0a6322a1941469a0e108a9367c420
               expression: |
-                find(/Nginx by HTTP/nginx.get_stub_status,,"regexp","HTTP\\/[\\d.]+\\s+200")=0 or
+                find(/Nginx by HTTP/nginx.get_stub_status,,"iregexp","HTTP\\/[\\d.]+\\s+200")=0 or
                 nodata(/Nginx by HTTP/nginx.get_stub_status,30m)=1
               name: 'Nginx: Failed to fetch stub status page'
               event_name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
@@ -308,7 +308,7 @@ zabbix_export:
           preprocessing:
             - type: REGEX
               parameters:
-                - 'Server: nginx\/(.+(?<!\r))'
+                - '(?i)Server: nginx\/(.+(?<!\r))'
                 - \1
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

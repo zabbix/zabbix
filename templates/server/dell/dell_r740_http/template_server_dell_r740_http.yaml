@@ -167,87 +167,87 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      system = JSON.parse(value);
+                  	system = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      system = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	system = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = {
-                      model: '',
-                      serialnumber: '',
-                      status: '',
-                      firmware: ''
+                  	model: '',
+                  	serialnumber: '',
+                  	status: '',
+                  	firmware: ''
                   };
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   result.model = getField(system, 'Model', '');
@@ -351,97 +351,97 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      storages = JSON.parse(value);
+                  	storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      storages = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	storages = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (storages.Members instanceof Array) {
-                      storages.Members.forEach(function (storage) {
-                          if (typeof storage["@odata.id"] === 'string') {
-                              response = request(params.url + storage["@odata.id"]);
-                              controller = response.body;
-                              if (getField(controller, 'Id', '').search('RAID') > -1) {
-                                  result.push({
-                                      '{#BATTERY_NAME}': getField(response.body, 'Oem.Dell.DellControllerBattery.Name', ''),
-                                      '{#ODATA}': controller["@odata.id"]
-                                  });
-                              }
-                          }
-                      });
+                  	storages.Members.forEach(function (storage) {
+                  		if (typeof storage["@odata.id"] === 'string') {
+                  			response = request(params.url + storage["@odata.id"]);
+                  			controller = response.body;
+                  			if (getField(controller, 'Id', '').search('RAID') > -1) {
+                  				result.push({
+                  					'{#BATTERY_NAME}': getField(response.body, 'Oem.Dell.DellControllerBattery.Name', ''),
+                  					'{#ODATA}': controller["@odata.id"]
+                  				});
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -510,98 +510,98 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      storages = JSON.parse(value);
+                  	storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      storages = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	storages = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (storages.Members instanceof Array) {
-                      storages.Members.forEach(function (storage) {
-                          if (typeof storage["@odata.id"] === 'string') {
-                              response = request(params.url + storage["@odata.id"]);
-                              controller = response.body;
-                              if (getField(controller, 'Id', '').search('RAID') > -1) {
-                                  result.push({
-                                      '{#CNTLR_NAME}': getField(response.body, 'Name', ''),
-                                      '{#SLOT}': getField(response.body, 'Oem.Dell.DellController.PCISlot', ''),
-                                      '{#ODATA}': controller["@odata.id"]
-                                  });
-                              }
-                          }
-                      });
+                  	storages.Members.forEach(function (storage) {
+                  		if (typeof storage["@odata.id"] === 'string') {
+                  			response = request(params.url + storage["@odata.id"]);
+                  			controller = response.body;
+                  			if (getField(controller, 'Id', '').search('RAID') > -1) {
+                  				result.push({
+                  					'{#CNTLR_NAME}': getField(response.body, 'Name', ''),
+                  					'{#SLOT}': getField(response.body, 'Oem.Dell.DellController.PCISlot', ''),
+                  					'{#ODATA}': controller["@odata.id"]
+                  				});
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -701,79 +701,79 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   try {
-                      sensors = JSON.parse(value);
+                  	sensors = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      sensors = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	sensors = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (sensors.Members instanceof Array) {
-                      sensors.Members.forEach(function (sensor) {
-                          if (typeof sensor["@odata.id"] === 'string') {
-                              response = request(params.url + sensor["@odata.id"]);
-                              if (response.body.ReadingType === 'Rotational') {
-                                  if (typeof response.body.Name === 'string') {
-                                      result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
-                                  }
-                              }
-                          }
-                      });
+                  	sensors.Members.forEach(function (sensor) {
+                  		if (typeof sensor["@odata.id"] === 'string') {
+                  			response = request(params.url + sensor["@odata.id"]);
+                  			if (response.body.ReadingType === 'Rotational') {
+                  				if (typeof response.body.Name === 'string') {
+                  					result.push({ '{#SENSOR_NAME}': response.body.Name, '{#ODATA}': sensor["@odata.id"] });
+                  				}
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -937,99 +937,99 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      adapters = JSON.parse(value);
+                  	adapters = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      adapters = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	adapters = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (adapters.Members instanceof Array) {
-                      adapters.Members.forEach(function (adapter) {
-                          if (typeof adapter["@odata.id"] === 'string') {
-                              response = request(params.url + adapter["@odata.id"] + "/NetworkPorts");
-                              ports = response.body;
-                              if (ports.Members instanceof Array) {
-                                  ports.Members.forEach(function (port) {
-                                      if (typeof port["@odata.id"] === 'string') {
-                                          response = request(params.url + port["@odata.id"]);
-                                          result.push({ '{#IFNAME}': getField(response.body, 'Id', ''), '{#ODATA}': port["@odata.id"] });
-                                      }
-                                  });
-                              }
-                          }
-                      });
+                  	adapters.Members.forEach(function (adapter) {
+                  		if (typeof adapter["@odata.id"] === 'string') {
+                  			response = request(params.url + adapter["@odata.id"] + "/NetworkPorts");
+                  			ports = response.body;
+                  			if (ports.Members instanceof Array) {
+                  				ports.Members.forEach(function (port) {
+                  					if (typeof port["@odata.id"] === 'string') {
+                  						response = request(params.url + port["@odata.id"]);
+                  						result.push({ '{#IFNAME}': getField(response.body, 'Id', ''), '{#ODATA}': port["@odata.id"] });
+                  					}
+                  				});
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -1219,99 +1219,99 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      storages = JSON.parse(value);
+                  	storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      storages = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	storages = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (storages.Members instanceof Array) {
-                      storages.Members.forEach(function (storage) {
-                          if (typeof storage["@odata.id"] === 'string') {
-                              response = request(params.url + storage["@odata.id"]);
-                              drives = response.body;
-                              if (drives.Drives instanceof Array) {
-                                  drives.Drives.forEach(function (drive) {
-                                      if (typeof drive["@odata.id"] === 'string') {
-                                          response = request(params.url + drive["@odata.id"]);
-                                          result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': drive["@odata.id"] });
-                                      }
-                                  });
-                              }
-                          }
-                      });
+                  	storages.Members.forEach(function (storage) {
+                  		if (typeof storage["@odata.id"] === 'string') {
+                  			response = request(params.url + storage["@odata.id"]);
+                  			drives = response.body;
+                  			if (drives.Drives instanceof Array) {
+                  				drives.Drives.forEach(function (drive) {
+                  					if (typeof drive["@odata.id"] === 'string') {
+                  						response = request(params.url + drive["@odata.id"]);
+                  						result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': drive["@odata.id"] });
+                  					}
+                  				});
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -1394,93 +1394,93 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      sensors = JSON.parse(value);
+                  	sensors = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      sensors = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	sensors = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (sensors.Members instanceof Array) {
-                      sensors.Members.forEach(function (sensor) {
-                          if (typeof sensor["@odata.id"] === 'string') {
-                              response = request(params.url + sensor["@odata.id"]);
-                              if (getField(response.body, 'ReadingType', '') === 'Voltage') {
-                                  result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
-                              }
-                          }
-                      });
+                  	sensors.Members.forEach(function (sensor) {
+                  		if (typeof sensor["@odata.id"] === 'string') {
+                  			response = request(params.url + sensor["@odata.id"]);
+                  			if (getField(response.body, 'ReadingType', '') === 'Voltage') {
+                  				result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -1581,93 +1581,93 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      sensors = JSON.parse(value);
+                  	sensors = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      sensors = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	sensors = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (sensors.Members instanceof Array) {
-                      sensors.Members.forEach(function (sensor) {
-                          if (typeof sensor["@odata.id"] === 'string') {
-                              response = request(params.url + sensor["@odata.id"]);
-                              if (getField(response.body, 'ReadingType', '') === 'Temperature') {
-                                  result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
-                              }
-                          }
-                      });
+                  	sensors.Members.forEach(function (sensor) {
+                  		if (typeof sensor["@odata.id"] === 'string') {
+                  			response = request(params.url + sensor["@odata.id"]);
+                  			if (getField(response.body, 'ReadingType', '') === 'Temperature') {
+                  				result.push({ '{#SENSOR_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': sensor["@odata.id"] });
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);
@@ -1867,99 +1867,99 @@ zabbix_export:
               parameters:
                 - |
                   function request(url) {
-                      api_request = new HttpRequest();
-                      api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
-                      Zabbix.log(4, '[ DELL ] Sending request: ' + url);
+                  	api_request = new HttpRequest();
+                  	api_request.addHeader('Authorization: Basic ' + btoa(params.user + ':' + params.password));
+                  	Zabbix.log(4, '[ DELL ] Sending request: ' + url);
                   
-                      try {
-                          response = api_request.get(url);
-                      } catch (error) {
-                          Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
-                          throw 'Get request returned error ' + error + '. Check debug log for more information.';
-                      }
+                  	try {
+                  		response = api_request.get(url);
+                  	} catch (error) {
+                  		Zabbix.log(4, '[ DELL ] Get request returned error ' + error);
+                  		throw 'Get request returned error ' + error + '. Check debug log for more information.';
+                  	}
                   
-                      Zabbix.log(4, '[ DELL ] Received response with status code ' +
-                          api_request.getStatus() + '\n' + response);
+                  	Zabbix.log(4, '[ DELL ] Received response with status code ' +
+                  		api_request.getStatus() + '\n' + response);
                   
-                      if (api_request.getStatus() !== 200) {
-                          var message = 'Request failed with status code ' + api_request.getStatus();
-                          if (response !== null) {
-                              if (typeof response.message === 'string') {
-                                  message += ': ' + response.message;
-                              }
-                          }
+                  	if (api_request.getStatus() !== 200) {
+                  		var message = 'Request failed with status code ' + api_request.getStatus();
+                  		if (response !== null) {
+                  			if (typeof response.message === 'string') {
+                  				message += ': ' + response.message;
+                  			}
+                  		}
                   
-                          throw message + ' Check debug log for more information.';
-                      }
+                  		throw message + ' Check debug log for more information.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                              response = null;
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  			response = null;
+                  		}
+                  	}
                   
-                      return {
-                          status: api_request.getStatus(),
-                          body: response
-                      };
+                  	return {
+                  		status: api_request.getStatus(),
+                  		body: response
+                  	};
                   }
                   
                   function getField(object, field, def) {
-                      var names = field.split('.');
-                      var name = names.shift();
+                  	var names = field.split('.');
+                  	var name = names.shift();
                   
-                      while (typeof name !== 'undefined') {
-                          if (typeof object === undefined || typeof object[name] === 'undefined') {
-                              return def;
-                          }
+                  	while (typeof name !== 'undefined') {
+                  		if (typeof object === undefined || typeof object[name] === 'undefined') {
+                  			return def;
+                  		}
                   
-                          object = object[name];
-                          name = names.shift();
-                      }
+                  		object = object[name];
+                  		name = names.shift();
+                  	}
                   
-                      return object;
+                  	return object;
                   }
                   
                   try {
-                      storages = JSON.parse(value);
+                  	storages = JSON.parse(value);
                   }
                   catch (error) {
-                      Zabbix.log(4, '[ DELL ] Failed to parse response.');
-                      storages = null;
+                  	Zabbix.log(4, '[ DELL ] Failed to parse response.');
+                  	storages = null;
                   }
                   
                   var params = {
-                      url: '{$API.URL}',
-                      user: '{$API.USER}',
-                      password: '{$API.PASSWORD}'
+                  	url: '{$API.URL}',
+                  	user: '{$API.USER}',
+                  	password: '{$API.PASSWORD}'
                   };
                   var result = [];
                   
                   var index = params.url.indexOf('://');
                   index = params.url.indexOf('/', (index !== -1) ? (index + 3) : 0);
                   if (index !== -1) {
-                      params.url = params.url.substring(0, index);
+                  	params.url = params.url.substring(0, index);
                   }
                   
                   if (storages.Members instanceof Array) {
-                      storages.Members.forEach(function (storage) {
-                          if (typeof storage["@odata.id"] === 'string') {
-                              response = request(params.url + storage["@odata.id"] + "/Volumes");
-                              volumes = response.body;
-                              if (volumes.Members instanceof Array) {
-                                  volumes.Members.forEach(function (volume) {
-                                      if (typeof volume["@odata.id"] === 'string') {
-                                          response = request(params.url + volume["@odata.id"]);
-                                          result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': volume["@odata.id"] });
-                                      }
-                                  });
-                              }
-                          }
-                      });
+                  	storages.Members.forEach(function (storage) {
+                  		if (typeof storage["@odata.id"] === 'string') {
+                  			response = request(params.url + storage["@odata.id"] + "/Volumes");
+                  			volumes = response.body;
+                  			if (volumes.Members instanceof Array) {
+                  				volumes.Members.forEach(function (volume) {
+                  					if (typeof volume["@odata.id"] === 'string') {
+                  						response = request(params.url + volume["@odata.id"]);
+                  						result.push({ '{#DISK_NAME}': getField(response.body, 'Name', ''), '{#ODATA}': volume["@odata.id"] });
+                  					}
+                  				});
+                  			}
+                  		}
+                  	});
                   }
                   
                   return JSON.stringify(result);

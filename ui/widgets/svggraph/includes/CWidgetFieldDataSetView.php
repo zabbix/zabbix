@@ -57,9 +57,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$view = (new CList())
-			->setId('data_sets')
-			->addClass(ZBX_STYLE_SORTABLE_LIST);
+		$view = (new CList())->setId('data_sets');
 
 		$values = $this->field->getValue();
 
@@ -263,11 +261,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
-			(new CLabel(''))
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-				->addClass('js-dataset-label'),
+			(new CLabel(''))->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -278,7 +273,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addItem([
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Draw')),
+							new CLabel(_('Draw'), $field_name.'['.$row_num.'][type]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
 									->addClass('js-type')
@@ -300,7 +295,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							])
 						])
 						->addItem([
-							new CLabel(_('Width')),
+							new CLabel(_('Width'), $field_name.'['.$row_num.'][width]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
@@ -311,7 +306,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Point size')),
+							new CLabel(_('Point size'), $field_name.'['.$row_num.'][pointsize]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
@@ -322,7 +317,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Transparency')),
+							new CLabel(_('Transparency'), $field_name.'['.$row_num.'][transparency]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 									(int) $value['transparency'])
@@ -334,7 +329,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Fill')),
+							new CLabel(_('Fill'), $field_name.'['.$row_num.'][fill]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
@@ -345,7 +340,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Missing data')),
+							new CLabel(_('Missing data'), $field_name.'['.$row_num.'][missingdatafunc]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][missingdatafunc]',
 									(int) $value['missingdatafunc'])
@@ -366,7 +361,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 						]),
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Y-axis')),
+							new CLabel(_('Y-axis'), $field_name.'['.$row_num.'][axisy]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
 									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
@@ -416,7 +411,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Aggregate')),
+							new CLabel(_('Aggregate'), $field_name.'['.$row_num.'][aggregate_grouping]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][aggregate_grouping]',
 									(int) $value['aggregate_grouping'])
@@ -460,7 +455,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
-			->addClass(ZBX_STYLE_SORTABLE_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
 			->setAttribute('data-set', $row_num)
 			->setAttribute('data-type', $dataset_type);
@@ -493,8 +487,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			]))
 				->addClass('table-col-action')
 				->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass(ZBX_STYLE_SORTABLE)
-			->addClass('single-item-table-row');
+		]))->addClass('single-item-table-row');
 	}
 }

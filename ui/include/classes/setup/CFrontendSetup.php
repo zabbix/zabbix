@@ -25,7 +25,7 @@
  */
 class CFrontendSetup {
 
-	const MIN_PHP_VERSION = '7.4.0';
+	const MIN_PHP_VERSION = '8.0.0';
 	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
 	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
 	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
@@ -86,6 +86,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
 		$result[] = $this->checkPhpArgSeparatorOutput();
+		$result[] = $this->checkPhpCurlModule();
 
 		return $result;
 	}
@@ -671,6 +672,23 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $writeable ? self::CHECK_FATAL : self::CHECK_OK,
 			'error' => _s('Database TLS certificate files must be read-only')
+		];
+	}
+
+	/**
+	 * Checks for PHP Curl extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpCurlModule() {
+		$current = function_exists('curl_init');
+
+		return [
+			'name' => _('PHP curl'),
+			'current' => $current ? _('on') : _('off'),
+			'required' => null,
+			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
+			'error' => _('PHP curl extension missing.')
 		];
 	}
 }

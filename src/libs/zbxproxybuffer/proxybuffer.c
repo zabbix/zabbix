@@ -18,16 +18,18 @@
 **/
 
 #include "proxybuffer.h"
-#include "zbxproxybuffer.h"
-#include "pb_discovery.h"
 #include "pb_autoreg.h"
+#include "pb_discovery.h"
 #include "pb_history.h"
-
-#include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "zbxmutexs.h"
-#include "zbxshmem.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxmutexs.h"
+#include "zbxnum.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
+#include "zbxstr.h"
 
 #define PB_DB_FLUSH_DISABLED	0
 #define PB_DB_FLUSH_ENABLED	1
@@ -171,7 +173,8 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 						" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
 
 				zbx_list_pop(&pb->discovery, NULL);
-				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
+				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns,
+						drow->error);
 				pb_list_free_discovery(&pb->discovery, drow);
 			}
 			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->handleid == handleid);
@@ -602,7 +605,7 @@ void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid)
  *                                                                            *
  * Purpose: wait for the opened data handles to be closed                     *
  *                                                                            *
- * parameters: handleids - [IN] the handle list to wait on                    *
+ * parameters: handleids - [IN] handle list to wait on                        *
  *                                                                            *
  ******************************************************************************/
 void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
@@ -660,8 +663,10 @@ void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
  *                                                                            *
  * Purpose: create proxy  buffer                                              *
  *                                                                            *
- * Parameters: size  - [IN] the cache size in bytes                           *
- *             age   - [IN] the maximum allowed data age                      *
+ * Parameters: mode  - [IN]                                                   *
+ *             size  - [IN] cache size in bytes                               *
+ *             age   - [IN] maximum allowed data age                          *
+ *             offline_buffer [IN] offline buffer in seconds                  *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - proxy buffer was created successfully              *

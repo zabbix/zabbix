@@ -24,9 +24,42 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @onBefore  prepareTestData
  *
- * @backup usrgrp
+ * @backup usrgrp, userdirectory, mfa
  */
 class testUserGroup extends CAPITest {
+
+	public static $data = [
+		'usrgrpid' => [],
+		'userdirectoryid' => [],
+		'mfaid' => []
+	];
+
+	/**
+	 * Create data to be used in tests.
+	 */
+	public function prepareTestData(): void {
+		$response = CDataHelper::call('userdirectory.create', [[
+			'name' => 'API LDAP #1',
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap.forumsys.com',
+			'port' => 389,
+			'base_dn' => 'dc=example,dc=com',
+			'search_attribute' => 'uid'
+		]]);
+
+		$this->assertArrayHasKey('userdirectoryids', $response);
+		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
+
+		$mfa = CDataHelper::call('mfa.create', [[
+			'type' => MFA_TYPE_TOTP,
+			'name' => 'MFA TOTP method',
+			'hash_function' => TOTP_HASH_SHA1,
+			'code_length' => TOTP_CODE_LENGTH_8
+		]]);
+
+		$this->assertArrayHasKey('mfaids', $mfa);
+		self::$data['mfaid'] = array_combine(['MFA TOTP method'], $mfa['mfaids']);
+	}
 
 	public static function usergroup_create() {
 		return [
@@ -158,14 +191,14 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [[
 					'usrgrpid' => '',
-					'name' => 'API user group udated'
+					'name' => 'API user group updated'
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
 				'group' => [[
 					'usrgrpid' => '123456',
-					'name' => 'API user group udated'
+					'name' => 'API user group updated'
 				]],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -179,7 +212,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [[
 					'usrgrpid' => '1.1',
-					'name' => 'API user group udated'
+					'name' => 'API user group updated'
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
@@ -910,10 +943,106 @@ class testUserGroup extends CAPITest {
 		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
 	}
 
-	public static $data = [
-		'usrgrpid' => [],
-		'userdirectoryid' => []
-	];
+	public static function crateValidMfaDataProvider(): array {
+		return [
+			'Create group with a specific MFA method' => [
+				'group' => [
+					[
+						'name' => 'API group mfa #1',
+						'mfa_status' => GROUP_MFA_ENABLED,
+						'mfaid' => 'MFA TOTP method'
+					]
+				],
+				'expected_error' => null
+			],
+			'Create group with default MFA method' => [
+				'group' => [
+					[
+						'name' => 'API group mfa #2',
+						'mfa_status' => GROUP_MFA_ENABLED,
+						'mfaid' => 0
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function crateInvalidMfaDataProvider(): array {
+		return [
+			'Create group with invalid MFA method' => [
+				'group' => [
+					[
+						'name' => 'API group mfa #3',
+						'mfa_status' => GROUP_MFA_ENABLED,
+						'mfaid' => 999
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mfaid": object does not exist.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider crateValidMfaDataProvider
+	 * @dataProvider crateInvalidMfaDataProvider
+	 */
+	public function testCreateWithMfaMethod(array $groups, $expected_error): void {
+		$response = $this->call('usergroup.create', self::resolveIds($groups), $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertArrayHasKey('usrgrpids', $response['result']);
+			self::$data['mfaid'] += array_combine(array_column($groups, 'name'), $response['result']['usrgrpids']);
+		}
+	}
+
+	public static function updateValidMfaDataProvider(): array {
+		return [
+			'Update group to specific mfa method ' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #1',
+						'mfa_status' => GROUP_MFA_ENABLED,
+						'mfaid' => 'MFA TOTP method'
+					]
+				],
+				'expected_error' => null
+			],
+			'Update group to default mfa method ' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #2',
+						'mfa_status' => GROUP_MFA_ENABLED,
+						'mfaid' => 0
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function updateInvalidMfaDataProvider(): array {
+		return [
+			'Update group with invalid mfaid' => [
+				'group' => [
+					[
+						'usrgrpid' => 'API group ldap #3',
+						'mfa_status' => GROUP_MFA_ENABLED,
+						'mfaid' => 999
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/mfaid": object does not exist.'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider updateValidMfaDataProvider
+	 * @dataProvider updateInvalidMfaDataProvider
+	 */
+	public function testUpdateWithMfaMethod(array $groups, $expected_error): void {
+		$this->call('usergroup.update', self::resolveIds($groups), $expected_error);
+	}
 
 	/**
 	 * Replace name by value for property names in self::$data.
@@ -934,22 +1063,5 @@ class testUserGroup extends CAPITest {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Create data to be used in tests.
-	 */
-	public function prepareTestData() {
-		$response = CDataHelper::call('userdirectory.create', [[
-			'name' => 'API LDAP #1',
-			'idp_type' => IDP_TYPE_LDAP,
-			'host' => 'ldap.forumsys.com',
-			'port' => 389,
-			'base_dn' => 'dc=example,dc=com',
-			'search_attribute' => 'uid'
-		]]);
-
-		$this->assertArrayHasKey('userdirectoryids', $response);
-		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
 	}
 }

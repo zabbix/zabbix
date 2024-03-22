@@ -38,6 +38,8 @@ const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated
 
 class CDashboard {
 
+	static ZBX_STYLE_IS_READY = 'is-ready';
+
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
 	static EVENT_FEEDBACK = 'dashboard-feedback';
@@ -145,13 +147,13 @@ class CDashboard {
 		this._is_unsaved = false;
 
 		if (!this._is_kiosk_mode) {
-			const sortable = document.createElement('div');
+			const sortable = document.createElement('ul');
 
 			this._containers.navigation_tabs.appendChild(sortable);
 
 			this._tabs = new CSortable(sortable, {
-				is_vertical: false,
-				is_sorting_enabled: this._is_edit_mode
+				is_horizontal: true,
+				enable_sorting: this._is_edit_mode
 			});
 
 			this._tabs_dashboard_pages = new Map();
@@ -513,7 +515,7 @@ class CDashboard {
 			unique_id: this._createUniqueId()
 		});
 
-		this._dashboard_pages.set(dashboard_page, {});
+		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
 			dashboard_page.addWidgetFromData({
@@ -551,7 +553,7 @@ class CDashboard {
 				}
 			}
 			else {
-				const tabs = [...this._tabs.getList().children];
+				const tabs = [...this._tabs.getTarget().children];
 				const tab_index = tabs.indexOf(this._dashboard_pages.get(dashboard_page).tab);
 
 				this._selectDashboardPage(
@@ -938,6 +940,8 @@ class CDashboard {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
+				this._updateReadyState();
+
 				if (!this._is_edit_mode) {
 					this._keepSteadyConfigurationChecker();
 
@@ -982,7 +986,7 @@ class CDashboard {
 		this._selected_dashboard_page = dashboard_page;
 
 		if (this._selected_dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-			this.#startDashboardPage(this._selected_dashboard_page);
+			this._startDashboardPage(this._selected_dashboard_page);
 		}
 
 		this._activateDashboardPage(this._selected_dashboard_page);
@@ -992,7 +996,8 @@ class CDashboard {
 		}
 	}
 
-	#startDashboardPage(dashboard_page) {
+	_startDashboardPage(dashboard_page) {
+		dashboard_page.on(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.start();
@@ -1035,6 +1040,7 @@ class CDashboard {
 	}
 
 	#destroyDashboardPage(dashboard_page) {
+		dashboard_page.off(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.off(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.destroy();
@@ -1081,10 +1087,21 @@ class CDashboard {
 			return dashboard_pages.indexOf(dashboard_page);
 		}
 
-		const tabs = [...this._tabs.getList().children];
+		const tabs = [...this._tabs.getTarget().children];
 		const data = this._dashboard_pages.get(dashboard_page);
 
 		return tabs.indexOf(data.tab);
+	}
+
+	/**
+	 * Update readiness state of the dashboard.
+	 *
+	 * Readiness state is updated on switching dashboard pages and as soon as the selected page gets fully loaded.
+	 */
+	_updateReadyState() {
+		const data = this._dashboard_pages.get(this._selected_dashboard_page);
+
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, data.is_ready);
 	}
 
 	save() {
@@ -1106,7 +1123,7 @@ class CDashboard {
 			}
 		}
 		else {
-			for (const tab of this._tabs.getList().children) {
+			for (const tab of this._tabs.getTarget().children) {
 				dashboard_pages.push(this._tabs_dashboard_pages.get(tab));
 			}
 		}
@@ -1720,8 +1737,7 @@ class CDashboard {
 		}
 
 		if (!this._is_kiosk_mode) {
-			const has_aria_expanded = this._tabs
-				.getList()
+			const has_aria_expanded = this._tabs.getTarget()
 				.querySelector(`.${ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES}[aria-expanded="true"]`) !== null;
 
 			if (has_aria_expanded) {
@@ -1739,6 +1755,8 @@ class CDashboard {
 
 		tab.appendChild(tab_contents);
 		tab_contents.appendChild(tab_contents_name);
+
+		tab.tabIndex = 0;
 
 		const data = this._dashboard_pages.get(dashboard_page);
 		const name = dashboard_page.getName();
@@ -1779,7 +1797,7 @@ class CDashboard {
 			tab_contents.append(properties_button);
 		}
 
-		this._tabs.insertItemBefore(tab);
+		this._tabs.getTarget().insertBefore(tab, null);
 		this._tabs_dashboard_pages.set(tab, dashboard_page);
 	}
 
@@ -1795,7 +1813,7 @@ class CDashboard {
 			tab_contents_name.title = name;
 		}
 		else {
-			const tab_index = [...this._tabs.getList().children].indexOf(data.tab) + 1;
+			const tab_index = [...this._tabs.getTarget().children].indexOf(data.tab) + 1;
 
 			let max_index = this._dashboard_pages.size - 1;
 			let is_tab_index_available = true;
@@ -1824,12 +1842,12 @@ class CDashboard {
 	_deleteTab(dashboard_page) {
 		const data = this._dashboard_pages.get(dashboard_page);
 
-		this._tabs.removeItem(data.tab);
+		this._tabs.getTarget().removeChild(data.tab);
 		this._tabs_dashboard_pages.delete(data.tab);
 	}
 
 	_selectTab(dashboard_page) {
-		this._tabs.getList().querySelectorAll(`.${ZBX_STYLE_DASHBOARD_SELECTED_TAB}`).forEach((el) => {
+		this._tabs.getTarget().querySelectorAll(`.${ZBX_STYLE_DASHBOARD_SELECTED_TAB}`).forEach((el) => {
 			el.classList.remove(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		})
 
@@ -1837,7 +1855,7 @@ class CDashboard {
 
 		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		this._updateNavigationButtons(dashboard_page);
-		this._tabs.scrollItemIntoView(data.tab);
+		this._tabs.scrollIntoView(data.tab);
 	}
 
 	_updateNavigationButtons(dashboard_page = null) {
@@ -2043,6 +2061,14 @@ class CDashboard {
 		let user_interaction_animation_frame = null;
 
 		this._events = {
+			dashboardPageReady: (e) => {
+				const data = this._dashboard_pages.get(e.detail.target);
+
+				data.is_ready = true;
+
+				this._updateReadyState();
+			},
+
 			dashboardPageRequireDataSource: (e) => {
 				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
 					return;
@@ -2186,13 +2212,7 @@ class CDashboard {
 				this._updateNavigationButtons();
 			},
 
-			tabsDragStart: () => {
-				this._selected_dashboard_page.blockInteraction();
-			},
-
 			tabsDragEnd: () => {
-				this._selected_dashboard_page.unblockInteraction();
-
 				this._updateNavigationButtons();
 			},
 
@@ -2202,10 +2222,18 @@ class CDashboard {
 				this._is_unsaved = true;
 			},
 
-			tabsClick: (e) => {
-				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+			tabsMouseDown: (e) => {
+				const tab = e.target.closest('li');
 
-				if (tab !== null && tab.parentNode.classList.contains(ZBX_STYLE_SORTABLE_LIST)) {
+				if (tab !== null && tab.parentElement === this._tabs.getTarget()) {
+					tab.focus();
+				}
+			},
+
+			tabsClick: (e) => {
+				const tab = e.target.closest('li');
+
+				if (tab !== null && tab.parentElement === this._tabs.getTarget()) {
 					const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 					if (dashboard_page !== this._selected_dashboard_page) {
@@ -2221,7 +2249,7 @@ class CDashboard {
 
 			tabsKeyDown: (e) => {
 				if (e.key === 'Enter') {
-					const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+					const tab = e.target.closest('li');
 
 					if (tab !== null) {
 						const dashboard_page = this._tabs_dashboard_pages.get(tab);
@@ -2344,10 +2372,10 @@ class CDashboard {
 			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
 			new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);
 
-			this._tabs.on(SORTABLE_EVENT_DRAG_START, this._events.tabsDragStart);
-			this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);
-			this._tabs.on(SORTABLE_EVENT_SORT, this._events.tabsSort);
+			this._tabs.on(CSortable.EVENT_DRAG_END, this._events.tabsDragEnd);
+			this._tabs.on(CSortable.EVENT_SORT, this._events.tabsSort);
 
+			this._containers.navigation_tabs.addEventListener('mousedown', this._events.tabsMouseDown);
 			this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
 			this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);
 

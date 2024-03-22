@@ -46,6 +46,26 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_COLUMNS_COUNT = 2;
 	private const DEFAULT_ROWS_COUNT = 1;
 
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
+				&& !$this->getFieldValue('itemid')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item prototype'), _('cannot be empty'));
+		}
+
+		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE
+				&& !$this->getFieldValue('graphid')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Graph prototype'), _('cannot be empty'));
+		}
+
+		return $errors;
+	}
+
 	public function addFields(): self {
 		return $this
 			->addField(
@@ -54,15 +74,15 @@ class WidgetForm extends CWidgetForm {
 					ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype')
 				]))
 					->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
-					->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			)
-			->addField(array_key_exists('source_type', $this->values)
-					&& $this->values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
-				? (new CWidgetFieldMultiSelectItemPrototype('itemid', _('Item prototype')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			->addField(
+				(new CWidgetFieldMultiSelectItemPrototype('itemid', _('Item prototype')))
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
-				: (new CWidgetFieldMultiSelectGraphPrototype('graphid', _('Graph prototype')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldMultiSelectGraphPrototype('graphid', _('Graph prototype')))
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 			)
 			->addField(

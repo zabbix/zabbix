@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
  * @backup profiles
  *
  * @onBefore prepareProblemsData
+ *
+ * @dataSource UserPermissions
  */
 class testPageProblems extends CWebTest {
 
@@ -587,6 +589,9 @@ class testPageProblems extends CWebTest {
 			// #5 Or tag operator.
 			[
 				[
+					'fields' => [
+						'Show timeline' => false
+					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
@@ -605,15 +610,6 @@ class testPageProblems extends CWebTest {
 							'Tags' => 'Service: Oracle'
 						],
 						[
-							'Severity' => 'Warning',
-							'Status' => 'PROBLEM',
-							'Info' => '',
-							'Host' => 'ЗАББИКС Сервер',
-							'Problem' => 'Test trigger with tag',
-							'Update' => 'Update',
-							'Tags' => 'Service: abc'
-						],
-						[
 							'Severity' => 'Not classified',
 							'Status' => 'PROBLEM',
 							'Info' => '',
@@ -621,6 +617,15 @@ class testPageProblems extends CWebTest {
 							'Problem' => 'Trigger for tag permissions MySQL',
 							'Update' => 'Update',
 							'Tags' => 'Service: MySQL'
+						],
+						[
+							'Severity' => 'Warning',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'ЗАББИКС Сервер',
+							'Problem' => 'Test trigger with tag',
+							'Update' => 'Update',
+							'Tags' => 'Service: abc'
 						],
 						[
 							'Severity' => 'Average',
@@ -671,6 +676,9 @@ class testPageProblems extends CWebTest {
 			// #8 "And/Or" and operator Exists, one tag.
 			[
 				[
+					'fields' => [
+						'Show timeline' => false
+					],
 					'Tags' => [
 						'Type' => 'And/Or',
 						'tags' => [
@@ -679,8 +687,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
@@ -688,6 +696,9 @@ class testPageProblems extends CWebTest {
 			// #9 "Or" and operator Exists, one tag.
 			[
 				[
+					'fields' => [
+						'Show timeline' => false
+					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
@@ -696,8 +707,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
@@ -720,6 +731,9 @@ class testPageProblems extends CWebTest {
 			// #11 "Or" and operator Exists, two tags.
 			[
 				[
+					'fields' => [
+						'Show timeline' => false
+					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
@@ -729,8 +743,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
@@ -815,8 +829,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Fourth test trigger with tag priority'],
 						['Problem' => 'Third test trigger with tag priority'],
 						['Problem' => 'Second test trigger with tag priority'],
@@ -838,11 +852,11 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month'],
-						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Test trigger with tag'],
-						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Test trigger to check tag filter on problem page'],
 						['Problem' => 'Fourth test trigger with tag priority'],
 						['Problem' => 'Third test trigger with tag priority'],
@@ -1288,6 +1302,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
 					]
@@ -1313,6 +1329,8 @@ class testPageProblems extends CWebTest {
 					],
 					'result' => [
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day']
 					]
 				]
@@ -1321,10 +1339,16 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Show' => 'History'
+						'Show' => 'History',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'link' => 'Last 1 day'
 					],
 					'result' => [
-						['Problem' => 'Trigger for Age problem']
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL']
 					]
 				]
 			],
@@ -1505,6 +1529,7 @@ class testPageProblems extends CWebTest {
 			$this->query('button:Apply')->one()->click();
 		}
 
+		$this->page->waitUntilReady();
 		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
@@ -1559,8 +1584,8 @@ class testPageProblems extends CWebTest {
 				else {
 					$this->assertTrue($tick->exists());
 					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
-					$action_dialog = $this->query($dialog_selector)->waitUntilVisible()->one();
-					$this->assertTableData($action, 'xpath://div[@class="overlay-dialogue"]//table');
+					$action_dialog = $this->query($dialog_selector)->asOverlayDialog()->waitUntilReady()->one();
+					$this->assertTableData($action, $dialog_selector.'//table');
 					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					$action_dialog->waitUntilNotPresent();
 				}

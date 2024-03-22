@@ -881,6 +881,12 @@ ZABBIX.apps.map = (function($) {
 					this.value = isNaN(value) || (value < 10) ? 10 : value;
 				});
 
+				const sortable_triggers = new CSortable(document.querySelector('#triggerContainer tbody'), {
+					selector_handle: 'div.drag-icon'
+				});
+
+				sortable_triggers.on(CSortable.EVENT_SORT, SelementForm.prototype.recalculateTriggerSortOrder);
+
 				// Init tag fields.
 				$('#selement-tags')
 					.dynamicRows({template: '#tag-row-tmpl', counter: 0, allow_empty: true})
@@ -1656,7 +1662,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {object} data
 			 */
@@ -1781,7 +1787,7 @@ ZABBIX.apps.map = (function($) {
 
 		Shape.prototype = {
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {object} data
 			 */
@@ -2069,8 +2075,8 @@ ZABBIX.apps.map = (function($) {
 					shiftY = Math.round(dims.height / 2),
 					newX = x,
 					newY = y,
-					newWidth = dims.width,
-					newHeight = dims.height,
+					newWidth = Math.round(dims.width),
+					newHeight = Math.round(dims.height),
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 				// Lines should not be aligned
@@ -2961,8 +2967,7 @@ ZABBIX.apps.map = (function($) {
 									});
 								});
 
-								SelementForm.prototype.recalculateSortOrder();
-								SelementForm.prototype.initSortable();
+								SelementForm.prototype.recalculateTriggerSortOrder();
 							}
 						});
 					}
@@ -3204,31 +3209,9 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Drag and drop trigger sorting.
-			 */
-			initSortable: function() {
-				var triggerContainer = $('#triggerContainer');
-
-				triggerContainer.sortable({
-					disabled: (triggerContainer.find('tr.sortable').length < 2),
-					items: 'tbody tr.sortable',
-					axis: 'y',
-					containment: 'parent',
-					cursor: 'grabbing',
-					handle: 'div.drag-icon',
-					tolerance: 'pointer',
-					opacity: 0.6,
-					update: this.recalculateSortOrder,
-					start: function(e, ui) {
-						$(ui.placeholder).height($(ui.helper).height());
-					}
-				});
-			},
-
-			/**
 			 * Sorting triggers by severity.
 			 */
-			recalculateSortOrder: function() {
+			recalculateTriggerSortOrder: function() {
 				if ($('input[name^="element_id"]').length != 0) {
 					var triggers = [],
 						priority;
@@ -3662,7 +3645,7 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		/**
-		 * Form for editin links.
+		 * Form for editing links.
 		 *
 		 * @param {object} formContainer jQuesry object
 		 * @param {object} sysmap

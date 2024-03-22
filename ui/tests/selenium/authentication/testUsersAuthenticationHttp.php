@@ -41,7 +41,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	public function testFormAdministrationAuthenticationHttp_Layout() {
+	public function testUsersAuthenticationHttp_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('HTTP settings');
@@ -325,11 +325,6 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 					],
 					'pages' => [
 						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
-							'target' => 'Global view'
-						],
-						[
 							'page' => 'index.php',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'Global view'
@@ -368,11 +363,6 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						[
 							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
-							'target' => 'Global view'
-						],
-						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
 							'target' => 'Global view'
 						],
 						[
@@ -530,6 +520,13 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		switch (CTestArrayHelper::get($page, 'action', self::LOGIN_GUEST)) {
 			case self::LOGIN_GUEST:
 				$this->page->open($page['page']);
+
+				if ($page['page'] !== 'zabbix.php?action=user.list') {
+					$this->query('button:Login')->one()->click();
+					$this->page->waitUntilReady();
+					$this->query('link:sign in as guest')->one()->click();
+					$this->page->waitUntilReady();
+				}
 
 				return 'guest';
 
