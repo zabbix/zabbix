@@ -507,6 +507,7 @@ class HostInterfaceManager {
 					}
 					break;
 				case 'checkbox':
+					el.readOnly = true;
 					el.disabled = true;
 
 					if (checked) {

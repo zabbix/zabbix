@@ -287,7 +287,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('Follow redirects'), 'follow_redirects'))->setId('js-item-follow-redirects-label'),
 		(new CFormField(
 			(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 		))->setId('js-item-follow-redirects-field')
 	])
@@ -306,7 +306,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('Convert to JSON'), 'output_format'))->setId('js-item-output-format-label'),
 		(new CFormField(
 			(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['output_format'] == HTTPCHECK_STORE_JSON)
 		))->setId('js-item-output-format-field')
 	])
@@ -350,7 +350,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
 		(new CFormField(
 			(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
@@ -358,7 +358,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])

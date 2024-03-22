@@ -119,7 +119,7 @@ $graphFormList
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
 			->setChecked($data['show_legend'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 
 // Append graph types to form list.
@@ -127,12 +127,12 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 	$graphFormList->addRow(_('Show working time'),
 		(new CCheckBox('show_work_period'))
 			->setChecked($data['show_work_period'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 	$graphFormList->addRow(_('Show triggers'),
 		(new CCheckbox('show_triggers'))
 			->setchecked($data['show_triggers'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 
 	if ($data['graphtype'] == GRAPH_TYPE_NORMAL) {
@@ -142,7 +142,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
 			->setChecked(true)
 			->onClick('showHideVisible("percent_left");')
-			->setEnabled(!$readonly);
+			->setReadonly($readonly);
 
 		if(array_key_exists('visible', $data) && array_key_exists('percent_left', $data['visible'])) {
 			$percentLeftCheckbox->setChecked(true);
@@ -160,7 +160,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
 			->setChecked(true)
 			->onClick('showHideVisible("percent_right");')
-			->setEnabled(!$readonly);
+			->setReadonly($readonly);
 
 		if(array_key_exists('visible', $data) && array_key_exists('percent_right', $data['visible'])) {
 			$percentRightCheckbox->setChecked(true);
@@ -366,7 +366,7 @@ else {
 	$graphFormList->addRow(_('3D view'),
 		(new CCheckBox('show_3d'))
 			->setChecked($data['show_3d'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 }
 

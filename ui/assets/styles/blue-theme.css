@@ -5283,6 +5283,8 @@ select {
     transform: translate(-50%, -50%) rotate(-45deg); }
   .checkbox-radio[type="checkbox"]:checked[disabled] + label span::after {
     border-color: #acbbc2 !important; }
+  .checkbox-radio[type="checkbox"]:checked[readonly] + label span::after {
+    border-color: #1f2c33 !important; }
   .checkbox-radio[type="radio"] + label span {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked + label span::after {

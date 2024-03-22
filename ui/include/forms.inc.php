@@ -660,12 +660,12 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 				$on_fail
-					->setEnabled(false)
+					->setReadonly(true)
 					->setChecked(true);
 				break;
 
 			default:
-				$on_fail->setEnabled(!$readonly);
+				$on_fail->setReadonly($readonly);
 
 				if ($step['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
 					$on_fail->setChecked(true);

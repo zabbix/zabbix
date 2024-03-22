@@ -260,7 +260,7 @@ $trigger_form_grid
 		new CFormField(
 			(new CCheckBox('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED))
 				->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 		)
 	])
 	->addItem([

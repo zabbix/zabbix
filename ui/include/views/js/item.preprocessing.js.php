@@ -551,7 +551,7 @@
 					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
 						$on_fail
 							.prop('checked', true)
-							.prop('disabled', true)
+							.prop('readonly', true)
 							.trigger('change');
 						break;
 

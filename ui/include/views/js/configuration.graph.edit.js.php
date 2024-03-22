@@ -148,6 +148,7 @@
 						CALC_FNC_AVG => _('avg'),
 						CALC_FNC_MAX => _('max')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -159,6 +160,7 @@
 						GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 						GRAPH_YAXIS_SIDE_RIGHT => _('Right')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -217,6 +219,7 @@
 						GRAPH_ITEM_SIMPLE =>_('Simple'),
 						GRAPH_ITEM_SUM =>_('Graph sum')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -230,6 +233,7 @@
 						CALC_FNC_MAX => _('max'),
 						CALC_FNC_LST => _('last')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -288,6 +292,7 @@
 						GRAPH_ITEM_SIMPLE => _('Simple'),
 						GRAPH_ITEM_SUM => _('Graph sum')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -301,6 +306,7 @@
 						CALC_FNC_MAX => _('max'),
 						CALC_FNC_LST => _('last')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 

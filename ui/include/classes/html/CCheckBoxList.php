@@ -47,6 +47,11 @@ class CCheckBoxList extends CList {
 	protected $enabled = true;
 
 	/**
+	 * @var bool $readonly
+	 */
+	protected $readonly = false;
+
+	/**
 	 * @var bool $layout_fixed
 	 */
 	protected $layout_fixed = false;
@@ -140,6 +145,17 @@ class CCheckBoxList extends CList {
 	}
 
 	/**
+	 * Set checkboxes readonly state.
+	 *
+	 * @param bool $readonly  State of checkboxes.
+	 */
+	public function setReadonly(bool $readonly) {
+		$this->readonly = $readonly;
+
+		return $this;
+	}
+
+	/**
 	 * Make columns the same size.
 	 *
 	 * @param bool $layout_fixed
@@ -203,7 +219,8 @@ class CCheckBoxList extends CList {
 			$checkbox = (new CCheckBox($name, $value['value']))
 				->setLabel($value['label'])
 				->setChecked($value['checked'])
-				->setEnabled($this->enabled);
+				->setEnabled($this->enabled)
+				->setReadonly($this->readonly);
 
 			if (array_key_exists('id', $value) || $this->uniqid !== '') {
 				$checkbox->setId(array_key_exists('id', $value)
