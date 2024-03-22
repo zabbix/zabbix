@@ -75,7 +75,7 @@ class CProxy extends CApiService {
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectAssignedHosts' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid'])), 'default' => null],
 			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CHost::OUTPUT_FIELDS, ['proxyid', 'proxy_groupid', 'assigned_proxyid'])), 'default' => null],
-			'selectProxyGroup' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CProxyGroup::OUTPUT_FIELDS), 'default' => null],
+			'selectProxyGroup' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', array_diff(CProxyGroup::OUTPUT_FIELDS, ['proxy_groupid'])), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -266,7 +266,9 @@ class CProxy extends CApiService {
 		$relation_map = $this->createRelationMap($result, 'proxyid', 'proxy_groupid');
 
 		$db_proxy_groups = API::ProxyGroup()->get([
-			'output' => $options['selectProxyGroup'],
+			'output' => $options['selectProxyGroup'] === API_OUTPUT_EXTEND
+				? array_diff(CProxyGroup::OUTPUT_FIELDS, ['proxy_groupid'])
+				: $options['selectProxyGroup'],
 			'proxy_groupids' => $relation_map->getRelatedIds(),
 			'preservekeys' => true
 		]);
