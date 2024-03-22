@@ -1123,8 +1123,11 @@ void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 				if (0 == proxy->firstaccess)
 					proxy->firstaccess = proxy->lastaccess;
 
-				if (now - proxy->firstaccess >= failover_delay)
+				if (ZBX_PG_PROXY_STATE_UNKNOWN == proxy->state ||
+						now - proxy->firstaccess >= failover_delay)
+				{
 					state = ZBX_PG_PROXY_STATE_ONLINE;
+				}
 			}
 
 			if (ZBX_PG_PROXY_STATE_UNKNOWN == state || proxy->state == state)
@@ -1211,6 +1214,7 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 		{
 			case ZBX_PG_GROUP_STATE_UNKNOWN:
 				state = ZBX_PG_GROUP_STATE_RECOVERING;
+				group->state_time = now;
 				ZBX_FALLTHROUGH;
 			case ZBX_PG_GROUP_STATE_RECOVERING:
 				if (total - offline < min_online)
