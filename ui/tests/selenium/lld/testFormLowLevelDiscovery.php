@@ -635,9 +635,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Discovery lifetime',
 					'key' => 'discovery-lifetime-test',
 					'lifetime' => ' ',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": cannot be empty.'
+						'Invalid parameter "/1/lifetime": cannot be empty.'
 					]
 				]
 			],
