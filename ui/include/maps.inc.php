@@ -796,9 +796,13 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			}
 		}
 
-		$selement_info = $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
-			? countNestedMapSelementProblems($selement, $sysmaps_data) + $selement_info
-			: countSelementProblems($selement) + $selement_info;
+		$selement_problem_summary = countSelementProblems($selement, $sysmaps_data);
+
+		$selement_info['problem'] = count($selement_problem_summary['problem']);
+		$selement_info['problem_unack'] = count($selement_problem_summary['problem_unack']);
+		$selement_info['latelyChanged'] = $selement_problem_summary['latelyChanged'];
+		$selement_info['priority'] = $selement_problem_summary['priority'];
+		$selement_info['problem_title'] = $selement_problem_summary['problem_title'];
 
 		// replace default icons
 		if (!$selement['iconid_on']) {
@@ -914,20 +918,17 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	return $info;
 }
 
-function countSelementProblems(array $selement): array {
+function countSelementProblems(array $selement, array &$sysmaps_data): array {
+	if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+		return countNestedMapSelementProblems($selement, $sysmaps_data);
+	}
+
 	$trigger_order = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
 		? array_column($selement['elements'], 'triggerid')
 		: [];
 	$critical_problem = [];
 	$lately_changed = 0;
-	$selement_info = [
-		'problem' => 0,
-		'problem_unack' => 0,
-		'latelyChanged' => false,
-		'priority' => 0
-	];
-	$counter_problems = [];
-	$counter_problems_unack = [];
+	$selement_problem_summary = defaultProblemSummary();
 
 	foreach ($selement['triggers'] as $trigger) {
 		if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
@@ -937,10 +938,10 @@ function countSelementProblems(array $selement): array {
 		foreach ($trigger['problems'] as $problem) {
 			if ($problem['r_clock'] == 0) {
 				$eventid = $problem['eventid'];
-				$counter_problems[$eventid] = true;
+				$selement_problem_summary['problem'][$eventid] = true;
 
 				if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-					$counter_problems_unack[$eventid] = true;
+					$selement_problem_summary['problem_unack'][$eventid] = true;
 				}
 
 				if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
@@ -971,49 +972,65 @@ function countSelementProblems(array $selement): array {
 			}
 		}
 
-		$selement_info['problem'] = count($counter_problems);
-		$selement_info['problem_unack'] = count($counter_problems_unack);
-
 		if ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD))) {
-			$selement_info['latelyChanged'] = true;
+			$selement_problem_summary['latelyChanged'] = true;
 		}
 	}
 
 	if ($critical_problem) {
-		$selement_info['priority'] = $critical_problem['severity'];
-		$selement_info['problem_title'] = $critical_problem['name'];
+		$selement_problem_summary['priority'] = $critical_problem['severity'];
+		$selement_problem_summary['problem_title'] = $critical_problem['name'];
+		$selement_problem_summary['problem_eventid'] = $critical_problem['eventid'];
 	}
 
-	return $selement_info;
+	return $selement_problem_summary;
 }
 
-function countNestedMapSelementProblems(array $selement, array $sysmaps_data): array {
-	$lookup_sysmapids = [$selement['elements'][0]['sysmapid']];
-	$nested_triggers = [];
+function countNestedMapSelementProblems(array $selement, array &$sysmaps_data): array {
+	$sysmapid = $selement['elements'][0]['sysmapid'];
 
-	while ($sysmapid = current($lookup_sysmapids)) {
-		foreach ($sysmaps_data[$sysmapid]['selements'] as $lookup_sysmap_element) {
-			if ($lookup_sysmap_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-				$sysmapid = $lookup_sysmap_element['elements'][0]['sysmapid'];
+	if (!array_key_exists('selement_problem_summary', $sysmaps_data[$sysmapid])) {
+		$selement_problem_summary = defaultProblemSummary();
 
-				// Avoid lookup of same map being added multiple times.
-				if (!in_array($sysmapid, $lookup_sysmapids)) {
-					$lookup_sysmapids[] = $sysmapid;
-				}
+		foreach ($sysmaps_data[$sysmapid]['selements'] as $nested_sysmap_element) {
+			$nested_problem_summary = countSelementProblems($nested_sysmap_element, $sysmaps_data);
+
+			if ($selement_problem_summary == null) {
+				$selement_problem_summary = $nested_problem_summary;
 			}
+			else {
+				$selement_problem_summary['problem'] += $nested_problem_summary['problem'];
+				$selement_problem_summary['problem_unack'] += $nested_problem_summary['problem_unack'];
+				$selement_problem_summary['latelyChanged'] |= $nested_problem_summary['latelyChanged'];
 
-			if (array_key_exists('triggers', $lookup_sysmap_element)) {
-				$nested_triggers = array_merge($nested_triggers, $lookup_sysmap_element['triggers']);
+				if ($nested_problem_summary['priority'] > $selement_problem_summary['priority']) {
+					$selement_problem_summary['priority'] = $nested_problem_summary['priority'];
+					$selement_problem_summary['problem_title'] = $nested_problem_summary['problem_title'];
+					$selement_problem_summary['problem_eventid'] = $nested_problem_summary['problem_eventid'];
+				}
+				elseif ($nested_problem_summary['priority'] == $selement_problem_summary['priority']
+						&& $nested_problem_summary['problem_eventid'] > $selement_problem_summary['problem_eventid']) {
+					$selement_problem_summary['problem_title'] = $nested_problem_summary['problem_title'];
+					$selement_problem_summary['problem_eventid'] = $nested_problem_summary['problem_eventid'];
+				}
 			}
 		}
 
-		next($lookup_sysmapids);
+		$sysmaps_data[$sysmapid]['selement_problem_summary'] = $selement_problem_summary;
 	}
 
-	return countSelementProblems([
-		'elementtype' => SYSMAP_ELEMENT_TYPE_MAP,
-		'triggers' => $nested_triggers
-	]);
+	return $sysmaps_data[$sysmapid]['selement_problem_summary'];
+}
+
+function defaultProblemSummary(): array {
+	return [
+		'problem' => [],
+		'problem_unack' => [],
+		'latelyChanged' => false,
+		'priority' => 0,
+		'problem_title' => null,
+		'problem_eventid' => null
+	];
 }
 
 function separateMapElements($sysmap) {
