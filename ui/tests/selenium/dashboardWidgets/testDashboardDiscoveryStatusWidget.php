@@ -503,18 +503,18 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_3,
-						'Up' => '100',
+						'Up' => ['text' => '100', 'selector' => 'class:red'],
 						'Down' => ''
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_4,
-						'Up' => '100',
-						'Down' => '100'
+						'Up' => ['text' => '100', 'selector' => 'class:green'],
+						'Down' => ['text' => '100', 'selector' => 'class:red']
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_5,
 						'Up' => '',
-						'Down' => '100'
+						'Down' => ['text' => '100', 'selector' => 'class:red']
 					]
 				]
 			]
@@ -546,10 +546,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals($widget_data->getHeadersText(), ['Discovery rule', 'Up', 'Down']);
 		$this->assertTableData($data);
 
-		// Check that amount of data with classes green / red is correct in the widget table.
-		$this->assertEquals(2, $widget_data->query('class:red')->all()->count());
-		$this->assertEquals(2, $widget_data->query('class:green')->all()->count());
-
+		// Check links for the discovery rules.
 		foreach (self::$druleids as $name => $id) {
 			$this->assertEquals('zabbix.php?action=discovery.view&filter_set=1&filter_druleids%5B0%5D='.$id,
 					$widget_data->query('link', $name)->one()->getAttribute('href')
