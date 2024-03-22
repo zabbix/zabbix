@@ -431,13 +431,29 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
-		if (array_key_exists('proxyid', $data)) {
-			$proxyid = $data['proxyid'];
-		}
-		elseif ($this->host['status'] != HOST_STATUS_TEMPLATE) {
-			$proxyid = $this->host['proxyid'];
+		if (in_array($this->item_type, $this->items_support_proxy)) {
+			if (array_key_exists('proxyid', $data)) {
+				$proxyid = $data['proxyid'];
+			}
+			elseif ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+				$proxyid = $this->host['proxyid'];
+			}
+			else {
+				$proxyid = 0;
+			}
+
+			if (array_key_exists('test_with', $data)) {
+				$test_with = $data['test_with'];
+			}
+			else {
+				$test_with = $this->getInput('test_with', $proxyid == 0
+					? self::TEST_WITH_SERVER
+					: self::TEST_WITH_PROXY
+				);
+			}
 		}
 		else {
+			$test_with = self::TEST_WITH_SERVER;
 			$proxyid = 0;
 		}
 
@@ -463,10 +479,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				: $this->getInput('get_value', 0),
 			'is_item_testable' => $this->is_item_testable,
 			'inputs' => $inputs,
-			'test_with' => array_key_exists('test_with', $data)
-				? $data['test_with']
-				: $this->getInput('test_with', $proxyid == 0 ? self::TEST_WITH_SERVER : self::TEST_WITH_PROXY),
-			'ms_proxy' => in_array($this->item_type, $this->items_support_proxy) && $proxyid != 0
+			'test_with' => $test_with,
+			'ms_proxy' => $proxyid != 0
 				? CArrayHelper::renameObjectsKeys(API::Proxy()->get([
 					'output' => ['proxyid', 'name'],
 					'proxyids' => [$proxyid]
