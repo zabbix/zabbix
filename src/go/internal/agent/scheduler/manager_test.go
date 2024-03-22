@@ -1930,7 +1930,7 @@ func Test_getCapacity(t *testing.T) {
 					},
 				},
 			},
-			1000,
+			10,
 		},
 		{
 			"system_cap",
