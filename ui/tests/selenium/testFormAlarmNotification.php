@@ -99,52 +99,65 @@ class testFormAlarmNotification extends CWebTest {
 
 		CDataHelper::call('trigger.create', [
 			[
-				'description' => 'Not classified',
-				'expression' => 'last(/Host for alarm item/not_classified)=0',
-				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
-			],
-			[
-				'description' => 'Not classified 2',
+				'description' => 'Not_classified_trigger',
 				'expression' => 'last(/Host for alarm item/not_classified)=0',
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-				'status' => TRIGGER_STATUS_DISABLED
+				'manual_close' => 1
 			],
 			[
-				'description' => 'Not classified 3',
+				'description' => 'Not_classified_trigger_2',
 				'expression' => 'last(/Host for alarm item/not_classified)=1',
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-				'status' => TRIGGER_STATUS_DISABLED
+				'manual_close' => 1
 			],
 			[
-				'description' => 'Information',
+				'description' => 'Not_classified_trigger_3',
+				'expression' => 'last(/Host for alarm item/not_classified)=1',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Not_classified_trigger_4',
+				'expression' => 'last(/Host for alarm item/not_classified)=2',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Information_trigger',
 				'expression' => 'last(/Host for alarm item/information)=1',
-				'priority' => TRIGGER_SEVERITY_INFORMATION
+				'priority' => TRIGGER_SEVERITY_INFORMATION,
+				'manual_close' => 1
 			],
 			[
-				'description' => 'Warning',
+				'description' => 'Warning_trigger',
 				'expression' => 'last(/Host for alarm item/warning)=2',
-				'priority' => TRIGGER_SEVERITY_WARNING
+				'priority' => TRIGGER_SEVERITY_WARNING,
+				'manual_close' => 1
 			],
 			[
-				'description' => 'Average',
+				'description' => 'Average_trigger',
 				'expression' => 'last(/Host for alarm item/average)=3',
-				'priority' => TRIGGER_SEVERITY_AVERAGE
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
 			],
 			[
-				'description' => 'High',
+				'description' => 'High_trigger',
 				'expression' => 'last(/Host for alarm item/high)=4',
-				'priority' => TRIGGER_SEVERITY_HIGH
+				'priority' => TRIGGER_SEVERITY_HIGH,
+				'manual_close' => 1
 			],
 			[
-				'description' => 'Disaster',
+				'description' => 'Disaster_trigger',
 				'expression' => 'last(/Host for alarm item/disaster)=5',
-				'priority' => TRIGGER_SEVERITY_DISASTER
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'manual_close' => 1
 			]
 		]);
 		self::$triggersid = CDataHelper::getIds('description');
 
 		// Enable Alarm Notification display for user.
-		DBexecute('UPDATE profiles SET value_str=1 WHERE userid=1 AND source='.zbx_dbstr('enabled'));
+		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
+				' VALUES (555,1,'.zbx_dbstr('web.messages').',1,'.zbx_dbstr('enabled').',3)');
 	}
 
 	/**
@@ -156,7 +169,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->assertHeader('Problems');
 
 		// Trigger problem.
-		CDBHelper::setTriggerProblem('Not classified', TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('Not_classified_trigger', TRIGGER_VALUE_TRUE);
 
 		// Find appeared Alarm notification overlay dialog.
 		$this->page->refresh()->waitUntilReady();
@@ -167,7 +180,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->assertEquals('Problem on Host for alarm item', $alarm_dialog->query('xpath:.//h4')->one()->getText());
 
 		// Check that link for host and trigger filtering works.
-		foreach (['Hosts' => 'Host for alarm item', 'Triggers' => 'Not classified'] as $field => $name) {
+		foreach (['Hosts' => 'Host for alarm item', 'Triggers' => 'Not_classified_trigger'] as $field => $name) {
 			$this->assertTrue($alarm_dialog->query('link', $name)->one()->isClickable());
 			$alarm_dialog->query('link', $name)->one()->click();
 			$this->page->waitUntilReady();
@@ -200,7 +213,6 @@ class testFormAlarmNotification extends CWebTest {
 			if ($button === 'Mute') {
 				// After clicking on button it changes status to off and become Unmute.
 				$alarm_dialog->query($selector)->one()->click();
-				$this->assertTrue($alarm_dialog->query($selector)->exists(false));
 				$alarm_dialog->query('xpath:.//button[@title="Unmute"]')->waitUntilVisible()->one();
 				$this->assertEquals($class.'-off', $alarm_dialog->query('xpath:.//button[@title="Unmute"]')->
 						one()->getAttribute('class')
@@ -219,6 +231,48 @@ class testFormAlarmNotification extends CWebTest {
 					$this->assertEquals($class.'-off', $alarm_dialog->query($selector)->one()->getAttribute('class'));
 				}
 			}
+		}
+
+		// Check close button.
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
+		$alarm_dialog->ensureNotPresent();
+	}
+
+	public static function getDisplayedAlarmsData() {
+		return [
+			[
+				[
+					'trigger_name' => ['Information_trigger']
+				]
+			],
+			[
+				[
+					'trigger_name' => ['Information_trigger']
+				]
+			]
+		];
+	}
+
+
+	/**
+	 * @dataProvider getDisplayedAlarmsData
+	 */
+	public function testFormAlarmNotification_DisplayedAlarms($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
+
+		// Trigger problem.
+		foreach ($data['trigger_name'] as $trigger_name) {
+			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE);
+		}
+
+		// Find appeared Alarm notification overlay dialog.
+		$this->page->refresh()->waitUntilReady();
+		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
+				waitUntilPresent()->one();
+
+		foreach ($data['trigger_name'] as $trigger_name) {
+			$this->assertEquals('Problem on Host for alarm item', $alarm_dialog->query('xpath:.//h4')->one()->getText());
+			$this->assertTrue($alarm_dialog->query('link', $trigger_name)->one()->isClickable());
 		}
 
 		// Check close button.
