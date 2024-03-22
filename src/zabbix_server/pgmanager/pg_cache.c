@@ -802,6 +802,12 @@ void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *h
 
 			if (0 == new_host->proxyid)
 			{
+				if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies,
+						&host->proxyid)))
+				{
+					zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
+				}
+
 				host_local.proxyid = host->proxyid;
 				zbx_hashset_remove_direct(&cache->hostmap, host);
 				zbx_vector_pg_host_append_ptr(hosts_del, &host_local);

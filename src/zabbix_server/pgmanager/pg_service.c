@@ -184,7 +184,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 		ptr += zbx_serialize_value(ptr, proxy->deleted_group_hosts.values_num);
 
 		for (int i = 0; i < proxy->deleted_group_hosts.values_num; i++)
-			ptr += zbx_serialize_value(ptr, proxy->deleted_group_hosts.values[i].hostid);
+			ptr += zbx_serialize_value(ptr, proxy->deleted_group_hosts.values[i].hostproxyid);
 	}
 
 	pg_cache_unlock(pgs->cache);
