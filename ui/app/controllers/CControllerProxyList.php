@@ -196,7 +196,6 @@ class CControllerProxyList extends CController {
 				}
 			}
 		}
-		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
 		$server_status = CSettingsHelper::getPrivate(CSettingsHelper::SERVER_STATUS);
 		$data['server_version'] = $server_status !== ''
