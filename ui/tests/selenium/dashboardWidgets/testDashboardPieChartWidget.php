@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup widget
  *
+ * @dataSource AllItemValueTypes
+ *
  * @onBefore prepareData
  */
 class testDashboardPieChartWidget extends testWidgets {
