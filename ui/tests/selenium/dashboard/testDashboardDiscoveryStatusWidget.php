@@ -51,13 +51,14 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 	 *
 	 * @var integer
 	 */
-
 	protected static $dashboardid;
+
+	protected static $druleids;
 	protected static $update_widget = 'Update widget';
 	const DISCOVERY_RULE_1 = 'A discovery rule to be displayed first';
 	const DISCOVERY_RULE_2 = 'Discovery rule with 0 discovered hosts';
 	const DISCOVERY_RULE_3 = 'Discovery rule with active discovered hosts';
-	const DISCOVERY_RULE_4 = 'Discovery rule with both type of hosts hosts';
+	const DISCOVERY_RULE_4 = 'Discovery rule with both type of hosts';
 	const DISCOVERY_RULE_5 = 'XYZ - discovery rule to be displayed last (Inactive hosts)';
 	const DELETE_WIDGET = 'Widget to delete';
 	const DATA_WIDGET = 'Widget for data check';
@@ -76,19 +77,18 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_itemid, wf.value_graphid';
 
 	/**
-	 * Create data for autotests which use DiscoveryStatusWidget.
+	 * Create test data.
 	 *
 	 * @return array
 	 */
 	public static function prepareDiscoveryStatusWidgetData() {
-
 		CDataHelper::call('drule.create', [
 			[
 				'name' => self::DISCOVERY_RULE_1,
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						'type' => 4		// Check: HTTP
+						'type' => SVC_HTTP
 					]
 				]
 			],
@@ -97,7 +97,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						'type' => 4		// Check: HTTP
+						'type' => SVC_HTTP
 					]
 				]
 			],
@@ -106,7 +106,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						'type' => 4		// Check: HTTP
+						'type' => SVC_HTTP
 					]
 				]
 			],
@@ -115,7 +115,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						'type' => 4		// Check: HTTP
+						'type' => SVC_HTTP
 					]
 				]
 			],
@@ -124,11 +124,15 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						'type' => 4		// Check: HTTP
+						'type' => SVC_HTTP
 					]
 				]
 			]
 		]);
+
+		self::$druleids = CDataHelper::getIds('name');
+		$id = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('Discovery rule for proxy delete test'));
+		self::$druleids += ['Discovery rule for proxy delete test' => $id];
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -228,11 +232,10 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$form->checkValue([
 			'Name' => '',
 			'Refresh interval' => 'Default (1 minute)',
-			'id:show_header' => true
+			'Show header' => true
 		]);
 
-		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals('default', $form->getField('Name')->getAttribute('placeholder'));
+		$this->assertTrue($form->getField('Name')->isAttributePresent(['maxlength' => '255', 'placeholder' => 'default']));
 
 		$this->assertEquals($form->getField('Refresh interval')->asDropdown()->getOptions()->asText(), [
 				'Default (1 minute)',
@@ -256,15 +259,10 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 	public static function getDiscoveryStatusWidgetData() {
 		return [
-			// #0 With default name.
+			// #0 With default values.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => '',
-						'Show header' => true,
-						'Refresh interval' => 'Default (1 minute)'
-					]
+					'expected' => TEST_GOOD
 				]
 			],
 			// #1 Name with special symbols.
@@ -462,9 +460,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
 		}
 		else {
-			$dialog = COverlayDialogElement::find()->one();
-			$dialog->query('button:Cancel')->one()->click();
-			$dialog->ensureNotPresent();
+			COverlayDialogElement::find()->one()->close(true);
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
 				foreach ([self::CANCEL_WIDGET => true, $new_name => false] as $name => $valid) {
@@ -530,23 +526,15 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 	 */
 	public function testDashboardDiscoveryStatusWidget_checkWidgetTableData($data) {
 
-		// Get ID's of the discovery rules from database.
-		$drule_id_1 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_1));
-		$drule_id_2 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_2));
-		$drule_id_3 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_3));
-		$drule_id_4 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_4));
-		$drule_id_5 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_5));
-		$drule_id_6 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('Discovery rule for proxy delete test'));
-
 		// Insert data into the database (dhosts table), to imitate the host discovery.
 		for ($i = 1, $j = 101; $i + $j <= 301; $i++, $j++) {
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$j.", ".$drule_id_3.", 0)");
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$i.", ".$drule_id_5.", 1)");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$j.", ".self::$druleids[self::DISCOVERY_RULE_3].", 0)");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$i.", ".self::$druleids[self::DISCOVERY_RULE_5].", 1)");
 		}
 
 		for ($i = 201, $j = 302; $i + $j <= 702; $i++, $j++) {
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$j.", ".$drule_id_4.", 0)");
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$i.", ".$drule_id_4.", 1)");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$j.", ".self::$druleids[self::DISCOVERY_RULE_4].", 0)");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$i.", ".self::$druleids[self::DISCOVERY_RULE_4].", 1)");
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
@@ -562,16 +550,9 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals(2, $widget_data->query('class:red')->all()->count());
 		$this->assertEquals(2, $widget_data->query('class:green')->all()->count());
 
-		$drules = [
-			[$drule_id_1, $drule_id_2, $drule_id_3, $drule_id_4, $drule_id_5, $drule_id_6],
-			[self::DISCOVERY_RULE_1, self::DISCOVERY_RULE_2, self::DISCOVERY_RULE_3, self::DISCOVERY_RULE_4,
-				self::DISCOVERY_RULE_5, 'Discovery rule for proxy delete test']
-		];
-
-		// Check the links of the discovery rules.
-		for ($i = 0; $i <= 5; $i++) {
-			$this->assertEquals('zabbix.php?action=discovery.view&filter_set=1&filter_druleids%5B0%5D='.$drules[0][$i],
-					$widget_data->query('link', $drules[1][$i])->one()->getAttribute('href')
+		foreach (self::$druleids as $name => $id) {
+			$this->assertEquals('zabbix.php?action=discovery.view&filter_set=1&filter_druleids%5B0%5D='.$id,
+					$widget_data->query('link', $name)->one()->getAttribute('href')
 			);
 		}
 	}
@@ -600,6 +581,14 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 	protected function checkWidgetForm($data, $update = false) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		$default_values = [
+			'Name' => '',
+			'Show header' => true,
+			'Refresh interval' => 'Default (1 minute)'
+		];
+		$data['fields'] = $update
+				? CTestArrayHelper::get($data, 'fields', $default_values)
+				: CTestArrayHelper::get($data, 'fields', []);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for testing actions with discovery status widget']);
@@ -611,6 +600,11 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Discovery status')]);
+
+		if (!$data['fields']) {
+			$data['fields'] = $default_values;
+		}
+
 		$form->fill($data['fields']);
 
 		if ($expected === TEST_GOOD) {
@@ -625,7 +619,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			$data['fields']['Name'] = trim($data['fields']['Name']);
 		}
 		// If name is empty string it is replaced by default name "Discovery status".
-		$header = ($data['fields']['Name'] === '') ? 'Discovery status' : $data['fields']['Name'];
+		$header = (CTestArrayHelper::get($data, 'fields.Name', '') === '') ? 'Discovery status' : $data['fields']['Name'];
 
 		if ($update) {
 			self::$update_widget = $header;
@@ -655,7 +649,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		// Check new widget update interval.
 		$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
 			? '1 minute'
-			: (CTestArrayHelper::get($data['fields'], 'Refresh interval'));
+			: CTestArrayHelper::get($data['fields'], 'Refresh interval');
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
 	}
 }
