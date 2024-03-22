@@ -33,7 +33,7 @@ class CProxyGroup extends CApiService {
 
 	protected $tableName = 'proxy_group';
 	protected $tableAlias = 'pg';
-	protected $sortColumns = ['proxy_groupid', 'name', 'state'];
+	protected $sortColumns = ['proxy_groupid', 'name'];
 
 	public const OUTPUT_FIELDS = ['proxy_groupid', 'name', 'failover_delay', 'min_online', 'description', 'state'];
 
@@ -119,6 +119,42 @@ class CProxyGroup extends CApiService {
 			$sql_parts['where']['pgp'] = 'pg.proxy_groupid=p.proxy_groupid';
 		}
 
+		if ($options['filter'] !== null && array_key_exists('state', $options['filter'])
+				&& $options['filter']['state'] !== null) {
+			$this->dbFilter('proxy_group_rtdata pgr', ['filter' => ['state' => $options['filter']['state']]] + $options,
+				$sql_parts
+			);
+		}
+
+		return $sql_parts;
+	}
+
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput']) {
+			$proxy_group_rtdata = false;
+
+			if ($this->outputIsRequested('state', $options['output'])) {
+				$sql_parts = $this->addQuerySelect('pgr.state', $sql_parts);
+				$proxy_group_rtdata = true;
+			}
+
+			if ($options['filter'] !== null && array_key_exists('state', $options['filter'])
+					&& $options['filter']['state'] !== null) {
+				$proxy_group_rtdata = true;
+			}
+
+			if ($proxy_group_rtdata) {
+				$sql_parts['left_join'][] = [
+					'alias' => 'pgr',
+					'table' => 'proxy_group_rtdata',
+					'using' => 'proxy_groupid'
+				];
+				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			}
+		}
+
 		return $sql_parts;
 	}
 
@@ -190,11 +226,15 @@ class CProxyGroup extends CApiService {
 		self::validateCreate($proxy_groups);
 
 		$proxy_groupids = DB::insert('proxy_group', $proxy_groups);
+		$proxy_group_rtdata = [];
 
 		foreach ($proxy_groups as $index => &$proxy_group) {
 			$proxy_group['proxy_groupid'] = $proxy_groupids[$index];
+			$proxy_group_rtdata[] = ['proxy_groupid' => $proxy_groupids[$index]];
 		}
 		unset($proxy_group);
+
+		DB::insert('proxy_group_rtdata', $proxy_group_rtdata, false);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_PROXY_GROUP, $proxy_groups);
 
@@ -277,7 +317,7 @@ class CProxyGroup extends CApiService {
 		}
 
 		$db_proxy_groups = DB::select('proxy_group', [
-			'output' => self::OUTPUT_FIELDS,
+			'output' => ['proxy_groupid', 'name', 'failover_delay', 'min_online', 'description'],
 			'proxy_groupids' => array_column($proxy_groups, 'proxy_groupid'),
 			'preservekeys' => true
 		]);
@@ -352,6 +392,7 @@ class CProxyGroup extends CApiService {
 
 		self::validateDelete($proxy_groupids, $db_proxy_groups);
 
+		DB::delete('proxy_group_rtdata', ['proxy_groupid' => $proxy_groupids]);
 		DB::delete('proxy_group', ['proxy_groupid' => $proxy_groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY_GROUP, $db_proxy_groups);
