@@ -168,7 +168,8 @@ class CProxy extends CApiService {
 					$proxy_rtdata = true;
 				}
 
-				if (is_array($options['filter']) && array_key_exists($field, $options['filter'])) {
+				if ($options['filter'] !== null && array_key_exists($field, $options['filter'])
+						&& $options['filter'][$field] !== null) {
 					$proxy_rtdata = true;
 				}
 			}
