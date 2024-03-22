@@ -93,7 +93,7 @@ class testProxyGroup extends CAPITest {
 
 		self::$data['proxy_groupids'] = array_combine(array_keys($proxy_groups), $db_proxy_groups['proxy_groupids']);
 
-		// Manually update "proxy_group" table.
+		// Manually update "proxy_group_rtdata" table.
 		$states = [
 			'state_offline' => [
 				'state' => ZBX_PROXYGROUP_STATE_OFFLINE
@@ -118,7 +118,7 @@ class testProxyGroup extends CAPITest {
 			];
 		}
 
-		DB::update('proxy_group', $proxy_groups);
+		DB::update('proxy_group_rtdata', $proxy_groups);
 	}
 
 	/**
@@ -747,7 +747,7 @@ class testProxyGroup extends CAPITest {
 		}
 		unset($proxy_group);
 
-		$sql_proxy_groups = 'SELECT NULL FROM proxy_group pg';
+		$sql_proxy_groups = 'SELECT NULL FROM proxy_group';
 		$old_hash_proxy_groups = CDBHelper::getHash($sql_proxy_groups);
 
 		if ($expected_error === null) {
@@ -887,7 +887,7 @@ class testProxyGroup extends CAPITest {
 
 		$this->call('proxygroup.update', $proxy_groups);
 
-		DB::update('proxy_group', $upd_states);
+		DB::update('proxy_group_rtdata', $upd_states);
 	}
 
 	/**
