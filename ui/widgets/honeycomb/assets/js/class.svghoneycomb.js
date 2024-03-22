@@ -473,7 +473,7 @@ class CSVGHoneycomb {
 							delete d.scale_timeout;
 							d.scaled = true;
 							this.#cellEnter(cell, d);
-						});
+						}, 50);
 					}, 150);
 				}
 
