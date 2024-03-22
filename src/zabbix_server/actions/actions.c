@@ -3106,7 +3106,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	zbx_hashset_iter_t		iter;
 	zbx_condition_t			*condition;
 	zbx_dc_um_handle_t		*um_handle;
-	zbx_vector_escalation_new_ptr_t *new_escalations = escalations, local_escalations;
+	zbx_vector_escalation_new_ptr_t *new_escalations = escalations, local_escalations, local_rec_escalations;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events->values_num);
 
@@ -3115,6 +3115,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		new_escalations = &local_escalations;
 		zbx_vector_escalation_new_ptr_create(new_escalations);
 	}
+	zbx_vector_escalation_new_ptr_create(&local_rec_escalations);
 	zbx_vector_uint64_pair_create(&rec_escalations);
 
 	for (int i = 0; i < EVENT_SOURCE_COUNT; i++)
@@ -3212,11 +3213,13 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		/* 3.2. Select escalations that must be recovered. */
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select eventid,escalationid"
-				" from escalations"
+				"select es.eventid,es.escalationid,ev.object,ev.objectid"
+				" from escalations es"
+				" left join events ev"
+					" on ev.eventid=es.eventid"
 				" where");
 
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "es.eventid", eventids.values,
 				eventids.values_num);
 		result = zbx_db_select("%s", sql);
 
@@ -3226,8 +3229,13 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_pair_t	pair;
+			zbx_escalation_new_t	*new_escalation;
+			zbx_uint64_t		eventid, escalationid, objectid;
+			int			object;
+			zbx_db_event		*event;
 
 			ZBX_STR2UINT64(pair.first, row[0]);
+			eventid = pair.first;
 
 			if (FAIL == (index = zbx_vector_uint64_pair_bsearch(closed_events, pair,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -3237,8 +3245,24 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 			}
 
 			pair.second = closed_events->values[index].second;
-			ZBX_DBROW2UINT64(pair.first, row[1]);
+			ZBX_DBROW2UINT64(escalationid, row[1]);
+			pair.first = escalationid;
 			zbx_vector_uint64_pair_append(&rec_escalations, pair);
+			ZBX_STR2UINT64(objectid, row[3]);
+			object = atoi(row[2]);
+
+			new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+			new_escalation->actionid = 0;
+			new_escalation->escalationid = escalationid;
+
+			event = (zbx_db_event *)zbx_malloc(NULL, sizeof(zbx_db_event));
+			memset(event, 0, sizeof(zbx_db_event));
+
+			event->eventid = eventid;
+			event->object = object;
+			event->objectid = objectid;
+			new_escalation->event = event;
+			zbx_vector_escalation_new_ptr_append(&local_rec_escalations, new_escalation);
 		}
 
 		zbx_db_free_result(result);
@@ -3283,11 +3307,20 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		zbx_db_insert_clean(&db_insert);
 	}
 
+	if (NULL == escalations)
+		zbx_vector_escalation_new_ptr_destroy(new_escalations);
+
 	/* 5. Modify recovered escalations in DB. */
 	if (0 != rec_escalations.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
+
+		if (NULL != escalations)
+		{
+			zbx_vector_escalation_new_ptr_append_array(new_escalations, local_rec_escalations.values,
+					local_rec_escalations.values_num);
+		}
 
 		zbx_vector_uint64_pair_sort(&rec_escalations, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -3312,8 +3345,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	}
 
 	zbx_vector_uint64_pair_destroy(&rec_escalations);
-	if (NULL == escalations)
-		zbx_vector_escalation_new_ptr_destroy(new_escalations);
+	zbx_vector_escalation_new_ptr_destroy(&local_rec_escalations);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

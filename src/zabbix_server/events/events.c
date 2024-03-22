@@ -2981,7 +2981,8 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		zbx_vector_ptr_destroy(&trigger_diff);
 
-		zbx_vector_escalation_new_ptr_clear_ext(&escalations, (zbx_escalation_new_ptr_free_func_t)zbx_ptr_free);
+		zbx_vector_escalation_new_ptr_clear_ext(&escalations,
+				(zbx_escalation_new_ptr_free_func_t)zbx_escalation_new_ptr_free);
 		zbx_vector_escalation_new_ptr_destroy(&escalations);
 	}
 

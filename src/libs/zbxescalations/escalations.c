@@ -89,3 +89,20 @@ void	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_ne
 
 	zbx_free(trigger_escalations);
 }
+
+typedef struct
+{
+	zbx_uint64_t	actionid;
+	zbx_uint64_t	escalationid;
+	zbx_db_event	*event;
+}
+zbx_escalation_new2_t;
+
+void	zbx_escalation_new_ptr_free(zbx_escalation_new_t *data)
+{
+	zbx_escalation_new2_t	*escalation = (zbx_escalation_new2_t *)data;
+
+	if (0 == escalation->actionid)
+		zbx_free(escalation->event);
+	zbx_free(data);
+}
