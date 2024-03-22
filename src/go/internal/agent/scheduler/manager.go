@@ -44,12 +44,10 @@ import (
 )
 
 const (
-	// Number of seconds to wait for plugins to finish during scheduler shutdown.
+	// number of seconds to wait for plugins to finish during scheduler shutdown
 	shutdownTimeout = 5
-	// Inactive shutdown value.
+	// inactive shutdown value
 	shutdownInactive = -1
-	// Default value of Plugins.<plugin name>.System.Capacity parameter in plugin config file.
-	defaultSysCapacity = 1000
 )
 
 type Request struct {
@@ -677,7 +675,7 @@ type pluginOptions struct {
 	Capacity int `conf:"optional"`
 	System   struct {
 		ForceActiveChecksOnStart *int `conf:"optional"`
-		Capacity                 int  `conf:"default=1000"`
+		Capacity                 int  `conf:"optional"`
 	} `conf:"optional"`
 }
 
@@ -991,8 +989,6 @@ func getPluginOpts(
 ) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
 	var opt pluginOptions
 
-	pluginSystemCap = defaultSysCapacity
-
 	if optsRaw == nil {
 		return
 	}
@@ -1004,11 +1000,7 @@ func getPluginOpts(
 	}
 
 	pluginCap = opt.Capacity
-
-	if opt.System.Capacity > 0 {
-		pluginSystemCap = opt.System.Capacity
-	}
-
+	pluginSystemCap = opt.System.Capacity
 	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
