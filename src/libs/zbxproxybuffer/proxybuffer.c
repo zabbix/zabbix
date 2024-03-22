@@ -183,7 +183,8 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 						" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
 
 				zbx_list_pop(&pb->discovery, NULL);
-				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
+				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns,
+						drow->error);
 				pb_list_free_discovery(&pb->discovery, drow);
 			}
 			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->handleid == handleid);

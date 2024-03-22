@@ -127,6 +127,7 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
 int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf);
+int	zbx_check_service_validate(const unsigned char svc_type, const char *data);
 
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000

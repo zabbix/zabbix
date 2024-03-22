@@ -2,6 +2,7 @@
 
 SUBDIRS = \
 	actions \
+	cachehistory \
 	dbconfig \
 	diag \
 	discovery \
@@ -35,9 +36,6 @@ libzbxserver_a_SOURCES = \
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-I$(top_srcdir)/src/libs/zbxcacheconfig \
-	-I$(top_srcdir)/src/libs/zbxcachehistory \
-	-I$(top_srcdir)/src/libs/zbxcachevalue \
 	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = \
@@ -45,6 +43,7 @@ zabbix_server_SOURCES = \
 	server.c
 
 zabbix_server_LDADD = \
+	cachehistory/libzbxcachehistory_server.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	dbconfig/libzbxdbconfig.a \

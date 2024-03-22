@@ -60,6 +60,7 @@ typedef struct
 	char		*dns;
 	char		*ip;
 	char		*value;
+	char		*error;
 	int		port;
 	int		clock;
 	int		status;
