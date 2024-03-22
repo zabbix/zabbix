@@ -68,7 +68,7 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 	onAdd: function(map) {
 		this._geomap_filter_div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
-		const btn = L.DomUtil.create('a', 'geomap-filter-button ' + ZBX_ICON_FILTER_THICK, this._geomap_filter_div);
+		const btn = L.DomUtil.create('a', 'geomap-filter-button ' + ZBX_ICON_FILTER_SMALL, this._geomap_filter_div);
 
 		btn.ariaLabel = t('Severity filter');
 		btn.title = t('Severity filter');

@@ -1,9 +1,3 @@
-%icon-large {
-	&::before {
-		font-size: $icon-large-size;
-	}
-}
-
 %icon-medium {
 	&::before {
 		font-size: $icon-medium-size;
@@ -99,14 +93,12 @@
 	@extend %icon-small;
 }
 
-.zi-filter-large {
+.zi-filter {
 	@extend .zi-filter;
-	@extend %icon-large;
-}
 
-.zi-filter-thick {
-	@extend .zi-filter;
-	font-weight: bold;
+	&::before {
+		font-size: 45px;
+	}
 }
 
 .zi-help-small {
@@ -179,14 +171,12 @@
 	@extend %icon-smaller;
 }
 
-.zi-search-large {
+.zi-search {
 	@extend .zi-search;
-	@extend %icon-large;
-}
 
-.zi-search-thick {
-	@extend .zi-search;
-	font-weight: bold;
+	&::before {
+		font-size: 45px;
+	}
 }
 
 .zi-tree-top-bottom-small {

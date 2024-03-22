@@ -178,7 +178,7 @@ $table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_
 
 if ($data['preselect_required']) {
 	$table->setNoDataMessage(
-		_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE, ZBX_STYLE_NO_FILTER_SET
+		_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER, ZBX_STYLE_NO_FILTER_SET
 	);
 }
 

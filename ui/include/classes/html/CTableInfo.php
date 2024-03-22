@@ -28,7 +28,7 @@ class CTableInfo extends CTable {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
-		$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE, ZBX_STYLE_NO_DATA_FOUND);
+		$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH, ZBX_STYLE_NO_DATA_FOUND);
 	}
 
 	public function toString($destroy = true) {
