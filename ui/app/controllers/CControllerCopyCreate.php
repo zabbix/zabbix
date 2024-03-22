@@ -143,13 +143,17 @@ class CControllerCopyCreate extends CController {
 
 	protected function doAction(): void {
 		$dst_hosts = $this->getTargets();
+		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
+			? ['templateids' => array_keys($dst_hosts)]
+			: ['hostids' => array_keys($dst_hosts)];
 		$success = false;
 		DBstart();
 
 		switch ($this->getInput('source')) {
 			case 'items':
 				$src_options = ['itemids' => $this->getInput('itemids')];
-				$success = !$dst_hosts || CItemHelper::copy($src_options, $dst_hosts);
+				$src_items = $dst_hosts ? CItemHelper::getSourceItems($src_options) : [];
+				$success = !$dst_hosts || !$src_items || CItemHelper::copy($src_items, $dst_hosts);
 
 				$items_count = count($src_options['itemids']);
 				$title = $success
@@ -160,7 +164,7 @@ class CControllerCopyCreate extends CController {
 			case 'triggers':
 				$src_options = ['triggerids' => $this->getInput('triggerids')]
 					+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
-				$success = !$dst_hosts || CTriggerHelper::copy($src_options, $dst_hosts);
+				$success = CTriggerHelper::copy($src_options, $dst_options);
 
 				$triggers_count = count($src_options['triggerids']);
 				$title = $success
@@ -171,7 +175,7 @@ class CControllerCopyCreate extends CController {
 			case 'graphs':
 				$src_options = ['graphids' => $this->getInput('graphids')]
 					+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
-				$success = !$dst_hosts || CGraphHelper::copy($src_options, $dst_hosts);
+				$success = CGraphHelper::copy($src_options, $dst_options);
 
 				$graphs_count = count($src_options['graphids']);
 				$title = $success

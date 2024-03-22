@@ -40,10 +40,14 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return bool
 	 */
 	public static function cloneTemplateItems(string $src_hostid, array $dst_host): bool {
-		return self::copy([
+		$src_items = self::getSourceItems([
 			'templateids' => $src_hostid,
 			'inherited' => false
-		], [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]]);
+		]);
+
+		return $src_items
+			? self::copy($src_items, [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]])
+			: true;
 	}
 
 	/**
@@ -53,11 +57,13 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return bool
 	 */
 	public static function cloneHostItems(string $src_hostid, array $dst_host): bool {
-		return self::copy([
+		$src_items = self::getSourceItems([
 			'hostids' => $src_hostid,
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		], [$dst_host['hostid'] => $dst_host]);
+		]);
+
+		return $src_items ? self::copy($src_items, [$dst_host['hostid'] => $dst_host]) : true;
 	}
 
 	/**
@@ -99,18 +105,12 @@ class CItemHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * @param array $src_options
+	 * @param array $src_items
 	 * @param array $dst_hosts
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_hosts): bool {
-		$src_items = self::getSourceItems($src_options);
-
-		if (!$src_items) {
-			return true;
-		}
-
+	public static function copy(array $src_items, array $dst_hosts): bool {
 		$dst_hostids = array_keys($dst_hosts);
 		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
 
@@ -203,7 +203,7 @@ class CItemHelper extends CItemGeneralHelper {
 	 *
 	 * @return array
 	 */
-	private static function getSourceItems(array $src_options): array {
+	public static function getSourceItems(array $src_options): array {
 		return API::Item()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',

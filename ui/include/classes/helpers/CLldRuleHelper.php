@@ -104,11 +104,14 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		}
 
 		$src_options = ['discoveryids' => array_keys($src_items)];
+		$dst_options = reset($dst_hosts)['status'] == HOST_STATUS_TEMPLATE
+			? ['templateids' => array_keys($dst_hosts)]
+			: ['hostids' => array_keys($dst_hosts)];
 
 		return CItemPrototypeHelper::cloneItems($src_options, $dst_hosts, $dst_itemids)
-			&& CTriggerPrototypeHelper::cloneTriggers($src_options, $dst_hosts)
-			&& CGraphPrototypeHelper::cloneGraphs($src_options, $dst_hosts)
-			&& CHostPrototypeHelper::cloneHosts($src_options, $dst_hostids, $dst_itemids);
+			&& CTriggerPrototypeHelper::copy($src_options, $dst_options)
+			&& CGraphPrototypeHelper::copy($src_options, $dst_options)
+			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);
 	}
 
 	/**
