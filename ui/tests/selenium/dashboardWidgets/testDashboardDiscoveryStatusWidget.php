@@ -503,7 +503,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_3,
-						'Up' => ['text' => '100', 'selector' => 'class:red'],
+						'Up' => ['text' => '100', 'selector' => 'class:green'],
 						'Down' => ''
 					],
 					[
@@ -528,13 +528,17 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 		// Insert data into the database (dhosts table), to imitate the host discovery.
 		for ($i = 1, $j = 101; $i + $j <= 301; $i++, $j++) {
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$j.", ".self::$druleids[self::DISCOVERY_RULE_3].", 0)");
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$i.", ".self::$druleids[self::DISCOVERY_RULE_5].", 1)");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($j).", ".
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_3]).", ".DHOST_STATUS_ACTIVE.")");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($i).", ".
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_5]).", ".DHOST_STATUS_DISABLED.")");
 		}
 
 		for ($i = 201, $j = 302; $i + $j <= 702; $i++, $j++) {
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$j.", ".self::$druleids[self::DISCOVERY_RULE_4].", 0)");
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".$i.", ".self::$druleids[self::DISCOVERY_RULE_4].", 1)");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($j).", ".
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_4]).", ".DHOST_STATUS_ACTIVE.")");
+			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($i).", ".
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_4]).", ".DHOST_STATUS_DISABLED.")");
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
@@ -556,12 +560,33 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 	public function testDashboardDiscoveryStatusWidget_checkEmptyWidget() {
 
-		// Disable discovery rules in the database to check the content of the empty widget.
-		DBexecute('UPDATE drules SET status=1 WHERE name IN ('.
-				zbx_dbstr(self::DISCOVERY_RULE_1).', '.zbx_dbstr(self::DISCOVERY_RULE_2).
-				', '.zbx_dbstr(self::DISCOVERY_RULE_3).', '.zbx_dbstr(self::DISCOVERY_RULE_4).
-				', '.zbx_dbstr(self::DISCOVERY_RULE_5).', '.zbx_dbstr('Discovery rule for proxy delete test').')'
-		);
+		// Disable discovery rules to check the content of the empty widget.
+		CDataHelper::call('drule.update', [
+			[
+				'druleid' => self::$druleids[self::DISCOVERY_RULE_1],
+				'status' => DRULE_STATUS_DISABLED
+			],
+			[
+				'druleid' => self::$druleids[self::DISCOVERY_RULE_2],
+				'status' => DRULE_STATUS_DISABLED
+			],
+			[
+				'druleid' => self::$druleids[self::DISCOVERY_RULE_3],
+				'status' => DRULE_STATUS_DISABLED
+			],
+			[
+				'druleid' => self::$druleids[self::DISCOVERY_RULE_4],
+				'status' => DRULE_STATUS_DISABLED
+			],
+			[
+				'druleid' => self::$druleids[self::DISCOVERY_RULE_5],
+				'status' => DRULE_STATUS_DISABLED
+			],
+			[
+				'druleid' => self::$druleids['Discovery rule for proxy delete test'],
+				'status' => DRULE_STATUS_DISABLED
+			]
+		]);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for testing widgets table data']);
