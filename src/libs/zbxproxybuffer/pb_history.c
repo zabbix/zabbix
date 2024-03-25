@@ -716,6 +716,7 @@ int	pb_history_has_mem_rows(zbx_pb_t *pb)
 zbx_pb_history_data_t	*zbx_pb_history_open(void)
 {
 	zbx_pb_history_data_t	*data;
+	zbx_pb_t		*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -723,10 +724,10 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 
 	pb_lock();
 
-	data->handleid = pb_register_handle(get_pb_data(), &get_pb_data()->history_handleids);
+	data->handleid = pb_register_handle(pb_data, &(pb_data->history_handleids));
 
-	if (PB_DATABASE == (data->state = get_pb_dst(get_pb_data()->state)))
-		get_pb_data()->db_handles_num++;
+	if (PB_DATABASE == (data->state = get_pb_dst(pb_data->state)))
+		pb_data->db_handles_num++;
 
 	pb_unlock();
 
@@ -752,10 +753,11 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
  *                                                                            *
  * Purpose: flush the cached history data and free the handle                 *
  *                                                                            *
- ******************************************************************************/
+ **********************************************************************/
 void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 {
 	zbx_uint64_t	lastid = 0;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -770,29 +772,29 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 
 		pb_history_set_row_ids(&data->rows, data->rows_num);
 
-		if (PB_MEMORY == get_pb_data()->state && SUCCEED != pb_history_check_age(get_pb_data()))
+		if (PB_MEMORY == pb_data->state && SUCCEED != pb_history_check_age(pb_data))
 		{
-			pd_fallback_to_database(get_pb_data(), "cached records are too old");
+			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
-		else if (PB_MEMORY == get_pb_dst(get_pb_data()->state))
+		else if (PB_MEMORY == get_pb_dst(pb_data->state))
 		{
-			if (NULL == (next = pb_history_add_rows_mem(get_pb_data(), &data->rows)))
+			if (NULL == (next = pb_history_add_rows_mem(pb_data, &data->rows)))
 				goto out;
 
-			if (PB_DATABASE_MEMORY == get_pb_data()->state)
+			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to"
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to"
 						" memory mode");
 			}
 			else
 			{
 				/* initiate transition to database cache */
-				pb_set_state(get_pb_data(), PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 
 		/* not all rows were added to memory cache - flush them to database */
-		get_pb_data()->db_handles_num++;
+		pb_data->db_handles_num++;
 		pb_unlock();
 
 		do
@@ -818,12 +820,12 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 
 	pb_lock();
 
-	if (get_pb_data()->history_lastid_db < lastid)
-		get_pb_data()->history_lastid_db = lastid;
+	if (pb_data->history_lastid_db < lastid)
+		pb_data->history_lastid_db = lastid;
 
-	get_pb_data()->db_handles_num--;
+	pb_data->db_handles_num--;
 out:
-	pb_deregister_handle(&get_pb_data()->history_handleids, data->handleid);
+	pb_deregister_handle(&(pb_data->history_handleids), data->handleid);
 	pb_unlock();
 
 	pb_history_data_free(data);
@@ -888,16 +890,17 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
  ******************************************************************************/
 void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 {
-	int	state;
+	int		state;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pb_lock();
 
-	get_pb_data()->history_lastid_sent = lastid;
+	pb_data->history_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
-		pb_history_clear(get_pb_data(), lastid);
+	if (PB_MEMORY == (state = get_pb_src(pb_data->state)))
+		pb_history_clear(pb_data, lastid);
 
 	pb_unlock();
 
@@ -915,11 +918,12 @@ void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 zbx_uint64_t	zbx_pb_history_get_unsent_num(void)
 {
 	zbx_uint64_t	lastid_sent, lastid;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	pb_lock();
 
-	lastid_sent = get_pb_data()->history_lastid_sent;
-	lastid = MAX(get_pb_data()->history_lastid_db, get_pb_data()->history_lastid_mem);
+	lastid_sent = pb_data->history_lastid_sent;
+	lastid = MAX(pb_data->history_lastid_db, pb_data->history_lastid_mem);
 
 	pb_unlock();
 

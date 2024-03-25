@@ -385,40 +385,41 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
 	zbx_uint64_t	id;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pb_lock();
 
-	if (PB_MEMORY == get_pb_dst(get_pb_data()->state))
+	if (PB_MEMORY == get_pb_dst(pb_data->state))
 	{
-		if (PB_MEMORY == get_pb_data()->state && SUCCEED != pb_autoreg_check_age(get_pb_data()))
+		if (PB_MEMORY == pb_data->state && SUCCEED != pb_autoreg_check_age(pb_data))
 		{
-			pd_fallback_to_database(get_pb_data(), "cached records are too old");
+			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
 		else
 		{
-			if (FAIL != pb_autoreg_write_host_mem(get_pb_data(), host, ip, dns, port, connection_type,
+			if (FAIL != pb_autoreg_write_host_mem(pb_data, host, ip, dns, port, connection_type,
 					host_metadata, flags, clock))
 			{
 				pb_unlock();
 				goto out;
 			}
 
-			if (PB_DATABASE_MEMORY == get_pb_data()->state)
+			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to"
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to"
 						" memory mode");
 			}
 			else
 			{
 				/* initiate transition to database cache */
-				pb_set_state(get_pb_data(), PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 	}
 
-	get_pb_data()->db_handles_num++;
+	pb_data->db_handles_num++;
 	pb_unlock();
 
 	id = zbx_db_get_maxid("proxy_autoreg_host");
@@ -432,10 +433,10 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 
 	pb_lock();
 
-	if (get_pb_data()->autoreg_lastid_db < id)
-		get_pb_data()->autoreg_lastid_db = id;
+	if (pb_data->autoreg_lastid_db < id)
+		pb_data->autoreg_lastid_db = id;
 
-	get_pb_data()->db_handles_num--;
+	pb_data->db_handles_num--;
 
 	pb_unlock();
 out:
@@ -475,16 +476,17 @@ int	zbx_pb_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
  ******************************************************************************/
 void	zbx_pb_autoreg_set_lastid(const zbx_uint64_t lastid)
 {
-	int	state;
+	int		state;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pb_lock();
 
-	get_pb_data()->autoreg_lastid_sent = lastid;
+	pb_data->autoreg_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
-		pb_autoreg_clear(get_pb_data(), lastid);
+	if (PB_MEMORY == (state = get_pb_src(pb_data->state)))
+		pb_autoreg_clear(pb_data, lastid);
 
 	pb_unlock();
 

@@ -478,6 +478,7 @@ int	pb_discovery_has_mem_rows(zbx_pb_t *pb)
 zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 {
 	zbx_pb_discovery_data_t	*data;
+	zbx_pb_t		*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -485,10 +486,10 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 
 	pb_lock();
 
-	data->handleid = pb_get_next_handleid(get_pb_data());
+	data->handleid = pb_get_next_handleid(pb_data);
 
-	if (PB_DATABASE == (data->state = get_pb_dst(get_pb_data()->state)))
-		get_pb_data()->db_handles_num++;
+	if (PB_DATABASE == (data->state = get_pb_dst(pb_data->state)))
+		pb_data->db_handles_num++;
 
 	pb_unlock();
 
@@ -516,6 +517,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 {
 	zbx_uint64_t	lastid = 0;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -530,32 +532,32 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 
 		pb_discovery_set_row_ids(&data->rows, data->rows_num, data->handleid);
 
-		if (PB_MEMORY == get_pb_data()->state && SUCCEED != pb_discovery_check_age(get_pb_data()))
+		if (PB_MEMORY == pb_data->state && SUCCEED != pb_discovery_check_age(pb_data))
 		{
-			pd_fallback_to_database(get_pb_data(), "cached records are too old");
+			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
-		else if (PB_MEMORY == get_pb_dst(get_pb_data()->state))
+		else if (PB_MEMORY == get_pb_dst(pb_data->state))
 		{
-			if (NULL == (next = pb_discovery_add_rows_mem(get_pb_data(), &data->rows)))
+			if (NULL == (next = pb_discovery_add_rows_mem(pb_data, &data->rows)))
 			{
 				pb_unlock();
 				goto out;
 			}
 
-			if (PB_DATABASE_MEMORY == get_pb_data()->state)
+			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pd_fallback_to_database(get_pb_data(), "not enough space to complete transition to memory"
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to memory"
 						" mode");
 			}
 			else
 			{
 				/* initiate transition to database cache */
-				pb_set_state(get_pb_data(), PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 
 		/* not all rows were added to memory cache - flush them to database */
-		get_pb_data()->db_handles_num++;
+		pb_data->db_handles_num++;
 		pb_unlock();
 
 		do
@@ -581,10 +583,10 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 
 	pb_lock();
 
-	if (get_pb_data()->discovery_lastid_db < lastid)
-		get_pb_data()->discovery_lastid_db = lastid;
+	if (pb_data->discovery_lastid_db < lastid)
+		pb_data->discovery_lastid_db = lastid;
 
-	get_pb_data()->db_handles_num--;
+	pb_data->db_handles_num--;
 
 	pb_unlock();
 out:
@@ -648,16 +650,17 @@ int	zbx_pb_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
  ******************************************************************************/
 void	zbx_pb_discovery_set_lastid(const zbx_uint64_t lastid)
 {
-	int	state;
+	int		state;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pb_lock();
 
-	get_pb_data()->discovery_lastid_sent = lastid;
+	pb_data->discovery_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
-		pb_discovery_clear(get_pb_data(), lastid);
+	if (PB_MEMORY == (state = get_pb_src(pb_data->state)))
+		pb_discovery_clear(pb_data, lastid);
 
 	pb_unlock();
 
