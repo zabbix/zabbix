@@ -134,7 +134,7 @@ typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, 
 
 zbx_dc_config_t	*config = NULL;
 
-zbx_dc_config_t	*get_config(void)
+zbx_dc_config_t	*get_dc_config(void)
 {
 	return config;
 }

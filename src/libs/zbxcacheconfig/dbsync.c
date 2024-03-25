@@ -4040,7 +4040,7 @@ out:
  ******************************************************************************/
 void	zbx_dbsync_clear_user_macros(void)
 {
-	um_cache_remove_hosts(get_config()->um_cache,
+	um_cache_remove_hosts(get_dc_config()->um_cache,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
 }
 

@@ -61,7 +61,7 @@ void	vps_monitor_destroy(void)
  ******************************************************************************/
 void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit)
 {
-	zbx_vps_monitor_t	*monitor = &(get_config())->vps_monitor;
+	zbx_vps_monitor_t	*monitor = &(get_dc_config())->vps_monitor;
 
 	monitor->last_flush = time(NULL);
 
@@ -77,7 +77,7 @@ void	zbx_vps_monitor_init(zbx_uint64_t vps_limit, zbx_uint64_t overcommit_limit)
  ******************************************************************************/
 void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 {
-	zbx_vps_monitor_t	*monitor = &(get_config())->vps_monitor;
+	zbx_vps_monitor_t	*monitor = &(get_dc_config())->vps_monitor;
 	time_t			now;
 
 	if (0 == monitor->values_limit)
@@ -132,7 +132,7 @@ void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
  ******************************************************************************/
 void	zbx_vps_monitor_add_written(zbx_uint64_t values_num)
 {
-	zbx_vps_monitor_t	*monitor = &(get_config())->vps_monitor;
+	zbx_vps_monitor_t	*monitor = &(get_dc_config())->vps_monitor;
 
 	zbx_mutex_lock(vps_lock);
 	monitor->total_values_num += values_num;
@@ -149,7 +149,7 @@ void	zbx_vps_monitor_add_written(zbx_uint64_t values_num)
  ******************************************************************************/
 int	zbx_vps_monitor_capped(void)
 {
-	zbx_vps_monitor_t	*monitor = &(get_config())->vps_monitor;
+	zbx_vps_monitor_t	*monitor = &(get_dc_config())->vps_monitor;
 
 	if (0 == monitor->values_limit || monitor->values_num < monitor->values_limit)
 		return FAIL;
@@ -173,7 +173,7 @@ int	zbx_vps_monitor_capped(void)
  ******************************************************************************/
 void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 {
-	zbx_vps_monitor_t	*monitor = &(get_config())->vps_monitor;
+	zbx_vps_monitor_t	*monitor = &(get_dc_config())->vps_monitor;
 
 	zbx_mutex_lock(vps_lock);
 	stats->overcommit = monitor->overcommit;

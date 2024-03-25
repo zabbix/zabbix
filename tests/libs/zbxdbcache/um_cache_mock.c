@@ -685,7 +685,7 @@ void	um_mock_config_destroy(void)
 	zbx_hashset_iter_t	iter;
 	zbx_um_macro_t		**pmacro;
 
-	zbx_dc_config_t		*config = get_config();
+	zbx_dc_config_t		*config = get_dc_config();
 
 	zbx_hashset_iter_reset(&config->gmacros, &iter);
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))

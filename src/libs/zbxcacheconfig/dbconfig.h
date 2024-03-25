@@ -1006,7 +1006,7 @@ typedef struct
 }
 zbx_dc_config_t;
 
-zbx_dc_config_t	*get_config(void);
+zbx_dc_config_t	*get_dc_config(void);
 
 /* for cmocka */
 void	set_config(zbx_dc_config_t *in);
