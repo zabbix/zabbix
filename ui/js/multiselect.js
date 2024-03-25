@@ -460,7 +460,7 @@
 
 			$obj
 				.on('mousedown', function(event) {
-					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1 && !ms.options.readonly) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
 
