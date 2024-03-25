@@ -34,20 +34,20 @@ class CItemHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * @param string $src_hostid
+	 * @param string $src_templateid
 	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneTemplateItems(string $src_hostid, array $dst_host): bool {
+	public static function cloneTemplateItems(string $src_templateid, array $dst_host): bool {
 		$src_items = self::getSourceItems([
-			'templateids' => $src_hostid,
+			'templateids' => $src_templateid,
 			'inherited' => false
 		]);
 
-		return $src_items
-			? self::copy($src_items, [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]])
-			: true;
+		$dst_hosts = [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]];
+
+		return !$src_items || self::copy($src_items, $dst_hosts);
 	}
 
 	/**
@@ -63,7 +63,9 @@ class CItemHelper extends CItemGeneralHelper {
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
-		return $src_items ? self::copy($src_items, [$dst_host['hostid'] => $dst_host]) : true;
+		$dst_hosts = [$dst_host['hostid'] => $dst_host];
+
+		return !$src_items || self::copy($src_items, $dst_hosts);
 	}
 
 	/**
@@ -111,8 +113,7 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return bool
 	 */
 	public static function copy(array $src_items, array $dst_hosts): bool {
-		$dst_hostids = array_keys($dst_hosts);
-		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
+		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hosts);
 
 		try {
 			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
@@ -142,7 +143,7 @@ class CItemHelper extends CItemGeneralHelper {
 		do {
 			$dst_items = [];
 
-			foreach ($dst_hostids as $dst_hostid) {
+			foreach ($dst_hosts as $dst_hostid => $dst_host) {
 				foreach ($src_items as $src_item) {
 					$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts']));
 
@@ -161,7 +162,7 @@ class CItemHelper extends CItemGeneralHelper {
 					$dst_items[] = ['hostid' => $dst_hostid] + getSanitizedItemFields([
 						'templateid' => 0,
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-						'hosts' => [$dst_hosts[$dst_hostid]]
+						'hosts' => [$dst_host]
 					] + $dst_item);
 
 				}
@@ -176,7 +177,7 @@ class CItemHelper extends CItemGeneralHelper {
 			$_src_items = [];
 
 			if ($src_dep_items) {
-				foreach ($dst_hostids as $dst_hostid) {
+				foreach ($dst_hosts as $dst_hostid => $foo) {
 					foreach ($src_items as $src_item) {
 						$dst_itemid = array_shift($response['itemids']);
 

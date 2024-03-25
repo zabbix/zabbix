@@ -81,15 +81,20 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * @param array $src_options
-	 * @param array $dst_hosts
-	 * @param array $dst_ruleids
+	 * @param array  $dst_ruleids
+	 * @param string $dst_ruleids[<src_ruleid>][<dst_hostid]  ID of target LLD rule.
+	 * @param array  $dst_hosts
 	 *
 	 * @return bool
 	 */
-	private static function copy(array $src_items, array $dst_hosts, array $dst_ruleids): bool {
-		$dst_hostids = array_keys($dst_hosts);
-		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
+	public static function copy(array $dst_ruleids, array $dst_hosts): bool {
+		$src_items = CItemPrototypeHelper::getSourceItemPrototypes(['discoveryids' => array_keys($dst_ruleids)]);
+
+		if (!$src_items) {
+			return true;
+		}
+
+		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hosts);
 
 		try {
 			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
@@ -114,7 +119,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 		do {
 			$dst_items = [];
 
-			foreach ($dst_hostids as $dst_hostid) {
+			foreach ($dst_hosts as $dst_hostid => $dst_host) {
 				foreach ($src_items as $src_item) {
 					$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts', 'discoveryRule']));
 
@@ -136,7 +141,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 					] + getSanitizedItemFields([
 						'templateid' => 0,
 						'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						'hosts' => [$dst_hosts[$dst_hostid]]
+						'hosts' => [$dst_host]
 					] + $dst_item);
 				}
 			}
@@ -150,7 +155,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			$_src_items = [];
 
 			if ($src_dep_items) {
-				foreach ($dst_hostids as $dst_hostid) {
+				foreach ($dst_hosts as $dst_hostid => $foo) {
 					foreach ($src_items as $src_item) {
 						$dst_itemid = array_shift($response['itemids']);
 
@@ -170,19 +175,6 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 		} while ($src_items);
 
 		return true;
-	}
-
-	/**
-	 * @param array $src_options
-	 * @param array $dst_hosts
-	 * @param array $dst_ruleids
-	 *
-	 * @return bool
-	 */
-	public static function cloneItems(array $src_options, array $dst_hosts, array $dst_ruleids): bool {
-		$src_items = self::getSourceItemPrototypes($src_options);
-
-		return $src_items ? self::copy($src_items, $dst_hosts, $dst_ruleids) : true;
 	}
 
 	/**

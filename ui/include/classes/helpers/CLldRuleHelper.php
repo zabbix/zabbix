@@ -33,9 +33,9 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'inherited' => false
 		]);
 
-		return $src_items
-			? self::copy($src_items, [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]])
-			: true;
+		$dst_hosts = [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]];
+
+		return !$src_items || self::copy($src_items, $dst_hosts);
 	}
 
 	/**
@@ -50,7 +50,9 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'inherited' => false
 		]);
 
-		return $src_items ? self::copy($src_items, [$dst_host['hostid'] => $dst_host]) : true;
+		$dst_hosts = [$dst_host['hostid'] => $dst_host];
+
+		return !$src_items || self::copy($src_items, $dst_hosts);
 	}
 
 	/**
@@ -68,9 +70,9 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			return false;
 		}
 
-		$dst_hostids = array_keys($dst_hosts);
 		$dst_items = [];
-		foreach ($dst_hostids as $dst_hostid) {
+
+		foreach ($dst_hosts as $dst_hostid => $dst_host) {
 			foreach ($src_items as $src_item) {
 				$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts']));
 
@@ -85,7 +87,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 				$dst_items[] = ['hostid' => $dst_hostid] + getSanitizedItemFields([
 					'templateid' => 0,
 					'flags' => ZBX_FLAG_DISCOVERY_RULE,
-					'hosts' => [$dst_hosts[$dst_hostid]]
+					'hosts' => [$dst_host]
 				] + $dst_item);
 			}
 		}
@@ -97,7 +99,8 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		}
 
 		$dst_itemids = [];
-		foreach ($dst_hostids as $dst_hostid) {
+
+		foreach ($dst_hosts as $dst_hostid => $foo) {
 			foreach ($src_items as $src_item) {
 				$dst_itemids[$src_item['itemid']][$dst_hostid] = array_shift($response['itemids']);
 			}
@@ -108,7 +111,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			? ['templateids' => array_keys($dst_hosts)]
 			: ['hostids' => array_keys($dst_hosts)];
 
-		return CItemPrototypeHelper::cloneItems($src_options, $dst_hosts, $dst_itemids)
+		return CItemPrototypeHelper::copy($dst_itemids, $dst_hosts)
 			&& CTriggerPrototypeHelper::copy($src_options, $dst_options)
 			&& CGraphPrototypeHelper::copy($src_options, $dst_options)
 			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);

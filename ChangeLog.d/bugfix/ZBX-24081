@@ -1,1 +1,1 @@
-A.F....... [ZBX-24081] fixed full clone of templates or hosts failing due to more strict copied item validation (jfreibergs)
+A.F....... [ZBX-24081] fixed full clone of templates or hosts failing due to more strict copied item validation (jfreibergs, vmaksimovs)

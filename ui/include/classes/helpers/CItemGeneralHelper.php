@@ -487,21 +487,21 @@ class CItemGeneralHelper {
 
 	/**
 	 * @param array  $src_items
-	 * @param array  $dst_items
+	 * @param array  $dst_hosts
 	 *
 	 * @return array
 	 */
-	protected static function getDestinationValueMaps(array $src_items, array $dst_hostids): array {
+	protected static function getDestinationValueMaps(array $src_items, array $dst_hosts): array {
 		$item_indexes = [];
 		$dst_valuemapids = [];
+
+		$dst_hostids = array_keys($dst_hosts);
 
 		foreach ($src_items as $src_item) {
 			if ($src_item['valuemapid'] != 0) {
 				$item_indexes[$src_item['valuemapid']][] = $src_item['itemid'];
 
-				foreach ($dst_hostids as $dst_hostid) {
-					$dst_valuemapids[$src_item['itemid']][$dst_hostid] = 0;
-				}
+				$dst_valuemapids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 			}
 		}
 

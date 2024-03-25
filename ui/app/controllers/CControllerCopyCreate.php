@@ -151,11 +151,10 @@ class CControllerCopyCreate extends CController {
 
 		switch ($this->getInput('source')) {
 			case 'items':
-				$src_options = ['itemids' => $this->getInput('itemids')];
-				$src_items = $dst_hosts ? CItemHelper::getSourceItems($src_options) : [];
-				$success = !$dst_hosts || !$src_items || CItemHelper::copy($src_items, $dst_hosts);
+				$src_items = $dst_hosts ? CItemHelper::getSourceItems(['itemids' => $this->getInput('itemids')]) : [];
+				$success = !$src_items || !$dst_hosts || CItemHelper::copy($src_items, $dst_hosts);
 
-				$items_count = count($src_options['itemids']);
+				$items_count = count($src_items);
 				$title = $success
 					? _n('Item copied', 'Items copied', $items_count)
 					: _n('Cannot copy item', 'Cannot copy items', $items_count);
