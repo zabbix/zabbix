@@ -2632,7 +2632,7 @@ class CAction extends CApiService {
 
 		self::addAffectedObjects($actions, $db_actions);
 
-		self::checkFilter($actions);
+		self::checkFilter($actions, $db_actions);
 		self::checkOperations($actions, $db_actions);
 
 		self::checkMediatypesPermissions($actions);
@@ -2682,17 +2682,25 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @param array $actions
+	 * @param array      $actions
+	 * @param array|null $db_actions
 	 *
 	 * @throws APIException
 	 */
-	private static function checkFilter(array $actions): void {
+	private static function checkFilter(array $actions, array $db_actions = null): void {
 		$condition_formula_parser = new CConditionFormula();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
 		foreach ($actions as $i => $action) {
 			if (!array_key_exists('filter', $action)) {
-				continue;
+				if ($db_actions !== null && array_key_exists('status', $action)
+						&& $action['status'] == ACTION_STATUS_ENABLED
+						&& $action['status'] != $db_actions[$action['actionid']]['status']) {
+					$action['filter'] = $db_actions[$action['actionid']]['filter'];
+				}
+				else {
+					continue;
+				}
 			}
 
 			$path = '/'.($i + 1).'/filter';
@@ -3391,14 +3399,16 @@ class CAction extends CApiService {
 	/**
 	 * Add existing filter with conditions and operations to $db_actions if they are affected by the update.
 	 *
-	 * @param array      $actions
-	 * @param array|null $db_actions
+	 * @param array $actions
+	 * @param array $db_actions
 	 */
-	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
+	private static function addAffectedObjects(array $actions, array &$db_actions): void {
 		$actionids = ['filter' => [], 'operations' => []];
 
 		foreach ($actions as $action) {
-			if (array_key_exists('filter', $action)) {
+			if (array_key_exists('filter', $action)
+					|| (array_key_exists('status', $action) && $action['status'] == ACTION_STATUS_ENABLED
+						&& $action['status'] != $db_actions[$action['actionid']]['status'])) {
 				$actionids['filter'][] = $action['actionid'];
 				$db_actions[$action['actionid']]['filter'] = [];
 				$db_actions[$action['actionid']]['filter']['conditions'] = [];
