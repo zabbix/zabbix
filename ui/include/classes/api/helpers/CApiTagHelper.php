@@ -52,28 +52,9 @@ class CApiTagHelper {
 				$operator = TAG_OPERATOR_EXISTS;
 			}
 
-			if (!array_key_exists($tag['tag'], $values_by_tag)) {
-				$values_by_tag[$tag['tag']] = [
-					'NOT EXISTS' => [],
-					'EXISTS' => []
-				];
-			}
-
-			$slot = in_array($operator, [TAG_OPERATOR_EXISTS, TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])
+			$prefix = in_array($operator, [TAG_OPERATOR_EXISTS, TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])
 				? 'EXISTS'
 				: 'NOT EXISTS';
-
-			if (!is_array($values_by_tag[$tag['tag']][$slot])) {
-				/*
-				 * If previously there was the same tag name with operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS,
-				 * we don't collect more values anymore because TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS has higher
-				 * priority.
-				 *
-				 * `continue` is necessary to accidentally not overwrite boolean with array. Tag values collected before
-				 * will be later removed.
-				 */
-				continue;
-			}
 
 			switch ($operator) {
 				case TAG_OPERATOR_LIKE:
@@ -81,21 +62,18 @@ class CApiTagHelper {
 					$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
 					$value = '%'.mb_strtoupper($value).'%';
 
-					$values_by_tag[$tag['tag']][$slot][]
+					$values_by_tag[$tag['tag']][$prefix]['value'][]
 						= 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 					break;
 
 				case TAG_OPERATOR_EXISTS:
-					$values_by_tag[$tag['tag']][$slot] = false;
-					break;
-
 				case TAG_OPERATOR_NOT_EXISTS:
-					$values_by_tag[$tag['tag']][$slot]['NOT EXISTS'] = true;
+					$values_by_tag[$tag['tag']][$prefix]['tag'] = true;
 					break;
 
 				case TAG_OPERATOR_EQUAL:
 				case TAG_OPERATOR_NOT_EQUAL:
-					$values_by_tag[$tag['tag']][$slot][] = $table.'.value='.zbx_dbstr($value);
+					$values_by_tag[$tag['tag']][$prefix]['value'][] = $table.'.value='.zbx_dbstr($value);
 					break;
 			}
 		}
@@ -103,50 +81,40 @@ class CApiTagHelper {
 		$sql_where = [];
 
 		foreach ($values_by_tag as $tag => $filters) {
-			// Tag operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS are both canceling explicit values of same tag.
-			if ($filters['EXISTS'] === false) {
-				unset($filters['NOT EXISTS']);
+			// The tag operator TAG_OPERATOR_EXISTS overrides explicit values of the same tag and NOT EXISTS statements.
+			if (array_key_exists('EXISTS', $filters) && array_key_exists('tag', $filters['EXISTS'])
+					&& $filters['EXISTS']['tag'] === true) {
+				unset($filters['NOT EXISTS'], $filters['EXISTS']['value']);
 			}
 
 			$_where = [];
 
-			foreach ($filters as $prefix => $values) {
-				if ($values === []) {
-					continue;
-				}
-
+			foreach ($filters as $prefix => $filter) {
 				$statement_start = $prefix.' ('.
 					'SELECT NULL'.
 					' FROM '.$table.
 					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
 						' AND '.$table.'.tag='.zbx_dbstr($tag);
 
-				$statement_end = ')';
-
-				if ($prefix === 'NOT EXISTS' && array_key_exists('NOT EXISTS', $values)) {
-					$_where[] = $statement_start.$statement_end;
-
-					unset($values['NOT EXISTS']);
-
-					if (!$values) {
-						continue;
+				foreach ($filter as $type => $values) {
+					if ($type === 'tag') {
+						$_where[] = $statement_start.')';
+					}
+					else {
+						$values = array_unique($values);
+						$conditions = count($values) == 1
+							? ' AND '.implode(' OR ', $values)
+							: ' AND ('.implode(' OR ', $values).')';
+						$_where[] = $statement_start.$conditions.')';
 					}
 				}
-
-				if ($values) {
-					$statement_start .= (count($values) === 1)
-						? ' AND '.implode(' OR ', $values)
-						: ' AND ('.implode(' OR ', $values).')';
-				}
-
-				$_where[] = $statement_start.$statement_end;
 			}
 
-			if (count($_where) == 1) {
-				$sql_where[] = $_where[0];
+			if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
+				$sql_where[] = count($_where) == 1 ? $_where[0] : '('.implode(' OR ', $_where).')';
 			}
 			else {
-				$sql_where[] = '('.implode(' OR ', $_where).')';
+				$sql_where = array_merge($sql_where, $_where);
 			}
 		}
 
@@ -154,12 +122,11 @@ class CApiTagHelper {
 			return '(1=0)';
 		}
 
-		$sql_where_cnt = count($sql_where);
+		$evaltype_glue = $evaltype == TAG_EVAL_TYPE_OR ? ' OR ' : ' AND ';
 
-		$evaltype_glue = ($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
-		$sql_where = implode($evaltype_glue, $sql_where);
-
-		return ($sql_where_cnt > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
+		return count($sql_where) > 1 && $evaltype == TAG_EVAL_TYPE_OR
+			? '('.implode($evaltype_glue, $sql_where).')'
+			: implode($evaltype_glue, $sql_where);
 	}
 
 	/**

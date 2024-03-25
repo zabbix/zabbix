@@ -67,6 +67,7 @@ class CApiTagHelperTest extends TestCase {
 						['tag' => 'Tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value3'],
 						['tag' => 'Tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value4'],
 						['tag' => 'Tag2', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value5'],
+						['tag' => 'Tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value1'],	// duplicate
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value1'],
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value3']
@@ -321,22 +322,20 @@ class CApiTagHelperTest extends TestCase {
 					TAG_EVAL_TYPE_OR
 				] + $sql_args,
 				'('.
-					'('.
-						'NOT EXISTS ('.
-							'SELECT NULL'.
-							' FROM event_tag'.
-							' WHERE'.
-								' e.eventid=event_tag.eventid'.
-								' AND event_tag.tag=\'OS\''.
-						')'.
-						' OR EXISTS ('.
-							'SELECT NULL'.
-							' FROM event_tag'.
-							' WHERE'.
-								' e.eventid=event_tag.eventid'.
-								' AND event_tag.tag=\'OS\''.
-								' AND event_tag.value=\'Android\''.
-						')'.
+					'NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM event_tag'.
+						' WHERE'.
+							' e.eventid=event_tag.eventid'.
+							' AND event_tag.tag=\'OS\''.
+					')'.
+					' OR EXISTS ('.
+						'SELECT NULL'.
+						' FROM event_tag'.
+						' WHERE'.
+							' e.eventid=event_tag.eventid'.
+							' AND event_tag.tag=\'OS\''.
+							' AND event_tag.value=\'Android\''.
 					')'.
 					' OR NOT EXISTS ('.
 						'SELECT NULL'.
@@ -407,6 +406,10 @@ class CApiTagHelperTest extends TestCase {
 						' WHERE'.
 							' e.eventid=event_tag.eventid'.
 							' AND event_tag.tag=\'tag1\''.
+							' AND (event_tag.value=\'val\''.
+								' OR UPPER(event_tag.value)'.
+								' LIKE \'%VALUE%\' ESCAPE \'!\''.
+							')'.
 					')'.
 					' OR NOT EXISTS ('.
 						'SELECT NULL'.
@@ -414,10 +417,6 @@ class CApiTagHelperTest extends TestCase {
 						' WHERE'.
 							' e.eventid=event_tag.eventid'.
 							' AND event_tag.tag=\'tag1\''.
-							' AND (event_tag.value=\'val\''.
-								' OR UPPER(event_tag.value)'.
-								' LIKE \'%VALUE%\' ESCAPE \'!\''.
-							')'.
 					')'.
 				')'
 			],
@@ -432,14 +431,7 @@ class CApiTagHelperTest extends TestCase {
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
 				'('.
-					'NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_tag'.
-						' WHERE'.
-							' e.eventid=event_tag.eventid'.
-							' AND event_tag.tag=\'tag1\''.
-					')'.
-					' OR EXISTS ('.
+					'EXISTS ('.
 						'SELECT NULL'.
 						' FROM event_tag'.
 						' WHERE'.
@@ -449,6 +441,13 @@ class CApiTagHelperTest extends TestCase {
 								' OR UPPER(event_tag.value)'.
 								' LIKE \'%VALUE%\' ESCAPE \'!\''.
 							')'.
+					')'.
+					' OR NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM event_tag'.
+						' WHERE'.
+							' e.eventid=event_tag.eventid'.
+							' AND event_tag.tag=\'tag1\''.
 					')'.
 				')'
 			]
