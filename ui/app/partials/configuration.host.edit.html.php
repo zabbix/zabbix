@@ -317,8 +317,7 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['host']['tags'],
 	'with_automatic' => true,
 	'tabs_id' => 'host-tabs',
-	'tags_tab_id' => 'host-tags-tab',
-	'field_label' => _('Tags')
+	'tags_tab_id' => 'host-tags-tab'
 ]);
 
 // Macros tab.

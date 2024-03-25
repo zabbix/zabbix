@@ -166,8 +166,7 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
-	'tags_tab_id' => 'template-tags-tab',
-	'field_label' => _('Tags')
+	'tags_tab_id' => 'template-tags-tab'
 ]);
 
 $form->addItem(
