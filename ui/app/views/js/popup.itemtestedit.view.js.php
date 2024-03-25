@@ -169,7 +169,7 @@ function itemGetValueTest(overlay) {
 		},
 		macros: form_data['macros'],
 		test_with: form_data['test_with'],
-		proxyid: form_data['test_with'] == <?= CControllerPopupItemTest::TEST_WITH_PROXY ?> ? form_data['proxyid'] : 0,
+		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		value: form_data['value']

@@ -404,17 +404,28 @@ abstract class CControllerPopupItemTest extends CController {
 
 		// Set proxy.
 		if (in_array($this->item_type, $this->items_support_proxy)) {
-			if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
-				$data['proxyid'] = $input['data']['proxyid'];
+			if (array_key_exists('data', $input) && array_key_exists('test_with', $input['data'])) {
+				$test_with = $input['data']['test_with'];
 			}
-			elseif (array_key_exists('proxyid', $input)) {
-				$data['proxyid'] = $input['proxyid'];
-			}
-			elseif (array_key_exists('proxyid', $this->host)) {
-				$data['proxyid'] = $this->host['proxyid'];
+			elseif (array_key_exists('test_with', $input)) {
+				$test_with = $input['test_with'];
 			}
 			else {
-				$data['proxyid'] = 0;
+				$test_with = self::TEST_WITH_SERVER;
+			}
+
+			$data['proxyid'] = 0;
+
+			if ($test_with == self::TEST_WITH_PROXY) {
+				if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
+					$data['proxyid'] = $input['data']['proxyid'];
+				}
+				elseif (array_key_exists('proxyid', $input)) {
+					$data['proxyid'] = $input['proxyid'];
+				}
+				elseif ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+					$data['proxyid'] = $this->host['proxyid'];
+				}
 			}
 		}
 
