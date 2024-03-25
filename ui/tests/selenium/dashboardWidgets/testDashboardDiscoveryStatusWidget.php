@@ -255,6 +255,8 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$dialog->close();
 	}
 
 	public static function getDiscoveryStatusWidgetData() {
