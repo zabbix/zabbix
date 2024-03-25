@@ -30,6 +30,10 @@
 		@extend %form-disabled;
 	}
 
+	&[aria-readonly] {
+		@extend %form-readonly;
+	}
+
 	input[type="text"] {
 		border: 0;
 		background: none;
@@ -125,6 +129,14 @@
 				color: $multiselect-item-disabled-color;
 				-webkit-text-fill-color: $multiselect-item-disabled-color;
 			}
+		}
+	}
+
+	[aria-readonly] {
+		.subfilter-enabled,
+		.btn-icon {
+			cursor: default;
+			background-color: $multiselect-item-disabled-bg-color;
 		}
 	}
 

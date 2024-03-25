@@ -185,6 +185,29 @@
 		},
 
 		/**
+		 * Make multi select UI control readonly.
+		 *
+		 * @return jQuery
+		 */
+		readonly: function() {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
+
+				if (ms.options.readonly === false) {
+					$obj.attr('aria-readonly', true);
+					$('.multiselect-list', $obj).attr('aria-readonly', true);
+					$('.multiselect-button > button', $obj.parent()).prop('disabled', true);
+					$('input[type="text"]', $obj).remove();
+
+					ms.options.readonly = true;
+
+					cleanSearch($obj);
+				}
+			});
+		},
+
+		/**
 		 * Remove select object value.
 		 *
 		 * @param {string} id
@@ -401,7 +424,8 @@
 	 *     string placeholder           set custom placeholder (optional)
 	 *     array  excludeids            the list of excluded ids (optional)
 	 *     string defaultValue          default value for input element (optional)
-	 *     bool   disabled              turn on/off readonly state (optional)
+	 *     bool   disabled              turn on/off disabled state (optional)
+	 *     bool   readonly              turn on/off readonly state (optional)
 	 *     bool   hidden                hide element (optional)
 	 *     bool   addNew                allow user to create new names (optional)
 	 *     int    selectedLimit         how many items can be selected (optional)
@@ -454,6 +478,7 @@
 			suggest_list_modifier: null,
 			custom_suggest_select_handler: null,
 			disabled: false,
+			readonly: false,
 			selectedLimit: 0,
 			limit: 20,
 			popup: {},
@@ -519,9 +544,15 @@
 
 			$obj.append($selected_div.append($selected_ul));
 
-			if (ms.options.disabled) {
-				$obj.attr('aria-disabled', true);
-				$selected_ul.addClass('disabled');
+			if (ms.options.disabled || ms.options.readonly) {
+				if (ms.options.disabled) {
+					$obj.attr('aria-disabled', true);
+					$selected_ul.addClass('disabled');
+				}
+				else {
+					$obj.attr('aria-readonly', true);
+					$selected_ul.attr('aria-readonly', true);
+				}
 			}
 			else {
 				$obj.append(makeMultiSelectInput($obj));
@@ -529,7 +560,7 @@
 
 			$obj
 				.on('mousedown', function(event) {
-					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1 && !ms.options.readonly) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
 
@@ -565,7 +596,7 @@
 					ms.select_button.on('click', (e) => openSelectPopup($obj, e.target));
 				}
 
-				if (ms.options.disabled) {
+				if (ms.options.disabled || ms.options.readonly) {
 					ms.select_button.prop('disabled', true);
 				}
 
@@ -996,7 +1027,7 @@
 						.append($('<span>')
 							.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALLER])
 							.on('click', function() {
-								if (!ms.options.disabled && !item_disabled) {
+								if (!ms.options.disabled && !item_disabled && !ms.options.readonly) {
 									removeSelected($obj, item.id);
 									if (isSearchFieldVisible($obj)) {
 										$('input[type="text"]', $obj)[0].focus({preventScroll:true});
@@ -1008,7 +1039,7 @@
 						)
 				)
 				.on('click', function() {
-					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1 && !ms.options.readonly) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
 

@@ -397,7 +397,7 @@ $formgrid = (new CFormGrid())
 				'name' => 'master_itemid',
 				'object_name' => 'items',
 				'multiple' => false,
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'data' => $item['master_item']
 					? [[
 							'id' => $item['master_item']['itemid'],

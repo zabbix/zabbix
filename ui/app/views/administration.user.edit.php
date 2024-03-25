@@ -450,7 +450,7 @@ if ($data['action'] === 'user.edit') {
 		'object_name' => 'roles',
 		'data' => $data['role'],
 		'multiple' => false,
-		'disabled' => $role_disabled,
+		'readonly' => $role_disabled,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'roles',

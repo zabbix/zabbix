@@ -181,7 +181,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'disabled' => (bool) $host_prototype['templateid'],
+		'readonly' => (bool) $host_prototype['templateid'],
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [

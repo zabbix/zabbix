@@ -60,6 +60,10 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
+		if (array_key_exists('readonly', $options) && $options['readonly']) {
+			$this->setAttribute('aria-readonly', 'true');
+		}
+
 		$this->params = [
 			'name' => $options['name'],
 			'labels' => [
@@ -95,7 +99,8 @@ class CMultiSelect extends CTag {
 			$this->params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden'] as $option) {
+		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden', 'readonly']
+				as $option) {
 			if (array_key_exists($option, $options)) {
 				$this->params[$option] = $options[$option];
 			}
@@ -160,7 +165,8 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
-			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
+			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden',
+			'readonly'
 		];
 
 		foreach ($options as $field => $value) {
@@ -181,7 +187,8 @@ class CMultiSelect extends CTag {
 			'add_new' => 'addNew',
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
-			'placeholder' => 'placeholder'
+			'placeholder' => 'placeholder',
+			'readonly' => 'readonly'
 		];
 
 		foreach ($mappings as $new_field => $old_field) {

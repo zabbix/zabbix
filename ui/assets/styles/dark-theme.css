@@ -2976,6 +2976,10 @@ output {
         pointer-events: none;
         color: #808080;
         -webkit-text-fill-color: #808080; }
+  .multiselect [aria-readonly] .subfilter-enabled,
+  .multiselect [aria-readonly] .btn-icon {
+    cursor: default;
+    background-color: #383838; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -5465,7 +5469,7 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
-.radio-list-control input[type="radio"]:checked[readonly] + label, .radio-list-control input[type="radio"][readonly] + label, .z-select[readonly] .focusable,
+.multiselect[aria-readonly], .radio-list-control input[type="radio"]:checked[readonly] + label, .radio-list-control input[type="radio"][readonly] + label, .z-select[readonly] .focusable,
 z-select[readonly] .focusable, input[readonly], textarea[readonly] {
   color: #f2f2f2;
   -webkit-text-fill-color: #f2f2f2;
