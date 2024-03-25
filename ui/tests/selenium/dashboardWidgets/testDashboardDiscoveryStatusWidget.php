@@ -60,7 +60,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 	const DISCOVERY_RULE_3 = 'Discovery rule with active discovered hosts';
 	const DISCOVERY_RULE_4 = 'Discovery rule with both type of hosts';
 	const DISCOVERY_RULE_5 = 'XYZ - discovery rule to be displayed last (Inactive hosts)';
-	const DELETE_WIDGET = 'Widget to delete';
+	const DELETE_WIDGET = 'Discovery status widget to delete';
 	const DATA_WIDGET = 'Widget for data check';
 	const CANCEL_WIDGET = 'Widget for testing cancel button';
 
