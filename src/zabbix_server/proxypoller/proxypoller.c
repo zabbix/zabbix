@@ -20,13 +20,13 @@
 #include "proxypoller.h"
 
 #include "proxyconfigread/proxyconfig_read.h"
-#include "../trapper/proxydata.h"
-#include "../discovery/discovery_server.h"
-#include "../autoreg/autoreg_server.h"
+#include "trapper/proxydata.h"
+#include "cachehistory/cachehistory_server.h"
+#include "discovery/discovery_server.h"
+#include "autoreg/autoreg_server.h"
 
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxdbhigh.h"

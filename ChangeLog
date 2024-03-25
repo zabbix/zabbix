@@ -1,3 +1,10 @@
+Changes for 7.0.0beta3
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0beta2
 
 New features:
@@ -23,7 +30,7 @@ A.F.....S. [ZBXNEXT-6876] added multi-factor authentication support for Zabbix U
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
-....I..... [ZBX-23441] fixed broken autoconf test when searching for go (jxl)
+....I..... [ZBX-23441] fixed Go agent Makefile template not respecting DESTDIR (jxl)
 .....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
 ..F....... [ZBX-23567] fixed PHP error during first time setup when no user is yet created (gcalenko, Ivo)
 ........S. [ZBX-24050] fixed snmpaddrs not getting updated when syncing interfaces (dgoloscapov)
@@ -585,12 +592,6 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
-
---------------------------------------------------------------------------------
-Changes for 6.4.13rc2
-
-Bug fixes:
-....I..... [ZBX-23441] fixed broken autoconf test when searching for go (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.13rc1
@@ -2279,6 +2280,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.28
+
+6.0.28rc1 was released as 6.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.28rc1
@@ -5253,6 +5259,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42
+
+5.0.42rc1 was released as 5.0.42 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42rc1

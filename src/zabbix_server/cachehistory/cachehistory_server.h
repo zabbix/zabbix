@@ -17,17 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
+#ifndef ZABBIX_CACHEHISTORY_SERVER_H
+#define ZABBIX_CACHEHISTORY_SERVER_H
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "20 March 2024";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "7.0.0beta3";
+#include "zbxdbhigh.h"
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
-	}
-}
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
+
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+
+#endif

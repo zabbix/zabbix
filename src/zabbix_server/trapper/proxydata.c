@@ -19,12 +19,12 @@
 
 #include "proxydata.h"
 
-#include "../taskmanager/taskmanager_server.h"
-#include "../discovery/discovery_server.h"
-#include "../autoreg/autoreg_server.h"
+#include "taskmanager/taskmanager_server.h"
+#include "cachehistory/cachehistory_server.h"
+#include "discovery/discovery_server.h"
+#include "autoreg/autoreg_server.h"
 
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
 #include "zbxjson.h"

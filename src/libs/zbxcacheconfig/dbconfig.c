@@ -58,6 +58,7 @@
 #include "zbxcomms.h"
 #include "zbxdb.h"
 #include "zbxautoreg.h"
+#include "zbxexpression.h"
 
 int	sync_in_progress = 0;
 
