@@ -1,5 +1,6 @@
-if SERVER
-SERVER_tests = \
+#if SERVER
+#SERVER_tests = \
+BINARIES_tests = \
 	zbx_str_extract \
 	convert_to_utf8 \
 	zbx_truncate_itemkey \
@@ -7,11 +8,14 @@ SERVER_tests = \
 	zbx_dyn_escape_string \
 	zbx_ltrim_utf8 \
 	zbx_rtrim_utf8 \
-endif
+#endif
 
-noinst_PROGRAMS = $(SERVER_tests)
+#noinst_PROGRAMS = $(SERVER_tests)
 
-if SERVER
+
+noinst_PROGRAMS = $(BINARIES_tests)
+
+#if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
@@ -129,4 +133,4 @@ zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TL
 
 zbx_rtrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-endif
+#endif

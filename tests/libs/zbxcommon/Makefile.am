@@ -1,11 +1,16 @@
-if SERVER
-SERVER_tests = \
+#if SERVER
+#SERVER_tests = \
+#	init_library_common
+#endif
+
+#noinst_PROGRAMS = $(SERVER_tests)
+
+BINARIES_tests = \
 	init_library_common
-endif
 
-noinst_PROGRAMS = $(SERVER_tests)
+noinst_PROGRAMS = $(BINARIES_tests)
 
-if SERVER
+#if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
@@ -35,4 +40,4 @@ init_library_common_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 init_library_common_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-endif
+#endif

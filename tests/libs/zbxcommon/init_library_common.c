@@ -30,6 +30,7 @@ static void    zbx_log_impl(int level, const char *fmt, va_list args)
 	ZBX_UNUSED(args);
 }
 
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_mock_progname")
 
 void	zbx_mock_test_entry(void **state)
 {
