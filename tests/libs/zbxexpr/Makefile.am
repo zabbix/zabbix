@@ -2,34 +2,15 @@ if SERVER
 SERVER_tests = \
 	zbx_function_find \
 	parse_key \
-	replace_key_params_dyn \
 	calculate_item_nextcheck \
 	calculate_item_nextcheck_unreachable \
 	zbx_function_get_param_dyn \
-	zbx_json_to_xml \
-	zbx_xml_to_json \
 	zbx_token_find \
 	zbx_interval_preproc \
 	zbx_validate_interval \
 	is_double_suffix \
-	is_double \
-	zbx_trim_float \
-	zbx_trim_integer \
-	zbx_variant_compare \
 	zbx_user_macro_parse \
-	zbx_str_extract \
-	convert_to_utf8 \
-	zbx_truncate_itemkey \
-	zbx_truncate_value \
-	zbx_dyn_escape_string \
-	zbx_tm_add \
-	zbx_tm_sub \
-	zbx_tm_round_up \
-	zbx_tm_round_down \
 	zbx_get_report_nextcheck \
-	zbx_ltrim_utf8 \
-	zbx_rtrim_utf8 \
-	zbx_get_week_number \
 	zbx_function_param_parse_ext
 endif
 

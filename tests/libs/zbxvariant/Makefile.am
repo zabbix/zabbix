@@ -1,6 +1,6 @@
 if SERVER
 SERVER_tests = \
-	replace_key_params_dyn
+	zbx_variant_compare
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -57,17 +57,17 @@ COMMON_COMPILER_FLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS)
 
-replace_key_params_dyn_SOURCES = \
-	replace_key_params_dyn.c \
+zbx_variant_compare_SOURCES = \
+	zbx_variant_compare.c \
 	$(COMMON_SRC_FILES)
 
-replace_key_params_dyn_LDADD = \
+zbx_variant_compare_LDADD = \
 	$(COMMON_LIB_FILES)
 
-replace_key_params_dyn_LDADD += @SERVER_LIBS@
+zbx_variant_compare_LDADD += @SERVER_LIBS@
 
-replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
