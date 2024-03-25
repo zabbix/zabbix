@@ -169,6 +169,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 	const ZBX_DC_HOST	*dc_host = NULL;
 	zbx_config_hk_t		config_hk;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
 
@@ -176,7 +177,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &itemids[i])))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(dc_config->items), &itemids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -184,7 +185,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(get_dc_config())->hosts,
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(dc_config->hosts),
 					&dc_item->hostid)))
 			{
 				errcodes[i] = FAIL;
@@ -195,7 +196,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 		dc_get_history_sync_host(&items[i].host, dc_host, mode);
 		dc_get_history_sync_item(&items[i], dc_item);
 
-		config_hk = get_dc_config()->config->hk;
+		config_hk = dc_config->config->hk;
 	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
@@ -743,6 +744,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
 
@@ -750,7 +752,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &itemids[i])))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(dc_config->items), &itemids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -758,7 +760,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 
 		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(get_dc_config())->hosts,
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(dc_config->hosts),
 					&dc_item->hostid)))
 			{
 				errcodes[i] = FAIL;
@@ -943,6 +945,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	zbx_hashset_iter_t	iter;
 	int			connectors_updated = FAIL, global_macro_updated = FAIL;
 	zbx_uint64_t		global_revision;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	if (get_dc_config()->revision.config == *config_revision)
 		return;
@@ -953,7 +956,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 
 	if (get_dc_config()->revision.connector != *connector_revision)
 	{
-		zbx_hashset_iter_reset(&(get_dc_config())->connectors, &iter);
+		zbx_hashset_iter_reset(&(dc_config->connectors), &iter);
 		while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
@@ -977,7 +980,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 				connector->time_flush = 0;
 			}
 
-			connector->revision = get_dc_config()->revision.connector;
+			connector->revision = dc_config->revision.connector;
 			connector->protocol = dc_connector->protocol;
 			connector->data_type = dc_connector->data_type;
 			connector->url_orig = zbx_strdup(connector->url_orig, dc_connector->url);
@@ -1012,17 +1015,17 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 					dc_connector->attempt_interval);
 		}
 
-		*connector_revision = get_dc_config()->revision.connector;
+		*connector_revision = dc_config->revision.connector;
 		connectors_updated = SUCCEED;
 	}
 
-	if (SUCCEED != um_cache_get_host_revision(get_dc_config()->um_cache, 0, &global_revision))
+	if (SUCCEED != um_cache_get_host_revision(dc_config->um_cache, 0, &global_revision))
 		global_revision = 0;
 
 	if (global_revision > *config_revision)
 		global_macro_updated = SUCCEED;
 
-	*config_revision = get_dc_config()->revision.config;
+	*config_revision = dc_config->revision.config;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
