@@ -214,67 +214,14 @@ static void	pgm_update(zbx_pg_cache_t *cache)
 static void	pgm_db_flush_group_updates(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		zbx_vector_pg_update_t *group_updates)
 {
-	zbx_vector_uint64_t	groupids;
-
-	zbx_vector_uint64_create(&groupids);
-
 	for (int i = 0; i < group_updates->values_num; i++)
 	{
-		if (0 == (group_updates->values[i].flags & ZBX_PG_GROUP_UPDATE_STATE))
-			continue;
-
-		zbx_vector_uint64_append(&groupids, group_updates->values[i].objectid);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
+				"update proxy_group_rtdata set state=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
+				group_updates->values[i].state, group_updates->values[i].objectid);
 	}
 
-	if (0 != groupids.values_num)
-	{
-		char	*sql_lock = NULL;
-		size_t	sql_lock_alloc = 0, sql_lock_offset = 0;
-
-		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_strcpy_alloc(&sql_lock, &sql_lock_alloc, &sql_lock_offset,
-				"select proxy_groupid from proxy_group where ");
-		zbx_db_add_condition_alloc(&sql_lock, &sql_lock_alloc, &sql_lock_offset, "proxy_groupid",
-				groupids.values, groupids.values_num);
-		zbx_strcpy_alloc(&sql_lock, &sql_lock_alloc, &sql_lock_offset, ZBX_FOR_UPDATE);
-
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		result = zbx_db_select("%s", sql_lock);
-		zbx_free(sql_lock);
-
-		zbx_vector_uint64_clear(&groupids);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	proxy_groupid;
-
-			ZBX_STR2UINT64(proxy_groupid, row[0]);
-			zbx_vector_uint64_append(&groupids, proxy_groupid);
-		}
-		zbx_db_free_result(result);
-
-		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		for (int i = 0; i < group_updates->values_num; i++)
-		{
-			if (FAIL == zbx_vector_uint64_bsearch(&groupids, group_updates->values[i].objectid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				continue;
-			}
-
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
-					"update proxy_group_rtdata set state=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
-					group_updates->values[i].state, group_updates->values[i].objectid);
-		}
-
-		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
-	}
-
-	zbx_vector_uint64_destroy(&groupids);
+	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 }
 
 /******************************************************************************
