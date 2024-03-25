@@ -2638,7 +2638,8 @@ class CHost extends CHostGeneral {
 	 */
 	protected static function addFieldDefaultsByMonitoredBy(array &$hosts, array $db_hosts): void {
 		foreach ($hosts as &$host) {
-			if ($host['monitored_by'] != $db_hosts[$host['hostid']]['monitored_by']) {
+			if (array_key_exists('monitored_by', $host)
+					&& $host['monitored_by'] != $db_hosts[$host['hostid']]['monitored_by']) {
 				switch ($host['monitored_by']) {
 					case ZBX_MONITORED_BY_SERVER:
 						$host += ['proxyid' => 0, 'proxy_groupid' => 0];
