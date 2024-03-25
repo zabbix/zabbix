@@ -71,7 +71,7 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 	zbx_uint64_t		maintenanceid;
 	zbx_dc_maintenance_t	*maintenance;
 	int			found, ret;
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -165,7 +165,7 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_vector_ptr_t		maintenances;
 	int				found, ret, index, i;
-	ZBX_DC_CONFIG			*config = get_config();
+	zbx_dc_config_t			*config = get_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -273,7 +273,7 @@ void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 	zbx_dc_maintenance_period_t	*period;
 	zbx_dc_maintenance_t		*maintenance;
 	int				found, ret, index;
-	ZBX_DC_CONFIG			*config = get_config();
+	zbx_dc_config_t			*config = get_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -355,7 +355,7 @@ void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 	zbx_dc_maintenance_t	*maintenance = NULL;
 	int			index, ret;
 	zbx_uint64_t		last_maintenanceid = 0, maintenanceid, groupid;
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -428,7 +428,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	zbx_dc_maintenance_t	*maintenance = NULL;
 	int			index, ret, i;
 	zbx_uint64_t		last_maintenanceid, maintenanceid, hostid;
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -849,7 +849,7 @@ int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 	int				i, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
 	unsigned char			state;
 	time_t				now, period_start, period_end, running_since, running_until;
-	ZBX_DC_CONFIG			*config = get_config();
+	zbx_dc_config_t			*config = get_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1024,7 +1024,7 @@ static void	dc_get_host_maintenances_by_ids(const zbx_vector_uint64_t *maintenan
 	zbx_dc_maintenance_t	*maintenance;
 	int			i, j;
 	zbx_vector_uint64_t	groupids;
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 
 	zbx_vector_uint64_create(&groupids);
 

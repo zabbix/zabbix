@@ -27,7 +27,7 @@
 
 typedef struct
 {
-	ZBX_DC_CONFIG		dc;
+	zbx_dc_config_t		dc;
 	zbx_vector_um_host_t	um_hosts;
 	zbx_vector_ptr_t	hosts;
 

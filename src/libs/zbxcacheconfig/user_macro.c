@@ -461,7 +461,7 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location,
 	int			i;
 	zbx_uint64_pair_t	pair = {macro->hostid, macro->macroid};
 	char			*path, *key;
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv :
 				&(get_config())->hmacro_kv);
 	zbx_dc_macro_kv_t	*mkv;
@@ -578,7 +578,7 @@ static void	um_macro_deregister_kvs(zbx_um_macro_t *macro)
  *********************************************************************************/
 int	um_macro_check_vault_location(const zbx_um_macro_t *macro, const char *location)
 {
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 	zbx_hashset_t		*macro_kv = (0 == macro->hostid ? &config->gmacro_kv : &config->hmacro_kv);
 	zbx_dc_macro_kv_t	*mkv;
 	char			*path, *key;

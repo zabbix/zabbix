@@ -132,14 +132,14 @@ static zbx_get_config_forks_f	get_config_forks_cb = NULL;
  ******************************************************************************/
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
-ZBX_DC_CONFIG	*config = NULL;
+zbx_dc_config_t	*config = NULL;
 
-ZBX_DC_CONFIG	*get_config(void)
+zbx_dc_config_t	*get_config(void)
 {
 	return config;
 }
 
-void	set_config(ZBX_DC_CONFIG *in)
+void	set_config(zbx_dc_config_t *in)
 {
 	config = in;
 }
@@ -997,8 +997,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (NULL == config->config)
 	{
 		found = 0;
-		config->config = (ZBX_DC_CONFIG_TABLE *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
-		memset(config->config, 0, sizeof(ZBX_DC_CONFIG_TABLE));
+		config->config = (zbx_dc_config_t_TABLE *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t_TABLE));
+		memset(config->config, 0, sizeof(zbx_dc_config_t_TABLE));
 	}
 
 	if (SUCCEED != (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
@@ -8804,7 +8804,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 		goto out;
 	}
 
-	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
+	config = (zbx_dc_config_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
 
 	if (SUCCEED != vps_monitor_create(&config->vps_monitor, error))

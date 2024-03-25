@@ -102,7 +102,7 @@ zbx_dbsync_journal_t;
 typedef struct
 {
 	zbx_hashset_t			strpool;
-	ZBX_DC_CONFIG			*cache;
+	zbx_dc_config_t			*cache;
 
 	zbx_hashset_t			changelog;
 
@@ -324,7 +324,7 @@ static void	dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 	zbx_vector_dbsync_obj_changelog_destroy(&journal->changelog);
 }
 
-void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
+void	zbx_dbsync_env_init(zbx_dc_config_t *cache)
 {
 	dbsync_env.cache = cache;
 	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);

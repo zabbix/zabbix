@@ -631,7 +631,7 @@ typedef struct
 
 	zbx_config_item_type_timeouts_t	item_timeouts;
 }
-ZBX_DC_CONFIG_TABLE;
+zbx_dc_config_t_TABLE;
 
 typedef struct
 {
@@ -996,7 +996,7 @@ typedef struct
 	zbx_binary_heap_t	trigger_queue;
 	zbx_binary_heap_t	drule_queue;
 	zbx_binary_heap_t	httptest_queue;		/* web scenario queue */
-	ZBX_DC_CONFIG_TABLE	*config;
+	zbx_dc_config_t_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
 	zbx_um_cache_t		*um_cache;
@@ -1004,12 +1004,12 @@ typedef struct
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
 }
-ZBX_DC_CONFIG;
+zbx_dc_config_t;
 
-ZBX_DC_CONFIG	*get_config(void);
+zbx_dc_config_t	*get_config(void);
 
 /* for cmocka */
-void	set_config(ZBX_DC_CONFIG *in);
+void	set_config(zbx_dc_config_t *in);
 
 #define	RDLOCK_CACHE	rdlock_cache()
 #define	WRLOCK_CACHE	wrlock_cache()

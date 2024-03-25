@@ -31,7 +31,7 @@ static void	DCdump_config(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
-	ZBX_DC_CONFIG	*config = get_config();
+	zbx_dc_config_t	*config = get_config();
 
 	if (NULL == config->config)
 		goto out;
@@ -593,7 +593,7 @@ static void	DCdump_items(void)
 	zbx_hashset_iter_t	iter;
 	int			i, j;
 	zbx_vector_ptr_t	index;
-	ZBX_DC_CONFIG		*config = get_config();
+	zbx_dc_config_t		*config = get_config();
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
