@@ -300,7 +300,7 @@ $form_grid
 				'name' => 'api_methods[]',
 				'object_name' => 'api_methods',
 				'data' => $data['rules']['api'],
-				'disabled' => $data['readonly'] || !$data['rules']['api.access'],
+				'readonly' => $data['readonly'] || !$data['rules']['api.access'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'api_methods',

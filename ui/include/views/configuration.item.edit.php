@@ -923,7 +923,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		(new CFormField((new CMultiSelect([
 				'name' => 'valuemapid',
 				'object_name' => 'valuemaps',
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [

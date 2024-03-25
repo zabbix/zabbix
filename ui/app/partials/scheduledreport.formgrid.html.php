@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form_grid = new CFormGrid();
@@ -29,7 +30,7 @@ $user_multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'object_name' => 'users',
 	'multiple' => false,
-	'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) || !$data['allowed_edit'],
+	'readonly' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) || !$data['allowed_edit'],
 	'data' => $data['ms_user'],
 	'popup' => [
 		'parameters' => [
@@ -47,7 +48,7 @@ $dashboard_multiselect = (new CMultiSelect([
 	'name' => 'dashboardid',
 	'object_name' => 'dashboard',
 	'multiple' => false,
-	'disabled' => !$data['allowed_edit'],
+	'readonly' => !$data['allowed_edit'],
 	'data' => $data['ms_dashboard'],
 	'popup' => [
 		'parameters' => [

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
@@ -211,7 +212,7 @@ $table
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
 			'data' => $data['groups_ms'],
-			'disabled' => !$data['allowed_edit'],
+			'readonly' => !$data['allowed_edit'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -228,7 +229,7 @@ $table
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
 			'data' => $data['hosts_ms'],
-			'disabled' => !$data['allowed_edit'],
+			'readonly' => !$data['allowed_edit'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
