@@ -321,8 +321,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				unset($hosts[0]['monitored_by'], $hosts[0]['assigned_proxyid']);
 			}
-
-			if (!$hosts) {
+			else {
 				$hosts = API::Template()->get([
 					'output' => ['templateid', 'host', 'name', 'status'],
 					'templateids' => [$hostid],
