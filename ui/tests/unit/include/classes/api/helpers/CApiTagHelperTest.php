@@ -368,7 +368,6 @@ class CApiTagHelperTest extends TestCase {
 					[
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value'],
 						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'win']
-
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
@@ -395,7 +394,6 @@ class CApiTagHelperTest extends TestCase {
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'val'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS]
-
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
@@ -426,7 +424,6 @@ class CApiTagHelperTest extends TestCase {
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'val'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value'],
 						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EXISTS]
-
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
