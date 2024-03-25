@@ -146,30 +146,6 @@ typedef enum
 }
 zbx_item_type_t;
 
-#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
-#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
-#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
-#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
-#define ZBX_AGENT_UNKNOWN	255
-#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
-
-typedef enum
-{
-	INTERFACE_TYPE_UNKNOWN = 0,
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_OPT = 254,
-	INTERFACE_TYPE_ANY = 255
-}
-zbx_interface_type_t;
-const char	*zbx_interface_type_string(zbx_interface_type_t type);
-
-#define INTERFACE_TYPE_COUNT	4	/* number of interface types */
-int	zbx_get_interface_type_priority(int n);
-
-
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
 
@@ -621,8 +597,6 @@ typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
 int	MAIN_ZABBIX_ENTRY(int flags);
-
-unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1

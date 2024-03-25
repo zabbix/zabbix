@@ -39,6 +39,7 @@
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 typedef enum
 {

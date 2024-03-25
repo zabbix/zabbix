@@ -59,6 +59,7 @@
 #include "zbxdb.h"
 #include "zbxmutexs.h"
 #include "zbxexpression.h"
+#include "zbxinterface.h"
 
 int	sync_in_progress = 0;
 

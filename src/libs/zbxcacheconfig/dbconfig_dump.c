@@ -25,6 +25,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 static void	DCdump_config(void)
 {

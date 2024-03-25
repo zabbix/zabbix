@@ -27,6 +27,7 @@
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxinterface.h"
 #include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_discoverer_constants.h"

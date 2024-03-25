@@ -35,6 +35,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxhash.h"
+#include "zbxinterface.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0

@@ -40,6 +40,7 @@
 #include "zbxdb.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1

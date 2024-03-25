@@ -37,6 +37,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbxpreproc.h"
+#include "zbxinterface.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {

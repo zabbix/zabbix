@@ -29,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 #include <stddef.h>
 
 /* global correlation constants */

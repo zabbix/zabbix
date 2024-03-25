@@ -469,39 +469,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Return value: Interface type                                               *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-unsigned char	get_interface_type_by_item_type(unsigned char type)
-{
-	switch (type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return INTERFACE_TYPE_AGENT;
-		case ITEM_TYPE_SNMP:
-		case ITEM_TYPE_SNMPTRAP:
-			return INTERFACE_TYPE_SNMP;
-		case ITEM_TYPE_IPMI:
-			return INTERFACE_TYPE_IPMI;
-		case ITEM_TYPE_JMX:
-			return INTERFACE_TYPE_JMX;
-		case ITEM_TYPE_SIMPLE:
-		case ITEM_TYPE_EXTERNAL:
-		case ITEM_TYPE_SSH:
-		case ITEM_TYPE_TELNET:
-			return INTERFACE_TYPE_ANY;
-		case ITEM_TYPE_HTTPAGENT:
-		case ITEM_TYPE_SCRIPT:
-			return INTERFACE_TYPE_OPT;
-		default:
-			return INTERFACE_TYPE_UNKNOWN;
-	}
-}
-
 void	zbx_alarm_flag_set(void)
 {
 	zbx_timed_out = 1;
@@ -562,37 +529,3 @@ zbx_uint64_t	suffix2factor(char c)
 	}
 }
 
-static const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
-{
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_IPMI
-};
-
-int	zbx_get_interface_type_priority(int n)
-{
-	return INTERFACE_TYPE_PRIORITY[n];
-}
-
-const char	*zbx_interface_type_string(zbx_interface_type_t type)
-{
-	switch (type)
-	{
-		case INTERFACE_TYPE_AGENT:
-			return "Zabbix agent";
-		case INTERFACE_TYPE_SNMP:
-			return "SNMP";
-		case INTERFACE_TYPE_IPMI:
-			return "IPMI";
-		case INTERFACE_TYPE_JMX:
-			return "JMX";
-		case INTERFACE_TYPE_OPT:
-			return "optional";
-		case INTERFACE_TYPE_ANY:
-			return "any";
-		case INTERFACE_TYPE_UNKNOWN:
-		default:
-			return "unknown";
-	}
-}
