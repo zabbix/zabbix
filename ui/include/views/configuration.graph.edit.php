@@ -219,7 +219,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'items',
 			'data' => $ymin_axis_ms_data,
 			'multiple' => false,
-			'disabled' => $readonly,
+			'readonly' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -313,7 +313,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'items',
 			'data' => $ymax_axis_ms_data,
 			'multiple' => false,
-			'disabled' => $readonly,
+			'readonly' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],

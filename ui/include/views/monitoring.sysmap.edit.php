@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/monitoring.sysmap.edit.js.php';
@@ -59,7 +60,7 @@ $multiselect_data = [
 	'name' => 'userid',
 	'object_name' => 'users',
 	'multiple' => false,
-	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+	'readonly' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'data' => [],
 	'popup' => [
 		'parameters' => [

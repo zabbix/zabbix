@@ -174,7 +174,7 @@ $form->addItem(
 					'name' => 'groupids[]',
 					'object_name' => 'hostGroup',
 					'data' => $data['groups_ms'],
-					'disabled' => !$data['allowed_edit'],
+					'readonly' => !$data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
@@ -194,7 +194,7 @@ $form->addItem(
 					'name' => 'hostids[]',
 					'object_name' => 'hosts',
 					'data' => $data['hosts_ms'],
-					'disabled' => !$data['allowed_edit'],
+					'readonly' => !$data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'hosts',

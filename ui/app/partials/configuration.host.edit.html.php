@@ -200,7 +200,7 @@ $host_tab
 			(new CMultiSelect([
 				'name' => 'groups[]',
 				'object_name' => 'hostGroup',
-				'disabled' => $host_is_discovered,
+				'readonly' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 				'data' => $data['groups_ms'],
 				'popup' => [

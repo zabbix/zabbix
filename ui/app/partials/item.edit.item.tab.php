@@ -784,7 +784,7 @@ $formgrid
 			(new CMultiSelect([
 				'name' => 'valuemapid',
 				'object_name' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
 					? [[
