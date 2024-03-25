@@ -15649,9 +15649,7 @@ void	zbx_proxy_discovery_get(char **data)
 	int		now;
 	struct zbx_json	json;
 
-	WRLOCK_CACHE;
 	dc_status_update();
-	UNLOCK_CACHE;
 
 	now = (int)time(NULL);
 
