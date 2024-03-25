@@ -17,14 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "cachehistory_proxy.h"
 #include "zbxcachehistory.h"
-#include "zbxcachehistory_proxy.h"
-#include "zbxcommon.h"
+
 #include "zbxdb.h"
 #include "zbxhistory.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
-#include "dbcache.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
@@ -348,7 +347,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 		/* values of items without history storage or any use of this history must be discarded */
 		if (0 == items[i].history)
 		{
-			dc_history_clean_value(history + i);
+			zbx_dc_history_clean_value(history + i);
 			history[i].flags |= ZBX_DC_FLAG_NOVALUE;
 		}
 	}
@@ -380,17 +379,17 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	{
 		*more = ZBX_SYNC_DONE;
 
-		dbcache_lock();
+		zbx_dbcache_lock();
 
-		hc_pop_items(&history_items);		/* select and take items out of history cache */
+		zbx_hc_pop_items(&history_items);		/* select and take items out of history cache */
 		history_num = history_items.values_num;
 
-		dbcache_unlock();
+		zbx_dbcache_unlock();
 
 		if (0 == history_num)
 			break;
 
-		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
+		zbx_hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 		proxy_prepare_history(history, history_items.values_num, &item_diff);
 
 		DBmass_proxy_add_history(history, history_num);
@@ -405,30 +404,30 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 		}
 
-		dbcache_lock();
+		zbx_dbcache_lock();
 
-		hc_push_items(&history_items);	/* return items to history cache */
+		zbx_hc_push_items(&history_items);	/* return items to history cache */
 
 		if (ZBX_DB_FAIL != txn_rc)
 		{
 			if (0 != item_diff.values_num)
 				zbx_dc_config_items_apply_changes(&item_diff);
 
-			dbcache_set_history_num(dbcache_get_history_num() - history_num);
+			zbx_dbcache_set_history_num(zbx_dbcache_get_history_num() - history_num);
 
-			if (0 != hc_queue_get_size())
+			if (0 != zbx_hc_queue_get_size())
 				*more = ZBX_SYNC_MORE;
 
-			dbcache_unlock();
+			zbx_dbcache_unlock();
 
 			*values_num += history_num;
 
-			hc_free_item_values(history, history_num);
+			zbx_hc_free_item_values(history, history_num);
 		}
 		else
 		{
 			*more = ZBX_SYNC_MORE;
-			dbcache_unlock();
+			zbx_dbcache_unlock();
 		}
 
 		zbx_vector_ptr_clear(&history_items);

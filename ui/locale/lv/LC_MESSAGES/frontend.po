@@ -458,6 +458,10 @@ msgstr ""
 msgid "API access"
 msgstr "API piekļuve"
 
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
 msgid "API methods"
@@ -1134,6 +1138,10 @@ msgstr "Uzlabotas etiķetes"
 msgid "Advanced options"
 msgstr "Pielāgotas opcijas"
 
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
@@ -1594,6 +1602,10 @@ msgstr "Plkst. (stunda:minūte)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Jābūt vismaz vienam LDAP serverim."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2122,6 +2134,18 @@ msgstr "CPU izmantošanas procents. Atgriež float"
 msgid "CRLF"
 msgstr "CRLF"
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr ""
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr "CSV uz JSON"
@@ -2570,6 +2594,11 @@ msgstr[0] "Nevar izdzēst API talonu"
 msgstr[1] "Nevar izdzēst API talonus"
 msgstr[2] "Nevar izdzēst API talonus"
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2609,6 +2638,10 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "Nevar izdzēst informācijas paneli"
 msgstr[1] "Nevar izdzēst informācijas paneļus"
 msgstr[2] "Nevar izdzēst informācijas paneļus"
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr ""
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3706,6 +3739,13 @@ msgstr ""
 msgid "Cannot rename guest user."
 msgstr "Nevar pārdēvēt viesu lietotāju."
 
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
 msgid "Cannot save discovery rule without checks."
@@ -4271,6 +4311,10 @@ msgstr "Mainīt"
 msgid "Change PSK"
 msgstr "Mainīt PSK"
 
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr ""
+
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
 #: widgets/item/includes/WidgetForm.php:252
@@ -4482,6 +4526,14 @@ msgstr "Noklikšķiniet un velciet līdz vajadzīgajam izmēram."
 msgid "Click to view or edit"
 msgstr "Noklikšķiniet, lai skatītu vai rediģētu"
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr ""
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr ""
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "Pulkstenis"
@@ -4565,6 +4617,10 @@ msgstr "Aizvērt problēmu"
 #: include/classes/helpers/CRoleHelper.php:547
 msgid "Close problems"
 msgstr "Aizvērt problēmas"
+
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr ""
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -5641,6 +5697,12 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS vārds"
 
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/maintenance.timeperiod.edit.php:80 app/views/popup.sla.edit.php:75
@@ -6005,6 +6067,10 @@ msgstr "Noklusējums (%1$s)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:145
 msgid "Default LDAP server must be specified."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
 msgstr ""
 
 #: app/views/administration.userrole.edit.php:143
@@ -7109,6 +7175,10 @@ msgstr ""
 msgid "Display graph"
 msgstr ""
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr ""
@@ -7262,6 +7332,10 @@ msgstr ""
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
 msgstr ""
 
 #: include/classes/api/services/CMap.php:614
@@ -7538,6 +7612,10 @@ msgstr ""
 msgid "Enable internal housekeeping"
 msgstr ""
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7777,6 +7855,10 @@ msgstr ""
 #: widgets/slareport/views/widget.view.php:103
 msgctxt "compact table header"
 msgid "Error budget"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
 msgstr ""
 
 #: include/db.inc.php:554
@@ -9055,6 +9137,10 @@ msgstr "Aparatūra (pilna informācija)"
 
 #: include/classes/data/CItemData.php:1313
 msgid "Hardware sensor reading. Returns float"
+msgstr ""
+
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
 msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:102
@@ -11178,6 +11264,11 @@ msgstr ""
 msgid "Invalid LDAP configuration"
 msgstr "Nederīga LDAP konfigurācija"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr ""
@@ -11973,6 +12064,10 @@ msgstr "LDAP Serveris"
 msgid "LDAP authentication"
 msgstr "LDAP autentifikācija"
 
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
 msgstr ""
@@ -12540,6 +12635,19 @@ msgstr "MD2"
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr ""
 
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr ""
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
 #: app/partials/hostmacros.list.html.php:36
@@ -12942,12 +13050,21 @@ msgstr ""
 msgid "Maximum concurrent checks"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
+msgstr ""
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
 msgstr ""
 
 #: app/partials/administration.system.info.php:149
@@ -13202,6 +13319,10 @@ msgstr "Ziņapmaiņa"
 
 #: include/classes/core/CJsonRpc.php:210
 msgid "Method not found."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
 msgstr ""
 
 #: include/httptest.inc.php:392
@@ -13476,6 +13597,23 @@ msgstr ""
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
+
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr ""
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr ""
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
@@ -13792,6 +13930,10 @@ msgstr ""
 
 #: app/views/popup.ldap.edit.php:315
 msgid "New LDAP server"
+msgstr ""
+
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
 msgstr ""
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
@@ -14431,6 +14573,10 @@ msgstr ""
 
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
 msgstr ""
 
 #: app/controllers/CControllerActionOperationCheck.php:141
@@ -15301,6 +15447,14 @@ msgstr "PHP ctype"
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "Trūkst PHP ctype paplašinājuma (PHP konfigurācijas parametrs --enable-ctype)."
 
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
 msgstr "PHP datubāzu atbalsts"
@@ -15810,6 +15964,10 @@ msgstr "Lūdzu, izveidojiet datu bāzi manuāli un iestatiet konfigurācijas par
 
 #: include/classes/setup/CSetupWizard.php:240
 msgid "Please enable \"allow_url_fopen\" directive."
+msgstr ""
+
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
 msgstr ""
 
 #: jsLoader.php:261
@@ -17004,6 +17162,10 @@ msgstr ""
 msgid "Reset"
 msgstr "Atiestatīt"
 
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr ""
+
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
 #: app/views/js/administration.housekeeping.edit.js.php:85
@@ -17679,6 +17841,10 @@ msgstr ""
 #: app/views/module.list.php:45
 msgid "Scan directory"
 msgstr "Skenēt direktoriju"
+
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -18516,6 +18682,10 @@ msgstr ""
 msgid "Show units"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr ""
@@ -18527,6 +18697,10 @@ msgstr "Parādīt darba laiku"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Parādīts"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -19080,6 +19254,10 @@ msgstr ""
 msgid "Submap"
 msgstr ""
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr ""
@@ -19251,6 +19429,21 @@ msgstr "TELNET aģents"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "KOPĀ"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19806,6 +19999,10 @@ msgstr ""
 
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
 msgstr ""
 
 #: app/views/administration.user.edit.php:288
@@ -20806,6 +21003,11 @@ msgstr ""
 msgid "Unable to retrieve TimescaleDB version."
 msgstr ""
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr ""
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "Nevar izvēlēties konfigurāciju."
@@ -21371,6 +21573,11 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1405
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
 msgstr ""
 
 #: app/controllers/CControllerUserProvision.php:61
@@ -22276,6 +22483,11 @@ msgstr "Vērtības"
 msgid "Values without names are not allowed in form fields."
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -22336,6 +22548,10 @@ msgstr ""
 
 #: include/items.inc.php:43
 msgid "Verbose"
+msgstr ""
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:655
@@ -22924,6 +23140,10 @@ msgstr ""
 #: include/classes/core/ZBase.php:758 include/func.inc.php:1685
 #, c-format
 msgid "You are logged in as \"%1$s\"."
+msgstr ""
+
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
 msgstr ""
 
 #: app/views/administration.gui.edit.php:69
@@ -23808,6 +24028,10 @@ msgstr "noklusētais"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
+msgstr ""
+
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
 msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:80
@@ -24701,6 +24925,10 @@ msgstr ""
 msgid "object does not exist, or you have no permissions to it"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
+msgstr ""
+
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
 msgstr "no"
@@ -24791,6 +25019,10 @@ msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
+msgstr ""
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903

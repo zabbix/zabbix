@@ -62,7 +62,7 @@ class JWT
         'RS256' => ['openssl', 'SHA256'],
         'RS384' => ['openssl', 'SHA384'],
         'RS512' => ['openssl', 'SHA512'],
-        'EdDSA' => ['sodium_crypto', 'EdDSA'],
+        'EdDSA' => ['sodium_crypto', 'EdDSA']
     ];
 
     /**

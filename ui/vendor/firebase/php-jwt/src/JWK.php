@@ -27,14 +27,14 @@ class JWK
     private const EC_CURVES = [
         'P-256' => '1.2.840.10045.3.1.7', // Len: 64
         'secp256k1' => '1.3.132.0.10', // Len: 64
-        'P-384' => '1.3.132.0.34', // Len: 96
+        'P-384' => '1.3.132.0.34' // Len: 96
         // 'P-521' => '1.3.132.0.35', // Len: 132 (not supported)
     ];
 
     // For keys with "kty" equal to "OKP" (Octet Key Pair), the "crv" parameter must contain the key subtype.
     // This library supports the following subtypes:
     private const OKP_SUBTYPES = [
-        'Ed25519' => true, // RFC 8037
+        'Ed25519' => true // RFC 8037
     ];
 
     /**
