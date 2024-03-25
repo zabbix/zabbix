@@ -257,7 +257,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
 		item->interfaceid_orig = 0;
-		switch (interface_type = get_interface_type_by_item_type(item->type))
+		switch (interface_type = zbx_get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
 			case INTERFACE_TYPE_OPT:

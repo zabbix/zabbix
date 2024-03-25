@@ -21,7 +21,7 @@
 
 #include "zbxcommon.h"
 
-static const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
+static const int	interface_type_priority[INTERFACE_TYPE_COUNT] =
 {
 	INTERFACE_TYPE_AGENT,
 	INTERFACE_TYPE_SNMP,
@@ -36,7 +36,7 @@ static const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-unsigned char	get_interface_type_by_item_type(unsigned char type)
+unsigned char	zbx_get_interface_type_by_item_type(unsigned char type)
 {
 	switch (type)
 	{
@@ -64,7 +64,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 
 int	zbx_get_interface_type_priority(int n)
 {
-	return INTERFACE_TYPE_PRIORITY[n];
+	return interface_type_priority[n];
 }
 
 const char	*zbx_interface_type_string(zbx_interface_type_t type)

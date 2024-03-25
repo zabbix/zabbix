@@ -873,7 +873,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		while (SUCCEED == ret && NULL != (trow = zbx_db_fetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
-			type = get_interface_type_by_item_type(type);
+			type = zbx_get_interface_type_by_item_type(type);
 
 			if (INTERFACE_TYPE_ANY == type)
 			{

@@ -43,6 +43,6 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 int	zbx_get_interface_type_priority(int n);
 
-unsigned char	get_interface_type_by_item_type(unsigned char type);
+unsigned char	zbx_get_interface_type_by_item_type(unsigned char type);
 
 #endif

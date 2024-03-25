@@ -5371,7 +5371,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			type = get_interface_type_by_item_type((unsigned char)atoi(row[1]));
+			type = zbx_get_interface_type_by_item_type((unsigned char)atoi(row[1]));
 
 			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN && type != INTERFACE_TYPE_OPT)
 			{
