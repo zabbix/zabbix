@@ -1009,7 +1009,7 @@ zbx_dc_config_t;
 zbx_dc_config_t	*get_dc_config(void);
 
 /* for cmocka */
-void	set_config(zbx_dc_config_t *in);
+void	set_dc_config(zbx_dc_config_t *in);
 
 #define	RDLOCK_CACHE	rdlock_cache()
 #define	WRLOCK_CACHE	wrlock_cache()

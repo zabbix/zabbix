@@ -139,7 +139,7 @@ zbx_dc_config_t	*get_dc_config(void)
 	return config;
 }
 
-void	set_config(zbx_dc_config_t *in)
+void	set_dc_config(zbx_dc_config_t *in)
 {
 	config = in;
 }

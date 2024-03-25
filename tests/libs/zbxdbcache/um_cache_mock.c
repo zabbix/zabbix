@@ -659,7 +659,7 @@ void	um_mock_config_init(void)
 
 	zbx_hashset_create(&config->gmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&config->hmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	set_config(config);
+	set_dc_config(config);
 }
 
 static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
