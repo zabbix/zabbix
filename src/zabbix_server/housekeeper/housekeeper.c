@@ -205,7 +205,8 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{.table = "trends_uint",	.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
 			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
 			.type = ITEM_VALUE_TYPE_UINT64},
-	{NULL, NULL, NULL, NULL, NULL, 0, {NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}, NULL}
+	{NULL, NULL, NULL, NULL, NULL, 0,
+			{NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL}, {NULL, 0, 0, NULL, NULL, NULL}}
 };
 
 static int	hk_history_rules_partition_is_table_name_excluded(const char *table_name)

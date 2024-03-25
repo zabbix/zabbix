@@ -591,7 +591,7 @@ const zbx_status_section_t	status_sections[] = {
 					{NULL, 0}
 				}
 			},
-			{NULL, 0, NULL}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
 	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -608,7 +608,7 @@ const zbx_status_section_t	status_sections[] = {
 					{NULL, 0}
 				}
 			},
-			{NULL, 0, {NULL, 0}}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
 	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -633,7 +633,7 @@ const zbx_status_section_t	status_sections[] = {
 					{NULL, 0}
 				}
 			},
-			{NULL, 0, {NULL, 0}}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
 	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -658,7 +658,7 @@ const zbx_status_section_t	status_sections[] = {
 					{NULL, 0}
 				}
 			},
-			{NULL, 0, {NULL, 0}}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
 	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&users_res,
@@ -675,7 +675,7 @@ const zbx_status_section_t	status_sections[] = {
 					{NULL, 0}
 				}
 			},
-			{NULL, 0, {NULL, 0}}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
 	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_SUPER_ADMIN,	NULL,
@@ -685,15 +685,15 @@ const zbx_status_section_t	status_sections[] = {
 					{NULL, 0}
 				}
 			},
-			{NULL, 0, {NULL, 0}}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
 	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
 		{
-			{NULL, 0, {NULL, 0}}
+			{NULL, 0, {{NULL, 0}}}
 		}
 	},
-	{NULL, 0, 0, NULL, {NULL, 0, {NULL, 0}}}
+	{NULL, 0, 0, NULL, {{NULL, 0, {{NULL, 0}}}}}
 };
 
 static void	server_stats_entry_export(struct zbx_json *json, const zbx_status_section_t *section)
