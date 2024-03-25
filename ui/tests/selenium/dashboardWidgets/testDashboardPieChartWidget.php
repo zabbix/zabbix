@@ -22,6 +22,10 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
+define('LOGIN', true);
+define('WITHOUT_LOGIN', false);
+define('DEFAULT_PAGE', null);
+
 /**
  * @backup widget
  *
@@ -38,6 +42,8 @@ class testDashboardPieChartWidget extends testWidgets {
 	const TYPE_DATA_SET_CLONE = 'Clone';
 	const HOST_NAME_ITEM_LIST = 'pie-chart-item-list';
 	const HOST_NAME_SCREENSHOTS = 'pie-chart-display';
+	const PAGE_1 = 'Page 1';
+	const PAGE_2 = 'Page 2';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -78,10 +84,10 @@ class testDashboardPieChartWidget extends testWidgets {
 			'auto_start' => 0,
 			'pages' => [
 				[
-					'name' => 'Page 1'
+					'name' => self::PAGE_1
 				],
 				[
-					'name' => 'Page 2',
+					'name' => self::PAGE_2,
 					'widgets' => [
 						[
 							'name' => 'Pie chart for simple update',
@@ -115,16 +121,6 @@ class testDashboardPieChartWidget extends testWidgets {
 			]
 		]);
 		self::$dashboard_id = $dashboards['dashboardids'][0];
-
-		// Create a disposable dashboard (this dashboard will have its data reset sometimes).
-		$dashboards = CDataHelper::call('dashboard.create', [
-			'name' => 'Disposable pie chart dashboard',
-			'auto_start' => 0,
-			'pages' => [
-				['name' => 'Page 1']
-			]
-		]);
-		self::$disposable_dashboard_id = $dashboards['dashboardids'][0];
 
 		// Create a host for Pie chart testing.
 		$response = CDataHelper::createHosts([
@@ -795,9 +791,12 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * Creates the base widget used for the update scenario.
 	 */
 	public function prepareUpdatePieChart(){
-		// Reset the "disposable" dashboard.
-		CDataHelper::call('dashboard.update', [
-			'dashboardid' => self::$disposable_dashboard_id,
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		// Create a dashboard with the widget for updating.
+		$response = CDataHelper::call('dashboard.create', [
+			'name' => 'Pie chart dashboard '.md5(serialize($data)),
 			'pages' => [
 				[
 					'widgets' => [
@@ -816,6 +815,7 @@ class testDashboardPieChartWidget extends testWidgets {
 				]
 			]
 		]);
+		self::$disposable_dashboard_id = $response['dashboardids'][0];
 	}
 
 	/**
@@ -833,15 +833,14 @@ class testDashboardPieChartWidget extends testWidgets {
 	 */
 	public  function testDashboardPieChartWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$page = 'Page 2';
-		$dashboard = $this->openDashboard(true, $page);
+		$dashboard = $this->openDashboard(LOGIN, self::PAGE_2);
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->getWidget('Pie chart for simple update')->edit();
 		$form->submit();
 		$dashboard->save();
 
 		// Assert that nothing changed.
-		$dashboard = $this->openDashboard(false, $page);
+		$dashboard = $this->openDashboard(WITHOUT_LOGIN, self::PAGE_2);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
@@ -947,8 +946,7 @@ class testDashboardPieChartWidget extends testWidgets {
 	public  function testDashboardPieChartWidget_Cancel($data) {
 		// Get DB hash and widget count.
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$page = 'Page 2';
-		$dashboard = $this->openDashboard(true, $page);
+		$dashboard = $this->openDashboard(LOGIN, self::PAGE_2);
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Edit data in widget's form.
@@ -989,7 +987,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		}
 
 		// Assert that widget count and DB data has not changed.
-		$dashboard = $this->openDashboard(false, $page);
+		$dashboard = $this->openDashboard(WITHOUT_LOGIN, self::PAGE_2);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
@@ -1002,7 +1000,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$widget_id = CDBHelper::getValue('SELECT widgetid FROM widget WHERE name='.zbx_dbstr($widget_name));
 
 		// Delete the widget and save the dashboard.
-		$dashboard = $this->openDashboard(true, 'Page 2');
+		$dashboard = $this->openDashboard(LOGIN, self::PAGE_2);
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$dashboard->edit()->deleteWidget($widget_name)->save();
 		$this->page->waitUntilReady();
@@ -1048,8 +1046,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		}
 
 		// Set the disposable dashboard to contain the needed widget.
-		CDataHelper::call('dashboard.update', [
-			'dashboardid' => self::$disposable_dashboard_id,
+		$response = CDataHelper::call('dashboard.create', [
+			'name' => 'Pie chart dashboard '.md5(serialize($data)),
 			'pages' => [
 				[
 					'widgets' => [
@@ -1065,6 +1063,7 @@ class testDashboardPieChartWidget extends testWidgets {
 				]
 			]
 		]);
+		self::$disposable_dashboard_id = $response['dashboardids'][0];
 	}
 
 	public function getPieChartDisplayData() {
@@ -1209,7 +1208,7 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		$this->openDashboard(true, null, self::$disposable_dashboard_id);
+		$this->openDashboard(LOGIN, DEFAULT_PAGE, self::$disposable_dashboard_id);
 		$widget = CDashboardElement::find()->one()->getWidget($data['widget_name']);
 
 		// Wait for the sector animation to end.
@@ -1285,13 +1284,13 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * @param string $update_widget_name    if this is set, then a widget named like this is updated
 	 */
 	protected function createUpdatePieChart($data, $update_widget_name = null) {
-		$id = $update_widget_name ? self::$disposable_dashboard_id : self::$dashboard_id;
-		$dashboard = $this->openDashboard(true, null, $id);
+		$dashboard_id = $update_widget_name ? self::$disposable_dashboard_id : self::$dashboard_id;
+		$dashboard = $this->openDashboard(LOGIN, DEFAULT_PAGE, $dashboard_id);
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $update_widget_name
 			? $dashboard->edit()->getWidget($update_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
-		$this->fillForm($form, $data['fields'], isset($update_widget_name));
+		$this->fillForm($form, $data['fields'], $update_widget_name !== null);
 		$form->submit();
 
 		// Assert the result.
@@ -1644,16 +1643,16 @@ class testDashboardPieChartWidget extends testWidgets {
 	 *
 	 * @param bool   $login          skips logging in if set to false
 	 * @param string $page           opens a page of this name if set
-	 * @param int    $dashboad_id    opens dashboard with this id
+	 * @param int    $dashboard_id    opens dashboard with this id
 	 *
 	 * @return CDashboardElement     dashboard element of the Pie chart dashboard
 	 */
-	protected function openDashboard($login = true, $page = null, $dashboad_id = null) {
+	protected function openDashboard($login = true, $page = null, $dashboard_id = null) {
 		if ($login) {
 			$this->page->login();
 		}
 
-		$id = $dashboad_id ? $dashboad_id : self::$dashboard_id;
+		$id = $dashboard_id === null ? self::$dashboard_id : $dashboard_id;
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.$id)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
