@@ -187,5 +187,7 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
 
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #endif
