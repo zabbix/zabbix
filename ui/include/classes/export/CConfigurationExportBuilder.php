@@ -141,8 +141,32 @@ class CConfigurationExportBuilder {
 			$store = [];
 
 			if ($type == XML_ARRAY) {
-				foreach ($rules as $tag => $rule) {
-					$value = self::buildArrayRow($rule, $row, $tag, $main_tag);
+				foreach ($rules as $tag => $tag_rules) {
+					while ($tag_rules['type'] & XML_MULTIPLE) {
+						$matched_multiple_rule = null;
+
+						foreach ($tag_rules['rules'] as $multiple_rule) {
+							if (self::multipleRuleMatched($multiple_rule, $row)) {
+								$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
+								$matched_multiple_rule =
+									$multiple_rule + array_intersect_key($tag_rules, array_flip(['default']));
+								break;
+							}
+						}
+
+						if ($matched_multiple_rule === null) {
+							// For use by developers. Do not translate.
+							throw new Exception('Incorrect XML_MULTIPLE validation rules.');
+						}
+
+						$tag_rules = $matched_multiple_rule;
+					}
+
+					if ($tag_rules['type'] & XML_IGNORE_TAG) {
+						continue;
+					}
+
+					$value = self::buildArrayRow($tag_rules, $row, $tag, $main_tag);
 
 					if ($value !== null) {
 						$store[$tag] = $value;
@@ -162,6 +186,22 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	private static function multipleRuleMatched(array $multiple_rule, array $data): bool {
+		if (array_key_exists('else', $multiple_rule)) {
+			return true;
+		}
+		elseif (is_array($multiple_rule['if'])) {
+			$field_name = $multiple_rule['if']['tag'];
+
+			return array_key_exists($data[$field_name], $multiple_rule['if']['in']);
+		}
+		elseif ($multiple_rule['if'] instanceof Closure) {
+			return call_user_func($multiple_rule['if'], $data);
+		}
+
+		return false;
 	}
 
 	/**

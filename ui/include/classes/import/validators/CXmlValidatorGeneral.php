@@ -166,17 +166,41 @@ abstract class CXmlValidatorGeneral {
 			}
 
 			// validation of the values type
-			foreach ($rules['rules'] as $tag => $rule) {
-				if (array_key_exists('import', $rule) && !$this->preview) {
-					$data[$tag] = call_user_func($rule['import'], $data);
+			foreach ($rules['rules'] as $tag => $tag_rules) {
+				while ($tag_rules['type'] & XML_MULTIPLE) {
+					$matched_multiple_rule = null;
+
+					foreach ($tag_rules['rules'] as $multiple_rule) {
+						if ($this->multipleRuleMatched($multiple_rule, $data, $rules['rules'])) {
+							$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
+							$matched_multiple_rule = $multiple_rule
+								+ array_intersect_key($tag_rules, array_flip(['default']));
+							break;
+						}
+					}
+
+					if ($matched_multiple_rule === null) {
+						// For use by developers. Do not translate.
+						throw new Exception('Incorrect XML_MULTIPLE validation rules.');
+					}
+
+					$tag_rules = $matched_multiple_rule;
+				}
+
+				if ($tag_rules['type'] & XML_IGNORE_TAG) {
+					continue;
+				}
+
+				if (array_key_exists('import', $tag_rules) && !$this->preview) {
+					$data[$tag] = call_user_func($tag_rules['import'], $data);
 				}
 
 				if (array_key_exists($tag, $data)) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->doValidateRecursive($rule, $data[$tag], $data, $subpath);
+					$this->doValidateRecursive($tag_rules, $data[$tag], $data, $subpath);
 				}
-				elseif (($rule['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $rule)
-						&& call_user_func($rule['ex_required'], $data))) {
+				elseif (($tag_rules['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $tag_rules)
+						&& call_user_func($tag_rules['ex_required'], $data))) {
 					throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $tag)
 					));
@@ -295,5 +319,26 @@ abstract class CXmlValidatorGeneral {
 		if (array_key_exists('in', $rules) && !in_array($value, array_values($rules['in']))) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
 		}
+	}
+
+	private function multipleRuleMatched(array $multiple_rule, array $data, array $rules): bool {
+		if (array_key_exists('else', $multiple_rule)) {
+			return true;
+		}
+		elseif (is_array($multiple_rule['if'])) {
+			$field_name = $multiple_rule['if']['tag'];
+
+			if (array_key_exists($field_name, $data)) {
+				return array_key_exists($data[$field_name], $multiple_rule['if']['in']);
+			}
+			elseif (array_key_exists('default', $rules[$field_name])) {
+				return array_key_exists($rules[$field_name]['default'], $multiple_rule['if']['in']);
+			}
+		}
+		elseif ($multiple_rule['if'] instanceof Closure) {
+			return call_user_func($multiple_rule['if'], $data);
+		}
+
+		return false;
 	}
 }
