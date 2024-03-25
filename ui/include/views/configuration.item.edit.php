@@ -565,7 +565,7 @@ $item_tab
 				'name' => 'master_itemid',
 				'object_name' => 'items',
 				'multiple' => false,
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'data' => ($data['master_itemid'] > 0)
 					? [
 						[

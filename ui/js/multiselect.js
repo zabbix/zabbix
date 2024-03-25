@@ -128,13 +128,22 @@
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				if (ms.options.disabled === true) {
-					$obj.removeAttr('aria-disabled');
-					$('.multiselect-list', $obj).removeClass('disabled');
+				if (ms.options.disabled === true || ms.options.readonly === true) {
+					if (ms.options.disabled === true) {
+						$obj.removeAttr('aria-disabled');
+						$('.multiselect-list', $obj).removeClass('disabled');
+
+						ms.options.disabled = false;
+					}
+					else {
+						$obj.removeAttr('aria-readonly');
+						$('.multiselect-list', $obj).removeAttr('aria-readonly');
+
+						ms.options.readonly = false;
+					}
+
 					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
 					$obj.append(makeMultiSelectInput($obj));
-
-					ms.options.disabled = false;
 
 					cleanSearch($obj);
 				}
@@ -158,6 +167,29 @@
 					$('input[type="text"]', $obj).remove();
 
 					ms.options.disabled = true;
+
+					cleanSearch($obj);
+				}
+			});
+		},
+
+		/**
+		 * Make multi select UI control readonly.
+		 *
+		 * @return jQuery
+		 */
+		readonly: function() {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
+
+				if (ms.options.readonly === false) {
+					$obj.attr('aria-readonly', true);
+					$('.multiselect-list', $obj).attr('aria-readonly', true);
+					$('.multiselect-button > button', $obj.parent()).prop('disabled', true);
+					$('input[type="text"]', $obj).remove();
+
+					ms.options.readonly = true;
 
 					cleanSearch($obj);
 				}
@@ -305,7 +337,8 @@
 	 * @param string options['placeholder']			set custom placeholder (optional)
 	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
-	 * @param bool   options['disabled']			turn on/off readonly state (optional)
+	 * @param bool   options['disabled']			turn on/off disabled state (optional)
+	 * @param bool   options['readonly']		    turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
@@ -346,6 +379,7 @@
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
+			readonly: false,
 			selectedLimit: 0,
 			limit: 20,
 			popup: {},
@@ -410,9 +444,15 @@
 
 			$obj.append($selected_div.append($selected_ul));
 
-			if (ms.options.disabled) {
-				$obj.attr('aria-disabled', true);
-				$selected_ul.addClass('disabled');
+			if (ms.options.disabled || ms.options.readonly) {
+				if (ms.options.disabled) {
+					$obj.attr('aria-disabled', true);
+					$selected_ul.addClass('disabled');
+				}
+				else {
+					$obj.attr('aria-readonly', true);
+					$selected_ul.attr('aria-readonly', true);
+				}
 			}
 			else {
 				$obj.append(makeMultiSelectInput($obj));
@@ -450,7 +490,7 @@
 					text: ms.options.labels['Select']
 				});
 
-				if (ms.options.disabled) {
+				if (ms.options.disabled || ms.options.readonly) {
 					ms.select_button.prop('disabled', true);
 				}
 
@@ -821,7 +861,7 @@
 						.append($('<span>')
 							.addClass('subfilter-disable-btn')
 							.on('click', function() {
-								if (!ms.options.disabled && !item_disabled) {
+								if (!ms.options.disabled && !item_disabled && !ms.options.readonly) {
 									removeSelected($obj, item.id);
 									if (isSearchFieldVisible($obj)) {
 										$('input[type="text"]', $obj)[0].focus({preventScroll:true});
@@ -833,7 +873,7 @@
 						)
 				)
 				.on('click', function() {
-					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1 && !ms.options.readonly) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
 

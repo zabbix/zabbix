@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.user.edit.common.js.php');
@@ -401,7 +402,7 @@ if ($data['action'] === 'user.edit') {
 		'object_name' => 'roles',
 		'data' => $data['role'],
 		'multiple' => false,
-		'disabled' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
+		'readonly' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'roles',

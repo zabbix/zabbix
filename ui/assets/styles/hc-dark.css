@@ -3406,6 +3406,10 @@ form.is-loading {
       background-color: #383838;
       color: #b5b5b5;
       -webkit-text-fill-color: #b5b5b5; }
+  .multiselect [aria-readonly] .subfilter-enabled,
+  .multiselect [aria-readonly] .subfilter-disable-btn {
+    cursor: default;
+    background-color: #383838; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -4248,7 +4252,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     background-color: transparent; }
 
 .radio-list-control input[type="radio"]:checked[readonly] + label, .radio-list-control input[type="radio"][readonly] + label, z-select[readonly] .focusable,
-.z-select[readonly] .focusable, input[readonly], textarea[readonly] {
+.z-select[readonly] .focusable, .multiselect[aria-readonly], input[readonly], textarea[readonly] {
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
   background-color: #000000;
