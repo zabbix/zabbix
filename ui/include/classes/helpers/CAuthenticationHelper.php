@@ -61,12 +61,7 @@ class CAuthenticationHelper {
 	public static function get(string $field): string {
 		if (!self::$params) {
 			self::$params = API::Authentication()->get([
-				'output' => [
-					'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-					'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
-					'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
-					'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
-				]
+				'output' => CAuthentication::getOutputFields()
 			]);
 
 			if (self::$params === false) {
