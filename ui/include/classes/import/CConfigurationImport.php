@@ -817,15 +817,6 @@ class CConfigurationImport {
 
 				$levels[$level] = true;
 
-				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-				];
-
-				if (!in_array($item['type'], $delay_types)) {
-					unset($item['delay']);
-				}
-
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
 
@@ -1079,12 +1070,6 @@ class CConfigurationImport {
 			}
 		}
 
-		$preprocessing_defaults = [
-			'params' => DB::getDefault('item_preproc', 'params'),
-			'error_handler' => DB::getDefault('item_preproc', 'error_handler'),
-			'error_handler_params' => DB::getDefault('item_preproc', 'error_handler_params')
-		];
-
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
@@ -1104,15 +1089,6 @@ class CConfigurationImport {
 				unset($discovery_rule['item_prototypes'], $discovery_rule['trigger_prototypes'],
 					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
 				);
-
-				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-				];
-
-				if (!in_array($discovery_rule['type'], $delay_types)) {
-					unset($discovery_rule['delay']);
-				}
 
 				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
@@ -1176,8 +1152,6 @@ class CConfigurationImport {
 
 						unset($preprocessing_step['parameters']);
 					}
-
-					$preprocessing_step += $preprocessing_defaults;
 				}
 				unset($preprocessing_step);
 

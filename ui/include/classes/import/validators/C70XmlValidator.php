@@ -96,8 +96,10 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
+		CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
 	];
 
 	private $PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET = [
