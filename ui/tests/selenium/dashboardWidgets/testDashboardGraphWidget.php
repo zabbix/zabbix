@@ -685,7 +685,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:lefty_min' => 'abc'
 					],
-					'error' => 'Invalid parameter "Left Y/Min": a number is expected.'
+					'error' => 'Invalid parameter "Left Y: Min": a number is expected.'
 				]
 			],
 			[
@@ -693,7 +693,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:lefty_max' => 'abc'
 					],
-					'error' => 'Invalid parameter "Left Y/Max": a number is expected.'
+					'error' => 'Invalid parameter "Left Y: Max": a number is expected.'
 				]
 			],
 			[
@@ -703,7 +703,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:lefty_max' => '5',
 						'id:lefty_units' => 'Auto'
 					],
-					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			[
@@ -714,7 +714,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:lefty_units' => 'Static',
 						'id:lefty_static_units' => 500
 					],
-					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			// Change default Y-axis option on Right.
@@ -728,7 +728,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:righty_min' => 'abc'
 					],
-					'error' => 'Invalid parameter "Right Y/Min": a number is expected.'
+					'error' => 'Invalid parameter "Right Y: Min": a number is expected.'
 				]
 			],
 			[
@@ -741,7 +741,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:righty_max' => 'abc'
 					],
-					'error' => 'Invalid parameter "Right Y/Max": a number is expected.'
+					'error' => 'Invalid parameter "Right Y: Max": a number is expected.'
 				]
 			],
 			[
@@ -757,7 +757,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_units' => 'Static',
 						'id:righty_static_units' => 500
 					],
-					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			[
@@ -772,7 +772,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '-10',
 						'id:righty_units' => 'Auto'
 					],
-					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			// Both axes validation.
@@ -793,8 +793,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => 'abc'
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Max": a number is expected.',
-						'Invalid parameter "Right Y/Max": a number is expected.'
+						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			],
@@ -817,8 +817,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '5'
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.',
-						'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+						'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.',
+						'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 					]
 				]
 			],
@@ -841,10 +841,10 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '('
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Min": a number is expected.',
-						'Invalid parameter "Left Y/Max": a number is expected.',
-						'Invalid parameter "Right Y/Min": a number is expected.',
-						'Invalid parameter "Right Y/Max": a number is expected.'
+						'Invalid parameter "Left Y: Min": a number is expected.',
+						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Min": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			]
