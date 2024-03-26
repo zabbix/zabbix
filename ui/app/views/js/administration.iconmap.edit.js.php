@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -28,7 +29,7 @@
 <?=
 	(new CRow([
 		(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CSpan(':'))->addClass('list-numbered-item'),
+		(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 		(new CSelect('iconmap[mappings][#{iconmappingid}][inventory_link]'))
 			->addOptions(CSelect::createOptionsFromArray($data['inventory_list']))
 			->setId('iconmap_mappings_#{iconmappingid}_inventory_link'),

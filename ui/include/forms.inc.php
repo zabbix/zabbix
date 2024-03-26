@@ -335,7 +335,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
-		->addClass('list-numbered')
+		->addClass(ZBX_STYLE_LIST_NUMBERED)
 		->setAttribute('data-readonly', $readonly)
 		->addItem(
 			(new CListItem([
@@ -714,7 +714,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
 						->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CDiv($preproc_types_select))
-						->addClass('list-numbered-item')
+						->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),

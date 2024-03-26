@@ -34,7 +34,7 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 			->setId($this->field->getName().'-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
-			->addClass('list-numbered')
+			->addClass(ZBX_STYLE_LIST_NUMBERED)
 			->setFooter(new CRow(
 				(new CCol(
 					(new CButtonLink(_('Add')))
@@ -111,7 +111,7 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 			new CTemplateTag($this->field->getName().'-row-tmpl',
 				(new CRow([
 					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CSpan(':'))->addClass('list-numbered-item'),
+					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 					(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
 						->addOptions(CSelect::createOptionsFromArray([
 							WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
