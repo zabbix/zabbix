@@ -60,9 +60,7 @@ class CAuthenticationHelper {
 	 */
 	public static function get(string $field): string {
 		if (!self::$params) {
-			self::$params = API::Authentication()->get([
-				'output' => CAuthentication::getOutputFields()
-			]);
+			self::$params = API::Authentication()->get(['output' => CAuthentication::getOutputFields()]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load authentication API parameters.'));
