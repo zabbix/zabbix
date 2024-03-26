@@ -879,7 +879,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
 		const char *config_listen_ip, int config_listen_port, const char *config_hostname,
 		const char *config_host_metadata, const char *config_host_metadata_item,
-		const char *config_host_interface, const char *config_host_interface_item, int config_buffer_send, int config_buffer_size)
+		const char *config_host_interface, const char *config_host_interface_item, int config_buffer_send,
+		int config_buffer_size)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;

@@ -80,8 +80,8 @@ static eventlog_result_t *new_eventlog_result(int slots)
 	return result;
 }
 
-static void add_eventlog_value(eventlog_result_t *result, const char *value, const char *source, int logeventid, int severity,
-	int timestamp, int state, zbx_uint64_t lastlogsize)
+static void add_eventlog_value(eventlog_result_t *result, const char *value, const char *source, int logeventid,
+		int severity, int timestamp, int state, zbx_uint64_t lastlogsize)
 {
 	eventlog_value_t *log;
 	log = (eventlog_value_t *)zbx_malloc(NULL, sizeof(eventlog_value_t));
@@ -101,7 +101,7 @@ static void add_eventlog_value(eventlog_result_t *result, const char *value, con
 }
 
 static int get_eventlog_value(eventlog_result_t *result, int index, char **value, char **source, int *logeventid,
-	 int *severity, int *timestamp, int *state, zbx_uint64_t *lastlogsize)
+		int *severity, int *timestamp, int *state, zbx_uint64_t *lastlogsize)
 {
 	eventlog_value_t *log;
 
