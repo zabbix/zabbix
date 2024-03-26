@@ -206,11 +206,32 @@ class CControllerTemplateCreate extends CController {
 	 */
 	private function copyFromCloneSourceTemplate(string $src_templateid, array $dst_template): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		return copyHttpTests($src_templateid, $dst_template['templateid'])
-			&& CItemHelper::cloneTemplateItems($src_templateid, $dst_template)
-			&& CTriggerHelper::cloneTemplateTriggers($src_templateid, $dst_template['templateid'])
-			&& CGraphHelper::cloneTemplateGraphs($src_templateid, $dst_template['templateid'])
-			&& CLldRuleHelper::cloneTemplateItems($src_templateid, $dst_template)
-			&& CTemplateHelper::cloneTemplateDashboards($src_templateid, $dst_template['templateid']);
+		if (!copyHttpTests($src_templateid, $dst_template['templateid'])
+			|| !CItemHelper::cloneTemplateItems($src_templateid, $dst_template)
+			|| !CTriggerHelper::cloneTemplateTriggers($src_templateid, $dst_template['templateid'])
+			|| !CGraphHelper::cloneTemplateGraphs($src_templateid, $dst_template['templateid'])
+			|| !CLldRuleHelper::cloneTemplateItems($src_templateid, $dst_template)) {
+			return false;
+		}
+
+		// Copy template dashboards.
+		$db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'templateids' => $src_templateid,
+			'selectPages' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		]);
+
+		if ($db_template_dashboards) {
+			$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards,
+				$dst_template['templateid']
+			);
+
+			if (!API::TemplateDashboard()->create($db_template_dashboards)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
