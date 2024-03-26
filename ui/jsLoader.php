@@ -360,6 +360,7 @@ $translate_strings = [
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Discovery' => _('Discovery'),
+		'Discovery rule' => _('Discovery rule'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),

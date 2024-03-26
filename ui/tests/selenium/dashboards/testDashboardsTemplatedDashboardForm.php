@@ -270,9 +270,22 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								]
 							],
 							[
+								'type' => 'piechart',
+								'name' => 'Pie chart widget',
+								'x' => 8,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
+									['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Item'],
+									['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF465C']
+								]
+							],
+							[
 								'type' => 'plaintext',
 								'name' => 'Plain text widget',
-								'x' => 8,
+								'x' => 12,
 								'y' => 8,
 								'width' => 4,
 								'height' => 4,
@@ -287,7 +300,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 12,
+								'x' => 16,
 								'y' => 8,
 								'width' => 4,
 								'height' => 4
@@ -295,7 +308,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 16,
+								'x' => 20,
 								'y' => 8,
 								'width' => 4,
 								'height' => 4
@@ -303,15 +316,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemsbysv',
 								'name' => 'Problems by severity widget',
-								'x' => 20,
-								'y' => 8,
+								'x' => 0,
+								'y' => 12,
 								'width' => 4,
 								'height' => 4
 							],
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 0,
+								'x' => 4,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4,
@@ -331,7 +344,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 4,
+								'x' => 8,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4
@@ -339,7 +352,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 8,
+								'x' => 12,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4,
@@ -354,7 +367,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 12,
+								'x' => 16,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4,
@@ -404,7 +417,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 16,
+								'x' => 20,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4
@@ -412,15 +425,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'trigover',
 								'name' => 'Trigger overview widget',
-								'x' => 20,
-								'y' => 12,
+								'x' => 0,
+								'y' => 16,
 								'width' => 4,
 								'height' => 4
 							],
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 0,
+								'x' => 4,
 								'y' => 16,
 								'width' => 4,
 								'height' => 4,
@@ -435,7 +448,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 4,
+								'x' => 8,
 								'y' => 16,
 								'width' => 4,
 								'height' => 4
@@ -443,7 +456,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'dataover',
 								'name' => 'Data overview widget',
-								'x' => 8,
+								'x' => 12,
 								'y' => 16,
 								'width' => 4,
 								'height' => 4
