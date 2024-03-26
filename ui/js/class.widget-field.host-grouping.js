@@ -69,7 +69,7 @@ class CWidgetFieldHostGrouping {
 					freeze_end: 1
 				}
 			})
-			.on("afteradd.dynamicRows, tableupdate.dynamicRows", () => this.#update());
+			.on('afteradd.dynamicRows, tableupdate.dynamicRows', () => this.#update());
 
 		this.#table.addEventListener('change', () => this.#update());
 	}
@@ -90,6 +90,6 @@ class CWidgetFieldHostGrouping {
 			tag_name_input.disabled = !is_tag_value;
 		});
 
-		this.#table.querySelector("#add-row").disabled = rows.length == this.#max_rows;
+		this.#table.querySelector('#add-row').disabled = rows.length == this.#max_rows;
 	}
 }
