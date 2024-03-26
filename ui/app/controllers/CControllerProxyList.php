@@ -190,9 +190,9 @@ class CControllerProxyList extends CController {
 
 		$server_status = CSettingsHelper::getServerStatus();
 
-		if (array_key_exists('version', $server_status) && $server_status['version'] !== '') {
-			$data['server_version'] = preg_split('/[a-z]/i', $server_status['version'], 2)[0];
-		}
+		$data['server_version'] = array_key_exists('version', $server_status) && $server_status['version'] !== ''
+			? preg_split('/[a-z]/i', $server_status['version'], 2)[0]
+			: '';
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));
