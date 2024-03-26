@@ -28,7 +28,7 @@
 #define	MAX_VALUE_LINES			1000
 #define	MAX_VALUE_LINES_MULTIPLIER	10
 
-/* NB! Next list must fit in unsigned char (see ZBX_ACTIVE_METRIC "flags" field below). */
+/* NB! Next list must fit in unsigned char (see zbx_active_metric_t "flags" field below). */
 #define ZBX_METRIC_FLAG_PERSISTENT	0x01	/* do not overwrite old values when adding to the buffer */
 #define ZBX_METRIC_FLAG_NEW		0x02	/* new metric, just added */
 #define ZBX_METRIC_FLAG_LOG_LOG		0x04	/* log[ or log.count[, depending on ZBX_METRIC_FLAG_LOG_COUNT */
@@ -65,8 +65,8 @@ typedef struct
 
 	int			timeout;
 }
-ZBX_ACTIVE_METRIC;
+zbx_active_metric_t;
 
-ZBX_PTR_VECTOR_DECL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
+ZBX_PTR_VECTOR_DECL(active_metrics_ptr, zbx_active_metric_t *)
 
 #endif

@@ -19,4 +19,4 @@
 
 #include "metrics.h"
 
-ZBX_PTR_VECTOR_IMPL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
+ZBX_PTR_VECTOR_IMPL(active_metrics_ptr, zbx_active_metric_t *)

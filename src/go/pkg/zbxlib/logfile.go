@@ -29,16 +29,16 @@ package zbxlib
 #include "zbx_item_constants.h"
 #include "../src/libs/zbxnix/fatal.h"
 
-typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
+typedef zbx_active_metric_t* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 typedef zbx_vector_pre_persistent_t * zbx_vector_pre_persistent_lp_t;
 
-ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
+zbx_active_metric_t *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
 {
-	ZBX_ACTIVE_METRIC *metric = malloc(sizeof(ZBX_ACTIVE_METRIC));
-	memset(metric, 0, sizeof(ZBX_ACTIVE_METRIC));
+	zbx_active_metric_t *metric = malloc(sizeof(zbx_active_metric_t));
+	memset(metric, 0, sizeof(zbx_active_metric_t));
 	metric->key = key;
 	// key_orig is used in error messages, consider using "itemid: <itemid>" instead of the key
 	metric->key_orig = zbx_strdup(NULL, key);
@@ -51,18 +51,18 @@ ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, in
 	return metric;
 }
 
-void metric_set_refresh(ZBX_ACTIVE_METRIC *metric, int refresh)
+void metric_set_refresh(zbx_active_metric_t *metric, int refresh)
 {
 	metric->refresh = refresh;
 }
 
-void metric_get_meta(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize, int *mtime)
+void metric_get_meta(zbx_active_metric_t *metric, zbx_uint64_t *lastlogsize, int *mtime)
 {
 	*lastlogsize = metric->lastlogsize;
 	*mtime = metric->mtime;
 }
 
-void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric)
+void metric_set_unsupported(zbx_active_metric_t *metric)
 {
 	metric->state = ITEM_STATE_NOTSUPPORTED;
 	metric->error_count = 0;
@@ -70,7 +70,7 @@ void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric)
 	metric->processed_bytes = 0;
 }
 
-int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
+int metric_set_supported(zbx_active_metric_t *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		zbx_uint64_t lastlogsize_last, int mtime_last)
 {
 	int	ret = FAIL;
@@ -95,7 +95,7 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 	return ret;
 }
 
-void	metric_free(ZBX_ACTIVE_METRIC *metric)
+void	metric_free(zbx_active_metric_t *metric)
 {
 	int	i;
 
@@ -211,7 +211,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #endif
 
 static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		int *mtime_sent, char **error, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, zbx_uint64_t itemid,
 		int config_buffer_send, int config_buffer_size, int config_max_lines_per_second)

@@ -225,11 +225,11 @@ static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *
 {
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*find_path = NULL, *file = NULL, *file_name;
+	char 			*find_path, *file = NULL, *file_name, *find_path;
 	wchar_t			*wfind_path = NULL;
 	int			ret = FAIL;
 
-	find_path = zbx_dsprintf(find_path, "%s\\*", path);
+	find_path = zbx_dsprintf(NULL, "%s\\*", path);
 	wfind_path = zbx_utf8_to_unicode(find_path);
 
 	if (INVALID_HANDLE_VALUE == (h_find = FindFirstFileW(wfind_path, &find_file_data)))

@@ -154,7 +154,7 @@ static void	init_active_metrics(int config_buffer_size)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
+static void	free_active_metric(zbx_active_metric_t *metric)
 {
 	zbx_free(metric->key);
 	zbx_free(metric->key_orig);
@@ -240,7 +240,7 @@ static int	get_min_nextcheck(void)
 
 	for (int i = 0; i < active_metrics.values_num; i++)
 	{
-		const ZBX_ACTIVE_METRIC	*metric = (const ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		const zbx_active_metric_t	*metric = (const zbx_active_metric_t *)active_metrics.values[i];
 
 		if (metric->nextcheck < min || -1 == min)
 			min = metric->nextcheck;
@@ -257,7 +257,7 @@ static int	get_min_nextcheck(void)
 static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime,
 		int timeout)
 {
-	ZBX_ACTIVE_METRIC	*metric;
+	zbx_active_metric_t	*metric;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d timeout:%d",
 			__func__, key, refresh, lastlogsize, mtime, timeout);
@@ -327,7 +327,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		goto out;
 	}
 
-	metric = (ZBX_ACTIVE_METRIC *)zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
+	metric = (zbx_active_metric_t *)zbx_malloc(NULL, sizeof(zbx_active_metric_t));
 
 	/* add new metric */
 	metric->key = zbx_strdup(NULL, key);
@@ -464,7 +464,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 				exp_delimiter, error[MAX_STRING_LEN];
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp, jp_data, jp_row;
-	ZBX_ACTIVE_METRIC	*metric;
+	zbx_active_metric_t	*metric;
 	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, timeout, i, j, ret = FAIL;
 	zbx_uint32_t		config_revision;
@@ -1500,7 +1500,7 @@ static void	process_remote_command_value(const char *value, zbx_uint64_t id, uns
 	zbx_vector_command_result_ptr_append(&command_results, result);
 }
 
-static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
+static int	need_meta_update(zbx_active_metric_t *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		unsigned char old_state, zbx_uint64_t lastlogsize_last, int mtime_last)
 {
 	int	ret = FAIL;
@@ -1530,7 +1530,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
+		zbx_vector_expression_t *regular_expressions, zbx_active_metric_t *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname, int config_buffer_send, int config_buffer_size,
@@ -1555,13 +1555,13 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 }
 #else
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_vector_expression_t *regexps, zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
 		int config_buffer_size, int config_eventlog_max_lines_per_second, char **error);
 #endif
 
-static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
+static int	process_common_check(zbx_vector_addr_ptr_t *addrs, zbx_active_metric_t *metric,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname, int config_buffer_send, int config_buffer_size, char **error)
 {
@@ -1700,7 +1700,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 	{
 		zbx_uint64_t		lastlogsize_last, lastlogsize_sent;
 		int			mtime_last, mtime_sent, ret;
-		ZBX_ACTIVE_METRIC	*metric = active_metrics.values[i];
+		zbx_active_metric_t	*metric = active_metrics.values[i];
 
 		if (metric->nextcheck > now)
 			continue;
@@ -1839,7 +1839,7 @@ static void	update_schedule(int delta)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		ZBX_ACTIVE_METRIC	*metric = active_metrics.values[i];
+		zbx_active_metric_t	*metric = active_metrics.values[i];
 		metric->nextcheck += delta;
 	}
 
