@@ -225,7 +225,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *
 {
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
-	char 			*find_path, *file = NULL, *file_name, *find_path;
+	char 			*file = NULL, *file_name, *find_path;
 	wchar_t			*wfind_path = NULL;
 	int			ret = FAIL;
 
