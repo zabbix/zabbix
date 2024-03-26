@@ -19,6 +19,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
