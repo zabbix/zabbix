@@ -23,7 +23,7 @@
 
 ZBX_PTR_VECTOR_IMPL(autoreg_host_ptr, zbx_autoreg_host_t*)
 
-int      zbx_autoreg_host_compare_func(const void *d1, const void *d2)
+int	zbx_autoreg_host_compare_func(const void *d1, const void *d2)
 {
 	const zbx_autoreg_host_t  *autoreg_host_1 = (const zbx_autoreg_host_t *)d1;
 	const zbx_autoreg_host_t  *autoreg_host_2 = (const zbx_autoreg_host_t *)d2;

@@ -30,4 +30,5 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		const zbx_events_funcs_t *events_cbs, int config_timeout,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb);
+
 #endif
