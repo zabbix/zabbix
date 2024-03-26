@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -316,6 +316,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -370,6 +376,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -400,6 +412,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Item value widget',
 					'copy to' => 'another dashboard'
 				]
@@ -425,6 +443,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Pie chart widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Honeycomb widget',
 					'copy to' => 'another template'
 				]
 			]

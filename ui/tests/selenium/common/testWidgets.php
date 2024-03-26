@@ -89,6 +89,21 @@ class testWidgets extends CWebTest {
 				// For Graph prototype only numeric item prototypes are available.
 				$item_types = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
 				break;
+
+			case 'Honeycomb':
+				$select_dialog = $widget_dialog->getFieldContainer('Item pattern');
+
+				// For Honeycomb widget all item types available.
+				$item_types = [
+					'Binary item',
+					'Character item',
+					'Float item',
+					'Log item',
+					'Text item',
+					'Unsigned item',
+					'Unsigned_dependent item'
+				];
+				break;
 		}
 
 		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
