@@ -54,4 +54,4 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO['SETTINGS']		= [];
 
 // If set to false, support for HTTP authentication will be disabled.
-// $ALLOW_HTTP_AUTH = true
+// $ALLOW_HTTP_AUTH = true;
