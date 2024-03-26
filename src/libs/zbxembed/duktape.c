@@ -20717,7 +20717,7 @@ DUK_EXTERNAL void *duk_require_buffer(duk_hthread *thr, duk_idx_t idx, duk_size_
 }
 
 /* Get the active buffer data area for a plain buffer or a buffer object.
- * Return NULL if the the value is not a buffer.  Note that a buffer may
+ * Return NULL if the value is not a buffer.  Note that a buffer may
  * have a NULL data pointer when its size is zero, the optional 'out_isbuffer'
  * argument allows caller to detect this reliably.
  */
@@ -57934,7 +57934,7 @@ DUK_INTERNAL duk_uint_fast32_t duk_hobject_pc2line_query(duk_hthread *thr, duk_i
  *      duk_tval copies is not problematic with respect to side effects;
  *      care must be taken when holding and using argument duk_tval pointers.
  *
- *    - If a finalizer is executed, it may operate on the the same object
+ *    - If a finalizer is executed, it may operate on the same object
  *      we're currently dealing with.  For instance, the finalizer might
  *      delete a certain property which has already been looked up and
  *      confirmed to exist.  Ideally finalizers would be disabled if GC

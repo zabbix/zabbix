@@ -210,7 +210,7 @@ LOGOUTREQUEST;
     }
 
     /**
-     * Gets the NameID Data of the the Logout Request.
+     * Gets the NameID Data of the Logout Request.
      *
      * @param string|DOMDocument $request Logout Request Message
      * @param string|null        $key     The SP key

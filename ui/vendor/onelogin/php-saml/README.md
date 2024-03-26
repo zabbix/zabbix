@@ -1268,7 +1268,7 @@ SAML 2 Logout Request class
  * `LogoutRequest` - Constructs the Logout Request object.
  * `getRequest` - Returns the Logout Request defated, base64encoded, unsigned
  * `getID` - Returns the ID of the Logout Request. (If you have the object you can access to the id attribute)
- * `getNameIdData` - Gets the NameID Data of the the Logout Request.
+ * `getNameIdData` - Gets the NameID Data of the Logout Request.
  * `getNameId` - Gets the NameID of the Logout Request.
  * `getIssuer` - Gets the Issuer of the Logout Request.
  * `getSessionIndexes` - Gets the SessionIndexes from the Logout Request.
