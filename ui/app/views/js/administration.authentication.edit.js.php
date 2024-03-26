@@ -38,7 +38,7 @@
 			this.ldap_jit_status = document.getElementById('ldap_jit_status');
 			this.ldap_servers_table = document.getElementById('ldap-servers');
 			this.templates = templates;
-			this.http_tab_visible = http_tab_visible;
+			this.is_http_auth_allowed = is_http_auth_allowed;
 			this.ldap_provisioning_fields = this.form.querySelectorAll(
 				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
 			);
