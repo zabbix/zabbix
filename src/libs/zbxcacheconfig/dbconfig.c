@@ -1635,9 +1635,13 @@ void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_
 	proxy->revision = revision;
 }
 
-static void	dc_host_set_proxy_group(ZBX_DC_HOST *host, zbx_uint64_t proxy_groupid, zbx_vector_objmove_t *pg_reloc)
+#define PG_HOST_RELOCATION_NOTIFY_DEFAULT	0
+#define PG_HOST_RELOCATION_NOTIFY_FORCE		1
+
+static void	dc_host_set_proxy_group(ZBX_DC_HOST *host, zbx_uint64_t proxy_groupid, int flags,
+		zbx_vector_objmove_t *pg_reloc)
 {
-	if (proxy_groupid != host->proxy_groupid)
+	if (proxy_groupid != host->proxy_groupid || PG_HOST_RELOCATION_NOTIFY_FORCE == flags)
 	{
 		if (NULL != pg_reloc)
 		{
@@ -1725,14 +1729,10 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 				if (0 != host->proxy_groupid)
 				{
-					/* force host-mapping upload to proxy through proxy group revision change */
-					zbx_dc_proxy_group_t	*pg;
-
-					if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(
-							&config->proxy_groups, &host->proxy_groupid)))
+					if (0 != host->proxy_groupid)
 					{
-						pg->revision = revision;
-						config->revision.proxy_group = revision;
+						dc_host_set_proxy_group(host, proxy_groupid,
+								PG_HOST_RELOCATION_NOTIFY_FORCE, pg_host_reloc);
 					}
 				}
 
@@ -1887,7 +1887,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		host->status = status;
 		host->monitored_by = monitored_by;
 
-		dc_host_set_proxy_group(host, proxy_groupid, pg_host_reloc);
+		dc_host_set_proxy_group(host, proxy_groupid, PG_HOST_RELOCATION_NOTIFY_DEFAULT, pg_host_reloc);
 	}
 
 	for (i = 0; i < proxy_hosts.values_num; i++)
@@ -1914,7 +1914,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		/* hosts */
 
 		/* clear proxy group and update tracking info */
-		dc_host_set_proxy_group(host, 0, pg_host_reloc);
+		dc_host_set_proxy_group(host, 0, PG_HOST_RELOCATION_NOTIFY_DEFAULT, pg_host_reloc);
 
 		if (HOST_STATUS_MONITORED == host->status || HOST_STATUS_NOT_MONITORED == host->status)
 		{

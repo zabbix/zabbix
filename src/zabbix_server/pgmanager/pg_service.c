@@ -52,16 +52,38 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 		ptr += zbx_deserialize_value(ptr, &srcid);
 		ptr += zbx_deserialize_value(ptr, &dstid);
 
-		if (0 != srcid)
+		if (srcid == dstid)
 		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &srcid)))
-				pg_cache_group_remove_host(pgs->cache, group, hostid);
-		}
+			/* handle host name change by re-assigning host to the same proxy */
+			/* causing its hostmap revision to change                         */
+			zbx_pg_host_t	*host;
+			zbx_pg_proxy_t	*proxy;
 
-		if (0 != dstid)
+			if (NULL == (host = (zbx_pg_host_t *)zbx_hashset_search(&pgs->cache->hostmap, &hostid)))
+				continue;
+
+			pg_cache_set_host_proxy(pgs->cache, hostid, host->proxyid);
+
+			if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies,
+					&host->hostid)) &&
+					NULL != proxy->group)
+			{
+				pg_cache_queue_group_update(pgs->cache, proxy->group);
+			}
+		}
+		else
 		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
-				pg_cache_group_add_host(pgs->cache, group, hostid);
+			if (0 != srcid)
+			{
+				if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &srcid)))
+					pg_cache_group_remove_host(pgs->cache, group, hostid);
+			}
+
+			if (0 != dstid)
+			{
+				if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&pgs->cache->groups, &dstid)))
+					pg_cache_group_add_host(pgs->cache, group, hostid);
+			}
 		}
 	}
 
