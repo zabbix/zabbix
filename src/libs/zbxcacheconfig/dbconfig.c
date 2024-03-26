@@ -9166,6 +9166,7 @@ static void	DCget_host(zbx_dc_host_t *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->proxyid = src_host->proxyid;
 	dst_host->proxy_groupid = src_host->proxy_groupid;
 	dst_host->status = src_host->status;
+	dst_host->monitored_by = src_host->monitored_by;
 
 	zbx_strscpy(dst_host->host, src_host->host);
 

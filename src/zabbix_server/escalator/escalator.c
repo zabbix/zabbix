@@ -1451,7 +1451,8 @@ fail:
 		{
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 			{
-				if (0 == host.proxyid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+				if (HOST_MONITORED_BY_SERVER == host.monitored_by ||
+						ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
@@ -1462,7 +1463,13 @@ fail:
 				}
 				else
 				{
-					if (0 == zbx_script_create_task(&script, &host, alertid, time(NULL)))
+					if (0 == host.proxyid)
+					{
+						zbx_snprintf(error, sizeof(error), "Host is monitored by proxy group, "
+								"but its proxy assignment is still pending.");
+						rc = FAIL;
+					}
+					else if (0 == zbx_script_create_task(&script, &host, alertid, time(NULL)))
 						rc = FAIL;
 				}
 			}

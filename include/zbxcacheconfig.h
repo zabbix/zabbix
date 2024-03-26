@@ -140,6 +140,7 @@ typedef struct
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[ZBX_HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[ZBX_HOST_IPMI_PASSWORD_LEN_MAX];
+	unsigned char	monitored_by;
 	unsigned char	status;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
