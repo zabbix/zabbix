@@ -17,18 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_ACTIVE_H
-#define ZABBIX_TRAPPER_ACTIVE_H
-
-#include "zbxcomms.h"
-#include "zbxjson.h"
-#include "zbxdbhigh.h"
 #include "zbxautoreg.h"
 
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_events_funcs_t *events_cbs,
-		int config_timeout, zbx_autoreg_update_host_func_t autoreg_update_host_cb);
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
-		const zbx_events_funcs_t *events_cbs, int config_timeout,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb);
+#include "zbxalgo.h"
 
-#endif
+ZBX_PTR_VECTOR_IMPL(autoreg_host_ptr, zbx_autoreg_host_t*)
+
+int	zbx_autoreg_host_compare_func(const void *d1, const void *d2)
+{
+	const zbx_autoreg_host_t  *autoreg_host_1 = (const zbx_autoreg_host_t *)d1;
+	const zbx_autoreg_host_t  *autoreg_host_2 = (const zbx_autoreg_host_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(autoreg_host_1->autoreg_hostid, autoreg_host_2->autoreg_hostid);
+
+	return 0;
+}

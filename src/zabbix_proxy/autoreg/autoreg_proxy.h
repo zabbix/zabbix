@@ -17,18 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_ACTIVE_H
-#define ZABBIX_TRAPPER_ACTIVE_H
+#ifndef ZABBIX_AUTOREG_PROXY_H
+#define ZABBIX_AUTOREG_PROXY_H
 
-#include "zbxcomms.h"
-#include "zbxjson.h"
 #include "zbxdbhigh.h"
-#include "zbxautoreg.h"
 
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_events_funcs_t *events_cbs,
-		int config_timeout, zbx_autoreg_update_host_func_t autoreg_update_host_cb);
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
-		const zbx_events_funcs_t *events_cbs, int config_timeout,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb);
+void	zbx_autoreg_update_host_proxy(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
+		int clock, const zbx_events_funcs_t *events_cbs);
 
 #endif
