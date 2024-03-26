@@ -33,21 +33,6 @@ class CAuthentication extends CApiService {
 	protected $tableAlias = 'c';
 
 	/**
-	 * @var array
-	 */
-	private const BASIC_OUTPUT_FIELDS = ['authentication_type', 'ldap_auth_enabled', 'ldap_case_sensitive',
-		'ldap_userdirectoryid', 'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
-		'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
-	];
-
-	/**
-	 * @var array
-	 */
-	private const HTTP_AUTH_OUTPUT_FIELDS = ['http_auth_enabled', 'http_login_form', 'http_strip_domains',
-		'http_case_sensitive'
-	];
-
-	/**
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -251,6 +236,13 @@ class CAuthentication extends CApiService {
 	public static function getOutputFields(): array {
 		global $ALLOW_HTTP_AUTH;
 
-		return $ALLOW_HTTP_AUTH ? self::BASIC_OUTPUT_FIELDS + self::HTTP_AUTH_OUTPUT_FIELDS : self::BASIC_OUTPUT_FIELDS;
+		$output_fields = ['authentication_type', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
+			'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
+			'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
+		];
+
+		$http_output_fields = ['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'];
+
+		return $ALLOW_HTTP_AUTH ? $output_fields + $http_output_fields : $output_fields;
 	}
 }
