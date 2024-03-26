@@ -31,7 +31,7 @@ class CControllerAuthenticationEdit extends CController {
 	 * @return bool
 	 */
 	protected function checkInput() {
-		global $HTTP_AUTH_VISIBLE;
+		global $ALLOW_HTTP_AUTH;
 
 		$fields = [
 			'form_refresh' =>					'int32',
@@ -71,7 +71,7 @@ class CControllerAuthenticationEdit extends CController {
 			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
 
-		if ($HTTP_AUTH_VISIBLE) {
+		if ($ALLOW_HTTP_AUTH) {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
@@ -99,7 +99,7 @@ class CControllerAuthenticationEdit extends CController {
 	}
 
 	protected function doAction() {
-		global $HTTP_AUTH_VISIBLE;
+		global $ALLOW_HTTP_AUTH;
 
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
@@ -107,7 +107,7 @@ class CControllerAuthenticationEdit extends CController {
 		$data = [
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
-			'http_auth_visible' => $HTTP_AUTH_VISIBLE,
+			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'form_refresh' => $this->getInput('form_refresh', 0)
@@ -128,7 +128,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::PASSWD_CHECK_RULES
 		];
 
-		if ($HTTP_AUTH_VISIBLE) {
+		if ($ALLOW_HTTP_AUTH) {
 			$auth_params = array_merge($auth_params, [
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,
@@ -174,7 +174,7 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_check_rules' => 0
 			];
 
-			if ($HTTP_AUTH_VISIBLE) {
+			if ($ALLOW_HTTP_AUTH) {
 				$config_fields += [
 					'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
 					'http_login_form' => DB::getDefault('config', 'http_login_form'),

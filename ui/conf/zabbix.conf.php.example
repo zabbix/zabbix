@@ -53,5 +53,5 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
 //$SSO['SETTINGS']		= [];
 
-// HTTP authentication setting is disabled in the frontend when set to false.
-// $HTTP_AUTH_VISIBLE = true;
+// If set to false, support for HTTP authentication will be disabled.
+// $ALLOW_HTTP_AUTH = true

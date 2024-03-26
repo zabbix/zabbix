@@ -190,8 +190,8 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
-		if (isset($HTTP_AUTH_VISIBLE)) {
-			$this->config['HTTP_AUTH_VISIBLE'] = $HTTP_AUTH_VISIBLE;
+		if (isset($ALLOW_HTTP_AUTH)) {
+			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
 		$this->makeGlobal();
@@ -201,7 +201,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$HTTP_AUTH_VISIBLE;
+			$ALLOW_HTTP_AUTH;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -210,7 +210,7 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
-		$HTTP_AUTH_VISIBLE = $this->config['HTTP_AUTH_VISIBLE'];
+		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 	}
 
 	public function save() {
@@ -308,8 +308,8 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 //$SSO[\'SETTINGS\']		= [];
 
-// HTTP authentication setting is disabled in the frontend when set to false.
-// $HTTP_AUTH_VISIBLE = true;
+// If set to false, support for HTTP authentication will be disabled.
+// $ALLOW_HTTP_AUTH = true;
 ';
 	}
 
@@ -342,7 +342,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
-		$this->config['HTTP_AUTH_VISIBLE'] = true;
+		$this->config['ALLOW_HTTP_AUTH'] = true;
 	}
 
 	protected function check() {

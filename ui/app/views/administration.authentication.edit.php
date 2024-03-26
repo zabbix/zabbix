@@ -514,7 +514,7 @@ $saml_tab = (new CFormGrid())
 		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab);
 
-	if ($data['http_auth_visible']) {
+	if ($data['is_http_auth_allowed']) {
 		// HTTP authentication fields.
 		$http_tab = (new CFormGrid())
 			->addItem([
@@ -653,7 +653,7 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		'saml_provision_groups' => $data['saml_provision_groups'],
 		'saml_provision_media' => $data['saml_provision_media'],
 		'templates' => $templates,
-		'http_tab_visible' => $data['http_auth_visible']
+		'is_http_auth_allowed' => $data['is_http_auth_allowed']
 	]).');'
 ))
 	->setOnDocumentReady()

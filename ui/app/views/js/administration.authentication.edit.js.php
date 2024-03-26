@@ -34,7 +34,7 @@
 		}
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates, http_tab_visible
+				saml_provision_media, templates, is_http_auth_allowed
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -68,7 +68,7 @@
 		_addEventListeners() {
 			this.#addLdapSettingsEventListeners();
 
-			if (this.http_tab_visible) {
+			if (this.is_http_auth_allowed) {
 				document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
 					this.form.querySelectorAll('[name^=http_]').forEach(field => {
 						if (!field.isSameNode(e.target)) {

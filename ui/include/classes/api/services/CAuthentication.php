@@ -35,10 +35,13 @@ class CAuthentication extends CApiService {
 	/**
 	 * @var array
 	 */
-	private $output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-		'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid', 'saml_auth_enabled',
-		'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval', 'saml_jit_status',
-		'ldap_jit_status', 'disabled_usrgrpid'
+	private array $output_fields = ['authentication_type', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
+		'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval',
+		'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
+	];
+
+	private array $http_auth_output_fields = ['http_auth_enabled', 'http_login_form',	'http_strip_domains',
+		'http_case_sensitive'
 	];
 
 	/**
@@ -49,10 +52,10 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options): array {
-		global $HTTP_AUTH_VISIBLE;
+		$output_fields = $this->getOutputFields();
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND]
+			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -60,7 +63,7 @@ class CAuthentication extends CApiService {
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $this->output_fields;
+			$options['output'] = $output_fields;
 		}
 
 		$db_auth = [];
@@ -71,10 +74,6 @@ class CAuthentication extends CApiService {
 		}
 		$db_auth = $this->unsetExtraFields($db_auth, ['configid'], []);
 
-		if (!$HTTP_AUTH_VISIBLE && array_key_exists('http_auth_enabled', $db_auth[0])) {
-			$db_auth[0]['http_auth_enabled'] = ZBX_AUTH_HTTP_DISABLED;
-		}
-
 		return $db_auth[0];
 	}
 
@@ -83,11 +82,19 @@ class CAuthentication extends CApiService {
 	 * required.
 	 */
 	public static function getPublic(): array {
-		$output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-			'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status', 'disabled_usrgrpid'
+		global $ALLOW_HTTP_AUTH;
+
+		$output_fields = ['authentication_type', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status',
+			'disabled_usrgrpid', 'http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'
 		];
 
-		return DB::select('config', ['output' => $output_fields])[0];
+		$db_auth = DB::select('config', ['output' => $output_fields])[0];
+
+		if (!$ALLOW_HTTP_AUTH) {
+			$db_auth['http_auth_enabled'] = (string) ZBX_AUTH_HTTP_DISABLED;
+		}
+
+		return $db_auth;
 	}
 
 	/**
@@ -130,14 +137,10 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	protected function validateUpdate(array $auth): array {
-		global $HTTP_AUTH_VISIBLE;
+		global $ALLOW_HTTP_AUTH;
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
-			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
-			'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
-			'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
-			'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_userdirectoryid' =>		['type' => API_ID],
@@ -151,21 +154,21 @@ class CAuthentication extends CApiService {
 			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])]
 		]];
 
+		if ($ALLOW_HTTP_AUTH) {
+			$api_input_rules += [
+				'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
+				'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
+				'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
+				'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
+			];
+		}
+
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!$HTTP_AUTH_VISIBLE) {
-			foreach (['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'] as $field) {
-				if (array_key_exists($field, $auth)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $field,
-						_('cannot update parameter due to frontend configuration')
-					));
-				}
-			}
-		}
+		$output_fields = $this->getOutputFields();
 
-		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 
 		$db_auth = DB::select('config', ['output' => $output_fields]);
@@ -235,5 +238,16 @@ class CAuthentication extends CApiService {
 		}
 
 		return $db_auth;
+	}
+
+	/**
+	 * Gets output fields based on if HTTP authentication support is enabled or not.
+	 *
+	 * @return array
+	 */
+	private function getOutputFields(): array {
+		global $ALLOW_HTTP_AUTH;
+
+		return $ALLOW_HTTP_AUTH ? $this->output_fields + $this->http_auth_output_fields : $this->output_fields;
 	}
 }
