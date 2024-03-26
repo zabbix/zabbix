@@ -146,7 +146,7 @@ class CAuthentication extends CApiService {
 		]];
 
 		if ($ALLOW_HTTP_AUTH) {
-			$api_input_rules += [
+			$api_input_rules['fields'] += [
 				'http_auth_enabled' =>		['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 				'http_login_form' =>		['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
 				'http_strip_domains' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
@@ -278,6 +278,6 @@ class CAuthentication extends CApiService {
 
 		$http_output_fields = ['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'];
 
-		return $ALLOW_HTTP_AUTH ? $output_fields + $http_output_fields : $output_fields;
+		return $ALLOW_HTTP_AUTH ? array_merge($output_fields, $http_output_fields) : $output_fields;
 	}
 }
