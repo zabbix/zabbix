@@ -1846,8 +1846,8 @@ class CScript extends CApiService {
 	/**
 	 * @param array $scripts
 	 *
-	 * @throws APIException if at least one script has execute_on parameter equal to Zabbix Server and global script
-	 * 						execution is disabled by Zabbix Server.
+	 * @throws APIException if at least one script has execute_on parameter equal to Zabbix server and global script
+	 * 						execution is disabled by Zabbix server.
 	 * @return void
 	 */
 	private static function checkScriptExecutionEnabled(array $scripts): void {
