@@ -38,7 +38,7 @@ class CWidgetFieldPatternSelectItemView extends CWidgetFieldPatternSelectView {
 		] + ($this->field->isTemplateDashboard()
 			? [
 				'hostid' => $this->field->getTemplateId(),
-				'hide_host_filter' => true,
+				'hide_host_filter' => true
 			]
 			: [
 				'real_hosts' => true
