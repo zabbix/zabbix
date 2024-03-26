@@ -63,16 +63,18 @@ func getSwapSize() (uint64, uint64, error) {
 	return uint64(info.Totalswap), uint64(info.Freeswap), nil
 }
 
-func getSwapPages() (r uint64, w uint64, data bool) {
+func getSwapPages() (uint64, uint64, bool) {
 	var err error
 	var file *os.File
 	var st uint8
 
 	file, err = os.Open(vmstatLocation)
 	if err != nil {
-		return
+		return 0, 0, false
 	}
 	defer file.Close()
+
+	var r, w uint64
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -87,16 +89,11 @@ func getSwapPages() (r uint64, w uint64, data bool) {
 		}
 
 		if st == 3 {
-			data = true
-			break
+			return r, w, true
 		}
 	}
 
-	if !data {
-		r, w = 0, 0
-	}
-
-	return
+	return 0, 0, false
 }
 
 func getSwapDevStats(swapdev string, rw bool) (uint64, uint64, bool) {
@@ -173,7 +170,10 @@ func getSwapDevStats(swapdev string, rw bool) (uint64, uint64, bool) {
 	return 0, 0, false
 }
 
-func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, gotData bool) {
+func getSwapStats(swapdev string, rw bool) (uint64, uint64, uint64, bool) {
+	var gotData bool
+	var io, sect, pag uint64
+
 	if len(swapdev) == 0 || swapdev == "all" {
 		swapdev = ""
 		if rw {
@@ -189,7 +189,7 @@ func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, 
 	var err error
 	file, err = os.Open(swapLocation)
 	if err != nil {
-		return
+		return 0, 0, pag, gotData
 	}
 	defer file.Close()
 
@@ -213,25 +213,25 @@ func getSwapStats(swapdev string, rw bool) (io uint64, sect uint64, pag uint64, 
 		}
 	}
 
-	return
+	return io, sect, pag, gotData
 }
 
-func getSwapStatsIn(swapdev string) (io uint64, sect uint64, pag uint64, err error) {
-	var gotData bool
-	io, sect, pag, gotData = getSwapStats(swapdev, false)
+func getSwapStatsIn(swapdev string) (uint64, uint64, uint64, error) {
+	io, sect, pag, gotData := getSwapStats(swapdev, false)
+
 	if !gotData {
-		err = errors.New("Cannot obtain swap information.")
+		return 0, 0, 0, errors.New("Cannot obtain swap information.")
 	}
 
-	return
+	return io, sect, pag, nil
 }
 
-func getSwapStatsOut(swapdev string) (io uint64, sect uint64, pag uint64, err error) {
-	var gotData bool
-	io, sect, pag, gotData = getSwapStats(swapdev, true)
+func getSwapStatsOut(swapdev string) (uint64, uint64, uint64, error) {
+	io, sect, pag, gotData := getSwapStats(swapdev, true)
+
 	if !gotData {
-		err = errors.New("Cannot obtain swap information.")
+		return 0, 0, 0, errors.New("Cannot obtain swap information.")
 	}
 
-	return
+	return io, sect, pag, nil
 }
