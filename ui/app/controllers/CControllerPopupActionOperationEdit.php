@@ -320,7 +320,8 @@ class CControllerPopupActionOperationEdit extends CController {
 
 			$operation_type_options[] = [
 				'value' => 'cmd['.$operation_type.']',
-				'name' => operation_type2str($operation_type)
+				'name' => operation_type2str($operation_type),
+				'has_warning' => false
 			];
 		}
 
