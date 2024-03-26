@@ -501,8 +501,12 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle,
 		zbx_pg_group_t *group)
 {
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name);
+
 	if (0 != group->unassigned_hostids.values_num)
-		return FAIL;
+		goto out;
 
 	int	 hosts_num = 0, proxies_num = 0;
 
@@ -514,7 +518,7 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 			continue;
 
 		if (0 == proxy->hosts.values_num && group->hostids.values_num > group->proxies.values_num)
-			return FAIL;
+			goto out;
 
 		hosts_num += proxy->hosts.values_num;
 		proxies_num++;
@@ -532,7 +536,8 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 	if (proxies_num < min_online)
 	{
 		/* no enough online proxies with supported version - treat the group as balanced */
-		return SUCCEED;
+		ret = SUCCEED;
+		goto out;
 	}
 
 	int	avg = hosts_num / proxies_num;
@@ -547,17 +552,21 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		if (PG_GROUP_UNBALANCE_LIMIT <= proxy->hosts.values_num - avg &&
 				PG_GROUP_UNBALANCE_FACTOR <= proxy->hosts.values_num / avg)
 		{
-			return FAIL;
+			goto out;
 		}
 
 		if (PG_GROUP_UNBALANCE_LIMIT <= avg - proxy->hosts.values_num &&
 				PG_GROUP_UNBALANCE_FACTOR <= avg / proxy->hosts.values_num)
 		{
-			return FAIL;
+			goto out;
 		}
 	}
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
