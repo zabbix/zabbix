@@ -40,7 +40,7 @@ class CSeverity extends CRadioButtonList {
 	 * @param string|int $value       Input element value.
 	 * @param string|null $class      List item class name.
 	 * @param string|null $on_change  Javascript handler for onchange event.
-	 * @param bool $disabled		  Disables the input element.
+	 * @param bool $disabled          Disables the input element.
 	 *
 	 * @return CSeverity
 	 */
