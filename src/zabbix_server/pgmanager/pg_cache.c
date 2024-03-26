@@ -242,6 +242,7 @@ static void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_proxy_t *p
 		zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
 
 	zbx_vector_pg_host_ptr_clear(&proxy->hosts);
+	proxy->group = NULL;
 
 	pg_cache_queue_group_update(cache, proxy->group);
 }
@@ -1007,12 +1008,8 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 			continue;
 		}
 
-		/* new proxies will have the same srcid and dstid and no old group needs to be updated */
-		if (reloc->srcid != reloc->dstid)
-		{
-			if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->srcid)))
-				pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_REASSIGNED_PROXY);
-		}
+		if (NULL != proxy->group)
+			pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_REASSIGNED_PROXY);
 
 		if (NULL != (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &reloc->dstid)))
 		{

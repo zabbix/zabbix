@@ -229,14 +229,14 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 			zbx_pg_proxy_t	proxy_local = {.proxyid = dc_proxy->proxyid};
 
 			proxy = (zbx_pg_proxy_t *)zbx_hashset_insert(proxies, &proxy_local, sizeof(proxy_local));
+			proxy->group = NULL;
 
 			zbx_vector_pg_host_ptr_create(&proxy->hosts);
 			zbx_vector_pg_host_create(&proxy->deleted_group_hosts);
 
-			/* add the same srcid and dstid to indicate that a new group is added */
 			zbx_objmove_t	reloc = {
 					.objid = proxy->proxyid,
-					.srcid = dc_proxy->proxy_groupid,
+					.srcid = 0,
 					.dstid = dc_proxy->proxy_groupid,
 				};
 
