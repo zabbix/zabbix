@@ -17,21 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AGENT_CONF_H
-#define ZABBIX_AGENT_CONF_H
+#include "metrics.h"
 
-#include "zbxcfg.h"
-void	load_aliases(char **lines);
-int	load_user_parameters(char **lines, char **err);
-int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg);
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
-		char **config_user_parameters);
-#ifdef _WINDOWS
-void	load_perf_counters(const char **def_lines, const char **eng_lines);
-#endif
-
-#ifdef _AIX
-void	tl_version(void);
-#endif
-
-#endif /* ZABBIX_AGENT_CONF_H */
+ZBX_PTR_VECTOR_IMPL(active_metrics_ptr, zbx_active_metric_t *)

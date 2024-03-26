@@ -1,6 +1,6 @@
 SUBDIRS = \
 	zbxcommon \
-	zbxconf \
+	zbxcfg \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhistory \
