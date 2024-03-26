@@ -150,7 +150,7 @@ class CAuthentication extends CApiService {
 				'http_auth_enabled' =>		['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 				'http_login_form' =>		['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
 				'http_strip_domains' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
-				'http_case_sensitive' =>	['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
+				'http_case_sensitive' =>	['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE]
 			];
 		}
 
