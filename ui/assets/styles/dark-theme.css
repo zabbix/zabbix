@@ -4165,6 +4165,9 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   color: #f2f2f2;
   background-color: transparent; }
 
+form.dashboard-widget-hostnavigator .host-grouping {
+  line-height: 1.4em; }
+
 div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
   display: flex;
   justify-content: flex-end;

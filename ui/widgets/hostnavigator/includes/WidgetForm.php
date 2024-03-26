@@ -55,6 +55,10 @@ class WidgetForm extends CWidgetForm {
 	public const GROUP_BY_TAG_VALUE = 1;
 	public const GROUP_BY_SEVERITY = 2;
 
+	private const LINES_MIN = 1;
+	private const LINES_MAX = 9999;
+	private const LINES_DEFAULT = 100;
+
 	public function addFields(): self {
 		return $this
 			->addField($this->isTemplateDashboard()
@@ -104,8 +108,8 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: (new CWidgetFieldIntegerBox('show_lines', _('Host limit'), 1, 9999))
-					->setDefault(ZBX_MAX_WIDGET_LINES)
+				: (new CWidgetFieldIntegerBox('show_lines', _('Host limit'), self::LINES_MIN, self::LINES_MAX))
+					->setDefault(self::LINES_DEFAULT)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(

@@ -461,8 +461,7 @@ class CMultiSelect extends CTag {
 			$is_valid = false;
 		}
 
-		if (!array_key_exists('submit_as', $field)
-			|| !is_string($field['submit_as']) || $field['submit_as'] === '') {
+		if (!array_key_exists('submit_as', $field) || !is_string($field['submit_as']) || $field['submit_as'] === '') {
 			error('invalid property: '.$path.'[\'submit_as\']');
 			$is_valid = false;
 		}

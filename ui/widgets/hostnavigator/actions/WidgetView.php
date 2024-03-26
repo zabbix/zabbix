@@ -52,9 +52,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if ($this->hasInput('with_config')) {
-			$data['vars']['config'] = $this->hasInput('widgetid')
-				? $this->getConfig($this->getInput('widgetid'))
-				: $this->getConfig();
+			$data['vars']['config'] = $this->getConfig($this->hasInput('widgetid')
+				? $this->getInput('widgetid')
+				: null
+			);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
@@ -69,27 +70,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$override_hostid = $this->fields_values['override_hostid'] ? $this->fields_values['override_hostid'][0] : '';
 
-		if ($this->isTemplateDashboard() && $override_hostid === '') {
+		if ($override_hostid === '' && $this->isTemplateDashboard()) {
 			return $no_data;
 		}
 
-		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-			? getSubGroups($this->fields_values['groupids'])
-			: null;
+		$is_show_in_maintenance_on = $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON;
 
-		$output = $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
+		$output = $is_show_in_maintenance_on
 			? ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status']
 			: ['hostid', 'name'];
 
 		$group_by_host_groups = false;
-		$group_by_severity = false;
-		$group_by_tags = false;
+		$group_by_severity = $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE;
 		$tags_to_keep = [];
 
 		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
 			switch ($group_by_attribute['attribute']) {
 				case WidgetForm::GROUP_BY_TAG_VALUE:
-					$group_by_tags = true;
 					$tags_to_keep[] = $group_by_attribute['tag_name'];
 					break;
 				case WidgetForm::GROUP_BY_HOST_GROUP:
@@ -101,11 +98,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
+		$hosts = [];
+
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
 			// Get hosts from host pattern and search narrowing criteria.
 			$hosts = API::Host()->get([
-				'output' => ['hostid'],
-				'groupids' => $groupids,
+				'output' => [],
+				'groupids' => $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null,
 				'evaltype' => $this->fields_values['host_tags_evaltype'],
 				'tags' => $this->fields_values['host_tags'] ?: null,
 				'search' => [
@@ -121,41 +120,33 @@ class WidgetView extends CControllerDashboardWidgetView {
 				return $no_data;
 			}
 
-			$hostids = array_keys($hosts);
-
 			// Get additional info for narrowed down hosts and filter them by status and maintenance status.
 			$hosts = API::Host()->get([
 				'output' => $output,
-				'hostids' => $hostids,
+				'hostids' => array_keys($hosts),
 				'filter' => [
 					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
 						: $this->fields_values['status'],
-					'maintenance_status' => $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
-						? null
-						: HOST_MAINTENANCE_STATUS_OFF
+					'maintenance_status' => $is_show_in_maintenance_on	? null : HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
-				'selectTags' => $group_by_tags ? ['tag', 'value'] : null,
+				'selectTags' => $tags_to_keep ? ['tag', 'value'] : null,
 				'sortfield' => 'name',
 				// Request more than the set limit to distinguish if there are even more hosts available.
 				'limit' => $this->fields_values['show_lines'] + 1
 			]);
 		}
-		else {
-			$hostid = $override_hostid !== '' ? $override_hostid : $this->getInput('templateid', '');
-
+		elseif ($override_hostid !== '') {
 			$hosts = API::Host()->get([
 				'output' => $output,
-				'hostids' => [$hostid],
+				'hostids' => [$override_hostid],
 				'severities' => $this->fields_values['severities'] ?: null,
 				'filter' => [
-					'maintenance_status' => $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON
-						? null
-						: HOST_MAINTENANCE_STATUS_OFF
+					'maintenance_status' => $is_show_in_maintenance_on ? null : HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
-				'selectTags' => $group_by_tags ? ['tag', 'value'] : null
+				'selectTags' => $tags_to_keep ? ['tag', 'value'] : null
 			]);
 		}
 
@@ -167,33 +158,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$this->isTemplateDashboard() && count($hosts) > $this->fields_values['show_lines']) {
 			$is_limit_exceeded = true;
+
 			array_pop($hosts);
 		}
 
-		if ($group_by_tags) {
-			foreach ($hosts as &$host) {
-				$host['tags'] = array_filter($host['tags'], function($tag) use ($tags_to_keep) {
-					return in_array($tag['tag'], $tags_to_keep);
-				});
-
-				// Reset array keys.
-				$host['tags'] = array_values($host['tags']);
-			}
-			unset($host);
-		}
-
-		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE || $group_by_severity) {
-			$hostids = [];
-
-			foreach ($hosts as $host) {
-				$hostids[] = $host['hostid'];
-			}
-
+		if ($group_by_severity) {
 			// Select triggers and problems to calculate number of problems for each host.
 			$triggers = API::Trigger()->get([
 				'output' => [],
 				'selectHosts' => ['hostid'],
-				'hostids' => $hostids,
+				'hostids' => array_column($hosts, 'hostid'),
 				'skipDependent' => true,
 				'monitored' => true,
 				'preservekeys' => true
@@ -217,52 +191,57 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$host_problems[$trigger_host['hostid']][$problem['severity']][$problem['eventid']] = true;
 				}
 			}
+		}
 
+		$maintenanceids = [];
+
+		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep) {
 			foreach ($hosts as &$host) {
-				// Fill empty arrays for hosts without problems.
-				if (!array_key_exists($host['hostid'], $host_problems)) {
-					$host_problems[$host['hostid']] = [];
+				if ($tags_to_keep) {
+					$host['tags'] = array_values(array_filter($host['tags'], function($tag) use ($tags_to_keep) {
+						return in_array($tag['tag'], $tags_to_keep);
+					}));
 				}
 
-				// Count the number of problems (as value) per severity (as key).
-				for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity <= TRIGGER_SEVERITY_DISASTER; $severity++) {
-					$host['problem_count'][$severity] = array_key_exists($severity, $host_problems[$host['hostid']])
-						? count($host_problems[$host['hostid']][$severity])
-						: 0;
+				if ($group_by_severity) {
+					$host['problem_count'] = array_fill(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT, 0);
+
+					// Count the number of problems (as value) per severity (as key).
+					if ($host_problems && array_key_exists($host['hostid'], $host_problems)) {
+						foreach ($host_problems[$host['hostid']] as $severity => $problems) {
+							$host['problem_count'][$severity] = count($problems);
+						}
+					}
+				}
+
+				if ($is_show_in_maintenance_on) {
+					if ($host['status'] == HOST_STATUS_MONITORED
+							&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+						$maintenanceids[$host['maintenanceid']] = true;
+					}
+					else {
+						unset($host['maintenanceid']);
+					}
+					unset($host['maintenance_status'], $host['status']);
 				}
 			}
 			unset($host);
 		}
 
-		$maintenances = [];
+		if ($maintenanceids) {
+			$maintenances = API::Maintenance()->get([
+				'output' => ['name', 'maintenance_type', 'description'],
+				'maintenanceids' => array_keys($maintenanceids),
+				'preservekeys' => true
+			]);
 
-		if ($this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON) {
-			$maintenanceids = [];
-
-			foreach ($hosts as &$host) {
-				if ($host['status'] == HOST_STATUS_MONITORED
-						&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-					$maintenanceids[$host['maintenanceid']] = true;
-				}
-				else {
-					unset($host['maintenanceid']);
-				}
-				unset($host['maintenance_status'], $host['status']);
+			foreach ($maintenances as &$maintenance) {
+				unset($maintenance['maintenanceid']);
 			}
-			unset($host);
-
-			if ($maintenanceids) {
-				$maintenances = API::Maintenance()->get([
-					'output' => ['name', 'maintenance_type', 'description'],
-					'maintenanceids' => array_keys($maintenanceids),
-					'preservekeys' => true
-				]);
-
-				foreach ($maintenances as &$maintenance) {
-					unset($maintenance['maintenanceid']);
-				}
-				unset($maintenance);
-			}
+			unset($maintenance);
+		}
+		else {
+			$maintenances = [];
 		}
 
 		return [

@@ -29,13 +29,14 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 	public const DEFAULT_VIEW = \CWidgetFieldHostGroupingView::class;
 	public const DEFAULT_VALUE = [];
+	public const MAX_ROWS = 10;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setValidationRules(['type' => API_OBJECTS, 'length' => 10, 'fields' => [
+			->setValidationRules(['type' => API_OBJECTS, 'length' => self::MAX_ROWS, 'fields' => [
 				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_TAG_VALUE, WidgetForm::GROUP_BY_SEVERITY])],
 				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()]
 			]]);
@@ -48,9 +49,21 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 			return $errors;
 		}
 
+		foreach ($this->getValue() as $value) {
+			if ($value['attribute'] != WidgetForm::GROUP_BY_TAG_VALUE) {
+				continue;
+			}
+
+			if ($value['tag_name'] === '') {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _s('tag cannot be empty'));
+
+				break;
+			}
+		}
+
 		$unique_groupings = [];
 
-		foreach ($this->getValue() as $key => $value) {
+		foreach ($this->getValue() as $value) {
 			$attribute = $value['attribute'];
 			$tag_name = $attribute == WidgetForm::GROUP_BY_TAG_VALUE ? $value['tag_name'] : '';
 
@@ -58,21 +71,15 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
 					_s('each "%1$s" can be used only once', _('Group by'))
 				);
+
+				break;
 			}
 			else {
 				$unique_groupings[$attribute] = $tag_name;
 			}
-
-			if ($attribute == WidgetForm::GROUP_BY_TAG_VALUE && $tag_name === '') {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _s('tag cannot be empty'));
-			}
 		}
 
-		if ($errors) {
-			return $errors;
-		}
-
-		return [];
+		return $errors;
 	}
 
 	public function toApi(array &$widget_fields = []): void {

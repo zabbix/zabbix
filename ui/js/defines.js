@@ -30,6 +30,7 @@ const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
 const ZBX_STYLE_ARROW_RIGHT = 'arrow-right';
 const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
 const ZBX_STYLE_COLLAPSED = 'collapsed';
+const ZBX_STYLE_DRAG_ICON = 'drag-icon';
 const ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';
 const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
