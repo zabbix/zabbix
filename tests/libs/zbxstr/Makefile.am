@@ -1,5 +1,3 @@
-#if SERVER
-#SERVER_tests = \
 BINARIES_tests = \
 	zbx_str_extract \
 	convert_to_utf8 \
@@ -7,11 +5,7 @@ BINARIES_tests = \
 	zbx_truncate_value \
 	zbx_dyn_escape_string \
 	zbx_ltrim_utf8 \
-	zbx_rtrim_utf8 \
-#endif
-
-#noinst_PROGRAMS = $(SERVER_tests)
-
+	zbx_rtrim_utf8
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -22,9 +16,15 @@ COMMON_SRC_FILES = \
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 COMMON_COMPILER_FLAGS = \
@@ -47,11 +47,11 @@ zbx_str_extract_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(T
 zbx_str_extract_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 convert_to_utf8_SOURCES = \
-     convert_to_utf8.c \
-     $(COMMON_SRC_FILES)
+	convert_to_utf8.c \
+	$(COMMON_SRC_FILES)
 
 convert_to_utf8_LDADD = \
-     $(COMMON_LIB_FILES)
+	$(COMMON_LIB_FILES)
 
 convert_to_utf8_LDADD += @SERVER_LIBS@
 

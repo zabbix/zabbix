@@ -21,9 +21,11 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
-#include "zbxnum.h"
 
-static void    zbx_log_impl(int level, const char *fmt, va_list args)
+#include "zbxcommon.h"
+#include <stdarg.h>
+
+static void	zbx_log_impl(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
 	ZBX_UNUSED(fmt);
@@ -34,13 +36,7 @@ ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_mock_progn
 
 void	zbx_mock_test_entry(void **state)
 {
-	int		expected_result, actual_result;
-	const char	*is_number;
-
 	ZBX_UNUSED(state);
-
-	is_number = zbx_mock_get_parameter_string("in.num");
-	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 }
