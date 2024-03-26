@@ -22,7 +22,7 @@
 
 window.operation_popup = new class {
 
-	init({eventsource, recovery_phase, data, warning_scripts, actionid}) {
+	init({eventsource, recovery_phase, data, scripts_with_warning, actionid}) {
 		this.recovery_phase = recovery_phase;
 		this.eventsource = eventsource;
 		this.overlay = overlays_stack.getById('operations');
@@ -31,7 +31,7 @@ window.operation_popup = new class {
 		this.actionid = actionid;
 		this.row_index = data.row_index;
 		this.data = data;
-		this.warning_scripts = warning_scripts;
+		this.scripts_with_warning = scripts_with_warning;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -52,18 +52,13 @@ window.operation_popup = new class {
 		this.#loadHostTags(this.data.optag);
 		this._removeAllFields();
 		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
+		this._toggleScriptWarningIconVisibility(operation_type);
 		this._changeView(operation_type);
 
 		document.querySelector('#operation-type-select').onchange = () => {
-			const operation_type = document.getElementById('operation-type-select').value;
+			const operation_type = document.getElementById('operation-type-select').getAttribute('value');
 
-			if (this.warning_scripts.length > 0) {
-				document.querySelector('#js-global-scripts-warning-icon')
-					.style.visibility = this.warning_scripts.includes(operation_type)
-						? 'visible'
-						: 'hidden';
-			}
-
+			this._toggleScriptWarningIconVisibility(operation_type);
 			this._removeAllFields();
 			this._changeView(operation_type);
 			this._processTypeOfCalculation();
@@ -94,6 +89,18 @@ window.operation_popup = new class {
 				e.target.closest('tr').remove();
 			}
 		});
+	}
+
+	/**
+	 * Show/hides warning icon for script operation type.
+	 *
+	 * @param {string} operation_type Type of operation selected.
+	 */
+	_toggleScriptWarningIconVisibility(operation_type) {
+		if (this.scripts_with_warning.length > 0) {
+			document.querySelector('.js-icon-scripts-warning-icon')
+				.style.display = this.scripts_with_warning.includes(operation_type)	? '' : 'none';
+		}
 	}
 
 	/**

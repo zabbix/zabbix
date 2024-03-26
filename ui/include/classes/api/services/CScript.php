@@ -256,7 +256,7 @@ class CScript extends CApiService {
 		}
 
 		self::checkUniqueness($scripts);
-		self::checkEnableGlobalScriptsAndExecuteOn($scripts);
+		self::checkScriptExecutionEnabled($scripts);
 		$this->checkDuplicates($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -331,7 +331,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$extend_fields = CSettingsHelper::getEnableGlobalScripts()
+		$extend_fields = CSettingsHelper::isGlobalScriptsEnabled()
 			? ['name', 'type', 'scope']
 			: ['name', 'type', 'scope', 'execute_on'];
 
@@ -349,7 +349,7 @@ class CScript extends CApiService {
 
 		self::checkUniqueness($scripts, $db_scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
-		self::checkEnableGlobalScriptsAndExecuteOn($scripts);
+		self::checkScriptExecutionEnabled($scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
@@ -917,7 +917,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!CSettingsHelper::getEnableGlobalScripts() && $db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+		if (!CSettingsHelper::isGlobalScriptsEnabled() && $db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 				&& ($db_scripts[0]['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
 					|| ($db_scripts[0]['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY && $db_hosts[0]['proxyid'] == 0))) {
 			self::exception(ZBX_API_ERROR_INTERNAL,
@@ -1850,13 +1850,13 @@ class CScript extends CApiService {
 	 * 						execution is disabled by Zabbix Server.
 	 * @return void
 	 */
-	private static function checkEnableGlobalScriptsAndExecuteOn(array $scripts): void {
-		if (!CSettingsHelper::getEnableGlobalScripts()) {
+	private static function checkScriptExecutionEnabled(array $scripts): void {
+		if (!CSettingsHelper::isGlobalScriptsEnabled()) {
 			foreach ($scripts as $script) {
 				if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 						&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', 'execute_on',
+						_s('Invalid parameter "%1$s": %2$s.', '/execute_on',
 							_('global script execution on Zabbix server is disabled by server configuration')
 						)
 					);

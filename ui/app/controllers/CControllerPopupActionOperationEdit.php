@@ -88,13 +88,13 @@ class CControllerPopupActionOperationEdit extends CController {
 		$recovery = (int) $this->getInput('recovery');
 		$operation_types = $this->popupConfigOperationTypes($eventsource, $recovery);
 
-		$warning_scripts = [];
+		$scripts_with_warning = [];
 
 		foreach ($operation_types as $type) {
 			$operation_type[$type['value']] = $type['name'];
 
-			if (!CSettingsHelper::getEnableGlobalScripts() && array_key_exists('warning', $type) && $type['warning']) {
-				$warning_scripts[] = $type['value'];
+			if ($type['has_warning']) {
+				$scripts_with_warning[] = $type['value'];
 			}
 		}
 
@@ -151,7 +151,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
-			'warning_scripts' => $warning_scripts,
+			'scripts_with_warning' => $scripts_with_warning,
 			'mediatype_options' => $media_types,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -334,7 +334,7 @@ class CControllerPopupActionOperationEdit extends CController {
 				CArrayHelper::sort($db_scripts, ['name']);
 
 				foreach ($db_scripts as $db_script) {
-					$warning = !CSettingsHelper::getEnableGlobalScripts()
+					$has_warning = !CSettingsHelper::isGlobalScriptsEnabled()
 						&& $db_script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 						&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
 							|| $db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY);
@@ -342,7 +342,7 @@ class CControllerPopupActionOperationEdit extends CController {
 					$operation_type_options[] = [
 						'value' => 'scriptid['.$db_script['scriptid'].']',
 						'name' => $db_script['name'],
-						'warning' => $warning
+						'has_warning' => $has_warning
 					];
 				}
 			}

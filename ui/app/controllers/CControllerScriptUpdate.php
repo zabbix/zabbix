@@ -69,11 +69,11 @@ class CControllerScriptUpdate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if (!CSettingsHelper::getEnableGlobalScripts()
+		if (!CSettingsHelper::isGlobalScriptsEnabled()
 				&& $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER) == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
-			$ret = false;
-
 			error(_('Global script execution on Zabbix server is disabled by server configuration'));
+
+			$ret = false;
 		}
 
 		if (!$ret) {

@@ -58,13 +58,11 @@ else {
 	]))->setId('operation-type');
 }
 
-if ($data['warning_scripts']) {
-	$icon_visibility = in_array($operationtype_value, $data['warning_scripts']) ? 'visible' : 'hidden';
-
+if ($data['scripts_with_warning']) {
 	$select_operationtype->addItem(
-		makeWarningIcon('Global script execution on Zabbix server is disabled by server configuration')
-			->setId('js-global-scripts-warning-icon')
-			->addStyle('visibility: '.$icon_visibility.';')
+		makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration'))
+			->addClass('js-icon-scripts-warning-icon')
+			->addStyle('display: none;')
 	);
 }
 
@@ -514,7 +512,7 @@ $output = [
 			'eventsource' => $data['eventsource'],
 			'recovery_phase' => $data['recovery'],
 			'data' => $operation,
-			'warning_scripts' => $data['warning_scripts'],
+			'scripts_with_warning' => $data['scripts_with_warning'],
 			'actionid' => $data['actionid']
 		]).');'
 ];

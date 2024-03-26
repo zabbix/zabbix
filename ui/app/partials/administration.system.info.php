@@ -133,7 +133,7 @@ if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info'
 	]);
 }
 
-if ($data['system_info']['enable_global_scripts'] === false) {
+if ($data['system_info']['is_global_scripts_enabled'] === false) {
 	$info_table->addRow([
 		_('Global scripts on Zabbix server'),
 		(new CSpan(_('Disabled'))),

@@ -190,7 +190,7 @@ class CSettingsHelper {
 		return self::$params_private[self::SERVER_STATUS];
 	}
 
-	public static function getEnableGlobalScripts(): bool {
+	public static function isGlobalScriptsEnabled(): bool {
 		return self::getServerStatus()['configuration']['enable_global_scripts'];
 	}
 }

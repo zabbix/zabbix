@@ -188,7 +188,7 @@ class CControllerScriptEdit extends CController {
 		$data['usergroups'] = array_column($usergroups, 'name', 'usrgrpid');
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
-		$data['global_scripts_enabled'] = CSettingsHelper::getEnableGlobalScripts();
+		$data['is_global_scripts_enabled'] = CSettingsHelper::isGlobalScriptsEnabled();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));
