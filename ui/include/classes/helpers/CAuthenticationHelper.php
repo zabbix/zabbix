@@ -40,6 +40,8 @@ class CAuthenticationHelper {
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
 	public const SAML_JIT_STATUS = 'saml_jit_status';
+	public const MFA_STATUS = 'mfa_status';
+	public const MFAID = 'mfaid';
 
 	private static $params = [];
 	private static $params_public = [];

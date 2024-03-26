@@ -35,6 +35,10 @@ class CUserGroup extends CApiService {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['usrgrpid', 'name'];
 
+	public const OUTPUT_FIELDS = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid',
+		'mfa_status', 'mfaid'
+	];
+
 	/**
 	 * Get user groups.
 	 *
@@ -64,7 +68,9 @@ class CUserGroup extends CApiService {
 		$defOptions = [
 			'usrgrpids'					=> null,
 			'userids'					=> null,
+			'mfaids'					=> null,
 			'status'					=> null,
+			'mfa_status'				=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -121,9 +127,21 @@ class CUserGroup extends CApiService {
 			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
 		}
 
+		if (!is_null($options['mfaids'])) {
+			zbx_value2array($options['mfaids']);
+
+			$sqlParts['where'][] = dbConditionId('g.mfaid', $options['mfaids']);
+		}
+
 		// status
 		if (!is_null($options['status'])) {
 			$sqlParts['where'][] = 'g.users_status='.zbx_dbstr($options['status']);
+		}
+
+		if (!is_null($options['mfa_status'])) {
+			zbx_value2array($options['mfa_status']);
+
+			$sqlParts['where'][] = dbConditionInt('g.mfa_status', $options['mfa_status']);
 		}
 
 		// filter
@@ -242,6 +260,11 @@ class CUserGroup extends CApiService {
 			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED]), 'default' => DB::getDefault('usrgrp', 'mfa_status')],
+			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
+											['else' => true, 'type' => API_ID, 'in' => '0']
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
@@ -267,6 +290,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
+		$this->checkMfaids($usrgrps);
 	}
 
 	/**
@@ -305,7 +329,7 @@ class CUserGroup extends CApiService {
 
 		$usrgrpids = array_column($usrgrps, 'usrgrpid');
 		$db_usrgrps = API::UserGroup()->get([
-			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
+			'output' => self::OUTPUT_FIELDS,
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
 		]);
@@ -322,7 +346,8 @@ class CUserGroup extends CApiService {
 		}
 
 		$names = [];
-		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
+		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access', 'mfa_status']);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'usrgrpid' =>				['type' => API_ID],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
@@ -353,6 +378,11 @@ class CUserGroup extends CApiService {
 			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED])],
+			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
+											['else' => true, 'type' => API_ID, 'in' => '0']
 			]]
 		]];
 
@@ -396,6 +426,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
+		$this->checkMfaids($usrgrps, $db_usrgrps);
 	}
 
 	/**
@@ -719,6 +750,8 @@ class CUserGroup extends CApiService {
 	 * @param array $db_usrgrps
 	 */
 	public static function updateForce($usrgrps, $db_usrgrps): void {
+		self::addFieldDefaultsByType($usrgrps, $db_usrgrps);
+
 		$upd_usrgrps = [];
 
 		foreach ($usrgrps as $usrgrp) {
@@ -743,6 +776,16 @@ class CUserGroup extends CApiService {
 		self::updateUsers($usrgrps, $db_usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+	}
+
+	private static function addFieldDefaultsByType(array &$usrgrps, array $db_usrgrps): void {
+		foreach ($usrgrps as &$usrgrp) {
+			if (array_key_exists('mfa_status', $usrgrp) && $usrgrp['mfa_status'] == GROUP_MFA_DISABLED
+					&& $db_usrgrps[$usrgrp['usrgrpid']]['mfaid'] != '0') {
+				$usrgrp['mfaid'] = '0';
+			}
+		}
+		unset($usrgrp);
 	}
 
 	/**
@@ -1581,6 +1624,42 @@ class CUserGroup extends CApiService {
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/userdirectoryid',
 						_('referred object does not exist')
 					)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Check for valid MFA method.
+	 *
+	 * @param array      $user_groups
+	 * @param array|null $db_user_groups
+	 *
+	 * @throws APIException
+	 */
+	private function checkMfaids(array $user_groups, array $db_user_groups = null): void {
+		foreach ($user_groups as $i => $user_group) {
+			if (!array_key_exists('mfaid', $user_group) || $user_group['mfaid'] == 0
+					|| ($db_user_groups !== null
+						&& bccomp($user_group['mfaid'], $db_user_groups[$user_group['usrgrpid']]['mfaid']) == 0)) {
+				unset($user_groups[$i]);
+			}
+		}
+
+		if (!$user_groups) {
+			return;
+		}
+
+		$db_mfas = DB::select('mfa', [
+			'output' => [],
+			'mfaids' => array_column($user_groups, 'mfaid'),
+			'preservekeys' => true
+		]);
+
+		foreach ($user_groups as $i => $user_group) {
+			if (!array_key_exists($user_group['mfaid'], $db_mfas)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/mfaid', _('object does not exist'))
 				);
 			}
 		}

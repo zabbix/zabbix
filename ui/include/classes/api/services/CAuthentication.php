@@ -72,8 +72,9 @@ class CAuthentication extends CApiService {
 	public static function getPublic(): array {
 		global $ALLOW_HTTP_AUTH;
 
-		$output_fields = ['authentication_type', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status',
-			'disabled_usrgrpid', 'http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'
+		$output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
+			'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive', 'saml_jit_status', 'disabled_usrgrpid',
+			'mfa_status', 'mfaid', 'ldap_userdirectoryid'
 		];
 
 		$db_auth = DB::select('config', ['output' => $output_fields])[0];
@@ -139,7 +140,9 @@ class CAuthentication extends CApiService {
 			'disabled_usrgrpid' =>			['type' => API_ID],
 			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'saml_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
-			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])]
+			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
+			'mfa_status' =>					['type' => API_INT32, 'in' => implode(',', [MFA_DISABLED, MFA_ENABLED])],
+			'mfaid' =>						['type' => API_ID]
 		]];
 
 		if ($ALLOW_HTTP_AUTH) {
@@ -225,7 +228,39 @@ class CAuthentication extends CApiService {
 			}
 		}
 
+		self::checkMfaExists($auth, $db_auth);
+		self::checkMfaid($auth, $db_auth);
+
 		return $db_auth;
+	}
+
+	private static function checkMfaExists(array $auth, array $db_auth): void {
+		if ($auth['mfa_status'] != $db_auth['mfa_status'] || $auth['mfa_status'] == MFA_ENABLED
+			|| $db_auth['mfaid'] != 0) {
+			$mfa_count = DB::select('mfa', ['countOutput' => true]);
+
+			if ($mfa_count == 0) {
+				static::exception(ZBX_API_ERROR_PARAMETERS, _('At least one MFA method must exist.'));
+			}
+		}
+	}
+
+	private static function checkMfaid(array $auth, array $db_auth): void {
+		$mfaid_changed = bccomp($auth['mfaid'], $db_auth['mfaid']) != 0;
+
+		if (($auth['mfa_status'] == MFA_DISABLED && $auth['mfaid'] != 0 && $mfaid_changed)
+			|| ($auth['mfa_status'] == MFA_ENABLED && ($mfaid_changed || $auth['mfaid'] == 0))) {
+			$db_mfas = DB::select('mfa', [
+				'output' => ['mfaid'],
+				'mfaids' => $auth['mfaid']
+			]);
+
+			if (!$db_mfas) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/mfaid',
+					_('object does not exist')
+				));
+			}
+		}
 	}
 
 	/**
@@ -238,7 +273,7 @@ class CAuthentication extends CApiService {
 
 		$output_fields = ['authentication_type', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
 			'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
-			'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
+			'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid','mfa_status', 'mfaid'
 		];
 
 		$http_output_fields = ['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'];

@@ -1,1 +1,0 @@
-A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins when visiting login page if guest account is disabled; removed automatic login as guest user when entering any page requiring authentication (vmaksimovs)

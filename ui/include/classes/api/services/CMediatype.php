@@ -492,7 +492,7 @@ class CMediatype extends CApiService {
 				switch ($type) {
 					case MEDIA_TYPE_EMAIL:
 						if (array_key_exists('smtp_authentication', $mediatype)
-								&& $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE) {
+								&& $mediatype['smtp_security'] == SMTP_SECURITY_NONE) {
 							$mediatype += [
 								'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
 								'smtp_verify_host' => $db_defaults['smtp_verify_host']
@@ -552,7 +552,7 @@ class CMediatype extends CApiService {
 					'smtp_helo' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
 					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
-					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_CONNECTION_SECURITY_NONE, SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])],
+					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_SECURITY_NONE, SMTP_SECURITY_STARTTLS, SMTP_SECURITY_SSL])],
 					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
 					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])],
 					'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))]
@@ -560,8 +560,8 @@ class CMediatype extends CApiService {
 
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication', 'provider']));
 
-				if ($mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
-						|| $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS) {
+				if ($mediatype['smtp_security'] == SMTP_SECURITY_STARTTLS
+						|| $mediatype['smtp_security'] == SMTP_SECURITY_SSL) {
 					$api_input_rules['fields'] += [
 						'smtp_verify_peer' =>	['type' => API_INT32, 'in' => '0,1'],
 						'smtp_verify_host' =>	['type' => API_INT32, 'in' => '0,1']
