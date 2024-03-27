@@ -1490,7 +1490,7 @@ class CDashboard {
 					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 				}
 
-				if ('reference' in fields) {
+				if ('reference' in fields && fields.reference === '') {
 					fields.reference = this._createReference();
 				}
 
