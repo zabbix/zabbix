@@ -1,14 +1,7 @@
 // Widget configuration.
 
 form.dashboard-widget-itemnavigator {
-	#tags_table_host_tags,
-	#tags_table_item_tags {
-		.form_row {
-			td:nth-child(3) {
-				input[type="text"] {
-					width: 159px !important;
-				}
-			}
-		}
+	.item-grouping {
+		line-height: $body-line-height;
 	}
 }

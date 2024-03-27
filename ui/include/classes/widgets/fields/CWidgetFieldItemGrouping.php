@@ -29,13 +29,14 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 
 	public const DEFAULT_VIEW = \CWidgetFieldItemGroupingView::class;
 	public const DEFAULT_VALUE = [];
+	public const MAX_ROWS = 10;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setValidationRules(['type' => API_OBJECTS, 'length' => 10, 'fields' => [
+			->setValidationRules(['type' => API_OBJECTS, 'length' => self::MAX_ROWS, 'fields' => [
 				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_HOST_NAME, WidgetForm::GROUP_BY_HOST_TAG, WidgetForm::GROUP_BY_ITEM_TAG])],
 				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()]
 			]]);
@@ -48,36 +49,38 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 			return $errors;
 		}
 
+		foreach ($this->getValue() as $value) {
+			if ($value['attribute'] == WidgetForm::GROUP_BY_HOST_GROUP
+					|| $value['attribute'] == WidgetForm::GROUP_BY_HOST_NAME) {
+				continue;
+			}
+
+			if ($value['tag_name'] === '') {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('tag cannot be empty'));
+
+				break;
+			}
+		}
+
 		$unique_groupings = [];
 
-		foreach ($this->getValue() as $key => $value) {
+		foreach ($this->getValue() as $value) {
 			$attribute = $value['attribute'];
 			$tag_name = $attribute == WidgetForm::GROUP_BY_HOST_TAG || $attribute == WidgetForm::GROUP_BY_ITEM_TAG
 				? $value['tag_name']
 				: '';
 
 			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
-					_s('row #%1$d is not unique', $key + 1)
-				);
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('rows must be unique'));
+
+				break;
 			}
 			else {
 				$unique_groupings[$attribute] = $tag_name;
 			}
-
-			if (($attribute == WidgetForm::GROUP_BY_HOST_TAG || $attribute == WidgetForm::GROUP_BY_ITEM_TAG)
-					&& $tag_name === '') {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'),
-					_s('row #%1$d tag cannot be empty', $key + 1)
-				);
-			}
 		}
 
-		if ($errors) {
-			return $errors;
-		}
-
-		return [];
+		return $errors;
 	}
 
 	public function toApi(array &$widget_fields = []): void {

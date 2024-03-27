@@ -89,7 +89,8 @@ class CControllerWidgetNavigationTreeToggle extends CController {
 					}
 
 					CProfile::update('web.dashboard.widget.open.'.$index, json_encode($group), PROFILE_TYPE_STR,
-						$widgetid);
+						$widgetid
+					);
 
 					$index++;
 				}

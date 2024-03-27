@@ -25,6 +25,8 @@ use Widgets\ItemNavigator\Includes\WidgetForm;
 
 class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 
+	public const ZBX_STYLE_ITEM_GROUPING = 'item-grouping';
+
 	public function __construct(CWidgetFieldItemGrouping $field) {
 		$this->field = $field;
 	}
@@ -32,7 +34,7 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 	public function getView(): CTable {
 		return (new CTable())
 			->setId($this->field->getName().'-table')
-			->addClass(ZBX_STYLE_TABLE_FORMS)
+			->addClass(self::ZBX_STYLE_ITEM_GROUPING)
 			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 			->addClass(ZBX_STYLE_LIST_NUMBERED)
 			->setFooter(new CRow(
@@ -45,64 +47,13 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 	}
 
 	public function getJavaScript(): string {
-		$field_name = $this->field->getName();
-		$group_by_host_tag = json_encode(WidgetForm::GROUP_BY_HOST_TAG);
-		$group_by_item_tag = json_encode(WidgetForm::GROUP_BY_ITEM_TAG);
-
 		return '
-			// Toggles tag name field visibility
-			function updateRowFieldVisibility(row) {
-				const attribute = row.querySelector("[name$=\"[attribute]\"]");
-				const tag_name_input = row.querySelector("input[name$=\"[tag_name]\"]");
-				const is_tag_attribute = (attribute.value == '.$group_by_host_tag.'
-					|| attribute.value == '.$group_by_item_tag.');
-
-				tag_name_input.style.display = is_tag_attribute ? "" : "none";
-				tag_name_input.disabled = !is_tag_attribute;
-			}
-
-			function updateAddButtonState(rows) {
-				document.querySelector("#add-row").disabled = rows.length == 10;
-			}
-
-			jQuery("#'.$field_name.'-table")
-				.dynamicRows({
-					template: "#'.$field_name.'-row-tmpl",
-					allow_empty: true,
-					rows: '.json_encode($this->field->getValue()).',
-					sortable: true,
-					sortable_options: {
-						target: "tbody",
-						selector_handle: ".'.ZBX_STYLE_DRAG_ICON.'",
-						freeze_end: 1
-					}
-				})
-				.on("afteradd.dynamicRows", e => {
-					updateRowFieldVisibility([...e.target.querySelectorAll(".form_row")].at(-1));
-				})
-				.on("tableupdate.dynamicRows", (e) => {
-					const rows = e.target.querySelectorAll(".form_row");
-
-					rows.forEach((row, index) => {
-						for (const field of row.querySelectorAll("[name^=\"'.$field_name.'[\"]")) {
-							field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
-						}
-					});
-
-					updateAddButtonState(rows);
-				});
-
-			document.querySelector("#'.$field_name.'-table").addEventListener("change", e => {
-				if (e.target.matches("[name$=\"[attribute]\"]")) {
-					updateRowFieldVisibility(e.target.closest(".form_row"));
-				}
-			});
-
-			// Update initial row field visibility and Add button state
-			const rows = document.querySelectorAll("#'.$field_name.'-table .form_row");
-
-			rows.forEach(updateRowFieldVisibility);
-			updateAddButtonState(rows);
+			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
+				new CWidgetFieldItemGrouping('.json_encode([
+				'field_name' => $this->field->getName(),
+				'field_value' => $this->field->getValue(),
+				'max_rows' => CWidgetFieldItemGrouping::MAX_ROWS
+			]).');
 		';
 	}
 
@@ -120,8 +71,8 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 							WidgetForm::GROUP_BY_ITEM_TAG => _('Item tag value')
 						]))
 						->setValue('#{attribute}')
-						->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
 						->setId($this->field->getName().'_#{rowNum}_attribute')
+						->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CCol(
 						(new CTextBox($this->field->getName().'[#{rowNum}][tag_name]', '#{tag_name}', false))

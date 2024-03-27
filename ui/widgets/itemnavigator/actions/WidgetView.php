@@ -51,9 +51,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if ($this->hasInput('with_config')) {
-			$data['vars']['config'] = $this->hasInput('widgetid')
-				? $this->getConfig($this->getInput('widgetid'))
-				: $this->getConfig();
+			$data['vars']['config'] = $this->getConfig($this->hasInput('widgetid')
+				? $this->getInput('widgetid')
+				: null
+			);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
@@ -68,18 +69,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$override_hostid = $this->fields_values['override_hostid'] ? $this->fields_values['override_hostid'][0] : '';
 
-		if ($this->isTemplateDashboard() && $override_hostid === '') {
+		if ($override_hostid === '' && $this->isTemplateDashboard()) {
 			return $no_data;
 		}
 
-		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-			? getSubGroups($this->fields_values['groupids'])
-			: null;
-
 		$group_by_host_groups = false;
-		$group_by_host_tags = false;
+		$group_by_host_name = false;
 		$host_tags_to_keep = [];
-		$group_by_item_tags = false;
 		$item_tags_to_keep = [];
 
 		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
@@ -87,12 +83,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				case WidgetForm::GROUP_BY_HOST_GROUP:
 					$group_by_host_groups = true;
 					break;
+				case WidgetForm::GROUP_BY_HOST_NAME:
+					$group_by_host_name = true;
+					break;
 				case WidgetForm::GROUP_BY_HOST_TAG:
-					$group_by_host_tags = true;
 					$host_tags_to_keep[] = $group_by_attribute['tag_name'];
 					break;
 				case WidgetForm::GROUP_BY_ITEM_TAG:
-					$group_by_item_tags = true;
 					$item_tags_to_keep[] = $group_by_attribute['tag_name'];
 					break;
 			}
@@ -110,7 +107,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
-			'selectTags' => $group_by_item_tags ? ['tag', 'value'] : null,
+			'selectTags' => $item_tags_to_keep ? ['tag', 'value'] : null,
 			'sortfield' => 'name',
 			'sortorder' => ZBX_SORT_UP
 		];
@@ -136,16 +133,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$limit = $this->fields_values['show_lines'];
 		$selected_items_cnt = 0;
 		$items = [];
+		$hosts = [];
 
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'groupids' => $groupids,
+				'output' => $group_by_host_name ? ['hostid', 'name'] : [],
+				'groupids' => $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null,
 				'hostids' => $this->fields_values['hostids'] ?: null,
 				'evaltype' => $this->fields_values['host_tags_evaltype'],
 				'tags' => $this->fields_values['host_tags'] ?: null,
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
-				'selectTags' => $group_by_host_tags ? ['tag', 'value'] : null,
+				'selectTags' => $host_tags_to_keep ? ['tag', 'value'] : null,
 				'preservekeys' => true,
 				'sortfield' => 'name',
 			]);
@@ -155,7 +153,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			foreach ($hosts as $hostid => $host) {
-				if ($selected_items_cnt > $limit + 1) {
+				if ($selected_items_cnt == $limit + 1) {
 					unset($hosts[$hostid]);
 					break;
 				}
@@ -165,26 +163,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				$options['hostids'] = [$hostid];
 
-				$items += API::Item()->get($options);
+				$items = array_merge($items, API::Item()->get($options));
 
 				$selected_items_cnt += count($items);
 			}
 		}
-		else {
-			$hostid = $override_hostid !== '' ? $override_hostid : $this->getInput('templateid', '');
-
+		elseif ($override_hostid !== '') {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'hostids' => [$hostid],
+				'output' => $group_by_host_name ? ['hostid', 'name'] : [],
+				'hostids' => [$override_hostid],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
-				'selectTags' => $group_by_host_tags ? ['tag', 'value'] : null
+				'selectTags' => $host_tags_to_keep ? ['tag', 'value'] : null
 			]);
 
 			if (!$hosts) {
 				return $no_data;
 			}
 
-			$options['hostids'] = [$hostid];
+			$options['hostids'] = [$override_hostid];
 			$options['limit'] = $limit + 1;
 
 			$items = API::Item()->get($options);
@@ -198,6 +194,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (count($items) > $limit) {
 			$is_limit_exceeded = true;
+
 			array_pop($items);
 		}
 
@@ -205,25 +202,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 		}
 
-		if ($group_by_item_tags) {
-			self::filterTags($items, $item_tags_to_keep);
-		}
-
-		if ($group_by_host_tags) {
+		if ($host_tags_to_keep) {
 			self::filterTags($hosts, $host_tags_to_keep);
 		}
 
+		if ($item_tags_to_keep) {
+			self::filterTags($items, $item_tags_to_keep);
+		}
+
 		if ($this->fields_values['problems'] !== WidgetForm::PROBLEMS_NONE) {
-			$itemids = [];
-
-			foreach ($items as $item) {
-				$itemids[] = $item['itemid'];
-			}
-
 			$triggers = API::Trigger()->get([
 				'output' => [],
 				'selectItems' => ['itemid'],
-				'itemids' => $itemids,
+				'itemids' => array_column($items, 'itemid'),
 				'skipDependent' => true,
 				'monitored' => true,
 				'preservekeys' => true
@@ -247,16 +238,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			foreach ($items as &$item) {
-				// Fill empty arrays for items without problems.
-				if (!array_key_exists($item['itemid'], $item_problems)) {
-					$item_problems[$item['itemid']] = [];
-				}
+				$item['problem_count'] = array_fill(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT, 0);
 
 				// Count the number of problems (as value) per severity (as key).
-				for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity <= TRIGGER_SEVERITY_DISASTER; $severity++) {
-					$item['problem_count'][$severity] = array_key_exists($severity, $item_problems[$item['itemid']])
-						? count($item_problems[$item['itemid']][$severity])
-						: 0;
+				if ($item_problems && array_key_exists($item['itemid'], $item_problems)) {
+					foreach ($item_problems[$item['itemid']] as $severity => $problems) {
+						$item['problem_count'][$severity] = count($problems);
+					}
 				}
 			}
 			unset($item);
