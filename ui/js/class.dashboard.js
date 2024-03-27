@@ -1485,7 +1485,7 @@ class CDashboard {
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
-				if (type !== this._widget_last_type) {
+				if (type !== this._widget_last_type && widget?.getType() !== type) {
 					this._widget_last_type = type;
 					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 				}
