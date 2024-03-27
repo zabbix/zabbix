@@ -36,6 +36,7 @@ const (
 	keyReplicationDiscovery   = "mysql.replication.discovery"
 	keyReplicationSlaveStatus = "mysql.replication.get_slave_status"
 	keyStatusVars             = "mysql.get_status_variables"
+	keyShowVars               = "mysql.get_show_variables"
 	keyVersion                = "mysql.version"
 
 	uriParam        = "URI"
@@ -143,6 +144,8 @@ func getHandlerFunc(key string) handlerFunc {
 		return replicationSlaveStatusHandler
 	case keyStatusVars:
 		return statusVarsHandler
+	case keyShowVars:
+		return showVarsHandler
 	case keyVersion:
 		return versionHandler
 	default:
