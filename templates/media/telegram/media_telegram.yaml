@@ -1,85 +1,94 @@
 zabbix_export:
-  version: '7.0'
+  version: '6.4'
   media_types:
-    -
+    - 
       name: Telegram
       type: WEBHOOK
       parameters:
-        -
-          name: Message
+        - name: event_tags
+          value: '{EVENT.TAGSJSON}'
+        - name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        - name: event_value
+          value: '{EVENT.VALUE}'
+        - name: Message
           value: '{ALERT.MESSAGE}'
-        -
-          name: ParseMode
-          value: ''
-        -
-          name: Subject
+        - name: ParseMode
+          value: markdown
+        - name: Subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: To
-          value: '{ALERT.SENDTO}'
-        -
-          name: Token
-          value: '<PLACE YOUR TOKEN>'
+        - name: To
+          value: 'channel'
+        - name: Token
+          value: 'Put token here'
       script: |
-        var Telegram = {
+        var
+            Telegram = {
             token: null,
             to: null,
             message: null,
             proxy: null,
             parse_mode: null,
-        
-            escapeMarkup: function (str, mode) {
-                switch (mode) {
-                    case 'markdown':
-                        return str.replace(/([_*\[`])/g, '\\$&');
-        
-                    case 'markdownv2':
-                        return str.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$&');
 
-                    case 'html':
-                        return str.replace(/<(\s|[^a-z\/])/g, '&lt;$1');
-        
-                    default:
-                        return str;
-                }
-            },
-        
-            sendMessage: function () {
+            newMessage: function () {
                 var params = {
                     chat_id: Telegram.to,
                     text: Telegram.message,
                     disable_web_page_preview: true,
-                    disable_notification: false
+                    disable_notification: false,
+                    // parse_mode: 'MarkdownV2'
                 },
-                data,
-                response,
-                request = new HttpRequest(),
-                url = 'https://api.telegram.org/bot' + Telegram.token + '/sendMessage';
-        
-                if (Telegram.parse_mode !== null) {
-                    params['parse_mode'] = Telegram.parse_mode;
-                }
-        
-                if (Telegram.proxy) {
-                    request.setProxy(Telegram.proxy);
-                }
-        
-                request.addHeader('Content-Type: application/json');
+                data;
+
                 data = JSON.stringify(params);
-        
-                // Remove replace() function if you want to see the exposed token in the log file.
-                Zabbix.log(4, '[Telegram Webhook] URL: ' + url.replace(Telegram.token, '<TOKEN>'));
-                Zabbix.log(4, '[Telegram Webhook] params: ' + data);
-                response = request.post(url, data);
-                Zabbix.log(4, '[Telegram Webhook] HTTP code: ' + request.getStatus());
-        
-                try {
-                    response = JSON.parse(response);
-                }
-                catch (error) {
-                    response = null;
-                }
-        
+
+                return telegramMessage('sendMessage', data);
+            },
+
+            editMessage: function () {
+                var params = {
+                    chat_id: Telegram.to,
+                    text: Telegram.message,
+                    disable_web_page_preview: true,
+                    disable_notification: false,
+                    message_id: Telegram.message_id,
+                    // parse_mode: 'MarkdownV2'
+                },
+                data;
+
+                data = JSON.stringify(params);
+
+                telegramMessage('editMessageText', data);
+            }
+        };
+
+        function isProblem(params) {
+            return params.event_value == 1 && params.event_update_status == 0;
+        }
+
+        function isResolve(params) {
+            return params.event_value == 0;
+        }
+
+        function telegramMessage (action, data) {
+            var request = new HttpRequest(),
+                url = 'https://api.telegram.org/bot' + Telegram.token + '/'+action,
+                result = { tags: {} };
+
+            if (Telegram.parse_mode !== null) {
+                params['parse_mode'] = Telegram.parse_mode;
+            }
+
+            if (Telegram.proxy) {
+                request.setProxy(Telegram.proxy);
+            }
+
+            request.addHeader('Content-Type: application/json');
+
+            response = request.post(url, data);
+
+            try {
+                response = JSON.parse(response);
                 if (request.getStatus() !== 200 || typeof response.ok !== 'boolean' || response.ok !== true) {
                     if (typeof response.description === 'string') {
                         throw response.description;
@@ -88,44 +97,68 @@ zabbix_export:
                         throw 'Unknown error. Check debug log for more information.';
                     }
                 }
+                if (action == 'sendMessage') {
+                    result.tags = { ['__telegram_m_id_']: response.result.message_id }
+                    return result;
+                }
             }
-        };
-        
+            catch (error) {
+                response = null;
+            }
+        }
+
         try {
             var params = JSON.parse(value);
-        
+
             if (typeof params.Token === 'undefined') {
                 throw 'Incorrect value is given for parameter "Token": parameter is missing';
             }
-        
-            Telegram.token = params.Token;
-        
+
             if (params.HTTPProxy) {
                 Telegram.proxy = params.HTTPProxy;
-            } 
-        
-            params.ParseMode = params.ParseMode.toLowerCase();
-            
-            if (['markdown', 'html', 'markdownv2'].indexOf(params.ParseMode) !== -1) {
-                Telegram.parse_mode = params.ParseMode;
             }
-        
+            Telegram.token = params.Token;
             Telegram.to = params.To;
             Telegram.message = params.Subject + '\n' + params.Message;
-        
-            if (['markdown', 'html', 'markdownv2'].indexOf(params.ParseMode) !== -1) {
-                Telegram.message = Telegram.escapeMarkup(Telegram.message, params.ParseMode);
+
+            if (isProblem(params)) {
+                result = Telegram.newMessage();
+                Zabbix.log(1, '[Telegram Webhook] notification was send: ' + result.tags.__telegram_m_id_);
+                return JSON.stringify(result);
+            };
+
+            if (isResolve(params)) {
+
+                var channel_event_tags = JSON.parse(params.event_tags);
+
+                cet = JSON.stringify(channel_event_tags);
+                
+                Zabbix.log(1,'[Telegram Webhook]' + cet);
+
+                if (Array.isArray(channel_event_tags)) {
+                    for (i in channel_event_tags) {
+                        if (channel_event_tags[i].tag.includes('__telegram_m_id_')) {
+                            Telegram.message_id = channel_event_tags[i].value;
+                            break;
+                        }
+                    }
+                }
+                Zabbix.log(1, 'Resolve message id ' + Telegram.message_id);
+                Telegram.editMessage();
+                return 'OK';
+            };
+
+            if (!(isResolve(params)) && !(isProblem(params))) {
+                return 'OK';
             }
-        
-            Telegram.sendMessage();
-        
-            return 'OK';
         }
         catch (error) {
-            Zabbix.log(4, '[Telegram Webhook] notification failed: ' + error);
+            Zabbix.log(1, '[Telegram Webhook] notification failed: ' + error);
             throw 'Sending failed: ' + error + '.';
         }
+
       timeout: 10s
+      process_tags: 'YES'
       description: |
         https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram
         
@@ -141,20 +174,18 @@ zabbix_export:
             4.3. Copy returned group id save it in the "Telegram Webhook" media for the user you created for  group notifications
             4.4. Send "/start@your_bot_name_here" in your group (Telegram bot won't send anything to the group without it)
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
-            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            **Problem started at {EVENT.TIME} on {EVENT.DATE}**
             Problem name: {EVENT.NAME}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
@@ -164,8 +195,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem: {EVENT.NAME}'
           message: |
@@ -173,8 +203,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -189,8 +218,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |
