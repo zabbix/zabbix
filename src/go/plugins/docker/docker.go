@@ -203,8 +203,7 @@ func (s *Stats) setCPUPercentUsage() {
 	// based on formula from docker api doc.
 	delta := s.CPUStats.CPUUsage.TotalUsage - s.PreCPUStats.CPUUsage.TotalUsage
 	systemDelta := s.CPUStats.SystemUsage - s.PreCPUStats.SystemUsage
-	cpuNum := s.CPUStats.OnlineCPUs
-	s.CPUStats.CPUUsage.PercentUsage = (float64(delta) / float64(systemDelta)) * float64(cpuNum) * 100.0
+	s.CPUStats.CPUUsage.PercentUsage = (float64(delta) / float64(systemDelta)) * 100.0
 }
 
 func (p *Plugin) containerInfo(queryPath, container, info string) ([]byte, error) {
