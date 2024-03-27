@@ -19,7 +19,7 @@
 
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
@@ -873,7 +873,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, z
 
 static void	zbx_fill_from_config_file(char **dst, char *src)
 {
-	/* helper function, only for TYPE_STRING configuration parameters */
+	/* helper function, only for ZBX_CFG_TYPE_STRING configuration parameters */
 
 	if (NULL != src)
 	{
@@ -893,49 +893,49 @@ static void	zbx_load_config(const char *config_file_in)
 		*cfg_tls_cipher_cert13 = NULL, *cfg_tls_cipher_cert = NULL,
 		*cfg_tls_cipher_psk13 = NULL, *cfg_tls_cipher_psk = NULL;
 
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,	MIN,			MAX */
-		{"SourceIP",			&cfg_source_ip,				TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"Hostname",			&cfg_hostname,				TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&cfg_tls_ca_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&cfg_tls_crl_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&cfg_tls_cert_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&cfg_tls_key_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&cfg_tls_cipher_cert13,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&cfg_tls_cipher_cert,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&cfg_tls_cipher_psk13,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
-			PARM_OPT,	0,			INT_MAX},
+			MANDATORY,		MIN,			MAX */
+		{"SourceIP",			&cfg_source_ip,				ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ServerActive",		&cfg_active_hosts,			ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"Hostname",			&cfg_hostname,				ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSConnect",			&cfg_tls_connect,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCAFile",			&cfg_tls_ca_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&cfg_tls_crl_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCertFile",			&cfg_tls_cert_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&cfg_tls_key_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&cfg_tls_psk_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert13",		&cfg_tls_cipher_cert13,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert",		&cfg_tls_cipher_cert,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK13",		&cfg_tls_cipher_psk13,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
 
 	/* do not complain about unknown parameters in agent configuration file */
-	parse_cfg_file(config_file_in, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(config_file_in, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	/* get first hostname only */
 	if (NULL != cfg_hostname)
@@ -1600,7 +1600,8 @@ int	main(int argc, char **argv)
 #endif
 	sendval_args->zbx_config_tls = zbx_config_tls;
 	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
+			ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
 
 	if (INPUT_FILE)
@@ -1843,9 +1844,11 @@ int	main(int argc, char **argv)
 			ret = SUCCEED;
 
 			zbx_json_addobject(&sendval_args->json, NULL);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&sendval_args->json);
 
 			succeed_count++;

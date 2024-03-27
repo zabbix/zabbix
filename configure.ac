@@ -1907,6 +1907,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
+		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2006,7 +2007,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
-	src/libs/zbxconf/Makefile
+	src/libs/zbxcfg/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile
@@ -2098,10 +2099,12 @@ AC_CONFIG_FILES([
 	src/zabbix_agent/active_checks/Makefile
 	src/zabbix_agent/agent_conf/Makefile
 	src/zabbix_agent/listener/Makefile
+	src/zabbix_agent/metrics/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/autoreg/Makefile
 	src/zabbix_proxy/cachehistory/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
@@ -2117,6 +2120,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile

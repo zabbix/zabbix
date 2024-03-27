@@ -14,7 +14,7 @@ DIST_SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxconf \
+	zbxcfg \
 	zbxcrypto \
 	zbxcurl \
 	zbxdb \
@@ -228,7 +228,7 @@ SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxconf \
+	zbxcfg \
 	zbxcrypto \
 	zbxcurl \
 	zbxdbschema \
