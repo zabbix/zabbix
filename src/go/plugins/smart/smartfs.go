@@ -284,7 +284,7 @@ func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
 
 // executeRaids executes runners for raid devices (except megaraid) retrieved from smartctl
 func (r *runner) executeRaids(raids []deviceInfo, jsonRunner bool) {
-	raidTypes := []string{"3ware", "areca", "cciss", "sat"}
+	raidTypes := []string{"3ware", "areca", "cciss", "sat", "aacraid"}
 
 	r.raids = make(chan raidParameters, len(raids)*len(raidTypes))
 
@@ -513,6 +513,8 @@ runner:
 
 			if raid.rType == satType {
 				name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
+			} else if raid.rType == "aacraid" {
+				name = fmt.Sprintf("%s -d %s,0,0,%d", raid.name, raid.rType, i)
 			} else {
 				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
 			}
@@ -563,6 +565,9 @@ runner:
 				if raid.rType == satType {
 					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
 					dp.Info.raidType = raid.rType
+				} else if raid.rType == "aacraid" {
+					dp.Info.Name = fmt.Sprintf("%s %s,0,0,%d", raid.name, raid.rType, i)
+					dp.Info.raidType = fmt.Sprintf("%s,0,0,%d", raid.rType, i)
 				} else {
 					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
 					dp.Info.raidType = fmt.Sprintf("%s,%d", raid.rType, i)
