@@ -53,10 +53,10 @@ chown zabbix:zabbix /var/lib/zabbix
 
 3. Copy the `template_db_postgresql.conf` file, containing user parameters, to the Zabbix agent configuration directory `/etc/zabbix/zabbix_agentd.d/` and restart Zabbix agent service.
 
-**Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, you can modify the connection string in user parameters. For example, to enable required encryption in transport mode without identity checks you could append `?sslmode=required` to the end of the connection string for all keys that use `psql`:
+**Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, you can modify the connection string in user parameters. For example, to enable required encryption in transport mode without identity checks you could append `?sslmode=require` to the end of the connection string for all keys that use `psql`:
 
 ```bash
-UserParameter=pgsql.bgwriter[*], psql -qtAX postgresql://"$3":"$4"@"$1":"$2"/"$5"?sslmode=required -f "/var/lib/zabbix/postgresql/pgsql.bgwriter.sql"
+UserParameter=pgsql.bgwriter[*], psql -qtAX postgresql://"$3":"$4"@"$1":"$2"/"$5"?sslmode=require -f "/var/lib/zabbix/postgresql/pgsql.bgwriter.sql"
 ```
 
 Consult the PostgreSQL documentation about [`protection modes`](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) and [`client connection parameters`](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-SSLMODE).
