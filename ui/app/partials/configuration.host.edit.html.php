@@ -343,8 +343,8 @@ $inventory_tab = (new CFormGrid())
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setEnabled(!$host_is_discovered)
-				->setModern(true),
+				->setReadonly($host_is_discovered)
+				->setModern(),
 			$host_is_discovered ? new CInput('hidden', 'inventory_mode', $data['host']['inventory_mode']) : null
 		])
 	]);
@@ -415,7 +415,7 @@ $encryption_tab = (new CFormGrid())
 				->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 				->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 				->setModern(true)
-				->setEnabled(!$host_is_discovered)
+				->setReadonly($host_is_discovered)
 		)
 	])
 	->addItem([
@@ -425,15 +425,15 @@ $encryption_tab = (new CFormGrid())
 				(new CCheckBox('tls_in_none'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
 					->setLabel(_('No encryption'))
-					->setEnabled(!$host_is_discovered),
+					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_psk'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
 					->setLabel(_('PSK'))
-					->setEnabled(!$host_is_discovered),
+					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_cert'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
 					->setLabel(_('Certificate'))
-					->setEnabled(!$host_is_discovered)
+					->setReadonly($host_is_discovered)
 			]))
 				->addClass(ZBX_STYLE_LIST_CHECK_RADIO),
 			new CInput('hidden', 'tls_accept', $tls_accept)
