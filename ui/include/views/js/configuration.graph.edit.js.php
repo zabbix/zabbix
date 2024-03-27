@@ -162,7 +162,7 @@
 						GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 						GRAPH_YAXIS_SIDE_RIGHT => _('Right')
 					]))
-				->setReadonly($readonly)
+					->setReadonly($readonly)
 			?>
 		</td>
 

@@ -174,29 +174,6 @@
 		},
 
 		/**
-		 * Make multi select UI control readonly.
-		 *
-		 * @return jQuery
-		 */
-		readonly: function() {
-			return this.each(function() {
-				var $obj = $(this),
-					ms = $obj.data('multiSelect');
-
-				if (ms.options.readonly === false) {
-					$obj.attr('aria-readonly', true);
-					$('.multiselect-list', $obj).attr('aria-readonly', true);
-					$('.multiselect-button > button', $obj.parent()).prop('disabled', true);
-					$('input[type="text"]', $obj).remove();
-
-					ms.options.readonly = true;
-
-					cleanSearch($obj);
-				}
-			});
-		},
-
-		/**
 		 * Clean multi select object values.
 		 *
 		 * @return jQuery

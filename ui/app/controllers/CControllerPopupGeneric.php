@@ -707,7 +707,7 @@ class CControllerPopupGeneric extends CController {
 				'object_name' => $src_name,
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
-				'disabled' => $this->hasInput('only_hostid'),
+				'readonly' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $src_name,

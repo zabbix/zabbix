@@ -143,7 +143,8 @@ $tag_table = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern(true)
-				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'])
+				->setEnabled(!$data['maintenance_type'] == MAINTENANCE_TYPE_NODATA)
+				->setReadonly(!$data['allowed_edit'])
 		))->setColSpan(4)
 	);
 
@@ -180,7 +181,7 @@ foreach ($tags as $tag) {
 				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true)
-				->setEnabled($data['allowed_edit']),
+				->setReadonly(!$data['allowed_edit']),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
