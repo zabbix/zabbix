@@ -36,13 +36,6 @@ class CHostNavigator {
 	#config;
 
 	/**
-	 * All severities and their info.
-	 *
-	 * @type {Array}
-	 */
-	#severities;
-
-	/**
 	 * Root container element.
 	 *
 	 * @type {HTMLElement}
@@ -89,7 +82,6 @@ class CHostNavigator {
 	 */
 	constructor(config) {
 		this.#config = config;
-		this.#severities = this.#getSeverities();
 
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CHostNavigator.ZBX_STYLE_CLASS);
@@ -168,46 +160,6 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Severity classifier.
-	 *
-	 * @returns {Array}  All severities with necessary info.
-	 */
-	#getSeverities() {
-		return [
-			{
-				name: t('Not classified'),
-				class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
-				class_status: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG
-			},
-			{
-				name: t('Information'),
-				class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
-				class_status: ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG
-			},
-			{
-				name: t('Warning'),
-				class: ZBX_STYLE_SEVERITY_WARNING_BG,
-				class_status: ZBX_STYLE_SEVERITY_WARNING_STATUS_BG
-			},
-			{
-				name: t('Average'),
-				class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
-				class_status: ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG
-			},
-			{
-				name: t('High'),
-				class: ZBX_STYLE_SEVERITY_HIGH_BG,
-				class_status: ZBX_STYLE_SEVERITY_HIGH_STATUS_BG
-			},
-			{
-				name: t('Disaster'),
-				class: ZBX_STYLE_SEVERITY_DISASTER_BG,
-				class_status: ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG
-			}
-		];
-	}
-
-	/**
 	 * Prepare structure of nodes - create and sort groups.
 	 * If no grouping provided, then leave flat list of hosts.
 	 *
@@ -236,23 +188,17 @@ class CHostNavigator {
 	 * @param {Array} nodes  Array of nodes (groups and hosts) and their info.
 	 */
 	#prepareNodesProperties(nodes) {
-		const show_problems = this.#config.show_problems
-			|| this.#config.group_by.some(group_by => group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY);
-
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].children === undefined) {
 				const properties = {
 					id: nodes[i].hostid,
 					name: nodes[i].name,
-					level: this.#config.group_by?.length || 0
+					level: this.#config.group_by?.length || 0,
+					problem_count: nodes[i].problem_count
 				}
 
 				if (nodes[i].maintenanceid !== undefined) {
 					properties.maintenance = this.#maintenances[nodes[i].maintenanceid];
-				}
-
-				if (show_problems) {
-					properties.problems = this.#prepareNodeProblems(nodes[i].problem_count);
 				}
 
 				nodes[i] = properties;
@@ -260,47 +206,13 @@ class CHostNavigator {
 			else {
 				nodes[i].is_open = this.#config.open_groups.includes(JSON.stringify(nodes[i].group_identifier));
 
-				if (show_problems) {
-					const severity_filter = nodes[i].group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY
-						? nodes[i].severity_index
-						: null;
-
-					nodes[i].problems = this.#prepareNodeProblems(nodes[i].problem_count, severity_filter);
-				}
-
-				delete nodes[i].problem_count;
+				nodes[i].severity_filter = nodes[i].group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY
+					? nodes[i].severity_index
+					: undefined;
 
 				this.#prepareNodesProperties(nodes[i].children);
 			}
 		}
-	}
-
-	/**
-	 * Prepare problems property of nodes (groups and hosts) to fit navigation component.
-	 *
-	 * @param {Array}       problem_count    Array of problem count.
-	 * @param {number|null} severity_filter  Index of severity. If provided, prepares only corresponding severity.
-	 *
-	 * @returns {Array}  Array of problem objects.
-	 */
-	#prepareNodeProblems(problem_count, severity_filter = null) {
-		const problems = [];
-
-		for (let i = problem_count.length - 1; i >= 0; i--) {
-			const is_severity_allowed = severity_filter !== null ? i === severity_filter : true;
-
-			if (problem_count[i] > 0 && is_severity_allowed) {
-				problems.push({
-					severity: this.#severities[i].name,
-					class: this.#severities[i].class,
-					class_status: this.#severities[i].class_status,
-					count: problem_count[i],
-					order: i,
-				});
-			}
-		}
-
-		return problems;
 	}
 
 	/**
@@ -317,7 +229,7 @@ class CHostNavigator {
 			case CHostNavigator.GROUP_BY_HOST_GROUP:
 				for (const hostgroup of host.hostgroups) {
 					const new_group = {
-						...this.#getGroupTemplate(),
+						...CHostNavigator.#getGroupTemplate(),
 						name: hostgroup.name,
 						group_by: {
 							attribute: CHostNavigator.GROUP_BY_HOST_GROUP,
@@ -339,7 +251,7 @@ class CHostNavigator {
 
 				if (matching_tags.length === 0) {
 					const new_group = {
-						...this.#getGroupTemplate(),
+						...CHostNavigator.#getGroupTemplate(),
 						name: t('Uncategorized'),
 						group_by: {
 							attribute: CHostNavigator.GROUP_BY_TAG_VALUE,
@@ -355,7 +267,7 @@ class CHostNavigator {
 				else {
 					for (const tag of matching_tags) {
 						const new_group = {
-							...this.#getGroupTemplate(),
+							...CHostNavigator.#getGroupTemplate(),
 							name: tag.value,
 							group_by: {
 								attribute: CHostNavigator.GROUP_BY_TAG_VALUE,
@@ -376,7 +288,7 @@ class CHostNavigator {
 
 				if (!has_problems) {
 					const new_group = {
-						...this.#getGroupTemplate(),
+						...CHostNavigator.#getGroupTemplate(),
 						name: t('Uncategorized'),
 						group_by: {
 							attribute: CHostNavigator.GROUP_BY_SEVERITY,
@@ -394,8 +306,8 @@ class CHostNavigator {
 					for (let i = 0; i < host.problem_count.length; i++) {
 						if (host.problem_count[i] > 0) {
 							const new_group = {
-								...this.#getGroupTemplate(),
-								name: this.#severities[i].name,
+								...CHostNavigator.#getGroupTemplate(),
+								name: CNavigationTree.getSeverity(i).name,
 								group_by: {
 									attribute: CHostNavigator.GROUP_BY_SEVERITY,
 									name: t('Severity')
@@ -419,14 +331,14 @@ class CHostNavigator {
 	 *
 	 * @returns {Object}  Group object with default values.
 	 */
-	#getGroupTemplate() {
+	static #getGroupTemplate() {
 		return {
 			name: '',
 			group_by: {},
 			group_identifier: [],
 			level: 0,
 			is_uncategorized: false,
-			problem_count: Array.from({length: this.#severities.length}, () => 0),
+			problem_count: [0, 0, 0, 0, 0, 0],
 			children: [],
 			is_open: false
 		};

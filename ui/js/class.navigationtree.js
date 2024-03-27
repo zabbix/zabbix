@@ -145,6 +145,50 @@ class CNavigationTree {
 	}
 
 	/**
+	 * Get severity object at provided index.
+	 *
+	 * @param {number} index  Which severity to return.
+	 *
+	 * @returns {Object}  Severity object with necessary info.
+	 */
+	static getSeverity(index) {
+		const severities = [
+			{
+				name: t('Not classified'),
+				class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
+				class_status: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG
+			},
+			{
+				name: t('Information'),
+				class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
+				class_status: ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG
+			},
+			{
+				name: t('Warning'),
+				class: ZBX_STYLE_SEVERITY_WARNING_BG,
+				class_status: ZBX_STYLE_SEVERITY_WARNING_STATUS_BG
+			},
+			{
+				name: t('Average'),
+				class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
+				class_status: ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG
+			},
+			{
+				name: t('High'),
+				class: ZBX_STYLE_SEVERITY_HIGH_BG,
+				class_status: ZBX_STYLE_SEVERITY_HIGH_STATUS_BG
+			},
+			{
+				name: t('Disaster'),
+				class: ZBX_STYLE_SEVERITY_DISASTER_BG,
+				class_status: ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG
+			}
+		];
+
+		return severities[index];
+	}
+
+	/**
 	 * Create node element of navigation tree.
 	 *
 	 * @param {Object} node  All data (including children) of node.
@@ -198,7 +242,7 @@ class CNavigationTree {
 			primary.appendChild(this.#createMaintenance(node));
 		}
 
-		if (this.#show_problems && node.problems?.length > 0) {
+		if (this.#show_problems) {
 			secondary.appendChild(this.#createProblems(node));
 		}
 
@@ -385,16 +429,47 @@ class CNavigationTree {
 		contents.classList.add(ZBX_STYLE_PROBLEM_ICON_LINK);
 		contents.href = '#';
 
-		this.#setProblemsHint(contents, node.problems);
+		const problems_data = this.#prepareNodeProblems(node);
+
+		this.#setProblemsHint(contents, problems_data);
 
 		problems.appendChild(contents);
 
-		for (const severity of node.problems) {
+		for (const severity of problems_data) {
 			const box = document.createElement('span');
 			box.classList.add(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM, severity.class_status);
 			box.innerText = severity.count;
 
 			contents.appendChild(box);
+		}
+
+		return problems;
+	}
+
+	/**
+	 * Prepare problems data of node.
+	 *
+	 * @param {Object} node  Node data.
+	 **
+	 * @returns {Array}  Array of problem objects.
+	 */
+	#prepareNodeProblems(node) {
+		const problems = [];
+
+		for (let i = node.problem_count.length - 1; i >= 0; i--) {
+			const is_severity_allowed = node.severity_filter !== undefined ? i === node.severity_filter : true;
+
+			if (node.problem_count[i] > 0 && is_severity_allowed) {
+				const severity = CNavigationTree.getSeverity(i);
+
+				problems.push({
+					severity: severity.name,
+					class: severity.class,
+					class_status: severity.class_status,
+					count: node.problem_count[i],
+					order: i,
+				});
+			}
 		}
 
 		return problems;
