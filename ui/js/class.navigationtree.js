@@ -473,8 +473,7 @@ class CNavigationTree {
 
 				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
 					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-					arrow.querySelector('span').classList.add(ZBX_STYLE_ARROW_RIGHT);
-					arrow.querySelector('span').classList.remove(ZBX_STYLE_ARROW_DOWN);
+					arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
 
 					const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
 
@@ -484,14 +483,12 @@ class CNavigationTree {
 						const inner_arrow = inner_open_node
 							.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
 
-						inner_arrow.querySelector('span').classList.add(ZBX_STYLE_ARROW_RIGHT);
-						inner_arrow.querySelector('span').classList.remove(ZBX_STYLE_ARROW_DOWN);
+						inner_arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
 					}
 				}
 				else {
 					node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-					arrow.querySelector('span').classList.add(ZBX_STYLE_ARROW_DOWN);
-					arrow.querySelector('span').classList.remove(ZBX_STYLE_ARROW_RIGHT);
+					arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_RIGHT, ZBX_STYLE_ARROW_DOWN);
 
 					is_open = true;
 				}
