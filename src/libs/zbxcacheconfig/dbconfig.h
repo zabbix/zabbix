@@ -631,7 +631,7 @@ typedef struct
 
 	zbx_config_item_type_timeouts_t	item_timeouts;
 }
-zbx_dc_config_t_TABLE;
+zbx_dc_config_table_t;
 
 typedef struct
 {
@@ -996,7 +996,7 @@ typedef struct
 	zbx_binary_heap_t	trigger_queue;
 	zbx_binary_heap_t	drule_queue;
 	zbx_binary_heap_t	httptest_queue;		/* web scenario queue */
-	zbx_dc_config_t_TABLE	*config;
+	zbx_dc_config_table_t	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
 	zbx_um_cache_t		*um_cache;

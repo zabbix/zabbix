@@ -997,8 +997,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (NULL == config->config)
 	{
 		found = 0;
-		config->config = (zbx_dc_config_t_TABLE *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t_TABLE));
-		memset(config->config, 0, sizeof(zbx_dc_config_t_TABLE));
+		config->config = (zbx_dc_config_table_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_table_t));
+		memset(config->config, 0, sizeof(zbx_dc_config_table_t));
 	}
 
 	if (SUCCEED != (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
