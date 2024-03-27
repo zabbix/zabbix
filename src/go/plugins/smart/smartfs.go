@@ -593,48 +593,49 @@ func getRaidDevices(
 	deviceName string,
 	deviceType DeviceType,
 ) []*SmartCtlDeviceData {
-	var (
-		devices []*SmartCtlDeviceData
-		i       int
-	)
-
-	if deviceType == Areca {
-		i = 1
-	}
-
-	for {
-		var (
-			deviceTypeArg string
-			more          bool
-		)
-
-		switch deviceType {
-		case SAT, SCSI:
-			deviceTypeArg = string(deviceType)
-			more = false
-		default:
-			deviceTypeArg = fmt.Sprintf("%s,%d", deviceType, i)
-			more = true
-		}
-
-		data, err := getAllDeviceInfoByType(ctl, deviceName, deviceTypeArg)
+	switch deviceType {
+	case SAT, SCSI:
+		data, err := getAllDeviceInfoByType(ctl, deviceName, string(deviceType))
 		if err != nil {
 			logr.Debugf(
 				"failed to get device %q info by type %q: %s",
 				deviceName, deviceType, err.Error(),
 			)
 
-			break
+			return []*SmartCtlDeviceData{}
 		}
 
-		devices = append(devices, data)
+		return []*SmartCtlDeviceData{data}
+	default:
+		var (
+			devices []*SmartCtlDeviceData
+			i       int
+		)
 
-		if !more {
-			break
+		if deviceType == Areca {
+			i = 1
 		}
+
+		for {
+			data, err := getAllDeviceInfoByType(
+				ctl,
+				deviceName,
+				fmt.Sprintf("%s,%d", deviceType, i),
+			)
+			if err != nil {
+				logr.Debugf(
+					"failed to get device %q info by type %q: %s",
+					deviceName, deviceType, err.Error(),
+				)
+
+				break
+			}
+
+			devices = append(devices, data)
+		}
+
+		return devices
 	}
-
-	return devices
 }
 
 // getMegaRaidDevices sets megaraid device information returned by smartctl.
