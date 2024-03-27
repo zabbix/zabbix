@@ -25,7 +25,7 @@
 #include "zbxtasks.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxtypes.h"
 #include "zbxvault.h"
@@ -57,6 +57,8 @@
 #include "zbxcachevalue.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
+#include "zbxautoreg.h"
+#include "zbxexpression.h"
 
 int	sync_in_progress = 0;
 
@@ -9228,7 +9230,7 @@ static void	autoreg_host_free_data(ZBX_DC_AUTOREG_HOST *autoreg_host)
 	dc_strpool_release(autoreg_host->host_metadata);
 }
 
-void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
+void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts)
 {
 	int			cached = 0, i;
 

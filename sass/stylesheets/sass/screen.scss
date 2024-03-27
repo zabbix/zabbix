@@ -62,6 +62,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/svg-gauge";
 @import "components/svg-graph";
 @import "components/svg-piechart";
+@import "components/svg-honeycomb";
 @import "components/tabfilter";
 @import "components/tabs";
 @import "components/toc";
@@ -70,6 +71,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-gauge";
+@import "components/dashboard/widget-honeycomb";
 @import "components/dashboard/widget-hostavail";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
