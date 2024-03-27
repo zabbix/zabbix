@@ -110,13 +110,25 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 
 	struct sockaddr_nl	s_sa = { AF_NETLINK, 0, 0, 0 };
 	struct iovec		s_io[1] = { { &request, sizeof(request) } };
-	struct msghdr		s_msg = { (void *)&s_sa, sizeof(struct sockaddr_nl), s_io, 1, NULL, 0, 0};
+	struct msghdr		s_msg = { .msg_name = (void *)&s_sa,
+								.msg_namelen = sizeof(struct sockaddr_nl),
+								.msg_iov = s_io,
+								.msg_iovlen = 1,
+								.msg_control = NULL,
+								.msg_controllen = 0,
+								.msg_flags = 0};
 
 	char			buffer[BUFSIZ] = { 0 };
 
 	struct sockaddr_nl	r_sa = { AF_NETLINK, 0, 0, 0 };
 	struct iovec		r_io[1] = { { buffer, BUFSIZ } };
-	struct msghdr		r_msg = { (void *)&r_sa, sizeof(struct sockaddr_nl), r_io, 1, NULL, 0, 0};
+	struct msghdr		r_msg = { .msg_name = (void *)&r_sa,
+								.msg_namelen = sizeof(struct sockaddr_nl),
+								.msg_iov = r_io,
+								.msg_iovlen = 1,
+								.msg_control = NULL,
+								.msg_controllen = 0,
+								.msg_flags = 0};
 
 	struct nlmsghdr		*r_hdr;
 
