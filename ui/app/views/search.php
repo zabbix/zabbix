@@ -44,7 +44,8 @@ $table = (new CTableInfo())
 			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 		)
 	)
-	->removeId();
+	->removeId()
+	->setNoDataMessage(_('No data found'));
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
@@ -204,7 +205,8 @@ $table = (new CTableInfo())
 				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 				: null
 		)
-	);
+	)
+	->setNoDataMessage(_('No data found'));
 
 foreach ($data['host_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
@@ -283,7 +285,8 @@ if ($data['admin']) {
 				->setColSpan($data['templates'] ? 6 : 1)
 				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 			)
-		);
+		)
+		->setNoDataMessage(_('No data found'));
 
 	foreach ($data['templates'] as $templateid => $template) {
 		$visible_name = make_decoration($template['name'], $data['search']);
@@ -387,7 +390,8 @@ $table = (new CTableInfo())
 				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 				: null
 		)
-	);
+	)
+	->setNoDataMessage(_('No data found'));
 
 foreach ($data['template_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);

@@ -356,6 +356,22 @@
 
 .dashboard-grid-widget-body {
 	display: contents;
+
+	table .nothing-to-show td div.no-data-found {
+		margin-top: 0;
+		margin-bottom: 0;
+
+		.zi-search {
+			&::before {
+				font-size: 26px;
+				margin-bottom: 0;
+			}
+		}
+
+		.first-message {
+			font-size: 12px;
+		}
+	}
 }
 
 .dashboard-grid-widget-debug {

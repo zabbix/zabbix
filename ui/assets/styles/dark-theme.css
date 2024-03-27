@@ -1779,6 +1779,14 @@ button {
 
 .dashboard-grid-widget-body {
   display: contents; }
+  .dashboard-grid-widget-body table .nothing-to-show td div.no-data-found {
+    margin-top: 0;
+    margin-bottom: 0; }
+    .dashboard-grid-widget-body table .nothing-to-show td div.no-data-found .zi-search::before {
+      font-size: 26px;
+      margin-bottom: 0; }
+    .dashboard-grid-widget-body table .nothing-to-show td div.no-data-found .first-message {
+      font-size: 12px; }
 
 .dashboard-grid-widget-debug .debug-output {
   margin: 8px 10px 0;
@@ -2396,9 +2404,11 @@ button {
     .list-table .nothing-to-show td div.no-filter-set, .list-table .nothing-to-show td div.no-data-found {
       margin-top: 100px;
       margin-bottom: 100px; }
+      .list-table .nothing-to-show td div.no-filter-set .zi-filter::before, .list-table .nothing-to-show td div.no-filter-set .zi-search::before, .list-table .nothing-to-show td div.no-data-found .zi-filter::before, .list-table .nothing-to-show td div.no-data-found .zi-search::before {
+        display: block;
+        margin-bottom: 10px; }
       .list-table .nothing-to-show td div.no-filter-set .first-message, .list-table .nothing-to-show td div.no-data-found .first-message {
-        font-size: 16px;
-        margin-top: 10px; }
+        font-size: 16px; }
       .list-table .nothing-to-show td div.no-filter-set .second-message, .list-table .nothing-to-show td div.no-data-found .second-message {
         font-size: 14px;
         margin-top: 10px; }
