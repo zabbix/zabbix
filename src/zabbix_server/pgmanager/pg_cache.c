@@ -526,8 +526,16 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
-		if (0 == proxy->hosts.values_num && group->hostids.values_num > group->proxies.values_num)
-			goto out;
+		if (0 == proxy->hosts.values_num)
+		{
+			/* if a proxy has no hosts and another proxy has */
+			/* multiple hosts then group is not balanced     */
+			for (int j = 0; i < group->proxies.values_num; i++)
+			{
+				if (1 < group->proxies.values[j]->hosts.values_num)
+					goto out;
+			}
+		}
 
 		hosts_num += proxy->hosts.values_num;
 		proxies_num++;
