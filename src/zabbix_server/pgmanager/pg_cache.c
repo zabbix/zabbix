@@ -353,9 +353,14 @@ static void	pg_cache_proxy_unassign_last_host(zbx_pg_cache_t *cache, zbx_pg_grou
 {
 	int	last = proxy->hosts.values_num - 1;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s proxy:%s proxy.hosts:%d", __func__, group->name, proxy->name,
+			proxy->hosts.values_num);
+
 	zbx_vector_uint64_append(&group->unassigned_hostids, proxy->hosts.values[last]->hostid);
 	pg_cache_set_host_proxy(cache, proxy->hosts.values[last]->hostid, 0);
 	zbx_vector_pg_host_ptr_remove_noorder(&proxy->hosts, last);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -370,6 +375,8 @@ static void	pg_cache_proxy_unassign_last_host(zbx_pg_cache_t *cache, zbx_pg_grou
 static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group, int limit,
 		int required)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() limit:%d required:%d", __func__, limit, required);
+
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
@@ -430,6 +437,8 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_g
 	}
 
 	zbx_vector_pg_proxy_ptr_destroy(&proxies);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
