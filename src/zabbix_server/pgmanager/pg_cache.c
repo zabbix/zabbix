@@ -349,7 +349,7 @@ static int	pg_proxy_compare_by_hosts_asc(const void *d1, const void *d2)
  * Purpose: unassign last host from proxy                                     *
  *                                                                            *
  ******************************************************************************/
-static void	pg_cache_proxy_unassign_last_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group,  zbx_pg_proxy_t *proxy)
+static void	pg_cache_proxy_unassign_last_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy)
 {
 	int	last = proxy->hosts.values_num - 1;
 
@@ -530,7 +530,7 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		{
 			/* if a proxy has no hosts and another proxy has */
 			/* multiple hosts then group is not balanced     */
-			for (int j = 0; i < group->proxies.values_num; i++)
+			for (int j = 0; j < group->proxies.values_num; j++)
 			{
 				if (1 < group->proxies.values[j]->hosts.values_num)
 					goto out;
