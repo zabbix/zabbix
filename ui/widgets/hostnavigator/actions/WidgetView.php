@@ -199,7 +199,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($hosts as &$host) {
 				if ($tags_to_keep) {
 					$host['tags'] = array_values(array_filter($host['tags'], function($tag) use ($tags_to_keep) {
-						return in_array($tag['tag'], $tags_to_keep);
+						return in_array($tag['tag'], $tags_to_keep, true);
 					}));
 				}
 
