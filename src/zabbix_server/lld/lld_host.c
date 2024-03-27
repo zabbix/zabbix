@@ -5648,7 +5648,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 		else
 			inventory_mode_proto = (signed char)atoi(row[5]);
 
-		lld_hosts_get(parent_hostid, &hosts, proxyid, monitored_by, proxy_groupid, ipmi_authtype, ipmi_privilege,
+		lld_hosts_get(parent_hostid, &hosts, monitored_by, proxyid, proxy_groupid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
 				tls_psk_identity, tls_psk);
 
