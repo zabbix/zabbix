@@ -1,0 +1,218 @@
+zabbix_export:
+  version: '6.0'
+  media_types:
+    -
+      name: SMSEagle
+      type: WEBHOOK
+      parameters:
+        -
+          name: url
+          value: '<PLACE YOUR SMSEAGLE URL>'
+        -
+          name: flash
+          value: 'false'
+        -
+          name: recipient
+          value: '{ALERT.SENDTO}'
+        -
+          name: message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: highpriority
+          value: '0'
+        -
+          name: modem_no
+          value: 'default'
+        -
+          name: oid
+          value: 'default'
+        -
+          name: unicode
+          value: '0'
+        -
+          name: date
+          value: 'YYYYmmDDHHMM'
+        -
+          name: send_after
+          value: 'HH:MM:SS'
+        -
+          name: send_before
+          value: 'HH:MM:SS'
+        -
+          name: access_token
+          value: '<PLACE ACCESS TOKEN>'
+        -
+          name: responsetype
+          value: 'text'
+        -
+          name: test
+          value: 'false'
+      script: |
+        var SMSEagle = {
+            params: [],
+
+            addParam: function (name, value) {
+                SMSEagle.params.push(name + '=' + encodeURIComponent(value));
+            },
+
+            setProxy: function (HTTPProxy) {
+                SMSEagle.HTTPProxy = HTTPProxy;
+            },
+
+            setPayload: function (params) {
+                var parts = params.recipient.split(':'),
+                    defaultValues = {
+                        flash: 'false',
+                        modem_no: 'default',
+                        oid: 'default',
+                        date: 'YYYYmmDDHHMM',
+                        send_before: 'HH:MM:SS',
+                        send_after: 'HH:MM:SS',
+                        unicode: '0',
+                        responsetype: 'text',
+                        highpriority: '0',
+                        test: 'false'
+                    }
+
+                Object.keys(params)
+                    .forEach(function (key) {
+                    if (params[key] && params[key] !== "" && params[key].trim() && params[key] !== defaultValues[key]) {
+                        SMSEagle.addParam(key, params[key]);
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + key + ": " + params[key]);
+                    }
+                });
+
+                if (parts[1] === 'g') {
+                    params.url = params.url + '/http_api/send_togroup';
+                    SMSEagle.addParam('groupname', parts[0]);
+                } else if (parts[1] === 'c') {
+                    params.url = params.url + '/http_api/send_tocontact';
+                    SMSEagle.addParam('contactname', parts[0]);
+                } else {
+                    params.url = params.url + '/http_api/send_sms';
+                    SMSEagle.addParam('to', parts[0]);
+                }
+
+                delete params.recipient;
+            },
+
+            request: function () {
+                var response,
+                    request = new HttpRequest(),
+                    data = '?' + SMSEagle.params.join('&');
+
+                request.addHeader('Content-Type: multipart/form-data');
+
+                if (typeof SMSEagle.HTTPProxy !== 'undefined' && SMSEagle.HTTPProxy !== '') {
+                    request.setProxy(SMSEagle.HTTPProxy);
+                }
+
+                request_url = params.url + data;
+
+                Zabbix.log(4, '[ SMSEagle Webhook ] Sending request: ' + request_url);
+
+                response = request.get(request_url);
+
+                Zabbix.log(4, '[ SMSEagle Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
+
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+
+                    if (response) {
+                        message += ': ' + response;
+                    }
+
+                    throw message + '. Check debug log for more information.';
+                }
+            }
+        };
+
+        try {
+            var params = JSON.parse(value);
+
+            ['url', 'access_token', 'message', 'recipient'].forEach(function (field) {
+                if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                    || !params[field].trim()) {
+                    throw 'Required parameter is not set: "' + field + '".';
+                }
+            });
+
+            if (params.recipient === '{ALERT.SENDTO}') {
+                throw 'Required parameter is not set: "recipient".';
+            }
+
+            if (params.access_token === "<PLACE ACCESS TOKEN>") {
+                throw 'Required parameter is not set: "access_token".';
+            }
+
+            if (params.url === "<PLACE YOUR SMSEAGLE URL>") {
+                throw 'Required parameter is not set: "url".';
+            }
+
+            SMSEagle.setProxy(params.HTTPProxy);
+            SMSEagle.setPayload(params);
+            SMSEagle.request();
+
+            return 'OK';
+        }
+        catch (error) {
+            Zabbix.log(3, '[ SMSEagle Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Started at {EVENT.TIME} on {EVENT.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            [{EVENT.STATUS}] {EVENT.NAME}
+            
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Autoregistration: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
