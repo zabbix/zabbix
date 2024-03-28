@@ -11,12 +11,12 @@ if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
+# zbxnum should depend only on zbxcommon
+
 COMMON_LIB_FILES = \
-	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \

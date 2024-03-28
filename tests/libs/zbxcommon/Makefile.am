@@ -9,7 +9,8 @@ COMMON_SRC_FILES = \
 # mockdata needs zbxalgo, zbxstr and zbxnum
 # mocktest needs zbxnix
 #
-# zbxcommon needs zbxnix, which needs zbxlog
+# zbxcommon currently needs zbxnix, which also needs zbxlog
+# zbxcommon should not depend on any other zabbix library
 #
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \

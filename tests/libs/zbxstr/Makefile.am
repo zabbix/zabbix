@@ -13,6 +13,8 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
+# zbxstr should depend only on zbxcommon
+#
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \

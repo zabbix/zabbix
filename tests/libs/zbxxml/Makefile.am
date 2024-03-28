@@ -10,8 +10,13 @@ if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
+# zbxxml should depend only on:
+# 1) zbxalgo
+# 2) zbxjson
+# 3) zbxvariant
+# 4) zbxstr
+
 COMMON_LIB_FILES = \
-	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
