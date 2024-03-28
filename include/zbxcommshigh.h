@@ -21,7 +21,7 @@
 #define ZABBIX_COMMSHIGH_H
 
 #include "zbxcomms.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls);

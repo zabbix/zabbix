@@ -24,6 +24,18 @@ class testWidgets extends CWebTest {
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
 
 	/**
+	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
+	 */
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid'.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_itemid,'.
+			' wf.value_graphid, wf.value_hostid';
+
+	/**
 	 * Function which checks that only permitted item types are accessible for widgets.
 	 *
 	 * @param string    $url       url provided which needs to be opened
@@ -65,7 +77,8 @@ class testWidgets extends CWebTest {
 
 			case 'Graph':
 			case 'Gauge':
-				// For Graph and Gauge only numeric items are available.
+			case 'Pie chart':
+				// For Graph, Gauge and Pie chart only numeric items are available.
 				$item_types = ['Float item', 'Unsigned item', 'Unsigned_dependent item'];
 				break;
 
@@ -78,7 +91,9 @@ class testWidgets extends CWebTest {
 				break;
 		}
 
-		$select_button = ($widget === 'Graph') ? 'xpath:(.//button[text()="Select"])[2]' : 'button:Select';
+		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
+			? 'xpath:(.//button[text()="Select"])[2]'
+			: 'button:Select';
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.

@@ -369,6 +369,60 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: composes expression by replacing processed macro tokens           *
+ *          (with values) starting from definite position of                  *
+ *          original expression                                               *
+ *                                                                            *
+ * Parameters: ctx        - [IN] evaluation context                           *
+ *             expression - [OUT] composed expression                         *
+ *             shift_pos  - [IN] position which to start from                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_compose_expression_from_pos(const zbx_eval_context_t *ctx, char **expression, size_t pos)
+{
+	zbx_vector_ptr_t	tokens;
+	const zbx_eval_token_t	*token;
+	int			i;
+	size_t			expression_alloc = 0, expression_offset = 0;
+
+	zbx_vector_ptr_create(&tokens);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		if (ctx->stack.values[i].loc.l < pos)
+			continue;
+
+		if (ZBX_EVAL_TOKEN_VAR_MACRO == ctx->stack.values[i].type ||
+				ZBX_EVAL_TOKEN_VAR_USERMACRO == ctx->stack.values[i].type ||
+				ZBX_EVAL_TOKEN_VAR_STR == ctx->stack.values[i].type)
+		{
+			if (ZBX_VARIANT_NONE != ctx->stack.values[i].value.type)
+				zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
+		}
+	}
+
+	zbx_vector_ptr_sort(&tokens, zbx_eval_compare_tokens_by_loc);
+
+	for (i = 0; i < tokens.values_num; i++)
+	{
+		token = (const zbx_eval_token_t *)tokens.values[i];
+
+		zbx_strncpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos,
+				token->loc.l - pos);
+
+		pos = token->loc.r + 1;
+
+		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token);
+	}
+
+	if ('\0' != ctx->expression[pos])
+		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos);
+
+	zbx_vector_ptr_destroy(&tokens);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: composes expression by replacing processed tokens (with values)   *
  *          in original expression                                            *
  *                                                                            *

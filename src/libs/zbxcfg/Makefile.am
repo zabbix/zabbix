@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxconf.a
+noinst_LIBRARIES = libzbxcfg.a
 
-libzbxconf_a_SOURCES = \
+libzbxcfg_a_SOURCES = \
 	cfg.c
