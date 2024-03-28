@@ -5,7 +5,7 @@
 # Once this is done, the test_libzbxcommon_bin rules can be moved to zbxcommon directory.
 bin_PROGRAMS = test_libzbxcommon_bin
 
-test_libzbxcommon_bin_SOURCES = $(top_builddir)/src/libs/zbxcommon/test_libzbxcommon_bin.c
+test_libzbxcommon_bin_SOURCES = test_libzbxcommon_bin.c
 
 test_libzbxcommon_bin_LDADD =  \
         $(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
