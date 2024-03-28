@@ -581,6 +581,11 @@ retry:
 
 	if (SUCCEED != zbx_tcp_recv(&sock))
 	{
+		/* if no data is expected then recv failure means */
+		/* the other side closed connection as expected   */
+		if (NULL == out)
+			goto success;
+
 		zabbix_log(loglevel, "unable to receive from [%s]:%d: %s",
 				addrs->values[0]->ip, addrs->values[0]->port, zbx_socket_strerror());
 		if (NULL != error)
@@ -612,9 +617,8 @@ retry:
 
 	if (NULL != out)
 		*out = zbx_socket_detach_buffer(&sock);
-
+success:
 	ret = SUCCEED;
-
 cleanup:
 	zbx_tcp_close(&sock);
 out:

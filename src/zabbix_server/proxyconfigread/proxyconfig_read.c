@@ -1154,7 +1154,7 @@ static int	proxyconfig_get_hostmap(const zbx_dc_proxy_t *proxy, zbx_uint64_t rev
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hp.hostproxyid,h.host,hp.proxyid,hp.revision,h.tls_connect,h.tls_issuer,h.tls_subject,"
+			"select hp.hostproxyid,h.host,hp.proxyid,hp.revision,h.tls_accept,h.tls_issuer,h.tls_subject,"
 				"h.tls_psk_identity,h.tls_psk"
 			" from proxy p,host_proxy hp"
 			" left join hosts h on"
