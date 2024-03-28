@@ -132,9 +132,14 @@ class CNavigationTree {
 		this.#activateEvents();
 
 		if (this.#selected_id !== '') {
-			this.#container.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_id}"]
-				.${CNavigationTree.ZBX_STYLE_NODE_INFO_NAME}`)
-					?.click();
+			const item = this.#container.querySelector(
+				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_id}"]
+					.${CNavigationTree.ZBX_STYLE_NODE_INFO}`
+			);
+
+			if (item !== null) {
+				this.#events.itemSelect({target: item});
+			}
 		}
 	}
 
