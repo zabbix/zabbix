@@ -6,16 +6,10 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# mockdata itself needs zbxalgo, not common
-# mockdata needs zbxstr
-# mockdata needs num
+# mockdata needs zbxalgo, zbxstr and zbxnum
+# mocktest needs zbxnix
 #
-# libzbxmocktest.a needs nix
-#
-# common needs nix
-# nix needs log
-# nix needs common
-# str needs common
+# zbxcommon needs zbxnix, which needs zbxlog
 #
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
