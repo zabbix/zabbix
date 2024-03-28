@@ -1,0 +1,1 @@
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)

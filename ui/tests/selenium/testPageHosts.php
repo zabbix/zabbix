@@ -68,7 +68,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
-		$this->zbxTestTextNotPresent('ZBX6648 All Triggers Host');
+		$this->zbxTestTextNotPresent('Empty host');
 
 		// Check that proxy field is disabled.
 		$this->zbxTestAssertElementNotPresentId('filter_proxyids__ms');

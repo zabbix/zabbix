@@ -47,6 +47,7 @@ $available_js = [
 	'class.widget.problemsbysv.js' => 'widgets/',
 	'class.widget.svggraph.js' => 'widgets/',
 	'class.widget.trigerover.js' => 'widgets/',
+	'class.widget.url.js' => 'widgets/',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
