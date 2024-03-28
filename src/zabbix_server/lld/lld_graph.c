@@ -70,7 +70,7 @@ zbx_lld_gitem_t;
 ZBX_PTR_VECTOR_DECL(lld_gitem_ptr, zbx_lld_gitem_t*)
 ZBX_PTR_VECTOR_IMPL(lld_gitem_ptr, zbx_lld_gitem_t*)
 
-static int      lld_gitem_compare_func(const void *d1, const void *d2)
+static int	lld_gitem_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_gitem_t  *lld_gitem_1 = *(const zbx_lld_gitem_t **)d1;
 	const zbx_lld_gitem_t  *lld_gitem_2 = *(const zbx_lld_gitem_t **)d2;
@@ -139,7 +139,7 @@ zbx_lld_graph_t;
 ZBX_PTR_VECTOR_DECL(lld_graph_ptr, zbx_lld_graph_t*)
 ZBX_PTR_VECTOR_IMPL(lld_graph_ptr, zbx_lld_graph_t*)
 
-static int      lld_graph_compare_func(const void *d1, const void *d2)
+static int	lld_graph_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_graph_t  *lld_graph_1 = *(const zbx_lld_graph_t **)d1;
 	const zbx_lld_graph_t  *lld_graph_2 = *(const zbx_lld_graph_t **)d2;
@@ -309,7 +309,6 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr
 static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr_t *gitems_proto,
 		zbx_vector_lld_graph_ptr_t *graphs)
 {
-	int			i;
 	zbx_lld_graph_t		*graph;
 	zbx_vector_uint64_t	graphids;
 	zbx_db_result_t		result;
@@ -322,7 +321,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 	zbx_vector_uint64_create(&graphids);
 	zbx_vector_uint64_append(&graphids, parent_graphid);
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -376,8 +375,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 		{
 			zbx_vector_lld_gitem_ptr_append(gitems_proto, gitem);
 		}
-		else if (FAIL != (index = zbx_vector_lld_graph_ptr_bsearch(graphs, &cmp,
-				lld_graph_compare_func)))
+		else if (FAIL != (index = zbx_vector_lld_graph_ptr_bsearch(graphs, &cmp, lld_graph_compare_func)))
 		{
 			graph = graphs->values[index];
 
@@ -393,7 +391,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 
 	zbx_vector_lld_gitem_ptr_sort(gitems_proto, lld_gitem_compare_func);
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -551,8 +549,7 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_lld_item_ptr
 	zbx_lld_item_t		*item_proto, lld_item_cmp = {.itemid = itemid_proto};
 	zbx_lld_item_link_t	*item_link;
 
-	if (FAIL == (index = zbx_vector_lld_item_ptr_bsearch(items, &lld_item_cmp,
-			lld_item_compare_func)))
+	if (FAIL == (index = zbx_vector_lld_item_ptr_bsearch(items, &lld_item_cmp, lld_item_compare_func)))
 	{
 		return FAIL;
 	}

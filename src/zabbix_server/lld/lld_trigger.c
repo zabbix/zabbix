@@ -56,12 +56,12 @@ zbx_lld_function_t;
 ZBX_PTR_VECTOR_DECL(lld_function_ptr, zbx_lld_function_t*)
 ZBX_PTR_VECTOR_IMPL(lld_function_ptr, zbx_lld_function_t*)
 
-static int      lld_function_compare_func(const void *d1, const void *d2)
+static int	lld_function_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_function_t  *lld_function_1 = *(const zbx_lld_function_t **)d1;
-	const zbx_lld_function_t  *lld_function_2 = *(const zbx_lld_function_t **)d2;
+	const zbx_lld_function_t	*f1 = *(const zbx_lld_function_t **)d1;
+	const zbx_lld_function_t	*f2 = *(const zbx_lld_function_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(lld_function_1->functionid, lld_function_2->functionid);
+	ZBX_RETURN_IF_NOT_EQUAL(f1->functionid, f2->functionid);
 
 	return 0;
 }
@@ -138,10 +138,10 @@ struct zbx_lld_trigger_s
 ZBX_PTR_VECTOR_FUNC_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
 ZBX_PTR_VECTOR_IMPL(lld_trigger_ptr, zbx_lld_trigger_t*)
 
-static int      lld_trigger_compare_func(const void *d1, const void *d2)
+static int	lld_trigger_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_trigger_t  *lld_trigger_1 = *(const zbx_lld_trigger_t **)d1;
-	const zbx_lld_trigger_t  *lld_trigger_2 = *(const zbx_lld_trigger_t **)d2;
+	const zbx_lld_trigger_t	*lld_trigger_1 = *(const zbx_lld_trigger_t **)d1;
+	const zbx_lld_trigger_t	*lld_trigger_2 = *(const zbx_lld_trigger_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(lld_trigger_1->triggerid, lld_trigger_2->triggerid);
 
@@ -161,10 +161,10 @@ struct zbx_lld_dependency_s
 
 ZBX_PTR_VECTOR_FUNC_DECL(lld_dependency_ptr, zbx_lld_dependency_t*)
 
-static int      lld_dependency_compare_func(const void *d1, const void *d2)
+static int	lld_dependency_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_dependency_t  *lld_dependency_1 = *(const zbx_lld_dependency_t **)d1;
-	const zbx_lld_dependency_t  *lld_dependency_2 = *(const zbx_lld_dependency_t **)d2;
+	const zbx_lld_dependency_t	*lld_dependency_1 = *(const zbx_lld_dependency_t **)d1;
+	const zbx_lld_dependency_t	*lld_dependency_2 = *(const zbx_lld_dependency_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(lld_dependency_1->triggerdepid, lld_dependency_2->triggerdepid);
 
@@ -206,7 +206,7 @@ zbx_lld_trigger_prototype_t;
 ZBX_PTR_VECTOR_DECL(lld_trigger_prototype_ptr, zbx_lld_trigger_prototype_t*)
 ZBX_PTR_VECTOR_IMPL(lld_trigger_prototype_ptr, zbx_lld_trigger_prototype_t*)
 
-static int      lld_trigger_prototype_compare_func(const void *d1, const void *d2)
+static int	lld_trigger_prototype_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_trigger_prototype_t  *lld_trigger_prototype_1 = *(const zbx_lld_trigger_prototype_t **)d1;
 	const zbx_lld_trigger_prototype_t  *lld_trigger_prototype_2 = *(const zbx_lld_trigger_prototype_t **)d2;

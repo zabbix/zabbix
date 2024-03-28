@@ -36,30 +36,30 @@ ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 
 int      lld_item_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_t  *lld_item_1 = *(const zbx_lld_item_t **)d1;
-	const zbx_lld_item_t  *lld_item_2 = *(const zbx_lld_item_t **)d2;
+	const zbx_lld_item_t  *item_1 = *(const zbx_lld_item_t **)d1;
+	const zbx_lld_item_t  *item_2 = *(const zbx_lld_item_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(lld_item_1->itemid, lld_item_2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
 
 	return 0;
 }
 
 int      lld_item_link_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_link_t  *lld_item_link_1 = *(const zbx_lld_item_link_t **)d1;
-	const zbx_lld_item_link_t  *lld_item_link_2 = *(const zbx_lld_item_link_t **)d2;
+	const zbx_lld_item_link_t  *link_1 = *(const zbx_lld_item_link_t **)d1;
+	const zbx_lld_item_link_t  *link_2 = *(const zbx_lld_item_link_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(lld_item_link_1->parent_itemid, lld_item_link_2->parent_itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(link_1->parent_itemid, link_2->parent_itemid);
 
 	return 0;
 }
 
 int     lld_item_full_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_full_t  *lld_item_full_1 = *(const zbx_lld_item_full_t **)d1;
-	const zbx_lld_item_full_t  *lld_item_full_2 = *(const zbx_lld_item_full_t **)d2;
+	const zbx_lld_item_full_t  *item_1 = *(const zbx_lld_item_full_t **)d1;
+	const zbx_lld_item_full_t  *item_2 = *(const zbx_lld_item_full_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(lld_item_full_1->itemid, lld_item_full_2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
 
 	return 0;
 }
@@ -495,10 +495,10 @@ static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json
 
 static int      lld_override_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_override_t  *lld_override_1 = *(const zbx_lld_override_t **)d1;
-	const zbx_lld_override_t  *lld_override_2 = *(const zbx_lld_override_t **)d2;
+	const zbx_lld_override_t  *override_1 = *(const zbx_lld_override_t **)d1;
+	const zbx_lld_override_t  *override_2 = *(const zbx_lld_override_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(lld_override_1->overrideid, lld_override_2->overrideid);
+	ZBX_RETURN_IF_NOT_EQUAL(override_1->overrideid, override_2->overrideid);
 
 	return 0;
 }
