@@ -86,6 +86,9 @@ const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
 const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
 const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
 
+const MAINTENANCE_TYPE_NORMAL = 0;
+const MAINTENANCE_TYPE_NODATA = 1;
+
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;
 const KEY_ARROW_RIGHT = 39;

@@ -46,9 +46,6 @@ class CNavigationTree {
 	static ZBX_STYLE_NODE_CHILDREN =							'navigation-tree-node-children';
 	static ZBX_STYLE_GROUP_UNCATEGORIZED =						'navigation-tree-group-uncategorized';
 
-	static MAINTENANCE_TYPE_NORMAL = '0';
-	static MAINTENANCE_TYPE_NODATA = '1';
-
 	static EVENT_ITEM_SELECT = 'item.select';
 	static EVENT_GROUP_TOGGLE = 'group.toggle';
 
@@ -402,7 +399,7 @@ class CNavigationTree {
 		element.dataset.hintbox = '1';
 		element.dataset.hintboxStatic = '1';
 
-		const type = maintenance.maintenance_type === CNavigationTree.MAINTENANCE_TYPE_NORMAL
+		const type = maintenance.maintenance_type === MAINTENANCE_TYPE_NORMAL
 			? t('Maintenance with data collection')
 			: t('Maintenance without data collection');
 
