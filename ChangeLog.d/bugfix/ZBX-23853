@@ -1,0 +1,1 @@
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)

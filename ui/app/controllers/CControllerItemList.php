@@ -530,7 +530,7 @@ class CControllerItemList extends CControllerItem {
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectTriggers' => ['triggerid'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectItemDiscovery' => ['ts_delete'],
+			'selectItemDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
 			'sortfield' => $input['sort'],
 			'evaltype' => $input['filter_evaltype'],

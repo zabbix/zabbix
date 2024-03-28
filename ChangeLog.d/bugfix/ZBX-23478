@@ -1,0 +1,1 @@
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
