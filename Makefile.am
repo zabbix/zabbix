@@ -208,6 +208,11 @@ clean: clean-recursive modules_clean
 	cd tests && $(MAKE) clean
 endif
 
+badger:
+	$(MAKE) $(AM_MAKEFLAGS) && \
+	cd src/libs/test_zbxcommon && \
+	$(MAKE) $(AM_MAKEFLAGS)
+
 sbom: sbom-ui
 
 sbom-ui: ui/sbom.json
