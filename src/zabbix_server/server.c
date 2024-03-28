@@ -384,6 +384,13 @@ static	const zbx_events_funcs_t	events_cbs = {
 	.events_update_itservices_cb	= zbx_events_update_itservices
 };
 
+typedef struct
+{
+	zbx_rtc_t	*rtc;
+	zbx_socket_t	*listen_sock;
+}
+zbx_on_exit_args_t;
+
 static int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num)
 {
@@ -1132,7 +1139,7 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
-static void	zbx_on_exit(int ret)
+static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
 
@@ -1204,6 +1211,17 @@ static void	zbx_on_exit(int ret)
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
 	zbx_deinit_library_export();
+
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_close(&args->rtc->service);
+	}
 
 	exit(EXIT_SUCCESS);
 }
@@ -1471,7 +1489,8 @@ static void	zbx_db_save_server_status(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
+static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc,
+		zbx_on_exit_args_t *exit_args)
 {
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
@@ -1614,6 +1633,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
+		exit_args->listen_sock = listen_sock;
+
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -2036,11 +2057,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	char		*error = NULL, *smtp_auth_feature_status = NULL;
 	int		i, db_type, ret, ha_status_old;
 
-	zbx_socket_t	listen_sock;
-	time_t		standby_warning_time;
-	zbx_rtc_t	rtc;
-	zbx_timespec_t	rtc_timeout = {1, 0};
-	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
+	zbx_socket_t		listen_sock = {0};
+	time_t			standby_warning_time;
+	zbx_rtc_t		rtc;
+	zbx_timespec_t		rtc_timeout = {1, 0};
+	zbx_ha_config_t		*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
+	zbx_on_exit_args_t	exit_args = {.rtc = NULL, .listen_sock = NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -2168,6 +2190,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	exit_args.rtc = &rtc;
+	zbx_set_on_exit_args(&exit_args);
+
 	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
@@ -2281,7 +2306,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
+		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc, &exit_args))
 		{
 			zbx_set_exiting_with_fail();
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -2368,7 +2393,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
+					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc, &exit_args))
 					{
 						zbx_set_exiting_with_fail();
 						ha_status = ZBX_NODE_STATUS_ERROR;
@@ -2430,7 +2455,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
 }

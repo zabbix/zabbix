@@ -272,7 +272,7 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_SELFMON */
 	0, /* ZBX_PROCESS_TYPE_VMWARE */
 	1, /* ZBX_PROCESS_TYPE_COLLECTOR */
-	3, /* ZBX_PROCESS_TYPE_LISTENER */
+	10, /* ZBX_PROCESS_TYPE_LISTENER */
 	0, /* ZBX_PROCESS_TYPE_ACTIVE_CHECKS */
 	0, /* ZBX_PROCESS_TYPE_TASKMANAGER */
 	0, /* ZBX_PROCESS_TYPE_IPMIMANAGER */
@@ -1131,8 +1131,17 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 }
 #endif	/* _WINDOWS */
 
-static void	zbx_on_exit(int ret)
+typedef struct
 {
+	zbx_socket_t	*listen_sock;
+}
+zbx_on_exit_args_t;
+
+static void	zbx_on_exit(int ret, void *on_exit_args)
+{
+#ifdef _WINDOWS
+	ZBX_UNUSED(on_exit_args);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	zbx_free_service_resources(ret);
@@ -1146,7 +1155,16 @@ static void	zbx_on_exit(int ret)
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
+#else
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+	}
 #endif
+
 	exit(EXIT_SUCCESS);
 }
 
@@ -1196,11 +1214,12 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	zbx_socket_t	listen_sock;
-	char		*error = NULL;
-	int		i, j = 0, ret = SUCCEED;
+	zbx_socket_t		listen_sock = {0};
+	zbx_on_exit_args_t	exit_args = {NULL};
+	char			*error = NULL;
+	int			i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
-	DWORD		res;
+	DWORD			res;
 
 #ifdef _M_X64
 	if (NULL == AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler))
@@ -1275,6 +1294,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_LISTENER])
 	{
+#ifndef _WINDOWS
+		exit_args.listen_sock = &listen_sock;
+		zbx_set_on_exit_args(&exit_args);
+#endif
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -1419,7 +1443,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	ret = ZBX_EXIT_STATUS();
 
 #endif
-	zbx_on_exit(ret);
+	zbx_on_exit(ret, &exit_args);
 
 	return SUCCEED;
 }

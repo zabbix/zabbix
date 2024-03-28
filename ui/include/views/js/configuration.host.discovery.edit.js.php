@@ -219,6 +219,34 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 					}
 				})
 				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
+
+			document.querySelectorAll('#lifetime_type, #enabled_lifetime_type').forEach(element => {
+				element.addEventListener('change', () => this.updateLostResourcesFields());
+			});
+
+			this.updateLostResourcesFields();
+		},
+
+		updateLostResourcesFields() {
+			const lifetime_type = document.querySelector('[name="lifetime_type"]:checked').value;
+			const enabled_lifetime_type = document.querySelector('[name="enabled_lifetime_type"]:checked').value;
+			const delete_immediately = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
+
+			document.getElementById('enabled_lifetime_type').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
+			document.getElementById('lifetime').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				lifetime_type != <?= ZBX_LLD_DELETE_AFTER ?>
+			);
+			document.getElementById('enabled_lifetime').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately || enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
+			);
+			document.getElementById('js-item-disable-resources-field').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
+			document.getElementById('js-item-disable-resources-label').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
 		},
 
 		updateExpression() {
@@ -240,7 +268,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		toggleConditionValue(event) {
 			const value = event.currentTarget.closest('.form_row').querySelector('.js-value');
 			const show_value = (event.currentTarget.value == <?= CONDITION_OPERATOR_REGEXP ?>
-					|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+				|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
 
 			value.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
 
