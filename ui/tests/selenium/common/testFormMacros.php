@@ -30,6 +30,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 	const ZABBIX_SERVERS_GROUPID = 4;
+
+	protected static $hostid_remove_inherited;
+	protected static $macro_resolve_hostid;
+
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -2495,8 +2499,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 	/**
 	 * Function for testing resolving macros on host or global level.
 	 *
-	 * @param string $data    data provider
-	 * @param string $object  macros level: global or host
+	 * @param string $data      data provider
+	 * @param string $hostid    id of a host which is opened to check macros
+	 * @param string $object    macros level: global or host
 	 */
 	public function resolveSecretMacro($data, $hostid, $object = 'global') {
 		$url = $data['url'] === 'latest_data'

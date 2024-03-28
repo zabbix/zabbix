@@ -327,7 +327,7 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getResolveSecretMacroData
 	 */
 	public function testFormMacrosHost_ResolveSecretMacro($data) {
-		$this->resolveSecretMacro($data, self::$macro_resolve_hostid, 'host');
+		$this->resolveSecretMacro($data, self::$macro_resolve_hostid,'host');
 	}
 
 	/**

@@ -1837,8 +1837,8 @@ UPDATE config SET session_key='caf1c06dcf802728c4cfc24d645e1e73' WHERE configid 
 -- INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99526, 99014, '{$VAULT_HOST_MACRO}', 'secret/path:key', 'Change name, value, description', 2);
 
 -- testFormAdministrationGeneralMacros
-INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params,query_fields, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap[{$Z_GLOBAL_MACRO_2_RESOLVE}]', NULL, '','', '', '', '');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99114, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'MACRO VALUE: {$Z_GLOBAL_MACRO_2_RESOLVE}');
+-- INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params,query_fields, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap[{$Z_GLOBAL_MACRO_2_RESOLVE}]', NULL, '','', '', '', '');
+-- INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99114, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'MACRO VALUE: {$Z_GLOBAL_MACRO_2_RESOLVE}');
 
 -- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');
