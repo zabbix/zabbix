@@ -58,7 +58,7 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('discovery.edit', parameters, {
 				dialogueid: 'discoveryForm',
-				dialogue_class: 'modal-popup-static',
+				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
