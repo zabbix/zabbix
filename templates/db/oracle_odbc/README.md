@@ -183,11 +183,11 @@ This template has been tested on:
 |Oracle: Service's TCP port state|<p>It checks the availability of Oracle on the TCP port.</p>|Zabbix agent|net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Oracle: Number of LISTENER processes|<p>The number of running LISTENER processes.</p>|Zabbix agent|proc.num[,,,"tnslsnr LISTENER"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Oracle: Get instance state|<p>The item gets its state of the current instance.</p>|Database monitor|db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get archive log|<p>The item gets destinations of the log archive.</p>|Database monitor|db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get ASM disk groups|<p>The item gets ASM disk groups.</p>|Database monitor|db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get database|<p>The item gets databases in the database management system (DBMS).</p>|Database monitor|db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get PDB|<p>The item gets pluggable database (PDB) in DBMS.</p>|Database monitor|db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get tablespace|<p>The item gets tablespaces in DBMS.</p>|Database monitor|db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get archive log|<p>Gets the destinations of the log archive.</p>|Database monitor|db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get ASM disk groups|<p>Gets the ASM disk groups.</p>|Database monitor|db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get database|<p>Gets the databases in the database management system (DBMS).</p>|Database monitor|db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get PDB|<p>Gets the pluggable database (PDB) in DBMS.</p>|Database monitor|db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get tablespace|<p>Gets tablespaces in DBMS.</p>|Database monitor|db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
 |Oracle: Version|<p>The Oracle Server version.</p>|Dependent item|oracle.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..VERSION.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Oracle: Uptime|<p>The Oracle instance uptime expressed in seconds.</p>|Dependent item|oracle.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..UPTIME.first()`</p></li></ul>|
 |Oracle: Instance status|<p>The status of the instance.</p>|Dependent item|oracle.instance_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..STATUS.first()`</p></li></ul>|
@@ -280,7 +280,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database discovery|<p>Discovery of the databases.</p>|Dependent item|oracle.db.discovery|
+|Database discovery|<p>Used for database discovery.</p>|Dependent item|oracle.db.discovery|
 
 ### Item prototypes for Database discovery
 
@@ -305,7 +305,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PDB discovery|<p>Discovery of the pluggable database (PDB).</p>|Dependent item|oracle.pdb.discovery|
+|PDB discovery|<p>Used for the discovery of the pluggable database (PDB).</p>|Dependent item|oracle.pdb.discovery|
 
 ### Item prototypes for PDB discovery
 
@@ -325,7 +325,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Tablespace discovery|<p>Discovery the tablespaces in DBMS.</p>|Dependent item|oracle.tablespace.discovery|
+|Tablespace discovery|<p>Used for the discovery of tablespaces in DBMS.</p>|Dependent item|oracle.tablespace.discovery|
 
 ### Item prototypes for Tablespace discovery
 
@@ -358,7 +358,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Archive log discovery|<p>Discovery of the log archive.</p>|Dependent item|oracle.archivelog.discovery|
+|Archive log discovery|<p>Used for the discovery of the log archive.</p>|Dependent item|oracle.archivelog.discovery|
 
 ### Item prototypes for Archive log discovery
 
@@ -379,7 +379,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ASM disk groups discovery|<p>Discovery the ASM disk groups.</p>|Dependent item|oracle.asm.discovery|
+|ASM disk groups discovery|<p>Used for discovering the ASM disk groups.</p>|Dependent item|oracle.asm.discovery|
 
 ### Item prototypes for ASM disk groups discovery
 

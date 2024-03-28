@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-01T13:04:03Z'
+  date: '2024-03-19T11:51:22Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -36,7 +36,7 @@ zabbix_export:
             FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets destinations of the log archive.'
+          description: 'Gets the destinations of the log archive.'
           tags:
             - tag: component
               value: raw
@@ -51,7 +51,7 @@ zabbix_export:
           params: 'SELECT name AS dgname FROM v$asm_diskgroup;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets ASM disk groups.'
+          description: 'Gets the ASM disk groups.'
           tags:
             - tag: component
               value: raw
@@ -66,7 +66,7 @@ zabbix_export:
           params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets databases in the database management system (DBMS).'
+          description: 'Gets the databases in the database management system (DBMS).'
           tags:
             - tag: component
               value: raw
@@ -104,7 +104,7 @@ zabbix_export:
           params: 'SELECT name as DBNAME FROM V$PDBS;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets pluggable database (PDB) in DBMS.'
+          description: 'Gets the pluggable database (PDB) in DBMS.'
           tags:
             - tag: component
               value: raw
@@ -195,7 +195,7 @@ zabbix_export:
             FROM CDB_TABLESPACES;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets tablespaces in DBMS.'
+          description: 'Gets tablespaces in DBMS.'
           tags:
             - tag: component
               value: raw
@@ -1523,7 +1523,7 @@ zabbix_export:
           type: DEPENDENT
           key: oracle.archivelog.discovery
           delay: '0'
-          description: 'Discovery of the log archive.'
+          description: 'Used for the discovery of the log archive.'
           item_prototypes:
             - uuid: 1a6e01f90dca47459975632c14ce5a39
               name: 'Archivelog ''{#DEST_NAME}'': Get archive log info'
@@ -1644,7 +1644,7 @@ zabbix_export:
           type: DEPENDENT
           key: oracle.asm.discovery
           delay: '0'
-          description: 'Discovery the ASM disk groups.'
+          description: 'Used for discovering the ASM disk groups.'
           item_prototypes:
             - uuid: 63fad55a2ced487aa30017b33bf1692e
               name: 'ASM ''{#DGNAME}'': Get ASM stats'
@@ -1787,7 +1787,7 @@ zabbix_export:
                 value: '{$ORACLE.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery of the databases.'
+          description: 'Used for database discovery.'
           item_prototypes:
             - uuid: 5de7c786988d49d0b50f28d2d622db62
               name: 'Oracle Database ''{#DBNAME}'': Get CDB and No-CDB info'
@@ -1995,7 +1995,7 @@ zabbix_export:
                 value: '{$ORACLE.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery of the pluggable database (PDB).'
+          description: 'Used for the discovery of the pluggable database (PDB).'
           item_prototypes:
             - uuid: cedcebd0b7ce474c9681022fcc75df1c
               name: 'Oracle Database ''{#DBNAME}'': Get PDB info'
@@ -2098,7 +2098,7 @@ zabbix_export:
                 value: '{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Discovery the tablespaces in DBMS.'
+          description: 'Used for the discovery of tablespaces in DBMS.'
           item_prototypes:
             - uuid: 972be2e777e44c539d0ddd7918b79e88
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Get tablespaces stats'
