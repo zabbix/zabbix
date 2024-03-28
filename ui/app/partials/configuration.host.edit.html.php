@@ -496,14 +496,17 @@ $encryption_tab = (new CFormGrid())
 
 // Value mapping tab.
 if (!$host_is_discovered) {
-	$value_mapping_tab = (new CFormList('valuemap-formlist'))
-		->addRow(null, new CPartial('configuration.valuemap', [
+	$value_mapping_tab = (new CFormList('valuemap-formlist'))->addRow(
+		_('Value mapping'),
+		new CPartial('configuration.valuemap', [
 			'source' => 'host',
 			'valuemaps' => $data['host']['valuemaps'],
 			'readonly' => $host_is_discovered,
 			'form' => 'host',
-			'table_id' => 'valuemap-table'
-		]));
+			'table_id' => 'valuemap-table',
+			'with_label' => true
+		])
+	);
 }
 
 // main output
