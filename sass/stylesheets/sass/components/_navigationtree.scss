@@ -1,3 +1,5 @@
+$max_levels: 10;
+
 .navigation-tree {
 	.navigation-tree-node-info {
 		display: flex;
@@ -24,8 +26,6 @@
 		height: 18px;
 		line-height: 18px;
 	}
-
-	$max_levels: 10;
 
 	@for $i from 0 through $max_levels {
 		[data-level="#{$i}"] {
