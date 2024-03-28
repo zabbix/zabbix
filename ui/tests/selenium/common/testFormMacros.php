@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 abstract class testFormMacros extends CLegacyWebTest {
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
-
+	const ZABBIX_SERVERS_GROUPID = 4;
 	/**
 	 * Attach Behaviors to the test.
 	 *

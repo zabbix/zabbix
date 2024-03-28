@@ -27,8 +27,6 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
  * @onBefore prepareHostMacrosData
  */
 class testFormMacrosHost extends testFormMacros {
-
-	const ZABBIX_SERVERS_GROUPID = 4;
 	protected $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
 	protected $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	protected $hashi_error_field = '/1/macros/3/value';

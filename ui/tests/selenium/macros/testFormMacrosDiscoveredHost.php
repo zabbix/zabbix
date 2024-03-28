@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
  * @backup hosts, config
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
-
 	protected static $hostid;
 	protected static $inherit_hostid;
 	protected static $hosts = [];
@@ -155,6 +154,11 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					]
 				]
 			],
+			// '3 Discovered host macros_create'.
+			[
+				'hostid' => self::$hosts[3]['hostid'],
+				'macros' => []
+			],
 			// '4 Discovered host macros_revert'.
 			[
 				'hostid' => self::$hosts[4]['hostid'],
@@ -209,6 +213,16 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					]
 				]
 			],
+			// '6 Discovered host vault_validation'.
+			[
+				'hostid' => self::$hosts[6]['hostid'],
+				'macros' => []
+			],
+			// '7 Discovered host vault_create'.
+			[
+				'hostid' => self::$hosts[7]['hostid'],
+				'macros' => []
+			],
 			// '8 Discovered host macros_inheritance'.
 			[
 				'hostid' => self::$hosts[8]['hostid'],
@@ -257,12 +271,12 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$hosts = CDataHelper::call('host.create', [
 			[
 				'host' => 'Parent host for discovered hosts macros',
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 				'interfaces' => ['type'=> 1, 'main' => 1, 'useip' => 1, 'ip' => '127.0.0.1', 'dns' => '', 'port' => 10050]
 			],
 			[
 				'host' => 'Parent host for macros inheritance',
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 				'interfaces' => ['type'=> 1, 'main' => 1, 'useip' => 1, 'ip' => '127.0.0.1', 'dns' => '', 'port' => 10050],
 				'macros' => [
 					[
@@ -322,7 +336,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			$prototypes_data[] = [
 				'host' => self::$hosts[$k]['prototype_name'],
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'groupLinks' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => $host_macros[$k]['macros']
 			];
 		}
@@ -332,7 +346,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			$prototypes_data[] = [
 				'host' => self::$hosts[$l]['prototype_name'],
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]]
+				'groupLinks' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]]
 			];
 		}
 
@@ -340,7 +354,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$prototypes_data[] = [
 			'host' => self::$hosts[8]['prototype_name'],
 			'ruleid' => $inherit_lldid,
-			'groupLinks' => [['groupid' => 4]],
+			'groupLinks' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 			'macros' => [
 				[
 					'macro' => '{$PROTO_MACRO}',
