@@ -136,11 +136,38 @@ $max_levels: 10;
 		display: flex;
 		align-items: center;
 		white-space: pre;
+		line-height: 18px;
 
+		.navigation-tree-node-info-problems-hint-severity-color {
+			margin-right: 10px
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'blue' or $theme-name == 'dark' {
+	.navigation-tree-node-info-problems-hint {
 		.navigation-tree-node-info-problems-hint-severity-color {
 			width: 10px;
 			height: 10px;
-			margin-right: 10px
+		}
+	}
+}
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	.navigation-tree-node-info-problems-hint {
+		.navigation-tree-node-info-problems-hint-severity-color {
+			width: $icon-medium-size;
+			height: $icon-medium-size;
+
+			&::before {
+				width: $icon-medium-size;
+				height: $icon-medium-size;
+				font-size: $icon-medium-size;
+				padding: 0;
+				border-radius: 3px;
+			}
 		}
 	}
 }

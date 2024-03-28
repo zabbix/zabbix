@@ -3098,11 +3098,20 @@ output {
 .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity {
   display: flex;
   align-items: center;
-  white-space: pre; }
+  white-space: pre;
+  line-height: 18px; }
   .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity .navigation-tree-node-info-problems-hint-severity-color {
-    width: 10px;
-    height: 10px;
     margin-right: 10px; }
+
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color {
+  width: 16px;
+  height: 16px; }
+  .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color::before {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    padding: 0;
+    border-radius: 3px; }
 
 .radio-list-control {
   display: inline-block;
