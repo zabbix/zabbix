@@ -6,6 +6,7 @@ SUBDIRS = \
 	zbxvariant \
 	zbxtime \
 	zbxxml \
+	zbxparam \
 	zbxcfg \
 	zbxdbcache \
 	zbxdbhigh \
