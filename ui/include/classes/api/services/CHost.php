@@ -1096,11 +1096,28 @@ class CHost extends CHostGeneral {
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
 			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
-		if (!zbx_empty($data)) {
+		if ($data) {
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
 			]);
+
+			if (array_key_exists('status', $data) && $data['status'] == HOST_STATUS_NOT_MONITORED) {
+				$discovered_hostids = [];
+
+				foreach ($db_hosts as $db_host) {
+					if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $data['status'] != $db_host['status']) {
+						$discovered_hostids[] = $db_host['hostid'];
+					}
+				}
+
+				if ($discovered_hostids) {
+					DB::update('host_discovery', [
+						'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
+						'where' => ['hostid' => $discovered_hostids]
+					]);
+				}
+			}
 		}
 
 		/*

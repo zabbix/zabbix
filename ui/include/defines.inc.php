@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0beta2');
+define('ZABBIX_VERSION',		'7.0.0beta3');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050227);
+define('ZABBIX_DB_VERSION',		6050253);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -565,7 +565,6 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
-define('ZBX_LLD_RULE_DELAY_DEFAULT',		'1h');
 define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
@@ -751,6 +750,23 @@ define('OPERATION_OBJECT_ITEM_PROTOTYPE', 0);
 define('OPERATION_OBJECT_TRIGGER_PROTOTYPE', 1);
 define('OPERATION_OBJECT_GRAPH_PROTOTYPE', 2);
 define('OPERATION_OBJECT_HOST_PROTOTYPE', 3);
+
+// LLD rule
+define('ZBX_LLD_DELETE_AFTER',			0);
+define('ZBX_LLD_DELETE_NEVER',			1);
+define('ZBX_LLD_DELETE_IMMEDIATELY',	2);
+define('ZBX_LLD_DISABLE_AFTER',			0);
+define('ZBX_LLD_DISABLE_NEVER',			1);
+define('ZBX_LLD_DISABLE_IMMEDIATELY',	2);
+
+define('ZBX_DISABLE_SOURCE_LLD',		1);
+define('ZBX_DISABLE_DEFAULT',			0);
+
+define('ZBX_LLD_STATUS_DISCOVERED',		0);
+define('ZBX_LLD_STATUS_LOST',			1);
+
+define('ZBX_LLD_RULE_ENABLED_LIFETIME',	'1h');
+define('ZBX_LLD_RULE_DELAY_DEFAULT',	'1h');
 
 define('GRAPH_DISCOVER',	0);
 define('GRAPH_NO_DISCOVER',	1);
@@ -1860,6 +1876,9 @@ define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 define('TAB_INDICATOR_TEMPLATE_VALUEMAPS', 'template-valuemaps');
+
+define('ZBX_COLOR_SCHEME_DARK', 'dark');
+define('ZBX_COLOR_SCHEME_LIGHT', 'light');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');

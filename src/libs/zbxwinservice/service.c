@@ -20,7 +20,7 @@
 #include "zbxwinservice.h"
 
 #include "zbxstr.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxlog.h"
 
 #include <strsafe.h> /* StringCchPrintf */

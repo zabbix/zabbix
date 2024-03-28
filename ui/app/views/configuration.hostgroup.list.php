@@ -181,7 +181,9 @@ foreach ($data['groups'] as $group) {
 				break;
 			}
 
-			$max = max($max, (int) $group_discovery['ts_delete']);
+			if ($group_discovery['status'] == ZBX_LLD_STATUS_LOST) {
+				$max = max($max, (int) $group_discovery['ts_delete']);
+			}
 		}
 
 		if ($max > 0) {

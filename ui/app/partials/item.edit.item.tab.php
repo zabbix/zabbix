@@ -846,9 +846,15 @@ $formgrid
 		)
 	]);
 
+
+$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('itemDiscovery', $item)
+		&& $item['itemDiscovery'] && $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+	: null;
+
 if ($data['source'] === 'item') {
 	$formgrid->addItem([
-		new CLabel(_('Enabled'), 'status'),
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
 			(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
 	]);

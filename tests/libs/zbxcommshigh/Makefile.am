@@ -28,7 +28,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
