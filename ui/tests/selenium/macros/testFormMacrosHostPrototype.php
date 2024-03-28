@@ -28,10 +28,66 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
  */
 class testFormMacrosHostPrototype extends testFormMacros {
 
-	/**
-	 * Create new macros for host prototype.
-	 */
+	const IS_PROTOTYPE	= true;
+	protected static $main_lldid;
+
 	public function prepareHostPrototypeMacrosData() {
+		CDataHelper::createHosts([
+			[
+				'host' => 'Host for host prortotypes macros testing',
+				'groups' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
+				'discoveryrules' => [
+					[
+						'name' => 'Main LLD',
+						'key_' => 'main_lld',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
+			]
+		]);
+
+		self::$main_lldid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('Main LLD'));
+
+		$response = CDataHelper::call('hostprototype.create', [
+			'host' => 'Host prototype for Inherited {#MACROS} removing',
+			'ruleid' => self::$main_lldid,
+			'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+			'macros' => [
+				[
+					'macro' => '{$TEST_MACRO123}',
+					'value' => 'test123',
+					'description' => 'description 123'
+				],
+				[
+					'macro' => '{$MACRO_FOR_DELETE_HOST1}',
+					'value' => 'test1',
+					'description' => 'description 1'
+				],
+				[
+					'macro' => '{$MACRO_FOR_DELETE_HOST2}',
+					'value' => 'test2',
+					'description' => 'description 2'
+				],
+				[
+					'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
+					'value' => 'test global 1',
+					'description' => 'global description 1'
+				],
+				[
+					'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
+					'value' => 'test global 2',
+					'description' => 'global description 2'
+				],
+				[
+					'macro' => '{$SNMP_COMMUNITY}',
+					'value' => 'redefined value',
+					'description' => 'redefined description'
+				]
+			]
+		]);
+
+		self::$host_prototypeid_remove_inherited = $response['hostids'][0];
+
 		CDataHelper::call('hostprototype.update', [
 			[
 				'hostid' => 90010,
@@ -43,10 +99,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			]
 		]);
 	}
-
-	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
-	const LLD_ID		= 90001;
-	const IS_PROTOTYPE	= true;
 
 	/**
 	 * The name of the host for updating macros, id=99200.
@@ -83,7 +135,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getCreateMacrosData
 	 */
 	public function testFormMacrosHostPrototype_Create($data) {
-		$this->checkMacros($data, 'host prototype', null, false, self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkMacros($data, 'host prototype', null, false, self::IS_PROTOTYPE, self::$main_lldid);
 	}
 
 	/**
@@ -91,64 +143,22 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
-		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::$main_lldid);
 	}
 
 	public function testFormMacrosHostPrototype_RemoveAll() {
-		$this->checkRemoveAll($this->host_name_remove, 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkRemoveAll($this->host_name_remove, 'host prototype', self::IS_PROTOTYPE, self::$main_lldid);
 	}
 
 	/**
 	 * @dataProvider getCheckInheritedMacrosData
 	 */
 	public function testFormMacrosHostPrototype_ChangeInheritedMacro($data) {
-		$this->checkChangeInheritedMacros($data, 'host prototype', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkChangeInheritedMacros($data, 'host prototype', self::IS_PROTOTYPE, self::$main_lldid);
 	}
 
 	public function prepareHostPrototypeRemoveMacrosData() {
-		$response = CDataHelper::call('hostprototype.create', [
-				'host' => 'Host prototype for Inherited {#MACROS} removing',
-				'ruleid' => self::LLD_ID,
-				'groupLinks' =>  [
-					[
-						'groupid'=> 4
-					]
-				],
-				'macros' => [
-					[
-						'macro' => '{$TEST_MACRO123}',
-						'value' => 'test123',
-						'description' => 'description 123'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_HOST1}',
-						'value' => 'test1',
-						'description' => 'description 1'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_HOST2}',
-						'value' => 'test2',
-						'description' => 'description 2'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_GLOBAL1}',
-						'value' => 'test global 1',
-						'description' => 'global description 1'
-					],
-					[
-						'macro' => '{$MACRO_FOR_DELETE_GLOBAL2}',
-						'value' => 'test global 2',
-						'description' => 'global description 2'
-					],
-					[
-						'macro' => '{$SNMP_COMMUNITY}',
-						'value' => 'redefined value',
-						'description' => 'redefined description'
-					]
-				]
-		]);
-		$this->assertArrayHasKey('hostids', $response);
-		self::$host_prototypeid_remove_inherited = $response['hostids'][0];
+
 	}
 
 	/**
@@ -158,7 +168,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$host_prototypeid_remove_inherited,
-				self::IS_PROTOTYPE, self::LLD_ID);
+				self::IS_PROTOTYPE, self::$main_lldid);
 	}
 
 	public function getCreateSecretMacrosData() {
