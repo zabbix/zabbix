@@ -997,7 +997,10 @@ function countSelementProblems(array $selement, array &$sysmaps_data): array {
 function countNestedMapSelementProblems(array $selement, array &$sysmaps_data): array {
 	$sysmapid = $selement['elements'][0]['sysmapid'];
 
-	if (!array_key_exists('selement_problem_summary', $sysmaps_data[$sysmapid])) {
+	if (!array_key_exists($sysmapid, $sysmaps_data)) {
+		return defaultProblemSummary();
+	}
+	elseif (!array_key_exists('selement_problem_summary', $sysmaps_data[$sysmapid])) {
 		$selement_problem_summary = defaultProblemSummary();
 
 		foreach ($sysmaps_data[$sysmapid]['selements'] as $nested_sysmap_element) {
