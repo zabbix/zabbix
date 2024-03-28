@@ -17,21 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AGENT_CONF_H
-#define ZABBIX_AGENT_CONF_H
+#ifndef ZABBIX_AUTOREG_PROXY_H
+#define ZABBIX_AUTOREG_PROXY_H
 
-#include "zbxcfg.h"
-void	load_aliases(char **lines);
-int	load_user_parameters(char **lines, char **err);
-int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg);
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
-		char **config_user_parameters);
-#ifdef _WINDOWS
-void	load_perf_counters(const char **def_lines, const char **eng_lines);
+#include "zbxdbhigh.h"
+
+void	zbx_autoreg_update_host_proxy(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
+		int clock, const zbx_events_funcs_t *events_cbs);
+
 #endif
-
-#ifdef _AIX
-void	tl_version(void);
-#endif
-
-#endif /* ZABBIX_AGENT_CONF_H */

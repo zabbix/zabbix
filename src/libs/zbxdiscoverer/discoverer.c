@@ -303,6 +303,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	zbx_vector_uint64_t	dserviceids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&dserviceids);
 
 	for (int i = 0; i < services->values_num; i++)
@@ -879,7 +880,7 @@ zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const z
 	result->druleid = druleid;
 	result->unique_dcheckid = unique_dcheckid;
 	result->ip = result->dnsname = NULL;
-	result->now = (int)time(NULL);
+	result->now = time(NULL);
 	result->processed_checks_per_ip = 0;
 
 	return result;
@@ -896,7 +897,7 @@ static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_d
 
 		zbx_vector_discoverer_services_ptr_create(&dst->services);
 		dst->ip = zbx_strdup(NULL, ip);
-		dst->now = (int)time(NULL);
+		dst->now = time(NULL);
 		dst->unique_dcheckid = unique_dcheckid;
 		dst->dnsname = zbx_strdup(NULL, "");
 	}

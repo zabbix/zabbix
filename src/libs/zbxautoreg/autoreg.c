@@ -17,21 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AGENT_CONF_H
-#define ZABBIX_AGENT_CONF_H
+#include "zbxautoreg.h"
 
-#include "zbxcfg.h"
-void	load_aliases(char **lines);
-int	load_user_parameters(char **lines, char **err);
-int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg);
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
-		char **config_user_parameters);
-#ifdef _WINDOWS
-void	load_perf_counters(const char **def_lines, const char **eng_lines);
-#endif
+#include "zbxalgo.h"
 
-#ifdef _AIX
-void	tl_version(void);
-#endif
+ZBX_PTR_VECTOR_IMPL(autoreg_host_ptr, zbx_autoreg_host_t*)
 
-#endif /* ZABBIX_AGENT_CONF_H */
+int	zbx_autoreg_host_compare_func(const void *d1, const void *d2)
+{
+	const zbx_autoreg_host_t  *autoreg_host_1 = (const zbx_autoreg_host_t *)d1;
+	const zbx_autoreg_host_t  *autoreg_host_2 = (const zbx_autoreg_host_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(autoreg_host_1->autoreg_hostid, autoreg_host_2->autoreg_hostid);
+
+	return 0;
+}
