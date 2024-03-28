@@ -38,7 +38,8 @@ class CUser extends CApiService {
 		'login' => [],
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'resettotp' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'users';
@@ -3327,8 +3328,8 @@ class CUser extends CApiService {
 			'output' => ['userid', 'userdirectoryid', 'username'],
 			'userids' => $db_sessions[0]['userid']
 		])[0];
-		static::addUserGroupFields($db_user, $group_status);
 
+		self::addUserGroupFields($db_user, $group_status);
 		self::checkGroupStatus($db_user, $group_status);
 
 		if ($db_user['mfaid'] == 0) {
@@ -3349,18 +3350,41 @@ class CUser extends CApiService {
 			'userid' => $db_user['userid']
 		];
 
-		if ($mfa['type'] == MFA_TYPE_TOTP) {
+		if ($mfa['type'] == MFA_TYPE_TOTP) {	// TODO check - if MFA TOTP method changes, does it delete previous totp secret, because only one is possible.
 			$user_totp_secret = DB::select('mfa_totp_secret', [
-				'output' => ['totp_secret'],
-				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']]
+				'output' => ['mfa_totp_secretid', 'totp_secret', 'status'],
+				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']],
+				'limit' => 1
 			]);
 
-			if (!$user_totp_secret) {
+			// Delete previously saved totp_secret for this specific user which are not related to current MFA method.
+			DBexecute(
+				'DELETE FROM mfa_totp_secret'.
+					' WHERE '.dbConditionId('userid', [$db_user['userid']]).
+						' AND '.dbConditionId('mfaid', [$mfa['mfaid']], true)
+			);
+
+			if (!$user_totp_secret || $user_totp_secret[0]['status'] == TOTP_SECRET_CONFIRMATION_REQUIRED) {
 				$totp_generator = self::createTotpGenerator($data['mfa']);
 				$data['totp_secret'] = $totp_generator->generateSecretKey(TOTP_SECRET_LENGTH_32);
 				$data['qr_code_url'] = $totp_generator->getQRCodeUrl('Zabbix', $data['mfa']['name'],
 					$data['totp_secret']
 				);
+
+				if (!$user_totp_secret) {
+					DB::insert('mfa_totp_secret', [[
+						'mfaid' => $data['mfa']['mfaid'],
+						'userid' => $data['userid'],
+						'totp_secret' => $data['totp_secret'],
+						'status' => TOTP_SECRET_CONFIRMATION_REQUIRED
+					]]);
+				}
+				else {
+					DB::update('mfa_totp_secret', [
+						'values' => ['totp_secret' => $data['totp_secret']],
+						'where' => ['mfa_totp_secretid' => $user_totp_secret[0]['mfa_totp_secretid']]
+					]);
+				}
 			}
 		}
 
@@ -3419,8 +3443,8 @@ class CUser extends CApiService {
 			'output' => ['userid', 'userdirectoryid', 'username', 'attempt_failed', 'attempt_clock'],
 			'userids' => $db_sessions[0]['userid']
 		])[0];
-		static::addUserGroupFields($db_user, $group_status);
 
+		self::addUserGroupFields($db_user, $group_status);
 		self::checkGroupStatus($db_user, $group_status);
 
 		if ($db_user['mfaid'] == 0) {
@@ -3439,32 +3463,53 @@ class CUser extends CApiService {
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
 			$db_user_secrets = DB::select('mfa_totp_secret', [
-				'output' => ['totp_secret'],
-				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']]
+				'output' => ['mfa_totp_secretid', 'totp_secret', 'status', 'used_codes'],
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']],
+				'limit' => 1
 			]);
 
-			if ($db_user_secrets && array_key_exists('totp_secret', $mfa_response)
+			if (!$db_user_secrets || ($db_user_secrets && array_key_exists('totp_secret', $mfa_response)
 					&& $mfa_response['totp_secret'] != null
-					&& $db_user_secrets[0]['totp_secret'] !== $mfa_response['totp_secret']) {
+					&& $db_user_secrets[0]['totp_secret'] !== $mfa_response['totp_secret'])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 			}
 
-			$user_secret = $db_user_secrets ? $db_user_secrets[0]['totp_secret'] : $mfa_response['totp_secret'];
+			$db_user_secret = $db_user_secrets[0];
 
 			$valid_code = (self::createTotpGenerator($mfa))
-				->verifyKey($user_secret, $mfa_response['verification_code']);
+				->verifyKey($db_user_secret['totp_secret'], $mfa_response['verification_code']);
 
 			if ($valid_code) {
-				if (!$db_user_secrets) {
-					// Delete any previously saved totp_secret for this specific user.
-					DB::delete('mfa_totp_secret', ['userid' => $db_user['userid']]);
+				$used_codes = explode(',', $db_user_secret['used_codes']);
+				$valid_code = !array_key_exists($mfa_response['verification_code'], array_flip($used_codes));
+			}
 
-					DB::insert('mfa_totp_secret', [[
-						'mfaid' => $mfa['mfaid'],
-						'userid' => $db_user['userid'],
-						'totp_secret' => $mfa_response['totp_secret']
-					]]);
+			if ($valid_code) {
+				/**
+				 * Store only the number of codes that are available at each verification widnow.
+				 * If window is 1, it means that current, previous and future codes are valid and they should be stored
+				 * if entered correctly.
+				 * Add used codes and remove old ones using FIFO principle.
+				 */
+				if (count($used_codes) == (TOTP_VERIFICATION_DELAY_WINDOW * 2 + 1)) {
+					array_shift($used_codes);
 				}
+
+				$used_codes[] = $mfa_response['verification_code'];
+
+				$upd_mfa_totp_secret = [[
+					'values' => ['used_codes' => implode(',', $used_codes)],
+					'where' => ['mfa_totp_secretid' => $db_user_secret['mfa_totp_secretid']]
+				]];
+
+				if ($db_user_secret['status'] != TOTP_SECRET_CONFIRMED) {
+					$upd_mfa_totp_secret[] = [
+						'values' => ['status' => TOTP_SECRET_CONFIRMED],
+						'where' => ['mfa_totp_secretid' => $db_user_secret['mfa_totp_secretid']]
+					];
+				}
+
+				DB::update('mfa_totp_secret', $upd_mfa_totp_secret);
 			}
 			else {
 				self::increaseFailedLoginAttempts($db_user);
@@ -3592,5 +3637,35 @@ class CUser extends CApiService {
 		$userids_with_totp = DB::select('mfa_totp_secret', $options);
 
 		return array_column($userids_with_totp, 'userid');
+	}
+
+	/**
+	 * Reset TOTP secret of provided users and terminate active session.
+	 *
+	 * @param array $userids
+	 */
+	public function resetTotp(array $userids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $userids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_users_secrets = DB::select('mfa_totp_secret', [
+			'output' => ['userid'],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+
+		if ($db_users_secrets) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_keys($db_users_secrets)]);
+
+			$userids = array_flip(array_column($db_users_secrets, 'userid'));
+
+			unset($userids[self::$userData['userid']]);
+
+			self::terminateActiveSessions(array_keys($userids));
+		}
+
+		return ['userids' => $userids];
 	}
 }
