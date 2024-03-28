@@ -155,38 +155,38 @@ class CNavigationTree {
 	 * @returns {Object}  Severity object with necessary info.
 	 */
 	static getSeverity(index) {
-		const severities = [
-			{
+		const severities = {
+			[TRIGGER_SEVERITY_NOT_CLASSIFIED]: {
 				name: t('Not classified'),
 				class: ZBX_STYLE_NA_BG,
 				class_status: ZBX_STYLE_STATUS_NA_BG
 			},
-			{
+			[TRIGGER_SEVERITY_INFORMATION]: {
 				name: t('Information'),
 				class: ZBX_STYLE_INFO_BG,
 				class_status: ZBX_STYLE_STATUS_INFO_BG
 			},
-			{
+			[TRIGGER_SEVERITY_WARNING]: {
 				name: t('Warning'),
 				class: ZBX_STYLE_WARNING_BG,
 				class_status: ZBX_STYLE_STATUS_WARNING_BG
 			},
-			{
+			[TRIGGER_SEVERITY_AVERAGE]: {
 				name: t('Average'),
 				class: ZBX_STYLE_AVERAGE_BG,
 				class_status: ZBX_STYLE_STATUS_AVERAGE_BG
 			},
-			{
+			[TRIGGER_SEVERITY_HIGH]: {
 				name: t('High'),
 				class: ZBX_STYLE_HIGH_BG,
 				class_status: ZBX_STYLE_STATUS_HIGH_BG
 			},
-			{
+			[TRIGGER_SEVERITY_DISASTER]: {
 				name: t('Disaster'),
 				class: ZBX_STYLE_DISASTER_BG,
 				class_status: ZBX_STYLE_STATUS_DISASTER_BG
 			}
-		];
+		};
 
 		return severities[index];
 	}
@@ -448,7 +448,7 @@ class CNavigationTree {
 	#prepareNodeProblems(node) {
 		const problems = [];
 
-		for (let i = node.problem_count.length - 1; i >= 0; i--) {
+		for (let i = TRIGGER_SEVERITY_DISASTER; i >= TRIGGER_SEVERITY_NOT_CLASSIFIED; i--) {
 			const is_severity_allowed = node.severity_filter !== undefined ? i === node.severity_filter : true;
 
 			if (node.problem_count[i] > 0 && is_severity_allowed) {

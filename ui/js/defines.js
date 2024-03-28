@@ -65,6 +65,13 @@ const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
+const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
+const TRIGGER_SEVERITY_INFORMATION = 1;
+const TRIGGER_SEVERITY_WARNING = 2;
+const TRIGGER_SEVERITY_AVERAGE = 3;
+const TRIGGER_SEVERITY_HIGH = 4;
+const TRIGGER_SEVERITY_DISASTER = 5;
+
 const ZBX_STYLE_NA_BG = 'na-bg';
 const ZBX_STYLE_INFO_BG = 'info-bg';
 const ZBX_STYLE_WARNING_BG = 'warning-bg';
