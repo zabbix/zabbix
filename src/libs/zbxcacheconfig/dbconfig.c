@@ -1635,27 +1635,20 @@ void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_
 	proxy->revision = revision;
 }
 
-#define PG_HOST_RELOCATION_NOTIFY_DEFAULT	0
-#define PG_HOST_RELOCATION_NOTIFY_FORCE		1
-
-static void	dc_host_set_proxy_group(ZBX_DC_HOST *host, zbx_uint64_t proxy_groupid, int flags,
-		zbx_vector_objmove_t *pg_reloc)
+static void	dc_host_set_proxy_group(ZBX_DC_HOST *host, zbx_uint64_t proxy_groupid, zbx_vector_objmove_t *pg_reloc)
 {
-	if (proxy_groupid != host->proxy_groupid || PG_HOST_RELOCATION_NOTIFY_FORCE == flags)
+	if (NULL != pg_reloc && (0 != proxy_groupid || 0 != host->proxy_groupid))
 	{
-		if (NULL != pg_reloc)
-		{
-			zbx_objmove_t	move = {
-					.objid = host->hostid,
-					.srcid = host->proxy_groupid,
-					.dstid = proxy_groupid
-			};
+		zbx_objmove_t	move = {
+				.objid = host->hostid,
+				.srcid = host->proxy_groupid,
+				.dstid = proxy_groupid
+		};
 
-			zbx_vector_objmove_append_ptr(pg_reloc, &move);
-		}
-
-		host->proxy_groupid = proxy_groupid;
+		zbx_vector_objmove_append_ptr(pg_reloc, &move);
 	}
+
+	host->proxy_groupid = proxy_groupid;
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
@@ -1714,6 +1707,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		update_index_h = 0;
 
+
 		if (0 == found || 0 != strcmp(host->host, row[2]))
 		{
 			if (1 == found)
@@ -1725,15 +1719,6 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 				{
 					dc_strpool_release(host_h->host);
 					zbx_hashset_remove_direct(&config->hosts_h, host_h);
-				}
-
-				if (0 != host->proxy_groupid)
-				{
-					if (0 != host->proxy_groupid)
-					{
-						dc_host_set_proxy_group(host, proxy_groupid,
-								PG_HOST_RELOCATION_NOTIFY_FORCE, pg_host_reloc);
-					}
 				}
 
 				/* update host proxy index if host was renamed */
@@ -1887,7 +1872,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		host->status = status;
 		host->monitored_by = monitored_by;
 
-		dc_host_set_proxy_group(host, proxy_groupid, PG_HOST_RELOCATION_NOTIFY_DEFAULT, pg_host_reloc);
+		dc_host_set_proxy_group(host, proxy_groupid, pg_host_reloc);
 	}
 
 	for (i = 0; i < proxy_hosts.values_num; i++)
@@ -1914,7 +1899,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		/* hosts */
 
 		/* clear proxy group and update tracking info */
-		dc_host_set_proxy_group(host, 0, PG_HOST_RELOCATION_NOTIFY_DEFAULT, pg_host_reloc);
+		dc_host_set_proxy_group(host, 0, pg_host_reloc);
 
 		if (HOST_STATUS_MONITORED == host->status || HOST_STATUS_NOT_MONITORED == host->status)
 		{

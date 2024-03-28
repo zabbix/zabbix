@@ -65,8 +65,7 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 			pg_cache_set_host_proxy(pgs->cache, hostid, host->proxyid);
 
 			if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies,
-					&host->hostid)) &&
-					NULL != proxy->group)
+					&host->proxyid)) && NULL != proxy->group)
 			{
 				pg_cache_queue_group_update(pgs->cache, proxy->group);
 			}
