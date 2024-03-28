@@ -3400,110 +3400,124 @@ static int	DBpatch_6050229(void)
 
 static int	DBpatch_6050230(void)
 {
-	const zbx_db_field_t	field = {"lifetime_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	return DBadd_field("items", &field);
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'honeycomb','widgets/honeycomb',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 static int	DBpatch_6050231(void)
 {
-	const zbx_db_field_t	field = {"enabled_lifetime_type", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"lifetime_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_6050232(void)
 {
-	const zbx_db_field_t	field = {"enabled_lifetime", "0", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"enabled_lifetime_type", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_6050233(void)
 {
-	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"enabled_lifetime", "0", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("host_discovery", &field);
+	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_6050234(void)
 {
-	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("host_discovery", &field);
 }
 
 static int	DBpatch_6050235(void)
 {
-	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("host_discovery", &field);
 }
 
 static int	DBpatch_6050236(void)
 {
-	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field("item_discovery", &field);
+	return DBadd_field("host_discovery", &field);
 }
 
 static int	DBpatch_6050237(void)
 {
-	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("item_discovery", &field);
 }
 
 static int	DBpatch_6050238(void)
 {
-	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("item_discovery", &field);
 }
 
 static int	DBpatch_6050239(void)
 {
-	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field("trigger_discovery", &field);
+	return DBadd_field("item_discovery", &field);
 }
 
 static int	DBpatch_6050240(void)
 {
-	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("trigger_discovery", &field);
 }
 
 static int	DBpatch_6050241(void)
 {
-	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("trigger_discovery", &field);
 }
 
 static int	DBpatch_6050242(void)
 {
-	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field("graph_discovery", &field);
+	return DBadd_field("trigger_discovery", &field);
 }
 
 static int	DBpatch_6050243(void)
 {
 	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field("group_discovery", &field);
+	return DBadd_field("graph_discovery", &field);
 }
 
 static int	DBpatch_6050244(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("group_discovery", &field);
+}
+
+static int	DBpatch_6050245(void)
 {
 	const zbx_db_field_t	field = {"lifetime", "7d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
 }
 
-static int	DBpatch_6050245(void)
+static int	DBpatch_6050246(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3515,7 +3529,7 @@ static int	DBpatch_6050245(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050246(void)
+static int	DBpatch_6050247(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3527,7 +3541,7 @@ static int	DBpatch_6050246(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050247(void)
+static int	DBpatch_6050248(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3539,7 +3553,7 @@ static int	DBpatch_6050247(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050248(void)
+static int	DBpatch_6050249(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3551,7 +3565,7 @@ static int	DBpatch_6050248(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050249(void)
+static int	DBpatch_6050250(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3563,7 +3577,7 @@ static int	DBpatch_6050249(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050250(void)
+static int	DBpatch_6050251(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3575,7 +3589,7 @@ static int	DBpatch_6050250(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050251(void)
+static int	DBpatch_6050252(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3587,7 +3601,7 @@ static int	DBpatch_6050251(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050252(void)
+static int	DBpatch_6050253(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3856,5 +3870,6 @@ DBPATCH_ADD(6050249, 0, 1)
 DBPATCH_ADD(6050250, 0, 1)
 DBPATCH_ADD(6050251, 0, 1)
 DBPATCH_ADD(6050252, 0, 1)
+DBPATCH_ADD(6050253, 0, 1)
 
 DBPATCH_END()

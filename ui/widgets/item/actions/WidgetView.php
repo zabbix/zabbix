@@ -222,7 +222,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 				[
 					$item['itemid'] => $item
-				] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item['itemid'] => $item]);
+				] = CMacrosResolverHelper::resolveItemBasedWidgetMacros(
+					[$item['itemid'] => $item],
+					['widget_description' => 'widget_description']
+				);
 			}
 
 			$elements['description'] = $item['widget_description'];
