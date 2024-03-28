@@ -333,6 +333,7 @@ class CConfigurationExportBuilder {
 				'host' => $host['host'],
 				'name' => $host['name'],
 				'description' => $host['description'],
+				'monitored_by' => $host['monitored_by'],
 				'proxy' => $host['proxy'],
 				'proxy_group' => $host['proxy_group'],
 				'status' => $host['status'],
