@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T15:40:11Z'
+  date: '2024-03-19T11:51:22Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -23,6 +23,53 @@ zabbix_export:
       groups:
         - name: Templates/Databases
       items:
+        - uuid: 76591a03cf684d30ae15eca8519ce1dd
+          name: 'Oracle: Get archive log'
+          type: ODBC
+          key: 'db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT d.dest_name
+            FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
+          username: '{$ORACLE.USER}'
+          password: '{$ORACLE.PASSWORD}'
+          description: 'Gets the destinations of the log archive.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 10f3da9afb674ff18956aa99229de8dd
+          name: 'Oracle: Get ASM disk groups'
+          type: ODBC
+          key: 'db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'SELECT name AS dgname FROM v$asm_diskgroup;'
+          username: '{$ORACLE.USER}'
+          password: '{$ORACLE.PASSWORD}'
+          description: 'Gets the ASM disk groups.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 7ca479f46bb2435f9f9cb62d404fa37c
+          name: 'Oracle: Get database'
+          type: ODBC
+          key: 'db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
+          username: '{$ORACLE.USER}'
+          password: '{$ORACLE.PASSWORD}'
+          description: 'Gets the databases in the database management system (DBMS).'
+          tags:
+            - tag: component
+              value: raw
         - uuid: dde19b79507648bd80a82a0575bf8671
           name: 'Oracle: Get instance state'
           type: ODBC
@@ -43,6 +90,21 @@ zabbix_export:
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'The item gets its state of the current instance.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: de5aa291b7da4733ad26d517e8ff55cf
+          name: 'Oracle: Get PDB'
+          type: ODBC
+          key: 'db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'SELECT name as DBNAME FROM V$PDBS;'
+          username: '{$ORACLE.USER}'
+          password: '{$ORACLE.PASSWORD}'
+          description: 'Gets the pluggable database (PDB) in DBMS.'
           tags:
             - tag: component
               value: raw
@@ -115,6 +177,25 @@ zabbix_export:
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'The item gets the values of the system metrics.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 2310462a8936465c8a62d8586ab0ba65
+          name: 'Oracle: Get tablespace'
+          type: ODBC
+          key: 'db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT NVL(CON$NAME, 'DB') CON_NAME,
+            TABLESPACE_NAME TABLESPACE,
+            CONTENTS
+            FROM CDB_TABLESPACES;
+          username: '{$ORACLE.USER}'
+          password: '{$ORACLE.PASSWORD}'
+          description: 'Gets tablespaces in DBMS.'
           tags:
             - tag: component
               value: raw
@@ -1439,15 +1520,10 @@ zabbix_export:
       discovery_rules:
         - uuid: a527b14b1cee4115be5c5e9387af821b
           name: 'Archive log discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          delay: 1h
-          params: |
-            SELECT d.dest_name
-            FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          description: 'Destinations of the log archive.'
+          type: DEPENDENT
+          key: oracle.archivelog.discovery
+          delay: '0'
+          description: 'Used for the discovery of the log archive.'
           item_prototypes:
             - uuid: 1a6e01f90dca47459975632c14ce5a39
               name: 'Archivelog ''{#DEST_NAME}'': Get archive log info'
@@ -1558,15 +1634,17 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
+          master_item:
+            key: 'db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          lld_macro_paths:
+            - lld_macro: '{#DEST_NAME}'
+              path: $.DEST_NAME
         - uuid: c40708b755c7464bb064b7bffc584381
           name: 'ASM disk groups discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          delay: 1h
-          params: 'SELECT name AS dgname FROM v$asm_diskgroup;'
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          description: 'The ASM disk groups.'
+          type: DEPENDENT
+          key: oracle.asm.discovery
+          delay: '0'
+          description: 'Used for discovering the ASM disk groups.'
           item_prototypes:
             - uuid: 63fad55a2ced487aa30017b33bf1692e
               name: 'ASM ''{#DGNAME}'': Get ASM stats'
@@ -1689,14 +1767,16 @@ zabbix_export:
                   item:
                     host: 'Oracle by ODBC'
                     key: 'oracle.asm_total_size["{#DGNAME}"]'
+          master_item:
+            key: 'db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          lld_macro_paths:
+            - lld_macro: '{#DGNAME}'
+              path: $.DGNAME
         - uuid: 0f65936b86314c269b7720a9ff3f1c14
           name: 'Database discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[db_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          delay: 1h
-          params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
+          type: DEPENDENT
+          key: oracle.db.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1707,7 +1787,7 @@ zabbix_export:
                 value: '{$ORACLE.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Scanning databases in the database management system (DBMS).'
+          description: 'Used for database discovery.'
           item_prototypes:
             - uuid: 5de7c786988d49d0b50f28d2d622db62
               name: 'Oracle Database ''{#DBNAME}'': Get CDB and No-CDB info'
@@ -1893,14 +1973,18 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
+          master_item:
+            key: 'db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          lld_macro_paths:
+            - lld_macro: '{#DBNAME}'
+              path: $.DBNAME
+            - lld_macro: '{#TYPE}'
+              path: $.TYPE
         - uuid: 2611e69f735a42b190852589658dd591
           name: 'PDB discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[pdb_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          delay: 1h
-          params: 'SELECT name as DBNAME FROM V$PDBS;'
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
+          type: DEPENDENT
+          key: oracle.pdb.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1911,7 +1995,7 @@ zabbix_export:
                 value: '{$ORACLE.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Scanning a pluggable database (PDB) in DBMS.'
+          description: 'Used for the discovery of the pluggable database (PDB).'
           item_prototypes:
             - uuid: cedcebd0b7ce474c9681022fcc75df1c
               name: 'Oracle Database ''{#DBNAME}'': Get PDB info'
@@ -1987,18 +2071,16 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+          master_item:
+            key: 'db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          lld_macro_paths:
+            - lld_macro: '{#DBNAME}'
+              path: $.DBNAME
         - uuid: c8de553c98f64e59b40bf927f6447ad1
           name: 'Tablespace discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[tbsname,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          delay: 1h
-          params: |
-            SELECT NVL(CON$NAME, 'DB') CON_NAME,
-            TABLESPACE_NAME TABLESPACE,
-            CONTENTS
-            FROM CDB_TABLESPACES;
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
+          type: DEPENDENT
+          key: oracle.tablespace.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -2016,7 +2098,7 @@ zabbix_export:
                 value: '{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Scanning tablespaces in DBMS.'
+          description: 'Used for the discovery of tablespaces in DBMS.'
           item_prototypes:
             - uuid: 972be2e777e44c539d0ddd7918b79e88
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Get tablespaces stats'
@@ -2449,6 +2531,15 @@ zabbix_export:
                   item:
                     host: 'Oracle by ODBC'
                     key: 'oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+          master_item:
+            key: 'db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+          lld_macro_paths:
+            - lld_macro: '{#CONTENTS}'
+              path: $.CONTENTS
+            - lld_macro: '{#CON_NAME}'
+              path: $.CON_NAME
+            - lld_macro: '{#TABLESPACE}'
+              path: $.TABLESPACE
       tags:
         - tag: class
           value: database
