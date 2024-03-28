@@ -134,7 +134,7 @@ class WidgetForm extends CWidgetForm {
 				: null;
 
 			if ($lefty_min !== null && $lefty_max !== null && $lefty_min >= $lefty_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').': '._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
@@ -150,7 +150,7 @@ class WidgetForm extends CWidgetForm {
 				: null;
 
 			if ($righty_min !== null && $righty_max !== null && $righty_min >= $righty_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').': '._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
@@ -303,12 +303,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_min', _('Min')))
-					->setFullName(_('Left Y').'/'._('Min'))
+					->prefixLabel(_('Left Y'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_max', _('Max')))
-					->setFullName(_('Left Y').'/'._('Max'))
+					->prefixLabel(_('Left Y'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -329,12 +329,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_min', _('Min')))
-					->setFullName(_('Right Y').'/'._('Min'))
+					->prefixLabel(_('Right Y'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_max', _('Max')))
-					->setFullName(_('Right Y').'/'._('Max'))
+					->prefixLabel(_('Right Y'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(

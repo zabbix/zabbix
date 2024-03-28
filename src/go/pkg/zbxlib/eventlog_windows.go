@@ -24,7 +24,7 @@ package zbxlib
 
 #include "zbxsysinfo.h"
 #include "zbxlog.h"
-#include "../src/zabbix_agent/metrics.h"
+#include "../src/zabbix_agent/metrics/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 #include "zbx_item_constants.h"
 
@@ -33,19 +33,19 @@ void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *config_tls, unsigned int a
 		char *ServerCertIssuer, char *ServerCertSubject);
 
 int	zbx_config_eventlog_max_lines_per_second = 20;
-typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
+typedef zbx_active_metric_t* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 
-void metric_set_refresh(ZBX_ACTIVE_METRIC *metric, int refresh);
-void metric_get_meta(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize, int *mtime);
-void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric);
-int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
+void metric_set_refresh(zbx_active_metric_t *metric, int refresh);
+void metric_get_meta(zbx_active_metric_t *metric, zbx_uint64_t *lastlogsize, int *mtime);
+void metric_set_unsupported(zbx_active_metric_t *metric);
+int metric_set_supported(zbx_active_metric_t *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		zbx_uint64_t lastlogsize_last, int mtime_last);
 
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_vector_expression_t *regexps, zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
 		int config_buffer_size, int config_eventlog_max_lines_per_second, char **error);
@@ -80,8 +80,8 @@ static eventlog_result_t *new_eventlog_result(int slots)
 	return result;
 }
 
-static void add_eventlog_value(eventlog_result_t *result, const char *value, const char *source, int logeventid, int severity,
-	int timestamp, int state, zbx_uint64_t lastlogsize)
+static void add_eventlog_value(eventlog_result_t *result, const char *value, const char *source, int logeventid,
+		int severity, int timestamp, int state, zbx_uint64_t lastlogsize)
 {
 	eventlog_value_t *log;
 	log = (eventlog_value_t *)zbx_malloc(NULL, sizeof(eventlog_value_t));
@@ -101,7 +101,7 @@ static void add_eventlog_value(eventlog_result_t *result, const char *value, con
 }
 
 static int get_eventlog_value(eventlog_result_t *result, int index, char **value, char **source, int *logeventid,
-	 int *severity, int *timestamp, int *state, zbx_uint64_t *lastlogsize)
+		int *severity, int *timestamp, int *state, zbx_uint64_t *lastlogsize)
 {
 	eventlog_value_t *log;
 

@@ -384,6 +384,13 @@ class ZBase {
 		];
 	}
 
+	public static function getColorScheme(string $theme): string {
+		return match ($theme) {
+			'dark-theme', 'hc-dark' => ZBX_COLOR_SCHEME_DARK,
+			default => ZBX_COLOR_SCHEME_LIGHT
+		};
+	}
+
 	/**
 	 * Check if maintenance mode is enabled.
 	 *

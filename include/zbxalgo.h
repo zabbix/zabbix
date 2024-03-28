@@ -455,6 +455,9 @@ void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __typ
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num)				\
 {														\
+	if (0 == values_num)											\
+		return;												\
+														\
 	zbx_vector_ ## __id ## _reserve(vector, (size_t)(vector->values_num + values_num));			\
 	memcpy(vector->values + vector->values_num, values, (size_t)values_num * sizeof(__type));		\
 	vector->values_num = vector->values_num + values_num;							\

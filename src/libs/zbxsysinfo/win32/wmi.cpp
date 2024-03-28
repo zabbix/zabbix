@@ -26,7 +26,6 @@ extern "C"
 #	include "zbxlog.h"
 #	include "zbxalgo.h"
 #	include "zbxjson.h"
-#	include "cfg.h"
 }
 
 #include <comdef.h>

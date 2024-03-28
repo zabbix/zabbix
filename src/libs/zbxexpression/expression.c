@@ -1470,7 +1470,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 							"c.type")))
 					{
 						replace_to = zbx_strdup(replace_to,
-								dservice_type_string(atoi(replace_to)));
+								zbx_dservice_type_string(atoi(replace_to)));
 					}
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_PORT))

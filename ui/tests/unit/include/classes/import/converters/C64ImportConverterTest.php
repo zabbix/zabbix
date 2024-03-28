@@ -88,6 +88,12 @@ class C64ImportConverterTest extends CImportConverterTest {
 		}
 		unset($lld_rule);
 
+		foreach ($expected_lld_rules as &$lld_rule) {
+			$lld_rule['lifetime'] = '30d';
+			$lld_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
+		}
+		unset($lld_rule);
+
 		foreach ($expected_items as &$item) {
 			$item['history'] = array_key_exists('history', $item) ? $item['history'] : '90d';
 		}
@@ -211,7 +217,11 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'trigger_prototypes' => $source_triggers
 					]
 				],
-				'trigger_prototypes' => $source_triggers
+				'trigger_prototypes' => $source_triggers,
+				'lifetime' => '30d',
+				'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+				'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER,
+				'enabled_lifetime' => '0'
 			]
 		];
 		$expected_lld_rules = [
@@ -224,7 +234,11 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'trigger_prototypes' => $expected_triggers
 					]
 				],
-				'trigger_prototypes' => $expected_triggers
+				'trigger_prototypes' => $expected_triggers,
+				'lifetime' => '30d',
+				'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+				'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER,
+				'enabled_lifetime' => '0'
 			]
 		];
 
@@ -447,7 +461,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $source_item_prototypes
+									'item_prototypes' => $source_item_prototypes,
+									'lifetime' => '30d',
+									'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
@@ -471,7 +488,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $expected_item_prototypes
+									'item_prototypes' => $expected_item_prototypes,
+									'lifetime' => '30d',
+									'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
@@ -482,7 +502,9 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $expected_item_prototypes
+									'item_prototypes' => $expected_item_prototypes,
+									'lifetime' => '30d',
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]

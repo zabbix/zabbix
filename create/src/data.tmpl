@@ -930,13 +930,13 @@ ROW   |202                |41         |3          |0       |[{EVENT.STATUS}] {EV
 ROW   |203                |41         |3          |1       |[{EVENT.STATUS}] {EVENT.NAME}                                                    |Problem has been resolved in {EVENT.DURATION}&eol;Problem name: {EVENT.NAME}&eol;Host: {HOST.NAME}&eol;Original problem ID: {EVENT.ID}                                                                                                                                                                                                                                                                                                                                                                            |
 
 TABLE |usrgrp
-FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|userdirectoryid|
-ROW   |7       |Zabbix administrators    |0         |0           |0         |NULL           |
-ROW   |8       |Guests                   |0         |0           |0         |NULL           |
-ROW   |9       |Disabled                 |0         |1           |0         |NULL           |
-ROW   |11      |Enabled debug mode       |0         |0           |1         |NULL           |
-ROW   |12      |No access to the frontend|3         |0           |0         |NULL           |
-ROW   |13      |Internal                 |1         |0           |0         |NULL           |
+FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|userdirectoryid|mfa_status|mfaid|
+ROW   |7       |Zabbix administrators    |0         |0           |0         |NULL           |0         |NULL |
+ROW   |8       |Guests                   |0         |0           |0         |NULL           |0         |NULL |
+ROW   |9       |Disabled                 |0         |1           |0         |NULL           |0         |NULL |
+ROW   |11      |Enabled debug mode       |0         |0           |1         |NULL           |0         |NULL |
+ROW   |12      |No access to the frontend|3         |0           |0         |NULL           |0         |NULL |
+ROW   |13      |Internal                 |1         |0           |0         |NULL           |0         |NULL |
 
 TABLE |users_groups
 FIELDS|id  |usrgrpid|userid|
@@ -1015,8 +1015,8 @@ ROW   |7          |5       |23           |0       |2    |      |
 ROW   |8          |6       |23           |0       |4    |      |
 
 TABLE |config
-FIELDS|configid|work_period    |alert_usrgrpid|discovery_groupid|dbversion_status|geomaps_tile_provider|ldap_userdirectoryid|server_status|
-ROW   |1       |1-5,09:00-18:00|7             |5                |                |OpenStreetMap.Mapnik |NULL                |             |
+FIELDS|configid|work_period    |alert_usrgrpid|discovery_groupid|dbversion_status|geomaps_tile_provider|ldap_userdirectoryid|server_status|mfaid|
+ROW   |1       |1-5,09:00-18:00|7             |5                |                |OpenStreetMap.Mapnik |NULL                |             |NULL |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette                                                                                                                                      |
@@ -1083,6 +1083,7 @@ ROW   |24      |web           |widgets/web           |1     |[]    |
 ROW   |25      |gauge         |widgets/gauge         |1     |[]    |
 ROW   |26      |toptriggers   |widgets/toptriggers   |1     |[]    |
 ROW   |27      |piechart      |widgets/piechart      |1     |[]    |
+ROW   |28      |honeycomb     |widgets/honeycomb     |1     |[]    |
 
 TABLE |role_rule
 FIELDS|role_ruleid|roleid|type|name                  |value_int|value_str|value_moduleid|value_serviceid|

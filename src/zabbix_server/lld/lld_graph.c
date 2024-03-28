@@ -132,6 +132,7 @@ typedef struct
 		ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_TYPE | ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_ITEMID)
 	zbx_uint64_t			flags;
 	int				lastcheck;
+	unsigned char			discovery_status;
 	int				ts_delete;
 }
 zbx_lld_graph_t;
@@ -212,7 +213,8 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr
 	result = zbx_db_select(
 			"select g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
-				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,gd.lastcheck,gd.ts_delete"
+				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,gd.lastcheck,gd.status,"
+				"gd.ts_delete"
 			" from graphs g,graph_discovery gd"
 			" where g.graphid=gd.graphid"
 				" and gd.parent_graphid=" ZBX_FS_UI64,
@@ -287,7 +289,8 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr
 		graph->ymax_itemid_orig = graph->ymax_itemid;
 
 		graph->lastcheck = atoi(row[17]);
-		graph->ts_delete = atoi(row[18]);
+		ZBX_STR2UCHAR(graph->discovery_status, row[18]);
+		graph->ts_delete = atoi(row[19]);
 
 		zbx_vector_lld_gitem_ptr_create(&graph->gitems);
 
@@ -757,6 +760,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 
 		graph->graphid = 0;
 		graph->lastcheck = 0;
+		graph->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		graph->ts_delete = 0;
 
 		graph->name = zbx_strdup(NULL, name_proto);
@@ -1475,15 +1479,21 @@ out:
 }
 
 static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete, const char **name)
+		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
+		unsigned char *disable_source, char **name)
 {
 	const zbx_lld_graph_t	*graph;
+
+	ZBX_UNUSED(ts_disable);
+	ZBX_UNUSED(object_status);
+	ZBX_UNUSED(disable_source);
 
 	graph = (const zbx_lld_graph_t *)object;
 
 	*id = graph->graphid;
 	*discovery_flag = graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED;
 	*lastcheck = graph->lastcheck;
+	*discovery_status = graph->discovery_status;
 	*ts_delete = graph->ts_delete;
 	*name = graph->name;
 }
@@ -1498,7 +1508,8 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+		int lastcheck)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;
@@ -1567,9 +1578,9 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
-
-		lld_remove_lost_objects("graph_discovery", "graphid", (zbx_vector_ptr_t *)(&graphs), lifetime,
-				lastcheck, zbx_db_delete_graphs, get_graph_info);
+		lld_process_lost_objects("graph_discovery", NULL, "graphid", (zbx_vector_ptr_t *)&graphs, lifetime,
+				NULL, lastcheck, zbx_db_delete_graphs, get_graph_info, NULL,
+				zbx_audit_graph_create_entry, NULL);
 
 		lld_items_free(&items);
 		lld_gitems_free(&gitems_proto);
