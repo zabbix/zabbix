@@ -305,10 +305,10 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
  *                                                                            *
  * Purpose: updates alert manager media types                                 *
  *                                                                            *
- * Parameters: amdb            - [IN] alert manager cache                     *
- *             mediatypeids    - [IN]                                         *
- *             medatypeids_num - [IN]                                         *
- *             mediatypes      - [OUT]                                        *
+ * Parameters: amdb             - [IN] alert manager cache                    *
+ *             mediatypeids     - [IN]                                        *
+ *             mediatypeids_num - [IN]                                        *
+ *             mediatypes       - [OUT]                                       *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,

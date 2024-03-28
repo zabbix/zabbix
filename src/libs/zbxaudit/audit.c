@@ -185,9 +185,9 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	int		ret = SUCCEED;
 	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
 			eventid_s[MAX_ID_LEN + 1], proxyid_s[MAX_ID_LEN + 1];
-	char		*details_esc;
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
+	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -228,19 +228,15 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	if (NULL != error)
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.error", error);
 
-	details_esc = zbx_db_dyn_escape_string(details_json.buffer);
+	zbx_db_insert_prepare(&db_insert, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
+			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
 
-	if (ZBX_DB_OK > zbx_db_execute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
-			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
-			ZBX_FS_UI64 ",'%s',%d,'%s','%s')", auditid_cuid, userid, username, (int)time(NULL),
-			ZBX_AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
-			details_esc))
-	{
-		ret = FAIL;
-	}
+	zbx_db_insert_add_values(&db_insert, auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_EXECUTE,
+			clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid, details_json.buffer);
 
-	zbx_free(details_esc);
+	ret = zbx_db_insert_execute(&db_insert);
 
+	zbx_db_insert_clean(&db_insert);
 	zbx_json_free(&details_json);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -372,7 +368,7 @@ int	zbx_audit_flush_once(int audit_context_mode)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		char	id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
+		char		id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
 		const char	*pfield;
 
 		if (SUCCEED != zbx_audit_validate_entry(*audit_entry))

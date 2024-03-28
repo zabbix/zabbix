@@ -104,5 +104,6 @@ void	zbx_escalation_new_ptr_free(zbx_escalation_new_t *data)
 
 	if (0 == escalation->actionid)
 		zbx_free(escalation->event);
+
 	zbx_free(data);
 }

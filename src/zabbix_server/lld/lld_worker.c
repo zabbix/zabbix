@@ -19,6 +19,7 @@
 
 #include "lld_worker.h"
 #include "lld.h"
+#include "lld_protocol.h"
 
 #include "../events/events.h"
 
@@ -26,11 +27,12 @@
 #include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "lld_protocol.h"
 #include "zbxtime.h"
-#include "zbxdbwrap.h"
 #include "zbx_item_constants.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *

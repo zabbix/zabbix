@@ -51,6 +51,10 @@ class CWidgetForm {
 		return $this->fields;
 	}
 
+	public function getField(string $field_name): CWidgetField {
+		return $this->fields[$field_name];
+	}
+
 	public function getFieldValue(string $field_name) {
 		return $this->fields[$field_name]->getValue();
 	}

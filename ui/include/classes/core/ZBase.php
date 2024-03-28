@@ -384,6 +384,13 @@ class ZBase {
 		];
 	}
 
+	public static function getColorScheme(string $theme): string {
+		return match ($theme) {
+			'dark-theme', 'hc-dark' => ZBX_COLOR_SCHEME_DARK,
+			default => ZBX_COLOR_SCHEME_LIGHT
+		};
+	}
+
 	/**
 	 * Check if maintenance mode is enabled.
 	 *
@@ -561,6 +568,10 @@ class ZBase {
 			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
 			'auth' => CWebUser::$data['sessionid']
 		];
+
+		if (CWebUser::isAutologinEnabled()) {
+			$session->lifetime = time() + SEC_PER_MONTH;
+		}
 
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
