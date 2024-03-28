@@ -3197,7 +3197,7 @@ class CUser extends CApiService {
 			'userid' => $db_user['userid']
 		];
 
-		if ($mfa['type'] == MFA_TYPE_TOTP) {	// TODO check - if MFA TOTP method changes, does it delete previous totp secret, because only one is possible.
+		if ($mfa['type'] == MFA_TYPE_TOTP) {
 			$user_totp_secret = DB::select('mfa_totp_secret', [
 				'output' => ['mfa_totp_secretid', 'totp_secret', 'status'],
 				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']],
