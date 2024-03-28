@@ -60,8 +60,8 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(proxy_groupid, row[0]);
 
-		pg = (zbx_dc_proxy_group_t *)DCfind_id(&config->proxy_groups, proxy_groupid, sizeof(ZBX_DC_PROXY),
-				&found);
+		pg = (zbx_dc_proxy_group_t *)DCfind_id(&config->proxy_groups, proxy_groupid,
+				sizeof(zbx_dc_proxy_group_t), &found);
 
 		dc_strpool_replace(found, &pg->failover_delay, row[1]);
 		dc_strpool_replace(found, &pg->min_online, row[2]);

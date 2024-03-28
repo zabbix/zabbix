@@ -7291,9 +7291,10 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		if (0 != proxy_groupid && 0 != found && (0 != strcmp(proxy->local_address, row[24]) ||
 				0 != strcmp(proxy->local_port, row[25])))
 		{
-			zbx_pg_group_t	*pg;
+			zbx_dc_proxy_group_t	*pg;
 
-			if (NULL != (pg = (zbx_pg_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
+			if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
+					&proxy_groupid)))
 			{
 				pg->revision = revision;
 				config->revision.proxy_group = revision;
