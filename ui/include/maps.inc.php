@@ -454,7 +454,7 @@ function getSysmapResourceIds(array $selements, array &$sysmaps_data, bool $coll
 				while ($lookup_sysmapids) {
 					$nested_sysmaps = API::Map()->get([
 						'output' => ['sysmapid', 'name'],
-						'selectSelements' => ['elementtype', 'elements', 'tags', 'evaltype'],
+						'selectSelements' => ['elementtype', 'elements', 'tags', 'evaltype', 'permission'],
 						'sysmapids' => $lookup_sysmapids,
 						'preservekeys' => true
 					]);
@@ -659,6 +659,13 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	foreach ($all_sysmaps as &$_sysmap) {
 		foreach ($_sysmap['selements'] as &$selement) {
+			$selement['triggers'] = [];
+			$selement['hosts'] = [];
+
+			if ($selement['permission'] < PERM_READ) {
+				continue;
+			}
+
 			// Assign selected triggers and problems back to the sysmap elements they origin from.
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -708,9 +715,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				$groupid = $selement['elements'][0]['groupid'];
 				$selement['hosts'] = $hosts_by_groupids[$groupid];
 			}
-			else {
-				$selement['hosts'] = [];
-			}
 		}
 		unset($selement);
 	}
@@ -748,7 +752,11 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'elementtype' => $selement['elementtype'],
 			'disabled' => 0,
 			'maintenance' => 0,
-			'expandproblem' => $sysmap['expandproblem']
+			'expandproblem' => $sysmap['expandproblem'],
+			'latelyChanged' => false,
+			'problem_unack' => [],
+			'priority' => 0,
+			'problem' => []
 		];
 
 		/*
