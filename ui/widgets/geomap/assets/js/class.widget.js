@@ -485,37 +485,37 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED, {
 			name: t('Not classified'),
 			abbr: t('N'),
-			class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
+			class: ZBX_STYLE_NA_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_INFORMATION, {
 			name: t('Information'),
 			abbr: t('I'),
-			class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
+			class: ZBX_STYLE_INFO_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_INFORMATION]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_WARNING, {
 			name: t('Warning'),
 			abbr: t('W'),
-			class: ZBX_STYLE_SEVERITY_WARNING_BG,
+			class: ZBX_STYLE_WARNING_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_WARNING]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_AVERAGE, {
 			name: t('Average'),
 			abbr: t('A'),
-			class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
+			class: ZBX_STYLE_AVERAGE_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_AVERAGE]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_HIGH, {
 			name: t('High'),
 			abbr: t('H'),
-			class: ZBX_STYLE_SEVERITY_HIGH_BG,
+			class: ZBX_STYLE_HIGH_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_HIGH]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_DISASTER, {
 			name: t('Disaster'),
 			abbr: t('D'),
-			class: ZBX_STYLE_SEVERITY_DISASTER_BG,
+			class: ZBX_STYLE_DISASTER_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
 		});
 

@@ -155,33 +155,33 @@ class CNavigationTree {
 		const severities = [
 			{
 				name: t('Not classified'),
-				class: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_BG,
-				class_status: ZBX_STYLE_SEVERITY_NOT_CLASSIFIED_STATUS_BG
+				class: ZBX_STYLE_NA_BG,
+				class_status: ZBX_STYLE_STATUS_NA_BG
 			},
 			{
 				name: t('Information'),
-				class: ZBX_STYLE_SEVERITY_INFORMATION_BG,
-				class_status: ZBX_STYLE_SEVERITY_INFORMATION_STATUS_BG
+				class: ZBX_STYLE_INFO_BG,
+				class_status: ZBX_STYLE_STATUS_INFO_BG
 			},
 			{
 				name: t('Warning'),
-				class: ZBX_STYLE_SEVERITY_WARNING_BG,
-				class_status: ZBX_STYLE_SEVERITY_WARNING_STATUS_BG
+				class: ZBX_STYLE_WARNING_BG,
+				class_status: ZBX_STYLE_STATUS_WARNING_BG
 			},
 			{
 				name: t('Average'),
-				class: ZBX_STYLE_SEVERITY_AVERAGE_BG,
-				class_status: ZBX_STYLE_SEVERITY_AVERAGE_STATUS_BG
+				class: ZBX_STYLE_AVERAGE_BG,
+				class_status: ZBX_STYLE_STATUS_AVERAGE_BG
 			},
 			{
 				name: t('High'),
-				class: ZBX_STYLE_SEVERITY_HIGH_BG,
-				class_status: ZBX_STYLE_SEVERITY_HIGH_STATUS_BG
+				class: ZBX_STYLE_HIGH_BG,
+				class_status: ZBX_STYLE_STATUS_HIGH_BG
 			},
 			{
 				name: t('Disaster'),
-				class: ZBX_STYLE_SEVERITY_DISASTER_BG,
-				class_status: ZBX_STYLE_SEVERITY_DISASTER_STATUS_BG
+				class: ZBX_STYLE_DISASTER_BG,
+				class_status: ZBX_STYLE_STATUS_DISASTER_BG
 			}
 		];
 
