@@ -35,7 +35,7 @@ zabbix_export:
           params: 'show databases'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
-          description: 'Scanning databases in DBMS.'
+          description: 'Used for scanning databases in DBMS.'
           tags:
             - tag: component
               value: raw
@@ -49,7 +49,7 @@ zabbix_export:
           params: 'show slave status'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
-          description: 'The item gets replication status information.'
+          description: 'Gets replication status information.'
           tags:
             - tag: component
               value: raw
@@ -1122,7 +1122,7 @@ zabbix_export:
                 value: information_schema
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
-          description: 'Discovery of the databases.'
+          description: 'Used for the discovery of the databases.'
           item_prototypes:
             - uuid: f358179ef78b4a31affa9e049b4048b8
               name: 'MySQL: Size of database {#DATABASE}'
@@ -1273,7 +1273,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'The amount of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.'
+              description: 'The number of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1308,7 +1308,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Whether the I/O thread for reading the master''s binary log is running. Normally, you want this to be Yes unless you have not yet started a replication or have explicitly stopped it with STOP SLAVE.'
+              description: 'Whether the I/O thread for reading the master''s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `STOP SLAVE`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1350,7 +1350,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 Whether the SQL thread for executing events in the relay log is running.
-                As with the I/O thread, this should normally be Yes.
+                As with the I/O thread, this should normally be `Yes`.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1383,7 +1383,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'This shows the state of the SQL driver threads.'
+              description: 'Shows the state of the SQL driver threads.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1404,7 +1404,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The item gets status information on the essential parameters of the slave threads.'
+              description: 'Gets status information on the essential parameters of the slave threads.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
