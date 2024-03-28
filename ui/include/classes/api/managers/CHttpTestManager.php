@@ -838,26 +838,11 @@ class CHttpTestManager {
 				if (array_key_exists('httpstepid', $step)) {
 					if (array_key_exists('posts', $step)) {
 						if (is_array($step['posts'])) {
-							if ($db_steps[$step['httpstepid']]['post_type'] == ZBX_POSTTYPE_RAW) {
-								if ($step['posts']) {
-									$step['post_type'] = ZBX_POSTTYPE_FORM;
-								}
-
-								$step['posts'] = '';
-							}
-							else {
-								if (!$step['posts']) {
-									$step['post_type'] = ZBX_POSTTYPE_RAW;
-								}
-
-								unset($step['posts']);
-							}
+							$step['post_type'] = ZBX_POSTTYPE_FORM;
+							$step['posts'] = '';
 						}
 						else {
-							if ($db_steps[$step['httpstepid']]['post_type'] == ZBX_POSTTYPE_FORM) {
-								$step['post_type'] = ZBX_POSTTYPE_RAW;
-								$db_steps[$step['httpstepid']]['posts'] = '';
-							}
+							$step['post_type'] = ZBX_POSTTYPE_RAW;
 						}
 					}
 
