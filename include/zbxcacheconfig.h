@@ -28,6 +28,7 @@
 #include "zbxvault.h"
 #include "zbxregexp.h"
 #include "zbxtagfilter.h"
+#include "zbxautoreg.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -839,7 +840,7 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
-void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
+void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
@@ -1040,7 +1041,6 @@ zbx_trigger_dep_t;
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
-void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids);
 
 /* data session support */
 
@@ -1058,6 +1058,7 @@ typedef struct
 	zbx_uint64_t	config;		/* configuration cache revision, increased every sync */
 	zbx_uint64_t	expression;	/* global expression revision */
 	zbx_uint64_t	autoreg_tls;	/* autoregistration tls revision */
+	zbx_uint64_t	drules;		/* drules revision */
 	zbx_uint64_t	upstream;	/* configuration revision received from server */
 	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
 	zbx_uint64_t	connector;
@@ -1260,7 +1261,7 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
-void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
+int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);

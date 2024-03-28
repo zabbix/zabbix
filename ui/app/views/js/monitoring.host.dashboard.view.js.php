@@ -152,6 +152,7 @@
 
 				ZABBIX.Dashboard.broadcast({
 					_hostid: dashboard_host.hostid,
+					_hostids: [dashboard_host.hostid],
 					_timeperiod: {
 						from: dashboard_time_period.from,
 						from_ts: dashboard_time_period.from_ts,

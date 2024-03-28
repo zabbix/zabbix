@@ -71,6 +71,7 @@ $available_js = [
 	'leaflet.js' => 'vendors/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet.markercluster/',
 	'd3.js' => 'vendors/D3/',
+	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
@@ -359,6 +360,7 @@ $translate_strings = [
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Discovery' => _('Discovery'),
+		'Discovery rule' => _('Discovery rule'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
@@ -413,7 +415,10 @@ $translate_strings = [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.csvgauge.js' => [
+	'class.csvggauge.js' => [
+		'No data' => _('No data')
+	],
+	'class.svghoneycomb.js' => [
 		'No data' => _('No data')
 	],
 	'common.js' => [

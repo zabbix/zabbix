@@ -106,9 +106,9 @@ $mediatype_form_grid = (new CFormGrid())
 		(new CLabel(_('Connection security'), 'smtp_security'))->setId('smtp-security-label'),
 		(new CFormField(
 			(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
-				->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
-				->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
-				->addValue(_('SSL/TLS'), SMTP_CONNECTION_SECURITY_SSL_TLS)
+				->addValue(_('None'), SMTP_SECURITY_NONE)
+				->addValue(_('STARTTLS'), SMTP_SECURITY_STARTTLS)
+				->addValue(_('SSL/TLS'), SMTP_SECURITY_SSL)
 				->setModern()
 		))->setId('smtp-security-field')
 	])

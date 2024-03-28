@@ -482,17 +482,18 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in descriptions of item-based widgets.
+	 * Resolve macros in fields of item-based widgets.
 	 *
 	 * @param array  $items
 	 *        string $items[<itemid>]['hostid']
-	 *        string $items[<itemid>]['itemid']
-	 *        string $items[<itemid>]['widget_description']  Field to resolve.
+	 *        string $items[<itemid>][<source_field>]  Particular source field, as referred by $fields.
 	 *
-	 * @return array  Returns array of items with macros resolved.
+	 * @param array  $fields                           Fields to resolve as [<source_field> => <resolved_field>].
+	 *
+	 * @return array
 	 */
-	public static function resolveItemWidgetDescriptions(array $items): array {
-		return CMacrosResolver::resolveItemWidgetDescriptions($items);
+	public static function resolveItemBasedWidgetMacros(array $items, array $fields): array {
+		return CMacrosResolver::resolveItemBasedWidgetMacros($items, $fields);
 	}
 
 	/**

@@ -62,9 +62,9 @@ typedef struct
 }
 zbx_thread_poller_args;
 
-ZBX_THREAD_ENTRY(poller_thread, args);
+ZBX_THREAD_ENTRY(zbx_poller_thread, args);
 
-ZBX_THREAD_ENTRY(async_poller_thread, args);
+ZBX_THREAD_ENTRY(zbx_async_poller_thread, args);
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros);
@@ -83,6 +83,6 @@ void	zbx_init_library_mt_snmp(const char *progname);
 
 void	zbx_shutdown_library_mt_snmp(const char *progname);
 
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname);
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 
 #endif /* ZABBIX_ZBX_POLLER_H*/

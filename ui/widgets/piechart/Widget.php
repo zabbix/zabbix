@@ -21,8 +21,6 @@
 
 namespace Widgets\PieChart;
 
-use Widgets\PieChart\Includes\WidgetForm;
-
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {

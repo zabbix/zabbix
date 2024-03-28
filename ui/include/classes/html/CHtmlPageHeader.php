@@ -125,7 +125,8 @@ class CHtmlPageHeader {
 		echo '<!DOCTYPE html>';
 		echo (new CTag('html'))
 			->setAttribute('lang', $this->lang)
-			->setAttribute('theme', $this->theme);
+			->setAttribute('theme', $this->theme)
+			->setAttribute('color-scheme', APP::getColorScheme($this->theme));
 		echo <<<HTML
 			<head>
 				<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>

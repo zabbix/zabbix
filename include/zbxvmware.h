@@ -577,7 +577,7 @@ typedef struct
 }
 zbx_thread_vmware_args;
 
-ZBX_THREAD_ENTRY(vmware_thread, args);
+ZBX_THREAD_ENTRY(zbx_vmware_thread, args);
 
 void	zbx_vmware_destroy(void);
 
