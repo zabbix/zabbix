@@ -800,8 +800,8 @@ class CDashboardPage {
 			return {
 				x: Math.max(0, Math.min(this._max_columns - width, x)),
 				y: Math.max(0, Math.min(this._max_rows - height, y)),
-				width: width,
-				height: height
+				width,
+				height
 			}
 		};
 

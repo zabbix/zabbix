@@ -215,6 +215,8 @@ class CDashboard {
 	setEditMode({is_internal_call = false} = {}) {
 		this._is_edit_mode = true;
 
+		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
+
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			if (!dashboard_page.isEditMode()) {
 				dashboard_page.setEditMode();
@@ -227,8 +229,6 @@ class CDashboard {
 
 		this._stopConfigurationChecker();
 		this._stopSlideshow();
-
-		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 
 		if (is_internal_call) {
 			this.fire(DASHBOARD_EVENT_EDIT);
