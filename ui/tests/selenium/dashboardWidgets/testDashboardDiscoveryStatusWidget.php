@@ -598,9 +598,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		// Check the table content.
 		$this->assertEquals($widget_data->getHeadersText(), ['Discovery rule', 'Up', 'Down']);
 		$this->assertEquals('No data found.', $widget_data->query('class:nothing-to-show')->one()->getText());
-
-		// Enable back the rule for proxy test.
-		DBexecute('UPDATE drules SET status=0 WHERE name='.zbx_dbstr('Discovery rule for proxy delete test'));
 	}
 
 	protected function checkWidgetForm($data, $update = false) {
