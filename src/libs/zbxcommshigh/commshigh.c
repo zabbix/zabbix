@@ -410,7 +410,7 @@ int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned
 		return SUCCEED;
 	}
 	else
-		*reset = 0;
+		*reset = ZBX_REDIRECT_NONE;
 
 	if (FAIL == zbx_json_value_by_name(&jp_redirect, ZBX_PROTO_TAG_REVISION, buf, sizeof(buf), NULL))
 		return FAIL;
@@ -474,7 +474,7 @@ static int	comms_check_redirect(const char *data, zbx_vector_addr_ptr_t *addrs, 
 	{
 		/* can't reset if the current address is not redirected */
 		if (0 == addrs->values[0]->revision)
-			return FAIL;
+			return SUCCEED;
 
 		/* move redirected address at the end of address list */
 		zbx_vector_addr_ptr_append(addrs, addrs->values[0]);
@@ -546,7 +546,7 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error)
 {
 	zbx_socket_t		sock;
-	int			ret = FAIL, retries = 0, retry;
+	int			ret = FAIL, retries = 0, retry = ZBX_REDIRECT_NONE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 retry:
@@ -610,7 +610,12 @@ retry:
 		}
 
 		if (NULL != error)
-			*error = zbx_strdup(NULL, "sequential redirect responses detected");
+		{
+			if (ZBX_REDIRECT_RETRY == retry)
+				*error = zbx_strdup(NULL, "sequential redirect responses detected");
+			else
+				*error = zbx_strdup(NULL, "connection was reset because of service being offline");
+		}
 
 		goto cleanup;
 	}
