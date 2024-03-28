@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-11-07 14:39+0000\n"
+"PO-Revision-Date: 2024-03-18 14:20+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -212,12 +212,12 @@ msgstr[2] "%1$s z %2$s elementów jest w stanie problem"
 #: app/views/administration.miscconfig.edit.php:119
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s lub %2$s — pozwala na wyświetlenie strony tylko w ramce o tym samym źródle co sama strona"
 
 #: app/views/administration.miscconfig.edit.php:122
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s lub %2$s — zapobiega wyświetlaniu strony w ramce, niezależnie od tego, która witryna próbuje to zrobić"
 
 #: jsLoader.php:348
 #, c-format
@@ -13248,7 +13248,7 @@ msgstr "Niewspierane"
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Pamiętaj, że %1$s lub %2$s będą traktowane jako nazwy hostów, jeśli zostaną użyte bez pojedynczych cudzysłowów."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19363,7 +19363,7 @@ msgstr "Czas dostępności/niedostępności"
 
 #: app/views/administration.miscconfig.edit.php:115
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "Użyj nagłówka HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20776,7 +20776,7 @@ msgstr "Nagłówek HTTP X-Frame-Options"
 
 #: app/views/administration.miscconfig.edit.php:117
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "Obsługiwane wartości nagłówka HTTP X-Frame-Options:"
 
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
@@ -21201,7 +21201,7 @@ msgstr "znak specjalny"
 #: app/views/administration.miscconfig.edit.php:125
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "ciąg nazw hostów oddzielonych spacjami; dodanie %1$s do listy umożliwia wyświetlenie strony w ramce o tym samym pochodzeniu, co sama strona"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -21782,7 +21782,7 @@ msgstr "degrees() - Konwertuje wartość z radianów na stopnie"
 
 #: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
 msgid "delimiter"
-msgstr ""
+msgstr "separator"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -22665,7 +22665,7 @@ msgstr "problem ze wzorem"
 
 #: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
 msgid "qualifier"
-msgstr ""
+msgstr "kwalifikator"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

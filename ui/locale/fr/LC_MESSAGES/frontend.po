@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2024-02-18 13:51+0000\n"
+"PO-Revision-Date: 2024-03-14 20:21+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -21640,7 +21640,7 @@ msgstr "degrees() - Convertit une valeur de radians en degrés"
 
 #: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
 msgid "delimiter"
-msgstr ""
+msgstr "délimiteur"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -22523,7 +22523,7 @@ msgstr "modèle de problème"
 
 #: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
 msgid "qualifier"
-msgstr ""
+msgstr "qualificatif"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"
