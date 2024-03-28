@@ -34,9 +34,6 @@ class CNavigationTree {
 	static ZBX_STYLE_NODE_INFO_ARROW =							'navigation-tree-node-info-arrow';
 	static ZBX_STYLE_NODE_INFO_NAME =							'navigation-tree-node-info-name';
 	static ZBX_STYLE_NODE_INFO_MAINTENANCE =					'navigation-tree-node-info-maintenance';
-	static ZBX_STYLE_NODE_INFO_MAINTENANCE_HINT =				'navigation-tree-node-info-maintenance-hint';
-	static ZBX_STYLE_NODE_INFO_MAINTENANCE_HINT_PRIMARY =		'navigation-tree-node-info-maintenance-hint-primary';
-	static ZBX_STYLE_NODE_INFO_MAINTENANCE_HINT_SECONDARY =		'navigation-tree-node-info-maintenance-hint-secondary';
 	static ZBX_STYLE_NODE_INFO_PROBLEMS =						'navigation-tree-node-info-problems';
 	static ZBX_STYLE_NODE_INFO_PROBLEMS_HINT =					'navigation-tree-node-info-problems-hint';
 	static ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY =			'navigation-tree-node-info-problems-hint-severity';
@@ -48,6 +45,9 @@ class CNavigationTree {
 	static ZBX_STYLE_NODE_INFO_GROUP_HINT_VALUE =				'navigation-tree-node-info-group-hint-value';
 	static ZBX_STYLE_NODE_CHILDREN =							'navigation-tree-node-children';
 	static ZBX_STYLE_GROUP_UNCATEGORIZED =						'navigation-tree-group-uncategorized';
+
+	static MAINTENANCE_TYPE_NORMAL = '0';
+	static MAINTENANCE_TYPE_NODATA = '1';
 
 	/**
 	 * Root container element.
@@ -394,24 +394,13 @@ class CNavigationTree {
 		element.dataset.hintbox = '1';
 		element.dataset.hintboxStatic = '1';
 
-		const hint = document.createElement('div');
-		hint.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_MAINTENANCE_HINT);
+		const type = maintenance.maintenance_type === CNavigationTree.MAINTENANCE_TYPE_NORMAL
+			? t('Maintenance with data collection')
+			: t('Maintenance without data collection');
 
-		const primary = document.createElement('div');
-		primary.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_MAINTENANCE_HINT_PRIMARY);
-		primary.innerText = `${maintenance.name} [${maintenance.type === '1'
-			? t('Maintenance without data collection')
-			: t('Maintenance with data collection')}]`;
+		const description = maintenance.description !== '' ? `\n${maintenance.description}` : '';
 
-		hint.appendChild(primary);
-
-		const secondary = document.createElement('div');
-		secondary.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_MAINTENANCE_HINT_SECONDARY);
-		secondary.innerText = maintenance.description;
-
-		hint.appendChild(secondary);
-
-		element.dataset.hintboxContents = hint.outerHTML;
+		element.dataset.hintboxContents = `${maintenance.name} [${type}]${description}`;
 	}
 
 	/**
