@@ -87,7 +87,7 @@ typedef struct
 	zbx_uint64_t				druleid;
 	char					*ip;
 	char					*dnsname;
-	int					now;
+	time_t					now;
 	zbx_uint64_t				unique_dcheckid;
 	unsigned int				processed_checks_per_ip;
 }

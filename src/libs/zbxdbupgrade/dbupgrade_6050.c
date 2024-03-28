@@ -3397,6 +3397,20 @@ static int	DBpatch_6050229(void)
 
 	return DBadd_field("proxy_dhistory", &field);
 }
+
+static int	DBpatch_6050230(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'honeycomb','widgets/honeycomb',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3631,5 +3645,6 @@ DBPATCH_ADD(6050226, 0, 1)
 DBPATCH_ADD(6050227, 0, 1)
 DBPATCH_ADD(6050228, 0, 1)
 DBPATCH_ADD(6050229, 0, 1)
+DBPATCH_ADD(6050230, 0, 1)
 
 DBPATCH_END()

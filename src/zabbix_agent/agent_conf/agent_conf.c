@@ -22,6 +22,7 @@
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
+#include "zbxcfg.h"
 #ifdef _WINDOWS
 #include	"zbxparam.h"
 #endif
@@ -116,7 +117,7 @@ int	load_user_parameters(char **lines, char **err)
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
  ******************************************************************************/
-int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
+int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg)
 {
 	unsigned char	rule_type;
 
@@ -222,16 +223,16 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
  ******************************************************************************/
 static int	load_config_user_params(const char *config_file, char **config_user_parameters)
 {
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,	MIN,			MAX */
-		{"UserParameter",		&config_user_parameters,		TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
+				MANDATORY,		MIN,			MAX */
+		{"UserParameter",		&config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{NULL, NULL, 0, 0, 0, 0}
 	};
 
-	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
+	return zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
 void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
