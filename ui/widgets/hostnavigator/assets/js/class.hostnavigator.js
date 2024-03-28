@@ -28,6 +28,9 @@ class CHostNavigator {
 	static GROUP_BY_TAG_VALUE = 1;
 	static GROUP_BY_SEVERITY = 2;
 
+	static EVENT_HOST_SELECT = 'host.select';
+	static EVENT_GROUP_TOGGLE = 'group.toggle';
+
 	/**
 	 * Widget configuration.
 	 *
@@ -456,7 +459,7 @@ class CHostNavigator {
 				if (e.detail.id !== this.#selected_host_id) {
 					this.#selected_host_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent('host.select', {
+					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
 						detail: {
 							_hostid: e.detail.id
 						}
@@ -492,7 +495,7 @@ class CHostNavigator {
 					}
 				}
 
-				this.#container.dispatchEvent(new CustomEvent('group.toggle', {
+				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_GROUP_TOGGLE, {
 					detail: {
 						group_identifier: e.detail.group_identifier,
 						is_open: e.detail.is_open
@@ -506,8 +509,8 @@ class CHostNavigator {
 	 * Activate events of host navigator widget.
 	 */
 	#activateEvents() {
-		this.#navigation_tree.addEventListener('item.select', this.#events.hostSelect);
-		this.#navigation_tree.addEventListener('group.toggle', this.#events.groupToggle);
+		this.#navigation_tree.addEventListener(CNavigationTree.EVENT_ITEM_SELECT, this.#events.hostSelect);
+		this.#navigation_tree.addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE, this.#events.groupToggle);
 	}
 
 	/**

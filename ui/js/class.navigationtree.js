@@ -49,6 +49,9 @@ class CNavigationTree {
 	static MAINTENANCE_TYPE_NORMAL = '0';
 	static MAINTENANCE_TYPE_NODATA = '1';
 
+	static EVENT_ITEM_SELECT = 'item.select';
+	static EVENT_GROUP_TOGGLE = 'group.toggle';
+
 	/**
 	 * Root container element.
 	 *
@@ -527,7 +530,11 @@ class CNavigationTree {
 					}
 				}
 
-				this.#container.dispatchEvent(new CustomEvent('item.select', {detail: {id: selected_id}}));
+				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
+					detail: {
+						id: selected_id
+					}
+				}));
 			},
 
 			groupToggle: (e) => {
@@ -557,7 +564,7 @@ class CNavigationTree {
 					is_open = true;
 				}
 
-				this.#container.dispatchEvent(new CustomEvent('group.toggle', {
+				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_GROUP_TOGGLE, {
 					detail: {
 						group_identifier: JSON.parse(node.dataset.group_identifier),
 						is_open

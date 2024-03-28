@@ -101,8 +101,12 @@ class CWidgetHostNavigator extends CWidget {
 	}
 
 	#activateEvents() {
-		this.#host_navigator.getContainer().addEventListener('host.select', this.#events.hostSelect);
-		this.#host_navigator.getContainer().addEventListener('group.toggle', this.#events.groupToggle);
+		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_HOST_SELECT,
+			this.#events.hostSelect
+		);
+		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_GROUP_TOGGLE,
+			this.#events.groupToggle
+		);
 	}
 
 	/**
