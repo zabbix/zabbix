@@ -588,16 +588,16 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 	char	buffer[MAX_STRING_LEN], *sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dhostid:" ZBX_FS_UI64 " dserviceids:%d now:" ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dhostid:" ZBX_FS_UI64 " dserviceids:%d now:" ZBX_FS_TIME_T,
 			__func__, dhostid, dserviceids->values_num, now);
 
 	zbx_snprintf(buffer, sizeof(buffer),
 			"update dservices"
-			" set status=%d,lastup=%d,lastdown=%d"
+			" set status=%d,lastup=%d,lastdown=" ZBX_FS_TIME_T
 			" where (status=%d or lastup<>0)"
 				" and dhostid=" ZBX_FS_UI64
 				" and not",
-			DOBJECT_STATUS_DOWN, 0, (int)now, DOBJECT_STATUS_UP, dhostid);
+			DOBJECT_STATUS_DOWN, 0, now, DOBJECT_STATUS_UP, dhostid);
 
 	zbx_vector_uint64_sort(dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_db_prepare_multiple_query(buffer, "dserviceid", dserviceids, &sql, &sql_alloc, &sql_offset);

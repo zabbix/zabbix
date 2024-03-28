@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxdiscovery.h"
+#include "zbxautoreg.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1
@@ -77,7 +78,10 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb,
-		zbx_discovery_update_drule_func_t discovery_update_drule_cb, int *more, char **error);
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb,
+		zbx_autoreg_host_free_func_t autoreg_host_free_cb,
+		zbx_autoreg_flush_hosts_func_t autoreg_flush_hosts_cb,
+		zbx_autoreg_prepare_host_func_t autoreg_prepare_host_cb, int *more, char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,

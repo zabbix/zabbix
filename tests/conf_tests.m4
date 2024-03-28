@@ -59,7 +59,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxcommon/Makefile
 			tests/libs/zbxcomms/Makefile
 			tests/libs/zbxcommshigh/Makefile
-			tests/libs/zbxconf/Makefile
+			tests/libs/zbxcfg/Makefile
 			tests/libs/zbxdbcache/Makefile
 			tests/libs/zbxdbhigh/Makefile
 			tests/libs/zbxeval/Makefile
