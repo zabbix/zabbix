@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-11-07 14:40+0000\n"
+"PO-Revision-Date: 2024-03-26 11:44+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -4563,7 +4563,7 @@ msgstr "Użytkownik bazy danych"
 #: app/views/popup.maintenance.period.php:112
 #: app/views/popup.maintenance.period.php:147
 msgid "Date"
-msgstr "Data"
+msgstr "Dane"
 
 #: include/hosts.inc.php:329
 msgid "Date HW decommissioned"
