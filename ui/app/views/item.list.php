@@ -157,6 +157,10 @@ foreach ($data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
+	$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['itemDiscovery']
+		? $item['itemDiscovery']['disable_source']
+		: '';
+
 	// Info
 	$info_cell = null;
 
@@ -167,9 +171,12 @@ foreach ($data['items'] as $item) {
 			$info_cell[] = makeErrorIcon($item['error']);
 		}
 
-		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_cell[] = getItemLifetimeIndicator($now_ts, (int) $item['itemDiscovery']['ts_delete']);
+
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_cell[] = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
+				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
+				_('item')
+			);
 		}
 
 		$info_cell = makeInformationList($info_cell);
@@ -177,6 +184,15 @@ foreach ($data['items'] as $item) {
 
 	$can_execute = in_array($item['type'], $data['check_now_types']) && $item['status'] == ITEM_STATUS_ACTIVE
 		&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED;
+
+	$status = (new CLink(itemIndicator($item['status'], $item['state'])))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($item['status'], $item['state']))
+		->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
+		->setAttribute('data-itemid', $item['itemid']);
+
+	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
+
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
 			->setAttribute('data-actions', $can_execute ? 'execute' : null),
@@ -201,11 +217,10 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		(new CLink(itemIndicator($item['status'], $item['state'])))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status'], $item['state']))
-			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
-			->setAttribute('data-itemid', $item['itemid']),
+		(new CDiv([
+			$status,
+			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
+		]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['tags'][$item['itemid']],
 		$info_cell
 	];
