@@ -455,7 +455,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *           <key>:<refresh time>:<last log size>:<modification time>           *
  *                                                                              *
  ********************************************************************************/
-static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
+static void	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_hostname,
 		zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, const char *config_source_ip,
 		int config_buffer_send, int config_buffer_size)
@@ -468,7 +468,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
-	int			delay, mtime, expression_type, case_sensitive, timeout, i, j, ret = FAIL;
+	int			delay, mtime, expression_type, case_sensitive, timeout, i, j;
 	zbx_uint32_t		config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -490,9 +490,9 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp), NULL))
-			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server [%s:%hu]: %s", host, port, tmp);
+			zabbix_log(LOG_LEVEL_ERR, "no active checks on server [%s:%hu]: %s", host, port, tmp);
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server");
+			zabbix_log(LOG_LEVEL_ERR, "no active checks on server");
 
 		goto out;
 	}
@@ -518,7 +518,9 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		if (0 != *config_revision_local)
-			goto success;;
+			goto out;
+
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
 
 		goto out;
 	}
@@ -708,24 +710,20 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			zbx_add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
-success:
-	ret = SUCCEED;
 out:
 	zbx_vector_str_clear_ext(&received_metrics, zbx_str_free);
 	zbx_vector_str_destroy(&received_metrics);
 	zbx_free(key_orig);
 	zbx_free(name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	parse_list_of_commands(char *str)
+static void	parse_list_of_commands(char *str)
 {
 	const char		*p;
 	char			*cmd = NULL, tmp[MAX_STRING_LEN], *key = NULL;
-	int			ret = FAIL, commands_num = 0;
+	int			commands_num = 0;
 	zbx_uint64_t		command_id;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	size_t			cmd_alloc = 0, key_alloc;
@@ -795,14 +793,11 @@ static int	parse_list_of_commands(char *str)
 		}
 	}
 
-	ret = SUCCEED;
 out:
 	zbx_free(key);
 	zbx_free(cmd);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /************************************************************************************************
@@ -951,20 +946,11 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 					((zbx_addr_t *)addrs->values[0])->port);
 		}
 
-		if (SUCCEED != parse_list_of_checks(data, ((zbx_addr_t *)addrs->values[0])->ip,
-				((zbx_addr_t *)addrs->values[0])->port, config_revision_local,
-				config_timeout, config_hostname, addrs, config_tls, config_source_ip,
-				config_buffer_send, config_buffer_size))
-		{
-				zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
-						zbx_json_strerror());
-		}
+		parse_list_of_checks(data, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+				config_revision_local, config_timeout, config_hostname, addrs, config_tls,
+				config_source_ip, config_buffer_send, config_buffer_size);
 
-		if (SUCCEED != parse_list_of_commands(data))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active commands: %s",
-					zbx_json_strerror());
-		}
+		parse_list_of_commands(data);
 
 		zbx_free(data);
 	}
