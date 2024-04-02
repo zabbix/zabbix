@@ -239,8 +239,7 @@ class CAuthentication extends CApiService {
 	private static function checkMfaid(array $auth, array $db_auth): void {
 		$mfaid_changed = bccomp($auth['mfaid'], $db_auth['mfaid']) != 0;
 
-		if (($auth['mfa_status'] == MFA_DISABLED && $auth['mfaid'] != 0 && $mfaid_changed)
-				|| ($auth['mfa_status'] == MFA_ENABLED && ($mfaid_changed || $auth['mfaid'] == 0))) {
+		if ($auth['mfaid'] != 0 && $mfaid_changed) {
 			$db_mfas = DB::select('mfa', [
 				'output' => ['mfaid'],
 				'mfaids' => $auth['mfaid']
