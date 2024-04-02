@@ -3416,7 +3416,11 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
-			'output' => array_merge(['itemid', 'hostid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				[
+					'itemid', 'hostid', 'name', 'type', 'key_', 'lifetime', 'lifetime_type', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				CItemType::FIELD_NAMES
 			),
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
