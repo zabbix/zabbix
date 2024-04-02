@@ -35,6 +35,7 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxescalations.h"
 
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 {
@@ -3320,6 +3321,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		{
 			zbx_vector_escalation_new_ptr_append_array(new_escalations, local_rec_escalations.values,
 					local_rec_escalations.values_num);
+			zbx_vector_escalation_new_ptr_clear(&local_rec_escalations);
 		}
 
 		zbx_vector_uint64_pair_sort(&rec_escalations, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -3345,6 +3347,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	}
 
 	zbx_vector_uint64_pair_destroy(&rec_escalations);
+	zbx_vector_escalation_new_ptr_clear_ext(&local_rec_escalations, zbx_escalation_new_ptr_free);
 	zbx_vector_escalation_new_ptr_destroy(&local_rec_escalations);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
