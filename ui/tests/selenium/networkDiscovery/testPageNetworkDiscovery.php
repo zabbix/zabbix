@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup drules
  *
+ * @onBefore prepareDiscoveryErrorData
+ *
  * @dataSource NetworkDiscovery, Proxies
  */
 class testPageNetworkDiscovery extends CWebTest {
@@ -46,6 +48,45 @@ class testPageNetworkDiscovery extends CWebTest {
 	 * SQL query which selects all values from table drules.
 	 */
 	const SQL = 'SELECT * FROM drules';
+
+	protected static $druleids;
+	const DISCOVERY_ERROR_CHECK = 'Discovery rule for testing error';
+	const DISCOVERY_ERROR_CHECK_SYMBOLS = 'Discovery rule with error (4-byte symbols)';
+	const ERROR_MESSAGE = 'Test error message for a discovery rule.';
+	const ERROR_WITH_SYMBOLS = 'Test error message with symbols: ᵭᵻᵴᶜṌṼẻṜὙ🛑😐🗼🁨☕';
+
+	public function prepareDiscoveryErrorData() {
+		CDataHelper::call('drule.create', [
+			[
+				'name' => self::DISCOVERY_ERROR_CHECK,
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_ACTIVE,
+				'dchecks' => [
+					[
+						'type' => SVC_HTTP
+					]
+				]
+			],
+			[
+				'name' => self::DISCOVERY_ERROR_CHECK_SYMBOLS,
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_ACTIVE,
+				'dchecks' => [
+					[
+						'type' => SVC_HTTP
+					]
+				]
+			]
+		]);
+
+		self::$druleids = CDataHelper::getIds('name');
+
+		// Add custom error messages using database.
+		DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_MESSAGE).' WHERE druleid='.
+				zbx_dbstr(self::$druleids[self::DISCOVERY_ERROR_CHECK]));
+		DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_WITH_SYMBOLS).' WHERE druleid='.
+				zbx_dbstr(self::$druleids[self::DISCOVERY_ERROR_CHECK_SYMBOLS]));
+	}
 
 	/**
 	 * Function which checks layout of Network Discovery page.
@@ -98,6 +139,23 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Check if fields "Name" length is as expected.
 		$this->assertEquals(255, $form->query('xpath:.//input[@name="filter_name"]')->one()->getAttribute('maxlength'));
 
+		// Check the presence of a error hintbox for a specific rows.
+		$this->assertEquals(self::ERROR_MESSAGE, $table->findRow('Name', self::DISCOVERY_ERROR_CHECK)->getColumn('Info')
+					->query('button')->one()->getAttribute('data-hintbox-contents')
+		);
+		$this->assertEquals(self::ERROR_WITH_SYMBOLS, $table->findRow('Name', self::DISCOVERY_ERROR_CHECK_SYMBOLS)
+				->getColumn('Info')->query('button')->one()->getAttribute('data-hintbox-contents')
+		);
+
+		// Check that correct amount of hintboxes is present in the table.
+		$this->assertEquals(2, $table->query('class', 'rel-container')->all()->count());
+
+		// Check expanding / collapsing of a hintbox.
+		$table->findRow('Name', self::DISCOVERY_ERROR_CHECK)->getColumn('Info')->query('button')->one()->click();
+		$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+		$this->assertEquals(self::ERROR_MESSAGE, $hintbox->one()->getText());
+		$hintbox->query('xpath://button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
+
 		/**
 		 * Check if counter displays correct number of rows and check if previously disabled buttons are enabled,
 		 * upon selecting discovery rules.
@@ -149,7 +207,9 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'External network',
+						self::DISCOVERY_ERROR_CHECK_SYMBOLS,
 						'Discovery rule for update',
+						self::DISCOVERY_ERROR_CHECK,
 						'Discovery rule for proxy delete test',
 						'Discovery rule for cancelling scenario'
 					]
@@ -182,8 +242,10 @@ class testPageNetworkDiscovery extends CWebTest {
 					'expected' => [
 						'Local network',
 						'External network',
+						self::DISCOVERY_ERROR_CHECK_SYMBOLS,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
+						self::DISCOVERY_ERROR_CHECK,
 						'Discovery rule for successful deleting',
 						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
@@ -202,8 +264,10 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'RULE'
 					],
 					'expected' => [
+						self::DISCOVERY_ERROR_CHECK_SYMBOLS,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
+						self::DISCOVERY_ERROR_CHECK,
 						'Discovery rule for successful deleting',
 						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
@@ -221,8 +285,10 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'Disco'
 					],
 					'expected' => [
+						self::DISCOVERY_ERROR_CHECK_SYMBOLS,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
+						self::DISCOVERY_ERROR_CHECK,
 						'Discovery rule for successful deleting',
 						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
