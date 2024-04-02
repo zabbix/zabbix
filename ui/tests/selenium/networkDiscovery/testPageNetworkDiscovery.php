@@ -49,7 +49,6 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	const SQL = 'SELECT * FROM drules';
 
-	protected static $druleids;
 	const DISCOVERY_ERROR_CHECK = 'Discovery rule for testing error';
 	const DISCOVERY_ERROR_CHECK_SYMBOLS = 'Discovery rule with error (4-byte symbols)';
 	const ERROR_MESSAGE = 'Test error message for a discovery rule.';
@@ -79,13 +78,11 @@ class testPageNetworkDiscovery extends CWebTest {
 			]
 		]);
 
-		self::$druleids = CDataHelper::getIds('name');
-
 		// Add custom error messages using database.
-		DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_MESSAGE).' WHERE druleid='.
-				zbx_dbstr(self::$druleids[self::DISCOVERY_ERROR_CHECK]));
-		DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_WITH_SYMBOLS).' WHERE druleid='.
-				zbx_dbstr(self::$druleids[self::DISCOVERY_ERROR_CHECK_SYMBOLS]));
+		DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_MESSAGE).' WHERE name='.
+				zbx_dbstr(self::DISCOVERY_ERROR_CHECK));
+		DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_WITH_SYMBOLS).' WHERE name='.
+				zbx_dbstr(self::DISCOVERY_ERROR_CHECK_SYMBOLS));
 	}
 
 	/**
@@ -148,7 +145,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		);
 
 		// Check that correct amount of hintboxes is present in the table.
-		$this->assertEquals(2, $table->query('class', 'rel-container')->all()->count());
+		$this->assertEquals(2, $table->query('class:rel-container')->all()->count());
 
 		// Check expanding / collapsing of a hintbox.
 		$table->findRow('Name', self::DISCOVERY_ERROR_CHECK)->getColumn('Info')->query('button')->one()->click();
@@ -455,16 +452,32 @@ class testPageNetworkDiscovery extends CWebTest {
 					'action' => 'Disable'
 				]
 			],
-			// Cancel disable action for multiple discovery rules.
+			// Disable action for multiple discovery rules.
 			[
 				[
 					'name' => [
-						'Discovery rule to check delete',
-						'Discovery rule for update',
-						'Disabled discovery rule for update'
+						'Local network',
+						'External network',
+						'Discovery rule to check delete'
 					],
-					'cancel' => true,
 					'action' => 'Disable'
+				]
+			],
+			// Disable action for discovery rule with error hintbox.
+			[
+				[
+					'name' => self::DISCOVERY_ERROR_CHECK,
+					'single' => true,
+					'action' => 'Disable'
+				]
+			],
+			// Enable action for discovery rule with error hintbox.
+			[
+				[
+					'name' => self::DISCOVERY_ERROR_CHECK,
+					'single' => true,
+					'action' => 'Enable',
+					'hintbox' => self::ERROR_MESSAGE
 				]
 			],
 			// Cancel enable action for multiple discovery rules.
@@ -585,6 +598,27 @@ class testPageNetworkDiscovery extends CWebTest {
 							(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
 							' '.lcfirst($data['action']).'d'
 					);
+				}
+
+				if ($data['action'] === 'Enable' && array_key_exists('hintbox', $data)) {
+					$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
+							->query('button')->one()->getAttribute('data-hintbox-contents')
+					);
+				}
+
+				if ($data['action'] === 'Disable') {
+					if (array_key_exists('single', $data)) {
+						$this->assertFalse($table->findRow('Name', $data['name'])->getColumn('Info')
+								->query('class:rel-container')->exists()
+						);
+					}
+					else {
+						foreach ($data['name'] as $name) {
+							$this->assertFalse($table->findRow('Name', $name)->getColumn('Info')
+									->query('class:rel-container')->exists()
+							);
+						}
+					}
 				}
 
 				CMessageElement::find()->one()->close();
