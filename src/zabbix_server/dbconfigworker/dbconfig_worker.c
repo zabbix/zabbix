@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbconfigworker.h"
-#include "zbx_host_constants.h"
+#include "dbconfigworker.h"
 
+#include "zbx_host_constants.h"
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxipcservice.h"
@@ -29,7 +29,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
-#include "zbxtypes.h"
 
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
@@ -223,4 +222,41 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 
 	exit(EXIT_SUCCESS);
 #undef ZBX_DBCONFIG_WORKER_DELAY
+}
+
+static void	dbconfig_worker_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
+{
+	static zbx_ipc_socket_t	socket;
+
+	/* configuration syncer process has a permanent connection to worker */
+	if (0 == socket.fd)
+	{
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_DBCONFIG_WORKER, SEC_PER_MIN, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to connector manager service: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector manager service");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	zbx_dbconfig_worker_send_ids(const zbx_vector_uint64_t *hostids)
+{
+	if (0 != hostids->values_num)
+	{
+		unsigned char	*data = NULL;
+		size_t		data_offset = 0;
+
+		zbx_dbconfig_worker_serialize_ids(&data, &data_offset, hostids);
+		dbconfig_worker_send(ZBX_IPC_DBCONFIG_WORKER_REQUEST, data, data_offset);
+
+		free(data);
+	}
 }

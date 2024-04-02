@@ -50,6 +50,7 @@
 #include "cachehistory/cachehistory_server.h"
 #include "discovery/discovery_server.h"
 #include "autoreg/autoreg_server.h"
+#include "dbconfigworker/dbconfigworker.h"
 
 #include "zbxdiscovery.h"
 #include "zbxdiscoverer.h"
@@ -78,7 +79,6 @@
 #include "zbxalerter.h"
 #include "zbxdbsyncer.h"
 #include "zbxconnector.h"
-#include "zbxdbconfigworker.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
 #include "zbxhistory.h"
