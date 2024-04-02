@@ -34,7 +34,7 @@
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
-#include "audit/zbxaudit_proxy.h"
+#include "audit/zbxaudit_config_reload.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxversion.h"

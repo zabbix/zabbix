@@ -11,7 +11,7 @@ libzbxaudit_a_SOURCES = \
 	audit_trigger.c \
 	audit_graph.c \
 	audit_ha.c \
-	audit_proxy.c \
+	audit_config_reload.c \
 	audit_settings.c
 
 libzbxaudit_a_CFLAGS = \
