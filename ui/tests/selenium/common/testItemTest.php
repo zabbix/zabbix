@@ -968,7 +968,7 @@ class testItemTest extends CWebTest {
 						$fields_value = [
 							'address' => '',
 							'port' => '',
-							'test_with' => ($is_host) ? 'Proxy' : 'Server'
+							'test_with' => 'Server'
 						];
 
 						if ($is_host) {
@@ -980,7 +980,7 @@ class testItemTest extends CWebTest {
 				}
 
 				foreach ($fields_value as $field => $value) {
-					$this->assertEquals($elements[$field]->getValue(), $value);
+					$this->assertEquals($value, $elements[$field]->getValue());
 				}
 				foreach ($fields_state as $field => $state) {
 					$this->assertTrue($elements[$field]->isEnabled($state));
