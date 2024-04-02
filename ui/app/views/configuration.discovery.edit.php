@@ -129,6 +129,7 @@ $form_grid->addItem([
 	))
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addClass('drule-table')
 ]);
 
 $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
@@ -152,6 +153,7 @@ $form_grid->addItem([
 	))
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addClass('drule-table')
 ]);
 
 $host_source_template = (new CTemplateTag('host-source-row-tmpl'))->addItem(
@@ -177,6 +179,7 @@ $form_grid->addItem([
 	))
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addClass('drule-table')
 ]);
 
 $name_source_template = (new CTemplateTag('name-source-row-tmpl'))->addItem(

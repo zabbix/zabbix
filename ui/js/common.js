@@ -403,7 +403,7 @@ function PopUp(action, parameters, {
 						if (rect.width > 0) {
 							// Use of setTimeout() to prevent ResizeObserver observation error in Safari.
 							setTimeout(() => {
-								grid.style.setProperty('--label-width', `${Math.ceil(rect.width)}px`);
+								grid.style.setProperty('--label-width', `${rect.width}px`);
 							});
 							break;
 						}
