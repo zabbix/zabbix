@@ -282,11 +282,16 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
 						ret = SUCCEED;
 				}
+				else if (0 == strcmp(arg1, "proxy group"))
+				{
+					ret = SUCCEED;
+				}
 				else if (0 == strcmp(arg1, "proxy") && (0 == strcmp(arg3, "lastaccess") ||
 						0 == strcmp(arg3, "delay")))
 				{
 					ret = SUCCEED;
 				}
+
 clean:
 				zbx_free_agent_request(&request);
 			}
