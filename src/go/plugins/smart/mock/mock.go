@@ -57,6 +57,8 @@ func (c *MockController) ExpectExecute() *expectation {
 	return e
 }
 
+
+// ExpectationsWhereMet checks if all expectations defined (expected) where met.
 func (c *MockController) ExpectationsWhereMet() error {
 	if c.count != len(c.expectations) {
 		return fmt.Errorf(
