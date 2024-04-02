@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0beta2');
+define('ZABBIX_VERSION',		'7.0.0beta3');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050210);
+define('ZABBIX_DB_VERSION',		6050253);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -103,6 +103,22 @@ define('IDP_TYPE_SAML',	2);
 
 define('JIT_PROVISIONING_DISABLED',	0);
 define('JIT_PROVISIONING_ENABLED',	1);
+
+define('MFA_DISABLED',	0);
+define('MFA_ENABLED',	1);
+
+define('MFA_TYPE_TOTP',	1);
+define('MFA_TYPE_DUO',	2);
+
+define('TOTP_HASH_SHA1',	1);
+define('TOTP_HASH_SHA256',	2);
+define('TOTP_HASH_SHA512',	3);
+
+define('TOTP_CODE_LENGTH_6',	6);
+define('TOTP_CODE_LENGTH_8',	8);
+
+define('TOTP_VERIFICATION_DELAY_WINDOW', 1);
+define('TOTP_SECRET_LENGTH_32', 32);
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
@@ -223,8 +239,9 @@ define('PAGE_TYPE_JSON_RPC',			7); // api call
 define('PAGE_TYPE_TEXT',				9); // simple text
 define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
-define('ZBX_SESSION_ACTIVE',	0);
-define('ZBX_SESSION_PASSIVE',	1);
+define('ZBX_SESSION_ACTIVE',				0);
+define('ZBX_SESSION_PASSIVE',				1);
+define('ZBX_SESSION_CONFIRMATION_REQUIRED',	2);
 
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
@@ -548,7 +565,6 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
-define('ZBX_LLD_RULE_DELAY_DEFAULT',		'1h');
 define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
@@ -735,6 +751,23 @@ define('OPERATION_OBJECT_TRIGGER_PROTOTYPE', 1);
 define('OPERATION_OBJECT_GRAPH_PROTOTYPE', 2);
 define('OPERATION_OBJECT_HOST_PROTOTYPE', 3);
 
+// LLD rule
+define('ZBX_LLD_DELETE_AFTER',			0);
+define('ZBX_LLD_DELETE_NEVER',			1);
+define('ZBX_LLD_DELETE_IMMEDIATELY',	2);
+define('ZBX_LLD_DISABLE_AFTER',			0);
+define('ZBX_LLD_DISABLE_NEVER',			1);
+define('ZBX_LLD_DISABLE_IMMEDIATELY',	2);
+
+define('ZBX_DISABLE_SOURCE_LLD',		1);
+define('ZBX_DISABLE_DEFAULT',			0);
+
+define('ZBX_LLD_STATUS_DISCOVERED',		0);
+define('ZBX_LLD_STATUS_LOST',			1);
+
+define('ZBX_LLD_RULE_ENABLED_LIFETIME',	'1h');
+define('ZBX_LLD_RULE_DELAY_DEFAULT',	'1h');
+
 define('GRAPH_DISCOVER',	0);
 define('GRAPH_NO_DISCOVER',	1);
 
@@ -840,9 +873,9 @@ define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_WEBHOOK',	4);
 
-define('SMTP_CONNECTION_SECURITY_NONE',		0);
-define('SMTP_CONNECTION_SECURITY_STARTTLS',	1);
-define('SMTP_CONNECTION_SECURITY_SSL_TLS',	2);
+define('SMTP_SECURITY_NONE',		0);
+define('SMTP_SECURITY_STARTTLS',	1);
+define('SMTP_SECURITY_SSL',			2);
 
 define('SMTP_AUTHENTICATION_NONE',		0);
 define('SMTP_AUTHENTICATION_NORMAL',	1);
@@ -1013,6 +1046,9 @@ define('USER_TYPE_SUPER_ADMIN',		3);
 
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
+
+define('GROUP_MFA_DISABLED', 0);
+define('GROUP_MFA_ENABLED', 1);
 
 define('LINE_TYPE_NORMAL',	0);
 define('LINE_TYPE_BOLD',	1);
@@ -1801,6 +1837,7 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
+define('TAB_INDICATOR_AUTH_MFA', 'mfa');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
@@ -1838,6 +1875,9 @@ define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 define('TAB_INDICATOR_TEMPLATE_VALUEMAPS', 'template-valuemaps');
+
+define('ZBX_COLOR_SCHEME_DARK', 'dark');
+define('ZBX_COLOR_SCHEME_LIGHT', 'light');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
@@ -1922,10 +1962,7 @@ define('ZBX_STYLE_DASHBOARD_GRID', 'dashboard-grid');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION', 'dashboard-navigation');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS', 'dashboard-navigation-controls');
 define('ZBX_STYLE_DASHBOARD_NAVIGATION_TABS', 'dashboard-navigation-tabs');
-define('ZBX_STYLE_DASHBOARD_WIDGET', 'dashboard-widget');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FORM', 'dashboard-widget-form');
-define('ZBX_STYLE_DASHBOARD_WIDGET_HEAD', 'dashboard-widget-head');
-define('ZBX_STYLE_DASHBOARD_WIDGET_FOOT', 'dashboard-widget-foot');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
 define('ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK', 'dashboard-widget-graph-link');
 define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
@@ -2159,6 +2196,7 @@ define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR', 'zabbix-logo-sidebar');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT', 'zabbix-logo-sidebar-compact');
 define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
+define('ZBX_STYLE_OVERLAY_DIALOGUE_HEADER', 'overlay-dialogue-header');
 
 // HTML column layout.
 define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');

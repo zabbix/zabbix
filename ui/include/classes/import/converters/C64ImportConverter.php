@@ -222,6 +222,10 @@ class C64ImportConverter extends CConverter {
 			if (array_key_exists('triggers', $item)) {
 				$item['triggers'] = self::convertTriggers($item['triggers']);
 			}
+
+			if (!array_key_exists('history', $item)) {
+				$item['history'] = '90d';
+			}
 		}
 		unset($item);
 
@@ -242,6 +246,22 @@ class C64ImportConverter extends CConverter {
 			if ($discovery_rule['type'] !== CXmlConstantName::HTTP_AGENT
 					&& $discovery_rule['type'] !== CXmlConstantName::SCRIPT) {
 				unset($discovery_rule['timeout']);
+			}
+
+			$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
+
+			if (array_key_exists('lifetime', $discovery_rule)) {
+				if ($discovery_rule['lifetime'][0] !== '{') {
+					$converted_lifetime = timeUnitToSeconds($discovery_rule['lifetime']);
+
+					if ($converted_lifetime !== null && $converted_lifetime == 0) {
+						$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_IMMEDIATELY;
+						$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_IMMEDIATELY;
+					}
+				}
+			}
+			else {
+				$discovery_rule['lifetime'] = '30d';
 			}
 
 			if (array_key_exists('item_prototypes', $discovery_rule)) {

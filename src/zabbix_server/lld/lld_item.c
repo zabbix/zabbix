@@ -21,6 +21,7 @@
 
 #include "lld_audit.h"
 
+#include "zbx_item_constants.h"
 #include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
@@ -40,6 +41,7 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "../server_constants.h"
 
 #define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
@@ -277,7 +279,10 @@ typedef struct
 	const zbx_lld_item_prototype_t	*prototype;
 	char				*key_proto;
 	int				lastcheck;
+	unsigned char			discovery_status;
 	int				ts_delete;
+	int				ts_disable;
+	unsigned char			disable_source;
 }
 zbx_item_discovery_t;
 
@@ -344,7 +349,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select itemid,key_,lastcheck,ts_delete,parent_itemid"
+			"select itemid,key_,lastcheck,status,ts_delete,ts_disable,disable_source,parent_itemid"
 			" from item_discovery"
 			" where");
 
@@ -359,7 +364,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 		zbx_item_discovery_t	*item_discovery;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(parent_id, row[4]);
+		ZBX_STR2UINT64(parent_id, row[7]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &parent_id,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -377,7 +382,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 		item_discovery->prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[index];
 		item_discovery->key_proto = zbx_strdup(NULL, row[1]);
 		item_discovery->lastcheck = atoi(row[2]);
-		item_discovery->ts_delete = atoi(row[3]);
+		ZBX_STR2UCHAR(item_discovery->discovery_status, row[3]);
+		item_discovery->ts_delete = atoi(row[4]);
+		item_discovery->ts_disable = atoi(row[5]);
+		ZBX_STR2UCHAR(item_discovery->disable_source, row[6]);
 
 		zbx_vector_item_discovery_append(&item_discoveries, item_discovery);
 	}
@@ -401,7 +409,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 					"master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,"
 					"post_type,http_proxy,headers,retrieve_mode,request_method,output_format,"
 					"ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,"
-					"allow_traps"
+					"allow_traps,status"
 				" from items"
 				" where");
 
@@ -431,7 +439,10 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 			item->parent_itemid = item_discovery->parent_itemid;
 			item->key_proto = zbx_strdup(NULL, item_discovery->key_proto);
 			item->lastcheck = item_discovery->lastcheck;
+			item->discovery_status = item_discovery->discovery_status;
 			item->ts_delete = item_discovery->ts_delete;
+			item->ts_disable = item_discovery->ts_disable;
+			item->disable_source = item_discovery->disable_source;
 
 			item->name = zbx_strdup(NULL, row[1]);
 			item->name_proto = NULL;
@@ -619,6 +630,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ll
 				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS;
 				item->allow_traps_orig = (unsigned char)atoi(row[42]);
 			}
+
+			ZBX_STR2UCHAR(item->status, row[43]);
 
 			item->lld_row = NULL;
 
@@ -1784,7 +1797,10 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->itemid = 0;
 	item->parent_itemid = item_prototype->itemid;
 	item->lastcheck = 0;
+	item->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 	item->ts_delete = 0;
+	item->ts_disable = 0;
+	item->disable_source = ZBX_DISABLE_SOURCE_DEFAULT;
 	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
@@ -4119,15 +4135,29 @@ out:
 }
 
 static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete, const char **name)
+		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
+		unsigned char *disable_source, char **name)
 {
 	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
 
 	*id = item->itemid;
 	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	*lastcheck = item->lastcheck;
+	*discovery_status = item->discovery_status;
 	*ts_delete = item->ts_delete;
+	*ts_disable = item->ts_disable;
+	*object_status = ITEM_STATUS_ACTIVE == item->status ?
+			ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
+	*disable_source = item->disable_source;
 	*name = item->name;
+}
+
+static	int	get_item_status_value(int status)
+{
+	if (ZBX_LLD_OBJECT_STATUS_ENABLED == status)
+		return ITEM_STATUS_ACTIVE;
+
+	return ITEM_STATUS_DISABLED;
 }
 
 static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_row_t *lld_rows,
@@ -4416,7 +4446,8 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_t *items, zbx_hash
  *                                                                            *
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		item_prototypes, item_dependencies;
 	zbx_hashset_t			items_index;
@@ -4470,8 +4501,10 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	}
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
-	lld_remove_lost_objects("item_discovery", "itemid", (const zbx_vector_ptr_t *)&items, lifetime, lastcheck,
-			zbx_db_delete_items, get_item_info);
+
+	lld_process_lost_objects("item_discovery", "items", "itemid", (zbx_vector_ptr_t *)&items, lifetime,
+			enabled_lifetime, lastcheck, zbx_db_delete_items, get_item_info, get_item_status_value,
+			zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
 clean:
 	zbx_hashset_destroy(&items_index);
 

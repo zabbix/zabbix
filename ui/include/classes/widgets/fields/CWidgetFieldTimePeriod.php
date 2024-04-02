@@ -72,7 +72,12 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
 
-		$label = $this->full_name ?? $this->label ?? '';
+		$label = $this->label ?? '';
+
+		if ($this->label_prefix !== null) {
+			$label = $this->label_prefix;
+		}
+
 		$value = $this->getValue();
 		$default = $this->getDefault();
 		$data_source = $this->getDataSource();

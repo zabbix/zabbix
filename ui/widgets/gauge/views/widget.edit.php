@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+
 $form = new CWidgetFormView($data);
 
 $form
@@ -75,11 +77,8 @@ $form
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_gauge_form.init('.json_encode([
-		'thresholds_colors' => ['FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7',
-			'EC1594', 'BAE37D', '6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB',
-			'894BBC', '6D6D6D'
-		]
-	], JSON_THROW_ON_ERROR).');')
+			'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE
+		], JSON_THROW_ON_ERROR).');')
 	->show();
 
 
