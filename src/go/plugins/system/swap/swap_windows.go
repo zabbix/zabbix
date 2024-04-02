@@ -24,9 +24,21 @@ package swap
 
 import (
 	"zabbix.com/pkg/win32"
+
+	"git.zabbix.com/ap/plugin-support/errs"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
-func getSwap() (uint64, uint64, error) {
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Swap",
+		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+func getSwapSize() (uint64, uint64, error) {
 	m, err := win32.GlobalMemoryStatusEx()
 	if err != nil {
 		return 0, 0, nil
@@ -41,4 +53,12 @@ func getSwap() (uint64, uint64, error) {
 	}
 
 	return total, avail, nil
+}
+
+func getSwapStatsIn(string) (uint64, uint64, uint64, error) {
+	return 0, 0, 0, plugin.UnsupportedMetricError
+}
+
+func getSwapStatsOut(string) (uint64, uint64, uint64, error) {
+	return 0, 0, 0, plugin.UnsupportedMetricError
 }

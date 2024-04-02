@@ -1,8 +1,26 @@
 Changes for 7.0.0beta3
 
 New features:
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+...G...... [ZBXNEXT-9024] set maximal Zabbix agent 2 plugin capacity to 1000, set default number of Zabbix agent listeners to 10 (mprihodko)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+..F....... [ZBXNEXT-9047] implemented new navigation icons for main menu (dpetra)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
+A.F.I...S. [ZBXNEXT-2020,ZBXNEXT-8918] implemented the option to disable no-longer discovered entities (asestakovs, esekace)
+..F.I..... [ZBXNEXT-8683] implemented new Honeycomb widget (apoga, ashubin, averza, ddauksa)
 
 Bug fixes:
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+A......... [ZBX-23402] fixed web scenario step post type saving in DB (Ivo)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+.......PS. [ZBX-23868] fixed empty result JSON data of vmware.vm.snapshot.get (MVekslers)
+..F....... [ZBX-24114] added labels to "Tags" and "Value mapping" fields in host configuration form (solonkins)
+..F....... [ZBX-23397] fixed runtime error in discovered host configuration form with inherited macros (esekace)
+..F....... [ZBX-24181] fixed max repetition count value reset for numbers exceeding 15 digits (esekace)
+........S. [ZBX-24091] fixed user macro resolution in function part of error messages (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta2
@@ -597,8 +615,22 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.14rc1
 
 New features:
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+...G...... [ZBXNEXT-9024] set maximal Zabbix agent 2 plugin capacity to 1000 and default capacity to 100 (mprihodko)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
 
 Bug fixes:
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+A......... [ZBX-23402] fixed web scenario step post type saving in DB (Ivo)
+........S. [ZBX-24091] fixed user macro resolution in function part of error messages (dgoloscapov)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+.......PS. [ZBX-23868] fixed empty result JSON data of vmware.vm.snapshot.get (MVekslers)
+..F....... [ZBX-23397] fixed runtime error in discovered host configuration form with inherited macros (esekace)
+..F....... [ZBX-24181] fixed max repetition count value reset for numbers exceeding 15 digits (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.13
@@ -2297,8 +2329,16 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.29rc1
 
 New features:
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
 
 Bug fixes:
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.28
