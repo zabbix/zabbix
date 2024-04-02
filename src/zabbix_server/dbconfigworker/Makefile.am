@@ -7,5 +7,5 @@ libdbconfigworker_a_CFLAGS = \
 
 libdbconfigworker_a_SOURCES = \
 	dbconfig_worker_protocol.c \
-	dbconfig_worker.h \
-	dbconfig_worker.c
+	dbconfigworker.h \
+	dbconfigworker.c
