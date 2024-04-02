@@ -1,1 +1,1 @@
-..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that server returns to Zabbix frontend (jfreibergs, kprutkovs)
+..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that Zabbix server returns to Zabbix frontend (jfreibergs, kprutkovs)

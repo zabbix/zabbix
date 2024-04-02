@@ -487,7 +487,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'timeout'
 				]) + [
 					'authtype' => ITEM_AUTHTYPE_PASSWORD,
-					'params_es' => ITEM_AUTHTYPE_PASSWORD,
+					'params_es' => ITEM_AUTHTYPE_PASSWORD
 				];
 				$data_host += $this->getInterface($input);
 
