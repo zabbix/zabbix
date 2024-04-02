@@ -16,21 +16,75 @@ COMMON_SRC_FILES = \
 # 3) zbxvariant
 # 4) zbxstr
 
-COMMON_LIB_FILES = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+#COMMON_LIB_FILES = \
+#	$(top_srcdir)/tests/libzbxmocktest.a \
+#	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+#	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+#	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+#	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+#	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+#	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+#	$(top_srcdir)/tests/libzbxmockdata.a \
+#	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+#	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+#	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+#	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+
+# 1) zbxxml depends on zbxalgo, zbxjson, zbxvariant, zbxstr and zbxcommon
+# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
+#
+# 1) mockdata needs zbxtime, zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
+# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
+#
+
+COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+MOCK_DATA_DEPS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(COMMON_LIB_DEPS) \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+MOCK_TEST_DEPS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(COMMON_LIB_DEPS)
+
+JSON_LIB_FILES = \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a
+
+XML_LIB_FILES = \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(JSON_LIB_FILES) \
+	$(COMMON_LIB_DEPS) \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
+
 
 COMMON_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
@@ -43,7 +97,7 @@ zbx_json_to_xml_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_json_to_xml_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(XML_LIB_FILES)
 
 zbx_json_to_xml_LDADD += @SERVER_LIBS@
 
@@ -56,7 +110,7 @@ zbx_xml_to_json_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_xml_to_json_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(XML_LIB_FILES)
 
 zbx_xml_to_json_LDADD += @SERVER_LIBS@
 

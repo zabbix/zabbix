@@ -6,25 +6,47 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# mockdata needs zbxalgo, zbxstr and zbxnum
-# mocktest needs zbxnix
+# 1) mockdata needs zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
+# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads and zbxcomms which themselves need zbxcommon
 #
-# zbxcommon currently needs zbxnix, which also needs zbxlog
-# zbxcommon should not depend on any other zabbix library
+# 3) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, and zbxcomms which themselves
+#    also need zbxcommon
 #
-COMMON_LIB_FILES = \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/tests/libzbxmocktest.a \
+# 4) zbxcommon should not depend on any other zabbix library
+#
+
+COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+MOCK_DATA_DEPS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(COMMON_LIB_DEPS) \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+MOCK_TEST_DEPS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(COMMON_LIB_DEPS)
+
+
+COMMON_LIB_FILES = \
+	$(COMMON_LIB_DEPS) \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
+
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 

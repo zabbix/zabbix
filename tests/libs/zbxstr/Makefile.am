@@ -13,19 +13,58 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# zbxstr should depend only on zbxcommon
+# 1) zbxstr should depend only on zbxcommon
+# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
-COMMON_LIB_FILES = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+# 1) mockdata needs zbxtime, zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
+# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
+#
+
+COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+MOCK_DATA_DEPS = \
+	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(COMMON_LIB_DEPS) \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+MOCK_TEST_DEPS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(COMMON_LIB_DEPS)
+
+STR_LIB_FILES = \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(COMMON_LIB_DEPS) \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
+
+
+#COMMON_LIB_FILES = \
+#	$(top_srcdir)/tests/libzbxmocktest.a \
+#	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+#	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+#	$(top_srcdir)/tests/libzbxmockdata.a \
+#	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+#	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+#	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+#	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 COMMON_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
@@ -38,7 +77,7 @@ zbx_str_extract_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_str_extract_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 zbx_str_extract_LDADD += @SERVER_LIBS@
 
@@ -51,7 +90,7 @@ convert_to_utf8_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 convert_to_utf8_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 convert_to_utf8_LDADD += @SERVER_LIBS@
 
@@ -65,7 +104,7 @@ zbx_truncate_itemkey_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_truncate_itemkey_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 zbx_truncate_itemkey_LDADD += @SERVER_LIBS@
 
@@ -79,7 +118,7 @@ zbx_truncate_value_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_truncate_value_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 zbx_truncate_value_LDADD += @SERVER_LIBS@
 
@@ -93,7 +132,7 @@ zbx_dyn_escape_string_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_dyn_escape_string_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
 
@@ -109,7 +148,7 @@ zbx_ltrim_utf8_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_ltrim_utf8_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 zbx_ltrim_utf8_LDADD += @SERVER_LIBS@
 
@@ -125,7 +164,7 @@ zbx_rtrim_utf8_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_rtrim_utf8_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(STR_LIB_FILES)
 
 zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
 
