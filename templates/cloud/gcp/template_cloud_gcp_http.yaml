@@ -711,7 +711,6 @@ zabbix_export:
                 value: '{$GCP.MSSQL.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: G
-          lifetime: 7d
           description: 'GCP Cloud SQL: MSSQL instances discovery.'
           host_prototypes:
             - uuid: edc6ab9314ed410b8a3cf6bfedff51ab
@@ -845,7 +844,6 @@ zabbix_export:
                 value: '{$GCP.MYSQL.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: G
-          lifetime: 7d
           description: 'GCP Cloud SQL: MySQL instances discovery.'
           host_prototypes:
             - uuid: 8b2556b881b14b86a98f90a447ae9734
@@ -972,7 +970,6 @@ zabbix_export:
                 value: '{$GCP.PGSQL.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: G
-          lifetime: 7d
           description: 'GCP Cloud SQL: PostgreSQL instances discovery.'
           host_prototypes:
             - uuid: 0fbbc550fda448d39aad6d0710f28b6a
@@ -1089,7 +1086,6 @@ zabbix_export:
                 value: '{$GCP.GCE.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          lifetime: 7d
           description: 'GCP Compute Engine: Instances discovery.'
           host_prototypes:
             - uuid: cb22d82a12814afb8ba833c649d575c4
@@ -1178,7 +1174,6 @@ zabbix_export:
                 value: '{$GCP.GCE.QUOTA.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'GCP Compute Engine: Quotas discovery.'
           item_prototypes:
             - uuid: 1e9a772b9a89497ba695079fc480bd0a
@@ -3132,7 +3127,6 @@ zabbix_export:
                 value: '{$CLOUD_SQL.MSSQL.DB.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Databases discovery.'
           item_prototypes:
             - uuid: 8f6deafa9efd416797ea58d1fce41c29
@@ -3218,7 +3212,6 @@ zabbix_export:
                 value: '{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Resources discovery.'
           item_prototypes:
             - uuid: 55bb12000dca46e096045da83a46edea
@@ -3323,7 +3316,6 @@ zabbix_export:
                 value: '{$CLOUD_SQL.MSSQL.SCHEDULER.ID.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Schedulers discovery.'
           item_prototypes:
             - uuid: 67bde61c128e4dfe9e47d8a3a6e3ceec
@@ -6550,7 +6542,6 @@ zabbix_export:
                 value: '{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Databases discovery for the particular PostgreSQL instance.'
           item_prototypes:
             - uuid: 997bdb03ba0b437ca2705f28dcc651ed
@@ -8763,7 +8754,6 @@ zabbix_export:
                 value: '{$GCE.DISK.STOR_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          lifetime: 7d
           description: 'GCP Compute Engine: Physical disks discovery.'
           item_prototypes:
             - uuid: dda10a0535c04fdb92092efeff020b2c
