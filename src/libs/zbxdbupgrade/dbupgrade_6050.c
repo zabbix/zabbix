@@ -3416,14 +3416,14 @@ static int	DBpatch_6050231(void)
 {
 	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	return DBadd_field("usrgrp", &field);
+	return DBadd_field("mfa_totp_secret", &field);
 }
 
 static int	DBpatch_6050232(void)
 {
 	const zbx_db_field_t	field = {"used_codes", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("usrgrp", &field);
+	return DBadd_field("mfa_totp_secret", &field);
 }
 #endif
 
