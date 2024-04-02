@@ -1,6 +1,8 @@
 Changes for 7.0.0beta3
 
 New features:
+.D........ [ZBXNEXT-9096] removed experimental status from PDF reporting (solonkins)
+.D........ [ZBXNEXT-9121] removed experimental status from Streaming to external systems (solonkins)
 .........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
 .........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
 ...G...... [ZBXNEXT-9024] set maximal Zabbix agent 2 plugin capacity to 1000, set default number of Zabbix agent listeners to 10 (mprihodko)
