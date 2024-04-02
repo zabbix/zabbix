@@ -35,37 +35,37 @@ class CItemHelper extends CItemGeneralHelper {
 
 	/**
 	 * @param string $src_templateid
-	 * @param string $dst_templateid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneTemplateItems(string $src_templateid, string $dst_templateid): bool {
-		$src_options = [
+	public static function cloneTemplateItems(string $src_templateid, array $dst_host): bool {
+		$src_items = self::getSourceItems([
 			'templateids' => $src_templateid,
 			'inherited' => false
-		];
+		]);
 
-		$dst_options = ['templateids' => [$dst_templateid]];
+		$dst_hosts = [$dst_host['templateid'] => $dst_host + ['status' => HOST_STATUS_TEMPLATE]];
 
-		return self::copy($src_options, $dst_options);
+		return !$src_items || self::copy($src_items, $dst_hosts);
 	}
 
 	/**
 	 * @param string $src_hostid
-	 * @param string $dst_hostid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	public static function cloneHostItems(string $src_hostid, string $dst_hostid): bool {
-		$src_options = [
+	public static function cloneHostItems(string $src_hostid, array $dst_host): bool {
+		$src_items = self::getSourceItems([
 			'hostids' => $src_hostid,
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		];
+		]);
 
-		$dst_options = ['hostids' => [$dst_hostid]];
+		$dst_hosts = [$dst_host['hostid'] => $dst_host];
 
-		return self::copy($src_options, $dst_options);
+		return !$src_items || self::copy($src_items, $dst_hosts);
 	}
 
 	/**
@@ -107,24 +107,16 @@ class CItemHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * @param array $src_options
-	 * @param array $dst_options
+	 * @param array $src_items
+	 * @param array $dst_hosts
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options): bool {
-		$src_items = self::getSourceItems($src_options);
-
-		if (!$src_items) {
-			return true;
-		}
-
-		$dst_hostids = reset($dst_options);
-
-		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
+	public static function copy(array $src_items, array $dst_hosts): bool {
+		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hosts);
 
 		try {
-			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_options);
+			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
@@ -142,7 +134,7 @@ class CItemHelper extends CItemGeneralHelper {
 		}
 
 		try {
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
+			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
@@ -151,9 +143,9 @@ class CItemHelper extends CItemGeneralHelper {
 		do {
 			$dst_items = [];
 
-			foreach ($dst_hostids as $dst_hostid) {
+			foreach ($dst_hosts as $dst_hostid => $dst_host) {
 				foreach ($src_items as $src_item) {
-					$dst_item = ['hostid' => $dst_hostid] + array_diff_key($src_item, array_flip(['itemid', 'hosts']));
+					$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts']));
 
 					if (array_key_exists($src_item['itemid'], $dst_valuemapids)) {
 						$dst_item['valuemapid'] = $dst_valuemapids[$src_item['itemid']][$dst_hostid];
@@ -167,7 +159,12 @@ class CItemHelper extends CItemGeneralHelper {
 						$dst_item['master_itemid'] = $dst_master_itemids[$src_item['itemid']][$dst_hostid];
 					}
 
-					$dst_items[] = $dst_item;
+					$dst_items[] = ['hostid' => $dst_hostid] + getSanitizedItemFields([
+						'templateid' => 0,
+						'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+						'hosts' => [$dst_host]
+					] + $dst_item);
+
 				}
 			}
 
@@ -180,7 +177,7 @@ class CItemHelper extends CItemGeneralHelper {
 			$_src_items = [];
 
 			if ($src_dep_items) {
-				foreach ($dst_hostids as $dst_hostid) {
+				foreach ($dst_hosts as $dst_hostid => $foo) {
 					foreach ($src_items as $src_item) {
 						$dst_itemid = array_shift($response['itemids']);
 
@@ -207,7 +204,7 @@ class CItemHelper extends CItemGeneralHelper {
 	 *
 	 * @return array
 	 */
-	private static function getSourceItems(array $src_options): array {
+	public static function getSourceItems(array $src_options): array {
 		return API::Item()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
