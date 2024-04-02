@@ -390,7 +390,7 @@ $item_tab
 	->addItem([
 		(new CLabel(_('Follow redirects'), 'follow_redirects'))->setId('js-item-follow-redirects-label'),
 		(new CFormField((new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setChecked($data['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 		))->setId('js-item-follow-redirects-field')
 	])
@@ -452,7 +452,7 @@ $item_tab
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
 		(new CFormField((new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
@@ -461,7 +461,7 @@ $item_tab
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
-				->setEnabled(!$data['limited'])
+				->setReadonly($data['limited'])
 				->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
