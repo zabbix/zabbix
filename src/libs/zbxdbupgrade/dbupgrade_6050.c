@@ -3411,6 +3411,20 @@ static int	DBpatch_6050230(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6050231(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6050232(void)
+{
+	const zbx_db_field_t	field = {"used_codes", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3646,5 +3660,7 @@ DBPATCH_ADD(6050227, 0, 1)
 DBPATCH_ADD(6050228, 0, 1)
 DBPATCH_ADD(6050229, 0, 1)
 DBPATCH_ADD(6050230, 0, 1)
+DBPATCH_ADD(6050231, 0, 1)
+DBPATCH_ADD(6050232, 0, 1)
 
 DBPATCH_END()
