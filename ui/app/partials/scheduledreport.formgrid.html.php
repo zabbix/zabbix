@@ -88,7 +88,7 @@ $form_grid
 				->addValue(_('Previous week'), ZBX_REPORT_PERIOD_WEEK)
 				->addValue(_('Previous month'), ZBX_REPORT_PERIOD_MONTH)
 				->addValue(_('Previous year'), ZBX_REPORT_PERIOD_YEAR)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 				->setModern(true)
 		)
 	])
@@ -100,7 +100,7 @@ $form_grid
 				->addValue(_('Weekly'), ZBX_REPORT_CYCLE_WEEKLY)
 				->addValue(_('Monthly'), ZBX_REPORT_CYCLE_MONTHLY)
 				->addValue(_('Yearly'), ZBX_REPORT_CYCLE_YEARLY)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 				->setModern(true)
 		)
 	])
@@ -110,11 +110,11 @@ $form_grid
 			(new CDiv([
 				(new CNumericBox('hours', $data['hours'], 2))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setEnabled($data['allowed_edit']),
+					->setReadonly(!$data['allowed_edit']),
 				' : ',
 				(new CNumericBox('minutes', $data['minutes'], 2))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setEnabled($data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
 		)
 	]);
@@ -143,7 +143,7 @@ $form_grid
 				->setColumns(3)
 				->setVertical(true)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		))
 			->setId('weekdays')
 			->addClass($show_weekdays ? null : ZBX_STYLE_DISPLAY_NONE)
@@ -154,7 +154,7 @@ $form_grid
 			(new CDateSelector('active_since', $data['active_since']))
 				->setDateFormat(ZBX_DATE)
 				->setPlaceholder(_('YYYY-MM-DD'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -163,7 +163,7 @@ $form_grid
 			(new CDateSelector('active_till', $data['active_till']))
 				->setDateFormat(ZBX_DATE)
 				->setPlaceholder(_('YYYY-MM-DD'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -172,7 +172,7 @@ $form_grid
 			(new CTextBox('subject', $data['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'subject'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -181,7 +181,7 @@ $form_grid
 			(new CTextArea('message', $data['message']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('report_param', 'value'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -194,7 +194,7 @@ $form_grid
 			(new CTextArea('description', $data['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxLength(DB::getFieldLength('report', 'description'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 				->setAriaRequired()
 		)
 	])
@@ -204,7 +204,7 @@ $form_grid
 			(new CCheckBox('status', ZBX_REPORT_STATUS_ENABLED))
 				->setChecked($data['status'] == ZBX_REPORT_STATUS_ENABLED)
 				->setUncheckedValue(ZBX_REPORT_STATUS_DISABLED)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	]);
 
