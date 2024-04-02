@@ -1629,6 +1629,15 @@ void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint6
 	zbx_vector_dc_host_ptr_remove_noorder(&proxy->hosts, i);
 }
 
+static int	dc_compare_host_rev_by_hostid(const void *d1, const void *d2)
+{
+	const zbx_host_rev_t	*r1 = (const zbx_host_rev_t *)d1;
+	const zbx_host_rev_t	*r2 = (const zbx_host_rev_t *)d2;
+
+	ZBX_RETURN_IF_DBL_NOT_EQUAL(r1->hostid, r2->hostid);
+	return 0;
+}
+
 void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision)
 {
 	ZBX_DC_PROXY	*proxy;
@@ -1638,6 +1647,12 @@ void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_
 
 	zbx_vector_dc_host_ptr_append(&proxy->hosts, host);
 	proxy->revision = revision;
+
+	zbx_host_rev_t	rev = {.hostid = host->hostid};
+	int		i;
+
+	if (FAIL != (i = zbx_vector_host_rev_search(&proxy->removed_hosts, rev, dc_compare_host_rev_by_hostid)))
+		zbx_vector_host_rev_remove_noorder(&proxy->removed_hosts, i);
 }
 
 static void	dc_host_set_proxy_group(ZBX_DC_HOST *host, zbx_uint64_t proxy_groupid, zbx_vector_objmove_t *pg_reloc)
