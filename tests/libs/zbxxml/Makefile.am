@@ -10,35 +10,11 @@ if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# zbxxml should depend only on:
-# 1) zbxalgo
-# 2) zbxjson
-# 3) zbxvariant
-# 4) zbxstr
-
-#COMMON_LIB_FILES = \
-#	$(top_srcdir)/tests/libzbxmocktest.a \
-#	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
-#	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-#	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-#	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-#	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
-#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-#	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-#	$(top_srcdir)/tests/libzbxmockdata.a \
-#	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-#	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-#	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-#	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-#	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
-
-
 # 1) zbxxml depends on zbxalgo, zbxjson, zbxvariant, zbxstr and zbxcommon
 # 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
-# 1) mockdata needs zbxtime, zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
+# 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-#
 
 COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \

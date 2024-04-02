@@ -1,21 +1,16 @@
-if SERVER
-SERVER_tests = \
+BINARIES_tests = \
 	replace_key_params_dyn
-endif
 
-noinst_PROGRAMS = $(SERVER_tests)
+noinst_PROGRAMS = $(BINARIES_tests)
 
-if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
-
 
 # 1) zbxparam depends on zbxexpr, zbxnum, zbxstr and zbxcommon
 # 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
-# 1) mockdata needs zbxtime, zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
+# 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-#
 
 COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -71,5 +66,3 @@ replace_key_params_dyn_LDADD += @SERVER_LIBS@
 replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-endif

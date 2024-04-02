@@ -1,25 +1,18 @@
-if SERVER
-SERVER_tests = \
+BINARIES_tests = \
 	is_double \
 	zbx_trim_float \
 	zbx_trim_integer
-endif
 
-noinst_PROGRAMS = $(SERVER_tests)
+noinst_PROGRAMS = $(BINARIES_tests)
 
-if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-
-
 # 1) zbxnum depends only on zbxcommon
-# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, and zbxcomms which themselves
-#    also need zbxcommon
+# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
-# 1) mockdata needs zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
-# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads and zbxcomms which themselves need zbxcommon
-#
+# 1) mockdata needs zbxalgo, zbxstr, zbxnum and zbxcommon
+# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 
 COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -100,4 +93,4 @@ zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(
 
 zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-endif
+#endif

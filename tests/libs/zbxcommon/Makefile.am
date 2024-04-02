@@ -6,14 +6,11 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) mockdata needs zbxalgo, zbxstr and zbxnum, which themselves need zbxcommon
-# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads and zbxcomms which themselves need zbxcommon
+# 1) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
+# 2) zbxcommon should not depend on any other zabbix library
 #
-# 3) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, and zbxcomms which themselves
-#    also need zbxcommon
-#
-# 4) zbxcommon should not depend on any other zabbix library
-#
+# 1) mockdata needs zbxalgo, zbxstr, zbxnum and zbxcommon
+# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 
 COMMON_LIB_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
