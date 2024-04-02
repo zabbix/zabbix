@@ -9,7 +9,6 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
-	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
