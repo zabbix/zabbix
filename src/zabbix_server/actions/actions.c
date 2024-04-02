@@ -3151,7 +3151,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	/*    operations) for events that match action conditions.                                                   */
 	for (int i = 0; i < events->values_num; i++)
 	{
-		const zbx_db_event	*event;
+		zbx_db_event	*event;
 
 		if (FAIL == is_escalation_event((event = events->values[i])))
 			continue;

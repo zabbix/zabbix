@@ -273,9 +273,9 @@ ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
 /* data structures used to create new and recover existing escalations */
 typedef struct
 {
-	zbx_uint64_t		actionid;
-	zbx_uint64_t		escalationid;
-	const zbx_db_event	*event;
+	zbx_uint64_t	actionid;
+	zbx_uint64_t	escalationid;
+	zbx_db_event	*event;
 }
 zbx_escalation_new_t;
 
