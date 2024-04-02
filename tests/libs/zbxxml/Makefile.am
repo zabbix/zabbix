@@ -62,11 +62,9 @@ XML_LIB_FILES = \
 	$(MOCK_TEST_DEPS)
 
 
-COMMON_COMPILER_FLAGS = \
+XML_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS)
 
 zbx_json_to_xml_SOURCES = \
 	zbx_json_to_xml.c \
@@ -77,9 +75,9 @@ zbx_json_to_xml_LDADD = \
 
 zbx_json_to_xml_LDADD += @SERVER_LIBS@
 
-zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
+zbx_json_to_xml_CFLAGS = $(XML_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
 zbx_xml_to_json_SOURCES = \
 	zbx_xml_to_json.c \
@@ -90,8 +88,8 @@ zbx_xml_to_json_LDADD = \
 
 zbx_xml_to_json_LDADD += @SERVER_LIBS@
 
-zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
+zbx_xml_to_json_CFLAGS = $(XML_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
 endif

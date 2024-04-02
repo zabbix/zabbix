@@ -17,7 +17,7 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) zbxexpr should depend only on zbxnum, zbxstr, zbxtime and zbxcommon
+# 1) zbxexpr depends only on zbxnum, zbxstr, zbxtime and zbxcommon
 # 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
 # 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
@@ -59,11 +59,9 @@ EXPR_LIB_FILES = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-COMMON_COMPILER_FLAGS = \
+EXPR_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS)
 
 zbx_function_find_SOURCES = \
 	zbx_function_find.c \
@@ -74,9 +72,9 @@ zbx_function_find_LDADD = \
 
 zbx_function_find_LDADD += @SERVER_LIBS@
 
-zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_function_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_function_find_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 parse_key_SOURCES = \
@@ -88,10 +86,9 @@ parse_key_LDADD = \
 
 parse_key_LDADD += @SERVER_LIBS@
 
-parse_key_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+parse_key_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-parse_key_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
+parse_key_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 calculate_item_nextcheck_SOURCES = \
@@ -103,9 +100,9 @@ calculate_item_nextcheck_LDADD = \
 
 calculate_item_nextcheck_LDADD += @SERVER_LIBS@
 
-calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
+calculate_item_nextcheck_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 calculate_item_nextcheck_unreachable_SOURCES = \
 	calculate_item_nextcheck_unreachable.c \
@@ -116,9 +113,9 @@ calculate_item_nextcheck_unreachable_LDADD = \
 
 calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
 
-calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
+calculate_item_nextcheck_unreachable_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 zbx_function_get_param_dyn_SOURCES = \
@@ -130,9 +127,9 @@ zbx_function_get_param_dyn_LDADD = \
 
 zbx_function_get_param_dyn_LDADD += @SERVER_LIBS@
 
-zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_function_get_param_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_function_get_param_dyn_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 zbx_token_find_SOURCES = \
@@ -144,9 +141,9 @@ zbx_token_find_LDADD = \
 
 zbx_token_find_LDADD += @SERVER_LIBS@
 
-zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_token_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_token_find_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 zbx_interval_preproc_SOURCES = \
 	zbx_interval_preproc.c \
@@ -157,9 +154,9 @@ zbx_interval_preproc_LDADD = \
 
 zbx_interval_preproc_LDADD += @SERVER_LIBS@
 
-zbx_interval_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_interval_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_interval_preproc_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_interval_preproc_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 zbx_validate_interval_SOURCES = \
@@ -171,9 +168,9 @@ zbx_validate_interval_LDADD = \
 
 zbx_validate_interval_LDADD += @SERVER_LIBS@
 
-zbx_validate_interval_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_validate_interval_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_validate_interval_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_validate_interval_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 is_double_suffix_SOURCES = \
@@ -185,9 +182,9 @@ is_double_suffix_LDADD = \
 
 is_double_suffix_LDADD += @SERVER_LIBS@
 
-is_double_suffix_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+is_double_suffix_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-is_double_suffix_CFLAGS = $(COMMON_COMPILER_FLAGS)
+is_double_suffix_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 zbx_user_macro_parse_SOURCES = \
@@ -199,10 +196,9 @@ zbx_user_macro_parse_LDADD = \
 
 zbx_user_macro_parse_LDADD += @SERVER_LIBS@
 
-zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
+zbx_user_macro_parse_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 # zbx_get_report_nextcheck
@@ -216,9 +212,9 @@ zbx_get_report_nextcheck_LDADD = \
 
 zbx_get_report_nextcheck_LDADD += @SERVER_LIBS@
 
-zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_get_report_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_get_report_nextcheck_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 zbx_function_param_parse_ext_SOURCES = \
@@ -232,4 +228,4 @@ zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
 
 zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_function_param_parse_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_function_param_parse_ext_CFLAGS = $(EXPR_COMPILER_FLAGS)

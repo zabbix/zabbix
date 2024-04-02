@@ -51,11 +51,9 @@ VARIANT_LIB_FILES = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-COMMON_COMPILER_FLAGS = \
+VARIANT_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS)
 
 zbx_variant_compare_SOURCES = \
 	zbx_variant_compare.c \
@@ -66,8 +64,8 @@ zbx_variant_compare_LDADD = \
 
 zbx_variant_compare_LDADD += @SERVER_LIBS@
 
-zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_variant_compare_CFLAGS = $(VARIANT_COMPILER_FLAGS)
 
 endif

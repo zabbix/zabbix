@@ -51,11 +51,9 @@ STR_LIB_FILES = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-COMMON_COMPILER_FLAGS = \
+STR_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS)
 
 zbx_str_extract_SOURCES = \
 	zbx_str_extract.c \
@@ -66,9 +64,9 @@ zbx_str_extract_LDADD = \
 
 zbx_str_extract_LDADD += @SERVER_LIBS@
 
-zbx_str_extract_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_str_extract_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_str_extract_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_str_extract_CFLAGS = $(STR_COMPILER_FLAGS)
 
 convert_to_utf8_SOURCES = \
 	convert_to_utf8.c \
@@ -79,9 +77,9 @@ convert_to_utf8_LDADD = \
 
 convert_to_utf8_LDADD += @SERVER_LIBS@
 
-convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-convert_to_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+convert_to_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
 
 
 zbx_truncate_itemkey_SOURCES = \
@@ -93,9 +91,9 @@ zbx_truncate_itemkey_LDADD = \
 
 zbx_truncate_itemkey_LDADD += @SERVER_LIBS@
 
-zbx_truncate_itemkey_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_truncate_itemkey_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_truncate_itemkey_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_truncate_itemkey_CFLAGS = $(STR_COMPILER_FLAGS)
 
 
 zbx_truncate_value_SOURCES = \
@@ -107,9 +105,9 @@ zbx_truncate_value_LDADD = \
 
 zbx_truncate_value_LDADD += @SERVER_LIBS@
 
-zbx_truncate_value_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_truncate_value_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_truncate_value_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_truncate_value_CFLAGS = $(STR_COMPILER_FLAGS)
 
 
 zbx_dyn_escape_string_SOURCES = \
@@ -121,9 +119,9 @@ zbx_dyn_escape_string_LDADD = \
 
 zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
 
-zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_dyn_escape_string_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_dyn_escape_string_CFLAGS = $(STR_COMPILER_FLAGS)
 
 # zbx_ltrim_utf8
 
@@ -137,9 +135,9 @@ zbx_ltrim_utf8_LDADD = \
 
 zbx_ltrim_utf8_LDADD += @SERVER_LIBS@
 
-zbx_ltrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_ltrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_ltrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_ltrim_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
 
 # zbx_ltrim_utf8
 
@@ -153,8 +151,8 @@ zbx_rtrim_utf8_LDADD = \
 
 zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
 
-zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_rtrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_rtrim_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif

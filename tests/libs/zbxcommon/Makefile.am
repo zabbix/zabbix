@@ -55,7 +55,7 @@ init_library_common_LDADD = $(COMMON_LIB_FILES)
 
 init_library_common_LDADD += @SERVER_LIBS@
 
-init_library_common_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+init_library_common_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 init_library_common_CFLAGS = $(COMMON_COMPILER_FLAGS)
 

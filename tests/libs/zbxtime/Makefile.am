@@ -51,7 +51,7 @@ TIME_LIB_FILES = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+TIME_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
 
 zbx_iso8601_utc_SOURCES = \
 	zbx_iso8601_utc.c \
@@ -62,7 +62,7 @@ zbx_iso8601_utc_LDADD = \
 
 zbx_iso8601_utc_LDADD += @SERVER_LIBS@
 
-zbx_iso8601_utc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_iso8601_utc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_iso8601_utc_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -76,9 +76,9 @@ zbx_get_week_number_LDADD = \
 
 zbx_get_week_number_LDADD += @SERVER_LIBS@
 
-zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_get_week_number_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_get_week_number_CFLAGS = $(TIME_COMPILER_FLAGS)
 
 
 zbx_tm_add_SOURCES = \
@@ -90,7 +90,7 @@ zbx_tm_add_LDADD = \
 
 zbx_tm_add_LDADD += @SERVER_LIBS@
 
-zbx_tm_add_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tm_add_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tm_add_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -104,7 +104,7 @@ zbx_tm_round_down_LDADD = \
 
 zbx_tm_round_down_LDADD += @SERVER_LIBS@
 
-zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tm_round_down_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -118,7 +118,7 @@ zbx_tm_round_up_LDADD = \
 
 zbx_tm_round_up_LDADD += @SERVER_LIBS@
 
-zbx_tm_round_up_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tm_round_up_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tm_round_up_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -132,6 +132,6 @@ zbx_tm_sub_LDADD = \
 
 zbx_tm_sub_LDADD += @SERVER_LIBS@
 
-zbx_tm_sub_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tm_sub_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tm_sub_CFLAGS = $(COMMON_COMPILER_FLAGS)

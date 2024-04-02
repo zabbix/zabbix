@@ -46,11 +46,9 @@ NUM_LIB_FILES = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-COMMON_COMPILER_FLAGS = \
+NUM_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS)
 
 is_double_SOURCES = \
 	is_double.c \
@@ -61,9 +59,9 @@ is_double_LDADD = \
 
 is_double_LDADD += @SERVER_LIBS@
 
-is_double_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+is_double_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
+is_double_CFLAGS = $(NUM_COMPILER_FLAGS)
 
 
 zbx_trim_float_SOURCES = \
@@ -75,9 +73,9 @@ zbx_trim_float_LDADD = \
 
 zbx_trim_float_LDADD += @SERVER_LIBS@
 
-zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_trim_float_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_trim_float_CFLAGS = $(NUM_COMPILER_FLAGS)
 
 
 zbx_trim_integer_SOURCES = \
@@ -89,8 +87,6 @@ zbx_trim_integer_LDADD = \
 
 zbx_trim_integer_LDADD += @SERVER_LIBS@
 
-zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-#endif
+zbx_trim_integer_CFLAGS = $(NUM_COMPILER_FLAGS)

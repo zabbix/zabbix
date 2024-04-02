@@ -48,11 +48,9 @@ PARAM_LIB_FILES = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-COMMON_COMPILER_FLAGS = \
+PARAM_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS)
 
 replace_key_params_dyn_SOURCES = \
 	replace_key_params_dyn.c \
@@ -63,6 +61,6 @@ replace_key_params_dyn_LDADD = \
 
 replace_key_params_dyn_LDADD += @SERVER_LIBS@
 
-replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+replace_key_params_dyn_CFLAGS = $(PARAM_COMPILER_FLAGS)

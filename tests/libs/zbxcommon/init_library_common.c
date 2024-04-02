@@ -21,9 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
-
 #include "zbxcommon.h"
-#include <stdarg.h>
 
 static void	zbx_log_impl(int level, const char *fmt, va_list args)
 {
