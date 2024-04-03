@@ -415,7 +415,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 
 		data_len = zbx_alerter_serialize_mediatypes(&data, (zbx_am_db_mediatype_t **)mediatypes.values,
 				mediatypes.values_num);
-		zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
+		(void)zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
 		zbx_free(data);
 	}
 
@@ -430,7 +430,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 			to = alerts.values_num;
 
 		data_len = zbx_alerter_serialize_alerts(&data, (zbx_am_db_alert_t **)&alerts.values[i], to - i);
-		zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_ALERTS, data, data_len);
+		(void)zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_ALERTS, data, data_len);
 		zbx_free(data);
 	}
 #undef ZBX_ALERT_BATCH_SIZE
@@ -675,7 +675,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0);
+	(void)zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0);
 	do {
 		zbx_ipc_message_free(message);
 
@@ -829,7 +829,7 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 		zbx_uint32_t	data_len;
 
 		data_len = zbx_alerter_serialize_ids(&data, dropids.values, dropids.values_num);
-		zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_DROP_MEDIATYPES, data, data_len);
+		(void)zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_DROP_MEDIATYPES, data, data_len);
 		zbx_free(data);
 	}
 
@@ -901,13 +901,13 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 		{
 			data_len = zbx_alerter_serialize_mediatypes(&data, (zbx_am_db_mediatype_t **)mediatypes.values,
 					mediatypes.values_num);
-			zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
+			(void)zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_MEDIATYPES, data, data_len);
 			zbx_free(data);
 		}
 	}
 
 	data_len = zbx_alerter_serialize_medias(&data, (zbx_am_media_t **)medias.values, medias.values_num);
-	zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_WATCHDOG, data, data_len);
+	(void)zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_WATCHDOG, data, data_len);
 	zbx_free(data);
 
 	medias_num = medias.values_num;
@@ -926,7 +926,7 @@ static void	alert_syncer_register(zbx_ipc_async_socket_t *socket)
 
 	ppid = getppid();
 
-	zbx_ipc_async_socket_send(socket, ZBX_IPC_ALERT_SYNCER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
+	(void)zbx_ipc_async_socket_send(socket, ZBX_IPC_ALERT_SYNCER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 }
 
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)

@@ -982,15 +982,6 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: registers alerter syncer                                          *
- *                                                                            *
- * Parameters: manager - [IN]                                                 *
- *             client  - [IN] connected alerter                               *
- *             message - [IN] received message                                *
- *                                                                            *
- ******************************************************************************/
 static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 {
 	pid_t	ppid;
