@@ -212,8 +212,8 @@ ZBX_PTR_VECTOR_IMPL(lld_trigger_prototype_ptr, zbx_lld_trigger_prototype_t*)
 
 static int	lld_trigger_prototype_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_trigger_prototype_t  *lld_trigger_prototype_1 = *(const zbx_lld_trigger_prototype_t **)d1;
-	const zbx_lld_trigger_prototype_t  *lld_trigger_prototype_2 = *(const zbx_lld_trigger_prototype_t **)d2;
+	const zbx_lld_trigger_prototype_t	*lld_trigger_prototype_1 = *(const zbx_lld_trigger_prototype_t **)d1;
+	const zbx_lld_trigger_prototype_t	*lld_trigger_prototype_2 = *(const zbx_lld_trigger_prototype_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(lld_trigger_prototype_1->triggerid, lld_trigger_prototype_2->triggerid);
 

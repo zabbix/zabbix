@@ -142,8 +142,8 @@ ZBX_PTR_VECTOR_IMPL(lld_graph_ptr, zbx_lld_graph_t*)
 
 static int	lld_graph_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_graph_t  *lld_graph_1 = *(const zbx_lld_graph_t **)d1;
-	const zbx_lld_graph_t  *lld_graph_2 = *(const zbx_lld_graph_t **)d2;
+	const zbx_lld_graph_t	*lld_graph_1 = *(const zbx_lld_graph_t **)d1;
+	const zbx_lld_graph_t	*lld_graph_2 = *(const zbx_lld_graph_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(lld_graph_1->graphid, lld_graph_2->graphid);
 
@@ -191,8 +191,7 @@ static void	lld_graphs_free(zbx_vector_lld_graph_ptr_t *graphs)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve graphs which were created by the specified graph         *
- *          prototype                                                         *
+ * Purpose: retrieves graphs which were created by specified graph prototype  *
  *                                                                            *
  * Parameters: parent_graphid - [IN] graph prototype identifier               *
  *             graphs         - [OUT] sorted list of graphs                   *
@@ -850,7 +849,7 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate sorted graph                                             *
+ * Purpose: validates sorted graph                                            *
  *                                                                            *
  * Parameters: hostid - [IN]                                                  *
  *             graphs - [IN] sorted list of graphs                            *

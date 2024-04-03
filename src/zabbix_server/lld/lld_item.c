@@ -290,8 +290,8 @@ ZBX_PTR_VECTOR_IMPL(item_discovery_ptr, zbx_item_discovery_t *)
 
 static int	item_discovery_compare_func(const void *d1, const void *d2)
 {
-	const zbx_item_discovery_t  *item_discovery_1 = *(const zbx_item_discovery_t **)d1;
-	const zbx_item_discovery_t  *item_discovery_2 = *(const zbx_item_discovery_t **)d2;
+	const zbx_item_discovery_t	*item_discovery_1 = *(const zbx_item_discovery_t **)d1;
+	const zbx_item_discovery_t	*item_discovery_2 = *(const zbx_item_discovery_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(item_discovery_1->itemid, item_discovery_2->itemid);
 
