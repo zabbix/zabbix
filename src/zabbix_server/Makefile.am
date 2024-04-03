@@ -53,7 +53,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	actions/libzbxactions.a \
-	housekeeper/libzbxhousekeeper.a \
+	housekeeper/libzbxhousekeeper_server.a \
 	timer/libzbxtimer.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \

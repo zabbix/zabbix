@@ -43,7 +43,7 @@
 #include "zbxdiscovery.h"
 
 #include "discovery/discovery_proxy.h"
-#include "housekeeper/housekeeper.h"
+#include "housekeeper/housekeeper_proxy.h"
 #include "poller/poller_proxy.h"
 #include "trapper/trapper_proxy.h"
 #include "proxyconfig/proxyconfig.h"

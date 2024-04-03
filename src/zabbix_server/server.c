@@ -25,7 +25,7 @@
 
 #include "postinit/postinit.h"
 #include "dbconfig/dbconfig.h"
-#include "housekeeper/housekeeper.h"
+#include "housekeeper/housekeeper_server.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
 #include "trapper/trapper_server.h"

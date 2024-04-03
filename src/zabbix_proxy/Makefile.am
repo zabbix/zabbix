@@ -25,7 +25,7 @@ zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
-	housekeeper/libzbxhousekeeper.a \
+	housekeeper/libzbxhousekeeper_proxy.a \
 	proxyconfig/libzbxproxyconfig.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
