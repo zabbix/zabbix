@@ -450,25 +450,35 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 
 	if (0 != proxies.values_num)
 	{
+		zbx_vector_uint64_t	proxy_hostnum;
+
 		zbx_vector_pg_proxy_ptr_sort(&proxies, pg_proxy_compare_by_hosts_asc);
+
+		zbx_vector_uint64_create(&proxy_hostnum);
+		zbx_vector_uint64_reserve(&proxy_hostnum, proxies.values_num);
+
+		for (int i = 0; i < proxies.values_num; i++)
+			zbx_vector_uint64_append(&proxy_hostnum, (zbx_uint64_t)proxies.values[i]->hosts.values_num);
 
 		while (0 < group->unassigned_hostids.values_num)
 		{
-			int	hosts_num = proxies.values[0]->hosts.values_num + 1;
+			zbx_uint64_t	hosts_num = proxy_hostnum.values[0] + 1;
 
 			for (int i = 0; i < proxies.values_num && 0 < group->unassigned_hostids.values_num; i++)
 			{
-				zbx_pg_proxy_t	*proxy = proxies.values[i];
-
-				if (hosts_num <= proxy->hosts.values_num)
+				if (hosts_num <= proxy_hostnum.values[i])
 					break;
 
 				int	last = group->unassigned_hostids.values_num - 1;
 
-				pg_cache_set_host_proxy(cache, group->unassigned_hostids.values[last], proxy->proxyid);
+				proxy_hostnum.values[i]++;
+				pg_cache_set_host_proxy(cache, group->unassigned_hostids.values[last],
+						proxies.values[i]->proxyid);
 				zbx_vector_uint64_remove_noorder(&group->unassigned_hostids, last);
 			}
 		}
+
+		zbx_vector_uint64_destroy(&proxy_hostnum);
 	}
 
 	zbx_vector_pg_proxy_ptr_destroy(&proxies);
