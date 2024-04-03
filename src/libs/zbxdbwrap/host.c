@@ -22,6 +22,7 @@
 #include "template.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
+
 #include "zbxcacheconfig.h"
 #include "zbxexpression.h"
 #include "audit/zbxaudit_host.h"
@@ -33,6 +34,11 @@
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbxcrypto.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxhash.h"
+#include "zbxstr.h"
 
 typedef enum
 {
@@ -6541,8 +6547,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	}
 	zbx_db_free_result(result);
 
+	sql_offset = 0;
+
 	if (0 == hgsets.values_num)
+	{
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		goto skip_permissions;
+	}
 
 	/* calculate hash for last hgset in vector */
 	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
@@ -6550,7 +6561,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,hgsetid from host_hgset where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values, hgsetids.values_num);
 

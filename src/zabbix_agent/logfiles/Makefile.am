@@ -4,7 +4,6 @@ noinst_LIBRARIES = libzbxlogfiles.a
 
 libzbxlogfiles_a_SOURCES = \
 	logfiles.c logfiles.h \
-	persistent_state.c persistent_state.h \
-	../metrics.h
+	persistent_state.c persistent_state.h
 
 libzbxlogfiles_a_CFLAGS = $(TLS_CFLAGS)

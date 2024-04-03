@@ -73,7 +73,8 @@ $web_layout_mode = $this->getLayoutMode();
 
 $main_filter_form = null;
 
-if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])
+		|| array_key_exists(CWidgetsData::DATA_TYPE_HOST_IDS, $data['broadcast_requirements'])) {
 	$main_filter_form = (new CForm('get'))
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))

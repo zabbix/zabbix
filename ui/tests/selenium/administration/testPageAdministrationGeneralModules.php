@@ -64,6 +64,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Graph (classic)' => 'Displays a single custom graph or a simple graph.',
 		'Graph prototype' => 'Displays a grid of graphs created by low-level discovery from either a graph prototype or '.
 				'an item prototype.',
+		'Honeycomb' => 'Displays item values as a honeycomb.',
 		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
 		'Item value' => 'Displays the value of a single item prominently.',
 		'Map' => 'Displays either a single configured network map or one of the configured network maps in the map '.
@@ -538,7 +539,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Test CSRF token support for modules',
 					'Directory' => 'modules/module_number_7',
 					'Namespace' => 'Modules\CSRF',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			]

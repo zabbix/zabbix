@@ -326,6 +326,14 @@ class CXmlConstantName {
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	const MACRO_TYPE_VAULT = 'VAULT';
 
+	// Constants for low-level discovery rules.
+	const LLD_DELETE_AFTER = 'DELETE_AFTER';
+	const LLD_DELETE_NEVER = 'DELETE_NEVER';
+	const LLD_DELETE_IMMEDIATELY = 'DELETE_IMMEDIATELY';
+	const LLD_DISABLE_AFTER = 'DISABLE_AFTER';
+	const LLD_DISABLE_NEVER = 'DISABLE_NEVER';
+	const LLD_DISABLE_IMMEDIATELY = 'DISABLE_IMMEDIATELY';
+
 	// Constants for low-level discovery rule overrides.
 	const LLD_OVERRIDE_STOP_NO = 'NO_STOP';
 	const LLD_OVERRIDE_STOP_YES = 'STOP';

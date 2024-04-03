@@ -17,6 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+const ZBX_COLOR_SCHEME_DARK = 'dark';
+const ZBX_COLOR_SCHEME_LIGHT = 'light';
+
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
@@ -108,3 +112,12 @@ const PAGE_TYPE_TEXT_RETURN_JSON = 11;
 
 const ZBX_SCRIPT_MANUALINPUT_DISABLED = 0;
 const ZBX_SCRIPT_MANUALINPUT_ENABLED = 1;
+
+const MFA_TYPE_TOTP = 1;
+const MFA_TYPE_DUO = 2;
+
+// IMPORTANT!!! by priority DESC
+const GROUP_GUI_ACCESS_SYSTEM = 0;
+const GROUP_GUI_ACCESS_INTERNAL = 1;
+const GROUP_GUI_ACCESS_LDAP = 2;
+const GROUP_GUI_ACCESS_DISABLED = 3;

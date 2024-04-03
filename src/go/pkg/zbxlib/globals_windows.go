@@ -24,7 +24,7 @@ package zbxlib
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxwin32.h"
-#include "../src/zabbix_agent/metrics.h"
+#include "../src/zabbix_agent/metrics/metrics.h"
 
 #cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/misc.o
