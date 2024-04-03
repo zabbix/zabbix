@@ -124,7 +124,8 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	 */
 	private static function getSourceLldRules(array $src_options): array {
 		$src_items = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status',
+			'output' => ['itemid', 'name', 'type', 'key_', 'lifetime', 'lifetime_type', 'enabled_lifetime_type',
+				'enabled_lifetime', 'description', 'status',
 
 				// Type fields.
 				// The fields used for multiple item types.
