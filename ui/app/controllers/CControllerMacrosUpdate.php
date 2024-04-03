@@ -46,7 +46,7 @@ class CControllerMacrosUpdate extends CController {
 					'type' => ['db globalmacro.type', 'required', 'in' => [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]]
 				],
 				'messages' => [
-					'uniq' => _('Entry is not unique by macro name.')
+					'uniq' => _('Macro name is not unique.')
 				]
 			]
 		]];
