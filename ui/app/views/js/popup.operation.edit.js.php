@@ -55,12 +55,10 @@ window.operation_popup = new class {
 		this._toggleScriptWarningIconVisibility(operation_type);
 		this._changeView(operation_type);
 
-		document.querySelector('#operation-type-select').onchange = () => {
-			const operation_type = document.getElementById('operation-type-select').getAttribute('value');
-
-			this._toggleScriptWarningIconVisibility(operation_type);
+		document.getElementById('operation-type-select').addEventListener('change', (e) => {
+			this.#toggleScriptWarningIcon(e.target.value);
 			this._removeAllFields();
-			this._changeView(operation_type);
+			this._changeView(e.target.value);
 			this._processTypeOfCalculation();
 		}
 
@@ -94,12 +92,13 @@ window.operation_popup = new class {
 	/**
 	 * Show/hides warning icon for script operation type.
 	 *
-	 * @param {string} operation_type Type of operation selected.
+	 * @param {string} operation_type   Type of operation selected.
 	 */
-	_toggleScriptWarningIconVisibility(operation_type) {
+	#toggleScriptWarningIcon(operation_type) {
 		if (this.scripts_with_warning.length > 0) {
-			document.querySelector('.js-icon-scripts-warning-icon')
-				.style.display = this.scripts_with_warning.includes(operation_type)	? '' : 'none';
+			const has_warning = this.scripts_with_warning.includes(operation_type);
+
+			this.form.querySelector('.js-script-warning-icon').style.display = has_warning ? '' : 'none';
 		}
 	}
 
