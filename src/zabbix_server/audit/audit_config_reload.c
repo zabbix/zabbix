@@ -37,7 +37,7 @@ void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid,
 		zbx_audit_entry_t	*new_entry;
 
 		new_entry = zbx_audit_entry_init(proxyid, AUDIT_HOST_ID, name, ZBX_AUDIT_ACTION_CONFIG_REFRESH,
-				AUDIT_RESOURCE_PROXY);
+				ZBX_AUDIT_RESOURCE_PROXY);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}
 }

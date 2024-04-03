@@ -291,8 +291,8 @@ PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, authprotocol, zbx_uint64_t, u
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, privprotocol, zbx_uint64_t, uint64)				\
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, contextname, const char*, string)				\
 
-PREPARE_AUDIT_HOST(host, host, AUDIT_RESOURCE_HOST)
-PREPARE_AUDIT_HOST(host_prototype, hostprototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
+PREPARE_AUDIT_HOST(host, host, ZBX_AUDIT_RESOURCE_HOST)
+PREPARE_AUDIT_HOST(host_prototype, hostprototype, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE)
 #undef PREPARE_AUDIT_HOST
 #undef PREPARE_AUDIT_HOST_INTERFACE
 
@@ -946,7 +946,7 @@ void	zbx_audit_host_group_create_entry(int audit_context_mode, int audit_action,
 		zbx_audit_entry_t	*local_audit_group_entry_insert;
 
 		local_audit_group_entry_insert = zbx_audit_entry_init(groupid, AUDIT_HOSTGRP_ID, name, audit_action,
-				AUDIT_RESOURCE_HOST_GROUP);
+				ZBX_AUDIT_RESOURCE_HOST_GROUP);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_group_entry_insert,
 				sizeof(local_audit_group_entry_insert));
 	}

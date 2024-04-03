@@ -232,7 +232,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
 
 	zbx_db_insert_add_values(&db_insert, auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_EXECUTE,
-			clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid, details_json.buffer);
+			clientip, hostid, hostname, ZBX_AUDIT_RESOURCE_SCRIPT, auditid_cuid, details_json.buffer);
 
 	ret = zbx_db_insert_execute(&db_insert);
 
@@ -736,7 +736,7 @@ int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const c
 	zbx_db_begin();
 
 	zbx_db_insert_add_values(&db_insert,  auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_PUSH,
-			clientip, AUDIT_RESOURCE_HISTORY, auditid_cuid,
+			clientip, ZBX_AUDIT_RESOURCE_HISTORY, auditid_cuid,
 			details_json.buffer);
 
 	ret = zbx_db_insert_execute(&db_insert);

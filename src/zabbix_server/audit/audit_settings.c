@@ -38,7 +38,7 @@ void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action, z
 	{
 		zbx_audit_entry_t	*new_entry;
 
-		new_entry = zbx_audit_entry_init(configid, AUDIT_CONFIG_ID, "", audit_action, AUDIT_RESOURCE_SETTINGS);
+		new_entry = zbx_audit_entry_init(configid, AUDIT_CONFIG_ID, "", audit_action, ZBX_AUDIT_RESOURCE_SETTINGS);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}
 }
