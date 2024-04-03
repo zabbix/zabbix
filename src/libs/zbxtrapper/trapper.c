@@ -1033,7 +1033,7 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 		return FAIL;
 	}
 
-	if (HOST_STATUS_NOT_MONITORED == recv_host.status)
+	if (0 != recv_host.proxyid || HOST_STATUS_NOT_MONITORED == recv_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
