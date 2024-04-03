@@ -119,7 +119,7 @@ $form_grid = (new CFormGrid())
 				->setModern()
 				->setId('execute-on'),
 			!$data['is_global_scripts_enabled']
-				? makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration'))
+				? makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration.'))
 				: null
 		]))->setId('execute-on')
 	])

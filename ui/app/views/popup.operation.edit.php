@@ -60,8 +60,8 @@ else {
 
 if ($data['scripts_with_warning']) {
 	$select_operationtype->addItem(
-		makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration'))
-			->addClass('js-icon-scripts-warning-icon')
+		makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration.'))
+			->addClass('js-script-warning-icon')
 			->addStyle('display: none;')
 	);
 }

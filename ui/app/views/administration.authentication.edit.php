@@ -561,7 +561,7 @@ if ($data['is_http_auth_allowed']) {
 		->addItem([
 			new CLabel([_('Enable HTTP authentication'),
 				makeHelpIcon(
-					_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+					_('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.')
 				)
 			], 'http_auth_enabled'),
 			new CFormField(
