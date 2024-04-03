@@ -206,11 +206,6 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	 * @return bool
 	 */
 	private function copyFromCloneSourceHost(string $src_hostid, array $dst_host): bool {
-		$dst_host['interfaces'] = API::HostInterface()->get([
-			'output' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
-			'hostids' => [$dst_host['hostid']]
-		]);
-
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
 		return copyHttpTests($src_hostid, $dst_host['hostid'])
 			&& CItemHelper::cloneHostItems($src_hostid, $dst_host)
