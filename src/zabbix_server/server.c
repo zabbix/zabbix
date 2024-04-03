@@ -43,7 +43,7 @@
 #include "events/events.h"
 #include "ha/ha.h"
 #include "rtc/rtc_server.h"
-#include "stats/zabbix_stats.h"
+#include "stats/stats_server.h"
 #include "diag/diag_server.h"
 #include "preproc/preproc_server.h"
 #include "lld/lld_protocol.h"

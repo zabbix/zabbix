@@ -81,7 +81,7 @@ zabbix_server_LDADD = \
 	libzbxserver.a \
 	postinit/libzbxpostinit.a \
 	operations/libzbxoperations.a \
-	stats/libzbxserver_server.a \
+	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
