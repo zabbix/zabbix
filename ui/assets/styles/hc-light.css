@@ -7152,7 +7152,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
     text-align: center;
     padding: 0 10px; }
 
-.drule-table label {
+.drule-radio-list label {
   text-align: left; }
 
 .valuemap-checkbox {
