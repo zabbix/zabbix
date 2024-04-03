@@ -51,8 +51,8 @@ window.operation_popup = new class {
 		this._customMessageFields();
 		this.#loadHostTags(this.data.optag);
 		this._removeAllFields();
-		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
-		this._toggleScriptWarningIconVisibility(operation_type);
+		const operation_type = document.getElementById('operation-type-select').value;
+		this.#toggleScriptWarningIcon(operation_type);
 		this._changeView(operation_type);
 
 		document.getElementById('operation-type-select').addEventListener('change', (e) => {
@@ -60,7 +60,7 @@ window.operation_popup = new class {
 			this._removeAllFields();
 			this._changeView(e.target.value);
 			this._processTypeOfCalculation();
-		}
+		});
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-condition-list-footer')) {
