@@ -101,7 +101,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	preproc/libpreproc_server.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
-	$(top_builddir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
+	$(top_builddir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	dbconfigworker/libdbconfigworker.a \
