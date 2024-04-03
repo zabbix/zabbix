@@ -1,3 +1,23 @@
+Changes for 6.0.29rc1
+
+New features:
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
+
+Bug fixes:
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.28
+
+6.0.28rc1 was released as 6.0.28 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.28rc1
 
 New features:
@@ -2970,6 +2990,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42
+
+5.0.42rc1 was released as 5.0.42 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42rc1
