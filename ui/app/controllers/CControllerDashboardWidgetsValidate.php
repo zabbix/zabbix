@@ -36,7 +36,7 @@ class CControllerDashboardWidgetsValidate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>	'db dashboard.templateid',
-			'widgets' =>	'required|array',
+			'widgets' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
