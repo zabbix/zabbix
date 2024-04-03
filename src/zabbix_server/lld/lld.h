@@ -27,19 +27,45 @@
 
 typedef struct
 {
+	zbx_uint64_t	itemid;
+	unsigned char	flags;
+}
+zbx_lld_item_t;
+
+ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
+
+int	lld_item_compare_func(const void *d1, const void *d2);
+
+typedef struct
+{
 	zbx_uint64_t	parent_itemid;
 	zbx_uint64_t	itemid;		/* the item, created by the item prototype */
 }
 zbx_lld_item_link_t;
 
-ZBX_PTR_VECTOR_DECL(lld_item_link, zbx_lld_item_link_t*)
+ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
+
+int	lld_item_link_compare_func(const void *d1, const void *d2);
+
+/* lld rule filter condition (item_condition table record) */
+typedef struct
+{
+	zbx_uint64_t		id;
+	char			*macro;
+	char			*regexp;
+	zbx_vector_expression_t	regexps;
+	unsigned char		op;
+}
+lld_condition_t;
+
+ZBX_PTR_VECTOR_DECL(lld_condition_ptr, lld_condition_t*)
 
 /* lld rule filter */
 typedef struct
 {
-	zbx_vector_ptr_t	conditions;
-	char			*expression;
-	int			evaltype;
+	zbx_vector_lld_condition_ptr_t	conditions;
+	char				*expression;
+	int				evaltype;
 }
 zbx_lld_filter_t;
 
@@ -79,17 +105,17 @@ typedef struct
 }
 zbx_lld_override_t;
 
-ZBX_PTR_VECTOR_DECL(lld_override, zbx_lld_override_t*)
+ZBX_PTR_VECTOR_DECL(lld_override_ptr, zbx_lld_override_t*)
 
 typedef struct
 {
 	struct zbx_json_parse		jp_row;
-	zbx_vector_lld_item_link_t	item_links;	/* the list of item prototypes */
-	zbx_vector_lld_override_t	overrides;
+	zbx_vector_lld_item_link_ptr_t	item_links;	/* the list of item prototypes */
+	zbx_vector_lld_override_ptr_t	overrides;
 }
 zbx_lld_row_t;
 
-ZBX_PTR_VECTOR_DECL(lld_row, zbx_lld_row_t*)
+ZBX_PTR_VECTOR_DECL(lld_row_ptr, zbx_lld_row_t*)
 
 typedef struct
 {
@@ -122,72 +148,72 @@ typedef struct
 }
 zbx_lld_item_preproc_t;
 
-ZBX_PTR_VECTOR_DECL(lld_item_preproc, zbx_lld_item_preproc_t*)
+ZBX_PTR_VECTOR_DECL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		valuemapid;
-	zbx_uint64_t		interfaceid;
-	zbx_uint64_t		master_itemid;
-	char			*name;
-	char			*key;
-	char			*delay;
-	char			*history;
-	char			*trends;
-	char			*trapper_hosts;
-	char			*units;
-	char			*formula;
-	char			*logtimefmt;
-	char			*params;
-	char			*ipmi_sensor;
-	char			*snmp_oid;
-	char			*username;
-	char			*password;
-	char			*publickey;
-	char			*privatekey;
-	char			*description;
-	char			*jmx_endpoint;
-	char			*timeout;
-	char			*url;
-	char			*query_fields;
-	char			*posts;
-	char			*status_codes;
-	char			*http_proxy;
-	char			*headers;
-	char			*ssl_cert_file;
-	char			*ssl_key_file;
-	char			*ssl_key_password;
-	unsigned char		verify_peer;
-	unsigned char		verify_host;
-	unsigned char		follow_redirects;
-	unsigned char		post_type;
-	unsigned char		retrieve_mode;
-	unsigned char		request_method;
-	unsigned char		output_format;
-	unsigned char		type;
-	unsigned char		value_type;
-	unsigned char		status;
-	unsigned char		authtype;
-	unsigned char		allow_traps;
-	unsigned char		discover;
-	zbx_vector_lld_row_t	lld_rows;
-	zbx_vector_lld_item_preproc_t	preproc_ops;
-	zbx_vector_item_param_ptr_t	item_params;
-	zbx_vector_db_tag_ptr_t	item_tags;
+	zbx_uint64_t				itemid;
+	zbx_uint64_t				valuemapid;
+	zbx_uint64_t				interfaceid;
+	zbx_uint64_t				master_itemid;
+	char					*name;
+	char					*key;
+	char					*delay;
+	char					*history;
+	char					*trends;
+	char					*trapper_hosts;
+	char					*units;
+	char					*formula;
+	char					*logtimefmt;
+	char					*params;
+	char					*ipmi_sensor;
+	char					*snmp_oid;
+	char					*username;
+	char					*password;
+	char					*publickey;
+	char					*privatekey;
+	char					*description;
+	char					*jmx_endpoint;
+	char					*timeout;
+	char					*url;
+	char					*query_fields;
+	char					*posts;
+	char					*status_codes;
+	char					*http_proxy;
+	char					*headers;
+	char					*ssl_cert_file;
+	char					*ssl_key_file;
+	char					*ssl_key_password;
+	unsigned char				verify_peer;
+	unsigned char				verify_host;
+	unsigned char				follow_redirects;
+	unsigned char				post_type;
+	unsigned char				retrieve_mode;
+	unsigned char				request_method;
+	unsigned char				output_format;
+	unsigned char				type;
+	unsigned char				value_type;
+	unsigned char				status;
+	unsigned char				authtype;
+	unsigned char				allow_traps;
+	unsigned char				discover;
+	zbx_vector_lld_row_ptr_t		lld_rows;
+	zbx_vector_lld_item_preproc_ptr_t	preproc_ops;
+	zbx_vector_item_param_ptr_t		item_params;
+	zbx_vector_db_tag_ptr_t			item_tags;
 }
 zbx_lld_item_prototype_t;
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
 
-ZBX_VECTOR_STRUCT_DECL(lld_item_full, zbx_lld_item_full_t*)
+ZBX_VECTOR_STRUCT_DECL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
 struct zbx_lld_item_full_s
 {
-	zbx_uint64_t			itemid;
-	zbx_uint64_t			parent_itemid;
-	zbx_uint64_t			master_itemid;
-	zbx_uint64_t			master_itemid_orig;
+	zbx_uint64_t				itemid;
+	zbx_uint64_t				parent_itemid;
+	zbx_uint64_t				master_itemid;
+	zbx_uint64_t				master_itemid_orig;
 #define ZBX_FLAG_LLD_ITEM_UNSET				__UINT64_C(0x0000000000000000)
 #define ZBX_FLAG_LLD_ITEM_DISCOVERED			__UINT64_C(0x0000000000000001)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_NAME			__UINT64_C(0x0000000000000002)
@@ -233,121 +259,123 @@ struct zbx_lld_item_full_s
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST		__UINT64_C(0x0040000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS		__UINT64_C(0x0080000000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE			(~ZBX_FLAG_LLD_ITEM_DISCOVERED)
-	zbx_uint64_t			flags;
-	char				*key_proto;
-	char				*name;
-	char				*name_proto;
-	char				*key_orig;
-	char				*key;
-	char				*delay_orig;
-	char				*delay;
-	char				*history_orig;
-	char				*history;
-	char				*trends_orig;
-	char				*trends;
-	char				*units_orig;
-	char				*units;
-	char				*params_orig;
-	char				*params;
-	char				*username_orig;
-	char				*username;
-	char				*password_orig;
-	char				*password;
-	char				*ipmi_sensor_orig;
-	char				*ipmi_sensor;
-	char				*snmp_oid_orig;
-	char				*snmp_oid;
-	char				*description_orig;
-	char				*description;
-	char				*jmx_endpoint_orig;
-	char				*jmx_endpoint;
-	char				*timeout_orig;
-	char				*timeout;
-	char				*url_orig;
-	char				*url;
-	char				*query_fields_orig;
-	char				*query_fields;
-	char				*posts_orig;
-	char				*posts;
-	char				*status_codes_orig;
-	char				*status_codes;
-	char				*http_proxy_orig;
-	char				*http_proxy;
-	char				*headers_orig;
-	char				*headers;
-	char				*ssl_cert_file_orig;
-	char				*ssl_cert_file;
-	char				*ssl_key_file_orig;
-	char				*ssl_key_file;
-	char				*ssl_key_password_orig;
-	char				*ssl_key_password;
-	int				lastcheck;
-	unsigned char			discovery_status;
-	int				ts_delete;
-	int				ts_disable;
-	unsigned char			disable_source;
-	const zbx_lld_row_t		*lld_row;
-	zbx_vector_lld_item_preproc_t	preproc_ops;
-	zbx_vector_lld_item_full_t	dependent_items;
-	zbx_vector_item_param_ptr_t	item_params;
-	zbx_vector_db_tag_ptr_t		item_tags;
-	zbx_vector_db_tag_ptr_t		override_tags;
-	unsigned char			status;
-	unsigned char			type_orig;
-	unsigned char			type;
-	unsigned char			value_type_orig;
-	char				*trapper_hosts_orig;
-	char				*formula_orig;
-	char				*logtimefmt_orig;
-	zbx_uint64_t			valuemapid_orig;
-	unsigned char			authtype_orig;
-	char				*publickey_orig;
-	char				*privatekey_orig;
-	zbx_uint64_t			interfaceid_orig;
-	unsigned char			follow_redirects_orig;
-	unsigned char			post_type_orig;
-	unsigned char			retrieve_mode_orig;
-	unsigned char			request_method_orig;
-	unsigned char			output_format_orig;
-	unsigned char			verify_peer_orig;
-	unsigned char			verify_host_orig;
-	unsigned char			allow_traps_orig;
+	zbx_uint64_t				flags;
+	char					*key_proto;
+	char					*name;
+	char					*name_proto;
+	char					*key_orig;
+	char					*key;
+	char					*delay_orig;
+	char					*delay;
+	char					*history_orig;
+	char					*history;
+	char					*trends_orig;
+	char					*trends;
+	char					*units_orig;
+	char					*units;
+	char					*params_orig;
+	char					*params;
+	char					*username_orig;
+	char					*username;
+	char					*password_orig;
+	char					*password;
+	char					*ipmi_sensor_orig;
+	char					*ipmi_sensor;
+	char					*snmp_oid_orig;
+	char					*snmp_oid;
+	char					*description_orig;
+	char					*description;
+	char					*jmx_endpoint_orig;
+	char					*jmx_endpoint;
+	char					*timeout_orig;
+	char					*timeout;
+	char					*url_orig;
+	char					*url;
+	char					*query_fields_orig;
+	char					*query_fields;
+	char					*posts_orig;
+	char					*posts;
+	char					*status_codes_orig;
+	char					*status_codes;
+	char					*http_proxy_orig;
+	char					*http_proxy;
+	char					*headers_orig;
+	char					*headers;
+	char					*ssl_cert_file_orig;
+	char					*ssl_cert_file;
+	char					*ssl_key_file_orig;
+	char					*ssl_key_file;
+	char					*ssl_key_password_orig;
+	char					*ssl_key_password;
+	int					lastcheck;
+	unsigned char				discovery_status;
+	int					ts_delete;
+	int					ts_disable;
+	unsigned char				disable_source;
+	const zbx_lld_row_t			*lld_row;
+	zbx_vector_lld_item_preproc_ptr_t	preproc_ops;
+	zbx_vector_lld_item_full_ptr_t		dependent_items;
+	zbx_vector_item_param_ptr_t		item_params;
+	zbx_vector_db_tag_ptr_t			item_tags;
+	zbx_vector_db_tag_ptr_t			override_tags;
+	unsigned char				status;
+	unsigned char				type_orig;
+	unsigned char				type;
+	unsigned char				value_type_orig;
+	char					*trapper_hosts_orig;
+	char					*formula_orig;
+	char					*logtimefmt_orig;
+	zbx_uint64_t				valuemapid_orig;
+	unsigned char				authtype_orig;
+	char					*publickey_orig;
+	char					*privatekey_orig;
+	zbx_uint64_t				interfaceid_orig;
+	unsigned char				follow_redirects_orig;
+	unsigned char				post_type_orig;
+	unsigned char				retrieve_mode_orig;
+	unsigned char				request_method_orig;
+	unsigned char				output_format_orig;
+	unsigned char				verify_peer_orig;
+	unsigned char				verify_host_orig;
+	unsigned char				allow_traps_orig;
 };
 
-ZBX_PTR_VECTOR_FUNC_DECL(lld_item_full, zbx_lld_item_full_t*)
+ZBX_PTR_VECTOR_FUNC_DECL(lld_item_full_ptr, zbx_lld_item_full_t*)
+
+int	lld_item_full_compare_func(const void *d1, const void *d2);
 
 int	lld_ids_names_compare_func(const void *d1, const void *d2);
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag);
 
-void	lld_override_item(const zbx_vector_lld_override_t *overrides, const char *name, const char **delay,
+void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const char *name, const char **delay,
 		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,
 		unsigned char *status, unsigned char *discover);
-void	lld_override_trigger(const zbx_vector_lld_override_t *overrides, const char *name, unsigned char *severity,
+void	lld_override_trigger(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover);
-void	lld_override_host(const zbx_vector_lld_override_t *overrides, const char *name,
+void	lld_override_host(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		zbx_vector_uint64_t *lnk_templateids, signed char *inventory_mode,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover);
-void	lld_override_graph(const zbx_vector_lld_override_t *overrides, const char *name, unsigned char *discover);
+void	lld_override_graph(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *discover);
 
-int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_t *overrides, const char *name,
+int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		unsigned char override_default);
 
-int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
 		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
 
-void	lld_item_links_sort(zbx_vector_lld_row_t *lld_rows);
+void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows);
 
-int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
 		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
 
-int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
 		int lastcheck);
 
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
 		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck);
 
 int	lld_end_of_life(int lastcheck, int lifetime);

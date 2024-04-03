@@ -244,21 +244,36 @@ typedef struct
 	int				ts_disable;
 	unsigned char			disable_source;
 
-#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or added */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and host_discovery.host fields should be updated */
+#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or */
+										/* added */
+#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and */
+										/* host_discovery.host fields should */
+										/* be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_NAME			__UINT64_C(0x00000004)	/* hosts.name field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxyid field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxyid field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field */
+										/* should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field */
+										/* should be updated */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -940,7 +955,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macros, unsigned char custom_iface, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -1473,7 +1488,8 @@ static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 
 			ZBX_STR2UINT64(hgsetid, row[0]);
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -1750,7 +1766,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 }
 
 static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const char *name_proto,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_lld_group_t			*group;
 	zbx_lld_group_discovery_t	*discovery;
@@ -1788,7 +1804,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_lld_group_ptr_t *groups,
 		const zbx_vector_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	i;
 
@@ -2081,7 +2097,7 @@ static void	lld_group_candidates_validate_db(zbx_vector_lld_group_ptr_t *groups_
  *                                                                            *
  ******************************************************************************/
 static int	lld_group_rename_discovery_link(zbx_lld_group_t *dst, const zbx_lld_group_t *src,
-		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_t *lld_macros)
+		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	ret = FAIL;
 	char	*name = NULL;
@@ -2130,7 +2146,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, const zbx_lld_group_t *src,
-		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_t *lld_macros)
+		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2153,7 +2169,7 @@ static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, 
  ******************************************************************************/
 static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2220,7 +2236,7 @@ static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, z
  ******************************************************************************/
 static void	lld_groups_validate(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2957,7 +2973,7 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -3360,8 +3376,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0,
-				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0, new_host_hgsets = 0,
-				upd_host_hgsets = 0;
+				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0,
+				new_host_hgsets = 0, upd_host_hgsets = 0;
 	zbx_uint64_t		hosttagid = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
@@ -5290,7 +5306,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
  *                                                                            *
  ******************************************************************************/
 static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -5698,8 +5714,8 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
 		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	zbx_db_result_t			result;
