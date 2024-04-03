@@ -194,7 +194,7 @@ class CControllerCopyCreate extends CController {
 
 	private function getTargets(): array {
 		$targetids = $this->getInput('copy_targetids', []);
-		$copy_type = $this->getInput('copy_type');
+		$copy_type = (int) $this->getInput('copy_type');
 
 		$dst_hosts = match ($copy_type) {
 			COPY_TYPE_TO_HOST => API::Host()->get([
