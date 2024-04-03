@@ -62,6 +62,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/svg-gauge";
 @import "components/svg-graph";
 @import "components/svg-piechart";
+@import "components/svg-honeycomb";
 @import "components/tabfilter";
 @import "components/tabs";
 @import "components/toc";
@@ -70,6 +71,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-gauge";
+@import "components/dashboard/widget-honeycomb";
 @import "components/dashboard/widget-hostavail";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
@@ -3934,36 +3936,21 @@ z-select {
 	}
 }
 
-.overlay-dialogue #host-form {
-	#tagsFormList,
-	#macrosFormList,
-	#valuemap-formlist {
-		.form-field {
-			grid-column-start: 1;
-		}
+.overlay-dialogue {
+	#host-form,
+	#templates-form {
+		#macrosFormList {
+			.form-field {
+				grid-column-start: 1;
+			}
 
-		.table-forms-td-left {
-			display: none;
-		}
+			.table-forms-td-left {
+				display: none;
+			}
 
-		.table-forms-td-right {
-			width: 100%;
-		}
-	}
-}
-
-.overlay-dialogue #templates-form {
-	#macrosFormList {
-		.form-field {
-			grid-column-start: 1;
-		}
-
-		.table-forms-td-left {
-			display: none;
-		}
-
-		.table-forms-td-right {
-			width: 100%;
+			.table-forms-td-right {
+				width: 100%;
+			}
 		}
 	}
 }

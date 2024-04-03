@@ -712,13 +712,38 @@ $item_tab->addItem([
 	]))->setId('js-item-timeout-field')
 ]);
 
+$lld_lifetime_help_icons = makeHelpIcon(_('The value should be greater than LLD rule update interval.'));
+
 $item_tab
 	->addItem([
-		(new CLabel(_('Keep lost resources period'), 'lifetime'))->setAsteriskMark(),
-		new CFormField((new CTextBox('lifetime', $data['lifetime']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		)
+		(new CLabel([_('Delete lost resources'), $lld_lifetime_help_icons], 'lifetime'))->setAsteriskMark(),
+		new CFormField([
+			(new CRadioButtonList('lifetime_type', (int) $data['lifetime_type']))
+				->addValue(_('Never'), ZBX_LLD_DELETE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DELETE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DELETE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('lifetime', $data['lifetime']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		])
+	])
+	->addItem([
+		(new CLabel([_('Disable lost resources'), $lld_lifetime_help_icons], 'enabled_lifetime'))
+			->setId('js-item-disable-resources-label')
+			->setAsteriskMark(),
+		(new CFormField([
+			(new CRadioButtonList('enabled_lifetime_type', (int) $data['enabled_lifetime_type']))
+				->addValue(_('Never'), ZBX_LLD_DISABLE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DISABLE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DISABLE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('enabled_lifetime', $data['enabled_lifetime']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))->setId('js-item-disable-resources-field')
 	])
 	->addItem([
 		(new CLabel(_('Enable trapping'), 'allow_traps'))->setId('js-item-allow-traps-label'),

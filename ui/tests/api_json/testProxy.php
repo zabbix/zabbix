@@ -235,6 +235,14 @@ class testProxy extends CAPITest {
 			'used_in_discovery_rule' => [
 				'name' => 'API test proxy - used in discovery rule',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			'filter_tests' => [
+				'name' => 'Filtered proxy',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+				'allowed_addresses' => '192.168.15.15',
+				'tls_accept' => HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+				'tls_psk_identity' => 'Test PSK',
+				'tls_psk' => '9b8eafedfaae00cece62e85d5f4792c7d9c9bcc851b23216a1d300311cc4f7cb'
 			]
 		];
 		$db_proxies = CDataHelper::call('proxy.create', array_values($proxies));
@@ -510,6 +518,64 @@ class testProxy extends CAPITest {
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "description".'
+			],
+
+			'Test proxy.get filter: invalid param `hostid`' => [
+				'request' => [
+					'output' => ['name'],
+					'filter' => [
+						'hostid' => 123
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "hostid".'
+			],
+			'Test proxy.get filter: invalid param `tls_psk`' => [
+				'request' => [
+					'output' => ['name'],
+					'filter' => [
+						'tls_psk' => 'Test PSK'
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "tls_psk".'
+			],
+			'Test proxy.get filter: invalid param `tls_psk_identity`' => [
+				'request' => [
+					'output' => ['name'],
+					'filter' => [
+						'tls_psk_identity' => 'Test PSK'
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "tls_psk_identity".'
+			],
+			'Test proxy.get filter: allowed_addresses' => [
+				'request' => [
+					'output' => ['name'],
+					'filter' => [
+						'allowed_addresses' => '192.168.15.15'
+					]
+				],
+				'expected_result' => [
+					['name' => 'Filtered proxy']
+				],
+				'expected_error' => null
+			],
+			'Test proxy.get filter: tls_accept' => [
+				'request' => [
+					'output' => ['name'],
+					'filter' => [
+						'tls_accept' => HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE
+					],
+					'search' => [
+						'name' => 'Filtered'
+					]
+				],
+				'expected_result' => [
+					['name' => 'Filtered proxy']
+				],
+				'expected_error' => null
 			],
 
 			// Check "search" option.

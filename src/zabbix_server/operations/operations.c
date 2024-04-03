@@ -30,6 +30,7 @@
 #include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_discoverer_constants.h"
+#include "../server_constants.h"
 
 typedef enum
 {
@@ -1079,6 +1080,10 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 
 	if (HOST_STATUS_NOT_MONITORED != status)
 	{
+		char		*sql;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
 		zbx_db_execute(
 				"update hosts"
 				" set status=%d"
@@ -1086,6 +1091,24 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 				HOST_STATUS_NOT_MONITORED, hostid);
 		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), hostid, status,
 				HOST_STATUS_NOT_MONITORED);
+
+		sql = zbx_dsprintf(NULL, "select null"
+				" from host_discovery"
+				" where disable_source=%d"
+					" and hostid=" ZBX_FS_UI64,
+				ZBX_DISABLE_SOURCE_LLD_LOST, hostid);
+
+		result = zbx_db_select_n(sql, 1);
+		zbx_free(sql);
+
+		if (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_db_execute("update host_discovery"
+					" set disable_source=%d"
+					" where hostid=" ZBX_FS_UI64,
+					ZBX_DISABLE_SOURCE_DEFAULT, hostid);
+		}
+		zbx_db_free_result(result);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

@@ -251,7 +251,7 @@ class CControllerItemEdit extends CControllerItem {
 				],
 				'selectDiscoveryRule' => ['name', 'templateid'],
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],
-				'selectItemDiscovery' => ['parent_itemid'],
+				'selectItemDiscovery' => ['parent_itemid', 'disable_source'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => [$this->getInput('itemid')]

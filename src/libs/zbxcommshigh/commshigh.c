@@ -29,7 +29,7 @@
 #include "zbxnix.h"
 #endif
 
-#include "cfg.h"
+#include "zbxcfg.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*config_tls_server_cert_issuer;

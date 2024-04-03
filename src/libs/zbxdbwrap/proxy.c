@@ -37,7 +37,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
-#include "zbxautoreg.h"
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
@@ -1810,13 +1809,13 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
-				"status", "dcheckid", "dns", (char *)NULL);
+				"status", "dcheckid", "dns", "error", (char *)NULL);
 
 		for (i = *processed_num; i < services->values_num; i++)
 		{
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (int)service->itemtime, drule.druleid, ip,
 					service->port, service->value, service->status, service->dcheckid,
-					service->dns);
+					service->dns, "");
 		}
 
 		zbx_db_insert_autoincrement(&db_insert, "id");
@@ -2185,18 +2184,24 @@ json_parse_return:
  *                                                                            *
  * Purpose: parse autoregistration data contents and process it               *
  *                                                                            *
- * Parameters: jp_data         - [IN] JSON with autoregistration data         *
- *             proxyid         - [IN] proxy identifier from database          *
- *             events_cbs      - [IN]                                         *
- *             error           - [OUT] address of a pointer to the info       *
- *                                     string (should be freed by the caller) *
+ * Parameters:                                                                *
+ *    jp_data                 - [IN] JSON with autoregistration data          *
+ *    proxyid                 - [IN] proxy identifier from database           *
+ *    events_cbs              - [IN]                                          *
+ *    autoreg_host_free_cb    - [IN]                                          *
+ *    autoreg_flush_hosts_cb  - [IN]                                          *
+ *    autoreg_prepare_host_cb - [IN]                                          *
+ *    error                   - [OUT] address of a pointer to the info        *
+ *                                    string (should be freed by the caller)  *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
 static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxyid,
-		const zbx_events_funcs_t *events_cbs, char **error)
+		const zbx_events_funcs_t *events_cbs, zbx_autoreg_host_free_func_t autoreg_host_free_cb,
+		zbx_autoreg_flush_hosts_func_t autoreg_flush_hosts_cb,
+		zbx_autoreg_prepare_host_func_t autoreg_prepare_host_cb, char **error)
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
@@ -2206,7 +2211,9 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
-	zbx_vector_ptr_t	autoreg_hosts;
+
+	zbx_vector_autoreg_host_ptr_t	autoreg_hosts;
+
 	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2218,7 +2225,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&autoreg_hosts);
+	zbx_vector_autoreg_host_ptr_create(&autoreg_hosts);
 	host_metadata = (char *)zbx_malloc(host_metadata, host_metadata_alloc);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
@@ -2316,21 +2323,21 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			continue;
 		}
 
-		zbx_autoreg_prepare_host(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata,
+		autoreg_prepare_host_cb(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata,
 				(unsigned short)flags, (int)itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)
 	{
 		zbx_db_begin();
-		zbx_autoreg_flush_hosts(&autoreg_hosts, proxyid, events_cbs);
+		autoreg_flush_hosts_cb(&autoreg_hosts, proxyid, events_cbs);
 		zbx_db_commit();
 		zbx_dc_config_delete_autoreg_host(&autoreg_hosts);
 	}
 
 	zbx_free(host_metadata);
-	zbx_vector_ptr_clear_ext(&autoreg_hosts, (zbx_mem_free_func_t)zbx_autoreg_host_free);
-	zbx_vector_ptr_destroy(&autoreg_hosts);
+	zbx_vector_autoreg_host_ptr_clear_ext(&autoreg_hosts, autoreg_host_free_cb);
+	zbx_vector_autoreg_host_ptr_destroy(&autoreg_hosts);
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
@@ -2456,6 +2463,9 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *    proxydata_frequency         - [IN]                                     *
  *    discovery_update_host_cb    - [IN]                                     *
  *    discovery_update_service_cb - [IN]                                     *
+ *    autoreg_host_free_cb        - [IN]                                     *
+ *    autoreg_flush_hosts_cb      - [IN]                                     *
+ *    autoreg_prepare_host_cb     - [IN]                                     *
  *    more                        - [OUT] available data flag                *
  *    error                       - [OUT] address of pointer to info string  *
  *                                        (should be freed by the caller)    *
@@ -2470,7 +2480,10 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb,
-		zbx_discovery_update_drule_func_t discovery_update_drule_cb, int *more, char **error)
+		zbx_discovery_update_drule_func_t discovery_update_drule_cb,
+		zbx_autoreg_host_free_func_t autoreg_host_free_cb,
+		zbx_autoreg_flush_hosts_func_t autoreg_flush_hosts_cb,
+		zbx_autoreg_prepare_host_func_t autoreg_prepare_host_cb, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old, lastaccess;
@@ -2582,7 +2595,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
 	{
 		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->proxyid, events_cbs,
-				&error_step)))
+				autoreg_host_free_cb, autoreg_flush_hosts_cb, autoreg_prepare_host_cb, &error_step)))
 		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 		}

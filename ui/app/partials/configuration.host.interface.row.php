@@ -123,7 +123,7 @@
 						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
 					(new CFormField(
 						(new CNumericBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
-							'#{iface.details.max_repetitions}', 20, false, false, false
+							'#{iface.details.max_repetitions}', 10, false, false, false
 						))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					))
 						->setId('snmp_repetition_count_field_#{iface.interfaceid}')

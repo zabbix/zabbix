@@ -53,6 +53,7 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxvault.h"
+#include "zbxautoreg.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -1145,7 +1146,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb, const char *config_ssh_key_location,
-		zbx_trapper_process_request_func_t trapper_process_request_cb)
+		zbx_trapper_process_request_func_t trapper_process_request_cb,
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	int	ret = SUCCEED;
 
@@ -1192,7 +1194,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
-			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout);
+			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
+					autoreg_update_host_cb);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 		{
@@ -1251,7 +1254,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
-		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout);
+		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout,
+				autoreg_update_host_cb);
 	}
 	else
 	{
@@ -1338,7 +1342,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb, const char *config_ssh_key_location,
-		zbx_trapper_process_request_func_t trapper_process_request_cb)
+		zbx_trapper_process_request_func_t trapper_process_request_cb,
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	ssize_t	bytes_received;
 
@@ -1348,7 +1353,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
-			zbx_get_value_internal_ext_cb, config_ssh_key_location, trapper_process_request_cb);
+			zbx_get_value_internal_ext_cb, config_ssh_key_location, trapper_process_request_cb,
+			autoreg_update_host_cb);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1451,7 +1457,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_externalscripts,
 					trapper_args_in->zbx_get_value_internal_ext_cb,
 					trapper_args_in->config_ssh_key_location,
-					trapper_args_in->trapper_process_request_func_cb);
+					trapper_args_in->trapper_process_request_func_cb,
+					trapper_args_in->autoreg_update_host_cb);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

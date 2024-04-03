@@ -144,7 +144,7 @@ class CControllerHostEdit extends CController {
 					],
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
 					'selectHostGroups' => ['groupid'],
-					'selectHostDiscovery' => ['parent_hostid'],
+					'selectHostDiscovery' => ['parent_hostid', 'disable_source'],
 					'selectInterfaces' => ['interfaceid', 'type', 'main', 'available', 'error', 'details', 'ip', 'dns',
 						'port', 'useip'
 					],
