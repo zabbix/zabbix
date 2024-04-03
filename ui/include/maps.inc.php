@@ -464,6 +464,10 @@ function getSysmapResourceIds(array $selements, array &$sysmaps_data, bool $coll
 
 					foreach ($nested_sysmaps as $nested_sysmap) {
 						foreach ($nested_sysmap['selements'] as $nested_sysmap_selement) {
+							if ($nested_sysmap_selement['permission'] < PERM_READ) {
+								continue;
+							}
+
 							switch ($nested_sysmap_selement['elementtype']) {
 								case SYSMAP_ELEMENT_TYPE_MAP:
 									$sysmapid = $nested_sysmap_selement['elements'][0]['sysmapid'];
