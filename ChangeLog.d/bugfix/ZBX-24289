@@ -1,1 +1,1 @@
-..F....... [ZBX-24289] fixed interface assignment for items copied from host to host (jfreibergs)
+..F....... [ZBX-24289] fixed issue with interface assignment for items copied from host to host (jfreibergs)
