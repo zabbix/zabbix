@@ -310,8 +310,8 @@ static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
 {
 	switch (entry->audit_action)
 	{
-		case AUDIT_ACTION_ADD:
-		case AUDIT_ACTION_UPDATE:
+		case ZBX_AUDIT_ACTION_ADD:
+		case ZBX_AUDIT_ACTION_UPDATE:
 			if (0 == strcmp(entry->details_json.buffer, "{}"))
 				return FAIL;
 			return SUCCEED;

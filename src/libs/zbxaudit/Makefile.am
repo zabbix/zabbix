@@ -10,9 +10,7 @@ libzbxaudit_a_SOURCES = \
 	audit_item.c \
 	audit_trigger.c \
 	audit_graph.c \
-	audit_ha.c \
-	audit_config_reload.c \
-	audit_settings.c
+	audit_ha.c
 
 libzbxaudit_a_CFLAGS = \
 	$(TLS_CFLAGS)
