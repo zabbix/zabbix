@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:46:51Z'
+  date: '2024-04-04T08:00:57Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -89,6 +89,30 @@ zabbix_export:
                   value: '{#CLUSTER.NAME}'
                 - tag: component
                   value: cluster
+              trigger_prototypes:
+                - uuid: 962adf853de24f589e34df7ddd560885
+                  expression: 'last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3'
+                  name: 'VMware: The {#CLUSTER.NAME} status is Red'
+                  priority: HIGH
+                  description: 'A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
+                - uuid: 44d12ca67931452194d1e1071136015d
+                  expression: 'last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=2'
+                  name: 'VMware: The {#CLUSTER.NAME} status is Yellow'
+                  priority: AVERAGE
+                  description: 'A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html'
+                  dependencies:
+                    - name: 'VMware: The {#CLUSTER.NAME} status is Red'
+                      expression: 'last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
         - uuid: 3cd02594ee644dbe88bdfc4f4257ae05
           name: 'Discover VMware datastores'
           type: SIMPLE
