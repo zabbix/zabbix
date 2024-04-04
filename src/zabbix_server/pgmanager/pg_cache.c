@@ -503,13 +503,12 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		zbx_pg_group_t *group)
 {
 	int	ret = FAIL;
+	int	hosts_num = 0, proxies_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name);
 
 	if (0 != group->unassigned_hostids.values_num)
 		goto out;
-
-	int	 hosts_num = 0, proxies_num = 0;
 
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
@@ -533,7 +532,7 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		proxies_num++;
 	}
 
-	int	min_online;
+	int	min_online, avg;
 	char	*tmp;
 
 	tmp = zbx_strdup(NULL, group->min_online);
@@ -549,7 +548,7 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		goto out;
 	}
 
-	int	avg = hosts_num / proxies_num;
+	avg = hosts_num / proxies_num;
 
 	for (int i = 0; i < group->proxies.values_num; i++)
 	{
