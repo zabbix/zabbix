@@ -106,7 +106,8 @@ class testFormSetup extends CWebTest {
 			'PHP option "session.auto_start"',
 			'PHP gettext',
 			'PHP option "arg_separator.output"',
-			'PHP curl'
+			'PHP curl',
+			'System locale'
 		];
 		$this->assertTableDataColumn($prerequisites, '');
 		$this->checkSections('Check of pre-requesties');

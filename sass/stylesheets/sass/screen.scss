@@ -3936,36 +3936,21 @@ z-select {
 	}
 }
 
-.overlay-dialogue #host-form {
-	#tagsFormList,
-	#macrosFormList,
-	#valuemap-formlist {
-		.form-field {
-			grid-column-start: 1;
-		}
+.overlay-dialogue {
+	#host-form,
+	#templates-form {
+		#macrosFormList {
+			.form-field {
+				grid-column-start: 1;
+			}
 
-		.table-forms-td-left {
-			display: none;
-		}
+			.table-forms-td-left {
+				display: none;
+			}
 
-		.table-forms-td-right {
-			width: 100%;
-		}
-	}
-}
-
-.overlay-dialogue #templates-form {
-	#macrosFormList {
-		.form-field {
-			grid-column-start: 1;
-		}
-
-		.table-forms-td-left {
-			display: none;
-		}
-
-		.table-forms-td-right {
-			width: 100%;
+			.table-forms-td-right {
+				width: 100%;
+			}
 		}
 	}
 }

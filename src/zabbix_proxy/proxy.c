@@ -347,6 +347,13 @@ static const zbx_events_funcs_t	events_cbs = {
 	.events_update_itservices_cb	= NULL
 };
 
+typedef struct
+{
+	zbx_rtc_t	*rtc;
+	zbx_socket_t	*listen_sock;
+}
+zbx_on_exit_args_t;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -1126,7 +1133,7 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&config_load_module);
 }
 
-static void	zbx_on_exit(int ret)
+static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
@@ -1176,6 +1183,17 @@ static void	zbx_on_exit(int ret)
 
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
+
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_close(&args->rtc->service);
+	}
 
 	exit(EXIT_SUCCESS);
 }
@@ -1419,11 +1437,12 @@ static void	proxy_db_init(void)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	zbx_socket_t				listen_sock;
+	zbx_socket_t				listen_sock = {0};
 	char					*error = NULL;
 	int					i, ret;
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
+	zbx_on_exit_args_t			exit_args = {.rtc = NULL, .listen_sock = NULL};
 
 	zbx_config_comms_args_t			config_comms = {zbx_config_tls, config_hostname, config_server,
 								config_proxymode, zbx_config_timeout,
@@ -1609,6 +1628,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	exit_args.rtc = &rtc;
+	zbx_set_on_exit_args(&exit_args);
+
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_proxy_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
@@ -1702,6 +1724,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
+		exit_args.listen_sock = &listen_sock;
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, config_listen_ip, (unsigned short)config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -1898,7 +1922,7 @@ out:
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
 }
