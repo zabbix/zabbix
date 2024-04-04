@@ -1193,7 +1193,7 @@ out:
 
 }
 
-static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
+static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
 		const zbx_dc_revision_t *dc_revision, unsigned char hostmap_sync, zbx_uint64_t proxy_hostmap_revision,
 		zbx_uint64_t hostmap_revision, const char *failover_delay, const zbx_vector_uint64_t *del_hostproxyids,
 		const zbx_config_vault_t *config_vault, const char *config_source_ip,
