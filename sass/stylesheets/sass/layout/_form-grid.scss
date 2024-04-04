@@ -105,26 +105,30 @@
 		}
 	}
 
-	label {
-		align-self: start;
-		line-height: 24px;
-		text-align: right;
-		word-wrap: break-word;
+	&,
+	.collapsible,
+	.fields-group {
+		> label {
+			align-self: start;
+			line-height: 24px;
+			text-align: right;
+			word-wrap: break-word;
 
-		&.fields-group-label {
-			margin-top: 6px;
-		}
+			&.fields-group-label {
+				margin-top: 6px;
+			}
 
-		.btn-icon,
-		.icon {
-			margin-left: 5px;
-		}
+			.btn-icon,
+			.icon {
+				margin-left: 5px;
+			}
 
-		&:not([for]) {
-			pointer-events: none;
+			&:not([for]) {
+				pointer-events: none;
 
-			.btn-icon {
-				pointer-events: initial;
+				.btn-icon {
+					pointer-events: initial;
+				}
 			}
 		}
 	}
