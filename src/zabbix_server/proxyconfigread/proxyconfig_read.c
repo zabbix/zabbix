@@ -1262,7 +1262,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 
 		if(0 != macro_hostids.values_num)
 			flags |= ZBX_PROXYCONFIG_SYNC_HMACROS;
-l
+
 		if (proxy_config_revision < proxy->revision)
 			flags |= ZBX_PROXYCONFIG_SYNC_DRULES;
 
