@@ -127,17 +127,17 @@ zbx_hashset_t	*zbx_get_audit_hashset(void);
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, const char *name, int audit_action,
 		int resource_type);
 
-#define ZBX_AUDIT_RESOURCE_HOST			4
+#define ZBX_AUDIT_RESOURCE_HOST				4
 #define	ZBX_AUDIT_RESOURCE_GRAPH			6
 #define ZBX_AUDIT_RESOURCE_TRIGGER			13
-#define ZBX_AUDIT_RESOURCE_HOST_GROUP		14
-#define ZBX_AUDIT_RESOURCE_ITEM			15
+#define ZBX_AUDIT_RESOURCE_HOST_GROUP			14
+#define ZBX_AUDIT_RESOURCE_ITEM				15
 #define ZBX_AUDIT_RESOURCE_SCENARIO			22
 #define ZBX_AUDIT_RESOURCE_DISCOVERY_RULE		23
 #define ZBX_AUDIT_RESOURCE_SCRIPT			25
 #define ZBX_AUDIT_RESOURCE_PROXY			26
 
-#define ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE	31
+#define ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE		31
 #define ZBX_AUDIT_RESOURCE_GRAPH_PROTOTYPE		35
 #define ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE		36
 #define ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE		37

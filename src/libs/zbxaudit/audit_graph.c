@@ -179,7 +179,7 @@ void	zbx_audit_graph_update_json_add_gitems(int audit_context_mode, zbx_uint64_t
 	resource_type = graph_flag_to_resource_type(flags);
 
 #define AUDIT_KEY_GITEMS_SNPRINTF(r, nested) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r),			\
-		((ZBX_AUDIT_RESOURCE_GRAPH == resource_type) ? "graph.gitems[" ZBX_FS_UI64 "]"#nested#r :		\
+		((ZBX_AUDIT_RESOURCE_GRAPH == resource_type) ? "graph.gitems[" ZBX_FS_UI64 "]"#nested#r :	\
 		"graphprototype.gitems[" ZBX_FS_UI64 "]"#nested#r), gitemid);
 	AUDIT_KEY_GITEMS_SNPRINTF(,)
 	AUDIT_KEY_GITEMS_SNPRINTF(drawtype, .)
