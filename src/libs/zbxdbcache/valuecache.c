@@ -2207,9 +2207,6 @@ out:
 			/* wait until there are enough values for range estimation    */
 			if (0 == item->active_range)
 				return;
-
-			/* increase active range if it has been set, but does not have enough values */
-			range_timestamp = ts->sec - item->daily_range * 1.5;
 		}
 		else
 		{
