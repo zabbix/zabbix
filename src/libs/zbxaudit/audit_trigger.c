@@ -365,7 +365,7 @@ void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint6
 }
 
 #define TRIGGER_RESOURCE_KEY_RESOLVE_TAG(resource, nested)							\
-	if (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type)								\
+	if (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "trigger.tag[" ZBX_FS_UI64	\
 				"]"#nested#resource, triggertagid);						\
