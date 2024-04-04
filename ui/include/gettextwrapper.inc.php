@@ -218,7 +218,6 @@ function setupLocale(string $language, string &$error = null): bool {
 	ini_set('default_charset', 'UTF-8');
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 
-	// Make sure LC_NUMERIC is set to C to force PHP to always use a point instead of a comma for decimal numbers.
 	// Also, C locale is always present.
 	setlocale(LC_ALL, 'C');
 
@@ -235,6 +234,9 @@ function setupLocale(string $language, string &$error = null): bool {
 			break;
 		}
 	}
+
+	// Make sure LC_NUMERIC is set to C to force PHP to always use a point instead of a comma for decimal numbers.
+	setlocale(LC_NUMERIC, 'C');
 
 	if (!$locale_set) {
 		$error = 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
