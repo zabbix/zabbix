@@ -704,14 +704,14 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					char	delim = ' ';
 					size_t	sql_alloc = 0, sql_offset = 0;
 
-
 					sql_offset = 0;
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
 
 					if (host_proxyid != new_proxyid)
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-								"%cproxyid=" ZBX_FS_UI64, delim, new_proxyid);
+								"%cproxyid=%s", delim,
+								zbx_db_sql_id_ins(new_proxyid));
 						delim = ',';
 
 						zbx_audit_host_update_json_update_proxyid(
@@ -722,8 +722,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (proxy_groupid != new_proxy_groupid)
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-								"%cproxy_groupid=" ZBX_FS_UI64, delim,
-								new_proxy_groupid);
+								"%cproxy_groupid=%s", delim,
+								zbx_db_sql_id_ins(new_proxy_groupid));
 						delim = ',';
 
 						zbx_audit_host_update_json_update_proxy_groupid(
@@ -734,7 +734,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (monitored_by != new_monitored_by)
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-								"%cmonitored_by=%d", delim, (int)monitored_by);
+								"%cmonitored_by=%d", delim, (int)new_monitored_by);
 
 						zbx_audit_host_update_json_update_monitored_by(
 								zbx_map_db_event_to_audit_context(event), hostid,
