@@ -2199,20 +2199,11 @@ static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vecto
 out:
 	if (count > values->values_num)
 	{
-		/* not enough data in the requested period, try to adjust the range */
-
 		if (0 == seconds)
-		{
-			/* if active range has not yet been set then range update can */
-			/* wait until there are enough values for range estimation    */
-			if (0 == item->active_range)
-				return;
-		}
-		else
-		{
-			/* set the range equal to the period plus one second to include nanosecond shifts */
-			range_timestamp = ts->sec - seconds;
-		}
+			return;
+
+		/* set the range equal to the period plus one second to include nanosecond shifts */
+		range_timestamp = ts->sec - seconds;
 	}
 	else
 	{
