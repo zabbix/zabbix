@@ -40,7 +40,7 @@ int	zbx_coredump_disable(void);
 
 void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb);
 
-typedef void	(*zbx_on_exit_t)(int);
+typedef void	(*zbx_on_exit_t)(int, void*);
 typedef void	(*zbx_signal_handler_f)(int flags);
 typedef void	(*zbx_signal_redirect_f)(int flags, zbx_signal_handler_f signal_handler_cb);
 typedef	ZBX_THREAD_HANDLE *(*zbx_get_threads_f)(void);
@@ -124,6 +124,7 @@ void	zbx_set_exit_on_terminate(void);
 void	zbx_unset_exit_on_terminate(void);
 
 void	zbx_log_exit_signal(void);
+void	zbx_set_on_exit_args(void *args);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);

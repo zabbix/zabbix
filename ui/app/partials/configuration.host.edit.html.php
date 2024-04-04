@@ -175,6 +175,12 @@ $templates_field_items[] = (new CMultiSelect([
 	]
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
+$disabled_by_lld_icon = $data['host']['status'] == HOST_STATUS_NOT_MONITORED
+		&& array_key_exists('hostDiscovery', $data['host']) && $data['host']['hostDiscovery']
+		&& $data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+	: null;
+
 $host_tab
 	->addItem([
 		new CLabel([
@@ -262,7 +268,7 @@ $host_tab
 		)
 	])
 	->addItem([
-		new CLabel(_('Enabled'), 'status'),
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
 			(new CCheckBox('status', HOST_STATUS_MONITORED))
 				->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)
@@ -490,14 +496,17 @@ $encryption_tab = (new CFormGrid())
 
 // Value mapping tab.
 if (!$host_is_discovered) {
-	$value_mapping_tab = (new CFormList('valuemap-formlist'))
-		->addRow(null, new CPartial('configuration.valuemap', [
+	$value_mapping_tab = (new CFormList('valuemap-formlist'))->addRow(
+		_('Value mapping'),
+		new CPartial('configuration.valuemap', [
 			'source' => 'host',
 			'valuemaps' => $data['host']['valuemaps'],
 			'readonly' => $host_is_discovered,
 			'form' => 'host',
-			'table_id' => 'valuemap-table'
-		]));
+			'table_id' => 'valuemap-table',
+			'with_label' => true
+		])
+	);
 }
 
 // main output

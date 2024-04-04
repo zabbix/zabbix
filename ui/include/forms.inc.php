@@ -93,9 +93,12 @@ function getItemFormData(array $item = []) {
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
-		'backurl' => getRequest('backurl')
+		'backurl' => getRequest('backurl'),
+		'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
+		'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
+		'enabled_lifetime_type' => getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type')),
+		'enabled_lifetime' => getRequest('enabled_lifetime', ZBX_LLD_RULE_ENABLED_LIFETIME)
 	];
-
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
 	// Unset empty and inherited tags.

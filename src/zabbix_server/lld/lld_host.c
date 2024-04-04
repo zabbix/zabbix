@@ -35,6 +35,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxhash.h"
+#include "../server_constants.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0
@@ -238,23 +239,41 @@ typedef struct
 	char				*name;
 	char				*name_orig;
 	int				lastcheck;
+	unsigned char			discovery_status;
 	int				ts_delete;
+	int				ts_disable;
+	unsigned char			disable_source;
 
-#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or added */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and host_discovery.host fields should be updated */
+#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or */
+										/* added */
+#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and */
+										/* host_discovery.host fields should */
+										/* be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_NAME			__UINT64_C(0x00000004)	/* hosts.name field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxyid field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxyid field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should */
+										/* be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field */
+										/* should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be */
+										/* updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field */
+										/* should be updated */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -337,6 +356,7 @@ typedef struct
 	zbx_uint64_t			groupdiscoveryid;
 	zbx_uint64_t			parent_group_prototypeid;
 	char				*name;
+	unsigned char			discovery_status;
 	int				ts_delete;
 	int				lastcheck;
 	const struct zbx_json_parse	*lld_row;
@@ -421,13 +441,6 @@ static int	lld_permission_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-typedef struct
-{
-	zbx_uint64_t	id;
-	char		*name;
-}
-zbx_id_name_pair_t;
-
 static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
 {
 	const zbx_id_name_pair_t	*id_name_pair_entry = (const zbx_id_name_pair_t *)data;
@@ -436,15 +449,7 @@ static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
 			ZBX_DEFAULT_HASH_SEED);
 }
 
-static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
-{
-	const zbx_id_name_pair_t	*id_name_pair_entry_1 = (const zbx_id_name_pair_t *)d1;
-	const zbx_id_name_pair_t	*id_name_pair_entry_2 = (const zbx_id_name_pair_t *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(id_name_pair_entry_1->id, id_name_pair_entry_2->id);
-
-	return 0;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -533,7 +538,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 			"select hd.hostid,hd.host,hd.lastcheck,hd.ts_delete,h.host,h.name,h.proxyid,"
 				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,hi.inventory_mode,"
 				"h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,"
-				"h.custom_interfaces,hh.hgsetid"
+				"h.custom_interfaces,hh.hgsetid,hd.status,hd.ts_disable,hd.disable_source,h.status"
 			" from host_discovery hd"
 				" join hosts h"
 					" on hd.hostid=h.hostid"
@@ -564,7 +569,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_psk_orig = NULL;
 		host->jp_row = NULL;
 		host->inventory_mode = HOST_INVENTORY_DISABLED;
-		host->status = 0;
+		ZBX_STR2UCHAR(host->status, row[23]);
 		host->custom_interfaces_orig = 0;
 		host->proxyid_orig = 0;
 		host->ipmi_authtype_orig = 0;
@@ -574,6 +579,9 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->flags = 0x00;
 		ZBX_STR2UCHAR(host->custom_interfaces, row[18]);
 		host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
+		ZBX_STR2UCHAR(host->discovery_status, row[20]);
+		host->ts_disable = atoi(row[21]);
+		ZBX_STR2UCHAR(host->disable_source, row[22]);
 
 		ZBX_DBROW2UINT64(db_proxyid, row[6]);
 		if (db_proxyid != proxyid)
@@ -947,7 +955,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_t *lld_macros, unsigned char custom_iface, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -991,7 +999,10 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host->hostid = 0;
 		host->host_proto = NULL;
 		host->lastcheck = 0;
+		host->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		host->ts_delete = 0;
+		host->ts_disable = 0;
+		host->disable_source = ZBX_DISABLE_SOURCE_DEFAULT;
 		host->host = zbx_strdup(NULL, host_proto);
 		host->host_orig = NULL;
 		zbx_substitute_lld_macros(&host->host, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
@@ -1477,7 +1488,8 @@ static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 
 			ZBX_STR2UINT64(hgsetid, row[0]);
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			if (FAIL == (i = zbx_vector_uint64_bsearch(del_hgsetids, hgsetid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -1659,7 +1671,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 	zbx_vector_uint64_create(&discoveryids);
 
 	result = zbx_db_select(
-			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.ts_delete,g.name,"
+			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.status,gd.ts_delete,g.name,"
 				"gd.groupdiscoveryid"
 			" from group_prototype gp,group_discovery gd"
 				" join hstgrp g"
@@ -1680,7 +1692,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 
 			group->groupid = groupid;
 			group->name_inherit = NULL;
-			group->name = zbx_strdup(NULL, row[5]);
+			group->name = zbx_strdup(NULL, row[6]);
 			group->name_orig = NULL;
 			group->flags = 0x0;
 			zbx_vector_ptr_create(&group->hosts);
@@ -1692,11 +1704,12 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 		}
 
 		discovery = (zbx_lld_group_discovery_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_discovery_t));
-		ZBX_DBROW2UINT64(discovery->groupdiscoveryid, row[6]);
+		ZBX_DBROW2UINT64(discovery->groupdiscoveryid, row[7]);
 		ZBX_DBROW2UINT64(discovery->parent_group_prototypeid, row[1]);
 		discovery->name = zbx_strdup(NULL, row[2]);
 		discovery->lastcheck = atoi(row[3]);
-		discovery->ts_delete = atoi(row[4]);
+		ZBX_STR2UCHAR(discovery->discovery_status, row[4]);
+		discovery->ts_delete = atoi(row[5]);
 		discovery->flags = 0x0;
 		discovery->lld_row = NULL;
 
@@ -1753,7 +1766,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 }
 
 static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const char *name_proto,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_lld_group_t			*group;
 	zbx_lld_group_discovery_t	*discovery;
@@ -1776,6 +1789,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 	discovery->groupdiscoveryid = 0;
 	discovery->parent_group_prototypeid = group_prototypeid;
 	discovery->name = zbx_strdup(NULL, name_proto);
+	discovery->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 	discovery->ts_delete = 0;
 	discovery->lastcheck = 0;
 	discovery->flags = ZBX_FLAG_LLD_GROUP_DISCOVERED;
@@ -1790,7 +1804,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_lld_group_ptr_t *groups,
 		const zbx_vector_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	i;
 
@@ -1863,6 +1877,7 @@ static  void	lld_group_merge_group_discovery(zbx_vector_lld_group_discovery_ptr_
 				dst->values[j]->groupdiscoveryid = src->values[i]->groupdiscoveryid;
 				dst->values[j]->lastcheck = src->values[i]->lastcheck;
 				dst->values[j]->ts_delete = src->values[i]->ts_delete;
+				dst->values[j]->discovery_status = src->values[i]->discovery_status;
 
 				lld_group_discovery_free(src->values[i]);
 				zbx_vector_lld_group_discovery_ptr_remove_noorder(src, i--);
@@ -2082,7 +2097,7 @@ static void	lld_group_candidates_validate_db(zbx_vector_lld_group_ptr_t *groups_
  *                                                                            *
  ******************************************************************************/
 static int	lld_group_rename_discovery_link(zbx_lld_group_t *dst, const zbx_lld_group_t *src,
-		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_t *lld_macros)
+		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	ret = FAIL;
 	char	*name = NULL;
@@ -2102,6 +2117,7 @@ static int	lld_group_rename_discovery_link(zbx_lld_group_t *dst, const zbx_lld_g
 				gd_dst->groupdiscoveryid = gd_src->groupdiscoveryid;
 				gd_dst->lastcheck = gd_src->lastcheck;
 				gd_dst->ts_delete = gd_src->ts_delete;
+				gd_dst->discovery_status = gd_src->discovery_status;
 				gd_dst->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME;
 
 				if (dst->groupid != src->groupid)
@@ -2130,7 +2146,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, const zbx_lld_group_t *src,
-		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_t *lld_macros)
+		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2153,7 +2169,7 @@ static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, 
  ******************************************************************************/
 static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2220,7 +2236,7 @@ static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, z
  ******************************************************************************/
 static void	lld_groups_validate(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2957,7 +2973,7 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -3360,8 +3376,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0,
-				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0, new_host_hgsets = 0,
-				upd_host_hgsets = 0;
+				new_snmp = 0, upd_snmp = 0, new_tags = 0, upd_tags = 0, new_hgsets = 0,
+				new_host_hgsets = 0, upd_host_hgsets = 0;
 	zbx_uint64_t		hosttagid = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
@@ -4419,19 +4435,93 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	lld_host_disable_validate(zbx_uint64_t hostid)
+{
+	int		ret;
+	char		*sql;
+	zbx_db_result_t	result;
+
+	sql = zbx_dsprintf(NULL, "select null from hosts where status=%d and hostid=" ZBX_FS_UI64,
+			HOST_STATUS_MONITORED, hostid);
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	lld_host_enable_validate(zbx_uint64_t hostid)
+{
+	int		ret;
+	char		*sql;
+	zbx_db_result_t	result;
+
+	sql = zbx_dsprintf(NULL, "select null"
+			" from hosts h"
+			" join host_discovery d on h.hostid=d.hostid"
+			" where h.status=%d"
+				" and d.disable_source=%d"
+				" and h.hostid=" ZBX_FS_UI64,
+				HOST_STATUS_NOT_MONITORED, ZBX_DISABLE_SOURCE_LLD_LOST, hostid);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	lld_host_delete_validate(zbx_uint64_t hostid)
+{
+	int		ret;
+	char		*sql;
+	zbx_db_result_t	result;
+
+	sql = zbx_dsprintf(NULL, "select null"
+			" from hosts h"
+			" join host_discovery d on h.hostid=d.hostid"
+			" where h.hostid=" ZBX_FS_UI64
+				" and (h.status=%d or d.disable_source=%d)",
+				hostid, HOST_STATUS_MONITORED, ZBX_DISABLE_SOURCE_LLD_LOST);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
- * Purpose: updates host_discovery.lastcheck and host_discovery.ts_delete     *
- *          fields; removes lost resources                                    *
+ * Purpose: updates host_discovery fields; removes or disables lost resources *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int lastcheck)
+static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *lifetime,
+		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const zbx_lld_host_t	*host;
-	zbx_vector_uint64_t	del_hostids, lc_hostids, ts_hostids;
+	zbx_vector_uint64_t	del_hostids, lc_hostids, lost_hostids, discovered_hostids, dis_hostids, en_hostids;
 	zbx_vector_str_t	del_hosts;
 	zbx_hashset_t		ids_names;
 	zbx_id_name_pair_t	local_id_name_pair;
@@ -4442,15 +4532,20 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 #define	IDS_NAMES_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&ids_names, IDS_NAMES_HASHSET_DEF_SIZE,
 			zbx_ids_names_hash_func,
-			zbx_ids_names_compare_func);
+			lld_ids_names_compare_func);
 #undef IDS_NAMES_HASHSET_DEF_SIZE
 
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_str_create(&del_hosts);
 	zbx_vector_uint64_create(&lc_hostids);
-	zbx_vector_uint64_create(&ts_hostids);
+	zbx_vector_uint64_create(&lost_hostids);
+	zbx_vector_uint64_create(&discovered_hostids);
+	zbx_vector_uint64_create(&dis_hostids);
+	zbx_vector_uint64_create(&en_hostids);
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	zbx_db_begin();
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -4461,16 +4556,29 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 		{
-			int	ts_delete = lld_end_of_life(host->lastcheck, lifetime);
+			int	ts_delete, ts_disable;
 
-			if (lastcheck > ts_delete)
+			if ((ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type ||
+					(ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type && lastcheck > (ts_delete =
+					lld_end_of_life(host->lastcheck, lifetime->duration)))) &&
+					SUCCEED == lld_host_delete_validate(host->hostid))
 			{
 				zbx_vector_uint64_append(&del_hostids, host->hostid);
 				local_id_name_pair.id = host->hostid;
 				local_id_name_pair.name = zbx_strdup(NULL, host->host);
 				zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
+				continue;
 			}
-			else if (host->ts_delete != ts_delete)
+
+			if (ZBX_LLD_DISCOVERY_STATUS_LOST != host->discovery_status)
+				zbx_vector_uint64_append(&lost_hostids, host->hostid);
+
+			if (ZBX_LLD_LIFETIME_TYPE_NEVER == lifetime->type)
+				ts_delete = 0;
+			else if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type)
+				ts_delete = 1;
+
+			if (host->ts_delete != ts_delete)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update host_discovery"
@@ -4478,13 +4586,81 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_delete, host->hostid);
 			}
+
+			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
+				ts_disable = 0;
+			else if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type)
+				ts_disable = 1;
+			else
+				ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration);
+
+			if (host->ts_disable != ts_disable)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"update host_discovery"
+						" set ts_disable=%d"
+						" where hostid=" ZBX_FS_UI64 ";\n",
+						ts_disable, host->hostid);
+			}
+
+			if ((ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck <= ts_disable) ||
+					ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type ||
+					HOST_STATUS_NOT_MONITORED == host->status ||
+					SUCCEED != zbx_db_lock_hostid(host->hostid) ||
+					FAIL == lld_host_disable_validate(host->hostid))
+			{
+				continue;
+			}
+
+			zbx_vector_uint64_append(&dis_hostids, host->hostid);
+			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, host->hostid,
+					host->host);
+			zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 		}
 		else
 		{
 			zbx_vector_uint64_append(&lc_hostids, host->hostid);
-			if (0 != host->ts_delete)
-				zbx_vector_uint64_append(&ts_hostids, host->hostid);
+
+			if (ZBX_LLD_DISCOVERY_STATUS_NORMAL != host->discovery_status)
+				zbx_vector_uint64_append(&discovered_hostids, host->hostid);
+
+			if (HOST_STATUS_MONITORED == host->status ||
+					ZBX_DISABLE_SOURCE_LLD_LOST != host->disable_source ||
+					SUCCEED != zbx_db_lock_hostid(host->hostid) ||
+					SUCCEED != lld_host_enable_validate(host->hostid))
+			{
+				continue;
+			}
+
+			zbx_vector_uint64_append(&en_hostids, host->hostid);
+			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, host->hostid,
+					host->host);
+			zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
+					HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED);
 		}
+	}
+
+	if (0 != discovered_hostids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set status=%d where",
+				ZBX_LLD_DISCOVERY_STATUS_NORMAL);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+				discovered_hostids.values, discovered_hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (0 != lost_hostids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set status=%d where",
+				ZBX_LLD_DISCOVERY_STATUS_LOST);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+				lost_hostids.values, lost_hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != lc_hostids.values_num)
@@ -4494,13 +4670,35 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				lc_hostids.values, lc_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	if (0 != ts_hostids.values_num)
+	if (0 != en_hostids.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set ts_delete=0 where");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
+				HOST_STATUS_MONITORED);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-				ts_hostids.values, ts_hostids.values_num);
+				en_hostids.values, en_hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (0 != dis_hostids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set disable_source=%d where",
+				ZBX_DISABLE_SOURCE_LLD_LOST);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+				dis_hostids.values, dis_hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
+				HOST_STATUS_NOT_MONITORED);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
@@ -4508,12 +4706,10 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 	{
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_begin();
-
 		zbx_db_execute("%s", sql);
-
-		zbx_db_commit();
 	}
+
+	zbx_db_commit();
 
 	zbx_free(sql);
 
@@ -4544,7 +4740,8 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 		zbx_db_commit();
 	}
 
-	zbx_vector_uint64_destroy(&ts_hostids);
+	zbx_vector_uint64_destroy(&lost_hostids);
+	zbx_vector_uint64_destroy(&discovered_hostids);
 	zbx_vector_uint64_destroy(&lc_hostids);
 	zbx_vector_uint64_destroy(&del_hostids);
 	zbx_vector_str_clear_ext(&del_hosts, zbx_str_free);
@@ -4554,16 +4751,15 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates group_discovery.lastcheck and group_discovery.ts_delete   *
- *          fields; removes lost resources                                    *
+ * Purpose: updates group_discovery fields; removes lost resources            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int lifetime, int lastcheck)
+static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, zbx_lld_lifetime_t *lifetime, int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const zbx_lld_group_t	*group;
-	zbx_vector_uint64_t	del_ids, lc_ids, ts_ids, groupids;
+	zbx_vector_uint64_t	del_ids, lc_ids, groupids, discovered_ids, lost_ids;
 	int			i, j;
 
 	if (0 == groups->values_num)
@@ -4571,8 +4767,9 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 
 	zbx_vector_uint64_create(&del_ids);
 	zbx_vector_uint64_create(&lc_ids);
-	zbx_vector_uint64_create(&ts_ids);
 	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_create(&discovered_ids);
+	zbx_vector_uint64_create(&lost_ids);
 
 	zbx_db_begin();
 
@@ -4597,19 +4794,23 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 
 			if (0 == (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED))
 			{
-				int	ts_delete;
+				int	ts_delete = 0;
 
-				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-					ts_delete = lld_end_of_life(discovery->lastcheck, lifetime);
-				else
-					ts_delete = 0;
-
-				if (lastcheck > ts_delete)
+				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED) ||
+						ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type ||
+						(ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type && lastcheck >
+						(ts_delete = lld_end_of_life(discovery->lastcheck,
+						lifetime->duration))))
 				{
 					zbx_vector_uint64_append(&del_ids, discovery->groupdiscoveryid);
 					zbx_vector_uint64_append(&groupids, group->groupid);
+					continue;
 				}
-				else if (discovery->ts_delete != ts_delete)
+
+				if (ZBX_LLD_DISCOVERY_STATUS_LOST != discovery->discovery_status)
+					zbx_vector_uint64_append(&lost_ids, discovery->groupdiscoveryid);
+
+				if (discovery->ts_delete != ts_delete)
 				{
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update group_discovery"
@@ -4621,8 +4822,9 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 			else
 			{
 				zbx_vector_uint64_append(&lc_ids, discovery->groupdiscoveryid);
-				if (0 != discovery->ts_delete)
-					zbx_vector_uint64_append(&ts_ids, discovery->groupdiscoveryid);
+
+				if (ZBX_LLD_DISCOVERY_STATUS_NORMAL != discovery->discovery_status)
+					zbx_vector_uint64_append(&discovered_ids, discovery->groupdiscoveryid);
 			}
 		}
 	}
@@ -4634,13 +4836,27 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid",
 				lc_ids.values, lc_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	if (0 != ts_ids.values_num)
+	if (0 != lost_ids.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update group_discovery set ts_delete=0 where");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update group_discovery set status=%d where",
+				ZBX_LLD_DISCOVERY_STATUS_LOST);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid",
-				ts_ids.values, ts_ids.values_num);
+				lost_ids.values, lost_ids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (0 != discovered_ids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update group_discovery set status=%d where",
+				ZBX_LLD_DISCOVERY_STATUS_NORMAL);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid",
+				discovered_ids.values, discovered_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
@@ -4710,8 +4926,9 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 
 	zbx_free(sql);
 
+	zbx_vector_uint64_destroy(&lost_ids);
+	zbx_vector_uint64_destroy(&discovered_ids);
 	zbx_vector_uint64_destroy(&groupids);
-	zbx_vector_uint64_destroy(&ts_ids);
 	zbx_vector_uint64_destroy(&lc_ids);
 	zbx_vector_uint64_destroy(&del_ids);
 }
@@ -5089,7 +5306,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
  *                                                                            *
  ******************************************************************************/
 static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -5497,8 +5714,9 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -5666,7 +5884,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 		/* linking of the templates */
 		lld_templates_link(&hosts, error);
 
-		lld_hosts_remove(&hosts, lifetime, lastcheck);
+		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);
 
 		zbx_vector_db_tag_ptr_clear_ext(&tags, zbx_db_tag_free);

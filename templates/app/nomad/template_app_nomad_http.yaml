@@ -328,7 +328,6 @@ zabbix_export:
                 value: '{$NOMAD.CLIENT.SCHEDULE.ELIGIBILITY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          lifetime: 7d
           description: 'Client nodes discovery.'
           host_prototypes:
             - uuid: 8284dcf3055749d3b27720526c665e34
@@ -408,7 +407,6 @@ zabbix_export:
                 value: '{$NOMAD.SERVER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          lifetime: 7d
           description: 'Server nodes discovery.'
           host_prototypes:
             - uuid: addb1ce7995f44089a13128052171445
