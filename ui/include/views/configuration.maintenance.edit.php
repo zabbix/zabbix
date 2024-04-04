@@ -143,7 +143,7 @@ $tag_table = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern(true)
-				->setEnabled(!$data['maintenance_type'] == MAINTENANCE_TYPE_NODATA)
+				->setEnabled($data['maintenance_type'] != MAINTENANCE_TYPE_NODATA)
 				->setReadonly(!$data['allowed_edit'])
 		))->setColSpan(4)
 	);
