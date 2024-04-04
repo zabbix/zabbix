@@ -346,6 +346,8 @@ int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 	if (FAIL == zbx_ipc_service_start(&pgs->service, ZBX_IPC_SERVICE_PGSERVICE, error))
 		goto out;
 
+	pgs->cache = cache;
+
 	pthread_attr_t	attr;
 	int		err;
 
@@ -355,8 +357,6 @@ int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;
 	}
-
-	pgs->cache = cache;
 
 	ret = SUCCEED;
 out:
