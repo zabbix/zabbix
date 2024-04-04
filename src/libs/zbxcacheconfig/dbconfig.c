@@ -16700,8 +16700,6 @@ void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision
 			{
 				*proxy_group_revision = pg->revision;
 			}
-			else
-				*proxy_group_revision = 0;
 		}
 	}
 
