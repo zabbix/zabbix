@@ -46,25 +46,25 @@
 typedef struct
 {
 	/* workers vector, created during manager initialization */
-	zbx_vector_ptr_t	workers;
+	zbx_vector_lld_worker_ptr_t	workers;
 
 	/* free workers */
-	zbx_queue_ptr_t		free_workers;
+	zbx_queue_ptr_t			free_workers;
 
 	/* workers indexed by IPC service clients */
-	zbx_hashset_t		workers_client;
+	zbx_hashset_t			workers_client;
 
 	/* the next worker index to be assigned to new IPC service clients */
-	int			next_worker_index;
+	int				next_worker_index;
 
 	/* index of queued LLD rules */
-	zbx_hashset_t		rule_index;
+	zbx_hashset_t			rule_index;
 
 	/* LLD rule queue, ordered by the oldest values */
-	zbx_binary_heap_t	rule_queue;
+	zbx_binary_heap_t		rule_queue;
 
 	/* the number of queued LLD rules */
-	zbx_uint64_t		queued_num;
+	zbx_uint64_t			queued_num;
 
 }
 zbx_lld_manager_t;
@@ -75,6 +75,9 @@ typedef struct
 	zbx_lld_rule_t		*rule;
 }
 zbx_lld_worker_t;
+
+ZBX_PTR_VECTOR_DECL(lld_worker_ptr, zbx_lld_worker_t*)
+ZBX_PTR_VECTOR_IMPL(lld_worker_ptr, zbx_lld_worker_t*)
 
 /* workers_client hashset support */
 static zbx_hash_t	worker_hash_func(const void *d)
@@ -137,6 +140,8 @@ static void	lld_rule_clear(zbx_lld_rule_t *rule)
 	}
 }
 
+ZBX_PTR_VECTOR_IMPL(lld_rule_info_ptr, zbx_lld_rule_info_t*)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initializes LLD manager                                           *
@@ -149,7 +154,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, get_config_forks_cb(ZBX_PROCESS_TYPE_LLDWORKER));
 
-	zbx_vector_ptr_create(&manager->workers);
+	zbx_vector_lld_worker_ptr_create(&manager->workers);
 	zbx_queue_ptr_create(&manager->free_workers);
 	zbx_hashset_create(&manager->workers_client, 0, worker_hash_func, worker_compare_func);
 
@@ -167,7 +172,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f 
 
 		worker->client = NULL;
 
-		zbx_vector_ptr_append(&manager->workers, worker);
+		zbx_vector_lld_worker_ptr_append(&manager->workers, worker);
 	}
 
 	manager->queued_num = 0;
@@ -233,7 +238,7 @@ static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *cl
 			exit(EXIT_FAILURE);
 		}
 
-		worker = (zbx_lld_worker_t *)manager->workers.values[manager->next_worker_index++];
+		worker = manager->workers.values[manager->next_worker_index++];
 		worker->client = client;
 
 		zbx_hashset_insert(&manager->workers_client, &worker, sizeof(zbx_lld_worker_t *));
@@ -461,13 +466,13 @@ static int	lld_diag_item_compare_values_desc(const void *d1, const void *d2)
 static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *client,
 		const zbx_ipc_message_t *message)
 {
-	int			limit;
-	unsigned char		*data;
-	zbx_uint32_t		data_len;
-	zbx_vector_ptr_t	view;
-	zbx_hashset_iter_t	iter;
-	zbx_hashset_t		rule_infos;
-	zbx_lld_rule_t		*rule;
+	int				limit;
+	unsigned char			*data;
+	zbx_uint32_t			data_len;
+	zbx_vector_lld_rule_info_ptr_t	view;
+	zbx_hashset_iter_t		iter;
+	zbx_hashset_t			rule_infos;
+	zbx_lld_rule_t			*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -475,9 +480,10 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 
 	zbx_hashset_create(&rule_infos, MAX(1000, (size_t)manager->rule_index.num_data), ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_ptr_create(&view);
+	zbx_vector_lld_rule_info_ptr_create(&view);
 
 	zbx_hashset_iter_reset(&manager->rule_index, &iter);
+
 	while (NULL != (rule = (zbx_lld_rule_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_lld_data_t	*data_ptr;
@@ -492,21 +498,21 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 			{
 				rule_info = (zbx_lld_rule_info_t *)zbx_hashset_insert(&rule_infos, &rule_info_local,
 						sizeof(zbx_lld_rule_info_t));
-				zbx_vector_ptr_append(&view, rule_info);
+				zbx_vector_lld_rule_info_ptr_append(&view, rule_info);
 			}
 
 			rule_info->values_num++;
 		}
 	}
 
-	zbx_vector_ptr_sort(&view, lld_diag_item_compare_values_desc);
+	zbx_vector_lld_rule_info_ptr_sort(&view, lld_diag_item_compare_values_desc);
 
 	data_len = zbx_lld_serialize_top_items_result(&data, (const zbx_lld_rule_info_t **)view.values,
 			MIN(limit, view.values_num));
 	zbx_ipc_client_send(client, ZBX_IPC_LLD_TOP_ITEMS_RESULT, data, data_len);
 
 	zbx_free(data);
-	zbx_vector_ptr_destroy(&view);
+	zbx_vector_lld_rule_info_ptr_destroy(&view);
 	zbx_hashset_destroy(&rule_infos);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

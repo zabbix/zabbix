@@ -67,6 +67,8 @@ typedef struct
 }
 zbx_lld_rule_info_t;
 
+ZBX_PTR_VECTOR_DECL(lld_rule_info_ptr, zbx_lld_rule_info_t*)
+
 typedef struct
 {
 	zbx_get_config_forks_f	get_process_forks_cb_arg;

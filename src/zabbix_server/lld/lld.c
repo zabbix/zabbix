@@ -33,6 +33,7 @@ ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
 ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
 
 int	lld_item_compare_func(const void *d1, const void *d2)
 {
@@ -60,6 +61,16 @@ int	lld_item_full_compare_func(const void *d1, const void *d2)
 	const zbx_lld_item_full_t	*item_2 = *(const zbx_lld_item_full_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
+
+	return 0;
+}
+
+int	lld_item_prototype_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_prototype_t	*item_proto_1 = *(const zbx_lld_item_prototype_t **)d1;
+	const zbx_lld_item_prototype_t	*item_proto_2 = *(const zbx_lld_item_prototype_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(item_proto_1->itemid, item_proto_2->itemid);
 
 	return 0;
 }

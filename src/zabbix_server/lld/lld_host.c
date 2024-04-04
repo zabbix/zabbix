@@ -63,6 +63,9 @@ typedef struct
 }
 zbx_lld_hostmacro_t;
 
+ZBX_PTR_VECTOR_DECL(lld_hostmacro_ptr, zbx_lld_hostmacro_t*)
+ZBX_PTR_VECTOR_IMPL(lld_hostmacro_ptr, zbx_lld_hostmacro_t*)
+
 static void	lld_hostmacro_free(zbx_lld_hostmacro_t *hostmacro)
 {
 	zbx_free(hostmacro->macro);
@@ -230,8 +233,8 @@ typedef struct
 	zbx_vector_uint64_t		groupids;		/* resulting host groups */
 	zbx_vector_uint64_t		lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t		del_templateids;	/* templates which should be unlinked */
-	zbx_vector_ptr_t		new_hostmacros;	/* host macros which should be added, deleted or updated */
-	zbx_vector_ptr_t		interfaces;
+	zbx_vector_lld_hostmacro_ptr_t	new_hostmacros;	/* host macros which should be added, deleted or updated */
+	zbx_vector_lld_interface_ptr_t	interfaces;
 	zbx_vector_db_tag_ptr_t		tags;
 	char				*host_proto;
 	char				*host;
@@ -311,6 +314,19 @@ typedef struct
 }
 zbx_lld_host_t;
 
+ZBX_PTR_VECTOR_DECL(lld_host_ptr, zbx_lld_host_t*)
+ZBX_PTR_VECTOR_IMPL(lld_host_ptr, zbx_lld_host_t*)
+
+int	lld_host_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_host_t	*host_1 = *(const zbx_lld_host_t **)d1;
+	const zbx_lld_host_t	*host_2 = *(const zbx_lld_host_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(host_1->hostid, host_2->hostid);
+
+	return 0;
+}
+
 static void	lld_host_free(zbx_lld_host_t *host)
 {
 	zbx_vector_uint64_destroy(&host->new_groupids);
@@ -318,12 +334,12 @@ static void	lld_host_free(zbx_lld_host_t *host)
 	zbx_vector_uint64_destroy(&host->groupids);
 	zbx_vector_uint64_destroy(&host->lnk_templateids);
 	zbx_vector_uint64_destroy(&host->del_templateids);
-	zbx_vector_ptr_clear_ext(&host->new_hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
-	zbx_vector_ptr_destroy(&host->new_hostmacros);
+	zbx_vector_lld_hostmacro_ptr_clear_ext(&host->new_hostmacros, lld_hostmacro_free);
+	zbx_vector_lld_hostmacro_ptr_destroy(&host->new_hostmacros);
 	zbx_vector_db_tag_ptr_clear_ext(&host->tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host->tags);
-	zbx_vector_ptr_clear_ext(&host->interfaces, (zbx_clean_func_t)lld_interface_free);
-	zbx_vector_ptr_destroy(&host->interfaces);
+	zbx_vector_lld_interface_ptr_clear_ext(&host->interfaces, (zbx_clean_func_t)lld_interface_free);
+	zbx_vector_lld_interface_ptr_destroy(&host->interfaces);
 	zbx_free(host->host_proto);
 	zbx_free(host->host);
 	zbx_free(host->host_orig);
@@ -344,6 +360,16 @@ typedef struct
 	char		*name;
 }
 zbx_lld_group_prototype_t;
+
+static int	lld_group_prototype_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_group_prototype_t	*group_prototype_1 = *(const zbx_lld_group_prototype_t **)d1;
+	const zbx_lld_group_prototype_t	*group_prototype_2 = *(const zbx_lld_group_prototype_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(group_prototype_1->group_prototypeid, group_prototype_2->group_prototypeid);
+
+	return 0;
+}
 
 static void	lld_group_prototype_free(zbx_lld_group_prototype_t *group_prototype)
 {
@@ -383,7 +409,7 @@ typedef struct
 {
 	zbx_uint64_t				groupid;
 	zbx_vector_lld_group_discovery_ptr_t	discovery;
-	zbx_vector_ptr_t			hosts;
+	zbx_vector_lld_host_ptr_t		hosts;
 	char					*name;
 	char					*name_orig;
 	char					*name_inherit;	/* name of a group to inherit rights from */
@@ -405,7 +431,7 @@ static void	lld_group_free(zbx_lld_group_t *group)
 	zbx_vector_lld_group_discovery_ptr_destroy(&group->discovery);
 
 	/* zbx_vector_ptr_clear_ext(&group->hosts, (zbx_clean_func_t)lld_host_free); is not missing here */
-	zbx_vector_ptr_destroy(&group->hosts);
+	zbx_vector_lld_host_ptr_destroy(&group->hosts);
 	zbx_free(group->name);
 	zbx_free(group->name_orig);
 	zbx_free(group->name_inherit);
@@ -419,6 +445,9 @@ typedef struct
 	zbx_vector_uint64_pair_t	rights;
 }
 zbx_lld_group_rights_t;
+
+ZBX_PTR_VECTOR_DECL(lld_group_rights_ptr, zbx_lld_group_rights_t*)
+ZBX_PTR_VECTOR_IMPL(lld_group_rights_ptr, zbx_lld_group_rights_t*)
 
 typedef struct
 {
@@ -456,7 +485,7 @@ static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
  * Purpose: retrieves tags of the existing hosts                              *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
+static void	lld_hosts_get_tags(zbx_vector_lld_host_ptr_t *hosts)
 {
 	zbx_vector_uint64_t	hostids;
 	int			i;
@@ -468,12 +497,12 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 	zbx_uint64_t		hostid;
 	zbx_db_tag_t		*tag;
 
-	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_host_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	zbx_vector_uint64_create(&hostids);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 		zbx_vector_uint64_append(&hostids, host->hostid);
 	}
 
@@ -485,7 +514,7 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 	result = zbx_db_select("%s", sql);
 
 	i = 0;
-	host = (zbx_lld_host_t *)hosts->values[i];
+	host = hosts->values[i];
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -522,7 +551,7 @@ out:
  *                                  different from original                   *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_uint64_t proxyid,
+static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts, zbx_uint64_t proxyid,
 		signed char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
 		const char *ipmi_password, unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
@@ -665,11 +694,11 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
-		zbx_vector_ptr_create(&host->new_hostmacros);
+		zbx_vector_lld_hostmacro_ptr_create(&host->new_hostmacros);
 		zbx_vector_db_tag_ptr_create(&host->tags);
-		zbx_vector_ptr_create(&host->interfaces);
+		zbx_vector_lld_interface_ptr_create(&host->interfaces);
 
-		zbx_vector_ptr_append(hosts, host);
+		zbx_vector_lld_host_ptr_append(hosts, host);
 	}
 	zbx_db_free_result(result);
 
@@ -684,7 +713,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
  *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
+static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -704,7 +733,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	{
 		char	*ch_error;
 
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -734,7 +763,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	/* checking a visible host name validity */
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -766,7 +795,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	/* checking duplicated host names */
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -952,7 +981,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
+static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, unsigned char custom_iface, char **error)
@@ -971,7 +1000,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -1042,9 +1071,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_vector_uint64_create(&host->old_groupids);
 			zbx_vector_uint64_create(&host->new_groupids);
 			zbx_vector_uint64_create(&host->del_templateids);
-			zbx_vector_ptr_create(&host->new_hostmacros);
+			zbx_vector_lld_hostmacro_ptr_create(&host->new_hostmacros);
 			zbx_vector_db_tag_ptr_create(&host->tags);
-			zbx_vector_ptr_create(&host->interfaces);
+			zbx_vector_lld_interface_ptr_create(&host->interfaces);
 			host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
 			host->jp_row = NULL;
 			host->inventory_mode_orig = host->inventory_mode;
@@ -1055,7 +1084,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			host->hgsetid_orig = 0;
 			host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
 
-			zbx_vector_ptr_append(hosts, host);
+			zbx_vector_lld_host_ptr_append(hosts, host);
 		}
 	}
 	else
@@ -1211,7 +1240,7 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
  *                                      should be deleted                     *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
+static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_lld_host_ptr_t *hosts,
 		const zbx_vector_lld_group_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
 {
 	zbx_db_result_t		result;
@@ -1228,12 +1257,13 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
 		zbx_vector_uint64_reserve(&host->new_groupids, (size_t)groupids->values_num);
+
 		for (j = 0; j < groupids->values_num; j++)
 			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
 
@@ -1288,13 +1318,15 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 			ZBX_STR2UINT64(hostid, row[0]);
 			ZBX_STR2UINT64(groupid, row[1]);
 
-			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_host_t	cmp = {.hostid = hostid};
+
+			if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &cmp, lld_host_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			host = (zbx_lld_host_t *)hosts->values[i];
+			host = hosts->values[i];
 			zbx_vector_uint64_append(&host->old_groupids, groupid);
 
 			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->new_groupids, groupid,
@@ -1337,7 +1369,7 @@ static zbx_lld_hgset_t	*lld_hgset_make(zbx_vector_uint64_t *groupids)
 	return hgset;
 }
 
-static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t *hgsets,
+static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t *hgsets,
 		zbx_vector_uint64_t *del_hgsetids)
 {
 	char				*sql = NULL;
@@ -1360,7 +1392,7 @@ static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		int		k;
 		zbx_lld_hgset_t	*hgset;
 
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -1608,7 +1640,8 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
  *             group_prototypes - [OUT] sorted list of group prototypes       *
  *                                                                            *
  ******************************************************************************/
-static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *group_prototypes)
+static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid,
+		zbx_vector_lld_group_prototype_ptr_t *group_prototypes)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -1625,16 +1658,16 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		group_prototype = (zbx_lld_group_prototype_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_prototype_t));
+		group_prototype = zbx_malloc(NULL, sizeof(zbx_lld_group_prototype_t));
 
 		ZBX_STR2UINT64(group_prototype->group_prototypeid, row[0]);
 		group_prototype->name = zbx_strdup(NULL, row[1]);
 
-		zbx_vector_ptr_append(group_prototypes, group_prototype);
+		zbx_vector_lld_group_prototype_ptr_append(group_prototypes, group_prototype);
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_ptr_sort(group_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_group_prototype_ptr_sort(group_prototypes, lld_group_prototype_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1695,7 +1728,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 			group->name = zbx_strdup(NULL, row[6]);
 			group->name_orig = NULL;
 			group->flags = 0x0;
-			zbx_vector_ptr_create(&group->hosts);
+			zbx_vector_lld_host_ptr_create(&group->hosts);
 			zbx_vector_lld_group_discovery_ptr_create(&group->discovery);
 
 			zbx_vector_lld_group_ptr_append(groups, group);
@@ -1803,7 +1836,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 }
 
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_lld_group_ptr_t *groups,
-		const zbx_vector_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
+		const zbx_vector_lld_group_prototype_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	int	i;
@@ -1815,11 +1848,11 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_lld_group_ptr_t *gr
 		const zbx_lld_group_prototype_t	*group_prototype;
 		zbx_lld_group_t			*group;
 
-		group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[i];
+		group_prototype = group_prototypes->values[i];
 
 		group = lld_group_make(group_prototype->group_prototypeid, group_prototype->name, jp_row, lld_macros);
 
-		zbx_vector_ptr_append(&group->hosts, host);
+		zbx_vector_lld_host_ptr_append(&group->hosts, host);
 
 		zbx_vector_lld_group_ptr_append(groups, group);
 	}
@@ -2167,9 +2200,9 @@ static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, 
  * Comments: If possible the old group is renamed.                            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
-		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macros)
+static void	lld_groups_merge_renames(const zbx_vector_lld_group_prototype_ptr_t *group_prototypes,
+		zbx_vector_lld_group_ptr_t *groups, zbx_vector_lld_group_ptr_t *groups_in,
+		zbx_vector_lld_group_ptr_t *groups_out, const zbx_vector_lld_macro_path_ptr_t *lld_macros)
 {
 	for (int i = 0; i < groups->values_num; i++)
 	{
@@ -2180,15 +2213,17 @@ static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, z
 		{
 			zbx_lld_group_discovery_t	*discovery = left->discovery.values[j];
 
-			if (FAIL == (k = zbx_vector_ptr_bsearch(group_prototypes, &discovery->parent_group_prototypeid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_group_prototype_t	*cmp = {.group_prototypeid =
+					discovery->parent_group_prototypeid;}; 	
+
+			if (FAIL == (k = zbx_vector_lld_group_prototype_ptr_bsearch(group_prototypes, &cmp,
+					lld_group_prototype_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			if (0 == strcmp(((zbx_lld_group_prototype_t *)group_prototypes->values[k])->name,
-					discovery->name))
+			if (0 == strcmp((group_prototypes->values[k])->name, discovery->name))
 			{
 				continue;
 			}
@@ -2234,9 +2269,9 @@ static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, z
  *             error            - [OUT]                                       *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_validate(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
-		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
+static void	lld_groups_validate(const zbx_vector_lld_group_prototype_ptr_t *group_prototypes,
+		zbx_vector_lld_group_ptr_t *groups, zbx_vector_lld_group_ptr_t *groups_in,
+		zbx_vector_lld_group_ptr_t *groups_out, const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2285,7 +2320,7 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
 	rights->name = zbx_strdup(NULL, name);
 	zbx_vector_uint64_pair_create(&rights->rights);
 
-	zbx_vector_ptr_append(group_rights, rights);
+	zbx_vector_lld_group_rights_ptr_append(group_rights, rights);
 
 	return group_rights->values_num - 1;
 }
@@ -2370,10 +2405,13 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 	{
 		rights_local.name = row[0];
 
-		if (FAIL == (i = zbx_vector_ptr_search(&group_rights, &rights_local, lld_group_rights_compare)))
+		if (FAIL == (i = zbx_vector_lld_group_rights_ptr_search(&group_rights, &rights_local,
+				lld_group_rights_compare)))
+		{
 			i = lld_group_rights_append(&group_rights, row[0]);
+		}
 
-		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
+		rights = group_rights.values[i];
 
 		ZBX_STR2UINT64(pair.first, row[2]);
 		pair.second = (zbx_uint64_t)atoi(row[1]);
@@ -2382,7 +2420,7 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_ptr_sort(&group_rights, lld_group_rights_compare);
+	zbx_vector_lld_group_rights_ptr_sort(&group_rights, lld_group_rights_compare);
 
 	/* save rights for the new groups */
 	for (i = 0; i < groups->values_num; i++)
@@ -2401,9 +2439,11 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 			name = zbx_strdup(NULL, group->name_inherit);
 
 		rights_local.name = name;
-		if (FAIL != (j = zbx_vector_ptr_bsearch(&group_rights, &rights_local, lld_group_rights_compare)))
+
+		if (FAIL != (j = zbx_vector_lld_group_rights_ptr_bsearch(&group_rights, &rights_local,
+				lld_group_rights_compare)))
 		{
-			rights = (zbx_lld_group_rights_t *)group_rights.values[j];
+			rights = group_rights.values[j];
 
 			for (j = 0; j < rights->rights.values_num; j++)
 			{
@@ -2420,10 +2460,10 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 	zbx_db_insert_clean(&db_insert);
 
 	zbx_free(sql);
-	zbx_vector_ptr_clear_ext(&group_rights, (zbx_clean_func_t)lld_group_rights_free);
+	zbx_vector_lld_group_rights_ptr_clear_ext(&group_rights, lld_group_rights_free);
 	zbx_vector_str_clear_ext(&group_names, zbx_str_free);
 out:
-	zbx_vector_ptr_destroy(&group_rights);
+	zbx_vector_lld_group_rights_ptr_destroy(&group_rights);
 	zbx_vector_str_destroy(&group_names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2700,12 +2740,13 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 
 			if (0 == discovery->groupdiscoveryid)
 			{
-				zbx_lld_group_prototype_t	*group_prototype;
+				zbx_lld_group_prototype_t	*group_prototype, cmp =
+						{group_prototypeid = discovery->parent_group_prototypeid;};
 				int				k;
+			
 
-				if (FAIL != (k = zbx_vector_ptr_bsearch(group_prototypes,
-						&discovery->parent_group_prototypeid,
-						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				if (FAIL != (k = zbx_vector_lld_group_prototype_ptr_bsearch(group_prototypes,
+						&cmp, lld_group_prototype_compare_func)))
 				{
 					discovery->groupdiscoveryid = next_gdid++;
 					group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[k];
@@ -2778,7 +2819,7 @@ out:
  *             hostmacros - [OUT] list of host macros                         *
  *                                                                            *
  ******************************************************************************/
-static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostmacros)
+static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_hostmacro_ptr_t *hostmacros)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
