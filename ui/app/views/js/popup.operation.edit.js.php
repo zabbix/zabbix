@@ -92,7 +92,7 @@ window.operation_popup = new class {
 	/**
 	 * Show/hides warning icon for script operation type.
 	 *
-	 * @param {string} operation_type   Type of operation selected.
+	 * @param {string} operation_type  Type of operation selected.
 	 */
 	#toggleScriptWarningIcon(operation_type) {
 		if (this.scripts_with_warning.length > 0) {
