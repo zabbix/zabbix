@@ -2615,8 +2615,6 @@ out:
 			vc_update_statistics(NULL, 0, values->values_num, time(NULL));
 	}
 
-	vc_dump_items_statistics();
-
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s count:%d cached:%d",
