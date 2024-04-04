@@ -617,11 +617,14 @@
 
 				row.querySelectorAll('[id]').forEach(element => {
 					element.id = element.id.substring(3).replace(/\d+/, `${index}`);
-					element.name = element.name ? element.name.replace(/\d+/, `${index}`) : null;
 
 					if (element.id.includes('sortorder')) {
 						element.value = index;
 					}
+				});
+
+				row.querySelectorAll('[name]').forEach(element => {
+					element.name = element.name.replace(/\d+/, `${index}`);
 				});
 			}
 
