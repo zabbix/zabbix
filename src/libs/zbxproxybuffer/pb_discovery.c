@@ -135,7 +135,7 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 	else
 	{
 		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), clock, druleid, ip, port, value, status,
-				dcheckid, dns);
+				dcheckid, dns, ZBX_NULL2EMPTY_STR(error));
 	}
 }
 
