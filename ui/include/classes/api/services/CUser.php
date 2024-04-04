@@ -3265,7 +3265,7 @@ class CUser extends CApiService {
 	 * @param string $data['sessionid']                               User's sessionid passed in session data.
 	 * @param string $data['redirect_uri']                            Redirect uri that will be used for Duo MFA.
 	 * @param array  $data['mfa_response_data']                       Array with data for MFA response confirmation.
-	 * @param int    $data['mfa_response_data']['verification_code']  TOTP MFA verification code.
+	 * @param string $data['mfa_response_data']['verification_code']  TOTP MFA verification code.
 	 * @param string $data['mfa_response_data']['totp_secret']        TOTP MFA secret at initial registration.
 	 * @param string $data['mfa_response_data']['duo_code']           DUO MFA response code.
 	 * @param string $data['mfa_response_data']['duo_state']          DUO MFA response state.
@@ -3309,54 +3309,45 @@ class CUser extends CApiService {
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
+			$enrollment_filter = $mfa_response['totp_secret'] != null
+				? ['totp_secret' => $mfa_response['totp_secret'], 'status' => TOTP_SECRET_CONFIRMATION_REQUIRED]
+				: [];
+
 			$db_user_secrets = DB::select('mfa_totp_secret', [
 				'output' => ['mfa_totp_secretid', 'totp_secret', 'status', 'used_codes'],
-				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']],
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']] + $enrollment_filter,
 				'limit' => 1
 			]);
 
-			if (!$db_user_secrets || ($db_user_secrets && array_key_exists('totp_secret', $mfa_response)
-					&& $mfa_response['totp_secret'] != null
-					&& $db_user_secrets[0]['totp_secret'] !== $mfa_response['totp_secret'])) {
+			if (!$db_user_secrets) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 			}
 
 			$db_user_secret = $db_user_secrets[0];
+			$used_codes = explode(',', $db_user_secret['used_codes']);
 
 			$valid_code = (self::createTotpGenerator($mfa))
 				->verifyKey($db_user_secret['totp_secret'], $mfa_response['verification_code']);
 
 			if ($valid_code) {
-				$used_codes = explode(',', $db_user_secret['used_codes']);
 				$valid_code = !array_key_exists($mfa_response['verification_code'], array_flip($used_codes));
 			}
 
 			if ($valid_code) {
-				/**
-				 * Store only the number of codes that are available at each verification widnow.
-				 * If window is 1, it means that current, previous and future codes are valid and they should be stored
-				 * if entered correctly.
-				 * Add used codes and remove old ones using FIFO principle.
-				 */
-				if (count($used_codes) == (TOTP_VERIFICATION_DELAY_WINDOW * 2 + 1)) {
-					array_shift($used_codes);
-				}
+				$used_codes = array_slice(
+					array_merge($used_codes, [$mfa_response['verification_code']]), -TOTP_MAX_USED_CODES
+				);
 
-				$used_codes[] = $mfa_response['verification_code'];
-
-				$upd_mfa_totp_secret = [[
+				$upd_totp_secret = [
 					'values' => ['used_codes' => implode(',', $used_codes)],
 					'where' => ['mfa_totp_secretid' => $db_user_secret['mfa_totp_secretid']]
-				]];
+				];
 
 				if ($db_user_secret['status'] != TOTP_SECRET_CONFIRMED) {
-					$upd_mfa_totp_secret[] = [
-						'values' => ['status' => TOTP_SECRET_CONFIRMED],
-						'where' => ['mfa_totp_secretid' => $db_user_secret['mfa_totp_secretid']]
-					];
+					$upd_totp_secret['values']['status'] = TOTP_SECRET_CONFIRMED;
 				}
 
-				DB::update('mfa_totp_secret', $upd_mfa_totp_secret);
+				DB::update('mfa_totp_secret', [$upd_totp_secret]);
 			}
 			else {
 				self::increaseFailedLoginAttempts($db_user);

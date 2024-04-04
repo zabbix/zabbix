@@ -120,6 +120,12 @@ define('TOTP_CODE_LENGTH_8',	8);
 define('TOTP_VERIFICATION_DELAY_WINDOW', 1);
 define('TOTP_SECRET_LENGTH_32', 32);
 
+/**
+ * The number of TOTP used codes stored in database. Depends on TOTP_VERIFICATION_DELAY_WINDOW. If it is 1, it means
+ * that current, previous and future codes are valid and they should be stored if entered correctly.
+ */
+define('TOTP_MAX_USED_CODES', 3);
+
 define('TOTP_SECRET_CONFIRMATION_REQUIRED', 0);
 define('TOTP_SECRET_CONFIRMED', 1);
 
