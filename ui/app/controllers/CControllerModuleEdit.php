@@ -28,10 +28,7 @@ class CControllerModuleEdit extends CController {
 		]]);
 
 		if (!$ret) {
-			foreach (CFormInputValidator::getErrors() as $field => $errors) {
-				$error = $errors[min(array_column($errors, 'level'))];
-				error(_s('%1$s: %2$s', $field, $error['message']));
-			}
+			CFormInputValidator::addErrorsToGlobal();
 
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
