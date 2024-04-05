@@ -3613,6 +3613,17 @@ static int	DBpatch_6050253(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050254(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*3,width=width*3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3871,5 +3882,6 @@ DBPATCH_ADD(6050250, 0, 1)
 DBPATCH_ADD(6050251, 0, 1)
 DBPATCH_ADD(6050252, 0, 1)
 DBPATCH_ADD(6050253, 0, 1)
+DBPATCH_ADD(6050254, 0, 1)
 
 DBPATCH_END()
