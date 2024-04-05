@@ -136,9 +136,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$hosts = [];
 
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
+			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+
 			$hosts = API::Host()->get([
 				'output' => $group_by_host_name ? ['hostid', 'name'] : [],
-				'groupids' => $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null,
+				'groupids' => $groupids,
 				'hostids' => $this->fields_values['hostids'] ?: null,
 				'evaltype' => $this->fields_values['host_tags_evaltype'],
 				'tags' => $this->fields_values['host_tags'] ?: null,
