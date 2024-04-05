@@ -30,6 +30,7 @@ typedef struct
 	char	*tls_cert_file;
 	char	*tls_key_file;
 	char	*db_path;
+	char	*prefix;
 }
 zbx_config_vault_t;
 
