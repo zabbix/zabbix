@@ -634,7 +634,7 @@ switch ($data['type']) {
 				foreach ($operators_by_condition[ZBX_CONDITION_TYPE_DUPTIME] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
-				$new_condition_value = (new CNumericBox('value', 600, 15))
+				$new_condition_value = (new CNumericBox('value', 600, 7))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH)
 					->setId('value');
 

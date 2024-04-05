@@ -49,13 +49,14 @@
 #include "lld/lld_protocol.h"
 #include "cachehistory/cachehistory_server.h"
 #include "discovery/discovery_server.h"
+#include "autoreg/autoreg_server.h"
 
 #include "zbxdiscovery.h"
 #include "zbxdiscoverer.h"
 #include "zbxexport.h"
 #include "zbxself.h"
 
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxpinger.h"
 #include "zbxtrapper.h"
 #include "zbxdbupgrade.h"
@@ -387,6 +388,13 @@ static	const zbx_events_funcs_t	events_cbs = {
 	.export_events_cb		= zbx_export_events,
 	.events_update_itservices_cb	= zbx_events_update_itservices
 };
+
+typedef struct
+{
+	zbx_rtc_t	*rtc;
+	zbx_socket_t	*listen_sock;
+}
+zbx_on_exit_args_t;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -747,39 +755,39 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	zbx_free(address);
 
 #if !defined(HAVE_IPV6)
-	err |= (FAIL == check_cfg_feature_str("Fping6Location", zbx_config_fping6_location, "IPv6 support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("Fping6Location", zbx_config_fping6_location, "IPv6 support"));
 #endif
 #if !defined(HAVE_LIBCURL)
-	err |= (FAIL == check_cfg_feature_str("SSLCALocation", config_ssl_ca_location, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", config_ssl_cert_location, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", config_ssl_key_location, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("HistoryStorageURL", CONFIG_HISTORY_STORAGE_URL, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
-	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
+	err |= (FAIL == zbx_check_cfg_feature_str("SSLCALocation", config_ssl_ca_location, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("SSLCertLocation", config_ssl_cert_location, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("SSLKeyLocation", config_ssl_key_location, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("HistoryStorageURL", CONFIG_HISTORY_STORAGE_URL, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
-	err |= (FAIL == check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
+	err |= (FAIL == zbx_check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
 
-	err |= (FAIL == check_cfg_feature_int("StartReportWriters", CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],
+	err |= (FAIL == zbx_check_cfg_feature_int("StartReportWriters", CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],
 			"cURL library"));
 #else
 	if (SUCCEED != zbx_curl_has_ssl(NULL))
 	{
-		err |= (FAIL == check_cfg_feature_str("SSLCALocation", config_ssl_ca_location,
+		err |= (FAIL == zbx_check_cfg_feature_str("SSLCALocation", config_ssl_ca_location,
 				"cURL library that supports SSL/TLS"));
 		/* can't check SSLCertLocation and SSLKeyLocation because they have defaults */
-		err |= (FAIL == check_cfg_feature_str("Vault", zbx_config_vault.name,
+		err |= (FAIL == zbx_check_cfg_feature_str("Vault", zbx_config_vault.name,
 				"cURL library that supports SSL/TLS"));
-		err |= (FAIL == check_cfg_feature_str("VaultToken", zbx_config_vault.token,
+		err |= (FAIL == zbx_check_cfg_feature_str("VaultToken", zbx_config_vault.token,
 				"cURL library that supports SSL/TLS"));
-		err |= (FAIL == check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path,
+		err |= (FAIL == zbx_check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path,
 				"cURL library that supports SSL/TLS"));
 	}
 #endif
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
-	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],
+	err |= (FAIL == zbx_check_cfg_feature_int("StartVMwareCollectors", CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],
 			"VMware support"));
 
 	/* parameters VMwareFrequency, VMwarePerfFrequency, VMwareCacheSize, VMwareTimeout are not checked here */
@@ -790,30 +798,30 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
 			"OpenSSL 1.1.1 or newer"));
 #endif
 
 #if !defined(HAVE_OPENIPMI)
-	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],
+	err |= (FAIL == zbx_check_cfg_feature_int("StartIPMIPollers", CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],
 			"IPMI support"));
 #endif
 
@@ -838,248 +846,281 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
  ******************************************************************************/
 static void	zbx_load_config(ZBX_TASK_EX *task)
 {
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,	MIN,			MAX */
-		{"StartDBSyncers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER],		TYPE_INT,
-			PARM_OPT,	1,			100},
-		{"StartDiscoverers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartHTTPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER],		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartPingers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER],			TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER],			TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartPollersUnreachable",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE],	TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartIPMIPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartTimers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER],			TYPE_INT,
-			PARM_OPT,	1,			1000},
-		{"StartTrappers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER],			TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartJavaPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER],		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartEscalators",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR],		TYPE_INT,
-			PARM_OPT,	1,			100},
-		{"JavaGateway",			&config_java_gateway,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"JavaGatewayPort",		&config_java_gateway_port,		TYPE_INT,
-			PARM_OPT,	1024,			32767},
-		{"SNMPTrapperFile",		&zbx_config_snmptrap_file,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"StartSNMPTrapper",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER],		TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"CacheSize",			&config_conf_cache_size,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"HistoryCacheSize",		&config_history_cache_size,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"TrendCacheSize",		&config_trends_cache_size,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"TrendFunctionCacheSize",	&config_trend_func_cache_size,		TYPE_UINT64,
-			PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"ValueCacheSize",		&config_value_cache_size,		TYPE_UINT64,
-			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"CacheUpdateFrequency",	&config_confsyncer_frequency,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
-			PARM_OPT,	0,			24},
-		{"MaxHousekeeperDelete",	&config_max_housekeeper_delete,		TYPE_INT,
-			PARM_OPT,	0,			1000000},
-		{"TmpDir",			&zbx_config_tmpdir,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"FpingLocation",		&zbx_config_fping_location,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"Fping6Location",		&zbx_config_fping6_location,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
-			PARM_OPT,	1,			30},
-		{"TrapperTimeout",		&zbx_config_trapper_timeout,		TYPE_INT,
-			PARM_OPT,	1,			300},
-		{"UnreachablePeriod",		&config_unreachable_period,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnreachableDelay",		&config_unreachable_delay,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
-			PARM_OPT,	1024,			32767},
-		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DebugLevel",			&config_log_level,			TYPE_INT,
-			PARM_OPT,	0,			5},
-		{"PidFile",			&zbx_config_pid_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LogFile",			&log_file_cfg.log_file_name,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
-			PARM_OPT,	0,			1024},
-		{"AlertScriptsPath",		&zbx_config_alert_scripts_path,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ExternalScripts",		&config_externalscripts,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBHost",			&(zbx_config_dbhigh->config_dbhost),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBName",			&(zbx_config_dbhigh->config_dbname),	TYPE_STRING,
-			PARM_MAND,	0,			0},
-		{"DBSchema",			&(zbx_config_dbhigh->config_dbschema),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBUser",			&(zbx_config_dbhigh->config_dbuser),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBPassword",			&(zbx_config_dbhigh->config_dbpassword),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"VaultToken",			&(zbx_config_vault.token),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"Vault",			&(zbx_config_vault.name),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"VaultTLSCertFile",		&(zbx_config_vault.tls_cert_file),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"VaultTLSKeyFile",		&(zbx_config_vault.tls_key_file),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"VaultURL",			&(zbx_config_vault.url),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"VaultDBPath",			&(zbx_config_vault.db_path),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBSocket",			&(zbx_config_dbhigh->config_dbsocket),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBPort",			&(zbx_config_dbhigh->config_dbport),	TYPE_INT,
-			PARM_OPT,	1024,			65535},
-		{"AllowUnsupportedDBVersions",	&config_allow_unsupported_db_versions,	TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"DBTLSConnect",		&(zbx_config_dbhigh->config_db_tls_connect),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBTLSCertFile",		&(zbx_config_dbhigh->config_db_tls_cert_file),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBTLSKeyFile",		&(zbx_config_dbhigh->config_db_tls_key_file),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBTLSCAFile",			&(zbx_config_dbhigh->config_db_tls_ca_file),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBTLSCipher",			&(zbx_config_dbhigh->config_db_tls_cipher),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DBTLSCipher13",		&(zbx_config_dbhigh->config_db_tls_cipher_13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"SSHKeyLocation",		&config_ssh_key_location,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LogSlowQueries",		&config_log_slow_queries,		TYPE_INT,
-			PARM_OPT,	0,			3600000},
-		{"StartProxyPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PROXYPOLLER],		TYPE_INT,
-			PARM_OPT,	0,			250},
-		{"ProxyConfigFrequency",	&config_proxyconfig_frequency,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_WEEK},
-		{"ProxyDataFrequency",		&config_proxydata_frequency,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
-		{"StartVMwareCollectors",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],			TYPE_INT,
-			PARM_OPT,	0,			250},
-		{"VMwareFrequency",		&config_vmware_frequency,		TYPE_INT,
-			PARM_OPT,	10,			SEC_PER_DAY},
-		{"VMwarePerfFrequency",		&config_vmware_perf_frequency,		TYPE_INT,
-			PARM_OPT,	10,			SEC_PER_DAY},
-		{"VMwareCacheSize",		&config_vmware_cache_size,		TYPE_UINT64,
-			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"VMwareTimeout",		&config_vmware_timeout,			TYPE_INT,
-			PARM_OPT,	1,			300},
-		{"AllowRoot",			&config_allow_root,			TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"User",			&CONFIG_USER,				TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"SSLCALocation",		&config_ssl_ca_location,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"SSLCertLocation",		&config_ssl_cert_location,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"SSLKeyLocation",		&config_ssl_key_location,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"StartAlerters",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER],			TYPE_INT,
-			PARM_OPT,	1,			100},
-		{"StartPreprocessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],		TYPE_INT,
-			PARM_OPT,	1,			1000},
-		{"HistoryStorageURL",		&CONFIG_HISTORY_STORAGE_URL,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"ExportDir",			&(zbx_config_export.dir),			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ExportType",			&(zbx_config_export.type),			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"ExportFileSize",		&(zbx_config_export.file_size),		TYPE_UINT64,
-			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
-		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],		TYPE_INT,
-			PARM_OPT,	1,			100},
-		{"StatsAllowedIP",		&config_stats_allowed_ip,		TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"StartHistoryPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTORYPOLLER],		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartReportWriters",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],		TYPE_INT,
-			PARM_OPT,	0,			100},
-		{"WebServiceURL",		&zbx_config_webservice_url,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"ProblemHousekeepingFrequency",	&config_problemhousekeeping_frequency,	TYPE_INT,
-			PARM_OPT,	1,			3600},
-		{"ServiceManagerSyncFrequency",	&config_service_manager_sync_frequency,	TYPE_INT,
-			PARM_OPT,	1,			3600},
-		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
-			PARM_OPT,	0,			INT_MAX},
-		{"HANodeName",			&CONFIG_HA_NODE_NAME,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"NodeAddress",			&CONFIG_NODE_ADDRESS,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartConnectors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER],	TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartHTTPAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartAgentPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"StartSNMPPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
-			PARM_OPT,	1,			1000},
-		{"VPSLimit",			&config_vps_limit,	TYPE_INT,
-			PARM_OPT,	0,			ZBX_MEBIBYTE},
-		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
-			PARM_OPT,	0,			ZBX_MEBIBYTE},
+			MANDATORY,		MIN,			MAX */
+		{"StartDBSyncers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			100},
+		{"StartDiscoverers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartHTTPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartPingers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartPollersUnreachable",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartIPMIPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartTimers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER],	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			1000},
+		{"StartTrappers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartJavaPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartEscalators",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			100},
+		{"JavaGateway",			&config_java_gateway,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"JavaGatewayPort",		&config_java_gateway_port,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1024,			32767},
+		{"SNMPTrapperFile",		&zbx_config_snmptrap_file,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"StartSNMPTrapper",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1},
+		{"CacheSize",			&config_conf_cache_size,		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
+		{"HistoryCacheSize",		&config_history_cache_size,		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"TrendCacheSize",		&config_trends_cache_size,		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"TrendFunctionCacheSize",	&config_trend_func_cache_size,		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"ValueCacheSize",		&config_value_cache_size,		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
+		{"CacheUpdateFrequency",	&config_confsyncer_frequency,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
+		{"HousekeepingFrequency",	&config_housekeeping_frequency,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			24},
+		{"MaxHousekeeperDelete",	&config_max_housekeeper_delete,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000000},
+		{"TmpDir",			&zbx_config_tmpdir,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"FpingLocation",		&zbx_config_fping_location,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"Fping6Location",		&zbx_config_fping6_location,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"Timeout",			&zbx_config_timeout,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			30},
+		{"TrapperTimeout",		&zbx_config_trapper_timeout,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			300},
+		{"UnreachablePeriod",		&config_unreachable_period,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
+		{"UnreachableDelay",		&config_unreachable_delay,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
+		{"UnavailableDelay",		&config_unavailable_delay,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
+		{"ListenIP",			&zbx_config_listen_ip,			ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ListenPort",			&zbx_config_listen_port,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1024,			32767},
+		{"SourceIP",			&zbx_config_source_ip,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DebugLevel",			&config_log_level,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			5},
+		{"PidFile",			&zbx_config_pid_file,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"LogType",			&log_file_cfg.log_type_str,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"LogFile",			&log_file_cfg.log_file_name,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"LogFileSize",			&log_file_cfg.log_file_size,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1024},
+		{"AlertScriptsPath",		&zbx_config_alert_scripts_path,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ExternalScripts",		&config_externalscripts,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBHost",			&(zbx_config_dbhigh->config_dbhost),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBName",			&(zbx_config_dbhigh->config_dbname),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_MAND,	0,			0},
+		{"DBSchema",			&(zbx_config_dbhigh->config_dbschema),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBUser",			&(zbx_config_dbhigh->config_dbuser),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBPassword",			&(zbx_config_dbhigh->config_dbpassword),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultToken",			&(zbx_config_vault.token),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"Vault",			&(zbx_config_vault.name),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultTLSCertFile",		&(zbx_config_vault.tls_cert_file),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultTLSKeyFile",		&(zbx_config_vault.tls_key_file),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultURL",			&(zbx_config_vault.url),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultDBPath",			&(zbx_config_vault.db_path),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBSocket",			&(zbx_config_dbhigh->config_dbsocket),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBPort",			&(zbx_config_dbhigh->config_dbport),	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1024,			65535},
+		{"AllowUnsupportedDBVersions",	&config_allow_unsupported_db_versions,	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1},
+		{"DBTLSConnect",		&(zbx_config_dbhigh->config_db_tls_connect),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBTLSCertFile",		&(zbx_config_dbhigh->config_db_tls_cert_file),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBTLSKeyFile",		&(zbx_config_dbhigh->config_db_tls_key_file),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBTLSCAFile",			&(zbx_config_dbhigh->config_db_tls_ca_file),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBTLSCipher",			&(zbx_config_dbhigh->config_db_tls_cipher),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"DBTLSCipher13",		&(zbx_config_dbhigh->config_db_tls_cipher_13),
+											ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"SSHKeyLocation",		&config_ssh_key_location,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"LogSlowQueries",		&config_log_slow_queries,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			3600000},
+		{"StartProxyPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PROXYPOLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			250},
+		{"ProxyConfigFrequency",	&config_proxyconfig_frequency,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			SEC_PER_WEEK},
+		{"ProxyDataFrequency",		&config_proxydata_frequency,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
+		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			ZBX_CFG_TYPE_MULTISTRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"StartVMwareCollectors",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			250},
+		{"VMwareFrequency",		&config_vmware_frequency,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	10,			SEC_PER_DAY},
+		{"VMwarePerfFrequency",		&config_vmware_perf_frequency,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	10,			SEC_PER_DAY},
+		{"VMwareCacheSize",		&config_vmware_cache_size,		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"VMwareTimeout",		&config_vmware_timeout,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			300},
+		{"AllowRoot",			&config_allow_root,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1},
+		{"User",			&CONFIG_USER,				ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"SSLCALocation",		&config_ssl_ca_location,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"SSLCertLocation",		&config_ssl_cert_location,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"SSLKeyLocation",		&config_ssl_key_location,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCertFile",			&(zbx_config_tls->cert_file),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"SocketDir",			&CONFIG_SOCKET_PATH,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"StartAlerters",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			100},
+		{"StartPreprocessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			1000},
+		{"HistoryStorageURL",		&CONFIG_HISTORY_STORAGE_URL,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1},
+		{"ExportDir",			&(zbx_config_export.dir),		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ExportType",			&(zbx_config_export.type),		ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ExportFileSize",		&(zbx_config_export.file_size),		ZBX_CFG_TYPE_UINT64,
+			ZBX_CONF_PARM_OPT,	ZBX_MEBIBYTE,		ZBX_GIBIBYTE},
+		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			100},
+		{"StatsAllowedIP",		&config_stats_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"StartHistoryPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTORYPOLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartReportWriters",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			100},
+		{"WebServiceURL",		&zbx_config_webservice_url,		ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"ProblemHousekeepingFrequency",
+						&config_problemhousekeeping_frequency,
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			3600},
+		{"ServiceManagerSyncFrequency",	&config_service_manager_sync_frequency,	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			3600},
+		{"ListenBacklog",		&config_tcp_max_backlog_size,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			INT_MAX},
+		{"HANodeName",			&CONFIG_HA_NODE_NAME,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"NodeAddress",			&CONFIG_NODE_ADDRESS,			ZBX_CFG_TYPE_STRING,
+			ZBX_CONF_PARM_OPT,	0,			0},
+		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartConnectors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartHTTPAgentPollers",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"StartSNMPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1000},
+		{"MaxConcurrentChecksPerPoller",
+						&config_max_concurrent_checks_per_poller,
+											ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	1,			1000},
+		{"VPSLimit",			&config_vps_limit,			ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
+		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,		ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 	{NULL}
 	};
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
-	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 	zbx_set_defaults();
 
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
@@ -1104,7 +1145,7 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
-static void	zbx_on_exit(int ret)
+static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
 
@@ -1176,6 +1217,17 @@ static void	zbx_on_exit(int ret)
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
 	zbx_deinit_library_export();
+
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_close(&args->rtc->service);
+	}
 
 	exit(EXIT_SUCCESS);
 }
@@ -1440,7 +1492,8 @@ static void	zbx_db_save_server_status(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
+static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc,
+		zbx_on_exit_args_t *exit_args)
 {
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
@@ -1465,7 +1518,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
 							zbx_get_value_internal_ext_server, config_ssh_key_location,
-							trapper_process_request_server};
+							trapper_process_request_server, zbx_autoreg_update_host_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							config_ssh_key_location, get_config_forks};
@@ -1581,6 +1634,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
+		exit_args->listen_sock = listen_sock;
+
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -2003,11 +2058,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	char		*error = NULL, *smtp_auth_feature_status = NULL;
 	int		i, db_type, ret, ha_status_old;
 
-	zbx_socket_t	listen_sock;
-	time_t		standby_warning_time;
-	zbx_rtc_t	rtc;
-	zbx_timespec_t	rtc_timeout = {1, 0};
-	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
+	zbx_socket_t		listen_sock = {0};
+	time_t			standby_warning_time;
+	zbx_rtc_t		rtc;
+	zbx_timespec_t		rtc_timeout = {1, 0};
+	zbx_ha_config_t		*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
+	zbx_on_exit_args_t	exit_args = {.rtc = NULL, .listen_sock = NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -2135,6 +2191,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	exit_args.rtc = &rtc;
+	zbx_set_on_exit_args(&exit_args);
+
 	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
@@ -2248,7 +2307,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
+		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc, &exit_args))
 		{
 			zbx_set_exiting_with_fail();
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -2335,7 +2394,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
+					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc, &exit_args))
 					{
 						zbx_set_exiting_with_fail();
 						ha_status = ZBX_NODE_STATUS_ERROR;
@@ -2397,7 +2456,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_version_info_clear(&db_version_info);
 
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
 }

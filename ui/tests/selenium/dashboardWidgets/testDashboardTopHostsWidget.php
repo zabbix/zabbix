@@ -65,18 +65,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 	const DEFAULT_WIDGET_NAME = 'Top hosts';
 
 	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid';
-
-	/**
 	 * Get threshold table element with mapping set.
 	 *
 	 * @return CMultifieldTable
@@ -159,11 +147,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$column_form = $column_dialog->asForm();
 
 		$this->assertEquals('New column', $column_dialog->getTitle());
-		$this->assertEquals(['Name', 'Data', 'Text', 'Item', 'Display', 'Min', 'Max','Base colour', 'Thresholds',
+		$this->assertEquals(['Name', 'Data', 'Text', 'Item name', 'Display', 'Min', 'Max','Base colour', 'Thresholds',
 				'Decimal places', 'Aggregation function', 'Time period', 'Widget', 'From', 'To', 'History data'],
 				$column_form->getLabels()->asText()
 		);
-		$form->getRequiredLabels(['Name', 'Item', 'Aggregation interval']);
+		$form->getRequiredLabels(['Name', 'Item name', 'Aggregation interval']);
 
 		$column_default_fields = [
 			'Name' => ['value' => '', 'maxlength' => 255],
@@ -171,7 +159,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Text' => ['value' => '', 'placeholder' => 'Text, supports {INVENTORY.*}, {HOST.*} macros','maxlength' => 255,
 					'visible' => false, 'enabled' => false
 			],
-			'Item' => ['value' => ''],
+			'Item name' => ['value' => ''],
 			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
@@ -190,7 +178,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
 
 		// Reassign new fields' values for comparing them in other 'Data' values.
-		foreach (['Aggregation function', 'Item', 'Display', 'History data', 'Min',
+		foreach (['Aggregation function', 'Item name', 'Display', 'History data', 'Min',
 				'Max', 'Decimal places', 'Thresholds' ] as $field) {
 			$column_default_fields[$field]['visible'] = false;
 			$column_default_fields[$field]['enabled'] = false;
@@ -292,7 +280,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Min values',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -321,7 +309,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'All fields 😅',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -337,12 +325,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'duplicated column name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Name' => 'duplicated column name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory in %'
+							'Item name' => 'Available memory in %'
 						]
 					]
 				]
@@ -360,7 +348,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'min',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1m', // minimum time period to display is 1 minute.
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
@@ -368,7 +356,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-20m',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
@@ -376,7 +364,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-20h',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
@@ -384,7 +372,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-20d',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
@@ -392,7 +380,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-20w',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
@@ -400,7 +388,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-20M',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
@@ -408,7 +396,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-730d', // maximum time period to display is 730 days.
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					],
 					'screenshot' => true
@@ -424,7 +412,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_1',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'As is',
 							'History data' => 'History',
 							'Aggregation function' => 'min',
@@ -434,7 +422,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_2',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'As is',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
@@ -445,7 +433,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_3',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'History data' => 'Auto',
 							'Min' => '2',
@@ -454,7 +442,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_4',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'History data' => 'History',
 							'Min' => '',
@@ -463,7 +451,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_5',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'History data' => 'Trends',
 							'Min' => '50',
@@ -472,7 +460,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_6',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Auto',
 							'Min' => '2',
@@ -481,7 +469,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_7',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'History',
 							'Min' => '',
@@ -490,7 +478,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column_8',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Min' => '50',
@@ -509,7 +497,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Base colour' => '039BE5'
 						]
 					]
@@ -525,7 +513,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column with threshold',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '5'
@@ -545,7 +533,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Column with some thresholds',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1'
@@ -571,7 +559,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Thresholds with colors',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1',
@@ -613,7 +601,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Host name column 3',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -644,7 +632,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Text column name 4',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -691,7 +679,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					],
 					'main_error' => [
@@ -804,7 +792,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'min',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-58s'
@@ -826,7 +814,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2y-2s'
@@ -849,7 +837,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => ''
@@ -871,7 +859,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'a'
@@ -893,7 +881,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_to' => 'now-59m-2s'
@@ -915,7 +903,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-3y-25h',
@@ -939,7 +927,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
 							'id:time_period_to' => ''
@@ -961,7 +949,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_to' => 'b'
@@ -983,7 +971,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'b',
@@ -1007,7 +995,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_from' => '',
@@ -1031,7 +1019,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Widget'
 						]
@@ -1052,7 +1040,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'Min' => 'zzz'
 						]
@@ -1073,7 +1061,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'Max' => 'zzz'
 						]
@@ -1094,7 +1082,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Base colour' => '!@#$%^'
 						]
 					],
@@ -1114,7 +1102,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1',
@@ -1139,7 +1127,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1',
@@ -1168,7 +1156,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test name',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => 'zzz',
@@ -1208,7 +1196,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => '     Text column name with spaces 3     ',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => '         now-2h         ',
@@ -1250,7 +1238,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => '{$USERMACRO3}',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -1278,7 +1266,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => '{HOST.IP}',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -1379,7 +1367,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'Incorrect threshold color',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'action' => USER_ACTION_UPDATE,
@@ -1402,7 +1390,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Min' => 'zzz'
@@ -1420,7 +1408,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Max' => 'zzz'
@@ -1643,7 +1631,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => ''
+							'Item name' => ''
 						]
 					],
 					'column_error' => [
@@ -1658,7 +1646,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Base colour' => '#$%$@@'
 						]
 					],
@@ -1723,7 +1711,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'min',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-120s',
@@ -1741,7 +1729,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1w',
@@ -1759,7 +1747,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2d/d',
@@ -1777,7 +1765,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-3M',
@@ -1807,7 +1795,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => '     Text column name with spaces2      ',
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => '  now-2d/d  ',
@@ -1851,7 +1839,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => '{$USERMACRO2}',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -1874,7 +1862,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => '{HOST.IP}',
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -1892,7 +1880,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Min' => '50',
@@ -2132,7 +2120,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 				// Check that column table has correct data.
 				if ($values['Data'] === 'Item value') {
-					$table_name = $values['Item'];
+					$table_name = $values['Item name'];
 				}
 				elseif ($values['Data'] === 'Host name') {
 					$table_name = $values['Data'];
@@ -2231,7 +2219,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test column 1',
 							'Data' => 'Item value',
-							'Item' => '1_item'
+							'Item name' => '1_item'
 						]
 					],
 					'screen_name' => 'as_is'
@@ -2247,7 +2235,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test column 1',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2271,7 +2259,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test column 1',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2295,7 +2283,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test column 1',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2319,7 +2307,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'test column 1',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '500',
 							'Max' => '2000',
@@ -2343,12 +2331,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column 0',
 							'Data' => 'Item value',
-							'Item' => '1_item'
+							'Item name' => '1_item'
 						],
 						[
 							'Name' => 'column 1',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '500',
 							'Max' => '2000',
@@ -2361,7 +2349,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column 2',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2374,7 +2362,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column 3',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2387,7 +2375,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column 4',
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2430,7 +2418,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_text'
+							'Item name' => 'top_hosts_trap_text'
 						]
 					],
 					'text' => "column1\nText for text item"
@@ -2446,7 +2434,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_text',
+							'Item name' => 'top_hosts_trap_text',
 							'History data' => 'Trends'
 						]
 					],
@@ -2463,7 +2451,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_text',
+							'Item name' => 'top_hosts_trap_text',
 							'Display' => 'Bar'
 						]
 					],
@@ -2480,7 +2468,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_text',
+							'Item name' => 'top_hosts_trap_text',
 							'Display' => 'Indicators'
 						]
 					],
@@ -2497,7 +2485,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_text',
+							'Item name' => 'top_hosts_trap_text',
 							'Aggregation function' => 'max'
 						]
 					],
@@ -2514,7 +2502,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_text',
+							'Item name' => 'top_hosts_trap_text',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -2535,7 +2523,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_log'
+							'Item name' => 'top_hosts_trap_log'
 						]
 					],
 					'text' => "column1\nLogs for text item"
@@ -2551,7 +2539,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_log',
+							'Item name' => 'top_hosts_trap_log',
 							'History data' => 'Trends'
 						]
 					],
@@ -2568,7 +2556,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_log',
+							'Item name' => 'top_hosts_trap_log',
 							'Display' => 'Bar'
 						]
 					],
@@ -2585,7 +2573,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_log',
+							'Item name' => 'top_hosts_trap_log',
 							'Display' => 'Indicators'
 						]
 					],
@@ -2602,7 +2590,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_log',
+							'Item name' => 'top_hosts_trap_log',
 							'Aggregation function' => 'max'
 						]
 					],
@@ -2619,7 +2607,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_log',
+							'Item name' => 'top_hosts_trap_log',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -2640,7 +2628,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_char'
+							'Item name' => 'top_hosts_trap_char'
 						]
 					],
 					'text' => "column1\ncharacters_here"
@@ -2656,7 +2644,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_char',
+							'Item name' => 'top_hosts_trap_char',
 							'History data' => 'Trends'
 						]
 					],
@@ -2673,7 +2661,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_char',
+							'Item name' => 'top_hosts_trap_char',
 							'Display' => 'Bar'
 						]
 					],
@@ -2690,7 +2678,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_char',
+							'Item name' => 'top_hosts_trap_char',
 							'Display' => 'Indicators'
 						]
 					],
@@ -2707,7 +2695,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_char',
+							'Item name' => 'top_hosts_trap_char',
 							'Aggregation function' => 'max'
 						]
 					],
@@ -2724,7 +2712,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							'Name' => 'column1',
 							'Data' => 'Item value',
-							'Item' => 'top_hosts_trap_char',
+							'Item name' => 'top_hosts_trap_char',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -2766,7 +2754,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column default',
-									'Item' => 'Available memory'
+									'Item name' => 'Available memory'
 								]
 							]
 						]
@@ -2785,7 +2773,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column with "Custom" time period',
-									'Item' => 'Available memory',
+									'Item name' => 'Available memory',
 									'Aggregation function' => 'min',
 									'Time period' => 'Custom'
 								]
@@ -2816,7 +2804,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column with "Widget" time period',
-									'Item' => 'Available memory',
+									'Item name' => 'Available memory',
 									'Aggregation function' => 'max',
 									'Time period' => 'Widget',
 									'Widget' => 'Graph widget with "Custom" time period'
@@ -2847,18 +2835,18 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column default',
-									'Item' => 'Available memory'
+									'Item name' => 'Available memory'
 								],
 								[
 									'Name' => 'Column with "Widget" time period',
-									'Item' => 'Available memory',
+									'Item name' => 'Available memory',
 									'Aggregation function' => 'avg',
 									'Time period' => 'Widget',
 									'Widget' => 'Graph widget with "Custom" time period'
 								],
 								[
 									'Name' => 'Column with "Custom" time period',
-									'Item' => 'Available memory',
+									'Item name' => 'Available memory',
 									'Aggregation function' => 'count',
 									'Time period' => 'Custom'
 								]
@@ -2879,7 +2867,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column with "Dashboard" time period',
-									'Item' => 'Available memory in %',
+									'Item name' => 'Available memory in %',
 									'Aggregation function' => 'sum',
 									'Time period' => 'Dashboard'
 								]
@@ -2902,7 +2890,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column with "Custom" time period',
-									'Item' => 'Available memory in %',
+									'Item name' => 'Available memory in %',
 									'Aggregation function' => 'first',
 									'Time period' => 'Custom',
 									'id:time_period_from' => 'now-2y',
@@ -2941,7 +2929,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'column_fields' => [
 								[
 									'Name' => 'Column with "Custom" time period',
-									'Item' => 'Available memory in %',
+									'Item name' => 'Available memory in %',
 									'Aggregation function' => 'first',
 									'Time period' => 'Custom',
 									'id:time_period_from' => 'now-2y',
@@ -2949,17 +2937,17 @@ class testDashboardTopHostsWidget extends testWidgets {
 								],
 								[
 									'Name' => 'Column with "Dashboard" time period',
-									'Item' => 'Available memory in %',
+									'Item name' => 'Available memory in %',
 									'Aggregation function' => 'last',
 									'Time period' => 'Dashboard'
 								],
 								[
 									'Name' => 'Column default',
-									'Item' => 'Available memory'
+									'Item name' => 'Available memory'
 								],
 								[
 									'Name' => 'Column with "Widget" time period',
-									'Item' => 'Available memory',
+									'Item name' => 'Available memory',
 									'Aggregation function' => 'min',
 									'Time period' => 'Widget',
 									'Widget' => 'Graph widget with "Custom" time period'
@@ -3056,7 +3044,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Threshold and numeric item but without data',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '1'],
 								['color' => 'CCBBAA', 'threshold' => '2']
@@ -3073,7 +3061,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Two thresholds and numeric item without data',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '0'],
 								['color' => 'CCDDAA', 'threshold' => '1.01']
@@ -3090,7 +3078,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (log) item without data and with aggregation function min',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'min',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0']
@@ -3107,7 +3095,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item without data and with aggregation function max',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'max',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '1']
@@ -3124,7 +3112,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item without data and with aggregation function avg',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'avg',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '-1']
@@ -3141,7 +3129,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (log) item without data and with aggregation function sum',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'sum',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0']
@@ -3158,7 +3146,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item without data and with aggregation function first',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'first',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '-1']
@@ -3175,7 +3163,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'last',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0.00']
@@ -3192,7 +3180,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (log) item without data and with aggregation function not used',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0']
 							]
@@ -3208,7 +3196,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Log) item without data but with aggregation function count',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '1']
@@ -3225,7 +3213,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item without data but with aggregation function count',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '1']
@@ -3242,7 +3230,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item without data but with aggregation function count',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '1']
@@ -3259,7 +3247,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (log) item without data but with aggregation function count and threshold that match 0',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0']
@@ -3274,7 +3262,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item without data but with aggregation function count and threshold that match 0',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0']
@@ -3289,7 +3277,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item without data but with aggregation function count and threshold that match 0',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => '7E57C2', 'threshold' => '0']
@@ -3305,7 +3293,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and numeric (unsigned) item',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '1'],
 								['color' => 'CCDDAA', 'threshold' => '2']
@@ -3322,7 +3310,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and numeric (float) item',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '1.01'],
 								['color' => 'CCDDAA', 'threshold' => '2.01']
@@ -3339,7 +3327,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with thresholds and aggregation function count',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '1'],
@@ -3357,7 +3345,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with thresholds and aggregation function count',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '0.99'],
@@ -3374,7 +3362,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Text) item',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => 'DDAAFF', 'threshold' => '1'],
@@ -3391,7 +3379,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Log) item',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => 'DDAAFF', 'threshold' => '1'],
@@ -3408,7 +3396,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Character) item',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'count',
 							'Thresholds' => [
 								['color' => 'DDAAFF', 'threshold' => '1'],
@@ -3426,7 +3414,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with threshold and aggregation function min',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'min',
 							'Thresholds' => [
 								['color' => 'AABBCC', 'threshold' => '1'],
@@ -3445,7 +3433,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with threshold and aggregation function max',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'max',
 							'Thresholds' => [
 								['color' => '7CB342', 'threshold' => '0.00'],
@@ -3464,7 +3452,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with threshold and aggregation function avg',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'avg',
 							'Thresholds' => [
 								['color' => '7CB342', 'threshold' => '1'],
@@ -3483,7 +3471,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with threshold and aggregation function sum',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'sum',
 							'Thresholds' => [
 								['color' => 'D32F2F', 'threshold' => '1.11'],
@@ -3502,7 +3490,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with threshold and aggregation function first',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'first',
 							'Thresholds' => [
 								['color' => 'D32F2F', 'threshold' => '0'],
@@ -3521,7 +3509,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with threshold and aggregation function last',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'last',
 							'Thresholds' => [
 								['color' => 'D32F2F', 'threshold' => '-1.00'],
@@ -3539,7 +3527,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function min',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'min',
 							'Thresholds' => [
 								['color' => 'DDAAFF', 'threshold' => '0']
@@ -3557,7 +3545,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function max',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'max',
 							'Thresholds' => [
 								['color' => 'D32F2F', 'threshold' => '-1'],
@@ -3576,7 +3564,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function avg',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'avg',
 							'Thresholds' => [
 								['color' => 'D1C4E9', 'threshold' => '1'],
@@ -3595,7 +3583,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function sum',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'sum',
 							'Thresholds' => [
 								['color' => 'D1C4E9', 'threshold' => '1'],
@@ -3614,7 +3602,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function first',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'first',
 							'Thresholds' => [
 								['color' => 'D1C4E9', 'threshold' => '0']
@@ -3632,7 +3620,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function last',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'last',
 							'Thresholds' => [
 								['color' => 'D1C4E9', 'threshold' => '0']
@@ -3650,7 +3638,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function not used',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Thresholds' => [
 								['color' => 'D1C4E9', 'threshold' => '0']
 							]
@@ -3678,7 +3666,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			foreach ($fields['Thresholds'] as $threshold) {
 				// Insert item data.
 				if (array_key_exists('value', $data)) {
-					CDataHelper::addItemData(self::$aggregation_itemids[$fields['Item']], $data['value'], $time);
+					CDataHelper::addItemData(self::$aggregation_itemids[$fields['Item name']], $data['value'], $time);
 
 					if (array_key_exists('numeric', $data)) {
 						$data['value']++;
@@ -3714,13 +3702,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Min',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'min',
 							'Time period' => 'Custom'
 						],
 						[
 							'Name' => 'Max',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2h',
@@ -3728,7 +3716,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Avg',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-7d',
@@ -3736,7 +3724,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Avg 2',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-4d',
@@ -3744,7 +3732,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Count',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-5h-30m',
@@ -3752,7 +3740,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Sum',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-360m',
@@ -3760,7 +3748,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'First',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1h-30m',
@@ -3768,7 +3756,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Last',
-							'Item' => 'Value mapping',
+							'Item name' => 'Value mapping',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1h-20m-600s',
@@ -3849,7 +3837,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						[
 							// 'not used' is default value for aggregation function field.
 							'Name' => 'Value mapping with aggregation function not used',
-							'Item' => 'Value mapping'
+							'Item name' => 'Value mapping'
 						]
 					],
 					'item_data' => [
@@ -3884,14 +3872,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned)',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Decimal places' => '9',
 							'Aggregation function' => 'min',
 							'Time period' => 'Custom'
 						],
 						[
 							'Name' => 'Numeric (float)',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Decimal places' => '3',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
@@ -3946,7 +3934,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) with avg',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-30m',
@@ -3989,7 +3977,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Units should not appear',
-							'Item' => 'Item with units',
+							'Item name' => 'Item with units',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1h-20m-30s',
@@ -4022,7 +4010,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Units should appear',
-							'Item' => 'Item with units',
+							'Item name' => 'Item with units',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1h-20m-30s',
@@ -4055,7 +4043,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'First',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-30d',
@@ -4103,7 +4091,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Last',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
 							'id:time_period_from' => '{date} 00:00:00',
@@ -4147,7 +4135,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item with aggregation function count',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2y-1M-2w-1d-10h-30m-20s',
@@ -4191,7 +4179,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'log item with aggregation function min',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'min', // only numeric items will be displayed.
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2y',
@@ -4199,7 +4187,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Character item with aggregation function max',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'max', // only numeric items will be displayed.
 							'Time period' => 'Custom',
 							'id:time_period_from' => '2023-12-12 00:00:00',
@@ -4207,7 +4195,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Text item with aggregation function avg',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'avg', // only numeric items will be displayed.
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1d',
@@ -4215,7 +4203,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Log item with aggregation function sum',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Aggregation function' => 'sum', // only numeric items will be displayed.
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1d',
@@ -4263,7 +4251,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item with aggregation function first',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1d',
@@ -4301,7 +4289,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item with aggregation function last',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1d',
@@ -4339,7 +4327,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with trends and aggregation function avg',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'avg',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1h',
@@ -4387,7 +4375,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function min',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'min',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2h',
@@ -4447,7 +4435,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function max',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'max',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-3h',
@@ -4495,7 +4483,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with trends and aggregation function count',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'count',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1h',
@@ -4543,7 +4531,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function sum',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'sum',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2d',
@@ -4591,7 +4579,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (unsigned) item with trends and aggregation function first',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Aggregation function' => 'first',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-2w',
@@ -4639,7 +4627,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Numeric (float) item with trends and aggregation function last',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Aggregation function' => 'last',
 							'Time period' => 'Custom',
 							'id:time_period_from' => 'now-1w',
@@ -4688,7 +4676,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Min',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -4699,7 +4687,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Max',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -4710,7 +4698,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Avg',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -4721,7 +4709,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Sum',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -4732,7 +4720,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'First',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -4743,7 +4731,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Last',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -4754,7 +4742,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Not used',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10'
@@ -4801,7 +4789,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Count Log',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4812,7 +4800,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Count Character',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4827,7 +4815,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Count Text',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4868,7 +4856,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Count Log',
-							'Item' => 'Item with type of information - Log',
+							'Item name' => 'Item with type of information - Log',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4876,7 +4864,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Count Character',
-							'Item' => 'Item with type of information - Character',
+							'Item name' => 'Item with type of information - Character',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '-1',
 							'Max' => '1',
@@ -4888,7 +4876,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Count Text',
-							'Item' => 'Item with type of information - Text',
+							'Item name' => 'Item with type of information - Text',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4909,7 +4897,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Min',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4917,7 +4905,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Max',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '-1',
 							'Max' => '1',
@@ -4925,7 +4913,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Avg',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4933,7 +4921,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Sum',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4941,7 +4929,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'First',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4949,7 +4937,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Last',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '1',
@@ -4979,7 +4967,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Min',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '-1',
 							'Max' => '10',
@@ -4991,7 +4979,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Max',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '-1.00',
 							'Max' => '10.00',
@@ -5000,7 +4988,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Avg',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -5009,7 +4997,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Count',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10.00',
@@ -5053,7 +5041,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Sum',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',
@@ -5061,7 +5049,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'First',
-							'Item' => 'Item with type of information - numeric (float)',
+							'Item name' => 'Item with type of information - numeric (float)',
 							'Display' => 'Bar', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10.00',
@@ -5073,7 +5061,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						],
 						[
 							'Name' => 'Last',
-							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
 							'Min' => '0',
 							'Max' => '10',

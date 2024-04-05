@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	autoreg \
 	actions \
 	cachehistory \
 	dbconfig \
@@ -58,7 +59,8 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
+	autoreg/libzbxautoreg_server.a \
+	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	escalator/libzbxescalator.a \
@@ -114,7 +116,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_builddir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_builddir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_builddir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
