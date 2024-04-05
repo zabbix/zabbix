@@ -196,28 +196,39 @@ class CControllerCopyCreate extends CController {
 		$targetids = $this->getInput('copy_targetids', []);
 		$copy_type = $this->getInput('copy_type');
 
-		$dst_hosts = match ($copy_type) {
-			COPY_TYPE_TO_HOST => API::Host()->get([
-				'output' => ['host', 'status'],
-				'hostids' => $targetids,
-				'preservekeys' => true
-			]),
-			COPY_TYPE_TO_HOST_GROUP => API::Host()->get([
-				'output' => ['host', 'status'],
-				'groupids' => $targetids,
-				'preservekeys' => true
-			]),
-			COPY_TYPE_TO_TEMPLATE => API::Template()->get([
-				'output' => ['host'],
-				'templateids' => $targetids,
-				'preservekeys' => true
-			]),
-			COPY_TYPE_TO_TEMPLATE_GROUP => API::Template()->get([
-				'output' => ['host'],
-				'groupids' => $targetids,
-				'preservekeys' => true
-			])
-		};
+		switch ($copy_type) {
+			case COPY_TYPE_TO_HOST:
+				$dst_hosts = API::Host()->get([
+					'output' => ['host', 'status'],
+					'hostids' => $targetids,
+					'preservekeys' => true
+				]);
+				break;
+
+			case COPY_TYPE_TO_HOST_GROUP:
+				$dst_hosts = API::Host()->get([
+					'output' => ['host', 'status'],
+					'groupids' => $targetids,
+					'preservekeys' => true
+				]);
+				break;
+
+			case COPY_TYPE_TO_TEMPLATE:
+				$dst_hosts = API::Template()->get([
+					'output' => ['host'],
+					'templateids' => $targetids,
+					'preservekeys' => true
+				]);
+				break;
+
+			case COPY_TYPE_TO_TEMPLATE_GROUP:
+				$dst_hosts = API::Template()->get([
+					'output' => ['host'],
+					'groupids' => $targetids,
+					'preservekeys' => true
+				]);
+				break;
+		}
 
 		if (in_array($copy_type, [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])) {
 			foreach ($dst_hosts as &$dst_host) {
