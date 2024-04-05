@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @onBefore  prepareTestData
  *
  * @onAfter cleanTestData
+ * @backup userdirectory
  */
 class testUserDirectory extends CAPITest {
 
@@ -193,7 +194,7 @@ class testUserDirectory extends CAPITest {
 			],
 			'Test invalid provision group roleid' => [
 				'userdirectories' => [[
-					'name' => 'LDAP #3',
+					'name' => 'LDAP NEW',
 					'idp_type' => IDP_TYPE_LDAP,
 					'host' => 'ldap.forumsys.com',
 					'port' => 389,
@@ -206,7 +207,7 @@ class testUserDirectory extends CAPITest {
 						'user_groups' => [['usrgrpid' => 1]]
 					]]
 				]],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/provision_groups/1/roleid": object does not exist.'
 			],
 			'Test non-existing provision group user groups' => [
 				'userdirectories' => [[
@@ -243,7 +244,7 @@ class testUserDirectory extends CAPITest {
 			],
 			'Test invalid provision group user groups' => [
 				'userdirectories' => [[
-					'name' => 'LDAP #3',
+					'name' => 'LDAP NEW',
 					'idp_type' => IDP_TYPE_LDAP,
 					'host' => 'ldap.forumsys.com',
 					'port' => 389,
@@ -256,7 +257,7 @@ class testUserDirectory extends CAPITest {
 						'user_groups' => [['usrgrpid' => 0]]
 					]]
 				]],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/provision_groups/1/user_groups/1": object does not exist.'
 			],
 			'Test non-unique provision group user groups' => [
 				'userdirectories' => [[
@@ -323,7 +324,7 @@ class testUserDirectory extends CAPITest {
 			],
 			'Test invalid provision media mediatypeid' => [
 				'userdirectories' => [[
-					'name' => 'LDAP #3',
+					'name' => 'LDAP NEW',
 					'idp_type' => IDP_TYPE_LDAP,
 					'host' => 'ldap.forumsys.com',
 					'port' => 389,
@@ -341,7 +342,7 @@ class testUserDirectory extends CAPITest {
 						'attribute' => 'attr'
 					]]
 				]],
-				'expected_error' => 'Invalid parameter "/1/provision_media/1/mediatypeid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/mediatypeid": object does not exist.'
 			],
 			'Test invalid provision media active' => [
 				'userdirectories' => [[
@@ -584,7 +585,7 @@ class testUserDirectory extends CAPITest {
 				'userdirectories' => [
 					['userdirectoryid' => 'LDAP #1', 'idp_type' => IDP_TYPE_SAML]
 				],
-				'expected_error' => 'Incorrect value for field "idp_type": cannot be changed.'
+				'expected_error' => 'Invalid parameter "/1/idp_type": cannot be changed.'
 			],
 			'Check of provision groups can be removed' => [
 				'userdirectories' => [
@@ -612,7 +613,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'LDAP #1',
 					'provision_status' => JIT_PROVISIONING_ENABLED
 				]],
-				'expected_error' => 'Invalid parameter "/1": the parameter "provision_groups" is missing.'
+				'expected_error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
 			],
 			'Set non-existing mediaid to provision media' => [
 				'userdirectories' => [[
@@ -622,7 +623,7 @@ class testUserDirectory extends CAPITest {
 						['name' => 'Email', 'mediatypeid' => 100000, 'attribute' => 'attr_email']
 					]
 				]],
-				'expected_error' => 'Invalid parameter "/1/provision_media/2/mediatypeid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/provision_media/2/mediatypeid": object does not exist.'
 			],
 			'Set incorrect provision media active' => [
 				'userdirectories' => [
@@ -666,7 +667,7 @@ class testUserDirectory extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/provision_media/1": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/userdirectory_mediaid": object does not exist or belongs to another object.'
 			],
 			'Test invalid SAML Encrypt assertions' => [
 				'userdirectories' => [[

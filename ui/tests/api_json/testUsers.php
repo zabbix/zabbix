@@ -500,22 +500,6 @@ class testUsers extends CAPITest {
 
 	public static function dataProviderUserMediaUpdate() {
 		return [
-			'Provisioned media cannot be deleted.' => [
-				'users' => [[
-					'userid' => 'Provisioned user',
-					'medias' => []
-				]],
-				'expected_error' => 'Incorrect value for field "/1/medias": cannot delete provisioned media.'
-			],
-			'Provisioned media cannot be replaced.' => [
-				'users' => [[
-					'userid' => 'Provisioned user',
-					'medias' => [
-						['mediatypeid' => 'SMS media type', 'sendto' => 'newmedia']
-					]
-				]],
-				'expected_error' => 'Incorrect value for field "/1/medias": cannot delete provisioned media.'
-			],
 			'Property userdirectory_mediaid is not supported in medias for user.update.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
@@ -570,9 +554,16 @@ class testUsers extends CAPITest {
 						]
 					]
 				]],
-				'expected_error' => 'Not allowed to update field "mediatypeid" for provisioned user.'
+				'expected_error' => 'Invalid parameter "/1/medias/1": cannot update readonly parameter "mediatypeid" of provisioned user.'
 			],
-			'Update provisioned media successful.' => [
+			'Provisioned media cannot be deleted, but without error.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => []
+				]],
+				'expected_error' => null
+			],
+			'Successfully update provisioned media.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -591,7 +582,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => null
 			],
-			'Add custom media to provisioned media list successful.' => [
+			'Successfully add custom media to provisioned media list.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'medias' => [
@@ -609,6 +600,32 @@ class testUsers extends CAPITest {
 						[
 							'mediatypeid' => 'SMS media type',
 							'sendto' => 'custom-sendto',
+							'active' => MEDIA_STATUS_ACTIVE,
+							'severity' => 1,
+							'period' => '1-5,9:00-20:00'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			'Successfully replace custom media without specifying provisioned media.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local'],
+							'active' => MEDIA_STATUS_DISABLED
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						],
+						[
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'custom-sendto2',
 							'active' => MEDIA_STATUS_ACTIVE,
 							'severity' => 1,
 							'period' => '1-5,9:00-20:00'
@@ -1312,14 +1329,14 @@ class testUsers extends CAPITest {
 					'userid' => 'Provisioned user',
 					'username' => 'other-username-value'
 				]],
-				'expected_error' => 'Not allowed to update field "username" for provisioned user.'
+				'expected_error' => 'Invalid parameter "/1": cannot update readonly parameter "username" of provisioned user.'
 			],
 			'Cannot update provisioned user readonly field password.' => [
 				'users' => [[
 					'userid' => 'Provisioned user',
 					'passwd' => 'Z@BB1X@dmln'
 				]],
-				'expected_error' => 'Not allowed to update field "passwd" for provisioned user.'
+				'expected_error' => 'Invalid parameter "/1": cannot update readonly parameter "passwd" of provisioned user.'
 			],
 			'Cannot update user userdirectoryid to make provisioned user not provisioned.' => [
 				'users' => [[
@@ -1756,7 +1773,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User without medias properties',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1768,7 +1785,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty mediatypeid',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1784,7 +1801,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid mediatypeid',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1811,14 +1828,14 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Media type with ID "1234" is not available.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/mediatypeid": object does not exist.'
 			],
 			// Check user media, sendto.
 			[
 				'user' => [
 					'username' => 'User without sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1845,13 +1862,13 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": cannot be empty.'
 			],
 			[
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1868,7 +1885,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1896,7 +1913,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": cannot be empty.'
 			],
 			[
 				'user' => [
@@ -1913,7 +1930,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/2": cannot be empty.'
 			],
 			[
 				'user' => [
@@ -1930,7 +1947,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1947,7 +1964,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1964,7 +1981,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1981,7 +1998,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1998,7 +2015,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -2015,7 +2032,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -2032,14 +2049,14 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			// Check user media, active.
 			[
 				'user' => [
 					'username' => 'User with empty active',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2057,7 +2074,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid active',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2075,7 +2092,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid active',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2094,7 +2111,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty severity',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2112,7 +2129,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid severity',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2131,7 +2148,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty period',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2149,7 +2166,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with string period',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2167,7 +2184,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, without comma',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2185,7 +2202,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, with two comma',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2203,7 +2220,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, 8 week days',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2221,7 +2238,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, zero week day',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2239,7 +2256,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2257,7 +2274,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2275,7 +2292,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2293,7 +2310,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
