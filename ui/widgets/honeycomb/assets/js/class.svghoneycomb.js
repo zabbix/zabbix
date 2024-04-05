@@ -311,11 +311,7 @@ class CSVGHoneycomb {
 			};
 		};
 
-		const cell_min_width = CSVGHoneycomb.CELL_WIDTH_MIN;
-		const cell_min_height = CSVGHoneycomb.CELL_WIDTH_MIN / Math.sqrt(3) * 2;
-
-		const max_rows = Math.floor((this.#height - cell_min_height) / (cell_min_height * .75)) + 1;
-		const max_columns = Math.floor((this.#width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width);
+		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width: this.#width, height: this.#height});
 
 		this.#cells_max_count = this.#cells_data !== null
 			? Math.min(this.#cells_data.length, max_rows * max_columns)
@@ -1001,5 +997,23 @@ class CSVGHoneycomb {
 	 */
 	static #getUniqueId() {
 		return `CSVGHoneycomb-${this.ID_COUNTER++}`;
+	}
+
+	/**
+	 * Get honeycomb container max row and max column count.
+	 *
+	 * @param {number} width
+	 * @param {number} height
+	 *
+	 * @returns {{max_rows: number, max_columns: number}}
+	 */
+	static getContainerMaxParams({width, height}) {
+		const cell_min_width = CSVGHoneycomb.CELL_WIDTH_MIN;
+		const cell_min_height = CSVGHoneycomb.CELL_WIDTH_MIN / Math.sqrt(3) * 2;
+
+		const max_rows = Math.floor((height - cell_min_height) / (cell_min_height * .75)) + 1;
+		const max_columns = Math.floor((width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width);
+
+		return {max_rows, max_columns};
 	}
 }

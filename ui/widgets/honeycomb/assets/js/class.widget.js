@@ -43,15 +43,36 @@ class CWidgetHoneycomb extends CWidget {
 	 */
 	#resize_timeout_id;
 
+	/**
+	 * @type {number}
+	 */
+	#max_items = 1000;
+
+	onActivate() {
+		this.#setMaxItems();
+	}
+
 	isUserInteracting() {
 		return this.#user_interacting || super.isUserInteracting();
 	}
 
 	onResize() {
+		if (this.getState() !== WIDGET_STATE_ACTIVE) {
+			return;
+		}
+
 		clearTimeout(this.#resize_timeout_id);
 
+		const old_max = this.#max_items;
+
+		this.#setMaxItems();
+
+		if (old_max < this.#max_items) {
+			this._startUpdating();
+		}
+
 		this.#resize_timeout_id = setTimeout(() => {
-			if (this.getState() === WIDGET_STATE_ACTIVE && this.#honeycomb !== null) {
+			if (this.#honeycomb !== null) {
 				this.#honeycomb.setSize(super._getContentsSize());
 			}
 		}, 100);
@@ -60,6 +81,7 @@ class CWidgetHoneycomb extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
+			max_items: this.#max_items,
 			with_config: this.#honeycomb === null ? 1 : undefined
 		};
 	}
@@ -153,5 +175,16 @@ class CWidgetHoneycomb extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	#setMaxItems() {
+		let {width, height} = super._getContentsSize();
+
+		width -= CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H * 2;
+		height -= CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V * 2;
+
+		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width, height});
+
+		this.#max_items = max_rows * max_columns;
 	}
 }
