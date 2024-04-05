@@ -250,7 +250,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 			['triggerids' => [self::$items['item_ui64']['triggers']['all_different']['triggerid']]]);
 
 		$this->assertArrayHasKey('error', $response['result'][0]);
-		$this->assertContains('not enough data', $response['result'][0]['error']);
+		$this->assertStringContainsString('not enough data', $response['result'][0]['error']);
 
 		return true;
 	}

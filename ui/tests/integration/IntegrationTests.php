@@ -69,6 +69,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
+		$suite->addTestSuite('testFunctionChangeCount');
 
 		return $suite;
 	}
