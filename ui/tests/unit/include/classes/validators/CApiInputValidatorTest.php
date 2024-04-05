@@ -8716,6 +8716,24 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/number": incorrect syntax near "1.5".'
 			],
 			[
+				['type' => API_NUMBER],
+				'005',
+				'/1/number',
+				'5'
+			],
+			[
+				['type' => API_NUMBER],
+				'000',
+				'/1/number',
+				'0'
+			],
+			[
+				['type' => API_NUMBER, 'in' => '1:100'],
+				'000',
+				'/1/number',
+				'Invalid parameter "/1/number": value must be one of 1-100.'
+			],
+			[
 				['type' => API_NUMBER, 'in' => '1:100'],
 				'-1',
 				'/1/number',

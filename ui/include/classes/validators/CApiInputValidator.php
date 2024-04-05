@@ -4327,6 +4327,8 @@ class CApiInputValidator {
 
 	/**
 	 * @param array  $rule
+	 *        string $rule['in']      (optional) Supported if value is an integer.
+	 *        int    $rule['length']  (optional) Supported if value is a macro.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -4342,6 +4344,14 @@ class CApiInputValidator {
 		$data = (string) $data;
 
 		if (preg_match('/^'.ZBX_PREG_INT.'$/', $data)) {
+			if ($data[0] === '0') {
+				$data = ltrim($data, '0');
+
+				if ($data === '') {
+					$data = '0';
+				}
+			}
+
 			return self::checkInt32In($rule, $data, $path, $error);
 		}
 
