@@ -10134,6 +10134,10 @@ msgstr[0] "아이템을 활성화 하였습니다"
 msgid "Item in \"not supported\" state"
 msgstr "아이템이 \"습득불가\" 상태"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"

@@ -10237,6 +10237,10 @@ msgstr[1] "Συλλέκτες ενεργοποιημένοι"
 msgid "Item in \"not supported\" state"
 msgstr "Συλλέκτης σε \"ανυποστήρικτη\" κατάσταση"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Συλλέκτης μή επιλεγμένος"

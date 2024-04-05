@@ -10134,6 +10134,10 @@ msgstr[0] "监控项目已启用"
 msgid "Item in \"not supported\" state"
 msgstr "监控项在“不支持”的状态"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "项目未被选择"

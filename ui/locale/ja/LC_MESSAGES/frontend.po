@@ -10139,6 +10139,10 @@ msgstr[0] "アイテムを有効にしました"
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "アイテムが選択されていません"

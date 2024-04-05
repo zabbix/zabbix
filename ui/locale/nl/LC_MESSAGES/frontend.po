@@ -10237,6 +10237,10 @@ msgstr[1] "Items ingeschakeld"
 msgid "Item in \"not supported\" state"
 msgstr "Item in \"niet ondersteund\" toestand"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Item niet geselecteerd"

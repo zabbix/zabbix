@@ -10233,6 +10233,10 @@ msgstr[1] "Öğeler etkin"
 msgid "Item in \"not supported\" state"
 msgstr "\"Desteklenmeyen\" durumundaki öğe"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Öğe seçilmedi"

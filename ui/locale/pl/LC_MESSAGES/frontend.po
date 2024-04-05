@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-03-29 12:11+0000\n"
+"PO-Revision-Date: 2024-04-04 13:04+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -1715,14 +1715,14 @@ msgstr "Niebieski"
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr "Obiekt"
+msgstr "Treść"
 
 #: app/views/popup.httpstep.php:167
 #: include/views/configuration.host.discovery.edit.php:403
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr "Obiekty i nagłówki"
+msgstr "Treść i nagłówki"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
@@ -9804,7 +9804,7 @@ msgstr "Akcje wewnętrzne"
 
 #: app/views/administration.housekeeping.edit.php:67
 msgid "Internal data storage period"
-msgstr "Część wewnętrzna przechowywania danych"
+msgstr "Okres przechowywania danych wewnętrznych"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
 #: include/classes/api/services/CGraphGeneral.php:713
@@ -10332,6 +10332,10 @@ msgstr[2] "Włączono pozycje"
 #: include/actions.inc.php:1265
 msgid "Item in \"not supported\" state"
 msgstr "Pozycja w stanie \"niewspierany\"."
+
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
@@ -15751,7 +15755,7 @@ msgstr "Hasło klucza SSL"
 #: include/views/configuration.item.edit.php:526
 #: include/views/configuration.item.prototype.edit.php:503
 msgid "SSL verify host"
-msgstr "Host weryfikacji SSL"
+msgstr "Weryfikacja hosta SSL"
 
 #: app/views/administration.mediatype.edit.php:87
 #: include/views/configuration.host.discovery.edit.php:453
@@ -15759,7 +15763,7 @@ msgstr "Host weryfikacji SSL"
 #: include/views/configuration.item.edit.php:518
 #: include/views/configuration.item.prototype.edit.php:495
 msgid "SSL verify peer"
-msgstr "Podmiot weryfikujący SSL"
+msgstr "Weryfikacja podmiotu SSL"
 
 #: app/views/administration.mediatype.edit.php:84
 msgid "SSL/TLS"
@@ -18186,7 +18190,7 @@ msgstr[2] "Skopiowano wyzwalacze"
 
 #: app/views/administration.housekeeping.edit.php:49
 msgid "Trigger data storage period"
-msgstr "Okres wyzwalacza magazynu danych"
+msgstr "Okres przechowywania danych wyzwalaczy"
 
 #: triggers.php:440
 msgid "Trigger deleted"

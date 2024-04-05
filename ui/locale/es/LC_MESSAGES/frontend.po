@@ -10236,6 +10236,10 @@ msgstr[1] "Métricas habilitadas"
 msgid "Item in \"not supported\" state"
 msgstr "Métrica en estado \"no soportado\""
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Métrica no seleccionada"

@@ -10254,6 +10254,10 @@ msgstr[1] "Datenpunkte aktiviert"
 msgid "Item in \"not supported\" state"
 msgstr "Element im Zustand \"nicht unterstützt\""
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Datenpunkt nicht ausgewählt"

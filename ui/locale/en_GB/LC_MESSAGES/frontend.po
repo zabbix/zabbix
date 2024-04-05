@@ -10238,6 +10238,10 @@ msgstr[1] ""
 msgid "Item in \"not supported\" state"
 msgstr ""
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr ""

@@ -10333,6 +10333,10 @@ msgstr[2] "Элементы данных активированы"
 msgid "Item in \"not supported\" state"
 msgstr "Элемент данных в \"неподдерживаемом\" состоянии"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Элемент данных не выбран"

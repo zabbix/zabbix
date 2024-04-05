@@ -10136,6 +10136,10 @@ msgstr[0] "Item đã được kích hoạtCác item đã được kích h
 msgid "Item in \"not supported\" state"
 msgstr "Item trong trạng thái \"không được hỗ trợ\""
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
