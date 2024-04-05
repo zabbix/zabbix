@@ -11565,6 +11565,10 @@ msgstr "아이템이 \"습득불가\" 상태"
 msgid "Item list"
 msgstr "아이템 리스트"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"
@@ -16475,6 +16479,10 @@ msgstr "직사각형"
 
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
+msgstr ""
+
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -23730,6 +23738,10 @@ msgstr "d"
 #: chart4.php:130
 msgid "d.M"
 msgstr "m/d"
+
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
