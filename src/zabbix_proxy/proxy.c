@@ -1494,14 +1494,6 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
-
-	zbx_locks_destroy();
-
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-
 	if (NULL != on_exit_args)
 	{
 		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
@@ -1513,5 +1505,12 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 			zbx_ipc_service_close(&args->rtc->service);
 	}
 
+	zabbix_close_log();
+
+	zbx_locks_destroy();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
 	exit(EXIT_SUCCESS);
 }
