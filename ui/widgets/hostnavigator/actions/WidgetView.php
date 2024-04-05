@@ -98,13 +98,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-			? getSubGroups($this->fields_values['groupids'])
-			: null;
-
 		$hosts = [];
 
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
+			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+
 			// Get hosts from host pattern and search narrowing criteria.
 			$hosts = API::Host()->get([
 				'output' => [],
