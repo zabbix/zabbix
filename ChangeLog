@@ -1,12 +1,22 @@
 Changes for 6.0.29rc1
 
 New features:
+.......PS. [ZBXNEXT-9117] updated max supported MariaDB version to 11.3 (mprihodko)
+...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
 .........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
 .........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
 .........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
 .........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
 
 Bug fixes:
+..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
+..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
+..F....... [ZBX-24289] fixed issue with interface assignment for items copied from host to host (jfreibergs)
+.........T [ZBX-23032] added triggers for cluster status in VMware templates (abrosimovs)
+.....J.... [ZBX-23948] added support for Tabular data when parsing an MBean attribute (dimir)
+A......... [ZBX-23742] fixed tag filtering logic for tags with 1 name and different types of operators (dfofanovs, Sasha)
+.........T [ZBX-24271] added delay in JavaScript execution for Azure Cost Management by HTTP template (egordymov)
+...G...... [ZBX-24208] fix oracle, mysql plugin connection cache blocking (rzvejs)
 .........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
 ...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
