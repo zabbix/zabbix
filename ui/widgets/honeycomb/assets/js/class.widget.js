@@ -86,15 +86,6 @@ class CWidgetHoneycomb extends CWidget {
 		};
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this.#honeycomb !== null) {
-			this.#honeycomb.destroy();
-			this.#honeycomb = null;
-		}
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	setContents(response) {
 		if (this.#honeycomb === null) {
 			const padding = {

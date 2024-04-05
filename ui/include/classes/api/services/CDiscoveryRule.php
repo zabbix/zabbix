@@ -3418,7 +3418,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcDiscovery = $this->get([
 			'output' => array_merge(
 				[
-					'itemid', 'hostid', 'name', 'type', 'key_', 'lifetime', 'lifetime_type', 'enabled_lifetime_type',
+					'itemid', 'hostid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
 					'enabled_lifetime', 'description', 'status'
 				],
 				CItemType::FIELD_NAMES

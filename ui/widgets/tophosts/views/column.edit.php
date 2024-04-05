@@ -83,7 +83,7 @@ $form_grid->addItem([
 // Item.
 $parameters = [
 	'srctbl' => 'items',
-	'srcfld1' => 'itemid',
+	'srcfld1' => 'name',
 	'dstfrm' => $form->getName(),
 	'dstfld1' => 'item',
 	'value_types' => [
@@ -120,7 +120,7 @@ $item_select = (new CPatternSelect([
 $scripts[] = $item_select->getPostJS();
 
 $form_grid->addItem([
-	(new CLabel(_('Item'), 'item_ms'))->setAsteriskMark(),
+	(new CLabel(_('Item name'), 'item_ms'))->setAsteriskMark(),
 	new CFormField($item_select)
 ]);
 
