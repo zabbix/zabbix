@@ -2396,7 +2396,11 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 					am_register_alert_syncer(&manager, client, message);
 					break;
 				case ZBX_IPC_ALERTER_SYNC_ALERTS:
-					zbx_ipc_client_send(manager.syncer_client, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
+					if (FAIL == zbx_ipc_client_send(manager.syncer_client,
+							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to send message to sync alerts");
+					}
 					break;
 				case ZBX_IPC_ALERTER_RESULT:
 					if (SUCCEED == am_process_result(&manager, client, message))
