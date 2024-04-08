@@ -59,10 +59,10 @@ ZBX_PTR_VECTOR_IMPL(item_dependence_ptr, zbx_item_dependence_t*)
 
 int	item_dependence_compare_func(const void *d1, const void *d2)
 {
-        const zbx_item_dependence_t	*item_dependence_1 = *(const zbx_item_dependence_t **)d1;
-        const zbx_item_dependence_t	*item_dependence_2 = *(const zbx_item_dependence_t **)d2;
+	const zbx_item_dependence_t	*item_dependence_1 = *(const zbx_item_dependence_t **)d1;
+	const zbx_item_dependence_t	*item_dependence_2 = *(const zbx_item_dependence_t **)d2;
 
-        ZBX_RETURN_IF_NOT_EQUAL(item_dependence_1->itemid, item_dependence_2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(item_dependence_1->itemid, item_dependence_2->itemid);
 
 
 ZBX_PTR_VECTOR_IMPL(lld_item_full_ptr, zbx_lld_item_full_t*)
