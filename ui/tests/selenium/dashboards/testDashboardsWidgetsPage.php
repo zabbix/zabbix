@@ -265,8 +265,8 @@ class testDashboardsWidgetsPage extends CWebTest {
 		}
 
 		// Check if widget can be found by a new name.
-		$dashboard->getWidget('New widget name');
-		$table = $widget->getContent()->asTable();
+		$table = $dashboard->getWidget('New widget name')->getContent()->asTable();
+
 		// Check if only selected host group is shown.
 		$this->assertEquals(['Zabbix servers'], array_keys($table->index('Host group')));
 

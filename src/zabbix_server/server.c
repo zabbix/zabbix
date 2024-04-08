@@ -1193,6 +1193,17 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_close(&args->rtc->service);
+	}
+
 	zbx_close_log();
 
 	zbx_locks_destroy();
@@ -1211,17 +1222,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
 	zbx_deinit_library_export();
-
-	if (NULL != on_exit_args)
-	{
-		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
-
-		if (NULL != args->listen_sock)
-			zbx_tcp_unlisten(args->listen_sock);
-
-		if (NULL != args->rtc)
-			zbx_ipc_service_close(&args->rtc->service);
-	}
 
 	exit(EXIT_SUCCESS);
 }
