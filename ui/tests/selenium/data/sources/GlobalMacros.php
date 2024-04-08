@@ -70,7 +70,7 @@ class GlobalMacros {
 			[
 				'macro' => '{$X_TEXT_2_SECRET}',
 				'value' => 'This text should become secret',
-				'description' => 'This text should become secret',
+				'description' => 'This text should become secret'
 			],
 			[
 				'macro' => '{$X_SECRET_2_TEXT}',
