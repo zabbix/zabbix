@@ -679,18 +679,14 @@ window.item_edit_form = new class {
 	}
 
 	#updateRetrieveModeVisibility() {
-		const disable = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
+		const is_readonly = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
 
 		this.field.retrieve_mode.forEach(radio => {
-			if (disable && radio.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
+			if (is_readonly && radio.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
 				radio.checked = true;
 			}
 
-			radio.disabled = disable || this.form_readonly;
-
-			disable || this.form_readonly
-				? radio.setAttribute('readonly', 'readonly')
-				: radio.removeAttribute('readonly');
+			radio.readOnly = is_readonly || this.form_readonly;
 		});
 	}
 

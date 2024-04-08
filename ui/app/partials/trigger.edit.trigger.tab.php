@@ -67,7 +67,7 @@ $trigger_form_grid
 
 if ($discovered_trigger) {
 	$trigger_form_grid->addItem([(new CVar('priority', (int) $data['priority']))->removeId()]);
-	$severity = (new CSeverity('priority_names', (int) $data['priority'], false))->setReadonly($readonly);
+	$severity = (new CSeverity('priority_names', (int) $data['priority']))->setReadonly($readonly);
 }
 else {
 	$severity = new CSeverity('priority', (int) $data['priority']);

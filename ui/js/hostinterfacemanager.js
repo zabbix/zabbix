@@ -479,38 +479,13 @@ class HostInterfaceManager {
 	/**
 	 * Converts form field to readonly.
 	 *
-	 * @param {Element} el  Native JavaScript element for form field.
+	 * @param {Element} element  Native JavaScript element for form field.
 	 */
-	setReadonly(el) {
-		const tag_name = el.tagName;
+	setReadonly(element) {
+		const tag_name = element.tagName;
 
-		if (tag_name === 'INPUT') {
-			const type = el.getAttribute('type');
-			const {checked, name, value} = el;
-
-			switch (type) {
-				case 'text':
-					el.readOnly = true;
-					break;
-
-				case 'radio':
-				case 'checkbox':
-					el.readOnly = true;
-					el.disabled = true;
-
-					if (checked) {
-						const input = document.createElement('input');
-						input.type = 'hidden';
-						input.name = name;
-						input.value = value;
-
-						el.insertAdjacentElement('beforebegin', input);
-					}
-					break;
-			}
-		}
-		else if (tag_name === 'Z-SELECT') {
-			el.readOnly = true;
+		if (tag_name === 'INPUT' || tag_name === 'Z-SELECT') {
+			element.readOnly = true;
 		}
 	}
 
