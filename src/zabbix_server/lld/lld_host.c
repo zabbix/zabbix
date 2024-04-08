@@ -157,8 +157,8 @@ typedef struct
 }
 zbx_lld_interface_t;
 
-ZBX_PTR_VECTOR_DECL(lld_interface, zbx_lld_interface_t *)
-ZBX_PTR_VECTOR_IMPL(lld_interface, zbx_lld_interface_t *)
+ZBX_PTR_VECTOR_DECL(lld_interface_ptr, zbx_lld_interface_t *)
+ZBX_PTR_VECTOR_IMPL(lld_interface_ptr, zbx_lld_interface_t *)
 
 static void	lld_interface_free(zbx_lld_interface_t *interface)
 {
@@ -317,7 +317,7 @@ zbx_lld_host_t;
 ZBX_PTR_VECTOR_DECL(lld_host_ptr, zbx_lld_host_t*)
 ZBX_PTR_VECTOR_IMPL(lld_host_ptr, zbx_lld_host_t*)
 
-int	lld_host_compare_func(const void *d1, const void *d2)
+static int	lld_host_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_host_t	*host_1 = *(const zbx_lld_host_t **)d1;
 	const zbx_lld_host_t	*host_2 = *(const zbx_lld_host_t **)d2;
@@ -338,7 +338,7 @@ static void	lld_host_free(zbx_lld_host_t *host)
 	zbx_vector_lld_hostmacro_ptr_destroy(&host->new_hostmacros);
 	zbx_vector_db_tag_ptr_clear_ext(&host->tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host->tags);
-	zbx_vector_lld_interface_ptr_clear_ext(&host->interfaces, (zbx_clean_func_t)lld_interface_free);
+	zbx_vector_lld_interface_ptr_clear_ext(&host->interfaces, lld_interface_free);
 	zbx_vector_lld_interface_ptr_destroy(&host->interfaces);
 	zbx_free(host->host_proto);
 	zbx_free(host->host);
@@ -1811,7 +1811,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 
 	group->groupid = 0;
 	group->name_inherit = NULL;
-	zbx_vector_lld_group_ptr_create(&group->hosts);
+	zbx_vector_lld_host_ptr_create(&group->hosts);
 	zbx_vector_lld_group_discovery_ptr_create(&group->discovery);
 	group->name = zbx_strdup(NULL, name_proto);
 	zbx_substitute_lld_macros(&group->name, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
@@ -2214,8 +2214,8 @@ static void	lld_groups_merge_renames(const zbx_vector_lld_group_prototype_ptr_t 
 		{
 			zbx_lld_group_discovery_t	*discovery = left->discovery.values[j];
 
-			zbx_lld_group_prototype_t	*cmp = {.group_prototypeid =
-					discovery->parent_group_prototypeid;};
+			zbx_lld_group_prototype_t	cmp = {.group_prototypeid =
+					discovery->parent_group_prototypeid};
 
 			if (FAIL == (k = zbx_vector_lld_group_prototype_ptr_bsearch(group_prototypes, &cmp,
 					lld_group_prototype_compare_func)))
@@ -2742,7 +2742,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 			if (0 == discovery->groupdiscoveryid)
 			{
 				zbx_lld_group_prototype_t	*group_prototype, cmp =
-						{group_prototypeid = discovery->parent_group_prototypeid;};
+						{.group_prototypeid = discovery->parent_group_prototypeid};
 				int				k;
 
 				if (FAIL != (k = zbx_vector_lld_group_prototype_ptr_bsearch(group_prototypes,
@@ -3086,8 +3086,9 @@ static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros
 
 			ZBX_STR2UINT64(hostid, row[1]);
 
-			if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &hostid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_host_t	cmp = {.hostid = hostid};
+
+			if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &cmp, lld_host_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -3224,8 +3225,9 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_lld_host_p
 			ZBX_STR2UINT64(templateid, row[1]);
 			link_type = atoi(row[2]);
 
-			if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &hostid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_lld_host_t	cmp = {.hostid = hostid};
+
+			if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &cmp, lld_host_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -5254,16 +5256,17 @@ static void	lld_interfaces_link(const zbx_lld_interface_t *ifold, zbx_lld_interf
 }
 
 static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_ptr_t *hosts,
-		zbx_vector_lld_interface_t *interfaces)
+		zbx_vector_lld_interface_ptr_t *interfaces)
 {
 	int			i, j;
 	zbx_lld_host_t		*host;
 	zbx_if_update_t		*update;
 	zbx_vector_if_update_t	updates;
+	zbx_lld_host_t		cmp = {.hostid = hostid};
 
-	if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &cmp, lld_host_compare_func)))
 	{
-		zbx_vector_lld_interface_clear_ext(interfaces, lld_interface_free);
+		zbx_vector_lld_interface_ptr_clear_ext(interfaces, lld_interface_free);
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
 	}
@@ -5321,7 +5324,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_pt
 			if (interfaces->values[i] == update->ifold)
 			{
 				lld_interface_free(interfaces->values[i]);
-				zbx_vector_lld_interface_remove_noorder(interfaces, i);
+				zbx_vector_lld_interface_ptr_remove_noorder(interfaces, i);
 				break;
 			}
 			else
@@ -5336,9 +5339,9 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_pt
 	for (i = 0; i < interfaces->values_num; i++)
 		interfaces->values[i]->flags |= ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
-	zbx_vector_lld_interface_ptr_append_array(&host->interfaces, (void **)interfaces->values,
+	zbx_vector_lld_interface_ptr_append_array(&host->interfaces, interfaces->values,
 			interfaces->values_num);
-	zbx_vector_lld_interface_clear(interfaces);
+	zbx_vector_lld_interface_ptr_clear(interfaces);
 
 	zbx_vector_if_update_destroy(&updates);
 }
@@ -5460,10 +5463,10 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 	{
 		char				*sql = NULL;
 		size_t				sql_alloc = 0, sql_offset = 0;
-		zbx_vector_lld_interface_t	old_interfaces;
+		zbx_vector_lld_interface_ptr_t	old_interfaces;
 		zbx_uint64_t			last_hostid = 0;
 
-		zbx_vector_lld_interface_create(&old_interfaces);
+		zbx_vector_lld_interface_ptr_create(&old_interfaces);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hi.hostid,id.parent_interfaceid,hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,"
@@ -5532,14 +5535,14 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 				interface->data.snmp = NULL;
 			}
 
-			zbx_vector_lld_interface_append(&old_interfaces, interface);
+			zbx_vector_lld_interface_ptr_append(&old_interfaces, interface);
 		}
 		zbx_db_free_result(result);
 
 		if (0 != old_interfaces.values_num)
 			lld_host_interfaces_make(last_hostid, hosts, &old_interfaces);
 
-		zbx_vector_lld_interface_destroy(&old_interfaces);
+		zbx_vector_lld_interface_ptr_destroy(&old_interfaces);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -5588,7 +5591,7 @@ static int	another_main_interface_exists(const zbx_vector_lld_interface_ptr_t *i
  *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	lld_interfaces_validate(zbx_vector_lld_interface_ptr_t *hosts, char **error)
+static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -5766,24 +5769,24 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
 		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
-	zbx_db_result_t			result;
-	zbx_db_row_t			row;
-	zbx_vector_lld_host_ptr_t	hosts;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
+	zbx_vector_lld_host_ptr_t		hosts;
 	zbx_vector_lld_group_prototype_ptr_t	group_prototypes;
-	zbx_vector_lld_interface_ptr_t	interfaces,
-	zbx_vector_lld_hostmacro_ptr_t	masterhostmacros, hostmacros;
-	zbx_vector_lld_group_ptr_t	groups, groups_in, groups_out;
-	zbx_vector_lld_hgset_ptr_t	hgsets;
-	zbx_vector_lld_permission_t	permissions;
-	zbx_vector_db_tag_ptr_t		tags;
-	zbx_vector_uint64_t		groupids;		/* list of host groups which should be added */
-	zbx_vector_uint64_t		del_hostgroupids;	/* list of host groups which should be deleted */
-	zbx_vector_uint64_t		del_hgsetids;		/* list of host groups sets which should be deleted */
-	zbx_uint64_t			proxyid;
-	char				*ipmi_username = NULL, *ipmi_password, *tls_issuer, *tls_subject,
-					*tls_psk_identity, *tls_psk;
-	signed char			ipmi_authtype, inventory_mode_proto;
-	unsigned char			ipmi_privilege, tls_connect, tls_accept;
+	zbx_vector_lld_interface_ptr_t		interfaces;
+	zbx_vector_lld_hostmacro_ptr_t		masterhostmacros, hostmacros;
+	zbx_vector_lld_group_ptr_t		groups, groups_in, groups_out;
+	zbx_vector_lld_hgset_ptr_t		hgsets;
+	zbx_vector_lld_permission_t		permissions;
+	zbx_vector_db_tag_ptr_t			tags;
+	zbx_vector_uint64_t			groupids;		/* list of host groups which should be added */
+	zbx_vector_uint64_t			del_hostgroupids;	/* list of host groups which should be deleted */
+	zbx_vector_uint64_t			del_hgsetids;		/* list of host groups sets which should be deleted */
+	zbx_uint64_t				proxyid;
+	char					*ipmi_username = NULL, *ipmi_password, *tls_issuer, *tls_subject,
+						*tls_psk_identity, *tls_psk;
+	signed char				ipmi_authtype, inventory_mode_proto;
+	unsigned char				ipmi_privilege, tls_connect, tls_accept;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5944,7 +5947,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		zbx_vector_lld_group_ptr_clear_ext(&groups, lld_group_free);
 		zbx_vector_lld_group_ptr_clear_ext(&groups_in, lld_group_free);
 		zbx_vector_lld_group_ptr_clear_ext(&groups_out, lld_group_free);
-		zbx_vector_lld_group_ptr_clear_ext(&group_prototypes, lld_group_prototype_free);
+		zbx_vector_lld_group_prototype_ptr_clear_ext(&group_prototypes, lld_group_prototype_free);
 		zbx_vector_lld_host_ptr_clear_ext(&hosts, lld_host_free);
 
 		zbx_vector_uint64_clear(&groupids);
@@ -5954,8 +5957,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 		if (ZBX_HOST_PROT_INTERFACES_CUSTOM == use_custom_interfaces)
 		{
-			zbx_vector_interface_custom_ptr_clear_ext(&interfaces_custom, lld_interface_free);
-			zbx_vector_interface_custom_ptr_destroy(&interfaces_custom);
+			zbx_vector_lld_interface_ptr_clear_ext(&interfaces_custom, lld_interface_free);
+			zbx_vector_lld_interface_ptr_destroy(&interfaces_custom);
 		}
 	}
 	zbx_db_free_result(result);

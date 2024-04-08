@@ -35,31 +35,42 @@ ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
 
-int	lld_item_compare_func(const zbx_lld_item_t *item_1, const zbx_lld_item_t *item_2)
+int	lld_item_compare_func(const void *d1, const void *d2)
 {
+	const zbx_lld_item_t	*item_1 = *(const zbx_lld_item_t **)d1;
+	const zbx_lld_item_t	*item_2 = *(const zbx_lld_item_t **)d2;
+
 	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
 
 	return 0;
 }
 
-int	lld_item_link_compare_func(const zbx_lld_item_link_t *link_1, const zbx_lld_item_link_t *link_2)
+int	lld_item_link_compare_func(const void *d1, const void *d2)
 {
+	const zbx_lld_item_link_t	*link_1 = *(const zbx_lld_item_link_t **)d1;
+	const zbx_lld_item_link_t	*link_2 = *(const zbx_lld_item_link_t **)d2;
+
 	ZBX_RETURN_IF_NOT_EQUAL(link_1->parent_itemid, link_2->parent_itemid);
 
 	return 0;
 }
 
-int	lld_item_full_compare_func(const zbx_lld_item_full_t *item_1, const zbx_lld_item_full_t *item_2)
+int	lld_item_full_compare_func(const void *d1, const void *d2)
 {
+	const zbx_lld_item_full_t	*item_1 = *(const zbx_lld_item_full_t **)d1;
+	const zbx_lld_item_full_t	*item_2 = *(const zbx_lld_item_full_t **)d2;
+
 	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
 
 	return 0;
 }
 
-int	lld_item_prototype_compare_func(const zbx_lld_item_prototype_t *item_proto_1,
-		const zbx_lld_item_prototype_t *item_proto_2)
+int	lld_item_prototype_compare_func(const void *d1, const void *d2)
 {
-	ZBX_RETURN_IF_NOT_EQUAL(item_proto_1->itemid, item_proto_2->itemid);
+	const zbx_lld_item_prototype_t	*proto_1 = *(const zbx_lld_item_prototype_t **)d1;
+	const zbx_lld_item_prototype_t	*proto_2 = *(const zbx_lld_item_prototype_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(proto_1->itemid, proto_2->itemid);
 
 	return 0;
 }
@@ -99,9 +110,12 @@ static void	lld_conditions_free(zbx_vector_lld_condition_ptr_t *conditions)
  * Purpose: compare two filter conditions by their macros                     *
  *                                                                            *
  ******************************************************************************/
-static int	lld_condition_compare_by_macro(const lld_condition_t *cond_1, const lld_condition_t *cond_2)
+static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
 {
-	return strcmp(cond_1->macro, cond_2->macro);
+	lld_condition_t	*condition1 = *(lld_condition_t **)cond1;
+	lld_condition_t	*condition2 = *(lld_condition_t **)cond2;
+
+	return strcmp(condition1->macro, condition2->macro);
 }
 
 /******************************************************************************

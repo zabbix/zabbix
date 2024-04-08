@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 typedef struct zbx_lld_value
 {

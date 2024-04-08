@@ -45,6 +45,16 @@
 
 typedef struct
 {
+	zbx_ipc_client_t	*client;
+	zbx_lld_rule_t		*rule;
+}
+zbx_lld_worker_t;
+
+ZBX_PTR_VECTOR_DECL(lld_worker_ptr, zbx_lld_worker_t*)
+ZBX_PTR_VECTOR_IMPL(lld_worker_ptr, zbx_lld_worker_t*)
+
+typedef struct
+{
 	/* workers vector, created during manager initialization */
 	zbx_vector_lld_worker_ptr_t	workers;
 
@@ -68,16 +78,6 @@ typedef struct
 
 }
 zbx_lld_manager_t;
-
-typedef struct
-{
-	zbx_ipc_client_t	*client;
-	zbx_lld_rule_t		*rule;
-}
-zbx_lld_worker_t;
-
-ZBX_PTR_VECTOR_DECL(lld_worker_ptr, zbx_lld_worker_t*)
-ZBX_PTR_VECTOR_IMPL(lld_worker_ptr, zbx_lld_worker_t*)
 
 /* workers_client hashset support */
 static zbx_hash_t	worker_hash_func(const void *d)
