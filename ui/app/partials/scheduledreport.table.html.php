@@ -46,7 +46,7 @@ $table = (new CTableInfo())
 		_('Status'),
 		_('Info')
 	])
-	->setPageNavigation($data['paging'] ?: null);
+	->setPageNavigation(array_key_exists('paging', $data) ? $data['paging'] : null);
 
 $cycles = [
 	ZBX_REPORT_CYCLE_DAILY => _('Daily'),

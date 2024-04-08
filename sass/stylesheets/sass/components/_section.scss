@@ -43,12 +43,6 @@ section {
 	.list-table {
 		border: 0;
 
-		tbody tr:last-child {
-			td {
-				border-bottom: 1px solid $table-border-color;
-			}
-		}
-
 		td,
 		th {
 			&:first-child {
