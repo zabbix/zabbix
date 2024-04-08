@@ -160,27 +160,6 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update configuration                                              *
- *                                                                            *
- ******************************************************************************/
-static void	pgm_update_config(zbx_pg_cache_t *cache)
-{
-	int	flags;
-
-	pg_cache_lock(cache);
-
-	if (SUCCEED == pg_cache_update_groups(cache))
-		flags = ZBX_PG_PROXY_FETCH_FORCE;
-	else
-		flags = ZBX_PG_PROXY_FETCH_REVISION;
-
-	pg_cache_update_proxies(cache, flags);
-
-	pg_cache_unlock(cache);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: update configuration and re-calculate proxy group/proxy statuses  *
  *                                                                            *
  ******************************************************************************/
@@ -579,7 +558,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	pgm_update_config(&cache);
+	pgm_update(&cache);
 	pgm_db_get_hosts(&cache);
 	pgm_db_get_hpmap(&cache);
 
