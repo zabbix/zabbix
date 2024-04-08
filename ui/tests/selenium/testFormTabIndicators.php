@@ -616,7 +616,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Pie chart widget configuration form tab data.
+			// #14 Pie chart widget configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
@@ -662,7 +662,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Map configuration form tab data.
+			// #15 Map configuration form tab data.
 			[
 				[
 					'url' => 'sysmaps.php?form=Create+map',
@@ -680,7 +680,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #15 User profile configuration form tab data.
+			// #16 User profile configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.edit',
