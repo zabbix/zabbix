@@ -11828,6 +11828,10 @@ msgstr "Položka je v \"not supported\" stave"
 msgid "Item list"
 msgstr "Zoznam itemov"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Položka nie je označená"
@@ -16783,6 +16787,10 @@ msgstr "Obdĺžnik"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Referenčný atribút"
+
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -24095,6 +24103,10 @@ msgstr "d"
 #: chart4.php:130
 msgid "d.M"
 msgstr "d.M"
+
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
