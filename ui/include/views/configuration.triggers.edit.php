@@ -111,12 +111,11 @@ $triggersFormList
 		(new CTextBox('opdata', $data['opdata'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
+$severity = new CSeverity('priority', (int) $data['priority']);
+
 if ($discovered_trigger) {
 	$triggersFormList->addVar('priority', (int) $data['priority']);
-	$severity = (new CSeverity('priority_names', (int) $data['priority'], false))->setReadonly($readonly);
-}
-else {
-	$severity = new CSeverity('priority', (int) $data['priority']);
+	$severity->setReadonly($readonly);
 }
 
 $triggersFormList->addRow(_('Severity'), $severity);

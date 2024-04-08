@@ -2281,6 +2281,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       transition: none;
       cursor: default; }
     .radio-list-control input[type="radio"]:checked[readonly] + label {
+      cursor: default;
       background-color: #878787 !important;
       -webkit-text-fill-color: #000000 !important; }
   .radio-list-control + .icon-info {
@@ -4251,7 +4252,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: .3;
     background-color: transparent; }
 
-.radio-list-control input[type="radio"]:checked[readonly] + label, .radio-list-control input[type="radio"][readonly] + label, z-select[readonly] .focusable,
+.radio-list-control input[type="radio"]:checked[readonly] + label, z-select[readonly] .focusable,
 .z-select[readonly] .focusable, .multiselect[aria-readonly], input[readonly], textarea[readonly] {
   color: #000000;
   -webkit-text-fill-color: #000000;

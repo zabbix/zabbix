@@ -424,16 +424,14 @@ $encryption_tab = (new CFormList('encryption'))
 		'tls_psk'
 	)
 	->addRow(_('Issuer'),
-		(new CTextBox('tls_issuer', $parent_host['tls_issuer'], false, 1024))
+		(new CTextBox('tls_issuer', $parent_host['tls_issuer'], $data['context'] !== 'template', 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setEnabled($data['context'] !== 'template')
-			->setReadonly($data['context'] !== 'template')
 	)
 	->addRow(_x('Subject', 'encryption certificate'),
-		(new CTextBox('tls_subject', $parent_host['tls_subject'], false, 1024))
+		(new CTextBox('tls_subject', $parent_host['tls_subject'], $data['context'] !== 'template', 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setEnabled($data['context'] !== 'template')
-			->setReadonly($data['context'] !== 'template')
 	);
 
 $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);

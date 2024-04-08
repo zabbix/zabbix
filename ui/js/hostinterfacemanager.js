@@ -490,16 +490,11 @@ class HostInterfaceManager {
 
 				case 'radio':
 				case 'checkbox':
-					el.readOnly = true;
-					el.disabled = true;
-
 					if (checked) {
-						const input = document.createElement('input');
-						input.type = 'hidden';
-						input.name = name;
-						input.value = value;
-
-						el.insertAdjacentElement('beforebegin', input);
+						el.readOnly = true;
+					}
+					else {
+						el.disabled = true;
 					}
 					break;
 			}
