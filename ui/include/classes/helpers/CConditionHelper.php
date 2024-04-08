@@ -105,7 +105,6 @@ class CConditionHelper {
 	 * @return array
 	 */
 	public static function getFormulaIds($formula) {
-		$matches = [];
 		preg_match_all('/\d+/', $formula, $matches);
 
 		$ids = array_keys(array_flip($matches[0]));
@@ -160,20 +159,6 @@ class CConditionHelper {
 		}
 
 		return $formula;
-	}
-
-	/**
-	 * Sort conditions by formula id as if they were numbers.
-	 *
-	 * @param array		$conditions		conditions
-	 * @return array
-	 */
-	public static function sortConditionsByFormulaId($conditions) {
-		uasort($conditions, function ($condition1, $condition2) {
-			return CConditionHelper::compareFormulaIds($condition1['formulaid'], $condition2['formulaid']);
-		});
-
-		return $conditions;
 	}
 
 	/**
@@ -232,30 +217,129 @@ class CConditionHelper {
 		return $nextFormulaId;
 	}
 
-
 	/**
 	 * Sorts the conditions based on the given formula.
 	 *
-	 * @param array $filter  Array containing the formula and conditions.
-	 *
-	 * $filter = [
-	 *     'conditions' =>  (array)   Array of conditions.
-	 *     'formula' =>     (string)  Action condition formula.
-	 * ]
+	 * @param array  $conditions
+	 * @param string $formula
+	 * @param string $pk_field_name
 	 *
 	 * @return array
 	 */
-	public static function sortConditionsByFormula(array $filter): array {
-		$formula = $filter['formula'];
+	public static function sortConditionsByFormula(array $conditions, string $formula, string $pk_field_name): array {
+		preg_match_all('/\d+/', $formula, $matches);
+		$order = [];
+		foreach ($matches[0] as $key => $conditionid) {
+			$order += [$conditionid => $key];
+		}
 
-		usort($filter['conditions'], static function (array $a, array $b) use ($formula) {
-			$pattern = '/([A-Z]+)/';
-			preg_match_all($pattern, $formula, $matches);
-			$upper_letters = $matches[0];
-
-			return array_search($a['formulaid'], $upper_letters) <=> array_search($b['formulaid'], $upper_letters);
+		usort($conditions, static function (array $a, array $b) use ($order, $pk_field_name) {
+			return $order[$a[$pk_field_name]] <=> $order[$b[$pk_field_name]];
 		});
 
-		return $filter['conditions'];
+		return $conditions;
+	}
+
+	/**
+	 * Sorts the action conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 * @param int   $eventsource
+	 *
+	 * @return array
+	 */
+	public static function sortActionConditions(array $conditions, int $eventsource): array {
+		$ct_order = array_flip(get_conditions_by_eventsource($eventsource));
+
+		usort($conditions, static function (array $row1, array $row2) use ($ct_order) {
+			if ($cmp = $ct_order[$row1['conditiontype']] <=> $ct_order[$row2['conditiontype']]) {
+				return $cmp;
+			}
+
+			foreach (['operator', 'value2', 'value'] as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+
+		return $conditions;
+	}
+
+	/**
+	 * Sorts the LLD rule filter conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array  $conditions
+	 * @param string $pk_field_name
+	 *
+	 * @return array
+	 */
+	public static function sortLldRuleFilterConditions(array $conditions, string $pk_field_name): array {
+		usort($conditions, static function (array $row1, array $row2) use ($pk_field_name) {
+			// To correctly sort macros, only the internal part of the macro needs to be sorted.
+			// See order_macros() for details.
+			if ($cmp = strnatcmp(substr($row1['macro'], 2, -1), substr($row2['macro'], 2, -1))) {
+				return $cmp;
+			}
+
+			foreach (['operator', 'value', $pk_field_name] as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+
+		return $conditions;
+	}
+
+	/**
+	 * Sorts the correlation conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 *
+	 * @return array
+	 */
+	public static function sortCorrelationConditions(array $conditions): array {
+		$type_order = array_flip(array_keys(CCorrelationHelper::getConditionTypes()));
+
+		usort($conditions, static function (array $row1, array $row2) use ($type_order) {
+			if ($cmp = $type_order[$row1['type']] <=> $type_order[$row2['type']]) {
+				return $cmp;
+			}
+
+			switch ($row1['type']) {
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+					$field_names = ['tag'];
+					break;
+
+				case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+					$field_names = ['operator', 'groupid'];
+					break;
+
+				case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+					$field_names = ['oldtag', 'newtag'];
+					break;
+
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+					$field_names = ['tag', 'operator', 'value'];
+					break;
+			}
+
+			foreach ($field_names as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+
+		return $conditions;
 	}
 }

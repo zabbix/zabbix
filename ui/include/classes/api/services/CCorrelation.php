@@ -88,35 +88,11 @@ class CCorrelation extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-
-			foreach ($result as &$correlation) {
-				// Unset the fields that are returned in the filter.
-				unset($correlation['formula'], $correlation['evaltype']);
-
-				if ($options['selectFilter'] !== null) {
-					$filter = $this->unsetExtraFields(
-						[$correlation['filter']],
-						['conditions', 'formula', 'evaltype'],
-						$options['selectFilter']
-					);
-					$filter = reset($filter);
-
-					if (array_key_exists('conditions', $filter)) {
-						foreach ($filter['conditions'] as &$condition) {
-							unset($condition['correlationid'], $condition['corr_conditionid']);
-						}
-						unset($condition);
-					}
-
-					$correlation['filter'] = $filter;
-				}
-			}
-			unset($correlation);
+			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
 		}
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		return $result;
@@ -783,116 +759,110 @@ class CCorrelation extends CApiService {
 
 		// Adding formulas and conditions.
 		if ($options['selectFilter'] !== null) {
-			$formula_requested = $this->outputIsRequested('formula', $options['selectFilter']);
-			$eval_formula_requested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
-			$conditions_requested = $this->outputIsRequested('conditions', $options['selectFilter']);
-
 			$filters = [];
 
-			if ($options['selectFilter']) {
+			if ($this->outputIsRequested('formula', $options['selectFilter'])
+					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
+					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
 				foreach ($result as $correlation) {
 					$filters[$correlation['correlationid']] = [
 						'evaltype' => $correlation['evaltype'],
-						'formula' => array_key_exists('formula', $correlation) ? $correlation['formula'] : '',
+						'formula' => '',
+						'eval_formula' => $correlation['formula'],
 						'conditions' => []
 					];
 				}
 
-				if ($formula_requested || $eval_formula_requested || $conditions_requested) {
-					$sql = 'SELECT c.correlationid,c.corr_conditionid,c.type,ct.tag AS ct_tag,'.
-								'cg.operator AS cg_operator,cg.groupid,ctp.oldtag,ctp.newtag,ctv.tag AS ctv_tag,'.
-								'ctv.operator AS ctv_operator,ctv.value'.
-							' FROM corr_condition c'.
-							' LEFT JOIN corr_condition_tag ct ON ct.corr_conditionid = c.corr_conditionid'.
-							' LEFT JOIN corr_condition_group cg ON cg.corr_conditionid = c.corr_conditionid'.
-							' LEFT JOIN corr_condition_tagpair ctp ON ctp.corr_conditionid = c.corr_conditionid'.
-							' LEFT JOIN corr_condition_tagvalue ctv ON ctv.corr_conditionid = c.corr_conditionid'.
-							' WHERE '.dbConditionInt('c.correlationid', $correlationids);
+				$db_corr_conditions = DBselect(
+					'SELECT c.correlationid,c.corr_conditionid,c.type,ct.tag AS ct_tag,'.
+						'cg.operator AS cg_operator,cg.groupid,ctp.oldtag,ctp.newtag,ctv.tag AS ctv_tag,'.
+						'ctv.operator AS ctv_operator,ctv.value'.
+					' FROM corr_condition c'.
+						' LEFT JOIN corr_condition_tag ct ON ct.corr_conditionid = c.corr_conditionid'.
+						' LEFT JOIN corr_condition_group cg ON cg.corr_conditionid = c.corr_conditionid'.
+						' LEFT JOIN corr_condition_tagpair ctp ON ctp.corr_conditionid = c.corr_conditionid'.
+						' LEFT JOIN corr_condition_tagvalue ctv ON ctv.corr_conditionid = c.corr_conditionid'.
+					' WHERE '.dbConditionInt('c.correlationid', $correlationids)
+				);
 
-					$db_corr_conditions = DBselect($sql);
+				while ($row = DBfetch($db_corr_conditions)) {
+					$fields = [
+						'correlationid' => $row['correlationid'],
+						'corr_conditionid' => $row['corr_conditionid'],
+						'type' => $row['type']
+					];
 
-					while ($row = DBfetch($db_corr_conditions)) {
-						$fields = [
-							'corr_conditionid' => $row['corr_conditionid'],
-							'correlationid' => $row['correlationid'],
-							'type' => $row['type']
-						];
+					switch ($row['type']) {
+						case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+						case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+							$fields['tag'] = $row['ct_tag'];
+							break;
 
-						switch ($row['type']) {
-							case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-							case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-								$fields['tag'] = $row['ct_tag'];
-								break;
+						case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+							$fields['operator'] = $row['cg_operator'];
+							$fields['groupid'] = $row['groupid'];
+							break;
 
-							case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-								$fields['operator'] = $row['cg_operator'];
-								$fields['groupid'] = $row['groupid'];
-								break;
+						case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+							$fields['oldtag'] = $row['oldtag'];
+							$fields['newtag'] = $row['newtag'];
+							break;
 
-							case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-								$fields['oldtag'] = $row['oldtag'];
-								$fields['newtag'] = $row['newtag'];
-								break;
-
-							case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-							case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-								$fields['tag'] = $row['ctv_tag'];
-								$fields['operator'] = $row['ctv_operator'];
-								$fields['value'] = $row['value'];
-								break;
-						}
-
-						$filters[$row['correlationid']]['conditions'][] = $fields;
+						case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+						case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+							$fields['tag'] = $row['ctv_tag'];
+							$fields['operator'] = $row['ctv_operator'];
+							$fields['value'] = $row['value'];
+							break;
 					}
 
-					foreach ($filters as &$filter) {
-						// In case of a custom expression, use the given formula.
-						if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-							$formula = $filter['formula'];
-						}
-						// In other cases generate the formula automatically.
-						else {
-							$conditions = $filter['conditions'];
-							CArrayHelper::sort($conditions, ['type']);
-							$conditions_for_formula = [];
+					$filters[$row['correlationid']]['conditions'][] = $fields;
+				}
 
-							foreach ($conditions as $condition) {
-								$conditions_for_formula[$condition['corr_conditionid']] = $condition['type'];
-							}
-
-							$formula = CConditionHelper::getFormula($conditions_for_formula, $filter['evaltype']);
-						}
-
-						// Generate formulaids from the effective formula.
-						$formulaids = CConditionHelper::getFormulaIds($formula);
-
-						foreach ($filter['conditions'] as &$condition) {
-							$condition['formulaid'] = $formulaids[$condition['corr_conditionid']];
-						}
-						unset($condition);
-
-						// Generated a letter based formula only for actions with custom expressions.
-						if ($formula_requested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-							$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
-						}
-
-						if ($eval_formula_requested) {
-							$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
-						}
+				foreach ($filters as &$filter) {
+					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$filter['conditions'] = CConditionHelper::sortConditionsByFormula($filter['conditions'],
+							$filter['eval_formula'], 'corr_conditionid'
+						);
 					}
-					unset($filter);
+					else {
+						$filter['conditions'] = CConditionHelper::sortCorrelationConditions($filter['conditions']);
+						$filter['eval_formula'] = CConditionHelper::getFormula(
+							array_column($filter['conditions'], 'type', 'corr_conditionid'), $filter['evaltype']
+						);
+					}
+
+					// Generate formulaids from the effective formula.
+					$formulaids = CConditionHelper::getFormulaIds($filter['eval_formula']);
+					$filter['eval_formula'] = CConditionHelper::replaceNumericIds($filter['eval_formula'], $formulaids);
+
+					foreach ($filter['conditions'] as &$condition) {
+						$condition = ['formulaid' => $formulaids[$condition['corr_conditionid']]] + $condition;
+						unset($condition['correlationid'], $condition['corr_conditionid']);
+					}
+					unset($condition);
+
+					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$filter['formula'] = $filter['eval_formula'];
+					}
+				}
+				unset($filter);
+			}
+			elseif ($this->outputIsRequested('evaltype', $options['selectFilter'])) {
+				foreach ($result as $correlation) {
+					$filters[$correlation['correlationid']] = ['evaltype' => $correlation['evaltype']];
 				}
 			}
 			else {
-				// In case no fields are actually selected in "filter", return empty array.
 				foreach ($result as $correlation) {
 					$filters[$correlation['correlationid']] = [];
 				}
 			}
 
-			// Add filters to the result.
 			foreach ($result as &$correlation) {
-				$correlation['filter'] = $filters[$correlation['correlationid']];
+				$correlation['filter'] = $this->unsetExtraFields([$filters[$correlation['correlationid']]],
+					['evaltype', 'formula', 'eval_formula', 'conditions'], $options['selectFilter']
+				)[0];
 			}
 			unset($correlation);
 		}

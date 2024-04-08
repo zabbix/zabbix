@@ -280,42 +280,6 @@ class CConditionHelperTest extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataProviderSortConditionsByFormulaId
-	 *
-	 * @param array $conditions
-	 * @param array $expectedConditions
-	 */
-	public function testSortConditionsByFormulaId($conditions, $expectedConditions) {
-		$sortedConditions = CConditionHelper::sortConditionsByFormulaId($conditions);
-
-		$this->assertSame($expectedConditions, $sortedConditions);
-	}
-
-	/**
-	 * @return array
-	 */
-	public function dataProviderSortConditionsByFormulaId() {
-		return [
-			[
-				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']],
-				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']]
-			],
-			[
-				[2 => ['formulaid' => 'C'], 0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B']],
-				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']]
-			],
-			[
-				[2 => ['formulaid' => 'C'], 3 => ['formulaid' => 'D'], 0 => ['formulaid' => 'A']],
-				[0 => ['formulaid' => 'A'], 2 => ['formulaid' => 'C'], 3 => ['formulaid' => 'D']]
-			],
-			[
-				[2 => ['formulaid' => 'CC'], 3 => ['formulaid' => 'D'], 0 => ['formulaid' => 'AA']],
-				[3 => ['formulaid' => 'D'], 0 => ['formulaid' => 'AA'], 2 => ['formulaid' => 'CC']]
-			]
-		];
-	}
-
-	/**
 	 * @dataProvider dataProviderGetNextFormulaId
 	 *
 	 * @param array $formulaIds
@@ -368,7 +332,9 @@ class CConditionHelperTest extends TestCase {
 	 * @param array $expected_conditions
 	 */
 	public function testSortConditionsByFormula(array $filter, array $expected_conditions): void {
-		$sorted_conditions = CConditionHelper::sortConditionsByFormula($filter);
+		$sorted_conditions = CConditionHelper::sortConditionsByFormula($filter['conditions'], $filter['formula'],
+			'conditionid'
+		);
 
 		$this->assertSame($expected_conditions, $sorted_conditions);
 	}
@@ -382,140 +348,155 @@ class CConditionHelperTest extends TestCase {
 		return [
 			[
 				[
-					'formula' => 'B or A',
+					'formula' => '{102} or {101}',
 					'conditions' => [
-						['formulaid' => 'A'],
-						['formulaid' => 'B']
+						['conditionid' => '101'],
+						['conditionid' => '102']
 					]
 				],
 				[
-					['formulaid' => 'B'],
-					['formulaid' => 'A']
+					['conditionid' => '102'],
+					['conditionid' => '101']
 				]
 			],
 			[
 				[
-					'formula' => 'A and B and C',
+					'formula' => '{101} or {102} or {101}',
 					'conditions' => [
-						['formulaid' => 'A'],
-						['formulaid' => 'B'],
-						['formulaid' => 'C']
+						['conditionid' => '102'],
+						['conditionid' => '101']
 					]
 				],
 				[
-					['formulaid' => 'A'],
-					['formulaid' => 'B'],
-					['formulaid' => 'C']
+					['conditionid' => '101'],
+					['conditionid' => '102']
 				]
 			],
 			[
 				[
-					'formula' => 'C and B and A',
+					'formula' => '{101} and {102} and {103}',
 					'conditions' => [
-						['formulaid' => 'A'],
-						['formulaid' => 'B'],
-						['formulaid' => 'C']
+						['conditionid' => '101'],
+						['conditionid' => '102'],
+						['conditionid' => '103']
 					]
 				],
 				[
-					['formulaid' => 'C'],
-					['formulaid' => 'B'],
-					['formulaid' => 'A']
+					['conditionid' => '101'],
+					['conditionid' => '102'],
+					['conditionid' => '103']
 				]
 			],
 			[
 				[
-					'formula' => '(D or E or F) and (C or A or B) and (G and H)',
+					'formula' => '{103} and {102} and {101}',
 					'conditions' => [
-						['formulaid' => 'A'],
-						['formulaid' => 'B'],
-						['formulaid' => 'C'],
-						['formulaid' => 'D'],
-						['formulaid' => 'E'],
-						['formulaid' => 'F'],
-						['formulaid' => 'G'],
-						['formulaid' => 'H']
+						['conditionid' => '101'],
+						['conditionid' => '102'],
+						['conditionid' => '103']
 					]
 				],
 				[
-					['formulaid' => 'D'],
-					['formulaid' => 'E'],
-					['formulaid' => 'F'],
-					['formulaid' => 'C'],
-					['formulaid' => 'A'],
-					['formulaid' => 'B'],
-					['formulaid' => 'G'],
-					['formulaid' => 'H']
+					['conditionid' => '103'],
+					['conditionid' => '102'],
+					['conditionid' => '101']
 				]
 			],
 			[
 				[
-					'formula' => '(G or D or B or E or C or H or A or F or I or J or O) and (AA or T or W or Z or Q or'.
-						' M or Y or X or K or U or V or S or AC or P or R or L or N) or (AB and AD)',
+					'formula' => '({104} or {105} or {106}) and ({103} or {101} or {102}) and ({107} and {108})',
 					'conditions' => [
-						['formulaid' => 'A'],
-						['formulaid' => 'B'],
-						['formulaid' => 'C'],
-						['formulaid' => 'D'],
-						['formulaid' => 'E'],
-						['formulaid' => 'F'],
-						['formulaid' => 'G'],
-						['formulaid' => 'H'],
-						['formulaid' => 'I'],
-						['formulaid' => 'J'],
-						['formulaid' => 'K'],
-						['formulaid' => 'L'],
-						['formulaid' => 'M'],
-						['formulaid' => 'N'],
-						['formulaid' => 'O'],
-						['formulaid' => 'P'],
-						['formulaid' => 'Q'],
-						['formulaid' => 'R'],
-						['formulaid' => 'S'],
-						['formulaid' => 'T'],
-						['formulaid' => 'U'],
-						['formulaid' => 'V'],
-						['formulaid' => 'W'],
-						['formulaid' => 'X'],
-						['formulaid' => 'Y'],
-						['formulaid' => 'Z'],
-						['formulaid' => 'AA'],
-						['formulaid' => 'AB'],
-						['formulaid' => 'AC'],
-						['formulaid' => 'AD']
+						['conditionid' => '101'],
+						['conditionid' => '102'],
+						['conditionid' => '103'],
+						['conditionid' => '104'],
+						['conditionid' => '105'],
+						['conditionid' => '106'],
+						['conditionid' => '107'],
+						['conditionid' => '108']
 					]
 				],
 				[
-					['formulaid' => 'G'],
-					['formulaid' => 'D'],
-					['formulaid' => 'B'],
-					['formulaid' => 'E'],
-					['formulaid' => 'C'],
-					['formulaid' => 'H'],
-					['formulaid' => 'A'],
-					['formulaid' => 'F'],
-					['formulaid' => 'I'],
-					['formulaid' => 'J'],
-					['formulaid' => 'O'],
-					['formulaid' => 'AA'],
-					['formulaid' => 'T'],
-					['formulaid' => 'W'],
-					['formulaid' => 'Z'],
-					['formulaid' => 'Q'],
-					['formulaid' => 'M'],
-					['formulaid' => 'Y'],
-					['formulaid' => 'X'],
-					['formulaid' => 'K'],
-					['formulaid' => 'U'],
-					['formulaid' => 'V'],
-					['formulaid' => 'S'],
-					['formulaid' => 'AC'],
-					['formulaid' => 'P'],
-					['formulaid' => 'R'],
-					['formulaid' => 'L'],
-					['formulaid' => 'N'],
-					['formulaid' => 'AB'],
-					['formulaid' => 'AD']
+					['conditionid' => '104'],
+					['conditionid' => '105'],
+					['conditionid' => '106'],
+					['conditionid' => '103'],
+					['conditionid' => '101'],
+					['conditionid' => '102'],
+					['conditionid' => '107'],
+					['conditionid' => '108']
+				]
+			],
+			[
+				[
+					'formula' => '({107} or {104} or {102} or {105} or {103} or {108} or {101} or {106} or {109} or '.
+						'{110} or {115}) and ({127} or {120} or {123} or {126} or {117} or {113} or {125} or {124} or '.
+						'{111} or {121} or {122} or {119} or {129} or {116} or {118} or {112} or {114}) or ({128} and '.
+						'{130})',
+					'conditions' => [
+						['conditionid' => '101'],
+						['conditionid' => '102'],
+						['conditionid' => '103'],
+						['conditionid' => '104'],
+						['conditionid' => '105'],
+						['conditionid' => '106'],
+						['conditionid' => '107'],
+						['conditionid' => '108'],
+						['conditionid' => '109'],
+						['conditionid' => '110'],
+						['conditionid' => '111'],
+						['conditionid' => '112'],
+						['conditionid' => '113'],
+						['conditionid' => '114'],
+						['conditionid' => '115'],
+						['conditionid' => '116'],
+						['conditionid' => '117'],
+						['conditionid' => '118'],
+						['conditionid' => '119'],
+						['conditionid' => '120'],
+						['conditionid' => '121'],
+						['conditionid' => '122'],
+						['conditionid' => '123'],
+						['conditionid' => '124'],
+						['conditionid' => '125'],
+						['conditionid' => '126'],
+						['conditionid' => '127'],
+						['conditionid' => '128'],
+						['conditionid' => '129'],
+						['conditionid' => '130']
+					]
+				],
+				[
+					['conditionid' => '107'],
+					['conditionid' => '104'],
+					['conditionid' => '102'],
+					['conditionid' => '105'],
+					['conditionid' => '103'],
+					['conditionid' => '108'],
+					['conditionid' => '101'],
+					['conditionid' => '106'],
+					['conditionid' => '109'],
+					['conditionid' => '110'],
+					['conditionid' => '115'],
+					['conditionid' => '127'],
+					['conditionid' => '120'],
+					['conditionid' => '123'],
+					['conditionid' => '126'],
+					['conditionid' => '117'],
+					['conditionid' => '113'],
+					['conditionid' => '125'],
+					['conditionid' => '124'],
+					['conditionid' => '111'],
+					['conditionid' => '121'],
+					['conditionid' => '122'],
+					['conditionid' => '119'],
+					['conditionid' => '129'],
+					['conditionid' => '116'],
+					['conditionid' => '118'],
+					['conditionid' => '112'],
+					['conditionid' => '114'],
+					['conditionid' => '128'],
+					['conditionid' => '130']
 				]
 			]
 		];

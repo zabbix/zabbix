@@ -132,7 +132,9 @@ class CControllerActionCreate extends CController {
 		}
 
 		if (array_key_exists('formula', $filter)) {
-			$action['filter']['conditions'] = CConditionHelper::sortConditionsByFormula($action['filter']);
+			$action['filter']['conditions'] = CConditionHelper::sortConditionsByFormula($action['filter']['conditions'],
+				$action['filter']['formula'], 'conditionid'
+			);
 		}
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
