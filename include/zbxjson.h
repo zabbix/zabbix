@@ -140,7 +140,6 @@
 #define ZBX_PROTO_TAG_VERIFY_HOST		"verify_host"
 #define ZBX_PROTO_TAG_SNMP_OID			"snmp_oid"
 #define ZBX_PROTO_TAG_DETAILS			"details"
-#define ZBX_PROTO_TAG_VERSION			"version"
 #define ZBX_PROTO_TAG_COMMUNITY			"community"
 #define	ZBX_PROTO_TAG_SECURITYNAME		"securityname"
 #define ZBX_PROTO_TAG_SECURITYLEVEL		"securitylevel"

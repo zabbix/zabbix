@@ -23,7 +23,7 @@
 #include "zbxmockjson.h"
 #include "zbxembed.h"
 #include "libs/zbxpreproc/pp_execute.h"
-#include "libs/zbxtrapper/trapper_item_test.h"
+#include "libs/zbxtrapper/trapper_preproc.h"
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
@@ -242,7 +242,7 @@ void	zbx_mock_test_entry(void **state)
 			\"result\": \"%s\"\
 		}"
 
-		size_t append_len, required_length;
+		size_t	append_len, required_length;
 
 		required_length = value_gen_length;
 		value_append = zbx_mock_get_parameter_string("in.value_append");
@@ -326,7 +326,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Invalid request format: missing value in preprocess request");
 	}
 
-	returned_ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, item_state, &out,
+	returned_ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, item_state, &out,
 			&error);
 
 	if (FAIL == returned_ret)

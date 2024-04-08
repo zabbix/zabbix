@@ -9,21 +9,9 @@ COMMON_SRC_FILES = \
 TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxtrapper/libzbxtrapper.a \
-	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
-	$(top_srcdir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
-	$(top_srcdir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
-	$(top_srcdir)/src/libs/zbxstats/libzbxstats.a \
-	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
-	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
-	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
-	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
-	$(top_srcdir)/src/libs/zbxversion/libzbxversion.a \
-	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
-	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
@@ -38,6 +26,8 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
+	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
@@ -75,7 +65,7 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -94,7 +84,7 @@ endif
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
-	../../../src/libs/zbxtrapper/trapper_item_test.c \
+	../../../src/libs/zbxtrapper/trapper_preproc.c \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)
