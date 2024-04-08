@@ -24,16 +24,19 @@ use Zabbix\Core\{
 	CWidget
 };
 
+/**
+ * Controller for strict validation of widget configuration form.
+ */
 class CControllerDashboardWidgetCheck extends CController {
 
 	private ?CWidget $widget = null;
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>		'required|string',
 			'fields' =>		'array',
@@ -69,11 +72,11 @@ class CControllerDashboardWidgetCheck extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+	protected function checkPermissions(): bool {
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$form = $this->widget->getForm($this->getInput('fields', []),
 			$this->hasInput('templateid') ? $this->getInput('templateid') : null
 		);

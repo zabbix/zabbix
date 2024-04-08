@@ -105,6 +105,7 @@ class CSystemInfoHelper {
 		}
 
 		$setup = new CFrontendSetup();
+		$setup->setDefaultLang(CWebUser::$data['lang']);
 		$requirements = $setup->checkRequirements();
 		$requirements[] = $setup->checkSslFiles();
 

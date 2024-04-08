@@ -939,7 +939,7 @@ window.widget_svggraph_form = new class {
 			});
 		}
 
-		if (time_period === undefined) {
+		if (time_period === undefined || time_period === null) {
 			time_period = ZABBIX.EventHub.getData({
 				context: 'dashboard',
 				event_type: 'broadcast',
