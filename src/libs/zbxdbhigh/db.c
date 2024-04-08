@@ -72,6 +72,15 @@ void    zbx_item_diff_free(zbx_item_diff_t *item_diff)
 	zbx_free(item_diff);
 }
 
+int     zbx_item_diff_compare_func(const void *d1, const void *d2)
+{
+        const zbx_item_diff_t    *id_1 = *(const zbx_item_diff_t **)d1;
+        const zbx_item_diff_t    *id_2 = *(const zbx_item_diff_t **)d2;
+
+        ZBX_RETURN_IF_NOT_EQUAL(id_1->itemid, id_2->itemid);
+
+        return 0;
+}
 static int	connection_failure;
 
 static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;

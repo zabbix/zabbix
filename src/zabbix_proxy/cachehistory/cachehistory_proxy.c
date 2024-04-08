@@ -441,6 +441,6 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	}
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
-	zbx_vector_ptr_destroy(&item_diff);
+	zbx_vector_item_diff_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&history_items);
 }
