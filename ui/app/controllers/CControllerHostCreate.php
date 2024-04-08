@@ -100,17 +100,22 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
 
 			$clone = $this->hasInput('clone');
-			$src_hostid = $this->getInput('clone_hostid', '');
+			$src_hostid = $this->getInput('clone_hostid', 0);
 
-			if ($src_hostid) {
+			if ($clone && $src_hostid != 0) {
 				$host = $this->extendHostCloneEncryption($host, $src_hostid);
 			}
 
 			$result = API::Host()->create($host);
 
-			if ($result === false
-					|| !$this->createValueMaps($result['hostids'][0])
-					|| ($clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
+			if ($result === false) {
+				throw new Exception();
+			}
+
+			$host = ['hostid' => $result['hostids'][0]] + $host;
+
+			if (!$this->createValueMaps($host['hostid'])
+					|| ($clone && !$this->copyFromCloneSourceHost($src_hostid, $host))) {
 				throw new Exception();
 			}
 
@@ -195,21 +200,17 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	/**
 	 * Copy http tests, items, triggers, discovery rules and graphs from source host to target host.
 	 *
-	 * @param string $src_hostid  Source hostid.
-	 * @param string $hostid      Target hostid.
+	 * @param string $src_hostid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	private function copyFromCloneSourceHost(string $src_hostid, string $hostid): bool {
+	private function copyFromCloneSourceHost(string $src_hostid, array $dst_host): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_hostid, $hostid)
-				|| !CItemHelper::cloneHostItems($src_hostid, $hostid)
-				|| !CTriggerHelper::cloneHostTriggers($src_hostid, $hostid)
-				|| !CGraphHelper::cloneHostGraphs($src_hostid, $hostid)
-				|| !CLldRuleHelper::cloneHostItems($src_hostid, $hostid)) {
-			return false;
-		}
-
-		return true;
+		return copyHttpTests($src_hostid, $dst_host['hostid'])
+			&& CItemHelper::cloneHostItems($src_hostid, $dst_host)
+			&& CTriggerHelper::cloneHostTriggers($src_hostid, $dst_host['hostid'])
+			&& CGraphHelper::cloneHostGraphs($src_hostid, $dst_host['hostid'])
+			&& CLldRuleHelper::cloneHostItems($src_hostid, $dst_host);
 	}
 }
