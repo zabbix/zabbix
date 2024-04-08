@@ -101,6 +101,7 @@
 		}
 
 		&[readonly]:checked + label {
+			box-shadow: none;
 			color: $font-color;
 			-webkit-text-fill-color: $font-color;
 		}
