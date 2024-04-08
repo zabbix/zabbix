@@ -758,7 +758,7 @@ error:
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
-	if (0 != redirect.revision || 0 != redirect.reset)
+	if (0 != redirect.revision || ZBX_REDIRECT_NONE != redirect.reset)
 		zbx_add_redirect_response(&json, &redirect);
 	else
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
