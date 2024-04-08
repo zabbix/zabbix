@@ -96,7 +96,7 @@ class CControllerQueueDetails extends CController {
 			'hosts' => $hosts,
 			'proxies' => $proxies,
 			'queue_data' => $queue_data,
-			'total_count' => (int) $zabbix_server->getTotalCount()
+			'total_count' => $zabbix_server->getTotalCount() ?? 0
 		]);
 
 		$title = _('Queue');

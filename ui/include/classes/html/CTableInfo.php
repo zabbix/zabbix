@@ -45,13 +45,13 @@ class CTableInfo extends CTable {
 
 	public function setNoDataMessage($first_message, $second_message = null, $icon = null, $class = null) {
 		$this->message = new CCol(
-				(new CDiv([
-					(new CDiv($first_message))
-						->addClass('first-message')
-						->addClass($icon),
-					$second_message
-						? (new CDiv($second_message))->addClass('second-message')
-						: null
+			(new CDiv([
+				(new CDiv($first_message))
+					->addClass('first-message')
+					->addClass($icon),
+				$second_message
+					? (new CDiv($second_message))->addClass('second-message')
+					: null
 			]))->addClass($class)
 		);
 

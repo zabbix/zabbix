@@ -301,7 +301,7 @@ class CScreenHistory extends CScreenBase {
 
 				// Array $history_data will be modified according page and rows on page.
 				$history_table->setPageNavigation(
-					CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP, new CUrl($this->page_file)				)
+					CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP, new CUrl($this->page_file))
 				);
 
 				foreach ($history_data as $data) {

@@ -2401,7 +2401,9 @@ button {
     .list-table .nothing-to-show td div.no-filter-set, .list-table .nothing-to-show td div.no-data-found {
       margin-top: 100px;
       margin-bottom: 100px; }
-      .list-table .nothing-to-show td div.no-filter-set .zi-filter::before, .list-table .nothing-to-show td div.no-filter-set .zi-search::before, .list-table .nothing-to-show td div.no-data-found .zi-filter::before, .list-table .nothing-to-show td div.no-data-found .zi-search::before {
+      .list-table .nothing-to-show td div.no-filter-set .zi-filter::before,
+      .list-table .nothing-to-show td div.no-filter-set .zi-search::before, .list-table .nothing-to-show td div.no-data-found .zi-filter::before,
+      .list-table .nothing-to-show td div.no-data-found .zi-search::before {
         display: block;
         margin-bottom: 10px; }
       .list-table .nothing-to-show td div.no-filter-set .first-message, .list-table .nothing-to-show td div.no-data-found .first-message {

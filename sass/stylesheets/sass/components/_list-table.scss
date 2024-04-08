@@ -181,11 +181,13 @@
 			}
 
 			div {
-				&.no-filter-set, &.no-data-found {
+				&.no-filter-set,
+				&.no-data-found {
 					margin-top: 100px;
 					margin-bottom: 100px;
 
-					.zi-filter, .zi-search {
+					.zi-filter,
+					.zi-search {
 						&::before {
 							display: block;
 							margin-bottom: 10px;
