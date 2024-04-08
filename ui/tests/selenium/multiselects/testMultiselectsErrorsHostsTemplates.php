@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
  * that multiselects' dialogs do not contain any errors before and after filling.
  *
  * @onBefore prepareProxyData
+ *
+ * @backup hosts
  */
 class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 

@@ -54,7 +54,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'groups' => [['groupid' => 4]], // Zabbix servers.
 				'discoveryrules' => [
 					[
-
 						'name' => 'Trapper LLD for filter',
 						'key_' => 'key_lld_trapper',
 						'type' => ITEM_TYPE_TRAPPER

@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  * @onBefore prepareUserMediaData
  *
  * @dataSource LoginUsers
+ *
+ * @backup users
  */
 class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
@@ -32,6 +34,9 @@ class testPageUsers extends CLegacyWebTest {
 	public $userSurname = 'Administrator';
 	public $userRole = 'Super admin role';
 
+	/**
+	 * Data for MassDelete scenario.
+	 */
 	public function prepareUserMediaData() {
 		CDataHelper::call('user.update', [
 			[

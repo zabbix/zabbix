@@ -33,7 +33,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			[
 				'host' => 'Template linkage test host',
 				'name' => self::HOST_VISIBLE_NAME,
-				'groups' => ['groupid' => 4], // Zabbix servers.
+				'groups' => ['groupid' => 4] // Zabbix servers.
 			]
 		]);
 	}
