@@ -131,19 +131,14 @@ class CRadioButtonList extends CList {
 				if ($this->autofocused) {
 					$radio->setAttribute('autofocus', 'autofocus');
 				}
-
-				if ($this->readonly) {
-					$radio->setAttribute('readonly', 'readonly');
-				}
-			}
-			else {
-				if ($this->readonly) {
-					$radio->setAttribute('disabled', 'disabled');
-				}
 			}
 
 			if (!$this->autocomplete) {
 				$radio->setAttribute('autocomplete', 'off');
+			}
+
+			if ($this->readonly) {
+				$radio->setAttribute('readonly', 'readonly');
 			}
 
 			if ($this->modern) {
