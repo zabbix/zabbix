@@ -18,12 +18,17 @@
 **/
 
 #include "pg_service.h"
+#include "zbxcommon.h"
 #include "pg_cache.h"
-#include "zbxpgservice.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
 #include "zbxnix.h"
+#include "zbxpgservice.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"
-#include "zbxpgservice.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
+#include "zbxversion.h"
 
 /******************************************************************************
  *                                                                            *

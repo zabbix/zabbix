@@ -60,6 +60,7 @@
 #include "zbxdb.h"
 #include "zbxautoreg.h"
 #include "zbxexpression.h"
+#include "zbxpgservice.h"
 
 int	sync_in_progress = 0;
 

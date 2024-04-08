@@ -20,8 +20,9 @@
 #ifndef ZABBIX_PROXY_GROUP_H
 #define ZABBIX_PROXY_GROUP_H
 
-#include "zbxcommon.h"
-#include "dbsync.h"
+#include "dbconfig.h"
+#include "zbxcomms.h"
+#include "zbxtypes.h"
 
 void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision);
 void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision);

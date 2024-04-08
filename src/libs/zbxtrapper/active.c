@@ -454,7 +454,7 @@ out:
  *                FAIL - an error occurred                                      *
  *                                                                              *
  ********************************************************************************/
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
+int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		const zbx_events_funcs_t *events_cbs, int config_timeout,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {

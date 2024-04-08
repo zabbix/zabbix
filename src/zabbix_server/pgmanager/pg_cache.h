@@ -20,9 +20,9 @@
 #ifndef ZABBIX_PG_CACHE_H
 #define ZABBIX_PG_CACHE_H
 
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxtypes.h"
 
 #define ZBX_PG_PROXY_STATE_UNKNOWN	0
 #define ZBX_PG_PROXY_STATE_OFFLINE	1

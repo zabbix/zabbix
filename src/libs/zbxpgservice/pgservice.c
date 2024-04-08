@@ -18,8 +18,11 @@
 **/
 
 #include "zbxpgservice.h"
+#include "zbxcommon.h"
+#include "zbxalgo.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
+#include "zbxtypes.h"
 
 static ZBX_THREAD_LOCAL	zbx_ipc_socket_t	pgservice_sock;
 

@@ -18,8 +18,18 @@
 **/
 
 #include "proxy_group.h"
+#include "config.h"
 #include "dbconfig.h"
 #include "dbsync.h"
+#include "user_macro.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxcommon.h"
+#include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxpgservice.h"
+#include "zbxtime.h"
+#include "zbxversion.h"
 
 ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)

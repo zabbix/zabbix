@@ -24,7 +24,6 @@
 #include "zbxcommshigh.h"
 #include "zbxrtc.h"
 #include "zbx_host_constants.h"
-#include "zbxpgservice.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"

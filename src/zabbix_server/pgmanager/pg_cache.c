@@ -18,8 +18,13 @@
 **/
 
 #include "pg_cache.h"
-#include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 #include "version.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxpgservice.h"
+#include "zbxtime.h"
+#include "zbxversion.h"
 
 #define PG_GROUP_UNBALANCE_FACTOR	2
 #define PG_GROUP_UNBALANCE_LIMIT	10
