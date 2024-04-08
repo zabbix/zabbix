@@ -337,14 +337,6 @@ $host_tab->addItem([
 	]))->addClass('js-field-proxy-group-proxy')
 ]);
 
-$host_tab->addItem([
-	new CLabel(_('Enabled'), 'status'),
-	new CFormField(
-		(new CCheckBox('status', HOST_STATUS_MONITORED))
-			->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)
-	)
-]);
-
 $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Authentication algorithm'), 'label_ipmi_authtype'),
