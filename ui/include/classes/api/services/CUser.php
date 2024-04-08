@@ -3200,8 +3200,7 @@ class CUser extends CApiService {
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
 			$user_totp_secret = DB::select('mfa_totp_secret', [
 				'output' => ['mfa_totp_secretid', 'totp_secret', 'status'],
-				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']],
-				'limit' => 1
+				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']]
 			]);
 
 			// Delete previously saved totp_secret for this specific user which are not related to current MFA method.
@@ -3315,8 +3314,7 @@ class CUser extends CApiService {
 
 			$db_user_secrets = DB::select('mfa_totp_secret', [
 				'output' => ['mfa_totp_secretid', 'totp_secret', 'status', 'used_codes'],
-				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']] + $enrollment_filter,
-				'limit' => 1
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']] + $enrollment_filter
 			]);
 
 			if (!$db_user_secrets) {
@@ -3343,7 +3341,7 @@ class CUser extends CApiService {
 					'where' => ['mfa_totp_secretid' => $db_user_secret['mfa_totp_secretid']]
 				];
 
-				if ($db_user_secret['status'] != TOTP_SECRET_CONFIRMED) {
+				if ($mfa_response['totp_secret'] != null) {
 					$upd_totp_secret['values']['status'] = TOTP_SECRET_CONFIRMED;
 				}
 
