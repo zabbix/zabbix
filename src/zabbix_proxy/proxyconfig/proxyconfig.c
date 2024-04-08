@@ -72,7 +72,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_json_free(&j);
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
-#define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
+#define CONFIG_PROXYCONFIG_RETRY	10	/* seconds */
 	if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
 			args->config_timeout, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING,
 			args->config_tls)) /* retry till have a connection */
