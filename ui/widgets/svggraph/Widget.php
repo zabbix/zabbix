@@ -32,8 +32,8 @@ class Widget extends CWidget {
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [
-				'Actions' => _s('Actions'),
-				'Download image' => _s('Download image')
+				'Actions' => _('Actions'),
+				'Download image' => _('Download image')
 			]
 		];
 	}

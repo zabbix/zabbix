@@ -79,7 +79,7 @@ class CWidgetsData {
 					'field_class' => CWidgetFieldMultiSelectHost::class,
 					'label' => _('Hosts'),
 					'is_multiple' => true,
-					'accepts_dashboard' => false
+					'accepts_dashboard' => true
 				],
 				self::DATA_TYPE_ITEM_ID => [
 					'field_class' => CWidgetFieldMultiSelectItem::class,
@@ -126,7 +126,7 @@ class CWidgetsData {
 				self::DATA_TYPE_TIME_PERIOD => [
 					'field_class' => CWidgetFieldTimePeriod::class,
 					'label' => _('Time period'),
-					'is_multiple' => false,
+					'is_multiple' => null,
 					'accepts_dashboard' => true
 				]
 			];

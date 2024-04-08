@@ -82,7 +82,7 @@ class CControllerTriggerEdit extends CController {
 				'triggerids' => $this->getInput('triggerid'),
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-				'selectTriggerDiscovery' => ['parent_triggerid'],
+				'selectTriggerDiscovery' => ['parent_triggerid', 'disable_source'],
 				'selectDependencies' => ['triggerid'],
 				'selectTags' => ['tag', 'value']
 			];

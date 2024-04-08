@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-02-19 09:23+0000\n"
+"PO-Revision-Date: 2024-04-02 13:10+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -439,6 +439,10 @@ msgstr "DESPERTADOR"
 #: app/views/administration.user.list.php:137
 msgid "API access"
 msgstr "Accés a l'API"
+
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr "Nom d'equip API"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1107,6 +1111,17 @@ msgstr "Etiquetes avançades"
 msgid "Advanced options"
 msgstr "Opcions avançades"
 
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr "Després"
+
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
+msgstr "Després d'aquest canvi, els usuaris que ja s'han inscrit a l'MFA hauran de tornar a fer el procés d'inscripció perquè els secrets TOTP es restabliran."
+
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
@@ -1565,6 +1580,10 @@ msgstr "A les (hora:minut)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Com a mínim ha d'existir un servidor LDAP."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr "Hi ha d'haver un mètode MFA com a mínim."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2093,6 +2112,18 @@ msgstr "Percentatge d'ús de la CPU. Retorna un nombre flotant"
 msgid "CRLF"
 msgstr "CRLF"
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr "Prova CSRF"
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr "Prova de token CSRF"
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr "La validació del token CSRF ha funcionat."
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr "CSV a JSON"
@@ -2536,6 +2567,11 @@ msgid_plural "Cannot delete API tokens"
 msgstr[0] "No es pot pas esborrar el token API"
 msgstr[1] "No es poden pas esborrar els tokens API"
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr "No es pot esborrar el mètode MFA \"%1$s\", perquè l'empra el grup d'usuaris \"%2$s\"."
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2570,6 +2606,10 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "No es pot pas esborrar el tauler"
 msgstr[1] "No es poden pas esborrar els taulers"
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr "No es pot pas esborrar el mètode MFA predeterminat."
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3600,6 +3640,12 @@ msgstr "No es pot pas esborrar l'etiqueta de nom \"%1$s\" i valor \"%2$s\", defi
 msgid "Cannot rename guest user."
 msgstr "No es pot pas canviar el nom de l'usuari convidat."
 
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] "No es pot pas restablir el secret TOTP"
+msgstr[1] "No es poden pas restablir els secrets TOTP"
+
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
 msgid "Cannot save discovery rule without checks."
@@ -4151,6 +4197,10 @@ msgstr "Canviar"
 msgid "Change PSK"
 msgstr "Canvia el PSK"
 
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr "Canvia el secret del client"
+
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
 #: widgets/item/includes/WidgetForm.php:252
@@ -4362,6 +4412,14 @@ msgstr "Cliqueu i arrossegueu a la mida desitjada."
 msgid "Click to view or edit"
 msgstr "Feu clic per veure o editar"
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr "ID del client"
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr "Secret del client"
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "Rellotge"
@@ -4446,6 +4504,10 @@ msgstr "Tancar el problema"
 msgid "Close problems"
 msgstr "Tancar els problemes"
 
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr "Llargària del codi"
+
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -4489,6 +4551,10 @@ msgstr "El color \"%1$s\" no és correcte: s'espera un codi de color hexadecimal
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "Color (d'acord)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr "Interpolació de colors"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5523,6 +5589,12 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "Nom DNS"
 
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr "Prompt universal DUO"
+
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/maintenance.timeperiod.edit.php:80 app/views/popup.sla.edit.php:75
@@ -5888,6 +5960,10 @@ msgstr "Per defecte (%1$s)"
 msgid "Default LDAP server must be specified."
 msgstr "El servidor LDAP per defecte ha d'ésser especificat."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
+msgstr "S'ha d'especificar el mètode MFA predeterminat."
+
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
 msgstr "Accés predeterminat als nous elements de la interfície d'usuari"
@@ -6073,6 +6149,11 @@ msgstr "Vols esborrar l'element?"
 #: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "Vols esborrar els enllaços entre els elements seleccionats?"
+
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr "Esborrar els recursos perduts"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6603,6 +6684,11 @@ msgstr "Vols desactivar els equips supervisats pels servidors intermediaris tria
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Vols desactivar els equips supervisats pels servidors intermediaris triats?"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr "Desactivar els recursos perduts"
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6763,6 +6849,14 @@ msgstr "Vols desactivar els escenaris web triats?"
 #: include/views/js/monitoring.sysmaps.js.php:285
 msgid "Disabled"
 msgstr "Deshabilitat"
+
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr "Desactivat automàticament per una regla LLD."
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -6987,6 +7081,10 @@ msgstr "Mostra els triggers en bon estat per"
 msgid "Display graph"
 msgstr "Mostra el gràfic"
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr "Mostra min/mitjana/max"
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr "Mostra min/max/mit"
@@ -7141,6 +7239,10 @@ msgstr "Menú desplegable"
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
 msgstr "Opcions desplegables"
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
+msgstr "L'estat de Duo no coincideix amb l'estat desat."
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7416,6 +7518,10 @@ msgstr "Vols habilitar els equips supervisats pel servidor intermediari triat?"
 msgid "Enable internal housekeeping"
 msgstr "Activa la neteja interna"
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr "Activa l'autenticació multifactor"
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7656,6 +7762,10 @@ msgstr "Pressupost erroni"
 msgctxt "compact table header"
 msgid "Error budget"
 msgstr "Pressupost erroni"
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
+msgstr "S'ha produït un error en descodificar el resultat de Duo."
 
 #: include/db.inc.php:554
 #, c-format
@@ -8927,6 +9037,10 @@ msgstr "Maquinari (tots els detalls)"
 msgid "Hardware sensor reading. Returns float"
 msgstr "Lectura del sensor de maquinari. Retorna un flotant"
 
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
+msgstr "Funció hash"
+
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
 msgid "HashiCorp Vault"
@@ -9088,6 +9202,10 @@ msgstr "Històric de funcions"
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Inici"
+
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr "Bresca"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -11038,6 +11156,11 @@ msgstr "La configuració de correspondència del grup d'usuaris d'aprovisionamen
 msgid "Invalid LDAP configuration"
 msgstr "Configuració LDAP no vàlida"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr "Configuració MFA no vàlida"
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "La configuració de correspondència de tipus de suport d'aprovisionament SAML JIT no és pas vàlid."
@@ -11548,6 +11671,10 @@ msgstr "Element amb estat \"no compatible\""
 msgid "Item list"
 msgstr "Llistat d'elements"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Element no triat"
@@ -11823,6 +11950,10 @@ msgstr "Servidor LDAP"
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "Autenticació LDAP"
+
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr "L'autenticació LDAP és desactivada a tot el sistema."
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12385,6 +12516,19 @@ msgstr "MD2"
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 checksum del fitxer. Retorna una cadena de caràcters (hash MD5 del fitxer)"
 
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr "Mètode MFA"
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr "El mètode MFA \"%1$s\" ja existeix."
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr "Configuració de l'MFA"
+
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
 #: app/partials/hostmacros.list.html.php:36
@@ -12786,6 +12930,10 @@ msgstr "Nivell de zoom màxim"
 msgid "Maximum concurrent checks"
 msgstr "Màximes comprovacions concurrents"
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr "Comprovacions concurrents màximes per tipus"
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Nombre màxim de fitxers oberts compatibles amb el sistema operatiu. Retorna un nombre enter"
@@ -12793,6 +12941,11 @@ msgstr "Nombre màxim de fitxers oberts compatibles amb el sistema operatiu. Ret
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Nombre màxim de processos compatibles amb el sistema operatiu. Retorna un nombre enter"
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
+msgstr "Nombre màxim de fileres"
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13043,6 +13196,10 @@ msgstr "Missatgeria"
 #: include/classes/core/CJsonRpc.php:210
 msgid "Method not found."
 msgstr "No s'ha trobat pas el mètode."
+
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
+msgstr "Mètodes"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13311,6 +13468,23 @@ msgstr "El més crític dels serveis fills"
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
+
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr "S'esborrarà el secret TOTP multifactorial."
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr "S'esborraran els secrets TOTP multifactorials."
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr "Autenticació multifactor"
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr "L'autenticació multifactor és desactivada a tot el sistema."
 
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
@@ -13626,6 +13800,10 @@ msgstr "Nous tokens API"
 #: app/views/popup.ldap.edit.php:315
 msgid "New LDAP server"
 msgstr "Nou servidor LDAP"
+
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
+msgstr "Nou mètode MFA"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -14265,6 +14443,10 @@ msgstr "No s'han especificat pas destinataris per al missatge d'operació d'acci
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
 msgstr "Sense refresc"
+
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
+msgstr "Estat no desat; si us plau, torneu a iniciar sessió."
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -15133,6 +15315,14 @@ msgstr "PHP ctype"
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "Hi manca l'extensió PHP ctype (paràmetre de configuració PHP --enable-ctype)."
 
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr "Curl PHP"
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr "Manca l'extensió curl PHP."
+
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
 msgstr "Suport de bases de dades PHP"
@@ -15644,6 +15834,10 @@ msgstr "Creeu la base de dades manualment i configureu els paràmetres de config
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Si us plau, activeu la directiva \"allow_url_fopen\"."
 
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
+msgstr "Si us plau, escaneja i obtingues el teu codi de verificació a la teva aplicació d'autenticació."
+
 #: jsLoader.php:261
 msgid "Please select two elements"
 msgstr "Trieu dos elements"
@@ -15845,6 +16039,15 @@ msgstr "Telèfon B del POC principal"
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
 msgstr "Nom de pantalla del POC principal"
+
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr "Etiqueta principal"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16403,6 +16606,10 @@ msgstr "Rectangle"
 msgid "Reference attribute"
 msgstr "Atribut de referència"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Recarregar"
@@ -16833,6 +17040,10 @@ msgstr "Vps demanats"
 #: include/classes/html/CFilter.php:217 include/classes/html/CTabFilter.php:103
 msgid "Reset"
 msgstr "Restableix"
+
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr "Reinicia el secret TOTP"
 
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
@@ -17507,6 +17718,10 @@ msgstr "Mida d'escala"
 msgid "Scan directory"
 msgstr "Escaneja el directori"
 
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr "Escaneja aquest codi QR"
+
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
 msgstr "Escenari"
@@ -17727,6 +17942,15 @@ msgstr "Telèfon secundari B POC"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "Nom de pantalla secundari del POC"
+
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr "Etiqueta secundària"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18338,6 +18562,10 @@ msgstr "Mostra els mapes no disponibles"
 msgid "Show units"
 msgstr "Mostra unitats"
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr "Mostra el valor"
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr "Mostra un avís si el servidor Zabbix ha caigut"
@@ -18349,6 +18577,10 @@ msgstr "Mostra el temps treballat"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Es mostra"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr "Es mostra com el nom del compte a tots els usuaris d'MFA a les aplicacions d'autenticació."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18902,6 +19134,10 @@ msgstr "Assumpte"
 msgid "Submap"
 msgstr "Submapa"
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr "Enviar"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr "Subscripció"
@@ -19035,6 +19271,10 @@ msgstr "Nom d'equip del sistema. Retorna una cadena"
 msgid "System information"
 msgstr "Informació del sistema"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr "Configuració regional"
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "Estadístiques del sistema. Retorna un enter o un flotant"
@@ -19073,6 +19313,21 @@ msgstr "Agent de TELNET"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "TOTAL"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr "TOTP"
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr "El secret TOTP per a l'usuari \"%1$s\" s'ha restablert."
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr "El restabliment del secret TOTP ha estat correcte."
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19497,6 +19752,20 @@ msgstr "El mètode \"%1$s.%2$s\" s'ha de cridar sense la capçalera d'autoritzac
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "El mètode \"%1$s.%2$s\" s'ha de cridar sense el paràmetre \"auth\"."
 
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr "El %1$s ja no es descobreix i %2$s, %3$s."
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr "Ja no es descobreix %1$s i %2$s."
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "La plantilla d'URL s'empra per carregar i mostrar la capa de mosaic als mapes geogràfics."
@@ -19622,6 +19891,14 @@ msgstr "El trigger ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "El trigger ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr "El valor ha de ser superior a l'interval d'actualització de regles LLD."
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
+msgstr "El codi de verificació era incorrecte; si us plau, torneu-ho a provar."
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20612,6 +20889,11 @@ msgstr "No s'ha pogut pas recuperar l'estat de suport de la compressió de Times
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "No es pot pas recuperar la versió de TimescaleDB."
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr "No es pot escanejar? Podeu emprar la clau secreta %1$s per configurar manualment la vostra aplicació d'autenticació:"
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "No es pot pas triar la configuració."
@@ -21177,6 +21459,11 @@ msgstr "L'usuari \"%1$s\" s'empra a l'acció \"%2$s\"."
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "L'usuari \"%1$s\" és l'usuari en nom del qual es crea l'informe \"%2$s\"."
+
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
+msgstr "L'usuari \"%1$s\" ha de tindre un mot de pas, perquè l'autenticació interna és en vigor."
 
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
@@ -22076,6 +22363,11 @@ msgstr "Valors"
 msgid "Values without names are not allowed in form fields."
 msgstr "Els valors sense nom no es permeten pas als camps del formulari."
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr "Variable"
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -22137,6 +22429,10 @@ msgstr "Fabricant i versió"
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Detallar"
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
+msgstr "Codi de verificació"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22721,6 +23017,10 @@ msgstr "Ahir"
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Heu iniciat sessió com a \"%1$s\"."
+
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
+msgstr "No podeu pas triar alguns dels mètodes MFA, perquè l'extensió PHP CURL no és pas instal·lada al servidor web."
 
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
@@ -23430,6 +23730,16 @@ msgstr "no pot pas ésser buit"
 msgid "cannot be equal to zero without custom intervals"
 msgstr "no pot pas ésser igual a zero sense intervals personalitzats"
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr "no pot pas ésser ser superior o igual al valor del camp \"%1$s\""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr "no pot pas ésser ser més gran o igual al valor del paràmetre \"%1$s\""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23576,6 +23886,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - Data actual"
@@ -23605,6 +23919,10 @@ msgstr "per defecte"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Converteix un valor de radians a graus"
+
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
+msgstr "delimitador"
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -23774,6 +24092,10 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "configuració global de neteja"
 
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr "gràfic"
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr "ja existeix un prototip de gràfic amb el mateix UUID"
@@ -23799,6 +24121,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr "s'ha desactivat"
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr "s'ha desactivat manualment"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24042,6 +24372,10 @@ msgstr "és menor o igual"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "no és pas inclòs entre {} o té un format incorrecte"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr "element"
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -24497,6 +24831,10 @@ msgstr "l'objecte no existeix pas o pertany a un altre objecte"
 msgid "object does not exist, or you have no permissions to it"
 msgstr "l'objecte no existeix, o no hi teniu pas permisos"
 
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
+msgstr "s'espera un objecte de tipus TOTP"
+
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
 msgstr "de"
@@ -24588,6 +24926,10 @@ msgstr "power() - La potència d'un valor base a un valor de potència"
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
 msgstr "patró del problema"
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
+msgstr "qualificador"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -25343,6 +25685,35 @@ msgstr "ja existeix un escenari web amb el mateix UUID"
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
 msgstr "s'han d'emparar patrons comodí amb '*'"
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr "s'esborrarà en %1$s"
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr "s'esborrarà el proper cop que es processi la regla de descoberta"
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr "es desactivarà en %1$s"
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr "es desactivarà el proper cop que es processi la regla de descoberta"
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr "no s'esborrarà pas"
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
+msgstr "no es desactivarà pas"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

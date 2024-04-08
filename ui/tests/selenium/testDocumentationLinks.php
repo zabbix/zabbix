@@ -2615,6 +2615,24 @@ class testDocumentationLinks extends CWebTest {
 					'url' => 'zabbix.php?action=timeouts.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
 				]
+			],
+			// #238 Create Pie chart.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Pie chart',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
+				]
 			]
 		];
 	}

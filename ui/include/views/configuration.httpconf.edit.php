@@ -374,7 +374,8 @@ $webscenario_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'field_label' => _('Tags')
 		]),
 		TAB_INDICATOR_TAGS
 	)

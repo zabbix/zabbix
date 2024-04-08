@@ -38,7 +38,7 @@ abstract class CWidgetField {
 
 	protected string $name;
 	protected ?string $label;
-	protected ?string $full_name = null;
+	protected ?string $label_prefix = null;
 
 	protected ?int $save_type = null;
 
@@ -84,11 +84,11 @@ abstract class CWidgetField {
 	}
 
 	/**
-	 * Set field full name which will appear in case of error messages. For example:
-	 * Invalid parameter "<FULL NAME>": too many decimal places.
+	 * Prefix field label to enhance clarity in case of error messages. For example:
+	 * Invalid parameter "<LABEL PREFIX>: <LABEL>": too many decimal places.
 	 */
-	public function setFullName(string $name): self {
-		$this->full_name = $name;
+	public function prefixLabel(string $prefix): self {
+		$this->label_prefix = $prefix;
 
 		return $this;
 	}
@@ -266,7 +266,13 @@ abstract class CWidgetField {
 		$errors = [];
 
 		$validation_rules = $this->getValidationRules($strict);
-		$label = $this->full_name ?? $this->label ?? $this->name;
+
+		$label = $this->label ?? $this->name;
+
+		if ($this->label_prefix !== null) {
+			$label = $this->label_prefix.': '.$label;
+		}
+
 		$value = $this->getValue();
 
 		if (CApiInputValidator::validate($validation_rules, $value, $label, $error)) {

@@ -302,7 +302,7 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' =>  20,
+					'Max repetition count' =>  10,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,

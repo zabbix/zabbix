@@ -427,7 +427,7 @@ switch ($data['method']) {
 				break;
 
 			case 'users':
-				$users = API::User()->get([
+				$options = [
 					'output' => ['userid', 'username', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
@@ -438,7 +438,13 @@ switch ($data['method']) {
 						: null,
 					'searchByAny' => true,
 					'limit' => $limit
-				]);
+				];
+
+				if (array_key_exists('exclude_provisioned', $data) && $data['exclude_provisioned']) {
+					$options['filter']['userdirectoryid'] = 0;
+				}
+
+				$users = API::User()->get($options);
 
 				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
 					$users[] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];

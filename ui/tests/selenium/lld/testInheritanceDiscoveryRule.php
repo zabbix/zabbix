@@ -53,9 +53,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
-
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
-
 	}
 
 	// Returns create data.

@@ -559,6 +559,7 @@ class testFormTabIndicators extends CWebTest {
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
 					'form' => 'id:widget-dialogue-form',
+					'widget_type' => 'Graph',
 					'tabs' => [
 						[
 							'name' => 'Data set',
@@ -615,7 +616,53 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #14 Map configuration form tab data.
+			// Pie chart widget configuration form tab data.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view',
+					'form' => 'id:widget-dialogue-form',
+					'widget_type' => 'Pie chart',
+					'tabs' => [
+						[
+							'name' => 'Data set',
+							'button' => 'button:Add new data set',
+							'new_entries' => 3,
+							'field_type' => 'data_set',
+							'initial_count' => 1,
+							'count' => 4
+						],
+						[
+							'name' => 'Displaying options',
+							'entries' => [
+								'selector' => 'id:source',
+								'value' => 'History',
+								'old_value' => 'Auto'
+							],
+							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'Time period',
+							'entries' => [
+								'selector' => 'id:time_period_data_source',
+								'value' => 'Custom',
+								'old_value' => 'Dashboard'
+							],
+							'field_type' => 'general_field'
+						],
+						// There is no tab indicator if the default values are set.
+						[
+							'name' => 'Legend',
+							'entries' => [
+								'selector' => 'id:legend',
+								'value' => false,
+								'old_value' => true
+							],
+							'field_type' => 'general_field'
+						]
+					]
+				]
+			],
+			// Map configuration form tab data.
 			[
 				[
 					'url' => 'sysmaps.php?form=Create+map',
@@ -680,7 +727,7 @@ class testFormTabIndicators extends CWebTest {
 			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
-			$form->getField('Type')->fill('Graph');
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
 			$form->invalidate();
 		}
 		elseif ($data['url'] === 'zabbix.php?action=template.list') {

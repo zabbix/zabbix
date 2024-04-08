@@ -209,33 +209,17 @@ function _params($format, array $arguments) {
  * @param string $language    Locale language prefix like en_US, ru_RU etc.
  * @param string $error       Message on failure.
  *
- * @return bool    Whether locale could be switched; always true for en_GB.
+ * @return bool    Whether locale could be switched.
  */
-function setupLocale(?string $language, ?string &$error = ''): bool {
-	$numeric_locales = [
-		'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-	];
-	$locale_variants = $language === null ? zbx_locale_variants(ZBX_DEFAULT_LANG) : zbx_locale_variants($language);
+function setupLocale(string $language, string &$error = null): bool {
+	$locale_variants = zbx_locale_variants($language);
 	$locale_set = false;
-	$error = '';
 
 	ini_set('default_charset', 'UTF-8');
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 
-	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
-	foreach ($locale_variants as $locale) {
-		putenv('LC_ALL='.$locale);
-		putenv('LANG='.$locale);
-		putenv('LANGUAGE='.$locale);
-
-		if (setlocale(LC_ALL, $locale)) {
-			$locale_set = true;
-			break;
-		}
-	}
-
-	// Force PHP to always use a point instead of a comma for decimal numbers.
-	setlocale(LC_NUMERIC, $numeric_locales);
+	// Also, C locale is always present.
+	setlocale(LC_ALL, 'C');
 
 	if (function_exists('bindtextdomain')) {
 		bindtextdomain('frontend', 'locale');
@@ -243,12 +227,21 @@ function setupLocale(?string $language, ?string &$error = ''): bool {
 		textdomain('frontend');
 	}
 
-	if (!$locale_set && strtolower($language) !== 'en_gb') {
-		setlocale(LC_ALL, $numeric_locales);
+	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
+	foreach ($locale_variants as $locale) {
+		if (setlocale(LC_ALL, $locale)) {
+			$locale_set = true;
+			break;
+		}
+	}
 
+	// Make sure LC_NUMERIC is set to C to force PHP to always use a point instead of a comma for decimal numbers.
+	setlocale(LC_NUMERIC, 'C');
+
+	if (!$locale_set) {
 		$error = 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
 			implode(', ', $locale_variants).'. Unable to translate Zabbix interface.';
 	}
 
-	return ($error === '');
+	return ($error === null);
 }

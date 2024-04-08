@@ -72,7 +72,12 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
 
-		$label = $this->full_name ?? $this->label ?? '';
+		$label = $this->label ?? '';
+
+		if ($this->label_prefix !== null) {
+			$label = $this->label_prefix;
+		}
+
 		$value = $this->getValue();
 		$default = $this->getDefault();
 		$data_source = $this->getDataSource();
@@ -90,6 +95,9 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					$reference_value, ($label !== '' ? $label.'/' : '').$data_source_label, $error)) {
 				$errors[] = $error;
 			}
+		}
+		elseif (($strict || array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)) && !$value) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name, _('data is missing'));
 		}
 		else {
 			$absolute_time_parser = new CAbsoluteTimeParser();
