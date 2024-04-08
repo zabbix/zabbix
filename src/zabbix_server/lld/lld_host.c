@@ -4740,6 +4740,8 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 		zbx_db_commit();
 	}
 
+	zbx_vector_uint64_destroy(&en_hostids);
+	zbx_vector_uint64_destroy(&dis_hostids);
 	zbx_vector_uint64_destroy(&lost_hostids);
 	zbx_vector_uint64_destroy(&discovered_hostids);
 	zbx_vector_uint64_destroy(&lc_hostids);
