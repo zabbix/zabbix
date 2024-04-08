@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	audit \
 	autoreg \
 	actions \
 	cachehistory \
@@ -149,6 +150,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_builddir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_builddir)/src/libs/zbxdbconfigworker/libzbxdbconfigworker.a \
+	audit/libzbxaudit_server.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
@@ -157,6 +159,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
+	$(top_builddir)/src/libs/zbxinterface/libzbxinterface.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \

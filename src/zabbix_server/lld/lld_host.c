@@ -35,6 +35,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxhash.h"
+#include "zbxinterface.h"
 #include "../server_constants.h"
 
 /* host macro discovery state */
@@ -4787,6 +4788,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lif
 		zbx_db_commit();
 	}
 
+	zbx_vector_uint64_destroy(&en_hostids);
+	zbx_vector_uint64_destroy(&dis_hostids);
 	zbx_vector_uint64_destroy(&lost_hostids);
 	zbx_vector_uint64_destroy(&discovered_hostids);
 	zbx_vector_uint64_destroy(&lc_hostids);
@@ -5638,7 +5641,7 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			type = get_interface_type_by_item_type((unsigned char)atoi(row[1]));
+			type = zbx_get_interface_type_by_item_type((unsigned char)atoi(row[1]));
 
 			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN && type != INTERFACE_TYPE_OPT)
 			{
