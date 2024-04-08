@@ -13,7 +13,7 @@
 			"sysmapid": {"type": "_mapid"}
 		},
 		"size": {
-			"width": 18,
+			"width": 54,
 			"height": 5
 		},
 		"js_class": "CWidgetMap",

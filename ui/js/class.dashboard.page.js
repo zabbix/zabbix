@@ -49,8 +49,6 @@ class CDashboardPage {
 		cell_height,
 		max_columns,
 		max_rows,
-		widget_min_rows,
-		widget_max_rows,
 		widget_defaults,
 		is_editable,
 		is_edit_mode,
@@ -76,8 +74,6 @@ class CDashboardPage {
 		this._cell_height = cell_height;
 		this._max_columns = max_columns;
 		this._max_rows = max_rows;
-		this._widget_min_rows = widget_min_rows;
-		this._widget_max_rows = widget_max_rows;
 		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
@@ -420,7 +416,6 @@ class CDashboardPage {
 			},
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
-			min_rows: this._widget_min_rows,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			csrf_token: this._csrf_token,
@@ -530,8 +525,8 @@ class CDashboardPage {
 
 		let pos_x = this._accommodatePosX({
 			...pos,
-			y: reverse_y ? pos.y + pos.height - this._widget_min_rows : pos.y,
-			height: this._widget_min_rows
+			y: reverse_y ? pos.y + pos.height - 1 : pos.y,
+			height: 1
 		}, {reverse: reverse_x});
 
 		pos_x = {...pos_x, y: pos.y, height: pos.height};
@@ -606,7 +601,7 @@ class CDashboardPage {
 			}
 		}
 		else {
-			for (let height = this._widget_min_rows; height <= pos.height; height++) {
+			for (let height = 1; height <= pos.height; height++) {
 				if (!this._isPosFree({...max_pos, height})) {
 					break;
 				}
@@ -806,22 +801,34 @@ class CDashboardPage {
 		};
 
 		const move = e => {
+			let event_pos = getGridEventPos(e, {width: 1, height: 1});
+
 			if (this._widget_placeholder_clicked_pos !== null) {
-				let event_pos = getGridEventPos(e, {width: 1, height: 1});
 				let reverse_x = false;
 				let reverse_y = false;
 
 				const delta_x = event_pos.x - this._widget_placeholder_clicked_pos.x;
+				const delta_y = event_pos.y - this._widget_placeholder_clicked_pos.y;
 
 				this._widget_placeholder_pos = {};
 
-				if (this._widget_placeholder_clicked_pos.width === 2) {
+				if (this._widget_placeholder_clicked_pos.width === 6) {
 					if (delta_x <= 0) {
 						this._widget_placeholder_clicked_pos.width = 1;
 					}
 					else if (delta_x >= 1) {
 						this._widget_placeholder_clicked_pos.x++;
 						this._widget_placeholder_clicked_pos.width = 1;
+					}
+				}
+
+				if (this._widget_placeholder_clicked_pos.height === 2) {
+					if (delta_y <= 0) {
+						this._widget_placeholder_clicked_pos.height = 1;
+					}
+					else if (delta_y >= 1) {
+						this._widget_placeholder_clicked_pos.y++;
+						this._widget_placeholder_clicked_pos.height = 1;
 					}
 				}
 
@@ -845,22 +852,12 @@ class CDashboardPage {
 						this._widget_placeholder_clicked_pos.height,
 						event_pos.y - this._widget_placeholder_clicked_pos.y + 1
 					);
-					this._widget_placeholder_pos.height = Math.min(this._widget_max_rows,
-						this._widget_placeholder_pos.height
-					);
 				}
 				else {
 					this._widget_placeholder_pos.y = event_pos.y;
 					this._widget_placeholder_pos.height = this._widget_placeholder_clicked_pos.y
 						- event_pos.y + this._widget_placeholder_clicked_pos.height;
 					reverse_y = true;
-
-					const delta_y = this._widget_placeholder_pos.height - this._widget_max_rows;
-
-					if (delta_y > 0) {
-						this._widget_placeholder_pos.y += delta_y;
-						this._widget_placeholder_pos.height -= delta_y;
-					}
 				}
 
 				this._widget_placeholder_pos = this.accommodatePos(
@@ -886,30 +883,35 @@ class CDashboardPage {
 					return;
 				}
 
+				const delta_x = event_pos.x - this._widget_placeholder_pos?.x || 0;
+				const delta_y = event_pos.y - this._widget_placeholder_pos?.y || 0;
+
 				this._widget_placeholder_pos = null;
 
-				const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
+				if (this._isPosFree(event_pos)) {
+					for (const height of [2, 1]) {
+						for (const offset_y of [0, -1, 1, -2, 2]) {
+							for (const width of [6, 5, 4, 3, 2, 1]) {
+								for (const offset_x of [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6]) {
+									const pos = {
+										x: delta_x < 0 ? event_pos.x + offset_x : event_pos.x - width + offset_x,
+										y: delta_y < 0 ? event_pos.y + offset_y : event_pos.y - height + offset_y,
+										width: width,
+										height: height
+									};
 
-				if (this._isPosFree(event_pos_1x1)) {
-					let event_pos = getGridEventPos(e, {width: 2, height: this._widget_min_rows});
+									if (pos.x < 0 || pos.x + pos.width > this._max_columns
+											|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
+										continue;
+									}
 
-					for (const width of [2, 1]) {
-						for (const offset_y of [0, -1, 1]) {
-							for (const offset_x of [0, -1, 1]) {
-								const pos = {
-									x: event_pos.x + offset_x,
-									y: event_pos.y + offset_y,
-									width: width,
-									height: this._widget_min_rows
-								};
-
-								if (pos.x < 0 || pos.x + pos.width > this._max_columns
-										|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
-									continue;
+									if (this._isPosOverlapping(pos, event_pos) && this._isPosFree(pos)) {
+										this._widget_placeholder_pos = pos;
+										break;
+									}
 								}
 
-								if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
-									this._widget_placeholder_pos = pos;
+								if (this._widget_placeholder_pos !== null) {
 									break;
 								}
 							}
@@ -983,7 +985,7 @@ class CDashboardPage {
 
 				const new_widget_pos = {...this._widget_placeholder_pos};
 
-				if (new_widget_pos.width === 2 && new_widget_pos.height === this._widget_min_rows) {
+				if (new_widget_pos.width === 6 && new_widget_pos.height === 2) {
 					delete new_widget_pos.width;
 					delete new_widget_pos.height;
 				}
@@ -1382,7 +1384,7 @@ class CDashboardPage {
 		};
 		const axes_dim_min = {
 			x: 1,
-			y: this._widget_min_rows
+			y: 1
 		};
 		const axes_max = {
 			x: this._max_columns,
@@ -1739,10 +1741,9 @@ class CDashboardPage {
 			if (resize_sides.bottom) {
 				dim.y = resize_dim.y;
 				dim.height = Math.max(
-					this._cell_height * this._widget_min_rows,
+					this._cell_height,
 					Math.min(
 						this._cell_height * this._max_rows - dim.y,
-						this._cell_height * this._widget_max_rows,
 						resize_dim.height + rel_y
 					)
 				);
@@ -1751,10 +1752,9 @@ class CDashboardPage {
 				dim.y = Math.max(
 					0,
 					Math.min(
-						resize_dim.y + resize_dim.height - this._cell_height * this._widget_min_rows,
+						resize_dim.y + resize_dim.height - this._cell_height,
 						resize_dim.y + rel_y
-					),
-					resize_dim.y + resize_dim.height - this._cell_height * this._widget_max_rows
+					)
 				);
 				dim.height = resize_dim.height + resize_dim.y - dim.y;
 			}
