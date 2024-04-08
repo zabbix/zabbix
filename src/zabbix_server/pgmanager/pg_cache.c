@@ -546,7 +546,7 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		min_online = 1;
 	zbx_free(tmp);
 
-	if (proxies_num < min_online)
+	if (0 == proxies_num || proxies_num < min_online)
 	{
 		/* no enough online proxies with supported version - treat the group as balanced */
 		ret = SUCCEED;
@@ -559,16 +559,17 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 	{
 		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state)
+		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
 		if (PG_GROUP_UNBALANCE_LIMIT <= proxy->hosts.values_num - avg &&
-				PG_GROUP_UNBALANCE_FACTOR <= proxy->hosts.values_num / avg)
+				0 != avg && PG_GROUP_UNBALANCE_FACTOR <= proxy->hosts.values_num / avg)
 		{
 			goto out;
 		}
 
 		if (PG_GROUP_UNBALANCE_LIMIT <= avg - proxy->hosts.values_num &&
+				0 != proxy->hosts.values_num &&
 				PG_GROUP_UNBALANCE_FACTOR <= avg / proxy->hosts.values_num)
 		{
 			goto out;
