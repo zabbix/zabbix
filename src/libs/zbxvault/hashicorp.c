@@ -57,7 +57,7 @@ int	zbx_hashicorp_kvs_get(const char *vault_url, const char *prefix, const char 
 		return FAIL;
 	}
 
-	if (NULL == prefix)
+	if (NULL == prefix || "\0" == *prefix)
 	{
 		zbx_strsplit_first(path, '/', &left, &right);
 

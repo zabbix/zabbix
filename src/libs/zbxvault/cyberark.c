@@ -51,7 +51,7 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *prefix, const char *
 
 	ZBX_UNUSED(token);
 
-	if (NULL == prefix)
+	if (NULL == prefix || "\0" == *prefix)
 		prefix = "/AIMWebService/api/Accounts?";
 
 	url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
