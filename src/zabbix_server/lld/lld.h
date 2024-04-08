@@ -32,6 +32,8 @@ typedef struct
 }
 zbx_lld_item_t;
 
+int	lld_item_compare_func(const zbx_lld_item_t *item_1, const zbx_lld_item_t *item_2);
+
 ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
 
 int	lld_item_proto_compare_func(const void *d1, const void *d2);
@@ -45,7 +47,7 @@ zbx_lld_item_link_t;
 
 ZBX_PTR_VECTOR_DECL(lld_item_link_ptr, zbx_lld_item_link_t*)
 
-int	lld_item_link_compare_func(const void *d1, const void *d2);
+int	lld_item_link_compare_func(const zbx_lld_item_link_t *link_1, const zbx_lld_item_link_t *link_2);
 
 /* lld rule filter condition (item_condition table record) */
 typedef struct
@@ -206,7 +208,8 @@ zbx_lld_item_prototype_t;
 
 ZBX_PTR_VECTOR_DECL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
 
-int	lld_item_prototype_compare_func(const void *d1, const void *d2);
+int	lld_item_prototype_compare_func(const zbx_lld_item_prototype_t *item_proto_1,
+		const zbx_lld_item_prototype_t *item_proto_2);
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
 
@@ -346,8 +349,7 @@ struct zbx_lld_item_full_s
 
 ZBX_PTR_VECTOR_FUNC_DECL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
-int	lld_item_full_compare_func(const void *d1, const void *d2);
-
+int	lld_item_full_compare_func(const zbx_lld_item_full_t *item_1, const zbx_lld_item_full_t *item_2);
 int	lld_ids_names_compare_func(const void *d1, const void *d2);
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag);
 

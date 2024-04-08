@@ -1733,7 +1733,7 @@ void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num)
  *             inventory_values - inventory values                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
+void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
 {
 	size_t	sql_offset = 0;
 	int	i;
@@ -1744,7 +1744,7 @@ void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vecto
 	{
 		zbx_item_diff_t	*diff;
 
-		diff = (zbx_item_diff_t *)item_diff->values[i];
+		diff = item_diff->values[i];
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & diff->flags))
 			break;
 	}

@@ -65,6 +65,13 @@
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 
+ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
+
+void    zbx_item_diff_free(zbx_item_diff_t *item_diff)
+{
+	zbx_free(item_diff);
+}
+
 static int	connection_failure;
 
 static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;

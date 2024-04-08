@@ -132,7 +132,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 		size_t *data_offset);
 void	zbx_dc_history_clean_value(zbx_dc_history_t *history);
 void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num);
-void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
+void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values);
 void	zbx_log_sync_history_cache_progress(void);
 void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int *values_num, int *triggers_num, int *more);
 void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
