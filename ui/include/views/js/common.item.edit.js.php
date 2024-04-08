@@ -223,11 +223,14 @@
 			if ($(this).val() == <?= HTTPCHECK_REQUEST_HEAD ?>) {
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
+					.prop('readonly', true)
 					.end()
-					.prop('readonly', true);
+					.not('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]')
+					.prop('disabled', true);
 			}
 			else {
 				$(':radio', '#retrieve_mode')
+					.prop('disabled', false)
 					.prop('readonly', false);
 			}
 		});
