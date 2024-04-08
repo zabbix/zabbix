@@ -1090,6 +1090,13 @@ msgstr "拡張ラベル"
 msgid "Advanced options"
 msgstr "高度なオプション"
 
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr ""
+
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
 msgstr ""
@@ -4460,6 +4467,10 @@ msgstr "色\"%1$s\"の設定が正しくありません: 16進数のカラーコ
 msgid "Color (OK)"
 msgstr "色(正常)"
 
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr ""
+
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
 msgstr "色"
@@ -6047,6 +6058,11 @@ msgstr "アイテムを削除しますか？"
 msgid "Delete links between selected elements?"
 msgstr "選択した要素間のリンクを削除しますか？"
 
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr ""
+
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
 msgstr "メンテナンス期間を削除しますか？"
@@ -6576,6 +6592,11 @@ msgstr "選択したプロキシによるホストの監視を無効にします
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr ""
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6736,6 +6757,14 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: include/views/js/monitoring.sysmaps.js.php:285
 msgid "Disabled"
 msgstr "無効"
+
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -9073,6 +9102,10 @@ msgstr "履歴関数"
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "ホーム"
+
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr ""
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -11527,6 +11560,10 @@ msgstr "アイテムが\"取得不可\"の状態"
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "アイテムリスト"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -15875,6 +15912,15 @@ msgstr "プライマリPOC電話番号B"
 msgid "Primary POC screen name"
 msgstr "プライマリPOCスクリーン名"
 
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
 #: app/views/popup.discovery.check.php:120
@@ -16430,6 +16476,10 @@ msgstr "長方形"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "リファレンスの属性"
+
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -17756,6 +17806,15 @@ msgstr "セカンダリPOC電話番号B"
 msgid "Secondary POC screen name"
 msgstr "セカンダリPOCスクリーン名"
 
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr ""
+
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
 msgid "Seconds"
@@ -19074,6 +19133,10 @@ msgstr "システムのホスト名。文字列値を返す。"
 msgid "System information"
 msgstr "システム情報"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "システム統計値。整数値または浮動小数点値を返す。"
@@ -19550,6 +19613,20 @@ msgstr "\"%1$s.%2$s\"メソッドは、認証ヘッダーなしで呼び出す�
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "メソッド\"%1$s.%2$s\"は\"auth\"パラメータなしで呼び出してください。"
 
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr ""
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URLテンプレートは、地理マップ上にタイルレイヤーを読み込んで表示するために使用されます。"
@@ -19673,6 +19750,10 @@ msgstr "トリガーがディスカバリされなくなったため%1$sに削�
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "トリガーはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -23496,6 +23577,16 @@ msgstr "空白は指定できません"
 msgid "cannot be equal to zero without custom intervals"
 msgstr ""
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23641,6 +23732,10 @@ msgstr "d"
 #: chart4.php:130
 msgid "d.M"
 msgstr "m/d"
+
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -23844,6 +23939,10 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "データの保存期間設定(全体設定)"
 
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr ""
@@ -23869,6 +23968,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr ""
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24112,6 +24219,10 @@ msgstr "以下"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "{}で括られていないか不正な値です"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -25418,6 +25529,35 @@ msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
+msgstr ""
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr ""
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr ""
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr ""
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
 msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122

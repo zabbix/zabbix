@@ -595,7 +595,6 @@ zabbix_export:
                 value: '{$ACRONIS.CPC.CUSTOMER.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-          lifetime: 7d
           description: 'Discovers customers.'
           item_prototypes:
             - uuid: d61dc067880a4317886acd54d0df1da1
@@ -654,7 +653,6 @@ zabbix_export:
                 value: '{$ACRONIS.CPC.DEVICE.DISCOVERY.TENANT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Discovers devices.'
           item_prototypes:
             - uuid: 63f8280408c34e029085af75f15c0db3

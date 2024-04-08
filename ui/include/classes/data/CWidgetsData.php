@@ -126,7 +126,7 @@ class CWidgetsData {
 				self::DATA_TYPE_TIME_PERIOD => [
 					'field_class' => CWidgetFieldTimePeriod::class,
 					'label' => _('Time period'),
-					'is_multiple' => false,
+					'is_multiple' => null,
 					'accepts_dashboard' => true
 				]
 			];

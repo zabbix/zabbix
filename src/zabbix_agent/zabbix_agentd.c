@@ -64,6 +64,24 @@ static char	**config_perf_counters = NULL;
 static char	**config_perf_counters_en = NULL;
 #endif
 
+#define ZBX_SERVICE_NAME_LEN	64
+char	zabbix_service_name[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+static const char	*get_zbx_service_name(void)
+{
+	return zabbix_service_name;
+}
+
+char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+#if defined(_WINDOWS)
+static const char	*get_zbx_event_source(void)
+{
+	return zabbix_event_source;
+}
+#endif
+#undef ZBX_SERVICE_NAME_LEN
+
 static char	*config_user = NULL;
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
@@ -286,10 +304,10 @@ static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 void	zbx_co_uninitialize();
 #endif
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 void	zbx_free_service_resources(int ret);
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+static int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num)
 {
 	int	server_count = 0;
 
@@ -1125,7 +1143,15 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	ZBX_UNUSED(on_exit_args);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+#ifndef _WINDOWS
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+	}
+#endif
 	zbx_free_service_resources(ret);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1137,14 +1163,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
-#else
-	if (NULL != on_exit_args)
-	{
-		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
-
-		if (NULL != args->listen_sock)
-			zbx_tcp_unlisten(args->listen_sock);
-	}
 #endif
 
 	exit(EXIT_SUCCESS);
@@ -1221,7 +1239,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, zabbix_event_source, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1483,11 +1501,11 @@ int	main(int argc, char **argv)
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
-			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
+			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item, get_zbx_service_name);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(get_zbx_progname);
 #else
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 #endif
 #ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
@@ -1507,7 +1525,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, zabbix_event_source, NULL);
 	}
 #endif
 
@@ -1555,9 +1573,9 @@ int	main(int argc, char **argv)
 				first_hostname = NULL != (p = strchr(zbx_config_hostnames, ',')) ? zbx_dsprintf(NULL,
 						"%.*s", (int)(p - zbx_config_hostnames), zbx_config_hostnames) :
 						zbx_strdup(NULL, zbx_config_hostnames);
-				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
+				zbx_snprintf(zabbix_service_name, sizeof(zabbix_service_name), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
-				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
+				zbx_snprintf(zabbix_event_source, sizeof(zabbix_event_source), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_free(first_hostname);
 			}
@@ -1675,7 +1693,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags);
+	zbx_service_start(t.flags, get_zbx_service_name, get_zbx_event_source);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,

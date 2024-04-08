@@ -93,6 +93,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxhttp}.c{..\..\..\src\libs\zbxhttp}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxcurl}.c{..\..\..\src\libs\zbxcurl}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxsysinfo}.c{..\..\..\src\libs\zbxsysinfo}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
