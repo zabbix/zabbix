@@ -1465,13 +1465,15 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 					if (0 != trigger_diff.values_num)
 					{
-						if (NULL != rtc)
-							zbx_start_escalations(rtc, &escalations);
 						zbx_db_save_trigger_changes(&trigger_diff);
 					}
 
 					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
+					{
+						if (NULL != rtc)
+							zbx_start_escalations(rtc, &escalations);
 						zbx_dc_config_triggers_apply_changes(&trigger_diff);
+					}
 					else if (NULL != events_cbs->clean_events_cb)
 						events_cbs->clean_events_cb();
 
