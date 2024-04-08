@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -543,36 +544,22 @@ func (m *Manager) init() {
 				usrprm:                   metric.UsrPrm,
 			}
 
-			interfaces := ""
-			if _, ok := metric.Plugin.(plugin.Exporter); ok {
-				interfaces += "exporter, "
-			}
-			if _, ok := metric.Plugin.(plugin.Collector); ok {
-				interfaces += "collector, "
-			}
-			if _, ok := metric.Plugin.(plugin.Runner); ok {
-				interfaces += "runner, "
-			}
-			if _, ok := metric.Plugin.(plugin.Watcher); ok {
-				interfaces += "watcher, "
-			}
-			if _, ok := metric.Plugin.(plugin.Configurator); ok {
-				interfaces += "configurator, "
-			}
-			interfaces = interfaces[:len(interfaces)-2]
-
 			if metric.Plugin.IsExternal() {
-				ext := metric.Plugin.(*external.Plugin)
-				metric.Plugin.SetCapacity(1)
-				log.Infof(
-					"using plugin '%s' (%s) providing following interfaces: %s",
-					metric.Plugin.Name(),
-					ext.Path,
-					interfaces,
-				)
+				ext, ok := metric.Plugin.(*external.Plugin)
+				if ok {
+					log.Infof(
+						"using plugin '%s' (%s) providing following interfaces: %s",
+						metric.Plugin.Name(),
+						ext.Path,
+						getPluginInterfaceNames(metric.Plugin),
+					)
+				}
 			} else {
-				log.Infof("using plugin '%s' (built-in) providing following interfaces: %s", metric.Plugin.Name(),
-					interfaces)
+				log.Infof(
+					"using plugin '%s' (built-in) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					getPluginInterfaceNames(metric.Plugin),
+				)
 			}
 		}
 		m.plugins[metric.Key] = pagent
@@ -799,4 +786,30 @@ func getPluginOpts(
 	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
+}
+
+func getPluginInterfaceNames(p plugin.Accessor) string {
+	interfaceNames := make([]string, 0, 5)
+
+	if _, ok := p.(plugin.Exporter); ok {
+		interfaceNames = append(interfaceNames, "exporter")
+	}
+
+	if _, ok := p.(plugin.Collector); ok {
+		interfaceNames = append(interfaceNames, "collector")
+	}
+
+	if _, ok := p.(plugin.Runner); ok {
+		interfaceNames = append(interfaceNames, "runner")
+	}
+
+	if _, ok := p.(plugin.Watcher); ok {
+		interfaceNames = append(interfaceNames, "watcher")
+	}
+
+	if _, ok := p.(plugin.Configurator); ok {
+		interfaceNames = append(interfaceNames, "configurator")
+	}
+
+	return strings.Join(interfaceNames, ", ")
 }
