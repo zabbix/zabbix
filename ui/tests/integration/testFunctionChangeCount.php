@@ -212,20 +212,29 @@ class testFunctionChangeCount extends CIntegrationTest {
 				$trigger['triggerid'] = $response['result']['triggerids'][0];
 			}
 		}
-
-		return true;
 	}
 
 	/**
 	 * Send values
 	 */
 	private function sendValues($item, $values) {
-		foreach ($values as &$value) {
-			$this->sendSenderValue(self::HOST_NAME, $item, $value);
-		}
-		sleep(self::WAIT_TIME);
+		$senderValues = [];
 
-		return true;
+		foreach ($values as &$value) {
+			if (!is_scalar($value)) {
+				$value = json_encode($value);
+			}
+
+			$data = [
+				'host' => self::HOST_NAME,
+				'key' => $item,
+				'value' => $value
+			];
+
+			array_push($senderValues, $data);
+		}
+
+		$this->sendSenderValues($senderValues);
 	}
 
 	/**
@@ -234,12 +243,10 @@ class testFunctionChangeCount extends CIntegrationTest {
 	private function checkTriggerValue($trigger) {
 		$response = $this->call('trigger.get', ['triggerids' => [$trigger['triggerid']]]);
 		$this->assertEquals(1, $response['result'][0]['value']);
-
-		return true;
 	}
 
 	public function testFunctionChangeCount_Send_NotEnoughData() {
-		return $this->sendValues('item_ui64', [64]);
+		$this->sendValues('item_ui64', [64]);
 	}
 
 	/**
@@ -251,132 +258,129 @@ class testFunctionChangeCount extends CIntegrationTest {
 
 		$this->assertArrayHasKey('error', $response['result'][0]);
 		$this->assertStringContainsString('not enough data', $response['result'][0]['error']);
-
-		return true;
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Get_NotEnoughData
 	 */
 	public function testFunctionChangeCount_Send_Ui64ImplicitAll_AllDifferent() {
-		return $this->sendValues('item_ui64', [64, 24, 69, 32, 96]);
+		$this->sendValues('item_ui64', [64, 24, 69, 32, 96]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_Ui64ImplicitAll_AllDifferent
 	 */
 	public function testFunctionChangeCount_Get_Ui64ImplicitAll_AllDifferent() {
-		return $this->checkTriggerValue(self::$items['item_ui64']['triggers']['all_different']);
+		$this->checkTriggerValue(self::$items['item_ui64']['triggers']['all_different']);
 	}
 
 	public function testFunctionChangeCount_Send_Ui64ImplicitAll_SomeEqual() {
-		return $this->sendValues('item_ui64', [97, 35, 35, 29, 29]);
+		$this->sendValues('item_ui64', [97, 35, 35, 29, 29]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_Ui64ImplicitAll_SomeEqual
 	 */
 	public function testFunctionChangeCount_Get_Ui64ImplicitAll_SomeEqual() {
-		return $this->checkTriggerValue(self::$items['item_ui64']['triggers']['some_equal']);
+		$this->checkTriggerValue(self::$items['item_ui64']['triggers']['some_equal']);
 	}
 
 	public function testFunctionChangeCount_Send_Ui64Inc() {
-		return $this->sendValues('item_ui64', [21, 34, 73, 55, 46]);
+		$this->sendValues('item_ui64', [21, 34, 73, 55, 46]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_Ui64Inc
 	 */
 	public function testFunctionChangeCount_Get_Ui64Inc() {
-		return $this->checkTriggerValue(self::$items['item_ui64']['triggers']['inc']);
+		$this->checkTriggerValue(self::$items['item_ui64']['triggers']['inc']);
 	}
 
 	public function testFunctionChangeCount_Send_Ui64Dec() {
-		return $this->sendValues('item_ui64', [7, 92, 67, 96, 44]);
+		$this->sendValues('item_ui64', [7, 92, 67, 96, 44]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_Ui64Dec
 	 */
 	public function testFunctionChangeCount_Get_Ui64Dec() {
-		return $this->checkTriggerValue(self::$items['item_ui64']['triggers']['dec']);
+		$this->checkTriggerValue(self::$items['item_ui64']['triggers']['dec']);
 	}
 
 	public function testFunctionChangeCount_Send_Ui64ExplicitAll() {
-		return $this->sendValues('item_ui64', [55, 93, 76, 76, 33]);
+		$this->sendValues('item_ui64', [55, 93, 76, 76, 33]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_Ui64ExplicitAll
 	 */
 	public function testFunctionChangeCount_Get_Ui64_ExplicitAll() {
-		return $this->checkTriggerValue(self::$items['item_ui64']['triggers']['all']);
+		$this->checkTriggerValue(self::$items['item_ui64']['triggers']['all']);
 	}
 
 	public function testFunctionChangeCount_Send_DblImplicitAll() {
-		return $this->sendValues('item_dbl', [0.000005, 0.000001, 0.000007, 0.000004, 0.000002]);
+		$this->sendValues('item_dbl', [0.000005, 0.000001, 0.000007, 0.000004, 0.000002]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_DblImplicitAll
 	 */
 	public function testFunctionChangeCount_Get_DblImplicitAll() {
-		return $this->checkTriggerValue(self::$items['item_dbl']['triggers']['all_different']);
+		$this->checkTriggerValue(self::$items['item_dbl']['triggers']['all_different']);
 	}
 
 	public function testFunctionChangeCount_Send_DblExplicitAll() {
-		return $this->sendValues('item_dbl', [0.0001, 0.0011, 0.0011, 0.0002, 0.0005]);
+		$this->sendValues('item_dbl', [0.0001, 0.0011, 0.0011, 0.0002, 0.0005]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_DblExplicitAll
 	 */
 	public function testFunctionChangeCount_Get_DblExplicitAll() {
-		return $this->checkTriggerValue(self::$items['item_dbl']['triggers']['some_equal']);
+		$this->checkTriggerValue(self::$items['item_dbl']['triggers']['some_equal']);
 	}
 
 	public function testFunctionChangeCount_Send_DblInc() {
-		return $this->sendValues('item_dbl', [0.0001, 0.0002, 0.0003, 0.0004, 0.0004]);
+		$this->sendValues('item_dbl', [0.0001, 0.0002, 0.0003, 0.0004, 0.0004]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_DblInc
 	 */
 	public function testFunctionChangeCount_Get_DblInc() {
-		return $this->checkTriggerValue(self::$items['item_dbl']['triggers']['inc']);
+		$this->checkTriggerValue(self::$items['item_dbl']['triggers']['inc']);
 	}
 
 	public function testFunctionChangeCount_Send_DblDec() {
-		return $this->sendValues('item_dbl', [0.00001, 0.00002, 0.00003, 0.00004, 0.00003]);
+		$this->sendValues('item_dbl', [0.00001, 0.00002, 0.00003, 0.00004, 0.00003]);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_DblDec
 	 */
 	public function testFunctionChangeCount_Get_DblDec() {
-		return $this->checkTriggerValue(self::$items['item_dbl']['triggers']['dec']);
+		$this->checkTriggerValue(self::$items['item_dbl']['triggers']['dec']);
 	}
 
 	public function testFunctionChangeCount_Send_StrAllDifferent() {
-		return $this->sendValues('item_str', ['abc', 'def', 'ghi', 'jkl', 'mno']);
+		$this->sendValues('item_str', ['abc', 'def', 'ghi', 'jkl', 'mno']);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_StrAllDifferent
 	 */
 	public function testFunctionChangeCount_Get_StrAllDifferent() {
-		return $this->checkTriggerValue(self::$items['item_str']['triggers']['all_different']);
+		$this->checkTriggerValue(self::$items['item_str']['triggers']['all_different']);
 	}
 
 	public function testFunctionChangeCount_Send_StrSomeEqual() {
-		return $this->sendValues('item_str', ['abc', 'abc', 'ghi', 'ghi', 'mno']);
+		$this->sendValues('item_str', ['abc', 'abc', 'ghi', 'ghi', 'mno']);
 	}
 
 	/**
 	 * @depends testFunctionChangeCount_Send_StrSomeEqual
 	 */
 	public function testFunctionChangeCount_Get_StrSomeEqual() {
-		return $this->checkTriggerValue(self::$items['item_str']['triggers']['some_equal']);
+		$this->checkTriggerValue(self::$items['item_str']['triggers']['some_equal']);
 	}
 }
-
