@@ -2298,16 +2298,16 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
       position: relative;
       z-index: 2; }
-    .radio-list-control input[type="radio"]:checked[disabled] + label {
-      background-color: #a3a3a3 !important;
-      transition: none; }
-    .radio-list-control input[type="radio"][disabled] + label {
+    .radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label {
       transition: none;
-      cursor: default; }
-    .radio-list-control input[type="radio"]:checked[readonly] + label {
       cursor: default;
-      background-color: #a3a3a3 !important;
-      -webkit-text-fill-color: #f2f2f2 !important; }
+      box-shadow: none; }
+    .radio-list-control input[type="radio"][readonly]:checked + label, .radio-list-control input[type="radio"][disabled]:checked + label {
+      background-color: #a3a3a3; }
+    .radio-list-control input[type="radio"][readonly]:checked + label {
+      box-shadow: none;
+      color: #f2f2f2;
+      -webkit-text-fill-color: #f2f2f2; }
   .radio-list-control + .icon-info {
     margin-left: 5px; }
 
@@ -4297,20 +4297,20 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: .3;
     background-color: transparent; }
 
-.radio-list-control input[type="radio"]:checked[readonly] + label, z-select[readonly] .focusable,
+z-select[readonly] .focusable,
 .z-select[readonly] .focusable, .multiselect[aria-readonly], input[readonly], textarea[readonly] {
   color: #f2f2f2;
   -webkit-text-fill-color: #f2f2f2;
   background-color: #2b2b2b;
   border-color: #3d3d3d; }
 
-.radio-list-control input[type="radio"][disabled] + label, z-select[disabled] .focusable,
+.radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] .focusable,
 .z-select[disabled] .focusable, .multiselect[aria-disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #525252;
   -webkit-text-fill-color: #525252;
   background-color: #2b2b2b;
   border-color: #3d3d3d; }
-  .radio-list-control input[type="radio"][disabled] + label::placeholder, z-select[disabled] .focusable::placeholder,
+  .radio-list-control input[type="radio"][readonly] + label::placeholder, .radio-list-control input[type="radio"][disabled] + label::placeholder, z-select[disabled] .focusable::placeholder,
   .z-select[disabled] .focusable::placeholder, .multiselect[aria-disabled]::placeholder, input[disabled]::placeholder, textarea[disabled]::placeholder, select option[disabled]::placeholder, select[disabled]::placeholder, select[readonly]::placeholder, .checkbox-radio[readonly] span::placeholder, .checkbox-radio[readonly] + label span::placeholder, .checkbox-radio[disabled] + label span::placeholder, .macro-input-group button.btn-dropdown-toggle:disabled::placeholder {
     color: #404040;
     -webkit-text-fill-color: #404040;
