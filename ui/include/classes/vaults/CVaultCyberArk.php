@@ -27,31 +27,19 @@ class CVaultCyberArk extends CVault {
 	public const TYPE					= ZBX_VAULT_TYPE_CYBERARK;
 	public const NAME					= 'CyberArk';
 	public const API_ENDPOINT_DEFAULT	= 'https://localhost:1858';
+	public const DB_PREFIX_DEFAULT		= '/AIMWebService/api/Accounts?';
 	public const DB_PATH_PLACEHOLDER	= 'AppID=foo&Query=Safe=bar;Object=buzz';
 
-	/**
-	 * @var string
-	 */
-	protected $api_endpoint;
+	private string $api_endpoint;
+	private string $db_prefix;
+	private string $db_path;
+	private ?string $cert_file;
+	private ?string $key_file;
 
-	/**
-	 * @var string
-	 */
-	protected $db_path;
-
-	/**
-	 * @var string
-	 */
-	protected $cert_file;
-
-	/**
-	 * @var string
-	 */
-	protected $key_file;
-
-	public function __construct(string $api_endpoint, string $db_path, ?string $cert_file, ?string $key_file) {
-		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
-		$this->db_path = trim($db_path);
+	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, ?string $cert_file, ?string $key_file) {
+		$this->api_endpoint = $api_endpoint;
+		$this->db_prefix = $db_prefix === '' ? self::API_ENDPOINT_DEFAULT : $db_prefix;
+		$this->db_path = $db_path;
 		$this->cert_file = $cert_file !== null ? trim($cert_file) : null;
 		$this->key_file = $key_file !== null ? trim($key_file) : null;
 	}
@@ -90,7 +78,7 @@ class CVaultCyberArk extends CVault {
 			];
 		}
 
-		$secret = @file_get_contents($this->api_endpoint.'/AIMWebService/api/Accounts?'.$this->db_path, false,
+		$secret = @file_get_contents($this->api_endpoint.$this->db_prefix.$this->db_path, false,
 			stream_context_create(['http' => $http_context])
 		);
 

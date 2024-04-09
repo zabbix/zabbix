@@ -55,6 +55,7 @@ $fields = [
 	'cipher_list' =>		[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'creds_storage' =>		[T_ZBX_INT, O_OPT, null,	IN([DB_STORE_CREDS_CONFIG, DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK]), null],
 	'vault_url' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
+	'vault_prefix' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_db_path' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_query_string' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_token' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
@@ -199,7 +200,9 @@ $sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_
 	view.init('.json_encode([
 		'step' => $setup_wizard->getStep(),
 		'hashicorp_endpoint_default' => CVaultHashiCorp::API_ENDPOINT_DEFAULT,
-		'cyberark_endpoint_default' => CVaultCyberArk::API_ENDPOINT_DEFAULT
+		'cyberark_endpoint_default' => CVaultCyberArk::API_ENDPOINT_DEFAULT,
+		'hashicorp_prefix_default' => CVaultHashiCorp::DB_PREFIX_DEFAULT,
+		'cyberark_prefix_default' => CVaultCyberArk::DB_PREFIX_DEFAULT
 	]).');
 '))
 	->setOnDocumentReady()
