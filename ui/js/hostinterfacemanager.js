@@ -476,27 +476,14 @@ class HostInterfaceManager {
 		}
 	}
 
-	/**
-	 * Converts form field to readonly.
-	 *
-	 * @param {Element} element  Native JavaScript element for form field.
-	 */
-	setReadonly(element) {
-		const tag_name = element.tagName;
-
-		if (tag_name === 'INPUT' || tag_name === 'Z-SELECT') {
-			element.readOnly = true;
-		}
-	}
-
 	makeReadonly() {
 		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].forEach((row) => {
-			[...row.querySelectorAll('input, z-select')].map((el) => {
-				this.setReadonly(el);
+			[...row.querySelectorAll('input, z-select')].map((element) => {
+				element.readOnly = true;
 			});
 
 			[...row.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)]
-				.map((el) => el.remove());
+				.map((element) => element.remove());
 		});
 
 		return true;
