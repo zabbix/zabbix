@@ -340,7 +340,16 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		& > li {
 			.status-container {
 				margin-right: 5px;
-				vertical-align: text-bottom;
+
+				> span {
+					vertical-align: middle;
+				}
+			}
+
+			.rel-container {
+				> button {
+					vertical-align: middle;
+				}
 			}
 		}
 

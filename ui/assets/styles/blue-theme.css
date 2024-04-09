@@ -1413,8 +1413,6 @@ button {
 .zi-i-warning, .zi-i-warning.btn-icon {
   color: #ffffff;
   background-color: #e99003; }
-.zi-i-warning.btn-breadcrumb-icon {
-  vertical-align: 5%; }
 
 .checkbox-list {
   display: grid;
@@ -4957,8 +4955,11 @@ pre, pre a, pre td, pre span {
   .header-navigation > ul {
     flex-wrap: wrap; }
     .header-navigation > ul > li .status-container {
-      margin-right: 5px;
-      vertical-align: text-bottom; }
+      margin-right: 5px; }
+      .header-navigation > ul > li .status-container > span {
+        vertical-align: middle; }
+    .header-navigation > ul > li .rel-container > button {
+      vertical-align: middle; }
     .header-navigation > ul li > span.selected {
       background-color: #ffffff;
       border-radius: 2px;

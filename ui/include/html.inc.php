@@ -362,14 +362,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_icons = getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
+			$info_icons = [getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
 				$db_host['hostDiscovery']['ts_disable'], $disable_source,
 				$db_host['status'] == HOST_STATUS_NOT_MONITORED, _('host')
-			);
+			)];
 
-			$list->addItem(makeInformationList([
-				$info_icons->addClass(ZBX_STYLE_BTN_BREADCRUMB_ICON)
-			]));
+			$list->addItem(makeInformationList($info_icons));
 		}
 	}
 
