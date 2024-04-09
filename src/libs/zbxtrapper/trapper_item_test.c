@@ -623,14 +623,6 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	{
-	char *str = NULL;
-	size_t offset = 0, alloc = 0;
-	zbx_strcpy_alloc(&str, &alloc, &offset, jp->start);
-	zbx_error("KDEBUG :: request json\n%s", str);
-	zbx_free(str);
-	}
-
 	zbx_json_init(&json, 1024);
 
 	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
