@@ -1371,8 +1371,8 @@ static zbx_lld_hgset_t	*lld_hgset_make(zbx_vector_uint64_t *groupids)
 	return hgset;
 }
 
-static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t *hgsets,
-		zbx_vector_uint64_t *del_hgsetids)
+static void	lld_hgsets_make(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t *hosts,
+		zbx_vector_lld_hgset_ptr_t *hgsets, zbx_vector_uint64_t *del_hgsetids)
 {
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
