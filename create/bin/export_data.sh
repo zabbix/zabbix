@@ -60,7 +60,7 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 		fld_line=${fld_line#*|}		# <ref_table>
 		ref_field=${fld_line%%|*}
 
-		fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+		fields="${fields}${delim}replace(replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;'),'\t','&tab;') as ${field}"
 		delim=','
 
 		if [[ ${ref_table} == ${table} ]]; then
