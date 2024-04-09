@@ -176,6 +176,7 @@ class CControllerLatestView extends CControllerLatest {
 		// Prepare subfilter data.
 		$subfilters_fields = self::getSubfilterFields($filter);
 		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
+		$is_subfilter_set = $this->isSubfilterSet($subfilters);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 		if ($filter['state'] != -1) {
@@ -217,6 +218,7 @@ class CControllerLatestView extends CControllerLatest {
 			'refresh_data' => $refresh_data,
 			'filter_defaults' => $profile->filter_defaults,
 			'mandatory_filter_set' => $mandatory_filter_set,
+			'is_subfilter_set' => $is_subfilter_set,
 			'filter_view' => 'monitoring.latest.filter',
 			'filter_tabs' => $filter_tabs,
 			'tabfilter_options' => [

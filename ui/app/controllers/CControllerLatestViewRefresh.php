@@ -70,6 +70,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			// Prepare subfilter data.
 			$subfilters_fields = self::getSubfilterFields($filter);
 			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
+			$is_subfilter_set = $this->isSubfilterSet($subfilters);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 			if ($filter['state'] != -1) {
@@ -89,6 +90,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 				'results' => [
 					'filter' => $filter,
 					'mandatory_filter_set' => $mandatory_filter_set,
+					'is_subfilter_set' => $is_subfilter_set,
 					'view_curl' => $view_url,
 					'sort_field' => $filter['sort'],
 					'sort_order' => $filter['sortorder'],
