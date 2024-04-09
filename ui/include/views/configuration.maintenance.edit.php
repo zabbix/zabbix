@@ -144,7 +144,7 @@ $tag_table = (new CTable())
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern(true)
 				->setEnabled($data['maintenance_type'] != MAINTENANCE_TYPE_NODATA)
-				->setReadonly(!$data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] != MAINTENANCE_TYPE_NODATA)
 		))->setColSpan(4)
 	);
 
