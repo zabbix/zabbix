@@ -1686,7 +1686,7 @@ class CUser extends CApiService {
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
-	private static function updateMedias(array &$users, array &$db_users = null): void {
+	private static function updateMedias(array &$users, array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
