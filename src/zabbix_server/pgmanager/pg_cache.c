@@ -1179,11 +1179,11 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 	zbx_pg_group_t		*group;
 	char			*tmp;
 	int			failover_delay, min_online;
+	zbx_hashset_iter_t	iter;
 
-	for (int i = 0; i < cache->group_updates.values_num; i++)
+	zbx_hashset_iter_reset(&cache->groups, &iter);
+	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		group = cache->group_updates.values[i];
-
 		if (ZBX_PG_GROUP_STATE_DISABLED == group->state)
 			continue;
 
@@ -1280,6 +1280,9 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 			group->state = state;
 			group->state_time = now;
 			group->flags |= ZBX_PG_GROUP_UPDATE_STATE;
+
+			if (ZBX_PG_GROUP_STATE_ONLINE == group->state)
+				pg_cache_queue_group_update(cache, group);
 		}
 
 		if (ZBX_PG_GROUP_STATE_ONLINE == group->state)
