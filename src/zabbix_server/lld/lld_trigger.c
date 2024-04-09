@@ -252,7 +252,6 @@ zbx_lld_trigger_ref_t;
 
 static void	lld_trigger_ref_free(zbx_lld_trigger_ref_t *lld_trigger_ref)
 {
-	zbx_free(lld_trigger_ref->trigger);
 	zbx_free(lld_trigger_ref);
 }
 

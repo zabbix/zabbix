@@ -22,6 +22,7 @@
 
 #include "zbxdbhigh.h"
 
-void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
+void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		int config_history_storage_pipelines, int *more);
 
 #endif
