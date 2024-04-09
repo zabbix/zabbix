@@ -62,7 +62,7 @@ class CWidgetItemNavigator extends CWidget {
 
 	updateProperties({name, view_mode, fields}) {
 		if (this.#item_navigator !== null) {
-			//this.#item_navigator.destroy();
+			this.#item_navigator.destroy();
 			this.#item_navigator = null;
 		}
 
@@ -71,18 +71,19 @@ class CWidgetItemNavigator extends CWidget {
 
 	setContents(response) {
 		if (this.#item_navigator === null) {
-			// this.#item_navigator = new CItemNavigator(response.config);
-			//
-			// this._body.appendChild(this.#item_navigator.getContainer());
+			this.#item_navigator = new CItemNavigator(response.config);
+
+			this._body.appendChild(this.#item_navigator.getContainer());
 
 			this.#registerEvents();
 			this.#activateEvents();
 		}
 
-		// this.#item_navigator.setValue({
-		// 	items: response.items,
-		// 	is_limit_exceeded: response.is_limit_exceeded
-		// });
+		this.#item_navigator.setValue({
+			items: response.items,
+			hosts: response.hosts,
+			is_limit_exceeded: response.is_limit_exceeded
+		});
 	}
 
 	#registerEvents() {
@@ -100,8 +101,12 @@ class CWidgetItemNavigator extends CWidget {
 	}
 
 	#activateEvents() {
-		// this.#item_navigator.getContainer().addEventListener('item.select', this.#events.itemSelect);
-		// this.#item_navigator.getContainer().addEventListener('group.toggle', this.#events.groupToggle);
+		this.#item_navigator.getContainer().addEventListener(CItemNavigator.EVENT_ITEM_SELECT,
+			this.#events.itemSelect
+		);
+		this.#item_navigator.getContainer().addEventListener(CItemNavigator.EVENT_GROUP_TOGGLE,
+			this.#events.groupToggle
+		);
 	}
 
 	/**

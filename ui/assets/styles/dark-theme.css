@@ -1212,7 +1212,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
   min-width: 18px;
   height: 18px; }
 
-button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
+button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
   min-width: 16px;
   height: 16px; }
 
@@ -3063,6 +3063,100 @@ output {
   font-weight: bold;
   color: #e99003; }
 
+.navigation-tree .navigation-tree-node-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 9px 8px;
+  border-bottom: 1px solid #383838; }
+  .navigation-tree .navigation-tree-node-info:hover {
+    background-color: #383838; }
+.navigation-tree .navigation-tree-node-info-helpers {
+  display: flex; }
+.navigation-tree .navigation-tree-node-info-primary {
+  display: flex;
+  flex-grow: 1;
+  gap: 4px;
+  min-width: 0;
+  height: 18px;
+  line-height: 18px; }
+.navigation-tree [data-level="0"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 0px; }
+.navigation-tree [data-level="1"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 15px; }
+.navigation-tree [data-level="2"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 30px; }
+.navigation-tree [data-level="3"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 45px; }
+.navigation-tree [data-level="4"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 60px; }
+.navigation-tree [data-level="5"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 75px; }
+.navigation-tree [data-level="6"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 90px; }
+.navigation-tree [data-level="7"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 105px; }
+.navigation-tree [data-level="8"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 120px; }
+.navigation-tree [data-level="9"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 135px; }
+.navigation-tree [data-level="10"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 150px; }
+.navigation-tree .navigation-tree-node-info-arrow {
+  width: 16px; }
+  .navigation-tree .navigation-tree-node-info-arrow button {
+    display: block;
+    padding: 0;
+    cursor: pointer;
+    line-height: 16px;
+    text-align: center;
+    border: 0;
+    background-color: transparent; }
+    .navigation-tree .navigation-tree-node-info-arrow button .arrow-right {
+      border-left-color: #737373; }
+    .navigation-tree .navigation-tree-node-info-arrow button .arrow-down {
+      position: relative;
+      top: -1px;
+      border-top-color: #737373; }
+    .navigation-tree .navigation-tree-node-info-arrow button:hover .arrow-right, .navigation-tree .navigation-tree-node-info-arrow button:focus .arrow-right {
+      border-left-color: #4796c4; }
+    .navigation-tree .navigation-tree-node-info-arrow button:hover .arrow-down, .navigation-tree .navigation-tree-node-info-arrow button:focus .arrow-down {
+      border-top-color: #4796c4; }
+.navigation-tree .navigation-tree-node-children {
+  display: none; }
+.navigation-tree .navigation-tree-node-is-open > .navigation-tree-node-children {
+  display: block; }
+.navigation-tree .navigation-tree-node-info-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+.navigation-tree .navigation-tree-group-uncategorized > .navigation-tree-node-info .navigation-tree-node-info-name {
+  font-style: italic;
+  padding-left: 0.2em;
+  padding-right: 0.2em; }
+.navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info {
+  cursor: pointer; }
+  .navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info .navigation-tree-node-info-name {
+    color: #4796c4; }
+.navigation-tree .navigation-tree-node-info-problems {
+  display: flex; }
+
+.navigation-tree-node-info-group-hint .navigation-tree-group-uncategorized {
+  font-style: italic; }
+
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+  line-height: 18px; }
+  .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity .navigation-tree-node-info-problems-hint-severity-color {
+    margin-right: 10px; }
+
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color {
+  width: 10px;
+  height: 10px; }
+
 .radio-list-control {
   display: inline-block;
   height: 24px;
@@ -4204,6 +4298,20 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 
 form.dashboard-widget-itemnavigator .item-grouping {
   line-height: 1.4em; }
+
+div.dashboard-widget-itemnavigator .item-navigator .item-navigator-limit {
+  display: flex;
+  justify-content: flex-end;
+  height: 18px;
+  padding: 9px 8px;
+  color: #737373; }
+div.dashboard-widget-itemnavigator .item-navigator .item-navigator-no-data {
+  display: flex;
+  justify-content: center;
+  height: 18px;
+  padding: 9px 8px;
+  color: #737373;
+  border-bottom: 1px solid #383838; }
 
 div.dashboard-widget-map .sysmap-widget-container {
   overflow: hidden;
@@ -6354,7 +6462,7 @@ td[class] + td.disaster-bg {
 .ok-ack-fg {
   color: #00ff00; }
 
-div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+.navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
   background-color: #2f280a; }
 
 @keyframes is-loading-kf {

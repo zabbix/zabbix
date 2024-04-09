@@ -114,6 +114,7 @@ $available_js = [
 	'class.tabfilteritem.js' => '',
 	'class.tagfilteritem.js' => '',
 	'class.template.js' => '',
+	'class.navigationtree.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
 	// templates
@@ -439,6 +440,16 @@ $translate_strings = [
 		'Open URL' => _('Open URL'),
 		'Unexpected server error.' => _('Unexpected server error.'),
 		'URL opening confirmation' => _('URL opening confirmation')
+	],
+	'class.navigationtree.js' => [
+		'Not classified' => _('Not classified'),
+		'Information' => _('Information'),
+		'Warning' => _('Warning'),
+		'Average' => _('Average'),
+		'High' => _('High'),
+		'Disaster' => _('Disaster'),
+		'Maintenance with data collection' => _('Maintenance with data collection'),
+		'Maintenance without data collection' => _('Maintenance without data collection')
 	]
 ];
 
@@ -469,6 +480,7 @@ if (empty($_GET['files'])) {
 		'class.sidebar.js',
 		'class.sortable.js',
 		'class.template.js',
+		'class.navigationtree.js',
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
