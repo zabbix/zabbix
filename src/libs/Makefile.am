@@ -9,7 +9,6 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
-	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -43,6 +42,7 @@ DIST_SUBDIRS = \
 	zbxhttp \
 	zbxhttppoller \
 	zbxicmpping \
+	zbxinterface \
 	zbxip \
 	zbxipcservice \
 	zbxipmi \
@@ -60,6 +60,7 @@ DIST_SUBDIRS = \
 	zbxpoller \
 	zbxagentget \
 	zbxpreproc \
+	zbxpreprocbase \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxregexp \
@@ -95,7 +96,6 @@ SERVER_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
-	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
 	zbxdiscovery \
@@ -119,6 +119,7 @@ SERVER_SUBDIRS = \
 	zbxhttp \
 	zbxhttppoller \
 	zbxicmpping \
+	zbxinterface \
 	zbxip \
 	zbxkvs \
 	zbxmedia \
@@ -128,6 +129,7 @@ SERVER_SUBDIRS = \
 	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
+	zbxpreprocbase \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
@@ -183,6 +185,7 @@ PROXY_SUBDIRS = \
 	zbxhttp \
 	zbxhttppoller \
 	zbxicmpping \
+	zbxinterface \
 	zbxip \
 	zbxkvs \
 	zbxnum \
@@ -191,6 +194,7 @@ PROXY_SUBDIRS = \
 	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
+	zbxpreprocbase \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
@@ -241,6 +245,7 @@ SUBDIRS = \
 	zbxhash \
 	zbxhttp \
 	zbxhttppoller \
+	zbxinterface \
 	zbxip \
 	zbxipcservice \
 	zbxjson \

@@ -24,7 +24,7 @@
 #include "zbxipcservice.h"
 
 void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int *more);
+		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 

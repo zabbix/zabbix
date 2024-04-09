@@ -17,13 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AUDIT_SETTINGS_H
-#define ZABBIX_AUDIT_SETTINGS_H
+#include "dbconfigworker.h"
 
-#include "zbxtypes.h"
+#include "zbxserialize.h"
+#include "zbxalgo.h"
 
-void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t configid);
-void	zbx_audit_settings_update_field_int(int audit_context_mode, zbx_uint64_t configid, const char *key,
-		int old_value, int new_value);
+void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_offset, const zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	data_len = 0, vector_uint64_len;
 
-#endif
+	zbx_serialize_prepare_vector_uint64_len(data_len, ids, vector_uint64_len);
+
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	*data_offset = data_len;
+
+	zbx_serialize_vector_uint64(*data, ids, vector_uint64_len);
+}
+
+void	zbx_dbconfig_worker_deserialize_ids(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	vector_uint64_len;
+
+	if (0 != size)
+		(void)zbx_deserialize_vector_uint64(data, ids, vector_uint64_len);
+}

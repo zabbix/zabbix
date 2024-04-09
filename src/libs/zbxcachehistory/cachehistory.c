@@ -1784,7 +1784,7 @@ void	zbx_db_mass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vecto
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
+static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
 	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
@@ -1831,7 +1831,8 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 
 		do
 		{
-			sync_history_cb(&values_num, &triggers_num, events_cbs, NULL, &more);
+			sync_history_cb(&values_num, &triggers_num, events_cbs, NULL, config_history_storage_pipelines,
+					&more);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)values_num / (cache->history_num + values_num) * 100);
@@ -1896,29 +1897,30 @@ void	zbx_log_sync_history_cache_progress(void)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: writes updates and new data from history cache to database        *
- *                                                                            *
- * Parameters:                                                                *
- *             events_cbs   - [IN]                                            *
- *             rtc          - [IN] RTC socket                                 *
- *             values_num   - [OUT] the number of synced values               *
- *             triggers_num - [OUT]                                           *
- *             more         - [OUT] a flag indicating the cache emptiness:    *
- *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
- *                                ZBX_SYNC_MORE - more data to sync           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc, int *values_num,
-		int *triggers_num, int *more)
+/***************************************************************************************
+ *                                                                                     *
+ * Purpose: writes updates and new data from history cache to database                 *
+ *                                                                                     *
+ * Parameters:                                                                         *
+ *   events_cbs                       - [IN]                                           *
+ *   rtc                              - [IN] RTC socket                                *
+ *   config_history_storage_pipelines - [IN]                                           *
+ *   values_num                       - [OUT] number of synced values                  *
+ *   triggers_num                     - [OUT]                                          *
+ *   more                             - [OUT] flag indicating cache emptiness:         *
+ *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
+ *                                            ZBX_SYNC_MORE - more data to sync        *
+ *                                                                                     *
+ ***************************************************************************************/
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, int *values_num, int *triggers_num, int *more)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
 	*values_num = 0;
 	*triggers_num = 0;
 
-	sync_history_cb(values_num, triggers_num, events_cbs, rtc, more);
+	sync_history_cb(values_num, triggers_num, events_cbs, rtc, config_history_storage_pipelines, more);
 }
 
 /******************************************************************************
@@ -3169,11 +3171,11 @@ out:
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
+static void	DCsync_all(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	sync_history_cache_full(events_cbs);
+	sync_history_cache_full(events_cbs, config_history_storage_pipelines);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
@@ -3186,12 +3188,12 @@ static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-		DCsync_all(events_cbs);
+		DCsync_all(events_cbs, config_history_storage_pipelines);
 
 	cache = NULL;
 
