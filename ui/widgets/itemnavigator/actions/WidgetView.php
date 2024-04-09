@@ -167,7 +167,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				$items = array_merge($items, API::Item()->get($options));
 
-				$selected_items_cnt += count($items);
+				$selected_items_cnt = count($items);
 			}
 		}
 		elseif ($override_hostid !== '') {
