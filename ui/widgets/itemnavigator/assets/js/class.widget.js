@@ -60,15 +60,6 @@ class CWidgetItemNavigator extends CWidget {
 		};
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this.#item_navigator !== null) {
-			this.#item_navigator.destroy();
-			this.#item_navigator = null;
-		}
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	setContents(response) {
 		if (this.#item_navigator === null) {
 			this.#item_navigator = new CItemNavigator(response.config);
