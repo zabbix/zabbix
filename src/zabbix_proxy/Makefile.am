@@ -115,6 +115,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
+	$(top_builddir)/src/libs/zbxinterface/libzbxinterface.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \

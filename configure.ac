@@ -1876,6 +1876,7 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
+		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
@@ -2034,6 +2035,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxip/Makefile
+	src/libs/zbxinterface/Makefile
 	src/libs/zbxipcservice/Makefile
 	src/libs/zbxipmi/Makefile
 	src/libs/zbxjson/Makefile
