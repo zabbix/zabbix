@@ -6612,7 +6612,8 @@ tr.cursor-move td * {
   position: relative;
   display: inline-block;
   min-width: 16px;
-  white-space: nowrap; }
+  white-space: nowrap;
+  line-height: 16px; }
 
 main .server-name {
   float: right;
