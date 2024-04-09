@@ -56,7 +56,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		->setOptions($data['tabfilter_options'])
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	if ($data['mandatory_filter_set'] && ($data['items'] || $data['is_subfilter_set'])) {
+	if ($data['mandatory_filter_set'] && ($data['items'] || $data['subfilter_set'])) {
 		$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
 			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
 		);
