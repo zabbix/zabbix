@@ -619,7 +619,10 @@ class CSetupWizard extends CForm {
 			// HashiCorp Vault - related fields.
 			->addRow(
 				(new CLabel(_('Vault secret path')))->setAsteriskMark(),
-				(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
+				(new CTextBox('vault_db_path', $db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP
+					? $this->getConfig('DB_VAULT_DB_PATH')
+					: ''
+				))
 					->setAttribute('placeholder', CVaultHashiCorp::DB_PATH_PLACEHOLDER)
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'vault_db_path_row',
@@ -635,7 +638,10 @@ class CSetupWizard extends CForm {
 			// CyberArk Vault - related fields.
 			->addRow(
 				(new CLabel(_('Vault secret query string')))->setAsteriskMark(),
-				(new CTextBox('vault_query_string', $this->getConfig('DB_VAULT_DB_PATH')))
+				(new CTextBox('vault_query_string', $db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK
+					? $this->getConfig('DB_VAULT_DB_PATH')
+					: ''
+				))
 					->setAttribute('placeholder', CVaultCyberArk::DB_PATH_PLACEHOLDER)
 					->setAttribute('maxlength', 2048)
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
