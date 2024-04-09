@@ -94,8 +94,6 @@
 }
 
 .zi-filter {
-	@extend .zi-filter;
-
 	&::before {
 		font-size: 45px;
 	}
@@ -172,8 +170,6 @@
 }
 
 .zi-search {
-	@extend .zi-search;
-
 	&::before {
 		font-size: 45px;
 	}

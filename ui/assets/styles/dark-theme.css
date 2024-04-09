@@ -46,7 +46,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1711795965371") format("woff2"), url("../fonts/zabbix-icons.woff?t=1711795965371") format("woff"), url("../fonts/zabbix-icons.ttf?t=1711795965371") format("truetype"), url("../fonts/zabbix-icons.svg?t=1711795965371#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1712654503350") format("woff2"), url("../fonts/zabbix-icons.woff?t=1712654503350") format("woff"), url("../fonts/zabbix-icons.ttf?t=1712654503350") format("truetype"), url("../fonts/zabbix-icons.svg?t=1712654503350#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .z-select .focusable::after,
 z-select .focusable::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after {
