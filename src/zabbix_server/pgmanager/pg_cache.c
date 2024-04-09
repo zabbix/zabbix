@@ -441,6 +441,9 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 {
 	zbx_vector_pg_proxy_ptr_t	proxies;
 
+	if (0 == group->unassigned_hostids.values_num)
+		return;
+
 	zbx_vector_pg_proxy_ptr_create(&proxies);
 
 	for (int i = 0; i < group->proxies.values_num; i++)
