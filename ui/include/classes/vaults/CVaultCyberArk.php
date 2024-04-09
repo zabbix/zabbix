@@ -38,7 +38,7 @@ class CVaultCyberArk extends CVault {
 
 	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, ?string $cert_file, ?string $key_file) {
 		$this->api_endpoint = $api_endpoint;
-		$this->db_prefix = $db_prefix === '' ? self::API_ENDPOINT_DEFAULT : $db_prefix;
+		$this->db_prefix = $db_prefix === '' ? self::DB_PREFIX_DEFAULT : $db_prefix;
 		$this->db_path = $db_path;
 		$this->cert_file = $cert_file !== null ? trim($cert_file) : null;
 		$this->key_file = $key_file !== null ? trim($key_file) : null;
