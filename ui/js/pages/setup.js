@@ -61,7 +61,7 @@ const view = new class {
 					for (const id of input_ids) {
 						const input = document.getElementById(id);
 
-						input.value = input.trim();
+						input.value = input.value.trim();
 					}
 				});
 
