@@ -4964,10 +4964,10 @@ pre, pre a, pre td, pre span {
     flex-wrap: wrap; }
     .header-navigation > ul > li .status-container {
       margin-right: 5px; }
-      .header-navigation > ul > li .status-container > span {
-        vertical-align: middle; }
-    .header-navigation > ul > li .rel-container > button {
-      vertical-align: middle; }
+    .header-navigation > ul > li .status-container,
+    .header-navigation > ul > li .rel-container {
+      line-height: 17px;
+      vertical-align: baseline; }
     .header-navigation > ul li > span.selected {
       background-color: #2b2b2b;
       border-radius: 2px;
@@ -6620,8 +6620,7 @@ tr.cursor-move td * {
   position: relative;
   display: inline-block;
   min-width: 16px;
-  white-space: nowrap;
-  line-height: 16px; }
+  white-space: nowrap; }
 
 main .server-name {
   float: right;

@@ -340,16 +340,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		& > li {
 			.status-container {
 				margin-right: 5px;
-
-				> span {
-					vertical-align: middle;
-				}
 			}
 
+			.status-container,
 			.rel-container {
-				> button {
-					vertical-align: middle;
-				}
+				line-height: 17px;
+				vertical-align: baseline;
 			}
 		}
 
@@ -2924,7 +2920,6 @@ tr.cursor-move {
 	display: inline-block;
 	min-width: 16px;
 	white-space: nowrap;
-	line-height: 16px;
 }
 
 main {
