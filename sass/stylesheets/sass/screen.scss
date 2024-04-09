@@ -63,6 +63,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/svg-gauge";
 @import "components/svg-graph";
 @import "components/svg-piechart";
+@import "components/svg-honeycomb";
 @import "components/tabfilter";
 @import "components/tabs";
 @import "components/toc";
@@ -71,6 +72,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-gauge";
+@import "components/dashboard/widget-honeycomb";
 @import "components/dashboard/widget-hostavail";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
@@ -492,12 +494,6 @@ form {
 
 		span {
 			white-space: normal;
-		}
-	}
-
-	&:last-child {
-		.dashboard-widget {
-			margin: 0 0 10px;
 		}
 	}
 }
@@ -1438,12 +1434,12 @@ select {
 }
 
 .ui-draggable {
-	.dashboard-widget-head {
+	.overlay-dialogue-header {
 		cursor: grab;
 	}
 
 	&.ui-draggable-dragging {
-		.dashboard-widget-head {
+		.overlay-dialogue-header {
 			cursor: grabbing;
 		}
 	}
@@ -1615,6 +1611,18 @@ select {
 	width: 100%;
 }
 
+.qr-code {
+	height: 190px;
+	width: 190px;
+	margin: 20px auto;
+	color: #{$font-color};
+	background-color: #{$ui-bg-color};
+}
+
+.qr-code img {
+	image-rendering: pixelated;
+}
+
 // Action Menus, Pop-up Menus.
 .menu-popup-overlay {
 	position: fixed;
@@ -1730,9 +1738,10 @@ select {
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
-	.dashboard-widget-head {
+	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
+		display: flex;
 
 		.btn-icon {
 			@extend %button-size-medium;
@@ -1752,6 +1761,16 @@ select {
 				margin-right: -6px;
 			}
 		}
+
+		h4 {
+			color: widget-head-font-color($font-color);
+			font-weight: bold;
+			margin-right: auto;
+		}
+
+		& > ul {
+			margin: -8px -10px -10px 10px;
+		}
 	}
 
 	&.modal {
@@ -1760,7 +1779,7 @@ select {
 		margin: 0 10px;
 		padding: 13px 10px 10px;
 
-		.dashboard-widget-head {
+		.overlay-dialogue-header {
 			margin-bottom: 12px;
 		}
 
@@ -2237,7 +2256,7 @@ select {
 .notif.overlay-dialogue {
 	width: 250px;
 
-	.dashboard-widget-head {
+	.overlay-dialogue-header {
 		ul {
 			margin: 0 auto 0 0;
 
@@ -3919,36 +3938,21 @@ z-select {
 	}
 }
 
-.overlay-dialogue #host-form {
-	#tagsFormList,
-	#macrosFormList,
-	#valuemap-formlist {
-		.form-field {
-			grid-column-start: 1;
-		}
+.overlay-dialogue {
+	#host-form,
+	#templates-form {
+		#macrosFormList {
+			.form-field {
+				grid-column-start: 1;
+			}
 
-		.table-forms-td-left {
-			display: none;
-		}
+			.table-forms-td-left {
+				display: none;
+			}
 
-		.table-forms-td-right {
-			width: 100%;
-		}
-	}
-}
-
-.overlay-dialogue #templates-form {
-	#macrosFormList {
-		.form-field {
-			grid-column-start: 1;
-		}
-
-		.table-forms-td-left {
-			display: none;
-		}
-
-		.table-forms-td-right {
-			width: 100%;
+			.table-forms-td-right {
+				width: 100%;
+			}
 		}
 	}
 }

@@ -60,9 +60,9 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 			'placeholder' => $this->placeholder,
 			'popup' => [
 				'parameters' => [
-						'dstfrm' => $this->form_name,
-						'dstfld1' => $this->getId()
-					] + $this->getPopupParameters()
+					'dstfrm' => $this->form_name,
+					'dstfld1' => $this->getId()
+				] + $this->getPopupParameters()
 			],
 			'add_post_js' => false
 		];

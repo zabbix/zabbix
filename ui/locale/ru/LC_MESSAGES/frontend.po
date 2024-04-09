@@ -458,6 +458,10 @@ msgstr "БУДИЛЬНИК"
 msgid "API access"
 msgstr "Доступ к API"
 
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
 msgid "API methods"
@@ -1131,6 +1135,17 @@ msgstr "Расширенные подписи"
 msgid "Advanced options"
 msgstr "Расширенные опции"
 
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr ""
+
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
@@ -1591,6 +1606,10 @@ msgstr "В (час:минута)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Должен быть указан хотя бы один сервер LDAP."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2119,6 +2138,18 @@ msgstr "Утилизация CPU в процентах. Возвращает ч�
 msgid "CRLF"
 msgstr "CRLF"
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr ""
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr "CSV в JSON"
@@ -2567,6 +2598,11 @@ msgstr[0] "Не удалось удалить API токен"
 msgstr[1] "Не удалось удалить API токены"
 msgstr[2] "Не удалось удалить API токены"
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2605,6 +2641,10 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "Не удалось удалить панель"
 msgstr[1] "Не удалось удалить панели"
 msgstr[2] "Не удалось удалить панели"
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr ""
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3692,6 +3732,13 @@ msgstr "Не удается удалить тег с именем \"%1$s\" и з
 msgid "Cannot rename guest user."
 msgstr "Невозможно переименовать гостевого пользователя."
 
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
 msgid "Cannot save discovery rule without checks."
@@ -4253,6 +4300,10 @@ msgstr "Изменить"
 msgid "Change PSK"
 msgstr "Изменить PSK"
 
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr ""
+
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
 #: widgets/item/includes/WidgetForm.php:252
@@ -4464,6 +4515,14 @@ msgstr "Нажмите и переместите до желаемого раз�
 msgid "Click to view or edit"
 msgstr "Нажмите для просмотра или изменения"
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr ""
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr ""
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "Часы"
@@ -4548,6 +4607,10 @@ msgstr "Закрыть проблему"
 msgid "Close problems"
 msgstr "Закрытие проблем"
 
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -4591,6 +4654,10 @@ msgstr "Цвет \"%1$s\" некорректный: ожидается шест�
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "Цвет (ОК)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr ""
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5631,6 +5698,12 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS имя"
 
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/maintenance.timeperiod.edit.php:80 app/views/popup.sla.edit.php:75
@@ -5997,6 +6070,10 @@ msgstr "По умолчанию (%1$s)"
 msgid "Default LDAP server must be specified."
 msgstr "Необходимо указать LDAP сервер по умолчанию."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
 msgstr "Доступ по умолчанию к новым элементам интерфейса"
@@ -6182,6 +6259,11 @@ msgstr "Удалить элемент данных?"
 #: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "Удалить связи между выбранными элементами?"
+
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr ""
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6712,6 +6794,11 @@ msgstr "Деактивировать узлы сети наблюдаемые в
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Деактивировать узлы сети наблюдаемые выбранными прокси?"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr ""
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6872,6 +6959,14 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: include/views/js/monitoring.sysmaps.js.php:285
 msgid "Disabled"
 msgstr "Деактивировано"
+
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -7099,6 +7194,10 @@ msgstr "Отображать триггеры в состоянии ОК в те
 msgid "Display graph"
 msgstr "Показать график"
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr "Отображение мин/макс/сред"
@@ -7252,6 +7351,10 @@ msgstr ""
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
 msgstr ""
 
 #: include/classes/api/services/CMap.php:614
@@ -7528,6 +7631,10 @@ msgstr "Активировать узлы сети наблюдаемые выб
 msgid "Enable internal housekeeping"
 msgstr "Активировать внутреннюю очистку истории"
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7768,6 +7875,10 @@ msgstr "Бюджет времени простоя"
 msgctxt "compact table header"
 msgid "Error budget"
 msgstr "Бюджет времени простоя"
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
+msgstr ""
 
 #: include/db.inc.php:554
 #, c-format
@@ -9048,6 +9159,10 @@ msgstr "Аппаратные средства (полная детализаци
 msgid "Hardware sensor reading. Returns float"
 msgstr "Значение аппаратного сенсора. Возвращает число с плавающей точкой"
 
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
 msgid "HashiCorp Vault"
@@ -9209,6 +9324,10 @@ msgstr "Функции истории"
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Домой"
+
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr ""
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -11172,6 +11291,11 @@ msgstr "Ошибочная конфигурация сопоставления �
 msgid "Invalid LDAP configuration"
 msgstr "Некорректные настройки LDAP"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Ошибочная конфигурация сопоставления способа оповещения JIT инициализации SAML."
@@ -11687,6 +11811,10 @@ msgstr "Элемент данных в \"неподдерживаемом\" со
 msgid "Item list"
 msgstr "Список элементов данных"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Элемент данных не выбран"
@@ -11967,6 +12095,10 @@ msgstr "LDAP сервер"
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP аутентификация"
+
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12535,6 +12667,19 @@ msgstr "MD2"
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Сумма MD5 файла. Возвращает символьную строку (MD5 хеш файла)"
 
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr ""
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
 #: app/partials/hostmacros.list.html.php:36
@@ -12937,6 +13082,10 @@ msgstr "Максимальный уровень масштаба"
 msgid "Maximum concurrent checks"
 msgstr "Макс. количество параллельных проверок"
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Максимальное количество открытых файлов поддерживаемое ОС. Возвращает целое число"
@@ -12944,6 +13093,11 @@ msgstr "Максимальное количество открытых файл�
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Максимальное количество процессов поддерживаемое ОС. Возвращает целое число"
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
+msgstr ""
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13198,6 +13352,10 @@ msgstr "Сообщения"
 #: include/classes/core/CJsonRpc.php:210
 msgid "Method not found."
 msgstr "Метод не найден."
+
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
+msgstr ""
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13471,6 +13629,23 @@ msgstr "Самое критичное из дочерних услуг"
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
+
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr ""
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr ""
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
@@ -13788,6 +13963,10 @@ msgstr "Новый API токен"
 #: app/views/popup.ldap.edit.php:315
 msgid "New LDAP server"
 msgstr "Новый сервер LDAP"
+
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
+msgstr ""
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -14427,6 +14606,10 @@ msgstr "Не указаны получатели для сообщения оп�
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
 msgstr "Не обновлять"
+
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
+msgstr ""
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -15296,6 +15479,14 @@ msgstr "PHP ctype"
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "Отсутствует расширение PHP ctype (параметр конфигурации PHP --enable-ctype)."
 
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
 msgstr "Поддержка баз данных PHP"
@@ -15807,6 +15998,10 @@ msgstr "Пожалуйста, создайте базу данных вручн�
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Пожалуйста, включите \"allow_url_fopen\" директиву."
 
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
+msgstr ""
+
 #: jsLoader.php:261
 msgid "Please select two elements"
 msgstr "Пожалуйста, выберите два элемента"
@@ -16008,6 +16203,15 @@ msgstr "Первичный телефон B для контакта"
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
 msgstr "Первичное ник-имя для контакта"
+
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16567,6 +16771,10 @@ msgstr "Прямоугольник"
 msgid "Reference attribute"
 msgstr "Атрибут ссылки"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Обновить"
@@ -16998,6 +17206,10 @@ msgstr "Требуемый vps"
 #: include/classes/html/CFilter.php:217 include/classes/html/CTabFilter.php:103
 msgid "Reset"
 msgstr "Сбросить"
+
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr ""
 
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
@@ -17675,6 +17887,10 @@ msgstr "Размер шкалы"
 msgid "Scan directory"
 msgstr "Сканировать директорию"
 
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
 msgstr "Сценарий"
@@ -17899,6 +18115,15 @@ msgstr "Вторичный телефон B для контакта"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "Вторичное ник-имя для контакта"
+
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18511,6 +18736,10 @@ msgstr "Отображать недоступные карты"
 msgid "Show units"
 msgstr "Показывать единицы измерения"
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr "Показывать предупреждение, если Zabbix сервер недоступен"
@@ -18522,6 +18751,10 @@ msgstr "Отображать рабочее время"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Отображено"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -19075,6 +19308,10 @@ msgstr "Субъект"
 msgid "Submap"
 msgstr "Подкарта"
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr "Подписка"
@@ -19208,6 +19445,10 @@ msgstr "Имя узла сети системы. Возвращает строк
 msgid "System information"
 msgstr "Информация о системе"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "Статистика системы. Возвращает целое число или дробное"
@@ -19246,6 +19487,21 @@ msgstr "TELNET агент"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "ВСЕГО"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19675,6 +19931,20 @@ msgstr "Метод \"%1$s.%2$s\" должен вызываться без заг
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "Метод \"%1$s.%2$s\" должен вызываться без \"auth\" параметра."
 
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr ""
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "Шаблон URL используется для загрузки и отображения слоя плитки на географических картах."
@@ -19802,6 +20072,14 @@ msgstr "Триггер более не обнаруживается и буде�
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Триггер более не обнаруживается и будет удален при следующей обработке правила обнаружения."
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
+msgstr ""
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20802,6 +21080,11 @@ msgstr "Не удалось получить состояние поддержк
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Не удалось получить версию TimescaleDB."
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr ""
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "Не удалось выбрать конфигурацию."
@@ -21368,6 +21651,11 @@ msgstr "Пользователь \"%1$s\" используется в \"%2$s\" �
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "Пользователь \"%1$s\" является пользователем от имени которого создан \"%2$s\" шаблон."
+
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
+msgstr ""
 
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
@@ -22272,6 +22560,11 @@ msgstr "Значения"
 msgid "Values without names are not allowed in form fields."
 msgstr "Значения без имен не разрешены в полях форм."
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -22333,6 +22626,10 @@ msgstr "Поставщик и версия"
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Подробно"
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22921,6 +23218,10 @@ msgstr "Вчера"
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Вы вошли под именем \"%1$s\"."
+
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
+msgstr ""
 
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
@@ -23630,6 +23931,16 @@ msgstr "не может быть пустым"
 msgid "cannot be equal to zero without custom intervals"
 msgstr "не может быть равно нулю без наличия пользовательских интервалов"
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23776,6 +24087,10 @@ msgstr "д"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - Текущая дата"
@@ -23805,6 +24120,10 @@ msgstr "по умолчанию"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Конвертация значения из радианов в градусы"
+
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
+msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -23974,6 +24293,10 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "глобальные настройки очистки истории"
 
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr "прототип графиков с таким UUID уже существует"
@@ -23999,6 +24322,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr ""
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24242,6 +24573,10 @@ msgstr "меньше чем или равно"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "не заключено в {} или ошибочно"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -24697,6 +25032,10 @@ msgstr "объект не существует или принадлежит д�
 msgid "object does not exist, or you have no permissions to it"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
+msgstr ""
+
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
 msgstr "из"
@@ -24788,6 +25127,10 @@ msgstr "power() - Степень основного значения к знач
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
 msgstr "шаблон проблем"
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -25545,6 +25888,35 @@ msgstr "веб-сценарий с таким UUID уже существует"
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
 msgstr "можно использовать шаблоны метасимволов с '*'"
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr ""
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr ""
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr ""
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

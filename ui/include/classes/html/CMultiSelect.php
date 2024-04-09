@@ -257,7 +257,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros'
+					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -430,6 +430,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('resolve_macros', $parameters) && $parameters['resolve_macros']) {
 					$popup_parameters['resolve_macros'] = '1';
 					$autocomplete_parameters['resolve_macros'] = true;
+				}
+
+				if (array_key_exists('exclude_provisioned', $parameters) && $parameters['exclude_provisioned']) {
+					$popup_parameters['exclude_provisioned'] = 1;
+					$autocomplete_parameters['exclude_provisioned'] = 1;
 				}
 			}
 

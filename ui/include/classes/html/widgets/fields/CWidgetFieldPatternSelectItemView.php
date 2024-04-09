@@ -33,16 +33,16 @@ class CWidgetFieldPatternSelectItemView extends CWidgetFieldPatternSelectView {
 
 	protected function getPopupParameters(): array {
 		return $this->popup_parameters + [
-				'srctbl' => 'items',
-				'srcfld1' => 'name'
-			] + ($this->field->isTemplateDashboard()
-				? [
-					'hostid' => $this->field->getTemplateId(),
-					'hide_host_filter' => true,
-				]
-				: [
-					'real_hosts' => true
-				]
-			);
+			'srctbl' => 'items',
+			'srcfld1' => 'name'
+		] + ($this->field->isTemplateDashboard()
+			? [
+				'hostid' => $this->field->getTemplateId(),
+				'hide_host_filter' => true
+			]
+			: [
+				'real_hosts' => true
+			]
+		);
 	}
 }

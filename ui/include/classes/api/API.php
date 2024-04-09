@@ -333,6 +333,13 @@ class API {
 	}
 
 	/**
+	 * @return CMfa
+	 */
+	public static function Mfa() {
+		return self::getApi('mfa');
+	}
+
+	/**
 	 * @return CProblem
 	 */
 	public static function Problem() {

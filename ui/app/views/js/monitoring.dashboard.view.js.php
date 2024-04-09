@@ -121,7 +121,7 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
 
-			if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
+				if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
 					jQuery('#dashboard_hostid').on('change', this.events.dashboardHostChange);
 				}
 
@@ -513,7 +513,7 @@
 			},
 
 			feedback(e) {
-				if (e.detail.type === '_timeperiod') {
+				if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
 					view.skip_time_selector_range_update = true;
 
 					$.publish('timeselector.rangechange', {

@@ -465,7 +465,7 @@ static int	DBpatch_2030043(void)
 
 static int	DBpatch_2030044(void)
 {
-	/* 21 - AUDIT_RESOURCE_NODE */
+	/* 21 - ZBX_AUDIT_RESOURCE_NODE */
 	const char	*sql = "delete from auditlog where resourcetype=21";
 
 	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))

@@ -1660,6 +1660,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers_functions = [];
 		$new_tags = [];
 		$del_triggertagids = [];
+		$upd_discovered_triggers = [];
 		$save_triggers = $triggers;
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions, $inherited);
 
@@ -1760,6 +1761,13 @@ abstract class CTriggerGeneral extends CApiService {
 					$new_tags[] = $tag_add;
 				}
 			}
+
+			if (array_key_exists('flags', $db_trigger) && $db_trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+					&& array_key_exists('status', $upd_trigger['values'])
+					&& $upd_trigger['values']['status'] == TRIGGER_STATUS_DISABLED
+					&& $upd_trigger['values']['status'] != $db_trigger['status']) {
+				$upd_discovered_triggers[] = $db_trigger['triggerid'];
+			}
 		}
 
 		if ($upd_triggers) {
@@ -1776,6 +1784,13 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		if ($new_tags) {
 			DB::insert('trigger_tag', $new_tags);
+		}
+
+		if ($upd_discovered_triggers) {
+			DB::update('trigger_discovery', [
+				'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
+				'where' => ['triggerid' => $upd_discovered_triggers]
+			]);
 		}
 
 		if (!$inherited) {

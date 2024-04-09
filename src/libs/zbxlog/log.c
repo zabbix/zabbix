@@ -20,7 +20,7 @@
 #include "zbxlog.h"
 
 #include "zbxmutexs.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxcommon.h"
@@ -258,7 +258,8 @@ void	zbx_handle_log(void)
 	UNLOCK_LOG;
 }
 
-int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *syslog_app_name, char **error)
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *syslog_app_name,
+		const char *event_source, char **error)
 {
 	const char	*filename = log_file_cfg->log_file_name;
 	int		type = log_file_cfg->log_type;
@@ -272,10 +273,11 @@ int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *sy
 #ifdef _WINDOWS
 		wchar_t	*wevent_source;
 
-		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
+		wevent_source = zbx_utf8_to_unicode(event_source);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
 		zbx_free(wevent_source);
 #else
+		ZBX_UNUSED(event_source);
 		openlog(syslog_app_name, LOG_PID, LOG_DAEMON);
 #endif
 	}

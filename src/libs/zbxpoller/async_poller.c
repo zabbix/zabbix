@@ -43,6 +43,7 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxasyncpoller.h"
 
 #include <event2/dns.h>
 
@@ -234,7 +235,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		else
 		{
 			zbx_unset_snmp_bulkwalk_options();
-			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num, zbx_progname);
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options(zbx_progname);
 			poller_config->clear_cache = 0;
 		}
@@ -281,7 +282,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			{
 				errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 						poller_config, poller_config, poller_config->base,
-						poller_config->dnsbase, poller_config->config_source_ip);
+						poller_config->dnsbase, poller_config->config_source_ip,
+						ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 			}
 			else
 			{
@@ -290,7 +292,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 						poller_config, poller_config, poller_config->base,
-						poller_config->dnsbase, poller_config->config_source_ip);
+						poller_config->dnsbase, poller_config->config_source_ip,
+						ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 	#else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled"
@@ -491,7 +494,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	struct event			*rtc_event;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 #ifdef HAVE_LIBCURL
-	zbx_asynchttppoller_config	*asynchttppoller_config;
+	zbx_asynchttppoller_config	*asynchttppoller_config = NULL;
 #endif
 	msgs_num = ZBX_POLLER_TYPE_SNMP == poller_type ? 1 : 0;
 
@@ -519,8 +522,18 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
 #ifdef HAVE_LIBCURL
-		asynchttppoller_config = zbx_async_httpagent_create(poller_config.base, process_httpagent_result,
-				poller_update_selfmon_counter, &poller_config);
+		char	*error = NULL;
+
+		zbx_async_httpagent_init();
+
+		if (NULL == (asynchttppoller_config = zbx_async_httpagent_create(poller_config.base, process_httpagent_result,
+				poller_update_selfmon_counter, &poller_config, &error)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "zbx_async_httpagent_create() error: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;
 #endif
 	}

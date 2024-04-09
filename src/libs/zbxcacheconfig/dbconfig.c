@@ -25,7 +25,7 @@
 #include "zbxtasks.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxtypes.h"
 #include "zbxvault.h"
@@ -57,6 +57,10 @@
 #include "zbxcachevalue.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
+#include "zbxmutexs.h"
+#include "zbxautoreg.h"
+#include "zbxexpression.h"
+#include "zbxinterface.h"
 
 int	sync_in_progress = 0;
 
@@ -129,12 +133,73 @@ static zbx_get_config_forks_f	get_config_forks_cb = NULL;
  ******************************************************************************/
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
-ZBX_DC_CONFIG		*config = NULL;
+zbx_dc_config_t	*config = NULL;
+
+zbx_dc_config_t	*get_dc_config(void)
+{
+	return config;
+}
+
+void	set_dc_config(zbx_dc_config_t *in)
+{
+	config = in;
+}
+
 zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+
+void	rdlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_rdlock(config_lock);
+}
+
+void	wrlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_wrlock(config_lock);
+}
+
+void	unlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_unlock(config_lock);
+}
+
 zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
-zbx_shmem_info_t	*config_mem;
+
+void	rdlock_cache_config_history(void)
+{
+	zbx_rwlock_rdlock(config_history_lock);
+}
+
+void	wrlock_cache_config_history(void)
+{
+	zbx_rwlock_wrlock(config_history_lock);
+}
+
+void	unlock_cache_config_history(void)
+{
+	zbx_rwlock_unlock(config_history_lock);
+}
+
+static zbx_shmem_info_t	*config_mem;
 
 ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
+
+void	dbconfig_shmem_free_func(void *ptr)
+{
+	__config_shmem_free_func(ptr);
+}
+
+void	*dbconfig_shmem_realloc_func(void *old, size_t size)
+{
+	return __config_shmem_realloc_func(old, size);
+}
+
+void	*dbconfig_shmem_malloc_func(void *old, size_t size)
+{
+	return __config_shmem_malloc_func(old, size);
+}
 
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
@@ -933,8 +998,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (NULL == config->config)
 	{
 		found = 0;
-		config->config = (ZBX_DC_CONFIG_TABLE *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
-		memset(config->config, 0, sizeof(ZBX_DC_CONFIG_TABLE));
+		config->config = (zbx_dc_config_table_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_table_t));
+		memset(config->config, 0, sizeof(zbx_dc_config_table_t));
 	}
 
 	if (SUCCEED != (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
@@ -2449,7 +2514,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		update->interface = interface;
 		update->host = host;
 
-				/* remove old address->interfaceid index */
+		/* remove old address->interfaceid index */
 		if (0 != found && INTERFACE_TYPE_SNMP == interface->type)
 			dc_interface_snmpaddrs_remove(interface);
 
@@ -2605,10 +2670,11 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			{
 				update->snmp->max_succeed = 0;
 				update->snmp->min_fail = ZBX_MAX_SNMP_ITEMS + 1;
-
-				dc_interface_snmpaddrs_update(update->interface);
 			}
 		}
+
+		if (INTERFACE_TYPE_SNMP == update->interface->type)
+			dc_interface_snmpaddrs_update(update->interface);
 	}
 
 	/* remove deleted interfaces from buffer */
@@ -6081,6 +6147,9 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		drule->delay = delay;
 		drule->revision = revision;
+
+		if (config->revision.drules != revision)
+			config->revision.drules = revision;
 	}
 
 	/* remove deleted discovery rules from cache and update proxy revision */
@@ -6100,6 +6169,9 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_strpool_release(drule->delay_str);
 		dc_strpool_release(drule->name);
 		zbx_hashset_remove_direct(&config->drules, drule);
+
+		if (config->revision.drules != revision)
+			config->revision.drules = revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -6153,6 +6225,9 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxyid)))
 			proxy->revision = revision;
+
+		if (config->revision.drules != revision)
+			config->revision.drules = revision;
 	}
 
 	/* remove deleted discovery checks from cache and update proxy revision */
@@ -6168,6 +6243,9 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				proxy->revision = revision;
 
 			drule->revision = revision;
+
+			if (config->revision.drules != revision)
+				config->revision.drules = revision;
 		}
 
 		dc_strpool_release(dcheck->key_);
@@ -8727,7 +8805,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 		goto out;
 	}
 
-	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
+	config = (zbx_dc_config_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
 
 	if (SUCCEED != vps_monitor_create(&config->vps_monitor, error))
@@ -9215,7 +9293,7 @@ static void	autoreg_host_free_data(ZBX_DC_AUTOREG_HOST *autoreg_host)
 	dc_strpool_release(autoreg_host->host_metadata);
 }
 
-void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts)
+void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts)
 {
 	int			cached = 0, i;
 
@@ -11020,9 +11098,9 @@ int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t host
 	if (0 == hostid)
 		goto unlock;
 
-	for (i = 0; i < (int)ARRSIZE(INTERFACE_TYPE_PRIORITY); i++)
+	for (i = 0; i < INTERFACE_TYPE_COUNT; i++)
 	{
-		if (SUCCEED == (res = dc_get_interface_by_type(interface, hostid, INTERFACE_TYPE_PRIORITY[i])))
+		if (SUCCEED == (res = dc_get_interface_by_type(interface, hostid, zbx_get_interface_type_priority(i))))
 			break;
 	}
 
@@ -16186,29 +16264,48 @@ void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay)
  *                                                                            *
  * Purpose: get discovery rules IDs with revisions in pairs                   *
  *                                                                            *
- * Parameter: revisions   - [IN/OUT] discovery rules ID/revisions pairs       *
+ * Parameters: rev_last   - [IN/OUT] discovery rules global revision          *
+ *             revisions  - [IN/OUT] discovery rules ID/revisions pairs       *
+ *                                                                            *
+ * Return value: SUCCEED - if discovery rules global revision differs from    *
+ *                            revision provided in argument rev_last          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: In case of FAIL the resulting ID/revisions pairs vector and      *
+ *              rev_last will not be updated                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions)
+int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t *revisions)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_pair_t	revision;
-	zbx_dc_drule_t		*drule;
+	int	ret;
 
-	WRLOCK_CACHE;
+	RDLOCK_CACHE;
 
-	zbx_hashset_iter_reset(&config->drules, &iter);
-
-	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
+	if (config->revision.drules != *rev_last)
 	{
-		revision.first = drule->druleid;
-		revision.second = drule->revision;
-		zbx_vector_uint64_pair_append(revisions, revision);
+		zbx_hashset_iter_t	iter;
+		zbx_uint64_pair_t	revision;
+		zbx_dc_drule_t		*drule;
+
+		zbx_hashset_iter_reset(&config->drules, &iter);
+
+		while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
+		{
+			revision.first = drule->druleid;
+			revision.second = drule->revision;
+			zbx_vector_uint64_pair_append(revisions, revision);
+		}
+
+		*rev_last = config->revision.drules;
+		zbx_vector_uint64_pair_sort(revisions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		ret = SUCCEED;
 	}
+	else
+		ret = FAIL;
 
 	UNLOCK_CACHE;
 
-	zbx_vector_uint64_pair_sort(revisions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	return ret;
 }
 
 /******************************************************************************

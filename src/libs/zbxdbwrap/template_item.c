@@ -29,6 +29,7 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxinterface.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 
@@ -256,7 +257,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
 		item->interfaceid_orig = 0;
-		switch (interface_type = get_interface_type_by_item_type(item->type))
+		switch (interface_type = zbx_get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
 			case INTERFACE_TYPE_OPT:
@@ -265,10 +266,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			case INTERFACE_TYPE_ANY:
 				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 				{
-					if (0 != interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1])
+					if (0 != interfaceids[zbx_get_interface_type_priority(i) - 1])
 						break;
 				}
-				item->interfaceid = interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1];
+				item->interfaceid = interfaceids[zbx_get_interface_type_priority(i) - 1];
 				break;
 			default:
 				item->interfaceid = interfaceids[interface_type - 1];
