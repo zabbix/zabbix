@@ -37,7 +37,7 @@ static zbx_history_table_t	dht = {
 		{"port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
 		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
 		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
-		{"error",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
+		{"error",		ZBX_PROTO_TAG_ERROR,		ZBX_JSON_TYPE_STRING,	""},
 		{NULL}
 		}
 };
@@ -135,7 +135,7 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 	else
 	{
 		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), clock, druleid, ip, port, value, status,
-				dcheckid, dns);
+				dcheckid, dns, ZBX_NULL2EMPTY_STR(error));
 	}
 }
 
@@ -302,8 +302,8 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
-		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
-				"dcheckid", "dns", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
+				"status", "dcheckid", "dns", "error", (char *)NULL);
 
 		do
 		{
@@ -500,7 +500,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 	else
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
-				"value", "status", "dcheckid", "dns", (char *)NULL);
+				"value", "status", "dcheckid", "dns", "error", (char *)NULL);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

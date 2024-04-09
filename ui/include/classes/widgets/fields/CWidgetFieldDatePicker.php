@@ -87,7 +87,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		}
 
 		return [
-			_s('Invalid parameter "%1$s": %2$s.', $this->full_name ?? $this->label ?? $this->name,
+			_s('Invalid parameter "%1$s": %2$s.', $this->label ?? $this->name,
 				$this->is_date_only ? _('a date is expected') : _('a time is expected')
 			)
 		];

@@ -152,6 +152,7 @@
 
 				ZABBIX.Dashboard.broadcast({
 					_hostid: dashboard_host.hostid,
+					_hostids: [dashboard_host.hostid],
 					_timeperiod: {
 						from: dashboard_time_period.from,
 						from_ts: dashboard_time_period.from_ts,
@@ -329,7 +330,7 @@
 		}
 
 		#onFeedback(e) {
-			if (e.detail.type === '_timeperiod') {
+			if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
 				this.#skip_time_selector_range_update = true;
 
 				$.publish('timeselector.rangechange', {

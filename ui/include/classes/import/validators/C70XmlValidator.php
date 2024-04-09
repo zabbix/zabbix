@@ -941,7 +941,20 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
-							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
+							'lifetime_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
+							'lifetime' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'enabled_lifetime_type' =>	['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
+															['else' => true, 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER, CXmlConstantValue::LLD_DISABLE_NEVER => CXmlConstantName::LLD_DISABLE_NEVER, CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY]]
+							]],
+							'enabled_lifetime' =>		['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
+															['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'interface_ref' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_INTERFACE], 'type' => XML_STRING],
@@ -2048,7 +2061,20 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
-							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
+							'lifetime_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
+							'lifetime' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'enabled_lifetime_type' =>	['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
+															['else' => true, 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER, CXmlConstantValue::LLD_DISABLE_NEVER => CXmlConstantName::LLD_DISABLE_NEVER, CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY]]
+							]],
+							'enabled_lifetime' =>		['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
+															['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [

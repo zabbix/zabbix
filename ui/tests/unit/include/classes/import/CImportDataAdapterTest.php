@@ -678,7 +678,9 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'empty-lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
-					'overrides' => []
+					'overrides' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
 				],
 				'empty-lld-rule-jmx' => [
 					'name' => 'empty-lld-rule-jmx',
@@ -703,7 +705,9 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'empty-lld-rule-jmx',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
-					'overrides' => []
+					'overrides' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
@@ -877,11 +881,12 @@ class CImportDataAdapterTest extends TestCase {
 							'custom_interfaces' => '0'
 						]
 					],
-					'interface_ref' => 'if1',
 					'key_' => 'lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
-					'overrides' => []
+					'overrides' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
 				]
 			],
 			'export-template' => [
@@ -905,7 +910,9 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'empty-lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
-					'overrides' => []
+					'overrides' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
 				],
 				'lld-rule-jmx' => [
 					'uuid' => '96c257b7f1104833ad3bb18f6a2e8d96',
@@ -930,7 +937,9 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'lld-rule-jmx',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
-					'overrides' => []
+					'overrides' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
 				],
 				'lld-rule' => [
 					'uuid' => 'cdcd6fb3277e481baa22573c8c349b3b',
@@ -1110,7 +1119,9 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
-					'overrides' => []
+					'overrides' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
 				]
 			]
 		], $adapter->getDiscoveryRules());
@@ -2359,6 +2370,8 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
@@ -2402,6 +2415,8 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
@@ -2445,6 +2460,8 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
@@ -2807,6 +2824,8 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
@@ -2850,6 +2869,8 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
@@ -2893,6 +2914,8 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
+					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],

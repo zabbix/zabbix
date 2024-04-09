@@ -62,6 +62,13 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |VMware: Status of "{#CLUSTER.NAME}" cluster|<p>VMware cluster status.</p>|Simple check|vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]|
 
+### Trigger prototypes for Discover VMware clusters
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: The {#CLUSTER.NAME} status is Red|<p>A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html</p>|`last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3`|High||
+|VMware: The {#CLUSTER.NAME} status is Yellow|<p>A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html</p>|`last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=2`|Average|**Depends on**:<br><ul><li>VMware: The {#CLUSTER.NAME} status is Red</li></ul>|
+
 ### LLD rule Discover VMware datastores
 
 |Name|Description|Type|Key and additional info|

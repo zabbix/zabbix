@@ -110,7 +110,7 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	onFeedback({type, value, descriptor}) {
+	onFeedback({type, value}) {
 		const item_selected = this.#navtree[this.#navtree_item_selected];
 
 		let new_item_id = 0;

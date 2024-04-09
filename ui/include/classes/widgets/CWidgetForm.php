@@ -51,6 +51,10 @@ class CWidgetForm {
 		return $this->fields;
 	}
 
+	public function getField(string $field_name): CWidgetField {
+		return $this->fields[$field_name];
+	}
+
 	public function getFieldValue(string $field_name) {
 		return $this->fields[$field_name]->getValue();
 	}
@@ -80,10 +84,12 @@ class CWidgetForm {
 	}
 
 	/**
-	 * Validate form fields.
+	 * Validate widget fields.
 	 *
-	 * @param bool $strict  Enables more strict validation of the form fields.
-	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 * @param bool $strict  If true, the submitted form data is strictly validated and all fields with not-empty flag
+	 *                      set must be filled-in. If false, the saved data is loosely validated and fields with
+	 *                      not-empty flag set, relating to database objects (like hosts or items) are allowed to be
+	 *                      missing (deleted or not available due to insufficient permissions).
 	 *
 	 * @return array
 	 */
