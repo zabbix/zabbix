@@ -147,7 +147,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $host_tags_to_keep ? ['tag', 'value'] : null,
 				'preservekeys' => true,
-				'sortfield' => 'name',
+				'sortfield' => 'hostid'
 			]);
 
 			if (!$hosts) {
@@ -157,7 +157,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($hosts as $hostid => $host) {
 				if ($selected_items_cnt == $limit + 1) {
 					unset($hosts[$hostid]);
-					break;
+					continue;
 				}
 				else {
 					$options['limit'] = $limit + 1 - $selected_items_cnt;
@@ -191,6 +191,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$items) {
 			return $no_data;
 		}
+
+		CArrayHelper::sort($items, ['name']);
+		$items = array_values($items);
 
 		$is_limit_exceeded = false;
 
