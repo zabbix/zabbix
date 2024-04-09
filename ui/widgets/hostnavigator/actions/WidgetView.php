@@ -22,6 +22,7 @@
 namespace Widgets\HostNavigator\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CProfile;
@@ -155,6 +156,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$hosts) {
 			return $no_data;
 		}
+
+		CArrayHelper::sort($hosts, ['name']);
+		$hosts = array_values($hosts);
 
 		$is_limit_exceeded = false;
 
