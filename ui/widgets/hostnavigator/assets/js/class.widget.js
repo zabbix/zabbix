@@ -60,15 +60,6 @@ class CWidgetHostNavigator extends CWidget {
 		};
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this.#host_navigator !== null) {
-			this.#host_navigator.destroy();
-			this.#host_navigator = null;
-		}
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	setContents(response) {
 		if (this.#host_navigator === null) {
 			this.#host_navigator = new CHostNavigator(response.config);
