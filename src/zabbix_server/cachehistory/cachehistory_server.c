@@ -1646,7 +1646,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
-	zbx_vector_ptr_destroy(&item_diff);
+	zbx_vector_item_diff_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);

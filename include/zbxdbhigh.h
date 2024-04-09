@@ -752,7 +752,7 @@ ZBX_PTR_VECTOR_DECL(item_diff_ptr, zbx_item_diff_t *)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff);
 
-void	zbx_item_diff_compare_func(const void *d1, const void *d2);
+int	zbx_item_diff_compare_func(const void *d1, const void *d2);
 
 typedef struct
 {
