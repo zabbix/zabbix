@@ -27,7 +27,7 @@
 
 typedef struct
 {
-	ZBX_DC_CONFIG		dc;
+	zbx_dc_config_t		dc;
 	zbx_vector_um_host_t	um_hosts;
 	zbx_vector_ptr_t	hosts;
 
@@ -35,6 +35,8 @@ typedef struct
 
 }
 zbx_mock_config_t;
+
+zbx_mock_config_t	*get_mock_config(void);
 
 #define ZBX_MOCK_CONFIG_USERMACROS	0x0001
 #define ZBX_MOCK_CONFIG_HOSTS		0x0002

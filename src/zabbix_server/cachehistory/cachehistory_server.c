@@ -819,7 +819,7 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 }
 
 static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values,
-		int *ret_flush)
+		int *ret_flush, int config_history_storage_pipelines)
 {
 	int	i, ret = SUCCEED;
 
@@ -834,20 +834,23 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
 	}
 
 	if (0 != history_values->values_num)
-		ret = zbx_vc_add_values(history_values, ret_flush);
+		ret = zbx_vc_add_values(history_values, ret_flush, config_history_storage_pipelines);
 
 	return ret;
 }
+
 
 /******************************************************************************
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
+ * Parameters:                                                                *
+ *    history                          - [IN] array of history data           *
+ *    history_num                      - [IN] number of history structures    *
+ *    config_history_storage_pipelines - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
-static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
+static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int config_history_storage_pipelines)
 {
 	int			ret, ret_flush = FLUSH_SUCCEED, num;
 	zbx_vector_ptr_t	history_values;
@@ -857,15 +860,18 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
 
-	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush)) &&
-			FLUSH_DUPL_REJECTED == ret_flush)
+	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush,
+			config_history_storage_pipelines)) && FLUSH_DUPL_REJECTED == ret_flush)
 	{
 		num = history_values.values_num;
 		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
 
-		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush)))
+		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush,
+				config_history_storage_pipelines)))
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
+		}
 	}
 
 	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
@@ -1184,30 +1190,32 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: flush history cache to database, process triggers of flushed      *
- *          and timer triggers from timer queue                               *
- *                                                                            *
- * Parameters:                                                                *
- *             values_num   - [IN/OUT] the number of synced values            *
- *             triggers_num - [IN/OUT] the number of processed timers         *
- *             events_cbs   - [IN]                                            *
- *             more         - [OUT] a flag indicating the cache emptiness:    *
- *                               ZBX_SYNC_DONE - nothing to sync, go idle     *
- *                               ZBX_SYNC_MORE - more data to sync            *
- *                                                                            *
- * Comments: This function loops syncing history values by 1k batches and     *
- *           processing timer triggers by batches of 500 triggers.            *
- *           Unless full sync is being done the loop is aborted if either     *
- *           timeout has passed or there are no more data to process.         *
- *           The last is assumed when the following is true:                  *
- *            a) history cache is empty or less than 10% of batch values were *
- *               processed (the other items were locked by triggers)          *
- *            b) less than 500 (full batch) timer triggers were processed     *
- *                                                                            *
- ******************************************************************************/
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more)
+/***************************************************************************************
+ *                                                                                     *
+ * Purpose: Flushes history cache to database, processes triggers of flushed           *
+ *          and timer triggers from timer queue.                                       *
+ *                                                                                     *
+ * Parameters:                                                                         *
+ *   values_num                       - [IN/OUT] number of synced values               *
+ *   triggers_num                     - [IN/OUT] number of processed timers            *
+ *   events_cbs                       - [IN]                                           *
+ *   config_history_storage_pipelines - [IN]                                           *
+ *   more                             - [OUT] flag indicating the cache emptiness:     *
+ *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
+ *                                            ZBX_SYNC_MORE - more data to sync        *
+ *                                                                                     *
+ * Comments: This function loops syncing history values by 1k batches and              *
+ *           processing timer triggers by batches of 500 triggers.                     *
+ *           Unless full sync is being done the loop is aborted if either              *
+ *           timeout has passed or there are no more data to process.                  *
+ *           The last is assumed when the following is true:                           *
+ *            a) history cache is empty or less than 10% of batch values were          *
+ *               processed (the other items were locked by triggers)                   *
+ *            b) less than 500 (full batch) timer triggers were processed              *
+ *                                                                                     *
+ ***************************************************************************************/
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		int config_history_storage_pipelines, int *more)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -1366,7 +1374,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					events_cbs->add_event_cb, &item_diff,
 					&inventory_values, compression_age, &proxy_subscriptions);
 
-			if (FAIL != (ret = DBmass_add_history(history, history_num)))
+			if (FAIL != (ret = DBmass_add_history(history, history_num, config_history_storage_pipelines)))
 			{
 				zbx_dc_config_items_apply_changes(&item_diff);
 				zbx_dc_mass_update_trends(history, history_num, &trends, &trends_num, compression_age);
