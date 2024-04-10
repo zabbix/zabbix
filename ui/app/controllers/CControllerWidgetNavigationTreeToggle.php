@@ -59,11 +59,15 @@ class CControllerWidgetNavigationTreeToggle extends CController {
 		$open_groups = [];
 
 		$open_groupids = CProfile::findByIdxPattern('web.dashboard.widget.open.%', $widgetid);
+		$open_group_indexes = [];
 
 		foreach ($open_groupids as $open_groupid) {
 			$open_group = CProfile::get($open_groupid, [], $widgetid);
 
 			if ($open_group) {
+				$open_group_index = substr($open_groupid, strrpos($open_groupid, '.') + 1);
+				$open_group_indexes[] = (int) $open_group_index;
+
 				$open_groups[$open_groupid] = json_decode($open_group, true);
 			}
 		}
@@ -79,11 +83,13 @@ class CControllerWidgetNavigationTreeToggle extends CController {
 			}
 
 			$index = 0;
+			sort($open_group_indexes);
+
 			foreach ($parent_groups as $group) {
 				if (!in_array($group, $open_groups)) {
 					// Save each parent group (and selected group) under first available index if not already saved.
-					foreach ($open_groupids as $groupid) {
-						if (str_ends_with($groupid, '.'.$index)) {
+					foreach ($open_group_indexes as $group_index) {
+						if ($group_index == $index) {
 							$index++;
 						}
 					}
