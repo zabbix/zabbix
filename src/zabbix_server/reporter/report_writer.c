@@ -20,6 +20,7 @@
 #include "reporter.h"
 #include "report_protocol.h"
 
+#include "zbxthreads.h"
 #include "zbxalerter.h"
 #include "zbxalgo.h"
 #include "zbxnix.h"

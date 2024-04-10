@@ -22,6 +22,7 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbxthreads.h"
 #include "zbxalerter.h"
 #include "zbxcrypto.h"
 #include "zbxexpression.h"

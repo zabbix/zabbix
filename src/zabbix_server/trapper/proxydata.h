@@ -20,7 +20,6 @@
 #ifndef ZABBIX_PROXYDATA_H
 #define ZABBIX_PROXYDATA_H
 
-#include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
