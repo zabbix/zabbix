@@ -3525,7 +3525,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		else
 		{
 			item_index_local.parent_itemid = item->master_itemid;
-			item_index_local.lld_row = item->lld_row;
+			item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
 
 			/* dependent item based on host item should be saved */
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
@@ -4476,7 +4476,7 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 			continue;
 
 		item_index_local.parent_itemid = item->master_itemid;
-		item_index_local.lld_row = item->lld_row;
+		item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
 
 		if (NULL != (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 		{
