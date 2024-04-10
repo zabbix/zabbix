@@ -43,7 +43,7 @@
 #include "zbxdiscovery.h"
 
 #include "discovery/discovery_proxy.h"
-#include "housekeeper/housekeeper.h"
+#include "housekeeper/housekeeper_proxy.h"
 #include "poller/poller_proxy.h"
 #include "trapper/trapper_proxy.h"
 #include "proxyconfig/proxyconfig.h"
@@ -51,6 +51,7 @@
 #include "taskmanager/taskmanager_proxy.h"
 #include "autoreg/autoreg_proxy.h"
 #include "cachehistory/cachehistory_proxy.h"
+#include "stats/stats_proxy.h"
 
 #include "zbxcomms.h"
 #include "zbxvault.h"
@@ -59,7 +60,6 @@
 #include "zbxrtc.h"
 #include "rtc/rtc_proxy.h"
 #include "zbxstats.h"
-#include "stats/zabbix_stats.h"
 #include "zbxip.h"
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
