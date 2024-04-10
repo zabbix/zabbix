@@ -56,7 +56,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$filter = static::FILTER_FIELDS_DEFAULT;
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
-			$mandatory_filter_set = $this->isMandatoryFilterFieldSet($filter);
+			$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
 			$prepared_data = [
 				'hosts' => [],
 				'items' => [],
@@ -70,7 +70,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			// Prepare subfilter data.
 			$subfilters_fields = self::getSubfilterFields($filter);
 			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
-			$subfilter_set = $this->isSubfilterSet($subfilters);
+			$subfilter_set = self::isSubfilterSet($subfilters);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 			if ($filter['state'] != -1) {

@@ -153,7 +153,7 @@ class CControllerLatestView extends CControllerLatest {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
-		$mandatory_filter_set = $this->isMandatoryFilterFieldSet($filter);
+		$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
@@ -176,7 +176,7 @@ class CControllerLatestView extends CControllerLatest {
 		// Prepare subfilter data.
 		$subfilters_fields = self::getSubfilterFields($filter);
 		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
-		$subfilter_set = $this->isSubfilterSet($subfilters);
+		$subfilter_set = self::isSubfilterSet($subfilters);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 		if ($filter['state'] != -1) {
