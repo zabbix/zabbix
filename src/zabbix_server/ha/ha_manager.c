@@ -20,6 +20,7 @@
 #include "ha.h"
 
 #include "../rtc/rtc_server.h"
+#include "../audit/audit_server.h"
 
 #include "zbx_ha_constants.h"
 #include "zbxdbhigh.h"
@@ -29,7 +30,6 @@
 #include "zbxmutexs.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
-#include "audit/zbxaudit_settings.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
