@@ -1512,7 +1512,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
 							zbx_get_value_internal_ext_server, config_ssh_key_location,
-							trapper_process_request_server, zbx_autoreg_update_host_server};
+							zbx_trapper_process_request_server,
+							zbx_autoreg_update_host_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							config_ssh_key_location, get_config_forks};

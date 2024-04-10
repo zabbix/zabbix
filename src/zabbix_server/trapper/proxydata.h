@@ -28,7 +28,5 @@
 void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency);
 
-int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
-		int upload_status, int config_timeout);
 
 #endif
