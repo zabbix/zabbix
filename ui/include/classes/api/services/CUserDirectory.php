@@ -201,7 +201,7 @@ class CUserDirectory extends CApiService {
 			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', CUserGroup::OUTPUT_FIELDS), 'default' => null],
-			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', static::MEDIA_OUTPUT_FIELDS), 'default' => null],
+			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::MEDIA_OUTPUT_FIELDS), 'default' => null],
 			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'roleid', 'user_groups']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
@@ -293,7 +293,7 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionMedia'] === API_OUTPUT_EXTEND) {
-			$options['selectProvisionMedia'] = static::MEDIA_OUTPUT_FIELDS;
+			$options['selectProvisionMedia'] = self::MEDIA_OUTPUT_FIELDS;
 		}
 
 		$db_provisioning_media = DB::select('userdirectory_media', [
@@ -712,7 +712,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		$options = [
-			'output' => array_merge(static::MEDIA_OUTPUT_FIELDS, ['userdirectoryid']),
+			'output' => array_merge(self::MEDIA_OUTPUT_FIELDS, ['userdirectoryid']),
 			'filter' => ['userdirectoryid' => $userdirectoryids]
 		];
 		$result = DBselect(DB::makeSql('userdirectory_media', $options));
@@ -1177,7 +1177,7 @@ class CUserDirectory extends CApiService {
 						'user_ref_attr', 'user_username', 'user_lastname'
 					],
 					'userdirectoryids' => $userdirectory['userdirectoryid'],
-					'selectProvisionMedia' => static::MEDIA_OUTPUT_FIELDS,
+					'selectProvisionMedia' => self::MEDIA_OUTPUT_FIELDS,
 					'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 				])[0];
 			}
