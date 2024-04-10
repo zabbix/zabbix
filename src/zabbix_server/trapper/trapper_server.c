@@ -20,7 +20,7 @@
 #include "trapper_history_push.h"
 #include "trapper_server.h"
 
-#include "../proxyconfigread/proxyconfig_read.h"
+#include "../proxyconfigread/proxyconfigread.h"
 #include "proxydata.h"
 #include "../reporter/reporter.h"
 
