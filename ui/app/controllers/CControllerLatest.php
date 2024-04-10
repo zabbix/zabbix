@@ -795,18 +795,12 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return bool
 	 */
-	public static function isSubfilterSet(array $subfilters): bool {
-		foreach ($subfilters as $filter) {
-			if (is_array($filter)) {
-				if (self::isSubfilterSet($filter)) {
-					return true;
-				}
-			}
-			else {
-				if (isset($subfilters['selected']) && $subfilters['selected']
-						|| isset($filter['selected']) && $filter['selected']) {
-					return true;
-				}
+	public static function isSubfilterSet(array $filter): bool {
+		$subfilters = ['subfilter_hostids','subfilter_tagnames','subfilter_tags','subfilter_state','subfilter_data'];
+
+		foreach ($subfilters as $subfilter) {
+			if ($filter[$subfilter]) {
+				return true;
 			}
 		}
 
