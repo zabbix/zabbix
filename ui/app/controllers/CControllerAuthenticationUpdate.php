@@ -438,6 +438,8 @@ class CControllerAuthenticationUpdate extends CController {
 			if ($result && array_key_exists('authentication_type', $data)) {
 				$this->invalidateSessions();
 			}
+
+			CAuthenticationHelper::reset();
 		}
 
 		return $result;
