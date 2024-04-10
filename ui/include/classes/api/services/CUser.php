@@ -578,7 +578,7 @@ class CUser extends CApiService {
 	private static function validateMedias(array &$users, array &$db_users): void {
 		foreach ($users as $i1 => &$user) {
 			if (!array_key_exists('medias', $user)) {
-				return;
+				continue;
 			}
 
 			$path = '/'.($i1 + 1).'/medias';
