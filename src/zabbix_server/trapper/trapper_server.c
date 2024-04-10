@@ -22,7 +22,7 @@
 
 #include "../proxyconfigread/proxyconfig_read.h"
 #include "proxydata.h"
-#include "../reporter/report.h"
+#include "../reporter/reporter.h"
 
 #include "zbxtrapper.h"
 #include "zbxdbhigh.h"

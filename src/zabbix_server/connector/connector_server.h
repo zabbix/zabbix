@@ -16,11 +16,31 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ZABBIX_REPORT_H
-#define ZABBIX_REPORT_H
 
-#include "zbxjson.h"
+#ifndef ZABBIX_CONNECTOR_SERVER_H
+#define ZABBIX_CONNECTOR_SERVER_H
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
+#include "zbxthreads.h"
+
+typedef struct
+{
+	const char	*config_source_ip;
+	const char	*config_ssl_ca_location;
+	const char	*config_ssl_cert_location;
+	const char	*config_ssl_key_location;
+}
+zbx_thread_connector_worker_args;
+
+ZBX_THREAD_ENTRY(connector_worker_thread, args);
+
+typedef struct
+
+{
+	zbx_get_config_forks_f	get_process_forks_cb_arg;
+}
+zbx_thread_connector_manager_args;
+
+ZBX_THREAD_ENTRY(connector_manager_thread, args);
+
 
 #endif

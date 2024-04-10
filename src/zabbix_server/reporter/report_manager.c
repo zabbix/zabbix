@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "report_manager.h"
+#include "reporter.h"
 #include "report_protocol.h"
+
 #include "../db_lengths_constants.h"
 
 #include "zbxalerter.h"

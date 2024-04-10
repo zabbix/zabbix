@@ -70,7 +70,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
-	service/libservice.a \
+	service/libservice_server.a \
 	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
