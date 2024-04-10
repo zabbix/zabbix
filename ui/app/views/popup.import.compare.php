@@ -39,7 +39,7 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'focused' => true,
-			'action' => 'popup_import_compare.submitImportComparePopup();'
+			'action' => 'popup_import_compare.submitImportComparePopup('.(bool) $data['with_removed_entities'].');'
 		];
 	}
 

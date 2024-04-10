@@ -44,8 +44,8 @@ window.popup_import_compare = new class {
 		this.#addEventListeners();
 	}
 
-	submitImportComparePopup() {
-		if (window.popup_import.isDeleteMissingChecked()) {
+	submitImportComparePopup(with_removed_entities) {
+		if (with_removed_entities && window.popup_import.isDeleteMissingChecked()) {
 			return window.popup_import.confirmSubmit(this.#overlay);
 		}
 

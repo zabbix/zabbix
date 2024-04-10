@@ -108,8 +108,9 @@ window.popup_import = new class {
 	confirmSubmit(compare_overlay) {
 		overlayDialogue({
 			class: 'position-middle',
-			content: document.createElement('span')
-				.innerText = (<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
+			content: document.createElement('span').innerText = (<?= json_encode(
+				_('By performing this operation some elements will be deleted. Do you want to proceed?')
+			) ?>),
 			buttons: [
 				{
 					title: <?= json_encode(_('OK')) ?>,
