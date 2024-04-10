@@ -194,9 +194,7 @@ $scenario_tab
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
-					]))
-						->addClass('form_row')
-						->addClass(CSortable::ZBX_STYLE_SORTABLE)
+					]))->addClass('form_row')
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -291,9 +289,7 @@ $steps_tab = (new CFormGrid())->addItem([
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('js-remove-step')
 						))->addClass(ZBX_STYLE_NOWRAP)
-					]))
-						->setAttribute('data-row_index', '#{row_index}')
-						->addClass(CSortable::ZBX_STYLE_SORTABLE)
+					]))->setAttribute('data-row_index', '#{row_index}')
 				)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -378,7 +374,8 @@ $webscenario_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'field_label' => _('Tags')
 		]),
 		TAB_INDICATOR_TAGS
 	)

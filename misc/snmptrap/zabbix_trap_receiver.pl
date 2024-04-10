@@ -48,7 +48,7 @@ $SNMPTrapperFile = '/tmp/zabbix_traps.tmp';
 #
 # Mandatory: yes
 # Default:
-$DateTimeFormat = '%H:%M:%S %Y/%m/%d';
+$DateTimeFormat = '%Y-%m-%dT%T%z';
 
 ###################################
 #### ZABBIX SNMP TRAP RECEIVER ####
@@ -56,6 +56,7 @@ $DateTimeFormat = '%H:%M:%S %Y/%m/%d';
 
 use Fcntl qw(O_WRONLY O_APPEND O_CREAT);
 use POSIX qw(strftime);
+use NetSNMP::TrapReceiver;
 
 sub zabbix_receiver
 {

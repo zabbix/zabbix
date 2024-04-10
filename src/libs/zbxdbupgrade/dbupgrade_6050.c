@@ -342,8 +342,6 @@ static int	DBpatch_6050026(void)
 	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBdrop_field_autoincrement("proxy_history", &field);
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6050027(void)
@@ -351,8 +349,6 @@ static int	DBpatch_6050027(void)
 	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBdrop_field_autoincrement("proxy_dhistory", &field);
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6050028(void)
@@ -360,8 +356,6 @@ static int	DBpatch_6050028(void)
 	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBdrop_field_autoincrement("proxy_autoreg_host", &field);
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6050029(void)
@@ -2973,10 +2967,15 @@ static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_na
 		}
 		zbx_db_free_result(result);
 
-		if (0 == allow_empty_groups && 0 == groupids.values_num)
+		if (0 == groupids.values_num)
 		{
-			ret = FAIL;
-			break;
+			if (0 == allow_empty_groups)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "host or template [hostid=" ZBX_FS_UI64 "] is not"
+						" assigned to any group, permissions not granted", ids->values[i]);
+			}
+
+			continue;
 		}
 
 		zbx_sha256_finish(&ctx, hash);
@@ -3011,6 +3010,9 @@ static int	dbupgrade_groupsets_insert(const char *tbl_name, zbx_hashset_t *group
 	zbx_uint64_t		gsetid;
 	zbx_hashset_iter_t	iter;
 	zbx_dbu_group_set_t	*gset_ptr;
+
+	if (0 == group_sets->num_data)
+		return SUCCEED;
 
 	gsetid = zbx_db_get_maxid_num(tbl_name, group_sets->num_data);
 
@@ -3218,6 +3220,399 @@ static int	DBpatch_6050209(void)
 
 	return DBadd_field("config", &field);
 }
+
+static int	DBpatch_6050210(void)
+{
+	int		ret = SUCCEED;
+	zbx_uint64_t	ugsetid;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select_n("select ugsetid from ugset where ugsetid not in (select ugsetid from ugset_group)", 1);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+		goto out;
+
+	ZBX_STR2UINT64(ugsetid, row[0]);
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from user_ugset where ugsetid=" ZBX_FS_UI64, ugsetid) ||
+			ZBX_DB_OK > zbx_db_execute("delete from ugset where ugsetid=" ZBX_FS_UI64, ugsetid))
+	{
+		ret = FAIL;
+		goto out;
+	}
+out:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_6050211(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050212(void)
+{
+	const zbx_db_field_t	field = {"history", "31d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("lld_override_ophistory", &field);
+}
+
+static int	DBpatch_6050213(void)
+{
+	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6050214(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6050215(void)
+{
+	return DBcreate_index("usrgrp", "usrgrp_3", "mfaid", 0);
+}
+
+static int	DBpatch_6050216(void)
+{
+	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050217(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050218(void)
+{
+	return DBcreate_index("config", "config_5", "mfaid", 0);
+}
+
+static int	DBpatch_6050219(void)
+{
+	const zbx_db_table_t	table =
+			{"mfa", "mfaid", 0,
+				{
+					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"hash_function", "1", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"code_length", "6", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"api_hostname", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, 0, 0},
+					{"clientid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
+					{"client_secret", "", NULL, NULL, 64, ZBX_TYPE_CHAR, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050220(void)
+{
+	return DBcreate_index("mfa", "mfa_1", "name", 1);
+}
+
+static int	DBpatch_6050221(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("usrgrp", 3, &field);
+}
+
+static int	DBpatch_6050222(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("config", 5, &field);
+}
+
+static int	DBpatch_6050223(void)
+{
+	const zbx_db_table_t	table =
+			{"mfa_totp_secret", "mfa_totp_secretid", 0,
+				{
+					{"mfa_totp_secretid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"totp_secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050224(void)
+{
+	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_1", "mfaid", 0);
+}
+
+static int	DBpatch_6050225(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("mfa_totp_secret", 1, &field);
+}
+
+static int	DBpatch_6050226(void)
+{
+	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_2", "userid", 0);
+}
+
+static int	DBpatch_6050227(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("mfa_totp_secret", 2, &field);
+}
+
+static int	DBpatch_6050228(void)
+{
+	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("drules", &field);
+}
+
+static int	DBpatch_6050229(void)
+{
+	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_dhistory", &field);
+}
+
+static int	DBpatch_6050230(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'honeycomb','widgets/honeycomb',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050231(void)
+{
+	const zbx_db_field_t	field = {"lifetime_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6050232(void)
+{
+	const zbx_db_field_t	field = {"enabled_lifetime_type", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6050233(void)
+{
+	const zbx_db_field_t	field = {"enabled_lifetime", "0", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6050234(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_discovery", &field);
+}
+
+static int	DBpatch_6050235(void)
+{
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_discovery", &field);
+}
+
+static int	DBpatch_6050236(void)
+{
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_discovery", &field);
+}
+
+static int	DBpatch_6050237(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_6050238(void)
+{
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_6050239(void)
+{
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_6050240(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_discovery", &field);
+}
+
+static int	DBpatch_6050241(void)
+{
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_discovery", &field);
+}
+
+static int	DBpatch_6050242(void)
+{
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_discovery", &field);
+}
+
+static int	DBpatch_6050243(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("graph_discovery", &field);
+}
+
+static int	DBpatch_6050244(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("group_discovery", &field);
+}
+
+static int	DBpatch_6050245(void)
+{
+	const zbx_db_field_t	field = {"lifetime", "7d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050246(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* update default value for items and item prototypes */
+	if (ZBX_DB_OK > zbx_db_execute("update items set lifetime='7d' where flags in (0,2,4)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050247(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set LIFETIME_TYPE_IMMEDIATELY for LLD rules with 0 lifetime */
+	if (ZBX_DB_OK > zbx_db_execute("update items set lifetime_type=2 where flags=1 and lifetime like '0%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050248(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set LIFETIME_TYPE_NEVER for existing LLD rules */
+	if (ZBX_DB_OK > zbx_db_execute("update items set enabled_lifetime_type=1 where flags=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050249(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update host_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050250(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update item_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050251(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update trigger_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050252(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update graph_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050253(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update group_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3432,5 +3827,49 @@ DBPATCH_ADD(6050206, 0, 1)
 DBPATCH_ADD(6050207, 0, 1)
 DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
+DBPATCH_ADD(6050210, 0, 1)
+DBPATCH_ADD(6050211, 0, 1)
+DBPATCH_ADD(6050212, 0, 1)
+DBPATCH_ADD(6050213, 0, 1)
+DBPATCH_ADD(6050214, 0, 1)
+DBPATCH_ADD(6050215, 0, 1)
+DBPATCH_ADD(6050216, 0, 1)
+DBPATCH_ADD(6050217, 0, 1)
+DBPATCH_ADD(6050218, 0, 1)
+DBPATCH_ADD(6050219, 0, 1)
+DBPATCH_ADD(6050220, 0, 1)
+DBPATCH_ADD(6050221, 0, 1)
+DBPATCH_ADD(6050222, 0, 1)
+DBPATCH_ADD(6050223, 0, 1)
+DBPATCH_ADD(6050224, 0, 1)
+DBPATCH_ADD(6050225, 0, 1)
+DBPATCH_ADD(6050226, 0, 1)
+DBPATCH_ADD(6050227, 0, 1)
+DBPATCH_ADD(6050228, 0, 1)
+DBPATCH_ADD(6050229, 0, 1)
+DBPATCH_ADD(6050230, 0, 1)
+DBPATCH_ADD(6050231, 0, 1)
+DBPATCH_ADD(6050232, 0, 1)
+DBPATCH_ADD(6050233, 0, 1)
+DBPATCH_ADD(6050234, 0, 1)
+DBPATCH_ADD(6050235, 0, 1)
+DBPATCH_ADD(6050236, 0, 1)
+DBPATCH_ADD(6050237, 0, 1)
+DBPATCH_ADD(6050238, 0, 1)
+DBPATCH_ADD(6050239, 0, 1)
+DBPATCH_ADD(6050240, 0, 1)
+DBPATCH_ADD(6050241, 0, 1)
+DBPATCH_ADD(6050242, 0, 1)
+DBPATCH_ADD(6050243, 0, 1)
+DBPATCH_ADD(6050244, 0, 1)
+DBPATCH_ADD(6050245, 0, 1)
+DBPATCH_ADD(6050246, 0, 1)
+DBPATCH_ADD(6050247, 0, 1)
+DBPATCH_ADD(6050248, 0, 1)
+DBPATCH_ADD(6050249, 0, 1)
+DBPATCH_ADD(6050250, 0, 1)
+DBPATCH_ADD(6050251, 0, 1)
+DBPATCH_ADD(6050252, 0, 1)
+DBPATCH_ADD(6050253, 0, 1)
 
 DBPATCH_END()

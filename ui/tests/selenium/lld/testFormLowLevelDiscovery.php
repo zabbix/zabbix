@@ -423,7 +423,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				if (!isset($data['form'])) {
-					$this->zbxTestAssertElementValue('delay', '1m');
+					$this->zbxTestAssertElementValue('delay', '1h');
 				}
 				break;
 			default:
@@ -431,10 +431,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestAssertNotVisibleId('delay');
 		}
 
-		$this->zbxTestTextPresent('Keep lost resources period');
+		$this->zbxTestTextPresent('Delete lost resources');
+		$this->zbxTestTextPresent('Disable lost resources');
 		$this->zbxTestAssertVisibleId('lifetime');
 		$this->zbxTestAssertAttribute("//input[@id='lifetime']", 'maxlength', 255);
-		$this->zbxTestAssertElementValue('lifetime', '30d');
+		$this->zbxTestAssertElementValue('lifetime', '7d');
 
 		// Custom intervals isn't visible for type 'SNMP trap' and 'Zabbix trapper'
 		if ($type === 'SNMP trap' || $type === 'Zabbix trapper') {

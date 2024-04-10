@@ -20,11 +20,15 @@
 #ifndef ZABBIX_PROXYBUFFER_H
 #define ZABBIX_PROXYBUFFER_H
 
-#include "zbxproxybuffer.h"
 #include "proxybuffer.h"
+#include "zbxalgo.h"
+#include "zbxcommon.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxjson.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
-#include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 #define ZBX_MAX_HRECORDS	1000
 #define ZBX_MAX_HRECORDS_TOTAL	10000
@@ -44,8 +48,8 @@ typedef enum
 }
 zbx_pb_state_t;
 
-extern zbx_pb_state_t	pb_dst[];
-extern zbx_pb_state_t	pb_src[];
+zbx_pb_state_t	get_pb_dst(int i);
+zbx_pb_state_t	get_pb_src(int i);
 
 typedef struct
 {
@@ -56,6 +60,7 @@ typedef struct
 	char		*dns;
 	char		*ip;
 	char		*value;
+	char		*error;
 	int		port;
 	int		clock;
 	int		status;
@@ -130,7 +135,7 @@ typedef struct
 }
 zbx_pb_t;
 
-extern zbx_pb_t	*pb_data;
+zbx_pb_t	*get_pb_data(void);
 
 zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield);
 

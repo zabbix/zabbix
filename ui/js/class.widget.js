@@ -115,13 +115,12 @@ class CWidget extends CWidgetBase {
 	 * Must return true to re-broadcast the feedback value or false to ignore the event.
 	 * Feedbacks-aware widgets must generally re-broadcast the value.
 	 *
-	 * @param {string} type        Out data type, as specified in the manifest.json.
-	 * @param {*}      value       Feedback value.
-	 * @param {Object} descriptor  Feedback descriptor.
+	 * @param {string} type   Out data type, as specified in the manifest.json.
+	 * @param {*}      value  Feedback value.
 	 *
 	 * @returns {boolean}  Whether to rebroadcast the value automatically.
 	 */
-	onFeedback({type, value, descriptor}) {
+	onFeedback({type, value}) {
 		return false;
 	}
 

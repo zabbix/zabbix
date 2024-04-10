@@ -278,6 +278,7 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 		}
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->assertEquals(isset($data['form']) ? 'Trigger' : 'New trigger', $dialog->getTitle());
 
@@ -285,15 +286,18 @@ class testFormTrigger extends CLegacyWebTest {
 			switch ($data['constructor']) {
 				case 'open':
 					$this->zbxTestClickButtonText('Expression constructor');
+					$form->query('id:expression')->waitUntilNotVisible();
 					break;
 				case 'open_close':
 					$this->zbxTestClickButtonText('Expression constructor');
+					$form->query('id:expression')->waitUntilNotVisible();
 					$this->zbxTestClickButtonText('Close expression constructor');
+					$form->query('id:expression')->waitUntilVisible();
 					break;
 			}
 		}
 
-		$this->assertEquals('Trigger', $dialog->asForm()->waitUntilVisible()->getSelectedTab());
+		$this->assertEquals('Trigger', $form->getSelectedTab());
 
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent triggers');

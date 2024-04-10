@@ -21,8 +21,6 @@
 
 namespace Widgets\PieChart;
 
-use Widgets\PieChart\Includes\WidgetForm;
-
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
@@ -38,7 +36,9 @@ class Widget extends CWidget {
 			],
 			'class.widget.js' => [
 				'Actions' => _('Actions'),
-				'Download image' => _('Download image')
+				'Download image' => _('Download image'),
+				'Value' => _('Value'),
+				'no data' => _('no data')
 			]
 		];
 	}

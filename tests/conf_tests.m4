@@ -59,7 +59,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxcommon/Makefile
 			tests/libs/zbxcomms/Makefile
 			tests/libs/zbxcommshigh/Makefile
-			tests/libs/zbxconf/Makefile
+			tests/libs/zbxcfg/Makefile
 			tests/libs/zbxdbcache/Makefile
 			tests/libs/zbxdbhigh/Makefile
 			tests/libs/zbxeval/Makefile
@@ -109,9 +109,6 @@ AC_DEFUN([CONF_TESTS],
 			;;
 		netbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/netbsd/Makefile])
-			;;
-		osf)
-			AC_CONFIG_FILES([tests/libs/zbxsysinfo/osf/Makefile])
 			;;
 		openbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/openbsd/Makefile])

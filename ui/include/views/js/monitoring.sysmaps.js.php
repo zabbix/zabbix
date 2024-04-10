@@ -85,7 +85,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('formDragHandler')
 			->toString()
 	?>
@@ -183,7 +183,6 @@ function createFontSelect(string $name): CSelect {
 								->setHeader(['', _('Name'), (new CColHeader(_('Action')))->addStyle('padding: 0 5px;')])
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
-								->addClass('ui-sortable')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -348,7 +347,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('shapeDragHandler')
 			->toString().
 		(new CForm())
@@ -510,7 +509,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('massShapeDragHandler')
 			->toString().
 		(new CForm())
@@ -643,7 +642,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('massDragHandler')
 			->toString()
 	?>
@@ -934,7 +933,6 @@ function createFontSelect(string $name): CSelect {
 					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('sortable')
 			->setId('triggerrow_#{triggerid}')
 			->toString()
 	?>

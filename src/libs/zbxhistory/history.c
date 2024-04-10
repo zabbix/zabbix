@@ -25,9 +25,6 @@
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
-extern char	*CONFIG_HISTORY_STORAGE_URL;
-extern char	*CONFIG_HISTORY_STORAGE_OPTS;
-
 zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
 
 /************************************************************************************
@@ -39,7 +36,8 @@ zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
  *           backend. (Binary value type is not supported for ElasticSearch)        *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_init(char **error)
+int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
+		char **error)
 {
 	/* TODO: support per value type specific configuration */
 
@@ -48,7 +46,7 @@ int	zbx_history_init(char **error)
 	for (int i = ITEM_VALUE_TYPE_FLOAT; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 
-		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
+		if (NULL == config_history_storage_url || NULL == strstr(config_history_storage_opts, opts[i]))
 		{
 			zbx_history_sql_init(&history_ifaces[i], i);
 		}
@@ -61,7 +59,7 @@ int	zbx_history_init(char **error)
 				return FAIL;
 			}
 
-			if (FAIL == zbx_history_elastic_init(&history_ifaces[i], i, error))
+			if (FAIL == zbx_history_elastic_init(&history_ifaces[i], i, config_history_storage_url, error))
 				return FAIL;
 		}
 	}
@@ -91,14 +89,17 @@ void	zbx_history_destroy(void)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: Sends values to the history storage                                     *
+ * Purpose: sends values to history storage                                         *
  *                                                                                  *
- * Parameters: history - [IN] the values to store                                   *
+ * Parameters:                                                                      *
+ *    history                          - [IN] values to store                       *
+ *    ret_flush                        - [OUT]                                      *
+ *    config_history_storage_pipelines - [IN] values to store                       *
  *                                                                                  *
  * Comments: add history values to the configured storage backends                  *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
+int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
 {
 	int	i, flags = 0;
 
@@ -112,7 +113,7 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
-		if (0 < writer->add_values(writer, history))
+		if (0 < writer->add_values(writer, history, config_history_storage_pipelines))
 			flags |= (1 << i);
 	}
 
@@ -445,8 +446,12 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
  *          functions                                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_check_version(struct zbx_json *json, int *result)
+void	zbx_history_check_version(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
+		const char *config_history_storage_url)
 {
-	if (NULL != CONFIG_HISTORY_STORAGE_URL)
-		zbx_elastic_version_extract(json, result);
+	if (NULL != config_history_storage_url)
+	{
+		zbx_elastic_version_extract(json, result, config_allow_unsupported_db_versions,
+				config_history_storage_url);
+	}
 }

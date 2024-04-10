@@ -20,11 +20,13 @@
 #include "proxypoller.h"
 
 #include "proxyconfigread/proxyconfig_read.h"
-#include "../trapper/proxydata.h"
+#include "trapper/proxydata.h"
+#include "cachehistory/cachehistory_server.h"
+#include "discovery/discovery_server.h"
+#include "autoreg/autoreg_server.h"
 
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
-#include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxdbhigh.h"
@@ -36,6 +38,9 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
+#include "zbxcacheconfig.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
@@ -407,7 +412,10 @@ static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, z
 	}
 
 	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, PROXY_OPERATING_MODE_PASSIVE, events_cbs,
-			proxydata_frequency, more, &error)))
+			proxydata_frequency, zbx_discovery_update_host_server, zbx_discovery_update_service_server,
+			zbx_discovery_update_service_down_server, zbx_discovery_find_host_server,
+			zbx_discovery_update_drule_server, zbx_autoreg_host_free_server, zbx_autoreg_flush_hosts_server,
+			zbx_autoreg_prepare_host_server, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->name, proxy->addr, error);
@@ -684,7 +692,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(proxy_poller_args_in->config_tls, zbx_get_program_type_cb);
+	zbx_tls_init_child(proxy_poller_args_in->config_tls, zbx_get_program_type_cb, zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);

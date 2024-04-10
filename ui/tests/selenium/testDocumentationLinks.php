@@ -80,6 +80,17 @@ class testDocumentationLinks extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for documentation links test',
+				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+				'active_since' => 1534885200,
+				'active_till' => 1534971600,
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'timeperiods' => [[]]
+			]
+		]);
 	}
 
 	/**
@@ -1449,7 +1460,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[text()="Maintenance for update (data collection)"]'
+							'element' => 'xpath://a[text()="Maintenance for documentation links test"]'
 						]
 					],
 					'doc_link' => '/en/manual/maintenance#configuration'
@@ -2603,6 +2614,24 @@ class testDocumentationLinks extends CWebTest {
 				[
 					'url' => 'zabbix.php?action=timeouts.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
+				]
+			],
+			// #238 Create Pie chart.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Pie chart',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
 				]
 			]
 		];

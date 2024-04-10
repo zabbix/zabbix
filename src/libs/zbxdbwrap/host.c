@@ -22,6 +22,7 @@
 #include "template.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
+
 #include "zbxcacheconfig.h"
 #include "zbxexpression.h"
 #include "audit/zbxaudit_host.h"
@@ -33,6 +34,12 @@
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbxcrypto.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxhash.h"
+#include "zbxstr.h"
+#include "zbxinterface.h"
 
 typedef enum
 {
@@ -866,7 +873,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		while (SUCCEED == ret && NULL != (trow = zbx_db_fetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
-			type = get_interface_type_by_item_type(type);
+			type = zbx_get_interface_type_by_item_type(type);
 
 			if (INTERFACE_TYPE_ANY == type)
 			{
@@ -5794,7 +5801,7 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 		int audit_context_mode)
 {
 	int			i;
-	zbx_vector_uint64_t	itemids, httptestids, hgsetids_keep, hgsetids_del, selementids;
+	zbx_vector_uint64_t	itemids, httptestids, hgsetids_del, selementids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 
@@ -5805,7 +5812,6 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 
 	zbx_vector_uint64_create(&httptestids);
 	zbx_vector_uint64_create(&selementids);
-	zbx_vector_uint64_create(&hgsetids_keep);
 	zbx_vector_uint64_create(&hgsetids_del);
 
 	/* delete web tests */
@@ -5848,26 +5854,36 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 
 	zbx_db_select_uint64(sql, &hgsetids_del);
 
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct hgsetid"
-			" from host_hgset"
-			" where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
-			hgsetids_del.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			" and not");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-
-	zbx_db_select_uint64(sql, &hgsetids_keep);
-
-	for (i = 0; i < hgsetids_del.values_num; i++)
+	if (0 < hgsetids_del.values_num)
 	{
-		if (FAIL != zbx_vector_uint64_bsearch(&hgsetids_keep, hgsetids_del.values[i],
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		zbx_vector_uint64_t	hgsetids_keep;
+
+		zbx_vector_uint64_create(&hgsetids_keep);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct hgsetid"
+				" from host_hgset"
+				" where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
+				hgsetids_del.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				" and not");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values,
+				hostids->values_num);
+
+		zbx_db_select_uint64(sql, &hgsetids_keep);
+
+		for (i = 0; i < hgsetids_del.values_num; i++)
 		{
-			zbx_vector_uint64_remove(&hgsetids_del, i--);
+			if (FAIL != zbx_vector_uint64_bsearch(&hgsetids_keep, hgsetids_del.values[i],
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_remove(&hgsetids_del, i--);
+			}
 		}
+
+		zbx_vector_uint64_destroy(&hgsetids_keep);
 	}
 
 	sql_offset = 0;
@@ -5899,10 +5915,13 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* delete host groups sets */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
-			hgsetids_del.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	if (0 < hgsetids_del.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
+				hgsetids_del.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -5915,7 +5934,6 @@ clean:
 
 	zbx_vector_uint64_destroy(&selementids);
 	zbx_vector_uint64_destroy(&hgsetids_del);
-	zbx_vector_uint64_destroy(&hgsetids_keep);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -6530,8 +6548,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	}
 	zbx_db_free_result(result);
 
+	sql_offset = 0;
+
 	if (0 == hgsets.values_num)
+	{
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		goto skip_permissions;
+	}
 
 	/* calculate hash for last hgset in vector */
 	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
@@ -6539,7 +6562,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,hgsetid from host_hgset where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values, hgsetids.values_num);
 

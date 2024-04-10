@@ -136,6 +136,12 @@ $gauge-needle-stroke-color: #f2f2f2;
 // Pie chart.
 $pie-chart-arc-no-data-color: #383838;
 
+// Honeycomb.
+$honeycomb-cell-color: #3d5059;
+$honeycomb-no-data-cell-color: #383838;
+$honeycomb-label-color: #eeeeee;
+$honeycomb-no-data-label-color: #eeeeee;
+
 // Statuses
 $problem-unack-fg-color: #ff3333;
 $problem-ack-fg-color: #ff3333;
@@ -230,9 +236,11 @@ $toc-title-bg-color: #4f4f4f;
 }
 
 .dashboard-navigation-tabs {
-	& .csortable > .csortable-item > div,
-	& .csortable-list > .csortable-item > div:hover {
-		border: 1px solid transparent;
+	.sortable {
+		li div:hover,
+		li.sortable-item-dragging div {
+			border: 1px solid transparent;
+		}
 	}
 }
 

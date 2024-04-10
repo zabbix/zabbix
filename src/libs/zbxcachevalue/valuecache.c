@@ -973,28 +973,21 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 {
 	void	*ptr;
+	int	tries = 0;
+	size_t	len;
 
-	ptr = zbx_hashset_search(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE);
+	len = strlen(str) + 1;
 
-	if (NULL == ptr)
+	while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
+			REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE, REFCOUNT_FIELD_SIZE + len,
+			ZBX_HASHSET_UNIQ_FALSE)))
 	{
-		int	tries = 0;
-		size_t	len;
-
-		len = strlen(str) + 1;
-
-		while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE)))
-		{
-			/* If there is not enough space - free enough to store string + hashset entry overhead */
-			/* and try inserting one more time. If it fails again, then fail the function.         */
-			if (0 == tries++)
-				vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
-			else
-				return NULL;
-		}
-
-		*(zbx_uint32_t *)ptr = 0;
+		/* If there is not enough space - free enough to store string + hashset entry overhead */
+		/* and try inserting one more time. If it fails again, then fail the function.         */
+		if (0 == tries++)
+			vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
+		else
+			return NULL;
 	}
 
 	(*(zbx_uint32_t *)ptr)++;
@@ -2514,21 +2507,24 @@ void	zbx_vc_reset(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds item values to the history and value cache                   *
+ * Purpose: adds item values to history and value cache                       *
  *                                                                            *
- * Parameters: history - [IN] item history values                             *
+ * Parameters:                                                                *
+ *   history                          - [IN] item history values              *
+ *   ret_flush                        - [OUT]                                 *
+ *   config_history_storage_pipelines - [IN]                                  *
  *                                                                            *
- * Return value: SUCCEED - the values were added successfully                 *
+ * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
+int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
 {
 	zbx_vc_item_t		*item;
 	int			i;
 	zbx_dc_history_t	*h;
 
-	if (SUCCEED != zbx_history_add_values(history, ret_flush))
+	if (SUCCEED != zbx_history_add_values(history, ret_flush, config_history_storage_pipelines))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
@@ -2540,7 +2536,22 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 	{
 		h = (zbx_dc_history_t *)history->values[i];
 
-		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
+		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+
+		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
+		{
+			zbx_vc_item_t	item_local = {
+					.itemid = h->itemid,
+					.value_type = h->value_type,
+					.last_accessed = (int)time(NULL)
+
+			};
+
+			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
+		}
+
+		/* cache new values only after the item history database status is known */
+		if (NULL != item && (ZBX_ITEM_STATUS_CACHED_ALL == item->status || 0 != item->db_cached_from))
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
 			zbx_vc_chunk_t		*head = item->head;
@@ -2875,6 +2886,42 @@ void	zbx_vc_flush_stats(void)
 	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
 }
 
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/valuecache_test.c"
-#endif
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add newly created items with triggers to value cachel              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
+{
+	if (ZBX_VC_DISABLED == vc_state)
+		return;
+
+	WRLOCK_CACHE;
+
+	if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
+	{
+		int	i;
+
+		for (i = 0; i < items->values_num; i++)
+		{
+			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i]))
+				continue;
+
+			zbx_vc_item_t	item_local = {
+					.itemid = items->values[i].first,
+					.value_type = (unsigned char)items->values[i].second,
+					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.last_accessed = (int)time(NULL)
+
+			};
+
+			if (NULL == zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local)))
+			{
+				/* out of memory - cache will switch to low memory mode on next caching request */
+				break;
+			}
+		}
+	}
+
+	UNLOCK_CACHE;
+}

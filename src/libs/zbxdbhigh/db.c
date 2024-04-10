@@ -20,12 +20,14 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
-#include "zbx_trigger_constants.h"
-#include "zbx_dbversion_constants.h"
+
+#ifdef HAVE_POSTGRESQL
+#	include "zbx_dbversion_constants.h"
+#endif
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -79,13 +81,13 @@ int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config
 	int	err = 0;
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
-	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", config_dbhigh->config_db_tls_connect,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSConnect", config_dbhigh->config_db_tls_connect,
 			"PostgreSQL or MySQL library version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file,
 			"PostgreSQL or MySQL library version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file,
 			"PostgreSQL or MySQL library version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file,
 			"PostgreSQL or MySQL library version that support TLS"));
 #endif
 
@@ -104,12 +106,12 @@ int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher,
 			"MySQL library version that support configuration of cipher"));
 #endif
 
 #if !defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13,
 			"MySQL library version that support configuration of TLSv1.3 ciphersuites"));
 #endif
 
@@ -1677,6 +1679,8 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 			(*sql_offset)--;
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
+#else
+		ZBX_UNUSED(sql_alloc);
 #endif
 #if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 		/* make sure we are not called twice without */

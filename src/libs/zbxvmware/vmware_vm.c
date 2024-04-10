@@ -34,21 +34,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_XPATH_VM_GUESTDISKS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
-	"/*/*[local-name()='GuestDiskInfo']"
-
-#define ZBX_XPATH_VM_UUID()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_INSTANCE_UUID()					\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()				\
-	ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
-
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
 
@@ -88,6 +73,8 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("guest.guestState")			/* ZBX_VMWARE_VMPROP_STATE */
 };
 
+#undef ZBX_VMPROPMAP
+
 #define ZBX_XPATH_GET_OBJECT_NAME(object, id)				\
 		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"				\
 		ZBX_XPATH_PROP_NAME_NODE("name")
@@ -103,7 +90,7 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
  *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
- * Parameters: vm   - [IN]                                                    *
+ * Parameters: vm - [IN]                                                      *
  *                                                                            *
  ******************************************************************************/
 void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
@@ -135,7 +122,7 @@ void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  *                                                                            *
  * Purpose: frees resources allocated to store vm device object               *
  *                                                                            *
- * Parameters: dev - [IN] the vm device                                       *
+ * Parameters: dev - [IN] vm device                                           *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_dev_free(zbx_vmware_dev_t *dev)
@@ -150,7 +137,7 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
  *                                                                            *
  * Purpose: frees resources allocated to store vm file system object          *
  *                                                                            *
- * Parameters: fs    - [IN] the file system                                   *
+ * Parameters: fs - [IN] file system                                          *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_fs_free(zbx_vmware_fs_t *fs)
@@ -163,7 +150,7 @@ static void	vmware_fs_free(zbx_vmware_fs_t *fs)
  *                                                                            *
  * Purpose: frees resources allocated to store vm custom attributes           *
  *                                                                            *
- * Parameters: ca - [IN] the custom attribute                                 *
+ * Parameters: ca - [IN] custom attribute                                     *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
@@ -177,7 +164,7 @@ static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
  *                                                                            *
  * Purpose: frees resources allocated to store virtual machine                *
  *                                                                            *
- * Parameters: vm   - [IN]                                                    *
+ * Parameters: vm - [IN]                                                      *
  *                                                                            *
  ******************************************************************************/
 void	vmware_vm_free(zbx_vmware_vm_t *vm)
@@ -224,11 +211,10 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
 	{
 		struct zbx_json	json_data;
-		int		i;
 
 		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
 
-		for (i = 0; i < ips.values_num; i++)
+		for (int i = 0; i < ips.values_num; i++)
 			zbx_json_addstring(&json_data, NULL, ips.values[i], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
@@ -244,17 +230,17 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 	return val;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: gets virtual machine network interface devices' additional        *
- * properties (props member of zbx_vmware_dev_t)                              *
- *                                                                            *
- * Parameters: details - [IN] an xml document containing virtual machine data *
- *             xmlNode - [IN] an xml document node that corresponds to given  *
- *                            network interface device                        *
- *             xmlNode - [IN] an xml node containing list of guest ips        *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: gets virtual machine network interface devices' additional           *
+ *          properties (props member of zbx_vmware_dev_t)                        *
+ *                                                                               *
+ * Parameters: details       - [IN] xml document containing virtual machine data *
+ *             node          - [IN] xml document node that corresponds to given  *
+ *                                  network interface device                     *
+ *             guestnet_node - [IN] xml node containing list of guest ips        *
+ *                                                                               *
+ *********************************************************************************/
 static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xmlNode *guestnet_node)
 {
 	char	**props;
@@ -479,6 +465,10 @@ clean:
  ******************************************************************************/
 static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
+#	define ZBX_XPATH_VM_GUESTDISKS()									\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
+		"/*/*[local-name()='GuestDiskInfo']"
+
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
@@ -501,21 +491,26 @@ static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 		zbx_vmware_fs_t	*fs;
 		char		*value;
 
-		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='diskPath']")))
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				"*[local-name()='diskPath']")))
+		{
 			continue;
+		}
 
 		fs = (zbx_vmware_fs_t *)zbx_malloc(NULL, sizeof(zbx_vmware_fs_t));
 		memset(fs, 0, sizeof(zbx_vmware_fs_t));
 
 		fs->path = value;
 
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='capacity']")))
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				"*[local-name()='capacity']")))
 		{
 			ZBX_STR2UINT64(fs->capacity, value);
 			zbx_free(value);
 		}
 
-		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], "*[local-name()='freeSpace']")))
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i],
+				"*[local-name()='freeSpace']")))
 		{
 			ZBX_STR2UINT64(fs->free_space, value);
 			zbx_free(value);
@@ -527,11 +522,13 @@ clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
+
+#	undef ZBX_XPATH_VM_GUESTDISKS
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets custom attributes data of the virtual machine                *
+ * Purpose: gets custom attributes data of virtual machine                    *
  *                                                                            *
  * Parameters: vm      - [OUT]                                                *
  *             details - [IN] xml document containing virtual machine data    *
@@ -539,6 +536,9 @@ clean:
  ******************************************************************************/
 static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
+#	define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()				\
+		ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
+
 	xmlXPathContext			*xpathCtx;
 	xmlXPathObject			*xpathObj;
 	xmlNodeSetPtr			nodeset;
@@ -592,23 +592,25 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() attributes:%d", __func__, vm->custom_attrs.values_num);
+
+#	undef ZBX_XPATH_VM_CUSTOM_FIELD_VALUES
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets the virtual machine data                                     *
+ * Purpose: gets virtual machine data                                         *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             vmid         - [IN] the virtual machine id                     *
- *             propmap      - [IN] the xpaths of the properties to read       *
- *             props_num    - [IN] the number of properties to read           *
- *             cq_prop      - [IN] the soap part of query with cq property    *
- *             xdoc         - [OUT] a reference to output xml document        *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             vmid         - [IN] virtual machine id                         *
+ *             propmap      - [IN] xpaths of properties to read               *
+ *             props_num    - [IN] number of properties to read               *
+ *             cq_prop      - [IN] soap part of query with cq property        *
+ *             xdoc         - [OUT] reference to output xml document          *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyhandle, const char *vmid,
@@ -664,12 +666,12 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	*tmp, props[ZBX_VMWARE_VMPROPS_NUM * 150], *vmid_esc;
-	int	i, ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __func__, vmid);
 	props[0] = '\0';
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 	{
 		zbx_strscat(props, "<ns0:pathSet>");
 		zbx_strscat(props, propmap[i].name);
@@ -687,17 +689,19 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_POST_VMWARE_VM_STATUS_EX
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert vm folder id to chain of folder names divided by '/'      *
+ * Purpose: converts vm folder id to chain of folder names divided by '/'     *
  *                                                                            *
- * Parameters: xdoc      - [IN] the xml with all vm details                   *
- *             vm_folder - [IN/OUT] the vm property with folder id            *
+ * Parameters: xdoc      - [IN] xml with all vm details                       *
+ *             vm_folder - [IN/OUT] vm property with folder id                *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
@@ -747,13 +751,13 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect info about snapshot disk size                             *
+ * Purpose: collects info about snapshot disk size                            *
  *                                                                            *
- * Parameters: xdoc       - [IN] the xml document with all details            *
- *             key        - [IN] the id of snapshot disk                      *
- *             layout_node- [IN] the xml node with snapshot disk info         *
- *             sz         - [OUT] size of snapshot disk                       *
- *             usz        - [OUT] uniquesize of snapshot disk                 *
+ * Parameters: xdoc        - [IN] xml document with all details               *
+ *             key         - [IN] id of snapshot disk                         *
+ *             layout_node - [IN] xml node with snapshot disk info            *
+ *             sz          - [OUT] size of snapshot disk                      *
+ *             usz         - [OUT] uniquesize of snapshot disk                *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *layout_node, zbx_uint64_t *sz,
@@ -807,28 +811,28 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect info about snapshots and create json                      *
+ * Purpose: collects info about snapshots and creates json                    *
  *                                                                            *
- * Parameters: xdoc       - [IN] the xml document with all details            *
- *             snap_node  - [IN] the xml node with snapshot info              *
- *             layout_node- [IN] the xml node with snapshot disk info         *
- *             disks_used - [IN/OUT] processed disk id                        *
- *             size       - [IN/OUT] total size of all snapshots              *
- *             uniquesize - [IN/OUT] total uniquesize of all snapshots        *
- *             count      - [IN/OUT] total number of all snapshots            *
- *             latestdate - [OUT] the date of last snapshot                   *
- *             oldestdate - [OUT] the date of oldest snapshot                 *
- *             json_data  - [OUT] json with info about snapshot               *
+ * Parameters: xdoc        - [IN] xml document with all details               *
+ *             snap_node   - [IN] xml node with snapshot info                 *
+ *             layout_node - [IN] xml node with snapshot disk info            *
+ *             disks_used  - [IN/OUT] processed disk ids                      *
+ *             size        - [IN/OUT] total size of all snapshots             *
+ *             uniquesize  - [IN/OUT] total uniquesize of all snapshots       *
+ *             count       - [IN/OUT] total number of all snapshots           *
+ *             latestdate  - [OUT] date of last snapshot                      *
+ *             oldestdate  - [OUT] date of oldest snapshot                    *
+ *             json_data   - [OUT] json with info about snapshot              *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED  - operation has completed successfully              *
+ *               FAIL     - operation has failed                              *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *layout_node,
 		zbx_vector_uint64_t *disks_used, zbx_uint64_t *size, zbx_uint64_t *uniquesize, zbx_uint64_t *count,
 		char **latestdate, char **oldestdate, struct zbx_json *json_data)
 {
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	char			*value, xpath[MAX_STRING_LEN], *name, *desc, *crtime;
 	zbx_vector_str_t	ids;
 	zbx_uint64_t		snap_size, snap_usize;
@@ -876,7 +880,7 @@ static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode 
 
 	zbx_free(value);
 
-	for (i = 0; i < ids.values_num; i++)
+	for (int i = 0; i < ids.values_num; i++)
 	{
 		zbx_uint64_t	dsize, dusize, disk_id =  (unsigned int)atoi(ids.values[i]);
 
@@ -933,9 +937,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create json with info about vm snapshots                          *
+ * Purpose: creates json with info about vm snapshots                         *
  *                                                                            *
- * Parameters: xml_node - [IN] the xml node with last vm snapshot             *
+ * Parameters: xml_node - [IN] xml node with last vm snapshot                 *
  *             jstr     - [OUT] json with vm snapshot info                    *
  *                                                                            *
  ******************************************************************************/
@@ -1028,6 +1032,14 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 		const char *id, zbx_vector_vmware_resourcepool_ptr_t *rpools, zbx_vector_cq_value_ptr_t *cq_values,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
+#	define ZBX_XPATH_VM_UUID()										\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
+			"/*[local-name()='val']"
+
+#	define ZBX_XPATH_VM_INSTANCE_UUID()					\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
+			"/*[local-name()='val']"
+
 	zbx_vmware_vm_t			*vm;
 	char				*value, *cq_prop;
 	xmlDoc				*details = NULL;
@@ -1085,7 +1097,8 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 	else
 	{
 		vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT] = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,"
-				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
+				"\"latestdate\":null,\"latestage\":0,\"oldestdate\":null,\"oldestage\":0,"
+				"\"size\":0,\"uniquesize\":0}");
 	}
 
 	if (NULL != vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL])
@@ -1126,6 +1139,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return vm;
+
+#	undef ZBX_XPATH_VM_UUID
+#	undef ZBX_XPATH_VM_INSTANCE_UUID
 }
 
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

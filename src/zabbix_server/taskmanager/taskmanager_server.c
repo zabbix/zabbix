@@ -22,8 +22,8 @@
 #include "../db_lengths_constants.h"
 #include "../events/events.h"
 #include "../actions/actions.h"
+#include "../audit/audit_server.h"
 
-#include "zbxservice.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -35,7 +35,6 @@
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
-#include "audit/zbxaudit_proxy.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxversion.h"

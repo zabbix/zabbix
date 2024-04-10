@@ -20,7 +20,10 @@
 #include "zbxdbwrap.h"
 
 #include "zbxnum.h"
-#include "zbxexpr.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

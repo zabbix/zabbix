@@ -111,9 +111,24 @@ func (t *collectorTask) perform(s Scheduler) {
 	log.Debugf("plugin %s: executing collector task", t.plugin.name())
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
-		if err := collector.Collect(); err != nil {
+		start := time.Now()
+		err := collector.Collect()
+
+		if err != nil {
 			log.Warningf("plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
 		}
+
+		elapsedSeconds := time.Since(start).Seconds()
+
+		if elapsedSeconds > float64(collector.Period()) {
+			log.Warningf(
+				"plugin '%s': time spent in collector task %f s exceeds collecting interval %d s",
+				t.plugin.impl.Name(),
+				elapsedSeconds,
+				collector.Period(),
+			)
+		}
+
 		s.FinishTask(t)
 	}()
 }
@@ -330,7 +345,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 		var err error
 
 		if now.After(t.expire) {
-			err = errors.New("No data available.")
+			err = errors.New("Timeout while waiting for item in queue.")
 			log.Debugf("direct exporter task expired for key '%s' error: '%s'", itemkey, err.Error())
 		} else {
 			if key, params, err = itemutil.ParseKey(itemkey); err == nil {
@@ -561,7 +576,7 @@ func (t *commandTask) perform(s Scheduler) {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,
-					Result: itemutil.ValueToString(ret),
+					Result: *itemutil.ValueToString(ret),
 				}
 			}
 		} else {

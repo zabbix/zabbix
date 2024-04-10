@@ -44,18 +44,9 @@ int	__wrap_vfs_dev_read(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_dev_write(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_dir_count(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_dir_get(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_dir_size(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_cksum(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_contents(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_exists(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_file_get(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_md5sum(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_file_owner(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_file_permissions(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_regexp(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_regmatch(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_size(const char *command, AGENT_RESULT *result);
-int	__wrap_vfs_file_time(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_fs_discovery(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_fs_get(const char *command, AGENT_RESULT *result);
 int	__wrap_vfs_fs_inode(const char *command, AGENT_RESULT *result);
@@ -92,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot convert flags to unsigned 32 bit integer.");
 
 	zbx_init_library_sysinfo(NULL, get_zbx_config_enable_remote_commands, NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL);
+			NULL, NULL);
 
 	zbx_init_metrics();
 

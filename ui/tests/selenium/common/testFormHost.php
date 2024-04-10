@@ -299,7 +299,7 @@ class testFormHost extends CWebTest {
 			if ($field === 'SNMPv3') {
 				// Check fields' lengths.
 				$field_lengths = [
-					'Max repetition count' =>  20,
+					'Max repetition count' =>  10,
 					'Context name' => 255,
 					'Security name' => 64,
 					'Authentication passphrase' => 64,
@@ -2032,7 +2032,7 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);

@@ -18,16 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/include/defines.inc.php';
 
 // get language translations
 require_once dirname(__FILE__).'/include/locales.inc.php';
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 
-setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
+setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : ZBX_DEFAULT_LANG);
 
 require_once dirname(__FILE__).'/include/js.inc.php';
-
-require_once dirname(__FILE__).'/include/defines.inc.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
@@ -66,11 +65,12 @@ $available_js = [
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
-	'jquery.js' => 'vendors/',
-	'jquery-ui.js' => 'vendors/',
-	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
-	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
-	'd3.v7.min.js' => 'vendors/',
+	'jquery.js' => 'vendors/jQuery/',
+	'jquery-ui.js' => 'vendors/jQueryUI/',
+	'leaflet.js' => 'vendors/Leaflet/',
+	'leaflet.markercluster.js' => 'vendors/Leaflet.markercluster/',
+	'd3.js' => 'vendors/D3/',
+	'qrcode.js' => 'vendors/qrcode/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
@@ -148,6 +148,7 @@ $translate_strings = [
 		'Page %1$d' => _('Page %1$d'),
 		'Paste widget' => _('Paste widget'),
 		'Properties' => _('Properties'),
+		'Referred widget became unavailable. Please update configuration.' => _('Referred widget became unavailable. Please update configuration.'),
 		'Start slideshow' => _('Start slideshow'),
 		'Stop slideshow' => _('Stop slideshow')
 	],
@@ -283,14 +284,14 @@ $translate_strings = [
 		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
 	],
 	'class.notifications.js' => [
+		'Mute for %1$s' => _('Mute for %1$s'),
 		'S_PROBLEM_ON' => _('Problem on'),
 		'S_RESOLVED' => _('Resolved'),
-		'S_MUTE' => _('Mute'),
 		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
-		'S_UNMUTE' => _('Unmute'),
 		'S_CLOSE' => _('Close'),
-		'S_SNOOZE' => _('Snooze'),
-		'Unexpected server error.' => _('Unexpected server error.')
+		'Snooze for %1$s' => _('Snooze for %1$s'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'Unmute for %1$s' => _('Unmute for %1$s')
 	],
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
@@ -359,6 +360,7 @@ $translate_strings = [
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Discovery' => _('Discovery'),
+		'Discovery rule' => _('Discovery rule'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
@@ -413,7 +415,10 @@ $translate_strings = [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.csvgauge.js' => [
+	'class.csvggauge.js' => [
+		'No data' => _('No data')
+	],
+	'class.svghoneycomb.js' => [
 		'No data' => _('No data')
 	],
 	'common.js' => [
@@ -466,6 +471,7 @@ if (empty($_GET['files'])) {
 		'class.script.js',
 		'class.scrollable.js',
 		'class.sidebar.js',
+		'class.sortable.js',
 		'class.template.js',
 		'chkbxrange.js',
 		'functions.js',

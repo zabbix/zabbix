@@ -28,13 +28,7 @@
 #include "zbxnix.h"
 #endif
 
-#include "cfg.h"
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern char	*config_tls_server_cert_issuer;
-extern char	*config_tls_server_cert_subject;
-extern char	*config_tls_psk_identity;
-#endif
+#include "zbxcfg.h"
 
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_addr_ptr_t *addrs,
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
