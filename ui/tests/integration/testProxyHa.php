@@ -326,7 +326,7 @@ class testProxyHa extends CIntegrationTest {
 			'proxyid' => self::$proxyid1,
 			'proxy_groupid' => self::$proxy_groupid,
 			'local_address' => '127.0.0.1',
-			'local_port' => $this->getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort'),
+			'local_port' => $this->getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort')
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 		$this->assertCount(1, $response['result']['proxyids']);
