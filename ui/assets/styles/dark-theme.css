@@ -4360,6 +4360,8 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 
 form.dashboard-widget-itemnavigator .item-grouping {
   line-height: 1.4em; }
+  form.dashboard-widget-itemnavigator .item-grouping tr:not(.form_row):first-child {
+    line-height: 24px; }
 
 div.dashboard-widget-itemnavigator .item-navigator .item-navigator-limit {
   display: flex;
