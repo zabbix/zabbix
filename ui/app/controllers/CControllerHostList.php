@@ -333,16 +333,15 @@ class CControllerHostList extends CController {
 			$host['has_passive_checks'] = array_key_exists($host['hostid'], $passive_item_count_by_hostid)
 				&& $passive_item_count_by_hostid[$host['hostid']] > 0;
 
-			if ($host['proxyid'] != 0) {
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				$proxyids[$host['proxyid']] = true;
 			}
-
-			if ($host['assigned_proxyid'] != 0) {
-				$proxyids[$host['assigned_proxyid']] = true;
-			}
-
-			if ($host['proxy_groupid'] != 0) {
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 				$proxy_groupids[$host['proxy_groupid']] = true;
+
+				if ($host['assigned_proxyid'] != 0) {
+					$proxyids[$host['assigned_proxyid']] = true;
+				}
 			}
 
 			if ($host['status'] == HOST_STATUS_MONITORED &&
