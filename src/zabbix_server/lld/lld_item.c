@@ -2469,7 +2469,7 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 	/* update/create discovered items */
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[i];
+		item_prototype = item_prototypes->values[i];
 		item_index_local.parent_itemid = item_prototype->itemid;
 
 		for (j = 0; j < lld_rows->values_num; j++)
@@ -2627,7 +2627,7 @@ static void	lld_items_preproc_make(const zbx_vector_lld_item_prototype_ptr_t *it
 		{
 			if (j >= item->preproc_ops.values_num)
 			{
-				ppsrc = (zbx_lld_item_preproc_t *)item_proto->preproc_ops.values[j];
+				ppsrc = item_proto->preproc_ops.values[j];
 				ppdst = zbx_init_lld_item_preproc(0, ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED |
 						ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE, ppsrc->step, ppsrc->type,
 						ppsrc->params, ppsrc->error_handler, ppsrc->error_handler_params);
@@ -3525,7 +3525,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		else
 		{
 			item_index_local.parent_itemid = item->master_itemid;
-			item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
+			item_index_local.lld_row = item->lld_row;
 
 			/* dependent item based on host item should be saved */
 			if (NULL == zbx_hashset_search(items_index, &item_index_local))
@@ -4476,7 +4476,7 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 			continue;
 
 		item_index_local.parent_itemid = item->master_itemid;
-		item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
+		item_index_local.lld_row = item->lld_row;
 
 		if (NULL != (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 		{

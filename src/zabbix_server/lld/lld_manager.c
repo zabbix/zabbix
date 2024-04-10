@@ -347,7 +347,7 @@ static void	lld_process_next_request(zbx_lld_manager_t *manager, zbx_lld_worker_
 	zbx_lld_data_t		*data;
 
 	elem = zbx_binary_heap_find_min(&manager->rule_queue);
-	worker->rule = (zbx_lld_rule_t *)elem->data;
+	worker->rule = elem->data;
 	zbx_binary_heap_remove_min(&manager->rule_queue);
 
 	data = worker->rule->head;

@@ -833,7 +833,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	/* checking duplicated visible host names */
 	for (i = 0; i < hosts->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -844,7 +844,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 
 		for (j = 0; j < hosts->values_num; j++)
 		{
-			host_b = (zbx_lld_host_t *)hosts->values[j];
+			host_b = hosts->values[j];
 
 			if (0 == (host_b->flags & ZBX_FLAG_LLD_HOST_DISCOVERED) || i == j)
 				continue;
@@ -2750,7 +2750,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 						&cmp, lld_group_prototype_compare_func)))
 				{
 					discovery->groupdiscoveryid = next_gdid++;
-					group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[k];
+					group_prototype = group_prototypes->values[k];
 
 					zbx_db_insert_add_values(&db_insert_gdiscovery, discovery->groupdiscoveryid,
 							group->groupid, discovery->parent_group_prototypeid,
@@ -2932,7 +2932,7 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_lld_hostma
 
 		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
 
-		masterhostmacro = (const zbx_lld_hostmacro_t *)masterhostmacros->values[i];
+		masterhostmacro = masterhostmacros->values[i];
 		hostmacro->hostmacroid = 0;
 		hostmacro->macro = zbx_strdup(NULL, masterhostmacro->macro);
 		hostmacro->value = zbx_strdup(NULL, masterhostmacro->value);
@@ -3046,8 +3046,8 @@ static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros
 			hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
 
 			hostmacro->hostmacroid = 0;
-			hostmacro->macro = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->macro);
-			hostmacro->value = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->value);
+			hostmacro->macro = zbx_strdup(NULL, (hostmacros->values[j])->macro);
+			hostmacro->value = zbx_strdup(NULL, (hostmacros->values[j])->value);
 			hostmacro->value_orig = NULL;
 			hostmacro->type = (hostmacros->values[j])->type;
 			hostmacro->type_orig = (hostmacros->values[j])->type_orig;
@@ -3557,7 +3557,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 		for (j = 0; j < host->new_hostmacros.values_num; j++)
 		{
-			hostmacro = (zbx_lld_hostmacro_t *)host->new_hostmacros.values[j];
+			hostmacro = host->new_hostmacros.values[j];
 
 			if (0 == hostmacro->hostmacroid)
 			{
@@ -4126,7 +4126,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 		for (j = 0; j < host->new_hostmacros.values_num; j++)
 		{
-			hostmacro = (zbx_lld_hostmacro_t *)host->new_hostmacros.values[j];
+			hostmacro = host->new_hostmacros.values[j];
 
 			if (0 == hostmacro->hostmacroid)
 			{
