@@ -3224,6 +3224,8 @@ section {
     margin-bottom: 10px; }
   section .list-table {
     border: 0; }
+    section .list-table tbody tr:last-child:not(.nothing-to-show) td {
+      border-bottom: 1px solid #383838; }
     section .list-table td:first-child,
     section .list-table th:first-child {
       padding-left: 10px; }
