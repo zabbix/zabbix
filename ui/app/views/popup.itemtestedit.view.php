@@ -247,7 +247,7 @@ if ($data['is_item_testable']) {
 	}
 
 	$form_grid->addItem([
-		(new CLabel(_('Test with')))->addClass('js-test-with-row'),
+		(new CLabel(_('Test with'), 'test_with'))->addClass('js-test-with-row'),
 		(new CFormField([
 			(new CRadioButtonList('test_with', (int) $data['test_with']))
 				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER)
