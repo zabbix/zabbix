@@ -2002,7 +2002,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
-	src/libs/zbxdbconfigworker/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
@@ -2052,6 +2051,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxpoller/Makefile
 	src/libs/zbxagentget/Makefile
 	src/libs/zbxpreproc/Makefile
+	src/libs/zbxpreprocbase/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile
 	src/libs/zbxregexp/Makefile

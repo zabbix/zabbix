@@ -54,7 +54,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
 	actions/libzbxactions.a \
-	housekeeper/libzbxhousekeeper.a \
+	housekeeper/libzbxhousekeeper_server.a \
 	timer/libzbxtimer.a \
 	$(top_builddir)/src/libs/zbxtrapper/libzbxtrapper.a \
 	$(top_builddir)/src/libs/zbxhttppoller/libzbxhttppoller.a \
@@ -82,7 +82,7 @@ zabbix_server_LDADD = \
 	libzbxserver.a \
 	postinit/libzbxpostinit.a \
 	operations/libzbxoperations.a \
-	stats/libzbxserver_server.a \
+	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -102,7 +102,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	preproc/libpreproc_server.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
-	$(top_builddir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
+	$(top_builddir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	dbconfigworker/libdbconfigworker.a \
@@ -149,7 +149,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_builddir)/src/libs/zbxconnector/libzbxconnector.a \
-	$(top_builddir)/src/libs/zbxdbconfigworker/libzbxdbconfigworker.a \
 	audit/libzbxaudit_server.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
