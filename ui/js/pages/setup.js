@@ -62,8 +62,6 @@ const view = new class {
 					}
 				});
 
-				for (const id of ['vault'])
-
 				this._update();
 				break;
 
@@ -133,8 +131,8 @@ const view = new class {
 			}
 		}
 
-		if (vault_enabled &&
-				[this._hashicorp_endpoint_default, this._cyberark_endpoint_default].includes(vault_url.value)) {
+		if (vault_enabled
+			&& [this._hashicorp_endpoint_default, this._cyberark_endpoint_default].includes(vault_url.value)) {
 			vault_url.value = vault_selected == DB_STORE_CREDS_VAULT_CYBERARK
 				? this._cyberark_endpoint_default
 				: this._hashicorp_endpoint_default;
