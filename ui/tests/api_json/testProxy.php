@@ -965,13 +965,14 @@ class testProxy extends CAPITest {
 					'output' => ['name'],
 					'search' => [
 						'name' => 'API test proxy - active'
-					]
+					],
+					'sortfield' => 'proxyid'
 				],
 				'expected_result' => [
+					['name' => 'API test proxy - active with defaults'],
 					['name' => 'API test proxy - active with PSK-based connections from proxy'],
-					['name' => 'API test proxy - active with any connections from proxy'],
 					['name' => 'API test proxy - active with certificate-based connections from proxy'],
-					['name' => 'API test proxy - active with defaults']
+					['name' => 'API test proxy - active with any connections from proxy']
 				],
 				'expected_error' => null
 			],
