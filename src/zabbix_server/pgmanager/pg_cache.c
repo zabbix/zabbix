@@ -446,13 +446,17 @@ out:
  *             group     - [IN] target group                                  *
  *             limit     - [IN] maximum number of hosts per proxy             *
  *                                                                            *
+ *  Return value: SUCCEED - unassiged hosts were distributed between online   *
+ *                          proxies                                           *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
  ******************************************************************************/
-static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
+static int	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
 {
 	zbx_vector_pg_proxy_ptr_t	proxies;
 
 	if (0 == group->unassigned_hostids.values_num)
-		return;
+		return FAIL;
 
 	zbx_vector_pg_proxy_ptr_create(&proxies);
 
@@ -500,6 +504,8 @@ static void	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_
 	}
 
 	zbx_vector_pg_proxy_ptr_destroy(&proxies);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -604,11 +610,14 @@ out:
  *             um_handle - [IN] user macro cache handle                       *
  *             group     - [IN] target group                                  *
  *                                                                            *
+ * Return value: SUCCEED - group was fully re-balanced                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle,
+static int	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle,
 		zbx_pg_group_t *group)
 {
-	int	online_num = 0, hosts_num = 0, hosts_min, hosts_required;
+	int	online_num = 0, hosts_num = 0, hosts_min, hosts_required, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name, cache->group_updates.values_num);
 
@@ -627,9 +636,7 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, const zbx_dc_um_handl
 	if (0 == online_num)
 		goto out;
 
-	pg_cache_group_distribute_hosts(cache, group);
-
-	if (SUCCEED == pg_cache_is_group_balanced(cache, um_handle, group))
+	if (SUCCEED == pg_cache_group_distribute_hosts(cache, group))
 		goto out;
 
 	if (hosts_num > online_num)
@@ -652,9 +659,13 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, const zbx_dc_um_handl
 	}
 
 	pg_cache_group_unassign_excess_hosts(cache, group, hosts_min, hosts_required);
-	pg_cache_group_distribute_hosts(cache, group);
+	(void)pg_cache_group_distribute_hosts(cache, group);
+
+	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -712,9 +723,11 @@ void	pg_cache_rebalance_groups(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *
 			}
 			else if (now >= group->balance_time)
 			{
-				pg_cache_reassign_hosts(cache, um_handle, group);
-				group->balance_time = 0;
-				group->unbalanced = PG_GROUP_UNBALANCED_NO;
+				if (SUCCEED == pg_cache_reassign_hosts(cache, um_handle, group))
+				{
+					group->balance_time = 0;
+					group->unbalanced = PG_GROUP_UNBALANCED_NO;
+				}
 			}
 		}
 		else
