@@ -4232,6 +4232,8 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
 
 form.dashboard-widget-hostnavigator .host-grouping {
   line-height: 1.4em; }
+  form.dashboard-widget-hostnavigator .host-grouping tr:not(.form_row):first-child {
+    line-height: 24px; }
 
 div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
   display: flex;
