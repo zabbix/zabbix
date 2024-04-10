@@ -167,8 +167,8 @@ class CSetupWizard extends CForm {
 						$this->getConfig('DB_VAULT_URL', CVaultHashiCorp::API_ENDPOINT_DEFAULT)
 					));
 
-					$this->setConfig('DB_VAULT_PREFIX', getRequest('vault_prefix',
-						$this->getConfig('DB_VAULT_PREFIX')
+					$this->setConfig('DB_VAULT_PREFIX', getRequest('vault_prefix_hashicorp',
+						$this->getConfig('DB_VAULT_PREFIX', '')
 					));
 
 					$this->setConfig('DB_VAULT_DB_PATH', getRequest('vault_db_path',
@@ -187,13 +187,13 @@ class CSetupWizard extends CForm {
 						$this->getConfig('DB_VAULT_URL', CVaultCyberArk::API_ENDPOINT_DEFAULT)
 					));
 
-					$this->setConfig('DB_VAULT_PREFIX', getRequest('vault_prefix',
-						$this->getConfig('DB_VAULT_PREFIX')
+					$this->setConfig('DB_VAULT_PREFIX', getRequest('vault_prefix_cyberark',
+						$this->getConfig('DB_VAULT_PREFIX', '')
 					));
 
-					$this->setConfig('DB_VAULT_DB_PATH',
-						getRequest('vault_query_string', $this->getConfig('DB_VAULT_DB_PATH'))
-					);
+					$this->setConfig('DB_VAULT_DB_PATH', getRequest('vault_query_string',
+						$this->getConfig('DB_VAULT_DB_PATH', '')
+					));
 
 					$vault_certificates = (bool) getRequest('vault_certificates',
 						$this->getConfig('DB_VAULT_CERTIFICATES', false)
@@ -602,21 +602,18 @@ class CSetupWizard extends CForm {
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
+			// HashiCorp Vault - related fields.
 			->addRow(
 				_('Vault prefix'),
-				(new CTextBox('vault_prefix'))
-					->setAttribute('maxlength', 2048)
+				(new CTextBox('vault_prefix_hashicorp',
+					$db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP ? $this->getConfig('DB_VAULT_PREFIX') : ''
+				))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setAttribute('placeholder', $db_creds_storage === DB_STORE_CREDS_VAULT_CYBERARK
-						? CVaultCyberArk::DB_PREFIX_DEFAULT
-						: CVaultHashiCorp::DB_PREFIX_DEFAULT
-				),
-				'vault_prefix_row',
-				!in_array($db_creds_storage, [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK])
-					? ZBX_STYLE_DISPLAY_NONE
-					: null
+					->setAttribute('maxlength', 2048)
+					->setAttribute('placeholder', CVaultHashiCorp::DB_PREFIX_PLACEHOLDER),
+				'vault_prefix_hashicorp_row',
+				$db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK ? ZBX_STYLE_DISPLAY_NONE : null
 			)
-			// HashiCorp Vault - related fields.
 			->addRow(
 				(new CLabel(_('Vault secret path')))->setAsteriskMark(),
 				(new CTextBox('vault_db_path', $db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP
@@ -637,6 +634,17 @@ class CSetupWizard extends CForm {
 			)
 			// CyberArk Vault - related fields.
 			->addRow(
+				_('Vault prefix'),
+				(new CTextBox('vault_prefix_cyberark',
+					$db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK ? $this->getConfig('DB_VAULT_PREFIX') : ''
+				))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('maxlength', 2048)
+					->setAttribute('placeholder', CVaultCyberArk::DB_PREFIX_DEFAULT),
+				'vault_prefix_cyberark_row',
+				$db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK ? ZBX_STYLE_DISPLAY_NONE : null
+			)
+			->addRow(
 				(new CLabel(_('Vault secret query string')))->setAsteriskMark(),
 				(new CTextBox('vault_query_string', $db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK
 					? $this->getConfig('DB_VAULT_DB_PATH')
@@ -653,14 +661,14 @@ class CSetupWizard extends CForm {
 				(new CCheckBox('vault_certificates'))
 					->setId('vault_certificates_toggle')
 					->setChecked($this->getConfig('DB_VAULT_CERTIFICATES', false)),
-				'vault_certificates',
+				'vault_certificates_row',
 				($db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
 			)
 			->addRow(_('SSL certificate file'),
 				(new CTextBox('vault_cert_file', $this->getConfig('VAULT_CERT_FILE', 'conf/certs/cyberark-cert.pem')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('maxlength', 2048),
-				'vault_cert_file',
+				'vault_cert_file_row',
 				($db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK || !$this->getConfig('DB_VAULT_CERTIFICATES', false))
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
@@ -669,7 +677,7 @@ class CSetupWizard extends CForm {
 				(new CTextBox('vault_key_file', $this->getConfig('VAULT_KEY_FILE', 'conf/certs/cyberark-key.pem')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('maxlength', 2048),
-				'vault_key_file',
+				'vault_key_file_row',
 				($db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK || !$this->getConfig('DB_VAULT_CERTIFICATES', false))
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
