@@ -855,7 +855,12 @@ void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *h
 			}
 		}
 		else
-			zbx_vector_pg_host_append_ptr(hosts_new, &host_local);
+		{
+			if (0 == new_host->proxyid)
+				zbx_vector_pg_host_append_ptr(hosts_del, &host_local);
+			else
+				zbx_vector_pg_host_append_ptr(hosts_new, &host_local);
+		}
 	}
 
 	zbx_hashset_clear(&cache->hostmap_updates);
