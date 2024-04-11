@@ -326,8 +326,8 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Invalid request format: missing value in preprocess request");
 	}
 
-	returned_ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, item_state, &out,
-			&error);
+	returned_ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, item_state,
+			&out, &error);
 
 	if (FAIL == returned_ret)
 		printf("trapper_preproc_test_run error: %s\n", error);

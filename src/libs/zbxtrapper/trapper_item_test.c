@@ -36,7 +36,6 @@
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-#include "zbxvariant.h"
 #include "trapper_preproc.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
@@ -165,7 +164,17 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	// item JSON object presence is checked in the calling function
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+	{
+		char *jp_data_contents = NULL;
+		size_t offset = 0, alloc = 0;
+
+		zbx_strncpy_alloc(&jp_data_contents, &offset, &alloc,
+				jp_data->start, (size_t)(jp_data->end - jp_data->start + 1));
+		zabbix_log(LOG_LEVEL_WARNING, "unexpected absence of %s tag in item.test data: %s", ZBX_PROTO_TAG_ITEM,
+				jp_data_contents);
+		zbx_free(jp_data_contents);
 		THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
 		zbx_json_open("{}", &jp_host);
@@ -480,7 +489,7 @@ out:
 static int	try_find_preproc_value(const struct zbx_json_parse *jp_first, const char *name_first,
 		const struct zbx_json_parse *jp_second, const char *name_second, char **value, size_t *value_size)
 {
-	int ret = zbx_json_value_by_name_dyn(jp_first, name_first, value, value_size, NULL);
+	int	ret = zbx_json_value_by_name_dyn(jp_first, name_first, value, value_size, NULL);
 
 	if (FAIL == ret)
 		ret = zbx_json_value_by_name_dyn(jp_second, name_second, value, value_size, NULL);
@@ -544,7 +553,8 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 				ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size);
 	}
 
-	if (FAIL == value_found) {
+	if (FAIL == value_found)
+	{
 		// Get value from host is not checked, yet no value was provided
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_KEY, &key, &key_size, NULL))
 		{
@@ -597,7 +607,6 @@ preproc_test:
 
 		value = zbx_strdup(NULL, info);
 		value_size = strlen(value);
-		ret = SUCCEED;
 	}
 
 	zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
@@ -629,11 +638,14 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
 			get_value_internal_ext_cb, config_ssh_key_location, &json, &error)))
 	{
-		ZBX_UNUSED(zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout));
+		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout))
+			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test response", __func__);
 	}
 	else
 	{
-		zbx_send_response(sock, ret, error, config_comms->config_timeout);
+		if (SUCCEED != zbx_send_response(sock, ret, error, config_comms->config_timeout))
+			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test error response", __func__);
+
 		zbx_free(error);
 	}
 

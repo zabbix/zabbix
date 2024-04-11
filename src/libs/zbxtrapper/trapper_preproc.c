@@ -18,11 +18,8 @@
 **/
 
 #include "trapper_preproc.h"
-#include "zbxtrapper.h"
 
 #include "zbxpreproc.h"
-#include "zbxcommshigh.h"
-#include "zbxdbhigh.h"
 #include "zbxjson.h"
 #include "zbxpreprocbase.h"
 #include "zbxtime.h"
@@ -47,7 +44,7 @@
  *             bypass_first - [OUT] flag to bypass first step                 *
  *             error        - [OUT] error message                             *
  *                                                                            *
- * Return value: SUCCEED - the request was parsed successfully                *
+ * Return value: SUCCEED - request was parsed successfully                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -235,7 +232,7 @@ static void	json_add_string_with_limit(struct zbx_json *j, const char *tag, cons
  *             json       - [OUT] the output json                             *
  *             error      - [OUT] the error message                           *
  *                                                                            *
- * Return value: SUCCEED - the request was executed successfully              *
+ * Return value: SUCCEED - request was executed successfully                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if the request format is not valid or    *
