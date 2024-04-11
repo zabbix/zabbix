@@ -2949,8 +2949,9 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_lld_hostma
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	lld_hostmacro_make(zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
-		const char *value, const char *description, unsigned char type, unsigned char automatic)
+static void	lld_hostmacro_make(zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_uint64_t hostmacroid,
+		const char *macro, const char *value, const char *description, unsigned char type,
+		unsigned char automatic)
 {
 	zbx_lld_hostmacro_t	*hostmacro;
 	int			i;
@@ -5782,9 +5783,16 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 	zbx_vector_lld_hgset_ptr_t		hgsets;
 	zbx_vector_lld_permission_t		permissions;
 	zbx_vector_db_tag_ptr_t			tags;
-	zbx_vector_uint64_t			groupids;		/* list of host groups which should be added */
-	zbx_vector_uint64_t			del_hostgroupids;	/* list of host groups which should be deleted */
-	zbx_vector_uint64_t			del_hgsetids;		/* list of host groups sets which should be deleted */
+
+	/* list of host groups which should be added */
+	zbx_vector_uint64_t			groupids;
+
+	/* list of host groups which should be deleted */
+	zbx_vector_uint64_t			del_hostgroupids;
+
+	/* list of host groups sets which should be deleted */
+	zbx_vector_uint64_t			del_hgsetids;
+
 	zbx_uint64_t				proxyid;
 	char					*ipmi_username = NULL, *ipmi_password, *tls_issuer, *tls_subject,
 						*tls_psk_identity, *tls_psk;

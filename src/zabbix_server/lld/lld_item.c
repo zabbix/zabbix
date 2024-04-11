@@ -57,7 +57,7 @@ zbx_item_dependence_t;
 ZBX_PTR_VECTOR_DECL(item_dependence_ptr, zbx_item_dependence_t*)
 ZBX_PTR_VECTOR_IMPL(item_dependence_ptr, zbx_item_dependence_t*)
 
-static void     item_dependence_free(zbx_item_dependence_t *id)
+static void	item_dependence_free(zbx_item_dependence_t *id)
 {
 	zbx_free(id);
 }

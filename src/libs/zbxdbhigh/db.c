@@ -67,7 +67,7 @@ ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 
-void    zbx_item_diff_free(zbx_item_diff_t *item_diff)
+void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
 	zbx_free(item_diff);
 }
