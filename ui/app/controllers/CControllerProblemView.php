@@ -129,6 +129,7 @@ class CControllerProblemView extends CControllerProblem {
 				'selected' => $profile->selected,
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
+				'expanded_timeselector' => $profile->expanded_timeselector,
 				'page' => $filter['page'],
 				'timeselector' => [
 					'from' => $profile->from,

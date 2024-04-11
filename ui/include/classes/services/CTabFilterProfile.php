@@ -46,6 +46,13 @@ class CTabFilterProfile {
 	public $expanded;
 
 	/**
+	 * Is timeselector tab expanded.
+	 *
+	 * @var bool
+	 */
+	public $expanded_timeselector;
+
+	/**
 	 * Global time range start.
 	 */
 	public $from;
@@ -98,6 +105,7 @@ class CTabFilterProfile {
 		];
 		$this->selected = 0;
 		$this->expanded = false;
+		$this->expanded_timeselector = false;
 	}
 
 	/**
@@ -277,6 +285,11 @@ class CTabFilterProfile {
 		$this->to = CProfile::get($this->namespace.'.to', $to);
 		$this->selected = (int) CProfile::get($this->namespace.'.selected', 0);
 		$this->expanded = (bool) CProfile::get($this->namespace.'.expanded', true);
+
+		if (!$this->expanded) {
+			$this->expanded_timeselector = (bool)CProfile::get($this->namespace . '.expanded_timeselector', true);
+		}
+
 		// CProfile::updateArray assign new idx2 values do not need to store order in profile
 		$this->tabfilters = CProfile::getArray($this->namespace.'.properties', []);
 
@@ -303,6 +316,8 @@ class CTabFilterProfile {
 		CProfile::updateArray($this->namespace.'.properties', array_map('json_encode', $tabfilters), PROFILE_TYPE_STR);
 		CProfile::update($this->namespace.'.selected', $this->selected, PROFILE_TYPE_INT);
 		CProfile::update($this->namespace.'.expanded', (int) $this->expanded, PROFILE_TYPE_INT);
+		CProfile::update($this->namespace.'.expanded_timeselector', (int) $this->expanded_timeselector,
+			PROFILE_TYPE_INT);
 
 		return $this;
 	}

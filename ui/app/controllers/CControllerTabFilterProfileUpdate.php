@@ -52,7 +52,7 @@ class CControllerTabFilterProfileUpdate extends CController {
 			$idx_cunks = explode('.', $this->getInput('idx'));
 			$property = array_pop($idx_cunks);
 			$idx = implode('.', $idx_cunks);
-			$supported = ['selected', 'expanded', 'properties', 'taborder'];
+			$supported = ['selected', 'expanded', 'expanded_timeselector', 'properties', 'taborder'];
 
 			$ret = (in_array($property, $supported) && array_key_exists($idx, static::$namespaces));
 
@@ -115,6 +115,19 @@ class CControllerTabFilterProfileUpdate extends CController {
 
 			case 'expanded':
 				$filter->expanded = ($data['value_int'] > 0);
+
+				if ($filter->expanded) {
+					$filter->expanded_timeselector = false;
+				}
+
+				break;
+
+			case 'expanded_timeselector':
+				$filter->expanded_timeselector = ($data['value_int'] > 0);
+
+				if ($filter->expanded_timeselector) {
+					$filter->expanded = false;
+				}
 
 				break;
 		}
