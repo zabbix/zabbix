@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-02-18 13:54+0000\n"
+"PO-Revision-Date: 2024-03-28 20:26+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1112,9 +1112,16 @@ msgstr "Étiquettes avancées"
 msgid "Advanced options"
 msgstr "Options avancées"
 
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr ""
+
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "Après ce changement, les utilisateurs déjà inscrits à cette méthode MFA devront terminer à nouveau le processus d'inscription car les secrets TOTP seront réinitialisés."
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
@@ -1577,7 +1584,7 @@ msgstr "Au moins un serveur LDAP doit exister."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "Au moins une méthode MFA doit exister."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2108,15 +2115,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "Test CSRF"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "Test du token CSRF"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "La validation du token CSRF a réussi."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2564,7 +2571,7 @@ msgstr[1] "Impossible de supprimer les Tokens API"
 #: include/classes/api/services/CMfa.php:459
 #, c-format
 msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
-msgstr ""
+msgstr "Impossible de supprimer la méthode MFA « %1$s », car elle est utilisée par le groupe d'utilisateurs « %2$s »."
 
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
@@ -2603,7 +2610,7 @@ msgstr[1] "Impossible de supprimer les tableaux de bord"
 
 #: include/classes/api/services/CMfa.php:446
 msgid "Cannot delete default MFA method."
-msgstr ""
+msgstr "Impossible de supprimer la méthode MFA par défaut."
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3637,8 +3644,8 @@ msgstr "Impossible de renommer l'utilisateur invité."
 #: app/controllers/CControllerUserResetTotp.php:85
 msgid "Cannot reset TOTP secret"
 msgid_plural "Cannot reset TOTP secrets"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de réinitialiser le secret TOTP"
+msgstr[1] "Impossible de réinitialiser les secrets TOTP"
 
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
@@ -4545,6 +4552,10 @@ msgstr "La couleur \"%1$s\" n'est pas correcte : code couleur hexadécimal atte
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "Couleur (OK)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr ""
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -6140,6 +6151,11 @@ msgstr "Effacer l'élément ?"
 msgid "Delete links between selected elements?"
 msgstr "Supprimer les liens entre les éléments sélectionnés ?"
 
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr ""
+
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
 msgstr "Supprimer la période de maintenance ?"
@@ -6669,6 +6685,11 @@ msgstr "Désactiver les hôtes surveillés par les proxies sélectionnés ?"
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Désactiver les hôtes surveillés par le proxy sélectionné ?"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr ""
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6829,6 +6850,14 @@ msgstr "Désactiver les scénarios web sélectionnés ?"
 #: include/views/js/monitoring.sysmaps.js.php:285
 msgid "Disabled"
 msgstr "Désactivé"
+
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -9174,6 +9203,10 @@ msgstr "Fonctions d'historique"
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Accueil"
+
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr ""
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -11638,6 +11671,10 @@ msgstr "Élément dans l'état \"non supporté\""
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "Liste d'éléments"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16004,6 +16041,15 @@ msgstr "Contact Principal - Téléphone 2"
 msgid "Primary POC screen name"
 msgstr "Contact Principal - Identifiant"
 
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
 #: app/views/popup.discovery.check.php:120
@@ -16560,6 +16606,10 @@ msgstr "Rectangle"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Attribut de référence"
+
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -17894,6 +17944,15 @@ msgstr "Contact Secondaire - Téléphone 2"
 msgid "Secondary POC screen name"
 msgstr "Contact Secondaire - Identifiant"
 
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr ""
+
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
 msgid "Seconds"
@@ -19213,6 +19272,10 @@ msgstr "Nom d'hôte du système. Retourne une chaîne de caractères"
 msgid "System information"
 msgstr "Information système"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "Statistiques du système. Retourne un entier ou un flottant"
@@ -19690,6 +19753,20 @@ msgstr "La méthode \"%1$s.%2$s\" doit être appelée sans en-tête d'autorisati
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "La méthode \"%1$s.%2$s\" doit être appelée sans le paramètre \"auth\"."
 
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr ""
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "Le modèle d'URL est utilisé pour charger et afficher la couche de tuiles sur les cartes géographiques."
@@ -19815,6 +19892,10 @@ msgstr "Le déclencheur n'est plus découvert et sera supprimé dans %1$s (le %2
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Le déclencheur n'est plus découvert et sera supprimé lors du prochain traitement de la règle de découverte."
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -23650,6 +23731,16 @@ msgstr "ne peut pas être vide"
 msgid "cannot be equal to zero without custom intervals"
 msgstr "ne peut pas être égal à zéro sans intervalles personnalisés"
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23795,6 +23886,10 @@ msgstr "j"
 #: chart4.php:130
 msgid "d.M"
 msgstr "d M"
+
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -23998,6 +24093,10 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "paramètres de nettoyage globaux"
 
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr "un prototype de graphique avec le même UUID existe déjà"
@@ -24023,6 +24122,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr ""
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24266,6 +24373,10 @@ msgstr "est inférieur ou égal à"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "n'est pas entouré de {} ou est malformé"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -25575,6 +25686,35 @@ msgstr "un scénario avec le même UUID existe déjà"
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
 msgstr "des caractères génériques avec '*' peuvent être utilisés"
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr ""
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr ""
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr ""
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

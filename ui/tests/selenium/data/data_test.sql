@@ -1504,12 +1504,13 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90007, 100005, 0, 'righty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 100005, 1, 'ds.0.hosts.0', 0, 'Host*');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 100005, 1, 'ds.0.items.0', 0, 'Available memory');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90010, 100005, 1, 'reference', 'LVRTC');
 -- widget "Test cases for update"
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90010, 100004, 0, 'ds.0.axisy', 1, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 1, 'ds.0.color', 0, 'FF465C');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 0, 'ds.0.pointsize', 4, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.0.transparency', 6, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 100004, 0, 'ds.0.type', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 0, 'ds.0.axisy', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 1, 'ds.0.color', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.0.pointsize', 4, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 100004, 0, 'ds.0.transparency', 6, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90015, 100004, 0, 'ds.0.type', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90016, 100004, 0, 'lefty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90017, 100004, 0, 'legend_lines', 2, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90018, 100004, 0, 'or.0.pointsize', 1, '');
@@ -1767,9 +1768,11 @@ INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashbo
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9004, 1400);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100099, 9004, 'graphprototype', 'Graph prototype widget for update', 0, 0, 16, 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 100099, 7, 'graphid.0', 600003);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905055, 100099, 1, 'reference', 'RZALA');
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (120000, 9004, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 16, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905055, 120000, 7, 'graphid.0', 600002);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905056, 120000, 7, 'graphid.0', 600002);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905057, 120000, 1, 'reference', 'MJHNB');
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9005, 1410);

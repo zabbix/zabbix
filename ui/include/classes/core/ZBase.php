@@ -384,6 +384,13 @@ class ZBase {
 		];
 	}
 
+	public static function getColorScheme(string $theme): string {
+		return match ($theme) {
+			'dark-theme', 'hc-dark' => ZBX_COLOR_SCHEME_DARK,
+			default => ZBX_COLOR_SCHEME_LIGHT
+		};
+	}
+
 	/**
 	 * Check if maintenance mode is enabled.
 	 *
@@ -501,7 +508,7 @@ class ZBase {
 	 * @param string|null $language  Locale variant prefix like en_US, ru_RU etc.
 	 */
 	public function initLocales(?string $language): void {
-		if (!setupLocale($language, $error) && $error !== '') {
+		if (!setupLocale($language, $error)) {
 			error($error);
 		}
 

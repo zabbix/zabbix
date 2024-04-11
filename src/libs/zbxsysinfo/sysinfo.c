@@ -77,8 +77,14 @@ static zbx_metric_t	parameter_hostname =
 
 static zbx_metric_t		*commands = NULL;
 static zbx_metric_t		*commands_local = NULL;
-zbx_vector_ptr_t		key_access_rules;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
+
+static zbx_vector_ptr_t		key_access_rules;
+
+zbx_vector_ptr_t	*get_key_access_rules(void)
+{
+	return &key_access_rules;
+}
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -101,6 +107,7 @@ GET_CONFIG_VAR(zbx_get_config_str_f, get_config_hostnames_cb, const char *, sysi
 GET_CONFIG_VAR(zbx_get_config_str_f, get_config_host_metadata_cb, const char *, sysinfo_get_config_host_metadata)
 GET_CONFIG_VAR(zbx_get_config_str_f, get_config_host_metadata_item_cb, const char *,
 		sysinfo_get_config_host_metadata_item)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_service_name_cb, const char *, sysinfo_get_config_service_name)
 #undef GET_CONFIG_VAR
 
 static int	compare_key_access_rules(const void *rule_a, const void *rule_b);
@@ -176,7 +183,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
 		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
 		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
-		get_config_host_metadata_item_f)
+		get_config_host_metadata_item_f, zbx_get_config_str_f get_config_service_name_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
@@ -187,6 +194,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 	get_config_hostnames_cb = get_config_hostnames_f;
 	get_config_host_metadata_cb = get_config_host_metadata_f;
 	get_config_host_metadata_item_cb = get_config_host_metadata_item_f;
+	get_config_service_name_cb = get_config_service_name_f;
 }
 
 /******************************************************************************

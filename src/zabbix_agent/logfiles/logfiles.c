@@ -21,7 +21,7 @@
 #include "persistent_state.h"
 
 #include "zbxsysinfo.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
@@ -3835,7 +3835,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  *                                                                            *
  ******************************************************************************/
 int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_vector_expression_t *regexps, zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size,

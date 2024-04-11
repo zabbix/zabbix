@@ -19,6 +19,8 @@
 
 #include "dbconfig.h"
 
+#include "../dbconfigworker/dbconfigworker.h"
+
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -27,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 #include "zbxcachevalue.h"
-#include "zbxdbconfigworker.h"
 #include "zbxtypes.h"
 
 /******************************************************************************

@@ -37,7 +37,7 @@ static zbx_history_table_t	dht = {
 		{"port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
 		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
 		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
-		{"error",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
+		{"error",		ZBX_PROTO_TAG_ERROR,		ZBX_JSON_TYPE_STRING,	""},
 		{NULL}
 		}
 };
@@ -135,7 +135,7 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 	else
 	{
 		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), clock, druleid, ip, port, value, status,
-				dcheckid, dns);
+				dcheckid, dns, ZBX_NULL2EMPTY_STR(error));
 	}
 }
 
@@ -147,8 +147,8 @@ void	pb_discovery_flush(zbx_pb_t *pb)
 
 	pb_discovery_add_rows_db(&pb->discovery, NULL, &lastid);
 
-	if (pb_data->discovery_lastid_db < lastid)
-		pb_data->discovery_lastid_db = lastid;
+	if (get_pb_data()->discovery_lastid_db < lastid)
+		get_pb_data()->discovery_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -266,7 +266,7 @@ static zbx_list_item_t	*pb_discovery_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows
 			if (0 == size)
 				size = pb_discovery_estimate_row_size(row->value, row->ip, row->dns, row->error);
 
-			if (FAIL == pb_free_space(pb_data, size))
+			if (FAIL == pb_free_space(get_pb_data(), size))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "discovery record with size " ZBX_FS_SIZE_T
 						" is too large for proxy memory buffer, discarding", size);
@@ -302,8 +302,8 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
-		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
-				"dcheckid", "dns", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
+				"status", "dcheckid", "dns", "error", (char *)NULL);
 
 		do
 		{
@@ -478,6 +478,7 @@ int	pb_discovery_has_mem_rows(zbx_pb_t *pb)
 zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 {
 	zbx_pb_discovery_data_t	*data;
+	zbx_pb_t		*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -487,7 +488,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 
 	data->handleid = pb_get_next_handleid(pb_data);
 
-	if (PB_DATABASE == (data->state = pb_dst[pb_data->state]))
+	if (PB_DATABASE == (data->state = get_pb_dst(pb_data->state)))
 		pb_data->db_handles_num++;
 
 	pb_unlock();
@@ -500,7 +501,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 	else
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
-				"value", "status", "dcheckid", "dns", (char *)NULL);
+				"value", "status", "dcheckid", "dns", "error", (char *)NULL);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -516,6 +517,7 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 {
 	zbx_uint64_t	lastid = 0;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -534,7 +536,7 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 		{
 			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
-		else if (PB_MEMORY == pb_dst[pb_data->state])
+		else if (PB_MEMORY == get_pb_dst(pb_data->state))
 		{
 			if (NULL == (next = pb_discovery_add_rows_mem(pb_data, &data->rows)))
 			{
@@ -628,8 +630,8 @@ int	zbx_pb_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
 
 	pb_lock();
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
-		ret = pb_discovery_get_mem(pb_data, j, lastid, more);
+	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
+		ret = pb_discovery_get_mem(get_pb_data(), j, lastid, more);
 
 	pb_unlock();
 
@@ -648,7 +650,8 @@ int	zbx_pb_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
  ******************************************************************************/
 void	zbx_pb_discovery_set_lastid(const zbx_uint64_t lastid)
 {
-	int	state;
+	int		state;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
@@ -656,7 +659,7 @@ void	zbx_pb_discovery_set_lastid(const zbx_uint64_t lastid)
 
 	pb_data->discovery_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+	if (PB_MEMORY == (state = get_pb_src(pb_data->state)))
 		pb_discovery_clear(pb_data, lastid);
 
 	pb_unlock();

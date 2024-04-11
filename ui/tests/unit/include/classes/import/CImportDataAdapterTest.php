@@ -887,7 +887,10 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'master_item' => []
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0'
 				],
 				'empty-lld-rule-jmx' => [
 					'name' => 'empty-lld-rule-jmx',
@@ -938,7 +941,10 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'master_item' => []
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0'
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
@@ -1234,7 +1240,10 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'master_item' => []
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0'
 				]
 			],
 			'export-template' => [
@@ -1287,7 +1296,10 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'master_item' => []
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0'
 				],
 				'lld-rule-jmx' => [
 					'uuid' => '96c257b7f1104833ad3bb18f6a2e8d96',
@@ -1338,7 +1350,10 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'master_item' => []
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0'
 				],
 				'lld-rule' => [
 					'uuid' => 'cdcd6fb3277e481baa22573c8c349b3b',
@@ -1637,7 +1652,10 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'master_item' => []
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0'
 				]
 			]
 		], $adapter->getDiscoveryRules());
@@ -3252,6 +3270,9 @@ class CImportDataAdapterTest extends TestCase {
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0',
 					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
@@ -3353,6 +3374,9 @@ class CImportDataAdapterTest extends TestCase {
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0',
 					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
@@ -3454,6 +3478,9 @@ class CImportDataAdapterTest extends TestCase {
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0',
 					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
@@ -4054,6 +4081,9 @@ class CImportDataAdapterTest extends TestCase {
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0',
 					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
@@ -4155,6 +4185,9 @@ class CImportDataAdapterTest extends TestCase {
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0',
 					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],
@@ -4256,6 +4289,10 @@ class CImportDataAdapterTest extends TestCase {
 					'host_prototypes' => [],
 					'jmx_endpoint' => '',
 					'master_item' => [],
+					'master_item' => [],
+					'lifetime_type' => '0',
+					'enabled_lifetime_type' => '1',
+					'enabled_lifetime' => '0',
 					'timeout' => '',
 					'url' => '',
 					'query_fields' => [],

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXAUDIT_H
 #define ZABBIX_ZBXAUDIT_H
 
-#include "zbxtypes.h"
+#include "zbxjson.h"
 
 /* audit logging mode */
 #define ZBX_AUDITLOG_DISABLED	0
@@ -39,6 +39,7 @@
 #define ZBX_AUDIT_ACTION_UPDATE		1
 #define ZBX_AUDIT_ACTION_DELETE		2
 #define ZBX_AUDIT_ACTION_EXECUTE	7
+#define ZBX_AUDIT_ACTION_CONFIG_REFRESH	11
 #define ZBX_AUDIT_ACTION_PUSH		12
 
 #define AUDIT_DETAILS_ACTION_ADD	"add"
@@ -107,5 +108,47 @@ void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int
 
 int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const char *clientip, int processed_num,
 		int failed_num, double time_spent);
+
+typedef struct zbx_audit_entry
+{
+	zbx_uint64_t	id;
+	char		*cuid;
+	int		id_table;
+	char		*name;
+	struct zbx_json	details_json;
+	int		audit_action;
+	int		resource_type;
+	char		audit_cuid[CUID_LEN];
+}
+zbx_audit_entry_t;
+
+zbx_hashset_t	*zbx_get_audit_hashset(void);
+
+zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, const char *name, int audit_action,
+		int resource_type);
+
+#define ZBX_AUDIT_RESOURCE_HOST				4
+#define	ZBX_AUDIT_RESOURCE_GRAPH			6
+#define ZBX_AUDIT_RESOURCE_TRIGGER			13
+#define ZBX_AUDIT_RESOURCE_HOST_GROUP			14
+#define ZBX_AUDIT_RESOURCE_ITEM				15
+#define ZBX_AUDIT_RESOURCE_SCENARIO			22
+#define ZBX_AUDIT_RESOURCE_DISCOVERY_RULE		23
+#define ZBX_AUDIT_RESOURCE_SCRIPT			25
+#define ZBX_AUDIT_RESOURCE_PROXY			26
+
+#define ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE		31
+#define ZBX_AUDIT_RESOURCE_GRAPH_PROTOTYPE		35
+#define ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE		36
+#define ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE		37
+#define ZBX_AUDIT_RESOURCE_SETTINGS			40
+#define ZBX_AUDIT_RESOURCE_HA_NODE			47
+#define ZBX_AUDIT_RESOURCE_HISTORY			53
+
+zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
+
+void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+
 
 #endif	/* ZABBIX_ZBXAUDIT_H */

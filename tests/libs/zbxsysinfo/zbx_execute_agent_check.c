@@ -83,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot convert flags to unsigned 32 bit integer.");
 
 	zbx_init_library_sysinfo(NULL, get_zbx_config_enable_remote_commands, NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL);
+			NULL, NULL);
 
 	zbx_init_metrics();
 

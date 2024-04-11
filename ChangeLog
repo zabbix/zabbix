@@ -1,3 +1,43 @@
+Changes for 7.0.0beta3
+
+New features:
+...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
+.......PS. [ZBXNEXT-9117] updated max supported MariaDB version to 11.3 (mprihodko)
+.D........ [ZBXNEXT-9096] removed experimental status from PDF reporting (solonkins)
+.D........ [ZBXNEXT-9121] removed experimental status from Streaming to external systems (solonkins)
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+...G...... [ZBXNEXT-9024] set maximal Zabbix agent 2 plugin capacity to 1000, set default number of Zabbix agent listeners to 10 (mprihodko)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+..F....... [ZBXNEXT-9047] implemented new navigation icons for main menu (dpetra)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
+A.F.I...S. [ZBXNEXT-2020,ZBXNEXT-8918] implemented the option to disable no-longer discovered entities (asestakovs, esekace)
+..F.I..... [ZBXNEXT-8683] implemented new Honeycomb widget (apoga, ashubin, averza, ddauksa)
+
+Bug fixes:
+..F....... [ZBX-23884] removed possibility to manually add provisioned user to user group (epulke)
+..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
+..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
+A.F....... [ZBX-24081] fixed full clone of templates or hosts failing due to more strict copied item validation (jfreibergs, vmaksimovs)
+.........T [ZBX-23032] added triggers for cluster status in VMware templates (abrosimovs)
+.....J.... [ZBX-23948] added support for Tabular data when parsing an MBean attribute (dimir)
+A......... [ZBX-23742] fixed tag filtering logic for tags with 1 name and different types of operators (dfofanovs, Sasha)
+..F....... [ZBX-24127] fixed checkboxes not being static in Connectors form (esekace)
+.........T [ZBX-24271] added delay in JavaScript execution for Azure Cost Management by HTTP template (egordymov)
+A......... [ZBX-24209] fixed missing filtering options for Proxy object (jfreibergs)
+...G...... [ZBX-24208] fix oracle, mysql plugin connection cache blocking (rzvejs)
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+A......... [ZBX-23402] fixed web scenario step post type saving in DB (Ivo)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+.......PS. [ZBX-23868] fixed empty result JSON data of vmware.vm.snapshot.get (MVekslers)
+..F....... [ZBX-24114] added labels to "Tags" and "Value mapping" fields in host configuration form (solonkins)
+..F....... [ZBX-23397] fixed runtime error in discovered host configuration form with inherited macros (esekace)
+..F....... [ZBX-24181] fixed max repetition count value reset for numbers exceeding 15 digits (esekace)
+........S. [ZBX-24091] fixed user macro resolution in function part of error messages (dgoloscapov)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0beta2
 
 New features:
@@ -23,7 +63,7 @@ A.F.....S. [ZBXNEXT-6876] added multi-factor authentication support for Zabbix U
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
-....I..... [ZBX-23441] fixed Go agent Makefile template not repsecting DESTDIR (jxl)
+....I..... [ZBX-23441] fixed Go agent Makefile template not respecting DESTDIR (jxl)
 .....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
 ..F....... [ZBX-23567] fixed PHP error during first time setup when no user is yet created (gcalenko, Ivo)
 ........S. [ZBX-24050] fixed snmpaddrs not getting updated when syncing interfaces (dgoloscapov)
@@ -585,6 +625,46 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.14rc1
+
+New features:
+...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
+.......PS. [ZBXNEXT-9117] updated max supported MariaDB version to 11.3 (mprihodko)
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+...G...... [ZBXNEXT-9024] set maximal Zabbix agent 2 plugin capacity to 1000 and default capacity to 100 (mprihodko)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
+
+Bug fixes:
+..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
+..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
+..F....... [ZBX-23884] removed possibility to manually add provisioned user to user group (epulke)
+.........T [ZBX-23032] added triggers for cluster status in VMware templates (abrosimovs)
+.....J.... [ZBX-23948] added support for Tabular data when parsing an MBean attribute (dimir)
+A......... [ZBX-23742] fixed tag filtering logic for tags with 1 name and different types of operators (dfofanovs, Sasha)
+A......... [ZBX-24081] fixed full clone of templates or hosts failing due to more strict copied item validation (jfreibergs)
+....I..... [ZBX-23441] fixed Go agent Makefile template not respecting DESTDIR (jxl)
+.........T [ZBX-24271] added delay in JavaScript execution for Azure Cost Management by HTTP template (egordymov)
+A......... [ZBX-24226] fixed fatal exception on a to be de-provisioned user log in (jfreibergs)
+A......... [ZBX-24209] fixed missing filtering options for Proxy object (jfreibergs)
+...G...... [ZBX-24208] fix oracle, mysql plugin connection cache blocking (rzvejs)
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+A......... [ZBX-23402] fixed web scenario step post type saving in DB (Ivo)
+........S. [ZBX-24091] fixed user macro resolution in function part of error messages (dgoloscapov)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+.......PS. [ZBX-23868] fixed empty result JSON data of vmware.vm.snapshot.get (MVekslers)
+..F....... [ZBX-23397] fixed runtime error in discovered host configuration form with inherited macros (esekace)
+..F....... [ZBX-24181] fixed max repetition count value reset for numbers exceeding 15 digits (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.13
+
+6.4.13rc1 was released as 6.4.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.13rc1
@@ -2273,6 +2353,36 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.29rc1
+
+New features:
+.......PS. [ZBXNEXT-9117] updated max supported MariaDB version to 11.3 (mprihodko)
+...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
+
+Bug fixes:
+..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
+..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
+..F....... [ZBX-24289] fixed issue with interface assignment for items copied from host to host (jfreibergs)
+.........T [ZBX-23032] added triggers for cluster status in VMware templates (abrosimovs)
+.....J.... [ZBX-23948] added support for Tabular data when parsing an MBean attribute (dimir)
+A......... [ZBX-23742] fixed tag filtering logic for tags with 1 name and different types of operators (dfofanovs, Sasha)
+.........T [ZBX-24271] added delay in JavaScript execution for Azure Cost Management by HTTP template (egordymov)
+...G...... [ZBX-24208] fix oracle, mysql plugin connection cache blocking (rzvejs)
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.28
+
+6.0.28rc1 was released as 6.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.28rc1
@@ -5247,6 +5357,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42
+
+5.0.42rc1 was released as 5.0.42 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42rc1
