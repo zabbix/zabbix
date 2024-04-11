@@ -397,7 +397,7 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_g
 	{
 		int	hosts_num = proxies->values[0]->host_refs.values_num - 1;
 
-		if (0 >= hosts_num)
+		if (limit > hosts_num)
 			goto out;
 
 		for (int i = 0; i < proxies->values_num && group->unassigned_hostids.values_num < required; i++)
