@@ -548,8 +548,8 @@ HEREDOC;
 
 		$this->startComponent(self::COMPONENT_PROXY_HANODE1);
 
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from unknown to online';
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, false, 90, 1);
+		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, false, 90, 1, true);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'assigned hostid', false, 90, 1);
 
@@ -676,8 +676,8 @@ HEREDOC;
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_PROXY);
 
-		$pg_logline = 'Proxy group "Proxy group X" changed state from unknown to online';
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1);
+		$pg_logline = 'Proxy group "Proxy group X" changed state from \b[a-z]+\b to online';
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$this->sendSenderValue('host3', 'trap', 333);
 
