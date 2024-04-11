@@ -194,8 +194,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			$output['eol'] = $result['item']['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
 			if (array_key_exists('truncated', $result['item']) && $result['item']['truncated']) {
-				$output['value_warning'] = _s('First %1$s of %2$s shown.',
-					convertUnits(['value' => strlen($result['item']['result']), 'units' => 'B']),
+				$output['value_warning'] = _s('Result is truncated due to its size (%1$s).',
 					convertUnits(['value' => $result['item']['original_size'], 'units' => 'B'])
 				);
 			}

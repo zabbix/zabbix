@@ -374,8 +374,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			if (array_key_exists('truncated', $result_item) && $result_item['truncated']) {
-				$output['value_warning'] = _s('First %1$s of %2$s shown.',
-					convertUnits(['value' => strlen($result_item['result']), 'units' => 'B']),
+				$output['value_warning'] = _s('Result is truncated due to its size (%1$s).',
 					convertUnits(['value' => $result_item['original_size'], 'units' => 'B'])
 				);
 			}
@@ -423,8 +422,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					$step['error'] = $step['error']['value'];
 				}
 				elseif (array_key_exists('truncated', $step) && $step['truncated']) {
-					$step['warning'] = _s('First %1$s of %2$s shown.',
-						convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
+					$step['warning'] = _s('Result is truncated due to its size (%1$s).',
 						convertUnits(['value' => $step['original_size'], 'units' => 'B'])
 					);
 				}
@@ -455,8 +453,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				];
 
 				if (array_key_exists('truncated', $final_result) && $final_result['truncated']) {
-					$output['final']['warning'] = _s('First %1$s of %2$s shown.',
-						convertUnits(['value' => strlen($final_result['result']), 'units' => 'B']),
+					$output['final']['warning'] = _s('Result is truncated due to its size (%1$s).',
 						convertUnits(['value' => $final_result['original_size'], 'units' => 'B'])
 					);
 				}
