@@ -300,15 +300,15 @@ zabbix_export:
             			datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
             			}) {\
             				sum{\
-            					requests\
-            					cachedRequests\
-            					encryptedRequests\
-            					responseStatusMap{ requests edgeResponseStatus }\
-            					bytes\
-            					cachedBytes\
-            					encryptedBytes\
-            					threats\
-            					pageViews\
+            					requests \
+            					cachedRequests \
+            					encryptedRequests \
+            					responseStatusMap{ requests edgeResponseStatus } \
+            					bytes \
+            					cachedBytes \
+            					encryptedBytes \
+            					threats \
+            					pageViews \
             				}\
             				uniq{uniques}\
             				}\
@@ -706,7 +706,7 @@ zabbix_export:
           value: cloudflare
       macros:
         - macro: '{$CLOUDFLARE.API.TOKEN}'
-          value: '<change>'
+          type: SECRET_TEXT
           description: 'Your Cloudflare API Token.'
         - macro: '{$CLOUDFLARE.API.URL}'
           value: 'https://api.cloudflare.com/client/v4'
@@ -718,7 +718,7 @@ zabbix_export:
           value: '30'
           description: 'Maximum responses with errors in %.'
         - macro: '{$CLOUDFLARE.ZONE_ID}'
-          value: '<change>'
+          type: SECRET_TEXT
           description: 'Your Cloudflare Site Zone ID.'
       dashboards:
         - uuid: 51f1013e8a3d492faed27fe80b68fc53

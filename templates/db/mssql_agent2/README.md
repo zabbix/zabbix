@@ -20,7 +20,8 @@ This template has been tested on:
 
 ## Setup
 
-1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with Zabbix versions 6.0.26 / 6.4.11
+1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with Zabbix versions 6.0.27 / 6.4.12. For more information, see [MSSQL plugin documentation](https://git.zabbix.com/projects/AP/repos/mssql/browse).
+Loadable plugin requires installation of a separate package or binary file or [compilation from sources](https://www.zabbix.com/documentation/7.0/manual/extensions/plugins/build).
 
 2. Create an MSSQL user for monitoring. For example, "zbx_monitor".
 
