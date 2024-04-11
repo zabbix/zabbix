@@ -1097,7 +1097,8 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 	else
 	{
 		vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT] = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,"
-				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
+				"\"latestdate\":null,\"latestage\":0,\"oldestdate\":null,\"oldestage\":0,"
+				"\"size\":0,\"uniquesize\":0}");
 	}
 
 	if (NULL != vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL])

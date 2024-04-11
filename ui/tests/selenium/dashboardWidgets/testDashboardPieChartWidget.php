@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -293,7 +293,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Space between sectors' => '1',
 			'id:merge' => false,         // 'Merge sectors smaller than' checkbox
 			'id:merge_percent' => '1',   // 'Merge sectors smaller than' input
-			'id:merge_color' => 'B0AF07' // 'Merge sectors smaller than' color picker
+			'id:merge_color' => 'FFD54F' // 'Merge sectors smaller than' color picker
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];

@@ -102,6 +102,8 @@ class CSetupWizard extends CForm {
 
 		if ($this->getStep() == self::STAGE_REQUIREMENTS) {
 			if (hasRequest('next') && array_key_exists(self::STAGE_REQUIREMENTS, getRequest('next'))) {
+				$default_lang = getRequest('default_lang', $this->getConfig('default_lang'));
+				$this->frontend_setup->setDefaultLang($default_lang);
 				$finalResult = CFrontendSetup::CHECK_OK;
 
 				foreach ($this->frontend_setup->checkRequirements() as $req) {
@@ -470,6 +472,8 @@ class CSetupWizard extends CForm {
 			->setHeader(['', _('Current value'), _('Required'), '']);
 
 		$messages = [];
+		$default_lang = getRequest('default_lang', $this->getConfig('default_lang'));
+		$this->frontend_setup->setDefaultLang($default_lang);
 		$finalResult = CFrontendSetup::CHECK_OK;
 
 		foreach ($this->frontend_setup->checkRequirements() as $req) {

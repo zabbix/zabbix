@@ -111,9 +111,24 @@ func (t *collectorTask) perform(s Scheduler) {
 	log.Debugf("plugin %s: executing collector task", t.plugin.name())
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
-		if err := collector.Collect(); err != nil {
+		start := time.Now()
+		err := collector.Collect()
+
+		if err != nil {
 			log.Warningf("plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
 		}
+
+		elapsedSeconds := time.Since(start).Seconds()
+
+		if elapsedSeconds > float64(collector.Period()) {
+			log.Warningf(
+				"plugin '%s': time spent in collector task %f s exceeds collecting interval %d s",
+				t.plugin.impl.Name(),
+				elapsedSeconds,
+				collector.Period(),
+			)
+		}
+
 		s.FinishTask(t)
 	}()
 }

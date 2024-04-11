@@ -6,4 +6,6 @@ libdbconfigworker_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 libdbconfigworker_a_SOURCES = \
-	dbconfig_worker.c
+	dbconfig_worker_protocol.c \
+	dbconfigworker.h \
+	dbconfigworker.c

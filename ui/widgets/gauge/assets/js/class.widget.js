@@ -34,17 +34,6 @@ class CWidgetGauge extends CWidget {
 		}
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this.gauge !== null) {
-			this.gauge.destroy();
-			this.gauge = null;
-		}
-
-		this._body.innerHTML = '';
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	promiseReady() {
 		const readiness = [super.promiseReady()];
 

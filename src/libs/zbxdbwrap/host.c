@@ -39,6 +39,7 @@
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 typedef enum
 {
@@ -872,7 +873,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		while (SUCCEED == ret && NULL != (trow = zbx_db_fetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
-			type = get_interface_type_by_item_type(type);
+			type = zbx_get_interface_type_by_item_type(type);
 
 			if (INTERFACE_TYPE_ANY == type)
 			{
@@ -6547,8 +6548,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	}
 	zbx_db_free_result(result);
 
+	sql_offset = 0;
+
 	if (0 == hgsets.values_num)
+	{
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		goto skip_permissions;
+	}
 
 	/* calculate hash for last hgset in vector */
 	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
@@ -6556,7 +6562,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,hgsetid from host_hgset where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values, hgsetids.values_num);
 

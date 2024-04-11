@@ -508,7 +508,7 @@ class ZBase {
 	 * @param string|null $language  Locale variant prefix like en_US, ru_RU etc.
 	 */
 	public function initLocales(?string $language): void {
-		if (!setupLocale($language, $error) && $error !== '') {
+		if (!setupLocale($language, $error)) {
 			error($error);
 		}
 

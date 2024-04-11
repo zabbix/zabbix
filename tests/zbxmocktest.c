@@ -32,7 +32,7 @@ unsigned char	get_program_type(void)
 	return program_type;
 }
 
-static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -81,12 +81,12 @@ static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 
 int	get_config_forks(unsigned char process_type)
 {
-	return CONFIG_FORKS[process_type];
+	return config_forks[process_type];
 }
 
 void	set_config_forks(unsigned char process_type, int forks)
 {
-	CONFIG_FORKS[process_type] = forks;
+	config_forks[process_type] = forks;
 }
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
@@ -102,10 +102,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 }
 
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
-
-char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
-int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 /* not used in tests, defined for linking with comms.c */
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
@@ -144,7 +140,7 @@ int	main (void)
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
 	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname);
 #ifndef _WINDOWS
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
