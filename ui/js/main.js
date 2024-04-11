@@ -471,7 +471,8 @@ var hintBox = {
 				if (target.scrollObserver !== undefined) {
 					const element_rect = element.getBoundingClientRect();
 
-					if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
+					if ((element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y)
+							&& element.dataset.hintboxIgnorePositionChange !== '1') {
 						const do_focus_target = document.activeElement === document.body
 							|| element.hintBoxItem[0].contains(document.activeElement);
 
