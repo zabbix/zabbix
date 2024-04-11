@@ -73,7 +73,7 @@ struct zbx_option	longopts[] =
 	{"timeout",			1,	NULL,	't'},
 	{"help",			0,	NULL,	'h'},
 	{"version",			0,	NULL,	'V'},
-	{NULL,				0,	NULL,	0}
+	{0}
 };
 
 /* short options */

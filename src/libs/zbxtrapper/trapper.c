@@ -589,10 +589,10 @@ const zbx_status_section_t	status_sections[] = {
 		{
 			{&templates,			ZBX_COUNTER_TYPE_UI64,
 				{
-					{NULL, 0}
+					{0}
 				}
 			},
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
 	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -600,16 +600,16 @@ const zbx_status_section_t	status_sections[] = {
 			{&hosts_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	HOST_STATUS_MONITORED},
-					{NULL, 0}
+					{0}
 				}
 			},
 			{&hosts_not_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	HOST_STATUS_NOT_MONITORED},
-					{NULL, 0}
+					{0}
 				}
 			},
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
 	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -618,23 +618,23 @@ const zbx_status_section_t	status_sections[] = {
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NORMAL},
-					{NULL, 0}
+					{0}
 				}
 			},
 			{&items_active_notsupported,	ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NOTSUPPORTED},
-					{NULL, 0}
+					{0}
 				}
 			},
 			{&items_disabled,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_DISABLED},
-					{NULL, 0}
+					{0}
 				}
 			},
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
 	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -643,23 +643,23 @@ const zbx_status_section_t	status_sections[] = {
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_OK},
-					{NULL, 0}
+					{0}
 				}
 			},
 			{&triggers_enabled_problem,	ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_PROBLEM},
-					{NULL, 0}
+					{0}
 				}
 			},
 			{&triggers_disabled,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_DISABLED},
-					{NULL, 0}
+					{0}
 				}
 			},
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
 	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&users_res,
@@ -667,34 +667,34 @@ const zbx_status_section_t	status_sections[] = {
 			{&users_online,			ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ZBX_SESSION_ACTIVE},
-					{NULL, 0}
+					{0}
 				}
 			},
 			{&users_offline,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ZBX_SESSION_PASSIVE},
-					{NULL, 0}
+					{0}
 				}
 			},
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
 	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_SUPER_ADMIN,	NULL,
 		{
 			{&required_performance,		ZBX_COUNTER_TYPE_DBL,
 				{
-					{NULL, 0}
+					{0}
 				}
 			},
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
 	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
 		{
-			{NULL, 0, {{NULL, 0}}}
+			{0}
 		}
 	},
-	{NULL, 0, 0, NULL, {{NULL, 0, {{NULL, 0}}}}}
+	{0}
 };
 
 static void	server_stats_entry_export(struct zbx_json *json, const zbx_status_section_t *section)

@@ -865,7 +865,7 @@ static int	DBcreate_dbversion_table(void)
 				{
 					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{NULL, NULL, NULL, NULL, 0, 0, 0, 0}
+					{0}
 				},
 				NULL
 			};

@@ -210,7 +210,7 @@ static struct zbx_option	longopts[] =
 
 	{"multiple-agents",	0,	NULL,	'm'},
 #endif
-	{NULL,			0,	NULL,	0}
+	{0}
 };
 
 static char	shortopts[] =
@@ -998,8 +998,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			3600},
-		{NULL,				NULL,					0,
-				0,		0,			0}
+		{0}
 	};
 
 	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;

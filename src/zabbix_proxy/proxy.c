@@ -171,7 +171,7 @@ static struct zbx_option	longopts[] =
 	{"test-config",		0,	NULL,	'T'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-	{NULL,			0,	NULL,	0}
+	{0}
 };
 
 /* short options */
@@ -1079,8 +1079,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 						&config_max_concurrent_checks_per_poller,
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	1,			1000},
-		{NULL,					NULL,						0,
-				0,		0,			0}
+		{0}
 	};
 
 	/* initialize multistrings */

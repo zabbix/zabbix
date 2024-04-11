@@ -208,7 +208,7 @@ static struct zbx_option	longopts[] =
 	{"test-config",		0,	NULL,	'T'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-	{NULL, 			0,	NULL,	0}
+	{0}
 };
 
 /* short options */

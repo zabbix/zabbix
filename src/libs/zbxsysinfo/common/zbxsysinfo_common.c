@@ -48,7 +48,7 @@ static zbx_metric_t	parameters_common_local[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.run",		CF_HAVEPARAMS,	system_run_no_remote, 	"echo test"},
-	{NULL,			0,		NULL,			NULL}
+	{0}
 };
 
 zbx_metric_t	*get_parameters_common_local(void)
@@ -96,7 +96,7 @@ static zbx_metric_t	parameters_common[] =
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	zabbix_stats,		"127.0.0.1,10051"},
 
-	{NULL,			0,		NULL,			NULL}
+	{0}
 };
 
 zbx_metric_t	*get_parameters_common(void)

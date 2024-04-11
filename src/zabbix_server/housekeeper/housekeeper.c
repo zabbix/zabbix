@@ -175,7 +175,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
 	{"events",		&poption_mode_regular,	&poption_global_disabled},
-	{NULL,			NULL,			NULL}
+	{0}
 };
 
 /* The history item rules, used for housekeeping history and trends tables */
@@ -1290,7 +1290,7 @@ static int	housekeeping_events(int now, int config_max_hk_delete)
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
 			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_service},
-		{NULL, NULL, NULL, 0, 0, NULL}
+		{0}
 	};
 
 	int		deleted = 0;

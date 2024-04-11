@@ -84,7 +84,7 @@ static zbx_metric_t	parameters_specific[] =
 
 	{"sensor",			CF_HAVEPARAMS,	get_sensor,		"w83781d-i2c-0-2d,temp1"},
 
-	{NULL,				0,		NULL,			NULL}
+	{0}
 };
 
 zbx_metric_t	*get_parameters_specific(void)
