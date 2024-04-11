@@ -1398,8 +1398,16 @@ typedef struct
 }
 zbx_pg_host_t;
 
-ZBX_PTR_VECTOR_DECL(pg_host_ptr, zbx_pg_host_t *)
 ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
+
+/* wrap reference to zbx_pg_host_t structure for hashset storage */
+typedef struct
+{
+	zbx_pg_host_t	*host;
+}
+zbx_pg_host_ref_t;
+
+ZBX_VECTOR_DECL(pg_host_ref_ptr, zbx_pg_host_ref_t *)
 
 typedef struct zbx_pg_group zbx_pg_group_t;
 
@@ -1427,7 +1435,7 @@ typedef struct
 							/* resync will be forced                                     */
 	zbx_uint32_t			flags;
 	struct zbx_pg_group		*group;
-	zbx_vector_pg_host_ptr_t	hosts;
+	zbx_hashset_t			hosts;		/* references to proxy group manager hostmap entries */
 	zbx_vector_pg_host_t		deleted_group_hosts;
 }
 zbx_pg_proxy_t;

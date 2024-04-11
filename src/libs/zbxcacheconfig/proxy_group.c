@@ -33,8 +33,24 @@
 
 ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
-ZBX_PTR_VECTOR_IMPL(pg_host_ptr, zbx_pg_host_t *)
 ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
+ZBX_VECTOR_IMPL(pg_host_ref_ptr, zbx_pg_host_ref_t *)
+
+zbx_hash_t	pg_host_ref_hash(const void *d)
+{
+	const zbx_pg_host_ref_t	*host = (const zbx_pg_host_ref_t *)d;
+
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&host->host->hostid);
+}
+
+int	pg_host_ref_compare(const void *d1, const void *d2)
+{
+	const zbx_pg_host_ref_t	*h1 = (const zbx_pg_host_ref_t *)d1;
+	const zbx_pg_host_ref_t	*h2 = (const zbx_pg_host_ref_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(h1->host->hostid, h2->host->hostid);
+	return 0;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -241,7 +257,7 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 			proxy = (zbx_pg_proxy_t *)zbx_hashset_insert(proxies, &proxy_local, sizeof(proxy_local));
 			proxy->group = NULL;
 
-			zbx_vector_pg_host_ptr_create(&proxy->hosts);
+			zbx_hashset_create(&proxy->hosts, 0, pg_host_ref_hash, pg_host_ref_compare);
 			zbx_vector_pg_host_create(&proxy->deleted_group_hosts);
 
 			zbx_objmove_t	reloc = {

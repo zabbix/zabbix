@@ -34,32 +34,29 @@
 
 ZBX_VECTOR_IMPL(pg_update, zbx_pg_update_t)
 
-static int	pg_host_compare(const void *d1, const void *d2)
+typedef struct
 {
-	const zbx_pg_host_t	*h1 = *(const zbx_pg_host_t * const *)d1;
-	const zbx_pg_host_t	*h2 = *(const zbx_pg_host_t * const *)d2;
+	zbx_pg_proxy_t			*proxy;
+	zbx_vector_pg_host_ref_ptr_t	host_refs;
+	int				hosts_num;
+}
+zbx_pg_proxy_hosts_t;
 
-	ZBX_RETURN_IF_NOT_EQUAL(h1, h2);
+ZBX_PTR_VECTOR_DECL(pg_proxy_hosts_ptr, zbx_pg_proxy_hosts_t *)
+ZBX_PTR_VECTOR_IMPL(pg_proxy_hosts_ptr, zbx_pg_proxy_hosts_t *)
 
-	return 0;
+void	pg_proxy_hosts_free(zbx_pg_proxy_hosts_t *ph)
+{
+	zbx_vector_pg_host_ref_ptr_destroy(&ph->host_refs);
+	zbx_free(ph);
 }
 
-static int	pg_host_compare_by_hostid(const void *d1, const void *d2)
+static int	pg_host_ref_compare_by_revision(const void *d1, const void *d2)
 {
-	const zbx_pg_host_t	*h1 = *(const zbx_pg_host_t * const *)d1;
-	const zbx_pg_host_t	*h2 = *(const zbx_pg_host_t * const *)d2;
+	const zbx_pg_host_ref_t	*hr1 = *(const zbx_pg_host_ref_t * const *)d1;
+	const zbx_pg_host_ref_t	*hr2 = *(const zbx_pg_host_ref_t * const *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(h1->hostid, h2->hostid);
-
-	return 0;
-}
-
-static int	pg_host_compare_by_revision(const void *d1, const void *d2)
-{
-	const zbx_pg_host_t	*h1 = *(const zbx_pg_host_t * const *)d1;
-	const zbx_pg_host_t	*h2 = *(const zbx_pg_host_t * const *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(h1->revision, h2->revision);
+	ZBX_RETURN_IF_NOT_EQUAL(hr1->host->revision, hr2->host->revision);
 
 	return 0;
 }
@@ -90,7 +87,7 @@ void	pg_group_clear(zbx_pg_group_t *group)
 
 void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
 {
-	zbx_vector_pg_host_ptr_destroy(&proxy->hosts);
+	zbx_hashset_destroy(&proxy->hosts);
 	zbx_vector_pg_host_destroy(&proxy->deleted_group_hosts);
 	zbx_free(proxy->name);
 }
@@ -241,24 +238,27 @@ void	pg_cache_set_host_proxy(zbx_pg_cache_t *cache, zbx_uint64_t hostid, zbx_uin
  ******************************************************************************/
 static void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy, int flags)
 {
-	int	i;
+	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_pg_host_ref_t	*ref;
 
 	pg_cache_queue_group_update(cache, proxy->group);
 
-	for (i = 0; i < proxy->hosts.values_num; i++)
+	zbx_hashset_iter_reset(&proxy->hosts, &iter);
+	while (NULL != (ref = (zbx_pg_host_ref_t *)zbx_hashset_iter_next(&iter)))
 	{
+		zbx_vector_uint64_append(&proxy->group->unassigned_hostids, ref->host->hostid);
 
-		zbx_vector_uint64_append(&proxy->group->unassigned_hostids, proxy->hosts.values[i]->hostid);
 		if (PG_REMOVE_REASSIGNED_PROXY == flags)
-			pg_cache_set_host_proxy(cache, proxy->hosts.values[i]->hostid, 0);
+			pg_cache_set_host_proxy(cache, ref->host->hostid, 0);
 		else
-			zbx_hashset_remove(&cache->hostmap, &proxy->hosts.values[i]->hostid);
+			zbx_hashset_remove_direct(&cache->hostmap, ref->host);
 	}
 
 	if (FAIL != (i = zbx_vector_pg_proxy_ptr_search(&proxy->group->proxies, proxy, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		zbx_vector_pg_proxy_ptr_remove_noorder(&proxy->group->proxies, i);
 
-	zbx_vector_pg_host_ptr_clear(&proxy->hosts);
+	zbx_hashset_clear(&proxy->hosts);
 	proxy->group = NULL;
 }
 
@@ -294,13 +294,11 @@ void	pg_cache_group_remove_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zb
 
 		if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)))
 		{
-			zbx_pg_host_t	host_local = {.hostid = hostid};
+			zbx_pg_host_t		host_local = {.hostid = hostid};
+			zbx_pg_host_ref_t	*hr, hr_local = {.host = &host_local};
 
-			if (FAIL != (i = zbx_vector_pg_host_ptr_search(&proxy->hosts, &host_local,
-					pg_host_compare_by_hostid)))
-			{
-				zbx_vector_pg_host_ptr_remove_noorder(&proxy->hosts, i);
-			}
+			if (NULL != (hr = (zbx_pg_host_ref_t *)zbx_hashset_search(&proxy->hosts, &hr_local)))
+				zbx_hashset_remove_direct(&proxy->hosts, hr);
 		}
 
 		pg_cache_set_host_proxy(cache, hostid, 0);
@@ -337,12 +335,12 @@ void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_u
  *          order                                                             *
  *                                                                            *
  ******************************************************************************/
-static int	pg_proxy_compare_by_hosts_desc(const void *d1, const void *d2)
+static int	pg_proxy_hosts_compare_by_hosts_desc(const void *d1, const void *d2)
 {
-	const zbx_pg_proxy_t	*p1 = *(const zbx_pg_proxy_t * const *)d1;
-	const zbx_pg_proxy_t	*p2 = *(const zbx_pg_proxy_t * const *)d2;
+	const zbx_pg_proxy_hosts_t	*ph1 = *(const zbx_pg_proxy_hosts_t * const *)d1;
+	const zbx_pg_proxy_hosts_t	*ph2 = *(const zbx_pg_proxy_hosts_t * const *)d2;
 
-	return p2->hosts.values_num - p1->hosts.values_num;
+	return ph2->host_refs.values_num - ph1->host_refs.values_num;
 }
 
 /******************************************************************************
@@ -351,12 +349,12 @@ static int	pg_proxy_compare_by_hosts_desc(const void *d1, const void *d2)
  *          order                                                             *
  *                                                                            *
  ******************************************************************************/
-static int	pg_proxy_compare_by_hosts_asc(const void *d1, const void *d2)
+static int	pg_proxy_hosts_compare_by_hosts_asc(const void *d1, const void *d2)
 {
-	const zbx_pg_proxy_t	*p1 = *(const zbx_pg_proxy_t * const *)d1;
-	const zbx_pg_proxy_t	*p2 = *(const zbx_pg_proxy_t * const *)d2;
+	const zbx_pg_proxy_hosts_t	*ph1 = *(const zbx_pg_proxy_hosts_t * const *)d1;
+	const zbx_pg_proxy_hosts_t	*ph2 = *(const zbx_pg_proxy_hosts_t * const *)d2;
 
-	return p1->hosts.values_num - p2->hosts.values_num;
+	return ph1->host_refs.values_num - ph2->host_refs.values_num;
 }
 
 /******************************************************************************
@@ -364,16 +362,15 @@ static int	pg_proxy_compare_by_hosts_asc(const void *d1, const void *d2)
  * Purpose: unassign last host from proxy                                     *
  *                                                                            *
  ******************************************************************************/
-static void	pg_cache_proxy_unassign_last_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy)
+static void	pg_cache_proxy_unassign_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy,
+		zbx_pg_host_ref_t *ref)
 {
-	int	last = proxy->hosts.values_num - 1;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s proxy:%s proxy.hosts:%d hostid:%d", __func__, group->name,
+			proxy->name, proxy->hosts.num_data, ref->host->hostid);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s proxy:%s proxy.hosts:%d", __func__, group->name, proxy->name,
-			proxy->hosts.values_num);
-
-	zbx_vector_uint64_append(&group->unassigned_hostids, proxy->hosts.values[last]->hostid);
-	pg_cache_set_host_proxy(cache, proxy->hosts.values[last]->hostid, 0);
-	zbx_vector_pg_host_ptr_remove_noorder(&proxy->hosts, last);
+	zbx_vector_uint64_append(&group->unassigned_hostids, ref->host->hostid);
+	pg_cache_set_host_proxy(cache, ref->host->hostid, 0);
+	zbx_hashset_remove_direct(&proxy->hosts, ref);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -382,59 +379,41 @@ static void	pg_cache_proxy_unassign_last_host(zbx_pg_cache_t *cache, zbx_pg_grou
  *                                                                            *
  * Purpose: remove hosts from group proxies exceeding host limit              *
  *                                                                            *
- * Parameters: group    - [IN]                                                *
+ * Parameters: cache    - [IN]                                                *
+ *             group    - [IN]                                                *
+ *             proxies  - [IN] target proxies                                 *
  *             limit    - [IN] target number of hosts per proxy               *
  *             required - [IN] required number of unassigned hosts            *
  *                                                                            *
  ******************************************************************************/
-static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group, int limit,
-		int required)
+static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group,
+		zbx_vector_pg_proxy_hosts_ptr_t *proxies, int limit, int required)
 {
-	zbx_vector_pg_proxy_ptr_t	proxies;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() limit:%d required:%d", __func__, limit, required);
 
-	zbx_vector_pg_proxy_ptr_create(&proxies);
-
-	for (int i = 0; i < group->proxies.values_num; i++)
-	{
-		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
-
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
-			continue;
-
-		if (proxy->hosts.values_num > limit)
-		{
-			zbx_vector_pg_host_ptr_sort(&proxy->hosts, pg_host_compare_by_revision);
-			zbx_vector_pg_proxy_ptr_append(&proxies, proxy);
-		}
-	}
-
-	if (0 == proxies.values_num)
-		goto out;
-
-	zbx_vector_pg_proxy_ptr_sort(&proxies, pg_proxy_compare_by_hosts_desc);
+	zbx_vector_pg_proxy_hosts_ptr_sort(proxies, pg_proxy_hosts_compare_by_hosts_desc);
 
 	while (group->unassigned_hostids.values_num < required)
 	{
-		int	hosts_num = proxies.values[0]->hosts.values_num - 1;
+		int	hosts_num = proxies->values[0]->host_refs.values_num - 1;
 
-		if (0 == hosts_num)
+		if (0 >= hosts_num)
 			goto out;
 
-		for (int i = 0; i < proxies.values_num && group->unassigned_hostids.values_num < required; i++)
+		for (int i = 0; i < proxies->values_num && group->unassigned_hostids.values_num < required; i++)
 		{
-			zbx_pg_proxy_t	*proxy = proxies.values[i];
+			zbx_pg_proxy_hosts_t	*ph = proxies->values[i];
 
-			if (hosts_num >= proxy->hosts.values_num)
+			if (hosts_num >= ph->host_refs.values_num)
 				break;
 
-			pg_cache_proxy_unassign_last_host(cache, group, proxy);
+			int	last = ph->host_refs.values_num - 1;
+
+			pg_cache_proxy_unassign_host(cache, group, ph->proxy, ph->host_refs.values[last]);
+			zbx_vector_pg_host_ref_ptr_remove_noorder(&ph->host_refs, last);
 		}
 	}
 out:
-	zbx_vector_pg_proxy_ptr_destroy(&proxies);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -444,66 +423,38 @@ out:
  *                                                                            *
  * Parameters: cache     - [IN] proxy group cache                             *
  *             group     - [IN] target group                                  *
- *             limit     - [IN] maximum number of hosts per proxy             *
+ *             proxies   - [IN] target proxies                                *
  *                                                                            *
- *  Return value: SUCCEED - unassiged hosts were distributed between online   *
+ *  Return value: SUCCEED - unassigned hosts were distributed between online  *
  *                          proxies                                           *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
+static int	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group,
+		zbx_vector_pg_proxy_hosts_ptr_t *proxies)
 {
-	zbx_vector_pg_proxy_ptr_t	proxies;
-
 	if (0 == group->unassigned_hostids.values_num)
 		return FAIL;
 
-	zbx_vector_pg_proxy_ptr_create(&proxies);
+	zbx_vector_pg_proxy_hosts_ptr_sort(proxies, pg_proxy_hosts_compare_by_hosts_asc);
 
-	for (int i = 0; i < group->proxies.values_num; i++)
+	while (0 < group->unassigned_hostids.values_num)
 	{
-		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
+		int	hosts_num = proxies->values[0]->hosts_num + 1;
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
-			continue;
-
-		zbx_vector_pg_proxy_ptr_append(&proxies, proxy);
-	}
-
-	if (0 != proxies.values_num)
-	{
-		zbx_vector_uint64_t	proxy_hostnum;
-
-		zbx_vector_pg_proxy_ptr_sort(&proxies, pg_proxy_compare_by_hosts_asc);
-
-		zbx_vector_uint64_create(&proxy_hostnum);
-		zbx_vector_uint64_reserve(&proxy_hostnum, proxies.values_num);
-
-		for (int i = 0; i < proxies.values_num; i++)
-			zbx_vector_uint64_append(&proxy_hostnum, (zbx_uint64_t)proxies.values[i]->hosts.values_num);
-
-		while (0 < group->unassigned_hostids.values_num)
+		for (int i = 0; i < proxies->values_num && 0 < group->unassigned_hostids.values_num; i++)
 		{
-			zbx_uint64_t	hosts_num = proxy_hostnum.values[0] + 1;
+			if (hosts_num <= proxies->values[i]->hosts_num)
+				break;
 
-			for (int i = 0; i < proxies.values_num && 0 < group->unassigned_hostids.values_num; i++)
-			{
-				if (hosts_num <= proxy_hostnum.values[i])
-					break;
+			int	last = group->unassigned_hostids.values_num - 1;
 
-				int	last = group->unassigned_hostids.values_num - 1;
-
-				proxy_hostnum.values[i]++;
-				pg_cache_set_host_proxy(cache, group->unassigned_hostids.values[last],
-						proxies.values[i]->proxyid);
-				zbx_vector_uint64_remove_noorder(&group->unassigned_hostids, last);
-			}
+			proxies->values[i]->hosts_num++;
+			pg_cache_set_host_proxy(cache, group->unassigned_hostids.values[last],
+					proxies->values[i]->proxy->proxyid);
+			zbx_vector_uint64_remove_noorder(&group->unassigned_hostids, last);
 		}
-
-		zbx_vector_uint64_destroy(&proxy_hostnum);
 	}
-
-	zbx_vector_pg_proxy_ptr_destroy(&proxies);
 
 	return SUCCEED;
 }
@@ -541,18 +492,18 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
-		if (0 == proxy->hosts.values_num)
+		if (0 == proxy->hosts.num_data)
 		{
 			/* if a proxy has no hosts and another proxy has */
 			/* multiple hosts then group is not balanced     */
 			for (int j = 0; j < group->proxies.values_num; j++)
 			{
-				if (1 < group->proxies.values[j]->hosts.values_num)
+				if (1 < group->proxies.values[j]->hosts.num_data)
 					goto out;
 			}
 		}
 
-		hosts_num += proxy->hosts.values_num;
+		hosts_num += proxy->hosts.num_data;
 		proxies_num++;
 	}
 
@@ -581,15 +532,15 @@ static int	pg_cache_is_group_balanced(zbx_pg_cache_t *cache, const zbx_dc_um_han
 		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
 			continue;
 
-		if (PG_GROUP_UNBALANCE_LIMIT <= proxy->hosts.values_num - avg &&
-				0 != avg && PG_GROUP_UNBALANCE_FACTOR <= proxy->hosts.values_num / avg)
+		if (PG_GROUP_UNBALANCE_LIMIT <= proxy->hosts.num_data - avg &&
+				0 != avg && PG_GROUP_UNBALANCE_FACTOR <= proxy->hosts.num_data / avg)
 		{
 			goto out;
 		}
 
-		if (PG_GROUP_UNBALANCE_LIMIT <= avg - proxy->hosts.values_num &&
-				0 != proxy->hosts.values_num &&
-				PG_GROUP_UNBALANCE_FACTOR <= avg / proxy->hosts.values_num)
+		if (PG_GROUP_UNBALANCE_LIMIT <= avg - proxy->hosts.num_data &&
+				0 != proxy->hosts.num_data &&
+				PG_GROUP_UNBALANCE_FACTOR <= avg / proxy->hosts.num_data)
 		{
 			goto out;
 		}
@@ -607,19 +558,20 @@ out:
  * Purpose: reassign host between online proxies within proxy group           *
  *                                                                            *
  * Parameters: cache     - [IN] proxy group cache                             *
- *             um_handle - [IN] user macro cache handle                       *
  *             group     - [IN] target group                                  *
  *                                                                            *
  * Return value: SUCCEED - group was fully re-balanced                        *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *um_handle,
-		zbx_pg_group_t *group)
+static int	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group)
 {
-	int	online_num = 0, hosts_num = 0, hosts_min, hosts_required, ret = FAIL;
+	int				hosts_num = 0, hosts_min, hosts_required, ret = FAIL;
+	zbx_vector_pg_proxy_hosts_ptr_t	proxies;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name, cache->group_updates.values_num);
+
+	zbx_vector_pg_proxy_hosts_ptr_create(&proxies);
 
 	/* find min/max host number of online proxies and remove hosts from offline proxies */
 	for (int i = 0; i < group->proxies.values_num; i++)
@@ -628,41 +580,66 @@ static int	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, const zbx_dc_um_handle
 
 		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state && proxy->version == cache->supported_version)
 		{
-			online_num++;
-			hosts_num += proxy->hosts.values_num;
+			zbx_pg_proxy_hosts_t	*ph;
+
+			ph = (zbx_pg_proxy_hosts_t *)zbx_malloc(NULL, sizeof(zbx_pg_proxy_hosts_t));
+			ph->proxy = proxy;
+			ph->hosts_num = proxy->hosts.num_data;
+			zbx_vector_pg_host_ref_ptr_create(&ph->host_refs);
+
+			zbx_vector_pg_proxy_hosts_ptr_append(&proxies, ph);
+			hosts_num += proxy->hosts.num_data;
 		}
 	}
 
-	if (0 == online_num)
+	if (0 == proxies.values_num)
 		goto out;
 
-	if (SUCCEED == pg_cache_group_distribute_hosts(cache, group))
+	if (SUCCEED == pg_cache_group_distribute_hosts(cache, group, &proxies))
 		goto out;
 
-	if (hosts_num > online_num)
-		hosts_min = hosts_num / online_num;
+	if (hosts_num > proxies.values_num)
+		hosts_min = hosts_num / proxies.values_num;
 	else
 		hosts_min = 1;
 
 	hosts_required = 0;
 
 	/* calculate how many hosts are needed to balance groups with deficit hosts */
-	for (int i = 0; i < group->proxies.values_num; i++)
+	for (int i = 0; i < proxies.values_num; i++)
 	{
-		zbx_pg_proxy_t	*proxy = group->proxies.values[i];
+		zbx_pg_proxy_hosts_t	*ph = proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE != proxy->state || proxy->version != cache->supported_version)
-			continue;
+		if (proxies.values[i]->hosts_num < hosts_min)
+		{
+			hosts_required += hosts_min - proxies.values[i]->hosts_num;
+		}
+		else
+		{
+			/* proxies with hosts more or equal to average number are possible      */
+			/* targets for host unassignment - prepare host list sorted by revision */
 
-		if (proxy->hosts.values_num < hosts_min)
-			hosts_required += hosts_min - proxy->hosts.values_num;
+			zbx_hashset_iter_t	iter;
+			zbx_pg_host_ref_t	*ref;
+
+			zbx_vector_pg_host_ref_ptr_reserve(&ph->host_refs, ph->proxy->hosts.num_data);
+
+			zbx_hashset_iter_reset(&ph->proxy->hosts, &iter);
+			while (NULL != (ref = (zbx_pg_host_ref_t *)zbx_hashset_iter_next(&iter)))
+				zbx_vector_pg_host_ref_ptr_append(&ph->host_refs, ref);
+
+			zbx_vector_pg_host_ref_ptr_sort(&ph->host_refs, pg_host_ref_compare_by_revision);
+		}
 	}
 
-	pg_cache_group_unassign_excess_hosts(cache, group, hosts_min, hosts_required);
-	(void)pg_cache_group_distribute_hosts(cache, group);
+	pg_cache_group_unassign_excess_hosts(cache, group, &proxies, hosts_min, hosts_required);
+	(void)pg_cache_group_distribute_hosts(cache, group, &proxies);
 
 	ret = SUCCEED;
 out:
+	zbx_vector_pg_proxy_hosts_ptr_clear_ext(&proxies, pg_proxy_hosts_free);
+	zbx_vector_pg_proxy_hosts_ptr_destroy(&proxies);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
@@ -723,7 +700,7 @@ void	pg_cache_rebalance_groups(zbx_pg_cache_t *cache, const zbx_dc_um_handle_t *
 			}
 			else if (now >= group->balance_time)
 			{
-				if (SUCCEED == pg_cache_reassign_hosts(cache, um_handle, group))
+				if (SUCCEED == pg_cache_reassign_hosts(cache, group))
 				{
 					group->balance_time = 0;
 					group->unbalanced = PG_GROUP_UNBALANCED_NO;
@@ -870,8 +847,10 @@ void	pg_cache_get_hostmap_updates(zbx_pg_cache_t *cache, zbx_vector_pg_host_t *h
 				if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies,
 						&host->proxyid)))
 				{
-					if (FAIL == zbx_vector_pg_host_ptr_search(&proxy->hosts, host, pg_host_compare))
-						zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
+					zbx_pg_host_ref_t	ref_local = {.host = host};
+
+					if (NULL == zbx_hashset_search(&proxy->hosts, &ref_local))
+						zbx_hashset_insert(&proxy->hosts, &ref_local, sizeof(ref_local));
 
 					if (NULL != proxy->group)
 						zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
@@ -923,7 +902,9 @@ void	pg_cache_add_new_hostmaps(zbx_pg_cache_t *cache, const zbx_vector_pg_host_t
 
 		if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &host->proxyid)))
 		{
-			zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
+			zbx_pg_host_ref_t	ref_local = {.host = host};
+
+			zbx_hashset_insert(&proxy->hosts, &ref_local, sizeof(ref_local));
 
 			if (NULL != proxy->group)
 				zbx_vector_uint64_append(groupids, proxy->group->proxy_groupid);
@@ -1108,16 +1089,20 @@ void	pg_cache_clear_offline_proxies(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 	{
 		zbx_pg_proxy_t 	*proxy = group->proxies.values[i];
 
-		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state || 0 == proxy->hosts.values_num)
+		if (ZBX_PG_PROXY_STATE_ONLINE == proxy->state || 0 == proxy->hosts.num_data)
 			continue;
 
-		for (int j = 0; j < proxy->hosts.values_num; j++)
+		zbx_hashset_iter_t	iter;
+		zbx_pg_host_ref_t	*ref;
+
+		zbx_hashset_iter_reset(&proxy->hosts, &iter);
+		while (NULL != (ref = (zbx_pg_host_ref_t *)zbx_hashset_iter_next(&iter)))
 		{
-			zbx_vector_uint64_append(&group->unassigned_hostids, proxy->hosts.values[j]->hostid);
-			pg_cache_set_host_proxy(cache, proxy->hosts.values[j]->hostid, 0);
+			zbx_vector_uint64_append(&group->unassigned_hostids, ref->host->hostid);
+			pg_cache_set_host_proxy(cache, ref->host->hostid, 0);
 		}
 
-		zbx_vector_pg_host_ptr_clear(&proxy->hosts);
+		zbx_hashset_clear(&proxy->hosts);
 	}
 }
 
@@ -1355,9 +1340,14 @@ static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 	zabbix_log(LOG_LEVEL_TRACE, "    state:%d version:%x lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
 			proxy->state, proxy->version, proxy->lastaccess, proxy->firstaccess, groupid);
 
-	zabbix_log(LOG_LEVEL_TRACE, "    hostids: [%d]", proxy->hosts.values_num);
-	for (int i = 0; i < proxy->hosts.values_num; i++)
-		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, proxy->hosts.values[i]->hostid);
+	zabbix_log(LOG_LEVEL_TRACE, "    hostids: [%d]", proxy->hosts.num_data);
+
+	zbx_hashset_iter_t	iter;
+	zbx_pg_host_ref_t	*ref;
+
+	zbx_hashset_iter_reset(&proxy->hosts, &iter);
+	while (NULL != (ref = (zbx_pg_host_ref_t *)zbx_hashset_iter_next(&iter)))
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, ref->host->hostid);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    deleted group hostproxyids: [%d]", proxy->deleted_group_hosts.values_num);
 	for (int i = 0; i < proxy->deleted_group_hosts.values_num; i++)

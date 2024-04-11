@@ -147,7 +147,9 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 			continue;
 		}
 
-		zbx_vector_pg_host_ptr_append(&proxy->hosts, host);
+		zbx_pg_host_ref_t	ref_local = {.host = host};
+
+		zbx_hashset_insert(&proxy->hosts, &ref_local, sizeof(ref_local));
 
 		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
 			proxy->group->hostmap_revision = revision;
