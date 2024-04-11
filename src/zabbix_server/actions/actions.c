@@ -3116,6 +3116,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		new_escalations = &local_escalations;
 		zbx_vector_escalation_new_ptr_create(new_escalations);
 	}
+
 	zbx_vector_escalation_new_ptr_create(&local_rec_escalations);
 	zbx_vector_uint64_pair_create(&rec_escalations);
 
