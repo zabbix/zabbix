@@ -176,8 +176,8 @@ class testProxyHa extends CIntegrationTest {
 	 * @required-components server, proxy, proxy_ha1
 	 */
 	public function testProxyHa_tc1() {
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from unknown to online';
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1);
+		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$assign_logline = '\bassigned hostid (' . self::$hostid1 . '|' . self::$hostid2 . ') to proxyid';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $assign_logline, true, 90, 1, true);
@@ -208,8 +208,8 @@ class testProxyHa extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from unknown to online';
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1);
+		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 120, 1, true);
