@@ -221,7 +221,7 @@ function createFontSelect(string $name): CSelect {
 							->setAriaRequired(),
 						'mapSelectRow'
 					)
-					->addRow(_('Tags'),
+					->addRow(_('Problem tags'),
 						(new CDiv([
 							(new CTable())
 								->setId('selement-tags')
