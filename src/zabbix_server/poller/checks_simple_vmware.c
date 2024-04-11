@@ -717,21 +717,15 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
-		zbx_vector_ptr_t *add_results)
+static void	vmware_get_events(const zbx_vector_ptr_t *events, const DC_ITEM *item, zbx_vector_ptr_t *add_results)
 {
-	int	i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* events were retrieved in reverse chronological order */
-	for (i = events->values_num - 1; i >= 0; i--)
+	for (int i = events->values_num - 1; i >= 0; i--)
 	{
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;
-
-		if (event->key <= eventlog_last_key)
-			continue;
 
 		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
 		init_result(add_result);
@@ -797,6 +791,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	{
 		/* this may happen if recreate item vmware.eventlog for the same service URL */
 		service->eventlog.last_key = request->lastlogsize;
+		service->eventlog.last_ts = 0;
 		service->eventlog.skip_old = skip_old;
 	}
 	else if (0 != service->eventlog.oom)
@@ -813,8 +808,9 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	}
 	else if (0 < service->data->events.values_num)
 	{
-		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
+		vmware_get_events(&service->data->events, item, add_results);
 		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+		service->eventlog.last_ts = ((const zbx_vmware_event_t *)service->data->events.values[0])->timestamp;
 	}
 
 	ret = SYSINFO_RET_OK;
