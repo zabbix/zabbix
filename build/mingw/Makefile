@@ -255,7 +255,7 @@ $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
 $(OUTPUTDIR)\active_checks.o: $(TOPDIR)\src\zabbix_agent\active_checks\active_checks.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\eventlog_win32.o: $(TOPDIR)\src\zabbix_agent\active_checks\eventlog_win32\eventlog.c
+$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\active_checks\eventlog_win32\eventlog.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\process_eventslog.o: $(TOPDIR)\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog.c
