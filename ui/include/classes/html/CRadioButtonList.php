@@ -137,6 +137,7 @@ class CRadioButtonList extends CList {
 			}
 
 			$radio = (new CInput('radio', $this->name, $value['value']))
+				->setAttribute('tabindex', '0')
 				// Read-only for radioboxes is simulated by disabling control and adding CVar with value.
 				->setEnabled($this->enabled && !$this->readonly)
 				->onChange($value['on_change'])

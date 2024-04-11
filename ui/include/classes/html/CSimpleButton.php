@@ -29,6 +29,7 @@ class CSimpleButton extends CTag implements CButtonInterface {
 	public function __construct($caption = '') {
 		parent::__construct('button', true, $caption);
 		$this->setAttribute('type', 'button');
+		$this->setAttribute('tabindex', '0');
 	}
 
 	/**
