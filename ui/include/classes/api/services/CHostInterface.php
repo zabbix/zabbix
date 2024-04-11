@@ -257,7 +257,9 @@ class CHostInterface extends CApiService {
 	 */
 	public function checkInput(array &$interfaces, $method) {
 		$update = ($method == 'update');
-		$allowed_fields = array_flip(['hostid', 'type', 'ip', 'dns', 'port', 'useip', 'main', 'details']);
+		$allowed_fields = array_flip([
+			'hostid', 'type', 'ip', 'dns', 'port', 'useip', 'main', 'details', 'interface_ref'
+		]);
 
 		// permissions
 		if ($update) {
