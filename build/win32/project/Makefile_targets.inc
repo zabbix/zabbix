@@ -141,7 +141,7 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\zabbix_agent\metrics}.c{..\..\..\src\zabbix_agent\metrics}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\zabbix_agent\eventlog}.c{..\..\..\src\zabbix_agent\eventlog}.o:
+{..\..\..\src\zabbix_agent\active_checks\eventlog}.c{..\..\..\src\zabbix_agent\active_checks\eventlog}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\zabbix_agent\listener}.c{..\..\..\src\zabbix_agent\listener}.o:
