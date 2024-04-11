@@ -165,8 +165,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	// item JSON object presence is checked in the calling function
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
 	{
-		char *jp_data_contents = NULL;
-		size_t offset = 0, alloc = 0;
+		char	*jp_data_contents = NULL;
+		size_t	offset = 0, alloc = 0;
 
 		zbx_strncpy_alloc(&jp_data_contents, &offset, &alloc,
 				jp_data->start, (size_t)(jp_data->end - jp_data->start + 1));
