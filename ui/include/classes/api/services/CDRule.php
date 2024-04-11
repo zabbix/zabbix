@@ -198,8 +198,13 @@ class CDRule extends CApiService {
 		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
+		$allowed_fields = array_flip(['proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max', 'dchecks']);
 
 		foreach ($drules as $drule) {
+			if (array_diff_key($drule, $allowed_fields)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
 			if (!array_key_exists('name', $drule)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'name'));
 			}
@@ -348,8 +353,15 @@ class CDRule extends CApiService {
 		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
+		$allowed_fields = array_flip([
+			'druleid', 'proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max', 'dchecks'
+		]);
 
 		foreach ($drules as $drule) {
+			if (array_diff_key($drule, $allowed_fields)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
 			if (!array_key_exists($drule['druleid'], $db_drules)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}

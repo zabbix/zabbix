@@ -1,0 +1,1 @@
+A......... [ZBX-24299] fixed possibility to alter read-only error fields with HostInterface and DRule API create/update operation (miks)
