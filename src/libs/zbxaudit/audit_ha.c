@@ -38,7 +38,7 @@ void	zbx_audit_ha_create_entry(int audit_action, const char *nodeid, const char 
 		zbx_audit_entry_t	*new_entry;
 
 		new_entry = zbx_audit_entry_init_cuid(nodeid, AUDIT_HA_NODE_ID, name, audit_action,
-				AUDIT_RESOURCE_HA_NODE);
+				ZBX_AUDIT_RESOURCE_HA_NODE);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}
 }

@@ -29,6 +29,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 #include <stddef.h>
 
 /* global correlation constants */
@@ -101,11 +102,13 @@ zbx_dbsync_journal_t;
 typedef struct
 {
 	zbx_hashset_t			strpool;
-	ZBX_DC_CONFIG			*cache;
+	zbx_dc_config_t			*cache;
 
 	zbx_hashset_t			changelog;
 
 	zbx_dbsync_journal_t		journals[ZBX_DBSYNC_OBJ_COUNT];
+
+	zbx_vector_dbsync_t		changelog_dbsyncs;
 }
 zbx_dbsync_env_t;
 
@@ -323,7 +326,7 @@ static void	dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 	zbx_vector_dbsync_obj_changelog_destroy(&journal->changelog);
 }
 
-void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
+void	zbx_dbsync_env_init(zbx_dc_config_t *cache)
 {
 	dbsync_env.cache = cache;
 	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -518,6 +521,8 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 		dbsync_remove_duplicate_ids(&dbsync_env.journals[i].updates, &dbsync_env.journals[i].inserts);
 	}
 
+	zbx_vector_dbsync_create(&dbsync_env.changelog_dbsyncs);
+
 	return changelog_num;
 }
 
@@ -581,18 +586,43 @@ void	zbx_dbsync_env_clear(void)
 {
 	size_t	i;
 
+	zbx_vector_dbsync_destroy(&dbsync_env.changelog_dbsyncs);
+
 	dbsync_prune_changelog();
 
 	zbx_hashset_destroy(&dbsync_env.strpool);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		dbsync_journal_destroy(&dbsync_env.journals[i]);
-
 }
 
 int	zbx_dbsync_env_changelog_num(void)
 {
 	return dbsync_env.changelog.num_data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if any new records were synced from tables supporting       *
+ *          changelog                                                         *
+ *                                                                            *
+ * Return value: SUCCEED - there were new records synced                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_env_changelog_dbsyncs_new_records(void)
+{
+	int	i;
+
+	for (i = 0; i < dbsync_env.changelog_dbsyncs.values_num; i++)
+	{
+		zbx_dbsync_t	*sync = dbsync_env.changelog_dbsyncs.values[i];
+
+		if (0 != sync->add_num)
+			return SUCCEED;
+	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -655,6 +685,13 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 {
 	int	i, inserts_num, updates_num;
 
+	if (ZBX_DBSYNC_TYPE_CHANGELOG != sync->type)
+	{
+		/* sync objects using changelog must be initialized with zbx_dbsync_init_changelog() */
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_vector_dbsync_append(&journal->syncs, sync);
 
 	inserts_num = journal->inserts.values_num;
@@ -701,7 +738,7 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
  * Purpose: initializes changeset                                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
+static void	dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
 {
 	sync->columns_num = 0;
 	sync->mode = mode;
@@ -721,6 +758,30 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
 	}
 	else
 		sync->dbresult = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes changeset                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
+{
+	dbsync_init(sync, mode);
+	sync->type = ZBX_DBSYNC_TYPE_DIFF;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes changeset for tables using changelog                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, unsigned char mode)
+{
+	dbsync_init(sync, mode);
+	sync->type = ZBX_DBSYNC_TYPE_CHANGELOG;
+
+	zbx_vector_dbsync_append(&dbsync_env.changelog_dbsyncs, sync);
 }
 
 /******************************************************************************
@@ -4039,7 +4100,8 @@ out:
  ******************************************************************************/
 void	zbx_dbsync_clear_user_macros(void)
 {
-	um_cache_remove_hosts(config->um_cache, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
+	um_cache_remove_hosts(get_dc_config()->um_cache,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
 }
 
 int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)

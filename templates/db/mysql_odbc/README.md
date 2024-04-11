@@ -55,6 +55,8 @@ For more information, please see MySQL documentation https://dev.mysql.com/doc/r
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |MySQL: Get status variables|<p>The item gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]|
+|MySQL: Get database|<p>Used for scanning databases in DBMS.</p>|Database monitor|db.odbc.get[get_database,"{$MYSQL.DSN}"]|
+|MySQL: Get replication|<p>Gets replication status information.</p>|Database monitor|db.odbc.get[get_replication,"{$MYSQL.DSN}"]|
 |MySQL: Status||Database monitor|db.odbc.select[ping,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |MySQL: Version||Database monitor|db.odbc.select[version,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |MySQL: Uptime|<p>The amount of seconds that the server has been up.</p>|Dependent item|mysql.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Uptime')].Value.first()`</p></li></ul>|
@@ -123,7 +125,7 @@ For more information, please see MySQL documentation https://dev.mysql.com/doc/r
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database discovery|<p>Scanning databases in DBMS.</p>|Database monitor|db.odbc.discovery[databases,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Database discovery|<p>Used for the discovery of the databases.</p>|Dependent item|mysql.database.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Database discovery
 
@@ -135,17 +137,17 @@ For more information, please see MySQL documentation https://dev.mysql.com/doc/r
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p>|Database monitor|db.odbc.discovery[replication,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Replication discovery|<p>Discovery of the replication.</p>|Dependent item|mysql.replication.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|MySQL: Replication Slave status {#MASTER_HOST}|<p>The item gets status information on the essential parameters of the slave threads.</p>|Database monitor|db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]|
-|MySQL: Replication Slave SQL Running State {#MASTER_HOST}|<p>This shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|MySQL: Replication Seconds Behind Master {#MASTER_HOST}|<p>The amount of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|MySQL: Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running. Normally, you want this to be Yes unless you have not yet started a replication or have explicitly stopped it with STOP SLAVE.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|MySQL: Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be Yes.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|MySQL: Replication Slave status {#MASTER_HOST}|<p>Gets status information on the essential parameters of the slave threads.</p>|Dependent item|mysql.slave_status["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Master_Host=='{#MASTER_HOST}')].first()`</p></li></ul>|
+|MySQL: Replication Slave SQL Running State {#MASTER_HOST}|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|MySQL: Replication Seconds Behind Master {#MASTER_HOST}|<p>The number of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_Master`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|MySQL: Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `STOP SLAVE`.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_IO_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|MySQL: Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Replication discovery
 

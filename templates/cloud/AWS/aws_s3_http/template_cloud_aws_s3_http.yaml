@@ -622,6 +622,8 @@ zabbix_export:
             		data = AWS.getField(AWS.request('filter_id', 'GET', region, 's3', AWS.prepareParams(payload), '', bucket_name), 'ListMetricsConfigurationsResult');
             
             		if (typeof data === 'object' && data.hasOwnProperty('MetricsConfiguration') === true) {
+            			if (!Array.isArray(data.MetricsConfiguration))
+            				data.MetricsConfiguration = [data.MetricsConfiguration]
             			data.MetricsConfiguration.forEach(function (item) {
             				item.region = region;
             			});

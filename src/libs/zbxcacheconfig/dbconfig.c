@@ -57,8 +57,10 @@
 #include "zbxcachevalue.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
+#include "zbxmutexs.h"
 #include "zbxautoreg.h"
 #include "zbxexpression.h"
+#include "zbxinterface.h"
 
 int	sync_in_progress = 0;
 
@@ -131,12 +133,73 @@ static zbx_get_config_forks_f	get_config_forks_cb = NULL;
  ******************************************************************************/
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
-ZBX_DC_CONFIG		*config = NULL;
+zbx_dc_config_t	*config = NULL;
+
+zbx_dc_config_t	*get_dc_config(void)
+{
+	return config;
+}
+
+void	set_dc_config(zbx_dc_config_t *in)
+{
+	config = in;
+}
+
 zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+
+void	rdlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_rdlock(config_lock);
+}
+
+void	wrlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_wrlock(config_lock);
+}
+
+void	unlock_cache(void)
+{
+	if (0 == sync_in_progress)
+		zbx_rwlock_unlock(config_lock);
+}
+
 zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
-zbx_shmem_info_t	*config_mem;
+
+void	rdlock_cache_config_history(void)
+{
+	zbx_rwlock_rdlock(config_history_lock);
+}
+
+void	wrlock_cache_config_history(void)
+{
+	zbx_rwlock_wrlock(config_history_lock);
+}
+
+void	unlock_cache_config_history(void)
+{
+	zbx_rwlock_unlock(config_history_lock);
+}
+
+static zbx_shmem_info_t	*config_mem;
 
 ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
+
+void	dbconfig_shmem_free_func(void *ptr)
+{
+	__config_shmem_free_func(ptr);
+}
+
+void	*dbconfig_shmem_realloc_func(void *old, size_t size)
+{
+	return __config_shmem_realloc_func(old, size);
+}
+
+void	*dbconfig_shmem_malloc_func(void *old, size_t size)
+{
+	return __config_shmem_malloc_func(old, size);
+}
 
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
@@ -935,8 +998,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (NULL == config->config)
 	{
 		found = 0;
-		config->config = (ZBX_DC_CONFIG_TABLE *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
-		memset(config->config, 0, sizeof(ZBX_DC_CONFIG_TABLE));
+		config->config = (zbx_dc_config_table_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_table_t));
+		memset(config->config, 0, sizeof(zbx_dc_config_table_t));
 	}
 
 	if (SUCCEED != (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
@@ -7439,10 +7502,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	zbx_hashset_create(&activated_hosts, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sec = zbx_time();
-	changelog_num = zbx_dbsync_env_prepare(mode);
-	changelog_sec = zbx_time() - sec;
-
 	if (ZBX_DBSYNC_INIT == mode)
 	{
 		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -7458,24 +7517,28 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		pnew_items = &new_items;
 	}
 
+	sec = zbx_time();
+	changelog_num = zbx_dbsync_env_prepare(changelog_sync_mode);
+	changelog_sec = zbx_time() - sec;
+
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
 
 	zbx_dbsync_init(&autoreg_config_sync, mode);
 	zbx_dbsync_init(&autoreg_host_sync, mode);
-	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&hosts_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
 	zbx_dbsync_init(&gmacro_sync, mode);
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
-	zbx_dbsync_init(&items_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&items_sync, changelog_sync_mode);
 	zbx_dbsync_init(&template_items_sync, mode);
-	zbx_dbsync_init(&prototype_items_sync, mode);
+	zbx_dbsync_init_changelog(&prototype_items_sync, changelog_sync_mode);
 	zbx_dbsync_init(&item_discovery_sync, mode);
-	zbx_dbsync_init(&triggers_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&triggers_sync, changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, mode);
-	zbx_dbsync_init(&func_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&func_sync, changelog_sync_mode);
 	zbx_dbsync_init(&expr_sync, mode);
 	zbx_dbsync_init(&action_sync, mode);
 
@@ -7485,15 +7548,15 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&action_op_sync, ZBX_DBSYNC_UPDATE);
 
 	zbx_dbsync_init(&action_condition_sync, mode);
-	zbx_dbsync_init(&trigger_tag_sync, changelog_sync_mode);
-	zbx_dbsync_init(&item_tag_sync, changelog_sync_mode);
-	zbx_dbsync_init(&host_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&trigger_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&item_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&host_tag_sync, changelog_sync_mode);
 	zbx_dbsync_init(&correlation_sync, mode);
 	zbx_dbsync_init(&corr_condition_sync, mode);
 	zbx_dbsync_init(&corr_operation_sync, mode);
 	zbx_dbsync_init(&hgroups_sync, mode);
 	zbx_dbsync_init(&hgroup_host_sync, mode);
-	zbx_dbsync_init(&itempp_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&itempp_sync, changelog_sync_mode);
 	zbx_dbsync_init(&itemscrp_sync, mode);
 
 	zbx_dbsync_init(&maintenance_sync, mode);
@@ -7502,18 +7565,18 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&maintenance_group_sync, mode);
 	zbx_dbsync_init(&maintenance_host_sync, mode);
 
-	zbx_dbsync_init(&drules_sync, changelog_sync_mode);
-	zbx_dbsync_init(&dchecks_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&drules_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&dchecks_sync, changelog_sync_mode);
 
-	zbx_dbsync_init(&httptest_sync, changelog_sync_mode);
-	zbx_dbsync_init(&httptest_field_sync, changelog_sync_mode);
-	zbx_dbsync_init(&httpstep_sync, changelog_sync_mode);
-	zbx_dbsync_init(&httpstep_field_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&httptest_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&httptest_field_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&httpstep_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&httpstep_field_sync, changelog_sync_mode);
 
-	zbx_dbsync_init(&connector_sync, changelog_sync_mode);
-	zbx_dbsync_init(&connector_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&connector_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&connector_tag_sync, changelog_sync_mode);
 
-	zbx_dbsync_init(&proxy_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&proxy_sync, changelog_sync_mode);
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
@@ -8289,9 +8352,25 @@ out:
 	{
 		case ZBX_DB_OK:
 			if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+			{
 				zbx_dbsync_env_flush_changelog();
+			}
 			else
-				sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
+			{
+				/* set changelog initialized only if database records were synced and */
+				/* next time differential sync must be used                           */
+				if (SUCCEED == zbx_dbsync_env_changelog_dbsyncs_new_records())
+				{
+					sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
+					zabbix_log(LOG_LEVEL_DEBUG, "initialized changelog support");
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "skipped changelog support initialization"
+							" because of empty database");
+				}
+
+			}
 			break;
 		case ZBX_DB_FAIL:
 			/* non recoverable database error is encountered */
@@ -8742,7 +8821,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 		goto out;
 	}
 
-	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
+	config = (zbx_dc_config_t *)__config_shmem_malloc_func(NULL, sizeof(zbx_dc_config_t) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
 
 	if (SUCCEED != vps_monitor_create(&config->vps_monitor, error))
@@ -11035,9 +11114,9 @@ int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t host
 	if (0 == hostid)
 		goto unlock;
 
-	for (i = 0; i < (int)ARRSIZE(INTERFACE_TYPE_PRIORITY); i++)
+	for (i = 0; i < INTERFACE_TYPE_COUNT; i++)
 	{
-		if (SUCCEED == (res = dc_get_interface_by_type(interface, hostid, INTERFACE_TYPE_PRIORITY[i])))
+		if (SUCCEED == (res = dc_get_interface_by_type(interface, hostid, zbx_get_interface_type_priority(i))))
 			break;
 	}
 

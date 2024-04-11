@@ -29,6 +29,7 @@
 #include "zbxnum.h"
 #include "ipmi.h"
 #include "zbxipmi.h"
+#include "zbxinterface.h"
 
 /******************************************************************************
  *                                                                            *

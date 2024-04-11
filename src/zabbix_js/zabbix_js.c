@@ -35,6 +35,10 @@ static const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
+#define ZBX_SERVICE_NAME_LEN	64
+char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#undef ZBX_SERVICE_NAME_LEN
+
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
 #define JS_TIMEOUT_DEF		ZBX_ES_TIMEOUT
@@ -137,7 +141,7 @@ int	main(int argc, char **argv)
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 #ifndef _WINDOWS
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -190,7 +194,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, syslog_app_name, zabbix_event_source, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;

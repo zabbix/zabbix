@@ -201,6 +201,7 @@ typedef struct
 	zbx_es_t			es;
 
 	zbx_ipc_service_t		ipc;
+	zbx_ipc_client_t		*syncer_client;
 }
 zbx_am_t;
 
@@ -981,6 +982,25 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	pid_t	ppid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memcpy(&ppid, message->data, sizeof(ppid));
+
+	if (ppid != getppid())
+	{
+		zbx_ipc_client_close(client);
+		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
+	}
+	else
+		manager->syncer_client = client;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: returns alerter by connected client                               *
@@ -1155,6 +1175,7 @@ static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char 
 	zbx_binary_heap_create(&manager->queue, am_mediatype_queue_compare, ZBX_BINARY_HEAP_OPTION_DIRECT);
 
 	zbx_es_init(&manager->es);
+	manager->syncer_client = NULL;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -2370,6 +2391,16 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			{
 				case ZBX_IPC_ALERTER_REGISTER:
 					am_register_alerter(&manager, client, message);
+					break;
+				case ZBX_IPC_ALERT_SYNCER_REGISTER:
+					am_register_alert_syncer(&manager, client, message);
+					break;
+				case ZBX_IPC_ALERTER_SYNC_ALERTS:
+					if (FAIL == zbx_ipc_client_send(manager.syncer_client,
+							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to send message to sync alerts");
+					}
 					break;
 				case ZBX_IPC_ALERTER_RESULT:
 					if (SUCCEED == am_process_result(&manager, client, message))

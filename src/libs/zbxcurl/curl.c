@@ -72,6 +72,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 			exit(EXIT_FAILURE);
 		}
 
+#ifndef _WINDOWS
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
@@ -85,6 +86,9 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 			dlclose(handle);
 			exit(EXIT_FAILURE);
 		}
+#else
+		fptr = curl_multi_wait;
+#endif
 	}
 
 	return fptr(multi_handle, NULL, 0, timeout_ms, numfds);
@@ -152,6 +156,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 
 	if (NULL == fptr)
 	{
+#ifndef _WINDOWS
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
@@ -165,6 +170,9 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 			dlclose(handle);
 			exit(EXIT_FAILURE);
 		}
+#else
+		fptr = curl_easy_header;
+#endif
 	}
 
 	origin = CURLH_HEADER | CURLH_TRAILER | CURLH_CONNECT | CURLH_1XX;
