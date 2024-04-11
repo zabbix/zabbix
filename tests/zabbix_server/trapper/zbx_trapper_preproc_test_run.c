@@ -27,23 +27,6 @@
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
-
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
-{
-	ZBX_UNUSED(local_server_num);
-	ZBX_UNUSED(local_process_type);
-	ZBX_UNUSED(local_process_num);
-
-	return 0;
-}
-
-int	MAIN_ZABBIX_ENTRY(int flags)
-{
-	ZBX_UNUSED(flags);
-
-	return 0;
-}
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,

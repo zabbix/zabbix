@@ -44,8 +44,6 @@ void	__wrap_zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, 
 
 /* stubs to satisfy hard link dependenceies */
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
-
 pid_t	*threads;
 int	threads_num;
 
@@ -53,20 +51,6 @@ void	zbx_update_selfmon_counter(const zbx_thread_info_t *info, unsigned char sta
 {
 	ZBX_UNUSED(state);
 	ZBX_UNUSED(info);
-}
-
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
-{
-	ZBX_UNUSED(local_server_num);
-	ZBX_UNUSED(local_process_type);
-	ZBX_UNUSED(local_process_num);
-	return 0;
-}
-
-int	MAIN_ZABBIX_ENTRY(int flags)
-{
-	ZBX_UNUSED(flags);
-	return 0;
 }
 
 /* service tree mock */
