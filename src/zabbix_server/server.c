@@ -1108,7 +1108,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
-				0,			0,			0},
 		{0}
 	};
 
