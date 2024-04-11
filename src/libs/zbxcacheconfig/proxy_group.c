@@ -86,7 +86,7 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(proxy_groupid, row[0]);
 
-		pg = (zbx_dc_proxy_group_t *)DCfind_id(&config->proxy_groups, proxy_groupid,
+		pg = (zbx_dc_proxy_group_t *)DCfind_id(&get_dc_config()->proxy_groups, proxy_groupid,
 				sizeof(zbx_dc_proxy_group_t), &found);
 
 		dc_strpool_replace(found, &pg->failover_delay, row[1]);
@@ -98,18 +98,18 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &rowid)))
+		if (NULL == (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&get_dc_config()->proxy_groups, &rowid)))
 			continue;
 
 		dc_strpool_release(pg->failover_delay);
 		dc_strpool_release(pg->min_online);
 		dc_strpool_release(pg->name);
 
-		zbx_hashset_remove_direct(&config->proxy_groups, pg);
+		zbx_hashset_remove_direct(&get_dc_config()->proxy_groups, pg);
 	}
 
 	if (0 != sync->add_num + sync->update_num + sync->remove_num)
-		config->revision.proxy_group = revision;
+		get_dc_config()->revision.proxy_group = revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -132,7 +132,7 @@ int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (*revision >= config->revision.proxy_group)
+	if (*revision >= get_dc_config()->revision.proxy_group)
 		goto out;
 
 	zbx_hashset_iter_t	iter;
@@ -145,9 +145,9 @@ int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 
 	RDLOCK_CACHE;
 
-	*revision = config->revision.proxy_group;
+	*revision = get_dc_config()->revision.proxy_group;
 
-	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	zbx_hashset_iter_reset(&get_dc_config()->proxy_groups, &iter);
 	while (NULL != (dc_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == (group = (zbx_pg_group_t *)zbx_hashset_search(groups, &dc_group->proxy_groupid)))
@@ -217,7 +217,7 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_PG_PROXY_FETCH_REVISION == flags && *revision >= config->revision.proxy)
+	if (ZBX_PG_PROXY_FETCH_REVISION == flags && *revision >= get_dc_config()->revision.proxy)
 		goto out;
 
 	zbx_hashset_iter_t	iter;
@@ -226,9 +226,9 @@ int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint
 
 	RDLOCK_CACHE;
 
-	*revision = config->revision.proxy;
+	*revision = get_dc_config()->revision.proxy;
 
-	zbx_hashset_iter_reset(&config->proxies, &iter);
+	zbx_hashset_iter_reset(&get_dc_config()->proxies, &iter);
 
 	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 	{
@@ -290,9 +290,9 @@ static void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
 
-	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
 	{
-		hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_insert(&config->host_proxy_index, &hpi_local,
+		hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_insert(&get_dc_config()->host_proxy_index, &hpi_local,
 				sizeof(hpi_local));
 		dc_strpool_acquire(hpi->host);
 	}
@@ -304,10 +304,10 @@ static void	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
 
-	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
 	{
 		dc_strpool_release(hpi->host);
-		zbx_hashset_remove_direct(&config->host_proxy_index, hpi);
+		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
 	}
 }
 
@@ -315,14 +315,14 @@ void	dc_update_host_proxy(const char *host_old, const char *host_new)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host_old};
 
-	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
 	{
 		dc_strpool_release(hpi->host);
-		zbx_hashset_remove_direct(&config->host_proxy_index, hpi);
+		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
 
 		hpi_local.host_proxy = hpi->host_proxy;
 		hpi_local.host = dc_strpool_intern(host_new);
-		zbx_hashset_insert(&config->host_proxy_index, &hpi_local, sizeof(hpi_local));
+		zbx_hashset_insert(&get_dc_config()->host_proxy_index, &hpi_local, sizeof(hpi_local));
 	}
 }
 
@@ -372,7 +372,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(hostproxyid, row[0]);
 
-		hp = (zbx_dc_host_proxy_t *)DCfind_id(&config->host_proxy, hostproxyid, sizeof(zbx_dc_host_proxy_t),
+		hp = (zbx_dc_host_proxy_t *)DCfind_id(&get_dc_config()->host_proxy, hostproxyid, sizeof(zbx_dc_host_proxy_t),
 				&found);
 
 		ZBX_DBROW2UINT64(hp->hostid, row[1]);
@@ -392,7 +392,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 			dc_strpool_replace(found, &hp->host, row[5]);
 
-			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hp->hostid)))
+			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&get_dc_config()->hosts, &hp->hostid)))
 			{
 				if (0 != dc_host->proxy_groupid)
 				{
@@ -423,10 +423,10 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (hp = (zbx_dc_host_proxy_t *)zbx_hashset_search(&config->host_proxy, &rowid)))
+		if (NULL == (hp = (zbx_dc_host_proxy_t *)zbx_hashset_search(&get_dc_config()->host_proxy, &rowid)))
 			continue;
 
-		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hp->hostid)))
+		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&get_dc_config()->hosts, &hp->hostid)))
 		{
 			if (0 != dc_host->proxy_groupid)
 			{
@@ -449,7 +449,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			dc_psk_unlink(hp->tls_dc_psk);
 		}
 #endif
-		zbx_hashset_remove_direct(&config->host_proxy, hp);
+		zbx_hashset_remove_direct(&get_dc_config()->host_proxy, hp);
 	}
 
 	if (0 != hosts.values_num)
@@ -497,21 +497,21 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
 	ZBX_DC_PROXY			*proxy;
 
-	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&config->host_proxy_index, &hpi_local)))
+	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
 		return FAIL;
 
-	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hpi->host_proxy->proxyid)))
+	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&get_dc_config()->proxies, &hpi->host_proxy->proxyid)))
 		return FAIL;
 
-	if (NULL != config->proxy_hostname && 0 == strcmp(proxy->name, config->proxy_hostname))
+	if (NULL != get_dc_config()->proxy_hostname && 0 == strcmp(proxy->name, get_dc_config()->proxy_hostname))
 	{
 		int	now;
 
 		now = (int)time(NULL);
 
 		/* check if proxy is not offline and the client redirect should be reset */
-		if (now - config->proxy_lastonline < config->proxy_failover_delay ||
-				now - hpi->lastreset < config->proxy_failover_delay)
+		if (now - get_dc_config()->proxy_lastonline < get_dc_config()->proxy_failover_delay ||
+				now - hpi->lastreset < get_dc_config()->proxy_failover_delay)
 		{
 			return FAIL;
 		}
@@ -526,7 +526,7 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 
 	if ('{' == *local_port)
 	{
-		um_cache_resolve_const(config->um_cache, NULL, 0, proxy->local_port, ZBX_MACRO_ENV_NONSECURE,
+		um_cache_resolve_const(get_dc_config()->um_cache, NULL, 0, proxy->local_port, ZBX_MACRO_ENV_NONSECURE,
 				&local_port);
 	}
 
@@ -546,7 +546,7 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	ZBX_DC_PSK	*dc_psk = NULL;
 #endif
 
-	if (NULL != config->proxy_hostname)
+	if (NULL != get_dc_config()->proxy_hostname)
 	{
 		/* on proxy encryption information is taken from host_proxy redirect mapping */
 		tls_accept = hpi->host_proxy->tls_accept;
@@ -605,18 +605,18 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
  ******************************************************************************/
 void	dc_update_proxy_failover_delay(void)
 {
-	if (NULL != config->proxy_failover_delay_raw)
+	if (NULL != get_dc_config()->proxy_failover_delay_raw)
 	{
-		const char	*ptr = config->proxy_failover_delay_raw;
+		const char	*ptr = get_dc_config()->proxy_failover_delay_raw;
 
 		if ('{' == *ptr)
-			um_cache_resolve_const(config->um_cache, NULL, 0, ptr, ZBX_MACRO_ENV_NONSECURE, &ptr);
+			um_cache_resolve_const(get_dc_config()->um_cache, NULL, 0, ptr, ZBX_MACRO_ENV_NONSECURE, &ptr);
 
-		if (FAIL == zbx_is_time_suffix(ptr, &config->proxy_failover_delay, ZBX_LENGTH_UNLIMITED))
-			config->proxy_failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
+		if (FAIL == zbx_is_time_suffix(ptr, &get_dc_config()->proxy_failover_delay, ZBX_LENGTH_UNLIMITED))
+			get_dc_config()->proxy_failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 
-		dc_strpool_release(config->proxy_failover_delay_raw);
-		config->proxy_failover_delay_raw = NULL;
+		dc_strpool_release(get_dc_config()->proxy_failover_delay_raw);
+		get_dc_config()->proxy_failover_delay_raw = NULL;
 	}
 }
 
@@ -629,12 +629,12 @@ void	zbx_dc_set_proxy_failover_delay(const char *failover_delay)
 {
 	WRLOCK_CACHE;
 
-	int	found = (NULL != config->proxy_failover_delay_raw);
+	int	found = (NULL != get_dc_config()->proxy_failover_delay_raw);
 
 	/* failover delay can be updated only by one process at time, */
 	/* so it can be checked without locking before update        */
-	if (0 == found || 0 != strcmp(config->proxy_failover_delay_raw, failover_delay))
-		dc_strpool_replace(found, &config->proxy_failover_delay_raw, failover_delay);
+	if (0 == found || 0 != strcmp(get_dc_config()->proxy_failover_delay_raw, failover_delay))
+		dc_strpool_replace(found, &get_dc_config()->proxy_failover_delay_raw, failover_delay);
 
 	UNLOCK_CACHE;
 }
@@ -647,7 +647,7 @@ void	zbx_dc_set_proxy_failover_delay(const char *failover_delay)
 void	zbx_dc_set_proxy_lastonline(int lastonline)
 {
 	WRLOCK_CACHE;
-	config->proxy_lastonline = lastonline;
+	get_dc_config()->proxy_lastonline = lastonline;
 	UNLOCK_CACHE;
 }
 
@@ -663,7 +663,7 @@ zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid)
 	RDLOCK_CACHE;
 	zbx_dc_proxy_group_t	*pg;
 
-	if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &proxy_groupid)))
+	if (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&get_dc_config()->proxy_groups, &proxy_groupid)))
 		revision = pg->revision;
 	else
 		revision = 0;
@@ -687,7 +687,7 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
 	{
 		RDLOCK_CACHE;
 
-		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&get_dc_config()->proxies, &proxyid)))
 			proxy_groupid = proxy->proxy_groupid;
 
 		UNLOCK_CACHE;

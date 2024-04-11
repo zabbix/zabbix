@@ -72,7 +72,7 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 				continue
 			fi
 		else
-			fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+			fields="${fields}${delim}replace(replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;'),'\t','&tab;') as ${field}"
 		fi
 		delim=','
 

@@ -81,8 +81,8 @@ PREPARE_AUDIT_HOST_INTERFACE_H(funcname, authprotocol, zbx_uint64_t)						\
 PREPARE_AUDIT_HOST_INTERFACE_H(funcname, privprotocol, zbx_uint64_t)						\
 PREPARE_AUDIT_HOST_INTERFACE_H(funcname, contextname, const char*)						\
 
-PREPARE_AUDIT_HOST_H(host, AUDIT_RESOURCE_HOST)
-PREPARE_AUDIT_HOST_H(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
+PREPARE_AUDIT_HOST_H(host, ZBX_AUDIT_RESOURCE_HOST)
+PREPARE_AUDIT_HOST_H(host_prototype, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE)
 
 #define PREPARE_AUDIT_HOST_UPDATE_H(resource, type1)							\
 void	zbx_audit_host_update_json_update_##resource(int audit_context_mode, zbx_uint64_t hostid,	\

@@ -21,22 +21,7 @@
 
 #include "zbxstr.h"
 
-const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
-{
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_IPMI
-};
-
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
-
-#ifdef _WINDOWS
-
-char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-
-#endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
@@ -484,39 +469,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Return value: Interface type                                               *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-unsigned char	get_interface_type_by_item_type(unsigned char type)
-{
-	switch (type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return INTERFACE_TYPE_AGENT;
-		case ITEM_TYPE_SNMP:
-		case ITEM_TYPE_SNMPTRAP:
-			return INTERFACE_TYPE_SNMP;
-		case ITEM_TYPE_IPMI:
-			return INTERFACE_TYPE_IPMI;
-		case ITEM_TYPE_JMX:
-			return INTERFACE_TYPE_JMX;
-		case ITEM_TYPE_SIMPLE:
-		case ITEM_TYPE_EXTERNAL:
-		case ITEM_TYPE_SSH:
-		case ITEM_TYPE_TELNET:
-			return INTERFACE_TYPE_ANY;
-		case ITEM_TYPE_HTTPAGENT:
-		case ITEM_TYPE_SCRIPT:
-			return INTERFACE_TYPE_OPT;
-		default:
-			return INTERFACE_TYPE_UNKNOWN;
-	}
-}
-
 void	zbx_alarm_flag_set(void)
 {
 	zbx_timed_out = 1;
@@ -576,3 +528,4 @@ zbx_uint64_t	suffix2factor(char c)
 			return 1;
 	}
 }
+

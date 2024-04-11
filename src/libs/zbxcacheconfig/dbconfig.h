@@ -23,7 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "user_macro.h"
 #include "vps_monitor.h"
-#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
 #include "zbx_trigger_constants.h"
@@ -637,7 +636,7 @@ typedef struct
 
 	zbx_config_item_type_timeouts_t	item_timeouts;
 }
-ZBX_DC_CONFIG_TABLE;
+zbx_dc_config_table_t;
 
 typedef struct
 {
@@ -1040,7 +1039,7 @@ typedef struct
 	zbx_binary_heap_t	trigger_queue;
 	zbx_binary_heap_t	drule_queue;
 	zbx_binary_heap_t	httptest_queue;		/* web scenario queue */
-	ZBX_DC_CONFIG_TABLE	*config;
+	zbx_dc_config_table_t	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
 	zbx_um_cache_t		*um_cache;
@@ -1055,21 +1054,28 @@ typedef struct
 								/* value during next configuration sync	      */
 	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
 }
-ZBX_DC_CONFIG;
+zbx_dc_config_t;
 
-extern int	sync_in_progress;
-extern ZBX_DC_CONFIG	*config;
-extern zbx_rwlock_t	config_lock;
+zbx_dc_config_t	*get_dc_config(void);
 
-#define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
-#define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
-#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
+/* for cmocka */
+void	set_dc_config(zbx_dc_config_t *in);
 
-extern zbx_rwlock_t	config_history_lock;
+#define	RDLOCK_CACHE	rdlock_cache()
+#define	WRLOCK_CACHE	wrlock_cache()
+#define	UNLOCK_CACHE	unlock_cache()
 
-#define	RDLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_rdlock(config_history_lock)
-#define	WRLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_wrlock(config_history_lock)
-#define	UNLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_unlock(config_history_lock)
+void	rdlock_cache(void);
+void	wrlock_cache(void);
+void	unlock_cache(void);
+
+void	rdlock_cache_config_history(void);
+void	wrlock_cache_config_history(void);
+void	unlock_cache_config_history(void);
+
+#define	RDLOCK_CACHE_CONFIG_HISTORY	rdlock_cache_config_history()
+#define	WRLOCK_CACHE_CONFIG_HISTORY	wrlock_cache_config_history()
+#define	UNLOCK_CACHE_CONFIG_HISTORY	unlock_cache_config_history()
 
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
@@ -1137,11 +1143,14 @@ void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_
 
 void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff);
 
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk);
 ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name, int found,
 		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk);
 #endif
+
+void	dbconfig_shmem_free_func(void *ptr);
+void	*dbconfig_shmem_realloc_func(void *old, size_t size);
+void	*dbconfig_shmem_malloc_func(void *old, size_t size);
 
 #endif

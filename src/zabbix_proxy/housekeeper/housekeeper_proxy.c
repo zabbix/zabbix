@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "housekeeper.h"
+#include "housekeeper_proxy.h"
 
 #include "zbxlog.h"
 #include "zbxnix.h"
