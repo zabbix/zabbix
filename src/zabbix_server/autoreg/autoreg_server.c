@@ -280,7 +280,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 	}
 
 	if (NULL != events_cbs->process_events_cb)
-		events_cbs->process_events_cb(NULL, NULL);
+		events_cbs->process_events_cb(NULL, NULL, NULL);
 
 	if (NULL != events_cbs->clean_events_cb)
 		events_cbs->clean_events_cb();

@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for testing changing rank of trigger-based events/problems
  *
  * @required-components server
+ * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,items,triggers,task,task_data,acknowledges,event_symptom,events,problem
  */
 class testEventsCauseAndSymptoms extends CIntegrationTest {
@@ -352,6 +353,19 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$symptom_events_test_scriptid = $response['result']['scriptids'][0];
+	}
+
+	/**
+	 * Component configuration provider for server.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableGlobalScripts' => 1
+			]
+		];
 	}
 
 	/**

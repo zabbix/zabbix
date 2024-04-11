@@ -2170,6 +2170,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Set time selector to display the time period, required for the corresponding data type.
 		$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
+		$this->page->waitUntilReady();
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');

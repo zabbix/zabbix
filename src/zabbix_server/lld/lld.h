@@ -32,9 +32,11 @@ typedef struct
 }
 zbx_lld_item_t;
 
+int	lld_item_compare_func(const void *d1, const void *d2);
+
 ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
 
-int	lld_item_compare_func(const void *d1, const void *d2);
+int	lld_item_proto_compare_func(const void *d1, const void *d2);
 
 typedef struct
 {
@@ -203,6 +205,10 @@ typedef struct
 	zbx_vector_db_tag_ptr_t			item_tags;
 }
 zbx_lld_item_prototype_t;
+
+ZBX_PTR_VECTOR_DECL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
+
+int	lld_item_prototype_compare_func(const void *d1, const void *d2);
 
 typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
 

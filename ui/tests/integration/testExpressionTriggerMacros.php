@@ -229,7 +229,7 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider for agent related tests.
+	 * Component configuration provider for server.
 	 *
 	 * @return array
 	 */
@@ -237,7 +237,8 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20
+				'LogFileSize' => 20,
+				'EnableGlobalScripts' => 1
 			]
 		];
 	}
