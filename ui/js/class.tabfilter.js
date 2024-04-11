@@ -81,6 +81,11 @@ class CTabFilter extends CBaseComponent {
 			index++;
 		}
 
+		if (options.expanded_timeselector) {
+			this.setSelectedItem(this._timeselector);
+			this._timeselector.setExpanded();
+		}
+
 		this.#updateSeparators();
 	}
 
@@ -302,11 +307,13 @@ class CTabFilter extends CBaseComponent {
 	 * @param {CTabFilterItem} item  Item object to be set as selected item.
 	 */
 	setSelectedItem(item) {
+		const item_was_selected = item.isSelected();
+
 		this._active_item = item;
 		this._active_item.unsetExpandedSubfilters();
 		item.setSelected();
 
-		if (item !== this._timeselector) {
+		if (item !== this._timeselector && !item_was_selected) {
 			item._target.setAttribute('tabindex', 0);
 			item.setBrowserLocationToApplyUrl();
 		}
@@ -425,15 +432,25 @@ class CTabFilter extends CBaseComponent {
 
 				item.setFocused();
 
-				if (item !== this._timeselector) {
-					if (item.isSelected()) {
+				if (item === this._timeselector) {
+					this.profileUpdate('expanded_timeselector', {
+						value_int: item._expanded ? 0 : 1
+					}).then(() => {
+						this._options.expanded_timeselector = +item._expanded;
+						this._options.expanded = false;
+					});
+				}
+				else {
+					if (item.isSelected() || this._active_item === this._timeselector) {
 						this.profileUpdate('expanded', {
 							value_int: item._expanded ? 0 : 1
 						}).then(() => {
 							this._options.expanded = +item._expanded;
+							this._options.expanded_timeselector = false;
 						});
 					}
-					else {
+
+					if (!item.isSelected()) {
 						item.initUnsavedState();
 						this.profileUpdate('selected', {
 							value_int: item._index
