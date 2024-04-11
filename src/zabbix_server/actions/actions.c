@@ -3300,6 +3300,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 					(int)ESCALATION_STATUS_ACTIVE, triggerid, itemid,
 					new_escalation->event->eventid, __UINT64_C(0), __UINT64_C(0));
 			new_escalation->escalationid = escalationid++;
+
 			if (NULL == escalations)
 				zbx_free(new_escalation);
 		}

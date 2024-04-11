@@ -3495,16 +3495,19 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			case ZBX_ESCALATION_SOURCE_TRIGGER:
 				zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null");
+
 				if (1 < get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR))
 				{
 					zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 							" and " ZBX_SQL_MOD(triggerid, %d) "=%d",
 							get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR), process_num - 1);
 				}
+
 				break;
 			case ZBX_ESCALATION_SOURCE_ITEM:
 				zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is null and"
 						" itemid is not null");
+
 				if (1 < get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR))
 				{
 					zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
@@ -3512,15 +3515,18 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 							get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR), process_num - 1);
 				}
 				break;
+
 			case ZBX_ESCALATION_SOURCE_SERVICE:
 				zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 						"triggerid is null and itemid is null and serviceid is not null");
+
 				if (1 < get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR))
 				{
 					zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 							" and " ZBX_SQL_MOD(serviceid, %d) "=%d",
 							get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR), process_num - 1);
 				}
+
 				break;
 			case ZBX_ESCALATION_SOURCE_DEFAULT:
 				zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
@@ -3531,6 +3537,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 							" and " ZBX_SQL_MOD(escalationid, %d) "=%d",
 							get_config_forks(ZBX_PROCESS_TYPE_ESCALATOR), process_num - 1);
 				}
+
 				break;
 		}
 	}
@@ -3698,6 +3705,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			unsigned char	*ptr = rtc_data;
 
 			ptr += zbx_deserialize_value(ptr, &notify_size);
+
 			for (zbx_uint32_t i = 0; i < notify_size; i++)
 			{
 				ptr += zbx_deserialize_value(ptr, &escalationid);
@@ -3761,6 +3769,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 				old_escalations_count = escalations_count;
 				old_total_sec = total_sec;
 			}
+
 			escalations_count = 0;
 			total_sec = 0.0;
 			last_stat_time = now;
@@ -3768,6 +3777,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		notify = 0;
 		wait_start_time = time(NULL);
+
 		do
 		{
 			if (0 == sleeptime_after_notify)

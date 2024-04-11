@@ -235,12 +235,15 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 			if (0 == sleeptime_after_notify)
 				sleeptime_after_notify = sleeptime;
+
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 			ret = zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime_after_notify);
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
+
 			if (0 > sleeptime_after_notify)
 				sleeptime_after_notify = 0;
+
 			zbx_free(rtc_data);
 
 			if (SUCCEED == ret && 0 != rtc_cmd)

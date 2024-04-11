@@ -679,7 +679,8 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 	if (FAIL == zbx_ipc_async_socket_send(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
 		zabbix_log(LOG_LEVEL_ERR, "failed to request alert results");
-	do {
+	do
+	{
 		zbx_ipc_message_free(message);
 
 		if (SUCCEED != zbx_ipc_async_socket_recv(&amdb->am, 1, &message) || NULL == message)
