@@ -114,7 +114,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 			}
 
 			zbx_db_begin();
-			zbx_process_events(NULL, NULL);
+			zbx_process_events(NULL, NULL, NULL);
 			zbx_db_commit();
 
 			zbx_clean_events();

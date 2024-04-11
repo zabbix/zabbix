@@ -16,16 +16,23 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 
-#ifndef ZABBIX_CACHEHISTORY_SERVER_H
-#define ZABBIX_CACHEHISTORY_SERVER_H
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
-#include "zbxdbhigh.h"
-#include "zbxipcservice.h"
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+{
+	ZBX_UNUSED(local_server_num);
+	ZBX_UNUSED(local_process_type);
+	ZBX_UNUSED(local_process_num);
 
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
+	return FAIL;
+}
 
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	ZBX_UNUSED(flags);
 
-#endif
+	return 0;
+}

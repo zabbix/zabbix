@@ -30,6 +30,7 @@
 #include "zbx_item_constants.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
+#include "zbxescalations.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxcacheconfig.h"
@@ -1830,7 +1831,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int co
 
 		do
 		{
-			sync_history_cb(&values_num, &triggers_num, events_cbs, config_history_storage_pipelines,
+			sync_history_cb(&values_num, &triggers_num, events_cbs, NULL, config_history_storage_pipelines,
 					&more);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
@@ -1902,6 +1903,7 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                                                                     *
  * Parameters:                                                                         *
  *   events_cbs                       - [IN]                                           *
+ *   rtc                              - [IN] RTC socket                                *
  *   config_history_storage_pipelines - [IN]                                           *
  *   values_num                       - [OUT] number of synced values                  *
  *   triggers_num                     - [OUT]                                          *
@@ -1910,15 +1912,15 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                            ZBX_SYNC_MORE - more data to sync        *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines,
-		int *values_num, int *triggers_num, int *more)
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+		int config_history_storage_pipelines, int *values_num, int *triggers_num, int *more)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
 	*values_num = 0;
 	*triggers_num = 0;
 
-	sync_history_cb(values_num, triggers_num, events_cbs, config_history_storage_pipelines, more);
+	sync_history_cb(values_num, triggers_num, events_cbs, rtc, config_history_storage_pipelines, more);
 }
 
 /******************************************************************************
