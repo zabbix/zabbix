@@ -411,6 +411,7 @@ static void	pg_cache_group_unassign_excess_hosts(zbx_pg_cache_t *cache, zbx_pg_g
 
 			pg_cache_proxy_unassign_host(cache, group, ph->proxy, ph->host_refs.values[last]);
 			zbx_vector_pg_host_ref_ptr_remove_noorder(&ph->host_refs, last);
+			ph->hosts_num--;
 		}
 	}
 out:
