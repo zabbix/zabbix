@@ -359,10 +359,11 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 }
 
 void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, int *more)
+		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
 {
 	ZBX_UNUSED(triggers_num);
 	ZBX_UNUSED(events_cbs);
+	ZBX_UNUSED(rtc);
 
 	int			history_num, txn_rc;
 	time_t			sync_start;

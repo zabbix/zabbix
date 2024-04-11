@@ -17,15 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CACHEHISTORY_SERVER_H
-#define ZABBIX_CACHEHISTORY_SERVER_H
+#ifndef ZABBIX_ESCALATIONS_H
+#define ZABBIX_ESCALATIONS_H
 
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
+typedef int (*zbx_rtc_notify_generic_cb_t)(zbx_ipc_async_socket_t *rtc, unsigned char process_type, int process_num,
+		zbx_uint32_t code, const char *data, zbx_uint32_t size);
 
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+void	zbx_init_escalations(int escalators_num, zbx_rtc_notify_generic_cb_t rtc_notify_cb);
+void	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new_ptr_t *escalations);
+void	zbx_escalation_new_ptr_free(zbx_escalation_new_t *data);
 
 #endif
