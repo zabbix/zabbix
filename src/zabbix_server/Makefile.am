@@ -32,6 +32,7 @@ SUBDIRS = \
 sbin_PROGRAMS = zabbix_server
 
 zabbix_server_SOURCES = \
+	db_lengths_constants.h \
 	server_constants.h \
 	server.c
 
