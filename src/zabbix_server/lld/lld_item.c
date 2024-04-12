@@ -90,12 +90,6 @@ static zbx_lld_item_preproc_t	*zbx_init_lld_item_preproc(zbx_uint64_t item_prepr
 	return preproc_op;
 }
 
-#define ZBX_ITEM_PARAMETER_FIELD_NAME	1
-#define ZBX_ITEM_PARAMETER_FIELD_VALUE	2
-
-#define ZBX_ITEM_TAG_FIELD_TAG		1
-#define ZBX_ITEM_TAG_FIELD_VALUE	2
-
 /* item index by prototype (parent) id and lld row */
 typedef struct
 {
@@ -1272,6 +1266,9 @@ static int	lld_item_dependencies_check(const zbx_lld_item_full_t *item,
 out:
 	return ret;
 }
+
+#undef	ZBX_DEPENDENT_ITEM_MAX_COUNT
+#undef	ZBX_DEPENDENT_ITEM_MAX_LEVELS
 
 /******************************************************************************
  *                                                                            *

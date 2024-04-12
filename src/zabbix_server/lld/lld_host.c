@@ -3008,12 +3008,15 @@ static void	lld_hostmacro_make(zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_u
 	zbx_vector_lld_hostmacro_ptr_append(hostmacros, hostmacro);
 }
 
+#undef ZBX_USERMACRO_MANUAL
+#undef ZBX_USERMACRO_AUTOMATIC
+
 /*******************************************************************************
  *                                                                             *
  * Parameters: hostmacros - [IN] List of host macros which should be present   *
  *                               on the each discovered host.                  *
- *             hosts      - [IN/OUT] List of hosts, should be sorted by hostid *
- *             lld_macros - [IN] list of LLD macros                            *
+ *             hosts      - [IN/OUT] list of hosts, should be sorted by hostid *
+ *             lld_macros - [IN]                                               *
  *                                                                             *
  ******************************************************************************/
 static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_vector_lld_host_ptr_t *hosts,
@@ -3112,7 +3115,7 @@ static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieve list of host tags which should be present on the each    *
+ * Purpose: Retrieves list of host tags which should be present on the each   *
  *          discovered host.                                                  *
  *                                                                            *
  * Parameters: parent_hostid - [IN] host prototype id                         *
@@ -4440,7 +4443,6 @@ out:
 
 static void	lld_templates_link(const zbx_vector_lld_host_ptr_t *hosts, char **error)
 {
-	int		i;
 	zbx_lld_host_t	*host;
 	char		*err = NULL;
 
@@ -4448,7 +4450,7 @@ static void	lld_templates_link(const zbx_vector_lld_host_ptr_t *hosts, char **er
 
 	zbx_db_begin();
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -4563,7 +4565,6 @@ static int	lld_host_delete_validate(zbx_uint64_t hostid)
 static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lifetime_t *lifetime,
 		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
-	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const zbx_lld_host_t	*host;
@@ -4593,7 +4594,7 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lif
 
 	zbx_db_begin();
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -4763,7 +4764,7 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lif
 	{
 		zbx_vector_uint64_sort(&del_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		for (i = 0; i < del_hostids.values_num; i++)
+		for (int i = 0; i < del_hostids.values_num; i++)
 		{
 			zbx_id_name_pair_t	*found, temp_t;
 			temp_t.id = del_hostids.values[i];

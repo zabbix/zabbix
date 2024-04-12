@@ -628,4 +628,5 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+#undef	STAT_INTERVAL
 }
