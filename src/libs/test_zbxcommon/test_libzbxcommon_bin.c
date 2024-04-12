@@ -32,5 +32,5 @@ int	main(void)
 {
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 
-	return 0;
+	return SUCCEED;
 }

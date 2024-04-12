@@ -1,4 +1,4 @@
-# This bin exists to ensure that libzbxcommon does not depend on any other Zabbix library.
+# This binary exists to ensure that libzbxcommon does not depend on any other Zabbix library.
 # It cannot be done in cmocka, since all compilation objects in tests directory are wrapped with undefined
 # references, which can be resolved by linking various others Zabbix libraries like libzbxnix.a
 # Unfortunately, libzbxcommon depends currently on other libraries. This needs to be fixed.
