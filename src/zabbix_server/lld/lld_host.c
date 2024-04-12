@@ -484,7 +484,7 @@ static zbx_hash_t	zbx_ids_names_hash_func(const void *data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves tags of the existing hosts                              *
+ * Purpose: retrieves tags of existing hosts                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_get_tags(zbx_vector_lld_host_ptr_t *hosts)
@@ -1236,7 +1236,7 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
  *                                     discovered host (Groups).               *
  *             hosts            - [IN/OUT] List of hosts which should be       *
  *                                         sorted by hostid.                   *
- *             groups           - [IN]  list of host groups (Group prototypes) *
+ *             groups           - [IN] list of host groups (Group prototypes)  *
  *             del_hostgroupids - [OUT] Sorted list of host groups which       *
  *                                      should be deleted.                     *
  *                                                                             *
@@ -1638,7 +1638,7 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
  *                                                                            *
  * Purpose: retrieves list of group prototypes                                *
  *                                                                            *
- * Parameters: parent_hostid    - [IN] host prototype identifier              *
+ * Parameters: parent_hostid    - [IN] host prototype id                      *
  *             group_prototypes - [OUT] sorted list of group prototypes       *
  *                                                                            *
  ******************************************************************************/
@@ -2010,7 +2010,7 @@ static void	lld_group_candidates_validate(zbx_vector_lld_group_ptr_t *groups_in,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Merge groups with candidates by names and add merged groups to    *
+ * Purpose: Merges groups with candidates by names and add merged groups to   *
  *          discovered groups.                                                *
  *                                                                            *
  ******************************************************************************/
@@ -2196,7 +2196,7 @@ static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Detect prototype renames in group discovery links and copy the    *
+ * Purpose: Detects prototype renames in group discovery links and copies the *
  *          old links to new groups.                                          *
  *                                                                            *
  * Comments: If possible the old group is renamed.                            *
@@ -2263,7 +2263,7 @@ static void	lld_groups_merge_renames(const zbx_vector_lld_group_prototype_ptr_t 
 /******************************************************************************
  *                                                                            *
  * Parameters:                                                                *
- *             group_prototypes - [IN] group prototypes                       *
+ *             group_prototypes - [IN]                                        *
  *             groups           - [IN] list of existing groups                *
  *             groups_in        - [IN] list of group candidates               *
  *             groups_out       - [IN] list of discovered groups              *
@@ -2813,7 +2813,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieve list of host macros which should be present on the each  *
+ * Purpose: Retrieves list of host macros which should be present on the each *
  *          discovered host.                                                  *
  *                                                                            *
  * Parameters: lld_ruleid - [IN]                                              *
@@ -2877,12 +2877,12 @@ static int	macro_str_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieve list of host macros which should be present on the each  *
+ * Purpose: Retrieves list of host macros which should be present on the each *
  *          discovered host.                                                  *
  *                                                                            *
  * Parameters: parent_hostid    - [IN] host prototype id                      *
- *             masterhostmacros - [IN] list of master host macros             *
- *             hostmacros       - [OUT] list of host macros                   *
+ *             masterhostmacros - [IN]                                        *
+ *             hostmacros       - [OUT]                                       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_lld_hostmacro_ptr_t *masterhostmacros,
@@ -3150,7 +3150,7 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
  *                                                                                *
  * Purpose: gets templates from host prototype                                    *
  *                                                                                *
- * Parameters: parent_hostid - [IN] host prototype identifier                     *
+ * Parameters: parent_hostid - [IN] host prototype id                             *
  *             hosts         - [IN/OUT] list of hosts, should be sorted by hostid *
  *                                                                                *
  **********************************************************************************/
@@ -3276,7 +3276,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_lld_host_p
  *                                                                            *
  * Purpose: prepares SQL for update record of interface_snmp table            *
  *                                                                            *
- * Parameters: hostid      - [IN] host identifier                             *
+ * Parameters: hostid      - [IN]                                             *
  *             interfaceid - [IN] SNMP interface id                           *
  *             snmp        - [IN] SNMP values for update                      *
  *             sql         - [IN/OUT] SQL string                              *

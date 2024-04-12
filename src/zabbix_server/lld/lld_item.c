@@ -2390,7 +2390,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *             items_index     - [OUT] Index of items based on prototype ids  *
- *                                     and lld rows. Used to quckly find an   *
+ *                                     and LLD rows. Used to quckly find an   *
  *                                     item by prototype and lld_row.         *
  *             error           - [OUT] error message                          *
  *                                                                            *
@@ -2496,7 +2496,7 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Escaping of symbols in items preprocessing steps for discovery    *
+ * Purpose: Escapes symbols in items preprocessing steps for discovery        *
  *          process.                                                          *
  *                                                                            *
  * Parameters: type            - [IN] item preprocessing step type            *
@@ -4254,16 +4254,16 @@ void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load discovery rule item prototypes                               *
+ * Purpose: loads discovery rule item prototypes                              *
  *                                                                            *
- * Parameters: lld_ruleid      - [IN] discovery rule id                       *
+ * Parameters: lld_ruleid      - [IN]                                         *
  *             item_prototypes - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item_prototype_ptr_t *item_prototypes)
 {
 	zbx_db_result_t			result;
-	zbx_db_row_t				row;
+	zbx_db_row_t			row;
 	zbx_lld_item_prototype_t	*item_prototype;
 	zbx_lld_item_preproc_t		*preproc_op;
 	zbx_item_param_t		*item_param;
@@ -4488,7 +4488,7 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update discovered items                                    *
+ * Purpose: adds or updates discovered items                                  *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully added/updated or        *
  *                         adding/updating was not necessary                  *

@@ -219,7 +219,7 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
  * Purpose: checks if LLD data passes filter evaluation                       *
  *                                                                            *
  * Parameters: jp_row          - [IN] LLD data row                            *
- *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             condition       - [IN] LLD filter condition                    *
  *             result          - [OUT] result of evaluation                   *
  *             err_msg         - [OUT]                                        *
@@ -292,7 +292,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row,
  *                                                                                      *
  * Parameters: filter          - [IN] LLD filter                                        *
  *             jp_row          - [IN] LLD data row                                      *
- *             lld_macro_paths - [IN] use json path to extract from jp_row              *
+ *             lld_macro_paths - [IN] use JSON path to extract from jp_row              *
  *             info            - [OUT] warning description                              *
  *                                                                                      *
  * Return value: SUCCEED - LLD data passed filter evaluation                            *
@@ -391,7 +391,7 @@ out:
  *                                                                            *
  * Parameters: filter          - [IN] LLD filter                              *
  *             jp_row          - [IN] LLD data row                            *
- *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             err_msg         - [OUT]                                        *
  *                                                                            *
  * Return value: SUCCEED - LLD data passed filter evaluation                  *
@@ -477,7 +477,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
  *                                                                            *
  * Parameters: filter          - [IN] LLD filter                              *
  *             jp_row          - [IN] LLD data row                            *
- *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             info            - [OUT] warning description                    *
  *                                                                            *
  * Return value: SUCCEED - LLD data passed filter evaluation                  *
