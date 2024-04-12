@@ -36,6 +36,8 @@
 
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
 
+#define ZBX_IPC_ALERTER_SYNC_ALERTS	1400
+
 typedef struct
 {
 	int		source;

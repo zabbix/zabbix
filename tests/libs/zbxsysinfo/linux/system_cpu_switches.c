@@ -84,7 +84,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&zbx_agent_request);
 	zbx_init_agent_result(&zbx_agent_result);
 
-	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 	/* call the function-under-test */
 	actual_ret = system_cpu_switches(&zbx_agent_request, &zbx_agent_result);

@@ -40,26 +40,7 @@ class CControllerUserResetTotp extends CController {
 	}
 
 	protected function doAction(): void {
-		$userids = $this->getInput('userids');
-
-		$users_with_totp_secret = CUser::getUseridsWithMfaTotpSecrets($userids);
-
-		$users_to_update = [];
-		foreach ($userids as $userid) {
-			if (in_array($userid, $users_with_totp_secret)) {
-				$users_to_update[] = [
-					'userid' => $userid,
-					'mfa_totp_secrets' => []
-				];
-			}
-		}
-
-		$result = API::User()->update($users_to_update);
-		$resetids = $result ? $result['userids'] : [];
-
-		unset($resetids[CWebUser::$data['userid']]);
-
-		CUser::terminateActiveSessions($resetids);
+		$resetids = API::User()->resetTotp($this->getInput('userids'));
 
 		$response = new CControllerResponseRedirect(
 			(new CUrl('zabbix.php'))
@@ -70,7 +51,7 @@ class CControllerUserResetTotp extends CController {
 		if ($resetids) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
-				'userids' => $resetids
+				'userids' => $resetids['userids']
 			]);
 
 			foreach ($users as $user) {
@@ -82,7 +63,7 @@ class CControllerUserResetTotp extends CController {
 		}
 		else {
 			CMessageHelper::setErrorTitle(
-				_n('Cannot reset TOTP secret', 'Cannot reset TOTP secrets', count($resetids))
+				_n('Cannot reset TOTP secret', 'Cannot reset TOTP secrets', count($resetids['userids']))
 			);
 		}
 
