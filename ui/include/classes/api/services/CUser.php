@@ -3478,11 +3478,9 @@ class CUser extends CApiService {
 		if ($db_users_secrets) {
 			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_keys($db_users_secrets)]);
 
-			$userids = array_flip(array_column($db_users_secrets, 'userid'));
-
-			unset($userids[self::$userData['userid']]);
-
-			self::terminateActiveSessions(array_keys($userids));
+			self::terminateActiveSessions(array_filter($userids,
+				static fn (string $userid): bool => bccomp($userid, self::$userData['userid']) != 0
+			));
 		}
 
 		return ['userids' => $userids];
