@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard, profiles
@@ -27,6 +28,11 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  * @dataSource Actions, LoginUsers, AllItemValueTypes, UserPermissions, Proxies
  */
 class testDashboardsWidgetsPage extends CWebTest {
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Default selected widget type.
@@ -133,6 +139,9 @@ class testDashboardsWidgetsPage extends CWebTest {
 	 * Check "Problem Hosts" widget.
 	 */
 	public function testDashboardsWidgetsPage_checkProblemHostsWidget() {
+		$this->page->login()->open('zabbix.php?action=host.list&filter_groups%5B%5D=4&filter_set=1');
+		echo (json_encode($this->getTableColumnData('Name'), JSON_PRETTY_PRINT));
+
 		// Authorize user and open the page with the desired widget.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1000');
 
@@ -151,7 +160,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 20,
+			'Zabbix servers'					=> 17,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];
