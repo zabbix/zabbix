@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 typedef struct zbx_lld_value
 {
@@ -66,6 +67,8 @@ typedef struct
 	int		values_num;
 }
 zbx_lld_rule_info_t;
+
+ZBX_PTR_VECTOR_DECL(lld_rule_info_ptr, zbx_lld_rule_info_t*)
 
 typedef struct
 {
