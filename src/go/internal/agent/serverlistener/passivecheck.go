@@ -52,6 +52,7 @@ type passiveChecksErrorResponseData struct {
 
 type passiveChecksResponse struct {
 	Version string  `json:"version"`
+	Variant int     `json:"variant"`
 	Data    []any   `json:"data,omitempty"`
 	Error   *string `json:"error,omitempty"`
 }
@@ -91,7 +92,11 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 	if err != nil {
 		errString := err.Error()
-		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
+		response = passiveChecksResponse{
+			Version: version.LongNoRC(),
+			Variant: agent.Variant,
+			Error:   &errString,
+		}
 	} else {
 		var value *string
 
@@ -104,11 +109,13 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 			errString := err.Error()
 			response = passiveChecksResponse{
 				Version: version.LongNoRC(),
+				Variant: agent.Variant,
 				Data:    []any{passiveChecksErrorResponseData{Error: &errString}},
 			}
 		} else {
 			response = passiveChecksResponse{
 				Version: version.LongNoRC(),
+				Variant: agent.Variant,
 				Data:    []any{passiveChecksResponseData{Value: value}},
 			}
 		}

@@ -66,6 +66,7 @@ type activeChecksRequest struct {
 	Request        string `json:"request"`
 	Host           string `json:"host"`
 	Version        string `json:"version"`
+	Variant        int    `json:"variant"`
 	Session        string `json:"session"`
 	ConfigRevision uint64 `json:"config_revision"`
 	HostMetadata   string `json:"host_metadata,omitempty"`
@@ -155,6 +156,7 @@ func (c *Connector) refreshActiveChecks() {
 		Request:        "active checks",
 		Host:           c.hostname,
 		Version:        version.Short(),
+		Variant:        agent.Variant,
 		Session:        c.session,
 		ConfigRevision: c.configRevision,
 	}

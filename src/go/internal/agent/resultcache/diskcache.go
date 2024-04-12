@@ -297,6 +297,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		Session:  u.Session(),
 		Host:     u.Hostname(),
 		Version:  version.Short(),
+		Variant:  agent.Variant,
 	}
 
 	var data []byte
