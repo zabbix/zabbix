@@ -20,6 +20,7 @@
 #include "lld.h"
 
 #include "../db_lengths_constants.h"
+#include "../server_constants.h"
 
 #include "zbxexpression.h"
 #include "audit/zbxaudit.h"
@@ -35,7 +36,6 @@
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
-#include "../server_constants.h"
 
 typedef struct
 {
@@ -946,6 +946,7 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 
 		zbx_vector_uint64_append(&parent_triggerids, trigger_prototype->triggerid);
 	}
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -971,6 +972,7 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 
 		zbx_vector_lld_item_ptr_append(items, item);
 	}
+
 	zbx_db_free_result(result);
 
 	zbx_vector_lld_item_ptr_sort(items, lld_item_compare_func);
@@ -1656,6 +1658,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	}
 
 	func_num = trigger->functions.values_num;
+
 	if (SUCCEED != lld_functions_make(&trigger_prototype->functions, &trigger->functions, items,
 			&lld_row->item_links, jp_row, lld_macros, &err_msg))
 	{
@@ -2042,7 +2045,6 @@ static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
-	int				i, j;
 	zbx_hashset_t			items_triggers;
 	zbx_lld_trigger_t		*trigger;
 	zbx_lld_function_t		*function;
@@ -2051,14 +2053,14 @@ static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *
 	/* used for fast search of trigger by item prototype */
 	zbx_hashset_create(&items_triggers, 512, items_triggers_hash_func, items_triggers_compare_func);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = 0; j < trigger->functions.values_num; j++)
+		for (int j = 0; j < trigger->functions.values_num; j++)
 		{
 			function = trigger->functions.values[j];
 
@@ -2069,11 +2071,11 @@ static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *
 		}
 	}
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 
-		for (j = 0; j < lld_rows->values_num; j++)
+		for (int j = 0; j < lld_rows->values_num; j++)
 		{
 			zbx_lld_row_t	*lld_row = lld_rows->values[j];
 
