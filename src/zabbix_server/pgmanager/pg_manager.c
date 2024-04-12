@@ -55,7 +55,7 @@ static void	pgm_init(zbx_pg_cache_t *cache)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update host-proxy group assignments from database                 *
+ * Purpose: update hosts and host-proxy group assignments from database       *
  *                                                                            *
  ******************************************************************************/
 static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
@@ -63,46 +63,10 @@ static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
 
-	result = zbx_db_select("select hostid,proxy_groupid from hosts where monitored_by=%d",
-			HOST_MONITORED_BY_PROXY_GROUP);
-
-	pg_cache_lock(cache);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		zbx_uint64_t	hostid, proxy_groupid;
-		zbx_pg_group_t	*group;
-
-		ZBX_DBROW2UINT64(hostid, row[0]);
-		ZBX_DBROW2UINT64(proxy_groupid, row[1]);
-
-		if (NULL == (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &proxy_groupid)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
-	}
-
-	pg_cache_unlock(cache);
-
-	zbx_db_free_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: update host-proxy mapping from database                           *
- *                                                                            *
- ******************************************************************************/
-static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
-{
-	zbx_db_row_t	row;
-	zbx_db_result_t	result;
-
-	result = zbx_db_select("select hp.hostid,hp.proxyid,hp.revision,hp.hostproxyid,h.monitored_by,h.proxy_groupid"
-			" from host_proxy hp,hosts h"
-			" where hp.hostid=h.hostid");
+	result = zbx_db_select("select h.hostid,hp.proxyid,hp.revision,hp.hostproxyid,h.monitored_by,h.proxy_groupid"
+			" from hosts h"
+			" left join host_proxy hp"
+			" on h.hostid=hp.hostid");
 
 	pg_cache_lock(cache);
 
@@ -113,17 +77,35 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		zbx_pg_group_t	*group;
 		unsigned char	monitored_by;
 
-		ZBX_DBROW2UINT64(proxyid, row[1]);
 		ZBX_DBROW2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(revision, row[2]);
-		ZBX_STR2UINT64(hostproxyid, row[3]);
+		ZBX_DBROW2UINT64(proxyid, row[1]);
+		ZBX_DBROW2UINT64(revision, row[2]);
+		ZBX_DBROW2UINT64(hostproxyid, row[3]);
 		ZBX_STR2UCHAR(monitored_by, row[4]);
 		ZBX_DBROW2UINT64(proxy_groupid, row[5]);
 
 		if (HOST_MONITORED_BY_PROXY_GROUP != monitored_by || 0 == proxy_groupid ||
 				NULL == (group = (zbx_pg_group_t *)zbx_hashset_search(&cache->groups, &proxy_groupid)))
 		{
-			/* remove hostmap if host is not monitored by proxy or no such group has been cached */
+			/* remove hostmap if host is not monitored by proxy group */
+			if (0 != proxyid)
+				pg_cache_set_host_proxy(cache, hostid, 0);
+
+			continue;
+		}
+
+		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
+
+		if (0 == proxyid)
+		{
+			zbx_vector_uint64_append(&group->unassigned_hostids, hostid);
+			continue;
+		}
+
+		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)) ||
+				group != proxy->group)
+		{
+			zbx_vector_uint64_append(&group->unassigned_hostids, hostid);
 			pg_cache_set_host_proxy(cache, hostid, 0);
 			continue;
 		}
@@ -133,43 +115,16 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 				.proxyid = proxyid,
 				.revision = revision,
 				.hostproxyid = hostproxyid
-			}, *host;
+			};
 
-		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
+		zbx_pg_host_ref_t	ref_local;
 
-		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)) ||
-				NULL == proxy->group || NULL == zbx_hashset_search(&proxy->group->hostids, &hostid))
-		{
-			zbx_vector_uint64_append(&group->unassigned_hostids, hostid);
-			pg_cache_set_host_proxy(cache, hostid, 0);
-			continue;
-		}
-
-		zbx_pg_host_ref_t	ref_local = {.host = host};
+		ref_local.host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
 
 		zbx_hashset_insert(&proxy->hosts, &ref_local, sizeof(ref_local));
 
-		if (NULL != proxy->group && proxy->group->hostmap_revision < revision)
-			proxy->group->hostmap_revision = revision;
-	}
-
-	/* queue unmapped hosts for proxy assignment */
-
-	zbx_hashset_iter_t	iter;
-	zbx_pg_group_t		*group;
-
-	zbx_hashset_iter_reset(&cache->groups, &iter);
-	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_hashset_iter_t	hostid_iter;
-		zbx_uint64_t		*phostid;
-
-		zbx_hashset_iter_reset(&group->hostids, &hostid_iter);
-		while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
-		{
-			if (NULL == zbx_hashset_search(&cache->hostmap, phostid))
-				zbx_vector_uint64_append(&group->unassigned_hostids, *phostid);
-		}
+		if (group->hostmap_revision < revision)
+			group->hostmap_revision = revision;
 	}
 
 	pg_cache_unlock(cache);
@@ -578,7 +533,6 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	pgm_update(&cache);
 	pgm_db_get_hosts(&cache);
-	pgm_db_get_hpmap(&cache);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		pg_cache_dump(&cache);
