@@ -1146,7 +1146,7 @@ static int	DBpatch_3030079(void)
 	const DBpatch_field_conv_t	field_convs[] = {
 						{"autologout",	DBpatch_conv_sec},
 						{"refresh",	DBpatch_conv_sec},
-						{NULL}
+						{0}
 					};
 
 	return DBpatch_table_convert("users", "userid", field_convs);
@@ -1192,7 +1192,7 @@ static int	DBpatch_3030084(void)
 
 static int	DBpatch_3030085(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"delay", DBpatch_conv_sec}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"delay", DBpatch_conv_sec}, {0}};
 
 	return DBpatch_table_convert("drules", "druleid", field_convs);
 }
@@ -1214,7 +1214,7 @@ static int	DBpatch_3030087(void)
 
 static int	DBpatch_3030088(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"delay", DBpatch_conv_sec}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"delay", DBpatch_conv_sec}, {0}};
 
 	return DBpatch_table_convert("httptest", "httptestid", field_convs);
 }
@@ -1236,7 +1236,7 @@ static int	DBpatch_3030090(void)
 
 static int	DBpatch_3030091(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"timeout", DBpatch_conv_sec}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"timeout", DBpatch_conv_sec}, {0}};
 
 	return DBpatch_table_convert("httpstep", "httpstepid", field_convs);
 }
@@ -1351,7 +1351,7 @@ static int	DBpatch_3030099(void)
 	const DBpatch_field_conv_t	field_convs[] = {
 						{"history",	DBpatch_conv_day_limit_25y},
 						{"trends",	DBpatch_conv_day_limit_25y},
-						{NULL}
+						{0}
 					};
 
 	return DBpatch_table_convert("items", "itemid", field_convs);
@@ -1436,7 +1436,7 @@ static int	DBpatch_3030104(void)
 
 static int	DBpatch_3030105(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {0}};
 
 	return DBpatch_table_convert("actions", "actionid", field_convs);
 }
@@ -1451,7 +1451,7 @@ static int	DBpatch_3030106(void)
 
 static int	DBpatch_3030107(void)
 {
-	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {NULL}};
+	const DBpatch_field_conv_t	field_convs[] = {{"esc_period", DBpatch_conv_sec_limit_1w}, {0}};
 
 	return DBpatch_table_convert("operations", "operationid", field_convs);
 }
@@ -1686,7 +1686,7 @@ static int	DBpatch_3030136(void)
 						{"hk_sessions",		DBpatch_conv_day_limit_25y},
 						{"hk_history",		DBpatch_conv_day_limit_25y},
 						{"hk_trends",		DBpatch_conv_day_limit_25y},
-						{NULL}
+						{0}
 					};
 
 	return DBpatch_table_convert("config", "configid", field_convs);

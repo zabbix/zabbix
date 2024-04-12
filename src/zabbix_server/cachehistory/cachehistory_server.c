@@ -904,7 +904,7 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int co
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
-		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,
+		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_item_diff_ptr_t *item_diff,
 		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscriptions)
 {
 	static time_t	last_history_discard = 0;
@@ -982,7 +982,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		/* calculate item update and update already retrieved item status for trigger calculation */
 		if (NULL != (diff = calculate_item_update(item, h, add_event_cb)))
-			zbx_vector_ptr_append(item_diff, diff);
+			zbx_vector_item_diff_ptr_append(item_diff, diff);
 
 		DCinventory_value_add(inventory_values, item, h);
 
@@ -998,7 +998,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_item_diff_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1233,7 +1233,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
-	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
+	zbx_vector_ptr_t		history_items, trigger_diff, inventory_values, trigger_timers;
+	zbx_vector_item_diff_ptr_t	item_diff;
 	zbx_vector_dc_trigger_t		trigger_order;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscriptions;
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
@@ -1287,7 +1288,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_connector_filter_create(&connector_filters_history);
 	zbx_vector_connector_filter_create(&connector_filters_events);
 	zbx_vector_ptr_create(&inventory_values);
-	zbx_vector_ptr_create(&item_diff);
+	zbx_vector_item_diff_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
 	zbx_vector_uint64_pair_create(&proxy_subscriptions);
@@ -1424,7 +1425,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				events_cbs->clean_events_cb();
 
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
-			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
+			zbx_vector_item_diff_ptr_clear_ext(&item_diff, zbx_item_diff_free);
 		}
 
 		if (FAIL != ret)
@@ -1662,7 +1663,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
-	zbx_vector_ptr_destroy(&item_diff);
+	zbx_vector_item_diff_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);

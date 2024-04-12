@@ -760,6 +760,12 @@ typedef struct
 }
 zbx_item_diff_t;
 
+ZBX_PTR_VECTOR_DECL(item_diff_ptr, zbx_item_diff_t *)
+
+void	zbx_item_diff_free(zbx_item_diff_t *item_diff);
+
+int	zbx_item_diff_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
 	zbx_uint64_t			hostid;
@@ -789,8 +795,8 @@ zbx_proxy_diff_t;
 
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
-		zbx_uint64_t mask);
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_vector_item_diff_ptr_t *item_diff, zbx_uint64_t mask);
 
 int	zbx_db_check_instanceid(void);
 

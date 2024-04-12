@@ -14571,7 +14571,7 @@ unlock:
  *          configuration cache                                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_items_apply_changes(const zbx_vector_ptr_t *item_diff)
+void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff)
 {
 	int			i;
 	const zbx_item_diff_t	*diff;
@@ -14584,7 +14584,7 @@ void	zbx_dc_config_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 
 	for (i = 0; i < item_diff->values_num; i++)
 	{
-		diff = (const zbx_item_diff_t *)item_diff->values[i];
+		diff = item_diff->values[i];
 
 		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &diff->itemid)))
 			continue;
