@@ -41,7 +41,7 @@ if (hasRequest('request')) {
 	}
 }
 
-if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
+if (CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
 	CSessionHelper::unset(['request']);
 
 	redirect($redirect_to->toString());
@@ -98,36 +98,40 @@ $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
 $settings = [
 	'sp' => [
-		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SP_ENTITYID),
+		'entityId' => CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SP_ENTITYID),
 		'assertionConsumerService' => [
 			'url' => $baseurl.'?acs'
 		],
 		'singleLogoutService' => [
 			'url' => $baseurl.'?sls'
 		],
-		'NameIDFormat' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_NAMEID_FORMAT),
+		'NameIDFormat' => CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_NAMEID_FORMAT),
 		'x509cert' => $sp_cert,
 		'privateKey' => $sp_key
 	],
 	'idp' => [
-		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
+		'entityId' => CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_IDP_ENTITYID),
 		'singleSignOnService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL)
+			'url' => CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SSO_URL)
 		],
 		'singleLogoutService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL)
+			'url' => CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SLO_URL)
 		],
 		'x509cert' => $idp_cert
 	],
 	'security' => [
-		'nameIdEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_NAMEID),
-		'authnRequestsSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS),
-		'logoutRequestSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS),
-		'logoutResponseSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES),
-		'wantMessagesSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_MESSAGES),
-		'wantAssertionsEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS),
-		'wantAssertionsSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_ASSERTIONS),
-		'wantNameIdEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_NAMEID)
+		'nameIdEncrypted' => (bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_ENCRYPT_NAMEID),
+		'authnRequestsSigned' =>
+			(bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS),
+		'logoutRequestSigned' =>
+			(bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS),
+		'logoutResponseSigned' =>
+			(bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES),
+		'wantMessagesSigned' => (bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SIGN_MESSAGES),
+		'wantAssertionsEncrypted' =>
+			(bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS),
+		'wantAssertionsSigned' => (bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SIGN_ASSERTIONS),
+		'wantNameIdEncrypted' => (bool) CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_ENCRYPT_NAMEID)
 	]
 ];
 
@@ -183,17 +187,17 @@ try {
 
 		$user_attributes = $auth->getAttributes();
 
-		if (!array_key_exists(CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE),
+		if (!array_key_exists(CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE),
 			$user_attributes
 		)) {
-			throw new Exception(
-				_s('The parameter "%1$s" is missing from the user attributes.', CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE))
-			);
+			throw new Exception(_s('The parameter "%1$s" is missing from the user attributes.',
+				CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)
+			));
 		}
 
 		$saml_data = [
 			'username_attribute' => reset(
-				$user_attributes[CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)]
+				$user_attributes[CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)]
 			),
 			'nameid' => $auth->getNameId(),
 			'nameid_format' => $auth->getNameIdFormat(),
@@ -210,7 +214,7 @@ try {
 		}
 	}
 
-	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== '') {
+	if (CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_SLO_URL) !== '') {
 		if (hasRequest('slo') && CSessionHelper::has('saml_data')) {
 			$saml_data = CSessionHelper::get('saml_data');
 
@@ -247,8 +251,8 @@ try {
 		}
 
 		CWebUser::$data = API::getApiService('user')->loginByUsername($saml_data['username_attribute'],
-			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
+			(CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::getPublic(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
 		if (CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {

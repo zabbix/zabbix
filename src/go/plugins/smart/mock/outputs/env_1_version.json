@@ -1,0 +1,11 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 3],
+    "svn_revision": "5338",
+    "platform_info": "x86_64-w64-mingw32-2016-1607",
+    "build_info": "(sf-7.3-1)",
+    "argv": ["smartctl", "-j", "-V"],
+    "exit_status": 0
+  }
+}

@@ -1,3 +1,74 @@
+Changes for 6.0.29rc1
+
+New features:
+.......PS. [ZBXNEXT-9117] updated max supported MariaDB version to 11.3 (mprihodko)
+...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
+.........T [ZBXNEXT-8786] changed 'odbc.discovery' keys to 'odbc.get' in MySQL by ODBC and Oracle by ODBC templates (akotsegubov)
+.........T [ZBXNEXT-8536] added cbdhsvc service to macros in Windows agent templates (abrosimovs)
+.........T [ZBXNEXT-8861] made changes and added more metrics to the FortiGate by SNMP template (aiantsen)
+.........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
+
+Bug fixes:
+..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
+..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
+..F....... [ZBX-24289] fixed issue with interface assignment for items copied from host to host (jfreibergs)
+.........T [ZBX-23032] added triggers for cluster status in VMware templates (abrosimovs)
+.....J.... [ZBX-23948] added support for Tabular data when parsing an MBean attribute (dimir)
+A......... [ZBX-23742] fixed tag filtering logic for tags with 1 name and different types of operators (dfofanovs, Sasha)
+.........T [ZBX-24271] added delay in JavaScript execution for Azure Cost Management by HTTP template (egordymov)
+...G...... [ZBX-24208] fix oracle, mysql plugin connection cache blocking (rzvejs)
+.........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
+..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
+...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
+...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.28
+
+6.0.28rc1 was released as 6.0.28 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.28rc1
+
+New features:
+.........T [ZBXNEXT-9063] added metadata in JavaScript for AWS templates (egordymov)
+.........T [ZBXNEXT-8958] added AWS ELB Application Load Balancer by HTTP template (egordymov)
+.........T [ZBXNEXT-8928] added Check Point Next Generation Firewall by SNMP template (aiantsen)
+.........T [ZBXNEXT-8947] added MSSQL by Zabbix agent 2 template (akotsegubov)
+........S. [ZBXNEXT-9012] updated max supported TimescaleDB version to 2.14 (mprihodko)
+
+Bug fixes:
+.....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
+..F....... [ZBX-23567] fixed PHP error during first time setup when no user is yet created (gcalenko, Ivo)
+.......PS. [ZBX-24103] improved configuration sync, history sync and pollers performance (vso)
+..F....... [ZBX-23488] fixed severity checkbox area width issue when editing widgets and added an option to add title attribute to checkbox labels (dfofanovs)
+..F....... [ZBX-23852] fixed template import failing with unexpected server error when trying to import template dashboards with items or graphs from unexisting hosts (agriscenko)
+........S. [ZBX-24043] fixed extensive locking when retrieving Zabbix server statistics (dgoloscapov)
+.........T [ZBX-24143] fixed swap space trigger prototype name in Proxmox VE by HTTP template (drasikhov)
+.......PS. [ZBX-24110] improved configuration sync performance by avoiding host join when syncing items (vso)
+.........T [ZBX-24141] fixed replication master host LLD macro in MySQL by Zabbix agent template (drasikhov)
+.......PS. [ZBX-23667] added VMware datastore UUID to *discovery items, added datastore selection by UUID to vmware.hv.datastore* items (MVekslers)
+...G...... [ZBX-23888] added setting items to unsupported state when invalid regexp is supplied (dgoloscapov)
+...G...... [ZBX-21703] fixed possible mutual lock between exporter and collector in performance counters for Zabbix Agent 2 (akozlovs, MVekslers)
+..F....... [ZBX-22332] fixed placeholder and default value for CSV to JSON preprocessing step parameters (vmurzins)
+..F.....S. [ZBX-20765] fixed empty PDF files in scheduled reports (averza, mprihodko)
+.........T [ZBX-20725] updated documentation for MySQL by Zabbix agent template, added the protocol option to the MySQL client configuration example (drasikhov)
+.........T [ZBX-20788] updated locale variable to force English locale in user parameter pgsql.ping.time[*] in PostgreSQL by Zabbix agent template (drasikhov)
+........S. [ZBX-24049] fixed Zabbix server template linking logic so that it does not wrongfully update triggers on host when there is a corresponding trigger on template with same description but different expression (arimdjonoks)
+..F....... [ZBX-23617] fixed item test form not showing values for macros with a backslash character used in a string parameter of a calculated item formula function (jfreibergs)
+A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins when visiting login page if guest account is disabled; removed automatic login as guest user when entering any page requiring authentication (vmaksimovs)
+.........T [ZBX-24038] fixed next token parameters in JavaScript for AWS templates; edited links in descriptions (egordymov)
+....I..... [ZBX-22783] added automatic detection of Oracle instant client installed from RPM (mprihodko)
+...G...... [ZBX-18859] fixed error event 5858 with ResultCode = 0x80041032 after WMI queries (mprihodko)
+.......PS. [ZBX-24095] improved data fetch performance for PostgreSQL (vso)
+..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.27
+
+6.0.27rc1 was released as 6.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.27rc1
 
 New features:
@@ -140,6 +211,7 @@ A...I..... [ZBX-23580] fixed aggregated item key conversion to calculated item f
 ........S. [ZBX-23235] fixed function macros to expand in notifications (arimdjonoks)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
 ...G...... [ZBX-23858] fixed injection vulnerability in Zabbix agent 2 smartctl plugin (esneiders)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.23
@@ -2930,11 +3002,23 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.42rc1
+Changes for 5.0.43rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42
+
+5.0.42rc1 was released as 5.0.42 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42rc1
+
+Bug fixes:
+.....J.... [ZBX-24093] fixed JMX monitoring when using "remote+http" protocol (dimir)
+.......PS. [ZBX-23145,ZBX-24032] disabled deprecated automatic reconnection in MySQL (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.41
@@ -2961,6 +3045,7 @@ Bug fixes:
 .........T [ZBX-23639] changed value type for item prototype 'Pool Percent Used' in Ceph by Zabbix agent 2 template (akotsegubov)
 ..F....... [ZBX-21891] fixed messages about enabling, disabling and updating modules being different from other places (agriscenko)
 ...G...... [ZBX-23855] fixed buffer overread in DNS response (askolmeisters)
+..F....... [ZBX-24070] removed ability to run XSS in graph item names (epulke)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.39

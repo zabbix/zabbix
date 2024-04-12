@@ -7,7 +7,7 @@ The template to monitor AWS S3 bucket by HTTP via Zabbix that works without any 
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
-For more information, please refer to the (CloudWatch pricing)[https://aws.amazon.com/cloudwatch/pricing/] page.
+For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
 
@@ -132,15 +132,15 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason|<p>An explanation for the alarm state, in text format.</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|AWS S3 Alarms: ["{#ALARM_NAME}"]: State|<p>The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|AWS S3 Alarms: [{#ALARM_NAME}]: State reason|<p>An explanation for the alarm state, in text format.</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS S3 Alarms: [{#ALARM_NAME}]: State|<p>The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Bucket Alarms discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS S3 Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|AWS S3 Alarms: "{#ALARM_NAME}" has 'Insufficient data' state||`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS S3 Alarms: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS S3 Alarms: [{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Request Metrics discovery
 
@@ -152,7 +152,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS S3: Filter ["{#AWS.S3.FILTER.ID.NAME}"]: Get request metrics|<p>Get bucket request metrics filter: '{#AWS.S3.FILTER.ID.NAME}'.</p><p>Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html</p>|Script|aws.s3.get_metrics["{#AWS.S3.FILTER.ID.NAME}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Get request metrics|<p>Get bucket request metrics filter: '{#AWS.S3.FILTER.ID.NAME}'.</p><p>Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html</p>|Script|aws.s3.get_metrics["{#AWS.S3.FILTER.ID.NAME}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: All|<p>The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.</p><p>If you're using a metrics configuration with a filter, then this metric only returns the HTTP requests that meet the filter's requirements.</p>|Dependent item|aws.s3.all_requests["{#AWS.S3.FILTER.ID.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "AllRequests")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Get|<p>The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn't include list operations.</p><p>Paginated list-oriented requests, like List Multipart Uploads, List Parts, Get Bucket Object versions, and others, are not included in this metric.</p>|Dependent item|aws.s3.get_requests["{#AWS.S3.FILTER.ID.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "GetRequests")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Put|<p>The number of HTTP PUT requests made for objects in an Amazon S3 bucket.</p>|Dependent item|aws.s3.put_requests["{#AWS.S3.FILTER.ID.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "PutRequests")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
