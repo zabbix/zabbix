@@ -380,8 +380,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Trapper LLD for filter',
-						'Test discovery rule'
+						'Test discovery rule',
+						'Trapper LLD for filter'
 					]
 				]
 			],
@@ -472,7 +472,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'fifth LLD',
 						'forth LLD',
 						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
-						'Trapper LLD for filter',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'LLD number 8',
@@ -486,6 +485,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
 						'Test of discovered host 2 template for clear: Template2 discovery rule',
 						'Test of discovered host Template: Template discovery rule',
+						'Trapper LLD for filter',
 						'Trīspadsmitais LLD',
 						'Zabbix server health: Zabbix server: Zabbix proxies stats: Zabbix proxy discovery',
 						'Četrpadsmitais LLD'
@@ -588,7 +588,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 */
 	public function testPageLowLevelDiscovery_Filter($data) {
 		$context = CTestArrayHelper::get($data, 'context', 'host');
-		$this->page->login()->open('host_discovery.php?filter_name=&filter_key='.
+		$this->page->login()->open('host_discovery.php?filter_name=&sortorder=ASC&filter_key='.
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
 				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();

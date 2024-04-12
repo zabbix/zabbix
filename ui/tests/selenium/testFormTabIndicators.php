@@ -25,10 +25,11 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
 
 /**
- * @dataSource Services
- * @dataSource EntitiesTags
+ * @dataSource Services, EntitiesTags
  *
- * @backup profiles
+ * @onBefore prepareMediaTypeData
+ *
+ * @backup users
  */
 class testFormTabIndicators extends CWebTest {
 
@@ -39,6 +40,27 @@ class testFormTabIndicators extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [CPreprocessingBehavior::class];
+	}
+
+	/**
+	 * Enable media types before test.
+	 */
+	public function prepareMediaTypeData() {
+
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 1, // Email.
+						'sendto' => ['test@zabbix.com'],
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					]
+				]
+			]
+		]);
 	}
 
 	public function getTabData() {
@@ -698,8 +720,8 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'initial_count' => 2,
-							'count' => 4
+							'initial_count' => 1,
+							'count' => 3
 						],
 						[
 							'name' => 'Frontend notifications',
