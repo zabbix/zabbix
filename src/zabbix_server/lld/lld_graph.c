@@ -193,7 +193,7 @@ static void	lld_graphs_free(zbx_vector_lld_graph_ptr_t *graphs)
  *                                                                            *
  * Purpose: retrieves graphs which were created by specified graph prototype  *
  *                                                                            *
- * Parameters: parent_graphid - [IN] graph prototype identifier               *
+ * Parameters: parent_graphid - [IN] graph prototype id                       *
  *             graphs         - [OUT] sorted list of graphs                   *
  *             ...            - [IN] new values which should be updated if    *
  *                                   different from original                  *
@@ -304,8 +304,8 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve graphs_items which are used by the graph prototype and   *
- *          by selected graphs                                                *
+ * Purpose: Retrieves graphs_items which are used by graph prototype and by   *
+ *          selected graphs.                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr_t *gitems_proto,
@@ -407,8 +407,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the list of items which are related to the graph          *
- *          prototype                                                         *
+ * Purpose: Returns list of items which are related to graph prototype.       *
  *                                                                            *
  * Parameters: gitems_proto      - [IN] graph prototype's graphs_items        *
  *             ymin_itemid_proto - [IN] graph prototype's ymin_itemid         *
@@ -481,9 +480,9 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already existing graph, using an item                       *
+ * Purpose: Finds already existing graph, using item.                         *
  *                                                                            *
- * Return value: upon successful completion return pointer to the graph       *
+ * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
@@ -513,10 +512,10 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already existing graph, using an item prototype and items   *
- *          already created by it                                             *
+ * Purpose: Finds already existing graph, using an item prototype and items   *
+ *          already created by it.                                            *
  *                                                                            *
- * Return value: upon successful completion return pointer to the graph       *
+ * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_graph_t	*lld_graph_get(zbx_vector_lld_graph_ptr_t *graphs,
@@ -538,8 +537,8 @@ static zbx_lld_graph_t	*lld_graph_get(zbx_vector_lld_graph_ptr_t *graphs,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already created item when itemid_proto is an item prototype *
- *          or return itemid_proto as itemid if it's a normal item            *
+ * Purpose: Finds already created item when itemid_proto is an item prototype *
+ *          or return itemid_proto as itemid if it's a normal item.           *
  *                                                                            *
  * Return value: SUCCEED if item successfully processed, FAIL - otherwise     *
  *                                                                            *
@@ -693,7 +692,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a graph based on lld rule and add it to the list           *
+ * Purpose: creates graph based on LLD rule and adds it to list               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
@@ -1006,7 +1005,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update graphs in database based on discovery rule          *
+ * Purpose: adds or updates graphs in database based on discovery rule        *
  *                                                                            *
  * Return value: SUCCEED - if graphs were successfully saved or saving        *
  *                         was not necessary                                  *
@@ -1499,7 +1498,7 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update graphs for discovery item                           *
+ * Purpose: adds or updates graphs for discovery item                         *
  *                                                                            *
  * Return value: SUCCEED - if graphs were successfully added/updated or       *
  *                         adding/updating was not necessary                  *

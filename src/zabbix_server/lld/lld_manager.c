@@ -265,7 +265,7 @@ static void	lld_queue_rule(zbx_lld_manager_t *manager, zbx_lld_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queues low level discovery request                                *
+ * Purpose: queues LLD request                                                *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
  *             message - [IN] message with LLD request                        *
@@ -442,8 +442,8 @@ static void	lld_process_diag_stats(zbx_lld_manager_t *manager, zbx_ipc_client_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sort lld manager cache item view by second value                  *
- *          (number of values) in descending order                            *
+ * Purpose: Sorts LLD manager cache item view by second value (number of      *
+ *          values) in descending order.                                      *
  *                                                                            *
  ******************************************************************************/
 static int	lld_diag_item_compare_values_desc(const void *d1, const void *d2)

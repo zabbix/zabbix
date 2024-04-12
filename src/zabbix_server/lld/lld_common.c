@@ -51,7 +51,7 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate when to delete lost resources in an overflow-safe way   *
+ * Purpose: calculates when to delete lost resources in overflow-safe way     *
  *                                                                            *
  ******************************************************************************/
 int	lld_end_of_life(int lastcheck, int lifetime)

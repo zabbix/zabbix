@@ -360,8 +360,8 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve trigger prototypes which are inherited from the          *
- *          discovery rule                                                    *
+ * Purpose: Retrieves trigger prototypes which are inherited from the         *
+ *          discovery rule.                                                   *
  *                                                                            *
  * Parameters: lld_ruleid         - [IN] discovery rule id                    *
  *             trigger_prototypes - [OUT] sorted list of trigger prototypes   *
@@ -450,8 +450,8 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve triggers which were created by the specified trigger     *
- *          prototypes                                                        *
+ * Purpose: Retrieves triggers which were created by the specified trigger    *
+ *          prototypes.                                                       *
  *                                                                            *
  * Parameters: trigger_prototypes - [IN] sorted list of trigger prototypes    *
  *             triggers           - [OUT] sorted list of triggers             *
@@ -599,8 +599,8 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve functions which are used by all triggers in the host of  *
- *          the trigger prototype                                             *
+ * Purpose: Retrieves functions which are used by all triggers in the host of *
+ *          the trigger prototype.                                            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -724,7 +724,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve trigger dependencies                                     *
+ * Purpose: retrieves trigger dependencies                                    *
  *                                                                            *
  ******************************************************************************/
 static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -830,7 +830,7 @@ static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve trigger tags                                             *
+ * Purpose: retrieves trigger tags                                            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -919,8 +919,8 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the list of items which are related to the trigger        *
- *          prototypes                                                        *
+ * Purpose: Returns the list of items which are related to the trigger        *
+ *          prototypes.                                                       *
  *                                                                            *
  * Parameters: trigger_prototypes - [IN] vector of trigger prototypes         *
  *             items              - [OUT] sorted list of items                *
@@ -984,10 +984,10 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already existing trigger, using an item prototype and items *
- *          already created by it                                             *
+ * Purpose: Finds already existing trigger, using an item prototype and items *
+ *          already created by it.                                            *
  *                                                                            *
- * Return value: upon successful completion return pointer to the trigger     *
+ * Return value: upon successful completion returns pointer to trigger        *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_hashset_t *items_triggers,
@@ -1013,8 +1013,8 @@ static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_has
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set indexes for functionid tokens {<functionid>} from the         *
- *          specified function vector                                         *
+ * Purpose: Sets indexes for functionid tokens {<functionid>} from the        *
+ *          specified function vector.                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vector_lld_function_ptr_t *functions)
@@ -1051,8 +1051,8 @@ static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Purpose: simplify parsed expression by replacing {<functionid>} with       *
- *          {<function index>}                                                *
+ * Purpose: Simplifies parsed expression by replacing {<functionid>} with     *
+ *          {<function index>}.                                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **expression,
@@ -1079,8 +1079,8 @@ static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **express
 
 /******************************************************************************
  *                                                                            *
- * Purpose: simplify trigger expression by replacing {<functionid>} with      *
- *          {<function index>}                                                *
+ * Purpose: Simplifies trigger expression by replacing {<functionid>} with    *
+ *          {<function index>}.                                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_expression_simplify(const zbx_lld_trigger_t *trigger, char **expression,
@@ -1112,8 +1112,8 @@ static void	lld_trigger_expression_simplify(const zbx_lld_trigger_t *trigger, ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand parsed expression function indexes with function strings   *
- *          in format itemid:func(params)                                     *
+ * Purpose: Expands parsed expression function indexes with function strings  *
+ *          in format itemid:func(params).                                    *
  *                                                                            *
  ******************************************************************************/
 static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vector_lld_function_ptr_t *functions)
@@ -1172,8 +1172,8 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand trigger expression function indexes with function strings  *
- *          in format itemid:func(params)                                     *
+ * Purpose: Expands trigger expression function indexes with function strings *
+ *          in format itemid:func(params).                                    *
  *                                                                            *
  ******************************************************************************/
 static char	*lld_trigger_expression_expand(const zbx_lld_trigger_t *trigger, const char *expression,
@@ -1206,8 +1206,8 @@ static char	*lld_trigger_expression_expand(const zbx_lld_trigger_t *trigger, con
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set function indexes and expand them to function strings in       *
- *          format itemid:func(params)                                        *
+ * Purpose: Sets function indexes and expands them to function strings in     *
+ *          format itemid:func(params).                                       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_expression_simplify_and_expand(const zbx_lld_trigger_t *trigger, char **expression,
@@ -1389,7 +1389,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return copy of the expression with expanded LLD macros            *
+ * Purpose: returns copy of expression with expanded LLD macros               *
  *                                                                            *
  ******************************************************************************/
 static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, const struct zbx_json_parse *jp_row,
@@ -1441,7 +1441,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger based on lld rule and add it to the list         *
+ * Purpose: creates trigger based on LLD rule and adds it to list             *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
@@ -1779,7 +1779,7 @@ static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trig
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create trigger dependencies                                       *
+ * Purpose: creates trigger dependencies                                      *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
@@ -1991,7 +1991,7 @@ static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger tag                                              *
+ * Purpose: creates trigger tag                                               *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
@@ -2045,7 +2045,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger tags                                             *
+ * Purpose: creates trigger tags                                              *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -2402,7 +2402,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 
 /******************************************************************************
  *                                                                            *
- * Purpose: transforms the simple trigger expression to the DB format         *
+ * Purpose: transforms simple trigger expression to DB format                 *
  *                                                                            *
  * Example:                                                                   *
  *                                                                            *
@@ -2486,7 +2486,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update triggers in database based on discovery rule        *
+ * Purpose: adds or updates triggers in database based on discovery rule      *
  *                                                                            *
  * Parameters: hostid             - [IN] parent host id                       *
  *             trigger_prototypes - [IN]                                      *
@@ -3178,13 +3178,13 @@ static int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds a node to trigger cache                                      *
+ * Purpose: adds node to trigger cache                                        *
  *                                                                            *
  * Parameters: cache     - [IN] trigger cache                                 *
  *             triggerid - [IN]                                               *
  *             trigger   - [IN] trigger data for new triggers                 *
  *                                                                            *
- * Return value: the added node                                               *
+ * Return value: added node                                                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zbx_uint64_t triggerid,
@@ -3205,7 +3205,7 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add trigger and all triggers related to it to trigger dependency  *
+ * Purpose: Adds trigger and all triggers related to it to trigger dependency *
  *          validation cache.                                                 *
  *                                                                            *
  * Parameters: cache           - [IN] trigger cache                           *
@@ -3286,8 +3286,8 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initializes trigger cache used to perform trigger dependency      *
- *          validation                                                        *
+ * Purpose: Initializes trigger cache used to perform trigger dependency      *
+ *          validation.                                                       *
  *                                                                            *
  * Parameters: cache    - [IN] trigger cache                                  *
  *             triggers - [IN] discovered triggers                            *
@@ -3467,8 +3467,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_lld_trigger_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: releases resources allocated by trigger cache                     *
- *          validation                                                        *
+ * Purpose: releases resources allocated by trigger cache validation          *
  *                                                                            *
  * Parameters: cache - [IN] trigger cache                                     *
  *                                                                            *
@@ -3560,8 +3559,8 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
  *             level         - [IN] dependency level                          *
  *             error         - [OUT] error message                            *
  *                                                                            *
- * Return value: SUCCEED - the trigger's dependency chain in valid            *
- *               FAIL    - a dependency loop was detected                     *
+ * Return value: SUCCEED - trigger's dependency chain in valid                *
+ *               FAIL    - dependency loop was detected                       *
  *                                                                            *
  * Comments: If the validation fails the offending dependency is removed.     *
  *                                                                            *
@@ -3627,7 +3626,7 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_n
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate discovered trigger dependencies                          *
+ * Purpose: validates discovered trigger dependencies                         *
  *                                                                            *
  * Parameters: triggers - [IN] discovered triggers                            *
  *             error    - [OUT] error message                                 *
@@ -3728,7 +3727,7 @@ static	int	get_trigger_status_value(int status)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update triggers for discovered items                       *
+ * Purpose: adds or updates triggers for discovered items                     *
  *                                                                            *
  * Return value: SUCCEED - if triggers were successfully added/updated or     *
  *                         adding/updating was not necessary                  *

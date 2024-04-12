@@ -77,9 +77,9 @@ int	lld_item_prototype_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release resources allocated by filter condition                   *
+ * Purpose: releases resources allocated by filter condition                  *
  *                                                                            *
- * Parameters: condition  - [IN] filter condition                             *
+ * Parameters: condition - [IN] filter condition                              *
  *                                                                            *
  ******************************************************************************/
 static void	lld_condition_free(lld_condition_t *condition)
@@ -94,7 +94,7 @@ static void	lld_condition_free(lld_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release resources allocated by filter conditions                  *
+ * Purpose: releases resources allocated by filter conditions                 *
  *                                                                            *
  * Parameters: conditions - [IN] filter conditions                            *
  *                                                                            *
@@ -107,7 +107,7 @@ static void	lld_conditions_free(zbx_vector_lld_condition_ptr_t *conditions)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two filter conditions by their macros                     *
+ * Purpose: compares two filter conditions by their macros                    *
  *                                                                            *
  ******************************************************************************/
 static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
@@ -120,7 +120,7 @@ static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initializes lld filter                                            *
+ * Purpose: initializes LLD filter                                            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_filter_init(zbx_lld_filter_t *filter)
@@ -132,7 +132,7 @@ static void	lld_filter_init(zbx_lld_filter_t *filter)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: releases resources allocated by lld filter                        *
+ * Purpose: releases resources allocated by LLD filter                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_filter_clean(zbx_lld_filter_t *filter)
@@ -178,11 +178,11 @@ static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: loads lld filter data                                             *
+ * Purpose: loads LLD filter data                                             *
  *                                                                            *
- * Parameters: filter     - [IN] lld filter                                   *
- *             lld_ruleid - [IN] lld rule id                                  *
- *             item       - [IN] lld item                                     *
+ * Parameters: filter     - [IN] LLD filter                                   *
+ *             lld_ruleid - [IN]                                              *
+ *             item       - [IN] LLD item                                     *
  *             error      - [OUT] error message                               *
  *                                                                            *
  ******************************************************************************/
@@ -216,15 +216,15 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the lld data passes filter evaluation                    *
+ * Purpose: checks if LLD data passes filter evaluation                       *
  *                                                                            *
- * Parameters: jp_row          - [IN] lld data row                            *
+ * Parameters: jp_row          - [IN] LLD data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             condition       - [IN] lld filter condition                    *
+ *             condition       - [IN] LLD filter condition                    *
  *             result          - [OUT] result of evaluation                   *
  *             err_msg         - [OUT]                                        *
  *                                                                            *
- * Return value: SUCCEED - the lld data passed filter evaluation              *
+ * Return value: SUCCEED - LLD data passed filter evaluation                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -288,14 +288,14 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row,
 
 /****************************************************************************************
  *                                                                                      *
- * Purpose: check if the lld data passes filter evaluation by and/or/andor rules        *
+ * Purpose: checks if LLD data passes filter evaluation by and/or/andor rules           *
  *                                                                                      *
- * Parameters: filter          - [IN] lld filter                                        *
- *             jp_row          - [IN] lld data row                                      *
+ * Parameters: filter          - [IN] LLD filter                                        *
+ *             jp_row          - [IN] LLD data row                                      *
  *             lld_macro_paths - [IN] use json path to extract from jp_row              *
  *             info            - [OUT] warning description                              *
  *                                                                                      *
- * Return value: SUCCEED - the lld data passed filter evaluation                        *
+ * Return value: SUCCEED - LLD data passed filter evaluation                            *
  *               FAIL    - otherwise                                                    *
  *                                                                                      *
  ****************************************************************************************/
@@ -387,20 +387,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the lld data passes filter evaluation by custom          *
- *          expression                                                        *
+ * Purpose: checks if LLD data passes filter evaluation by custom expression  *
  *                                                                            *
- * Parameters: filter          - [IN] lld filter                              *
- *             jp_row          - [IN] lld data row                            *
+ * Parameters: filter          - [IN] LLD filter                              *
+ *             jp_row          - [IN] LLD data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             err_msg         - [OUT]                                        *
  *                                                                            *
- * Return value: SUCCEED - lld data passed filter evaluation                  *
+ * Return value: SUCCEED - LLD data passed filter evaluation                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: 1) replace {item_condition} references with action condition     *
  *              evaluation results (1 or 0)                                   *
- *           2) call zbx_evaluate() to calculate the final result             *
+ *           2) call zbx_evaluate() to calculate final result                 *
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
@@ -474,14 +473,14 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the lld data passes filter evaluation                    *
+ * Purpose: checks if LLD data passes filter evaluation                       *
  *                                                                            *
- * Parameters: filter          - [IN] lld filter                              *
- *             jp_row          - [IN] lld data row                            *
+ * Parameters: filter          - [IN] LLD filter                              *
+ *             jp_row          - [IN] LLD data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             info            - [OUT] warning description                    *
  *                                                                            *
- * Return value: SUCCEED - the lld data passed filter evaluation              *
+ * Return value: SUCCEED - LLD data passed filter evaluation                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -1110,11 +1109,11 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update items, triggers and graphs for discovery item       *
+ * Purpose: adds or updates items, triggers and graphs for discovery item     *
  *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery item identifier from database      *
+ * Parameters: lld_ruleid - [IN] discovery item id from database              *
  *             value      - [IN] received value from agent                    *
- *             error      - [OUT] error or informational message. Will be set *
+ *             error      - [OUT] Error or informational message. Will be set *
  *                               to empty string on successful discovery      *
  *                               without additional information.              *
  *                                                                            *

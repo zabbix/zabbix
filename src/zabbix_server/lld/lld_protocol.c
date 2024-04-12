@@ -174,7 +174,7 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: enqueue low level discovery value/error                           *
+ * Purpose: enqueues LLD value/error                                          *
  *                                                                            *
  * Parameters: itemid      - [IN]                                             *
  *             hostid      - [IN]                                             *
@@ -214,8 +214,6 @@ void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process low level discovery agent result                          *
- *                                                                            *
  * Parameters: itemid - [IN]                                                  *
  *             hostid - [IN]                                                  *
  *             result - [IN] agent result                                     *
@@ -250,12 +248,12 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get queue size (enqueued value count) of LLD manager              *
+ * Purpose: gets queue size (enqueued value count) of LLD manager             *
  *                                                                            *
  * Parameters: size  - [OUT] queue size                                       *
  *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the queue size was returned successfully           *
+ * Return value: SUCCEED - queue size was returned successfully               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -293,7 +291,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get lld manager diagnostic statistics                             *
+ * Purpose: gets LLD manager diagnostic statistics                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, char **error)
@@ -314,13 +312,13 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the top N items by the number of queued values                *
+ * Purpose: gets top N items by number of queued values                       *
  *                                                                            *
  * Parameters limit - [IN] number of top records to retrieve                  *
  *            items - [OUT] vector of top itemid, values_num pairs            *
  *            error - [OUT] error message                                     *
  *                                                                            *
- * Return value: SUCCEED - the top n items were returned successfully         *
+ * Return value: SUCCEED - top n items were returned successfully             *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
