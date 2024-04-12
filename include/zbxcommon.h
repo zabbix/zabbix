@@ -76,10 +76,6 @@
 #define OFF	0
 
 #if defined(_WINDOWS)
-#	define	ZBX_SERVICE_NAME_LEN	64
-extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
-extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
-
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
@@ -149,22 +145,6 @@ typedef enum
 	ITEM_TYPE_SCRIPT	/* 21 */
 }
 zbx_item_type_t;
-
-typedef enum
-{
-	INTERFACE_TYPE_UNKNOWN = 0,
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_OPT = 254,
-	INTERFACE_TYPE_ANY = 255
-}
-zbx_interface_type_t;
-const char	*zbx_interface_type_string(zbx_interface_type_t type);
-
-#define INTERFACE_TYPE_COUNT	4	/* number of interface types */
-extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
@@ -617,8 +597,6 @@ typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
 int	MAIN_ZABBIX_ENTRY(int flags);
-
-unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1

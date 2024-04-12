@@ -64,17 +64,6 @@ class CWidgetPieChart extends CWidget {
 		};
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this.#pie_chart !== null) {
-			this.#pie_chart.destroy();
-			this.#pie_chart = null;
-		}
-
-		this.#removeLegend();
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	setContents(response) {
 		const legend = {...response.legend};
 

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-03-01 08:30+0000\n"
+"PO-Revision-Date: 2024-03-26 13:30+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -429,7 +429,7 @@ msgstr "API 访问"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "API主机名"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1092,9 +1092,16 @@ msgstr "高级标签"
 msgid "Advanced options"
 msgstr " 高级选项"
 
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr ""
+
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "更改后，因TOTP 密钥将被重置，已注册此MFA方法的用户将必须再次完成注册过程。"
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
@@ -1555,7 +1562,7 @@ msgstr "LDAP 服务必须存在"
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "必须存在至少一种 MFA 方法。"
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2086,15 +2093,15 @@ msgstr "换行"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "CSRF测试"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "CSRF令牌测试"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "CSRF令牌验证成功。"
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2537,7 +2544,7 @@ msgstr[0] "无法删除API token"
 #: include/classes/api/services/CMfa.php:459
 #, c-format
 msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
-msgstr ""
+msgstr "无法删除 MFA 方法\"%1$s\"，因为它由用户组\"%2$s\"使用。"
 
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
@@ -2572,7 +2579,7 @@ msgstr[0] "无法删除仪表盘"
 
 #: include/classes/api/services/CMfa.php:446
 msgid "Cannot delete default MFA method."
-msgstr ""
+msgstr "无法删除默认 MFA 方法。"
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -4094,7 +4101,7 @@ msgstr "修改 PSK"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
-msgstr ""
+msgstr "更改客户端密钥"
 
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
@@ -4309,11 +4316,11 @@ msgstr "点击查看或编辑"
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
-msgstr ""
+msgstr "客户ID"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
-msgstr ""
+msgstr "客户端密钥"
 
 #: widgets/clock/Widget.php:46
 msgid "Clock"
@@ -4401,7 +4408,7 @@ msgstr "关闭问题"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
-msgstr ""
+msgstr "校验码长度"
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -4446,6 +4453,10 @@ msgstr "颜色 \"%1$s\" 设置不正确: 应使用十六进制格式颜色代码
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "颜色 (OK)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr ""
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5478,7 +5489,7 @@ msgstr "DNS名称"
 #: app/controllers/CControllerAuthenticationEdit.php:457
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
 msgid "DUO Universal Prompt"
-msgstr ""
+msgstr "DUO 通用提示"
 
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
@@ -5846,7 +5857,7 @@ msgstr "必须指定默认 LDAP 服务器。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Default MFA method must be specified."
-msgstr ""
+msgstr "必须指定默认 MFA 方法。"
 
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
@@ -6033,6 +6044,11 @@ msgstr "删除监控项?"
 #: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "删除所选组件间的连接?"
+
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr ""
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6563,6 +6579,11 @@ msgstr "禁用所选的proxy所监测的主机?"
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "禁用所选的agent代理程序上监测的主机？"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr ""
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6723,6 +6744,14 @@ msgstr "禁用所选定的web场景？"
 #: include/views/js/monitoring.sysmaps.js.php:285
 msgid "Disabled"
 msgstr "停用"
+
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -6946,7 +6975,7 @@ msgstr "显示图表"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
-msgstr ""
+msgstr "显示最小值/平均值/最大值"
 
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
@@ -7103,9 +7132,15 @@ msgstr "下拉"
 msgid "Dropdown options"
 msgstr "下拉选项"
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
-msgstr ""
+msgstr "Duo 状态与保存的不匹配。"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7383,7 +7418,7 @@ msgstr "开启内部管家服务"
 
 #: app/views/administration.authentication.edit.php:564
 msgid "Enable multi-factor authentication"
-msgstr ""
+msgstr "启用多重身份验证MFA"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -7628,7 +7663,7 @@ msgstr "误差范围"
 
 #: include/classes/api/services/CUser.php:3506
 msgid "Error decoding Duo result."
-msgstr ""
+msgstr "解码 Duo 结果时出错。"
 
 #: include/db.inc.php:554
 #, c-format
@@ -8503,6 +8538,18 @@ msgstr "全局"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "找不到全局正则表达式 \"%1$s\" 。"
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr "全局超时"
@@ -8895,7 +8942,7 @@ msgstr "硬件传感器读数。返回浮点型"
 
 #: app/views/mfa.edit.php:77
 msgid "Hash function"
-msgstr ""
+msgstr "哈希函数"
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -9058,6 +9105,10 @@ msgstr "历史数据函数"
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "主页"
+
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr ""
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -11001,7 +11052,7 @@ msgstr "LDAP 配置无效"
 #: app/controllers/CControllerMfaCheck.php:53
 #: app/controllers/CControllerMfaEdit.php:48
 msgid "Invalid MFA configuration"
-msgstr ""
+msgstr "MFA 配置无效"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -11509,6 +11560,10 @@ msgstr "监控项在“不支持”的状态"
 msgid "Item list"
 msgstr "项目列表"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "项目未被选择"
@@ -11784,7 +11839,7 @@ msgstr "LDAP认证"
 
 #: app/views/usergroup.edit.php:109
 msgid "LDAP authentication is disabled system-wide."
-msgstr ""
+msgstr "LDAP 身份验证在系统范围内被禁用。"
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12343,16 +12398,16 @@ msgstr "文件的MD5校验。返回字符串（该文件的MD5哈希值）"
 
 #: app/views/mfa.edit.php:161
 msgid "MFA method"
-msgstr ""
+msgstr "MFA方法"
 
 #: include/classes/api/services/CMfa.php:243
 #, c-format
 msgid "MFA method \"%1$s\" already exists."
-msgstr ""
+msgstr "MFA 方法\"%1$s\" 已存在。"
 
 #: app/views/administration.authentication.edit.php:606
 msgid "MFA settings"
-msgstr ""
+msgstr "MFA 设置"
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -12756,7 +12811,7 @@ msgstr "最大并发检查数"
 
 #: app/views/configuration.discovery.edit.php:85
 msgid "Maximum concurrent checks per type"
-msgstr ""
+msgstr "每种类型的最大并发检查数"
 
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -12769,7 +12824,7 @@ msgstr "操作系统最大的进程数。返回整数"
 #: widgets/piechart/views/widget.edit.js.php:680
 #: widgets/svggraph/views/widget.edit.js.php:805
 msgid "Maximum number of rows"
-msgstr ""
+msgstr "最大行数"
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13019,7 +13074,7 @@ msgstr "未发现方法."
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
-msgstr ""
+msgstr "方法"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13286,20 +13341,20 @@ msgstr "Mozilla Firefox"
 
 #: app/views/administration.user.list.php:320
 msgid "Multi-factor TOTP secret will be deleted."
-msgstr ""
+msgstr "多因素TOTP密串将被删除。"
 
 #: app/views/administration.user.list.php:321
 msgid "Multi-factor TOTP secrets will be deleted."
-msgstr ""
+msgstr "多因素TOTP密串将被删除。"
 
 #: app/controllers/CControllerAuditLogList.php:236
 #: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
 msgid "Multi-factor authentication"
-msgstr ""
+msgstr "多因素认证"
 
 #: app/views/usergroup.edit.php:111
 msgid "Multi-factor authentication is disabled system-wide."
-msgstr ""
+msgstr "系统范围内多因素认证被禁用。"
 
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
@@ -13617,7 +13672,7 @@ msgstr "添加LDAP 服务器"
 
 #: app/views/mfa.edit.php:149
 msgid "New MFA method"
-msgstr ""
+msgstr "新的MFA方法"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -14260,7 +14315,7 @@ msgstr "没有刷新"
 
 #: include/classes/api/services/CUser.php:3489
 msgid "No saved state, please login again."
-msgstr ""
+msgstr "没有保存状态，请重新登录。"
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -15130,11 +15185,11 @@ msgstr "PHP不支持ctype扩展(PHP配置参数--enable-ctype)."
 
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
-msgstr ""
+msgstr "PHP curl扩展"
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
-msgstr ""
+msgstr "PHP curl扩展缺失。"
 
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
@@ -15649,7 +15704,7 @@ msgstr "请启用 \"allow_url_fopen\" 命令。"
 
 #: include/views/mfa.login.php:62
 msgid "Please scan and get your verification code displayed in your authenticator app."
-msgstr ""
+msgstr "请扫描并填写您的身份验证器app中的验证码。"
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -15852,6 +15907,15 @@ msgstr "主要的POC电话B"
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
 msgstr "主要的POC屏幕名称"
+
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16409,6 +16473,10 @@ msgstr "矩形"
 msgid "Reference attribute"
 msgstr "引用属性"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "刷新"
@@ -16841,7 +16909,7 @@ msgstr "重设"
 
 #: app/views/administration.user.list.php:318
 msgid "Reset TOTP secret"
-msgstr ""
+msgstr "重置TOTP密串"
 
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
@@ -17515,7 +17583,7 @@ msgstr "扫描目录"
 
 #: include/views/mfa.login.php:60
 msgid "Scan this QR code"
-msgstr ""
+msgstr "扫描此二维码"
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -17733,6 +17801,15 @@ msgstr "第二个POC电话B"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "第二个POC聚合图形名称"
+
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18345,7 +18422,7 @@ msgstr "显示单位"
 
 #: widgets/piechart/includes/WidgetForm.php:210
 msgid "Show value"
-msgstr ""
+msgstr "查看值"
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -18917,7 +18994,7 @@ msgstr "子拓扑图"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "提交"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -19052,6 +19129,10 @@ msgstr "系统主机名。返回字符串"
 msgid "System information"
 msgstr "系统信息"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "系统统计数据。返回整数值或者浮点值"
@@ -19095,16 +19176,16 @@ msgstr "总合"
 #: app/controllers/CControllerAuthenticationEdit.php:457
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
 msgid "TOTP"
-msgstr ""
+msgstr "基于时间的一次性口令TOTP"
 
 #: app/controllers/CControllerUserResetTotp.php:77
 #, c-format
 msgid "TOTP secret for user \"%1$s\" has been reset."
-msgstr ""
+msgstr "用户\"%1$s\" 的 TOTP 密串已重置。"
 
 #: app/controllers/CControllerUserResetTotp.php:81
 msgid "TOTP secret reset successful."
-msgstr ""
+msgstr "TOTP 密串重置成功。"
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19526,6 +19607,20 @@ msgstr "必须在没有授权请求头的情况下调用“%1$s.%2$s”方法。
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "\"%1$s.%2$s\"方法只能被以不带 \"auth\"进行调用."
 
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr ""
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URL 模板用于加载和显示地图上的瓦片图层。"
@@ -19650,9 +19745,13 @@ msgstr "触发器不再被发现，并将在 %1$s 中删除（在 %2$s 的 %3$s 
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "触发器不再被发现，将在下次处理发现规则时被删除。"
 
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
-msgstr ""
+msgstr "验证码不正确，请重试。"
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -22107,7 +22206,7 @@ msgstr "在表单字段中不允许空的值。"
 #: widgets/piechart/includes/WidgetForm.php:220
 #: widgets/svggraph/includes/WidgetForm.php:374
 msgid "Variable"
-msgstr ""
+msgstr "变量"
 
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
@@ -22173,7 +22272,7 @@ msgstr "冗余"
 
 #: include/views/mfa.login.php:72 include/views/mfa.login.php:85
 msgid "Verification code"
-msgstr ""
+msgstr "验证码"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22862,6 +22961,10 @@ msgstr "Zabbix内部认证"
 msgid "Zabbix login form"
 msgstr "Zabbix 登录表单"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "zabbix服务器"
@@ -23468,6 +23571,16 @@ msgstr "不能为空"
 msgid "cannot be equal to zero without custom intervals"
 msgstr "自定义间隔不能等于零"
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23614,6 +23727,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - 当前日期"
@@ -23646,7 +23763,7 @@ msgstr "degree() - 将弧度转换为度数"
 
 #: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
 msgid "delimiter"
-msgstr ""
+msgstr "分隔符"
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -23816,6 +23933,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "全局管家设置"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
+
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr "具有相同 UUID 的图表原型已存在"
@@ -23841,6 +23966,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr ""
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24084,6 +24217,10 @@ msgstr "小于等于"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "不包含在{}或格式错误"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -24637,7 +24774,7 @@ msgstr "问题模式"
 
 #: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
 msgid "qualifier"
-msgstr ""
+msgstr "限定符"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -25391,6 +25528,35 @@ msgstr "具有相同 UUID 的 Web 场景已存在"
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
 msgstr "可以使用带有“*”的通配符模式"
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr ""
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr ""
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr ""
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for testing changing rank of trigger-based events/problems
  *
  * @required-components server
+ * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,items,triggers,task,task_data,acknowledges,event_symptom,events,problem
  */
 class testEventsCauseAndSymptoms extends CIntegrationTest {
@@ -355,6 +356,19 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	}
 
 	/**
+	 * Component configuration provider for server.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableGlobalScripts' => 1
+			]
+		];
+	}
+
+	/**
 	 * Start 5 events/problems. All events/problems are expected to be causes with no symptoms.
 	 *
 	 * Expected result:
@@ -402,7 +416,9 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_startEvents
+	 *
 	 */
 	public function testEventsCauseAndSymptoms_rankAsSymptom() {
 		$this->markAsSymptoms([
@@ -444,6 +460,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)          <-- no change is expected here
 	 * |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankAsSymptom
 	 *
 	 */
@@ -486,6 +503,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_swapCauseAndSymptom
 	 *
 	 */
@@ -527,6 +545,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankCauseAsSymptomOfSymptom
 	 *
 	 */
@@ -574,6 +593,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * [C] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankAsCause1
 	 *
 	 */

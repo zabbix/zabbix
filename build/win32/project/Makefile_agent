@@ -78,6 +78,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexec\execute.o \
 	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxhttp\http.o \
+	..\..\..\src\libs\zbxcurl\curl.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
 	..\..\..\src\libs\zbxhttp\charset.o \

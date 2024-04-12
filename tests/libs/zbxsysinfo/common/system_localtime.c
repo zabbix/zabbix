@@ -144,7 +144,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
 
-	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 	if (SUCCEED != zbx_parse_item_key(key_string, &request))
 		fail_msg("Cannot parse item key from string '%s'", key_string);

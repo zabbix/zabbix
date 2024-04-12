@@ -40,6 +40,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
+#include "zbxescalations.h"
 
 /******************************************************************************
  *                                                                            *
@@ -819,7 +820,7 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 }
 
 static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values,
-		int *ret_flush)
+		int *ret_flush, int config_history_storage_pipelines)
 {
 	int	i, ret = SUCCEED;
 
@@ -834,20 +835,23 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
 	}
 
 	if (0 != history_values->values_num)
-		ret = zbx_vc_add_values(history_values, ret_flush);
+		ret = zbx_vc_add_values(history_values, ret_flush, config_history_storage_pipelines);
 
 	return ret;
 }
+
 
 /******************************************************************************
  *                                                                            *
  * Purpose: inserting new history data after new value is received            *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
+ * Parameters:                                                                *
+ *    history                          - [IN] array of history data           *
+ *    history_num                      - [IN] number of history structures    *
+ *    config_history_storage_pipelines - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
-static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
+static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int config_history_storage_pipelines)
 {
 	int			ret, ret_flush = FLUSH_SUCCEED, num;
 	zbx_vector_ptr_t	history_values;
@@ -857,15 +861,18 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
 
-	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush)) &&
-			FLUSH_DUPL_REJECTED == ret_flush)
+	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush,
+			config_history_storage_pipelines)) && FLUSH_DUPL_REJECTED == ret_flush)
 	{
 		num = history_values.values_num;
 		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
 
-		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush)))
+		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush,
+				config_history_storage_pipelines)))
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
+		}
 	}
 
 	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
@@ -897,7 +904,7 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
-		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,
+		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_item_diff_ptr_t *item_diff,
 		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscriptions)
 {
 	static time_t	last_history_discard = 0;
@@ -975,7 +982,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		/* calculate item update and update already retrieved item status for trigger calculation */
 		if (NULL != (diff = calculate_item_update(item, h, add_event_cb)))
-			zbx_vector_ptr_append(item_diff, diff);
+			zbx_vector_item_diff_ptr_append(item_diff, diff);
 
 		DCinventory_value_add(inventory_values, item, h);
 
@@ -991,7 +998,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_item_diff_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1184,30 +1191,33 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: flush history cache to database, process triggers of flushed      *
- *          and timer triggers from timer queue                               *
- *                                                                            *
- * Parameters:                                                                *
- *             values_num   - [IN/OUT] the number of synced values            *
- *             triggers_num - [IN/OUT] the number of processed timers         *
- *             events_cbs   - [IN]                                            *
- *             more         - [OUT] a flag indicating the cache emptiness:    *
- *                               ZBX_SYNC_DONE - nothing to sync, go idle     *
- *                               ZBX_SYNC_MORE - more data to sync            *
- *                                                                            *
- * Comments: This function loops syncing history values by 1k batches and     *
- *           processing timer triggers by batches of 500 triggers.            *
- *           Unless full sync is being done the loop is aborted if either     *
- *           timeout has passed or there are no more data to process.         *
- *           The last is assumed when the following is true:                  *
- *            a) history cache is empty or less than 10% of batch values were *
- *               processed (the other items were locked by triggers)          *
- *            b) less than 500 (full batch) timer triggers were processed     *
- *                                                                            *
- ******************************************************************************/
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more)
+/***************************************************************************************
+ *                                                                                     *
+ * Purpose: Flushes history cache to database, processes triggers of flushed           *
+ *          and timer triggers from timer queue.                                       *
+ *                                                                                     *
+ * Parameters:                                                                         *
+ *   values_num                       - [IN/OUT] number of synced values               *
+ *   triggers_num                     - [IN/OUT] number of processed timers            *
+ *   events_cbs                       - [IN]                                           *
+ *   rtc                              - [IN] RTC socket                                *
+ *   config_history_storage_pipelines - [IN]                                           *
+ *   more                             - [OUT] flag indicating the cache emptiness:     *
+ *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
+ *                                            ZBX_SYNC_MORE - more data to sync        *
+ *                                                                                     *
+ * Comments: This function loops syncing history values by 1k batches and              *
+ *           processing timer triggers by batches of 500 triggers.                     *
+ *           Unless full sync is being done the loop is aborted if either              *
+ *           timeout has passed or there are no more data to process.                  *
+ *           The last is assumed when the following is true:                           *
+ *            a) history cache is empty or less than 10% of batch values were          *
+ *               processed (the other items were locked by triggers)                   *
+ *            b) less than 500 (full batch) timer triggers were processed              *
+ *                                                                                     *
+ ***************************************************************************************/
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -1223,7 +1233,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
-	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
+	zbx_vector_ptr_t		history_items, trigger_diff, inventory_values, trigger_timers;
+	zbx_vector_item_diff_ptr_t	item_diff;
 	zbx_vector_dc_trigger_t		trigger_order;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscriptions;
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
@@ -1277,7 +1288,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_connector_filter_create(&connector_filters_history);
 	zbx_vector_connector_filter_create(&connector_filters_events);
 	zbx_vector_ptr_create(&inventory_values);
-	zbx_vector_ptr_create(&item_diff);
+	zbx_vector_item_diff_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
 	zbx_vector_uint64_pair_create(&proxy_subscriptions);
@@ -1366,7 +1377,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					events_cbs->add_event_cb, &item_diff,
 					&inventory_values, compression_age, &proxy_subscriptions);
 
-			if (FAIL != (ret = DBmass_add_history(history, history_num)))
+			if (FAIL != (ret = DBmass_add_history(history, history_num, config_history_storage_pipelines)))
 			{
 				zbx_dc_config_items_apply_changes(&item_diff);
 				zbx_dc_mass_update_trends(history, history_num, &trends, &trends_num, compression_age);
@@ -1396,7 +1407,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					if (NULL != events_cbs->process_events_cb)
 					{
 						/* process internal events generated by DCmass_prepare_history() */
-						events_cbs->process_events_cb(NULL, NULL);
+						events_cbs->process_events_cb(NULL, NULL, NULL);
 					}
 
 					if (ZBX_DB_OK != (txn_error = zbx_db_commit()))
@@ -1414,7 +1425,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				events_cbs->clean_events_cb();
 
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
-			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
+			zbx_vector_item_diff_ptr_clear_ext(&item_diff, zbx_item_diff_free);
 		}
 
 		if (FAIL != ret)
@@ -1444,6 +1455,9 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 				do
 				{
+					zbx_vector_escalation_new_ptr_t	escalations;
+
+					zbx_vector_escalation_new_ptr_create(&escalations);
 					zbx_db_begin();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
@@ -1454,19 +1468,31 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 					if (NULL != events_cbs->process_events_cb)
 					{
 						/* process trigger events generated by recalculate_triggers() */
-						events_cbs->process_events_cb(&trigger_diff, &triggerids);
+						events_cbs->process_events_cb(&trigger_diff, &triggerids, &escalations);
 					}
 
 					if (0 != trigger_diff.values_num)
+					{
 						zbx_db_save_trigger_changes(&trigger_diff);
+					}
 
 					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
+					{
+						if (NULL != rtc)
+							zbx_start_escalations(rtc, &escalations);
+
 						zbx_dc_config_triggers_apply_changes(&trigger_diff);
+					}
 					else if (NULL != events_cbs->clean_events_cb)
+					{
 						events_cbs->clean_events_cb();
+					}
 
 					zbx_vector_ptr_clear_ext(&trigger_diff,
 							(zbx_clean_func_t)zbx_trigger_diff_free);
+					zbx_vector_escalation_new_ptr_clear_ext(&escalations,
+							zbx_escalation_new_ptr_free);
+					zbx_vector_escalation_new_ptr_destroy(&escalations);
 				}
 				while (ZBX_DB_DOWN == txn_error);
 
@@ -1637,7 +1663,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
-	zbx_vector_ptr_destroy(&item_diff);
+	zbx_vector_item_diff_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);

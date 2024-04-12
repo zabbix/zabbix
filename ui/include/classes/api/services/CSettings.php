@@ -102,6 +102,9 @@ class CSettings extends CApiService {
 
 		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
 
+		$db_settings['server_status'] = json_decode($db_settings['server_status'], true) ?: [];
+		$db_settings['server_status'] += ['configuration' => ['enable_global_scripts' => true]];
+
 		return $db_settings;
 	}
 

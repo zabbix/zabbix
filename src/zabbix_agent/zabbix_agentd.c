@@ -64,6 +64,24 @@ static char	**config_perf_counters = NULL;
 static char	**config_perf_counters_en = NULL;
 #endif
 
+#define ZBX_SERVICE_NAME_LEN	64
+char	zabbix_service_name[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+static const char	*get_zbx_service_name(void)
+{
+	return zabbix_service_name;
+}
+
+char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+#if defined(_WINDOWS)
+static const char	*get_zbx_event_source(void)
+{
+	return zabbix_event_source;
+}
+#endif
+#undef ZBX_SERVICE_NAME_LEN
+
 static char	*config_user = NULL;
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
@@ -210,7 +228,7 @@ static struct zbx_option	longopts[] =
 
 	{"multiple-agents",	0,	NULL,	'm'},
 #endif
-	{NULL}
+	{0}
 };
 
 static char	shortopts[] =
@@ -286,10 +304,10 @@ static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 void	zbx_co_uninitialize();
 #endif
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 void	zbx_free_service_resources(int ret);
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+static int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num)
 {
 	int	server_count = 0;
 
@@ -882,123 +900,123 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,		MIN,			MAX */
+				MANDATORY,		MIN,			MAX */
 		{"Server",			&zbx_config_hosts_allowed,		ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ServerActive",		&active_hosts,				ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"Hostname",			&zbx_config_hostnames,			ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HostnameItem",		&config_hostname_item,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HostMetadata",		&zbx_config_host_metadata,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HostMetadataItem",		&zbx_config_host_metadata_item,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HostInterface",		&zbx_config_host_interface,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"HostInterfaceItem",		&zbx_config_host_interface_item,	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"BufferSize",			&zbx_config_buffer_size,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	2,			65535},
+				ZBX_CONF_PARM_OPT,	2,			65535},
 		{"BufferSend",			&zbx_config_buffer_send,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
+				ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
 #ifndef _WINDOWS
 		{"PidFile",			&config_pid_file,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 #endif
 		{"LogType",			&log_file_cfg.log_type_str,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"LogFile",			&log_file_cfg.log_file_name,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			1024},
+				ZBX_CONF_PARM_OPT,	0,			1024},
 		{"Timeout",			&zbx_config_timeout,			ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	1,			30},
+				ZBX_CONF_PARM_OPT,	1,			30},
 		{"ListenPort",			&zbx_config_listen_port,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	1024,			32767},
+				ZBX_CONF_PARM_OPT,	1024,			32767},
 		{"ListenIP",			&zbx_config_listen_ip,			ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SourceIP",			&zbx_config_source_ip,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DebugLevel",			&config_log_level,			ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			5},
+				ZBX_CONF_PARM_OPT,	0,			5},
 		{"StartAgents",			&config_forks[ZBX_PROCESS_TYPE_LISTENER],ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			100},
+				ZBX_CONF_PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&zbx_config_refresh_active_checks,	ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
-			MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
+				ZBX_CONF_PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
+				MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
 		{"MaxLinesPerSecond",		&zbx_config_max_lines_per_second,	ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	1,			1000},
+				ZBX_CONF_PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	ZBX_CFG_TYPE_CUSTOM,
-			ZBX_CONF_PARM_OPT,	0,			1},
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			1},
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"UnsafeUserParameters",	&zbx_config_unsafe_user_parameters,	ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			1},
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"Alias",			&config_aliases,			ZBX_CFG_TYPE_MULTISTRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"UserParameter",		&zbx_config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"UserParameterDir",		&config_user_parameter_dir,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 #ifndef _WINDOWS
 		{"LoadModulePath",		&config_load_module_path,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"LoadModule",			&config_load_module,			ZBX_CFG_TYPE_MULTISTRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"AllowRoot",			&config_allow_root,			ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			1},
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"User",			&config_user,				ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 #endif
 #ifdef _WINDOWS
 		{"PerfCounter",			&config_perf_counters,			ZBX_CFG_TYPE_MULTISTRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"PerfCounterEn",		&config_perf_counters_en,		ZBX_CFG_TYPE_MULTISTRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 #endif
 		{"TLSConnect",			&(zbx_config_tls->connect),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSAccept",			&(zbx_config_tls->accept),		ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCAFile",			&(zbx_config_tls->ca_file),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCertFile",			&(zbx_config_tls->cert_file),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&(zbx_config_tls->key_file),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"AllowKey",			&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DenyKey",			&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			INT_MAX},
+				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			3600},
-		{NULL}
+				ZBX_CONF_PARM_OPT,	0,			3600},
+		{0}
 	};
 
 	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
@@ -1125,7 +1143,15 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	ZBX_UNUSED(on_exit_args);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+#ifndef _WINDOWS
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
 
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+	}
+#endif
 	zbx_free_service_resources(ret);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1137,14 +1163,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
-#else
-	if (NULL != on_exit_args)
-	{
-		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
-
-		if (NULL != args->listen_sock)
-			zbx_tcp_unlisten(args->listen_sock);
-	}
 #endif
 
 	exit(EXIT_SUCCESS);
@@ -1221,7 +1239,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, zabbix_event_source, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1471,7 +1489,7 @@ void	zbx_free_service_resources(int ret)
 
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t = {ZBX_TASK_START};
+	ZBX_TASK_EX	t = {ZBX_TASK_START, 0, 0, NULL};
 	char		*error = NULL;
 #ifdef _WINDOWS
 	int		ret;
@@ -1483,11 +1501,11 @@ int	main(int argc, char **argv)
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
-			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
+			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item, get_zbx_service_name);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(get_zbx_progname);
 #else
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 #endif
 #ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
@@ -1507,7 +1525,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, zabbix_event_source, NULL);
 	}
 #endif
 
@@ -1555,9 +1573,9 @@ int	main(int argc, char **argv)
 				first_hostname = NULL != (p = strchr(zbx_config_hostnames, ',')) ? zbx_dsprintf(NULL,
 						"%.*s", (int)(p - zbx_config_hostnames), zbx_config_hostnames) :
 						zbx_strdup(NULL, zbx_config_hostnames);
-				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
+				zbx_snprintf(zabbix_service_name, sizeof(zabbix_service_name), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
-				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
+				zbx_snprintf(zabbix_event_source, sizeof(zabbix_event_source), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_free(first_hostname);
 			}
@@ -1675,7 +1693,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags);
+	zbx_service_start(t.flags, get_zbx_service_name, get_zbx_event_source);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,
