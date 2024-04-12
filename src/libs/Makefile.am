@@ -29,6 +29,7 @@ DIST_SUBDIRS = \
 	zbxdiag \
 	zbxdiscovery \
 	zbxembed \
+	zbxescalations \
 	zbxeval \
 	zbxevent \
 	zbxexec \
@@ -109,6 +110,7 @@ SERVER_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
+	zbxescalations \
 	zbxeval \
 	zbxevent \
 	zbxexport \
@@ -175,6 +177,7 @@ PROXY_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
+	zbxescalations \
 	zbxeval \
 	zbxevent \
 	zbxexport \
@@ -234,6 +237,7 @@ SUBDIRS = \
 	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
+	zbxescalations \
 	zbxexec \
 	zbxexpr \
 	zbxfile \
