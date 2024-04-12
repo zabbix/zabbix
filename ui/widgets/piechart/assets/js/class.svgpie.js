@@ -319,7 +319,9 @@ class CSVGPie {
 
 		this.#svg.on('mousemove', null);
 
-		this.#popped_out_sector = null;
+		if (this.#popped_out_sector !== null) {
+			this.#popIn(this.#popped_out_sector);
+		}
 
 		if (this.#config.total_value && total_value.value !== null) {
 			this.#total_value_text = total_value.value;
@@ -361,9 +363,10 @@ class CSVGPie {
 			.attr('data-hintbox-static', 1)
 			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
-			.attr('data-hintbox-contents', (d) => this.#setHint(d))
 			.each((d, index, nodes) => {
-				d3.select(nodes[index])
+				const sector = nodes[index];
+
+				d3.select(sector)
 					.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 					.data((d) => [d])
 					.join('svg:path')
@@ -372,7 +375,7 @@ class CSVGPie {
 					.each((d, index, nodes) => nodes[index]._current = d);
 
 				if (this.#config.stroke > 0) {
-					d3.select(nodes[index])
+					d3.select(sector)
 						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_STROKE}`)
 						.data((d) => [d])
 						.join('svg:path')
@@ -384,7 +387,7 @@ class CSVGPie {
 						.each((d, index, nodes) => nodes[index]._current = d);
 				}
 
-				d3.select(nodes[index])
+				d3.select(sector)
 					.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 					.data((d) => [d])
 					.join('svg:path')
@@ -413,7 +416,17 @@ class CSVGPie {
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_CONTAINER}`)
-			.data(this.#pieGenerator(is), key);
+			.data(this.#pieGenerator(is), key)
+			.attr('data-hintbox-contents', d => this.#getHint(d.data))
+			.each((d, index, nodes) => {
+				const sector = nodes[index];
+
+				if (sector.matches(':hover')) {
+					// Simulate mouse leave event to show hint properly.
+					// Must be jQuery event because hints listen to jQuery events.
+					jQuery(sector).trigger(jQuery.Event('mouseleave'));
+				}
+			});
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
@@ -485,10 +498,21 @@ class CSVGPie {
 						attributeOldValue: true
 					});
 
-					// If mouse was on any sector before/during animation, then pop that sector out again.
-					if (sector.matches(':hover')) {
-						this.#popOut(sector);
-					}
+					setTimeout(() => {
+						// If mouse was on any sector before/during animation, then pop that sector out again.
+						if (sector.matches(':hover')) {
+							this.#popOut(sector);
+
+							// Simulate mouse move event to show hint properly.
+							// Must be jQuery event because hints listen to jQuery events.
+							const mousemove = jQuery.Event('mousemove');
+
+							mousemove.clientX = this.#svg.node().dataset.mouseClientX;
+							mousemove.clientY = this.#svg.node().dataset.mouseClientY;
+
+							jQuery(sector).trigger(mousemove);
+						}
+					});
 
 					d3.select(sector).on('mouseleave', () => this.#onMouseLeave(sector));
 				}
@@ -744,25 +768,25 @@ class CSVGPie {
 	 *
 	 * @returns {string}
 	 */
-	#setHint(sector) {
+	#getHint(sector) {
 		const hint = d3.create('div')
 			.attr('class', 'svg-pie-chart-hintbox');
 
 		hint.append('span')
 			.attr('class', 'svg-pie-chart-hintbox-color')
-			.style('background-color', sector.data.color);
+			.style('background-color', sector.color);
 
 		hint.append('span')
 			.attr('class', 'svg-pie-chart-hintbox-name')
-			.text(`${sector.data.name}: `);
+			.text(`${sector.name}: `);
 
 		hint.append('span')
 			.attr('class', 'svg-pie-chart-hintbox-value')
 			.text(() => {
-				let text = sector.data.formatted_value.value;
+				let text = sector.formatted_value.value;
 
-				if (sector.data.formatted_value.units !== '') {
-					text += ` ${sector.data.formatted_value.units}`;
+				if (sector.formatted_value.units !== '') {
+					text += ` ${sector.formatted_value.units}`;
 				}
 
 				return text;
@@ -868,6 +892,9 @@ class CSVGPie {
 				this.#popOut(sector);
 			}
 		}
+
+		this.#svg.node().dataset.mouseClientX = e.clientX;
+		this.#svg.node().dataset.mouseClientY = e.clientY;
 	}
 
 	/**
