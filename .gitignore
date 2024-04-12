@@ -136,6 +136,8 @@ src/zabbix_js/zabbix_js
 src/zabbix_proxy/zabbix_proxy
 src/zabbix_sender/zabbix_sender
 src/zabbix_server/zabbix_server
+src/libs/test_zbxcommon/test_libzbxcommon_bin
+src/go/bin/zabbix_web_service
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/evaluate_unknown
 tests/libs/zbxalgo/list
