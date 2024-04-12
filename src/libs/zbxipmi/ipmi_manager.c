@@ -38,8 +38,6 @@
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
-extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 #define ZBX_IPMI_POLLER_INIT		0
 #define ZBX_IPMI_POLLER_READY		1
 #define ZBX_IPMI_POLLER_BUSY		2
@@ -306,37 +304,18 @@ static void	ipmi_poller_free_request(zbx_ipmi_poller_t *poller)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees IPMI poller                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	ipmi_poller_free(zbx_ipmi_poller_t *poller)
-{
-	zbx_ipmi_request_t	*request;
-
-	zbx_ipc_client_close(poller->client);
-
-	while (NULL != (request = ipmi_poller_pop_request(poller)))
-		ipmi_request_free(request);
-
-	zbx_binary_heap_destroy(&poller->requests);
-
-	zbx_free(poller);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: initializes IPMI manager                                          *
  *                                                                            *
  * Parameters: manager - [IN] the manager to initialize                       *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
+static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_f get_config_forks)
 {
 	int			i;
 	zbx_ipmi_poller_t	*poller;
 	zbx_binary_heap_elem_t	elem = {0};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER));
 
 	zbx_vector_ptr_create(&manager->pollers);
 	zbx_hashset_create(&manager->pollers_client, 0, poller_hash_func, poller_compare_func);
@@ -344,7 +323,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 
 	manager->next_poller_index = 0;
 
-	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]; i++)
+	for (i = 0; i < get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER); i++)
 	{
 		poller = (zbx_ipmi_poller_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_poller_t));
 
@@ -368,36 +347,22 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: destroys IPMI manager                                             *
- *                                                                            *
- * Parameters: manager - [IN] the manager to destroy                          *
- *                                                                            *
- ******************************************************************************/
-static void	ipmi_manager_destroy(zbx_ipmi_manager_t *manager)
-{
-	zbx_hashset_destroy(&manager->hosts);
-	zbx_binary_heap_destroy(&manager->pollers_load);
-	zbx_hashset_destroy(&manager->pollers_client);
-	zbx_vector_ptr_clear_ext(&manager->pollers, (zbx_clean_func_t)ipmi_poller_free);
-	zbx_vector_ptr_destroy(&manager->pollers);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: performs cleanup of monitored hosts cache                         *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             now     - [IN] the current time                                *
+ * Parameters: manager          - [IN]                                        *
+ *             now              - [IN]                                        *
+ *             get_config_forks - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
+static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,
+		zbx_get_config_forks_f get_config_forks)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_ipmi_manager_host_t	*host;
 	zbx_ipmi_poller_t	*poller;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER));
 
 	zbx_hashset_iter_reset(&manager->hosts, &iter);
 	while (NULL != (host = (zbx_ipmi_manager_host_t *)zbx_hashset_iter_next(&iter)))
@@ -988,7 +953,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	ipmi_manager_init(&ipmi_manager);
+	ipmi_manager_init(&ipmi_manager, ipmi_manager_args_in->get_config_forks);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -1085,7 +1050,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 
 		if (now >= nextcleanup)
 		{
-			ipmi_manager_host_cleanup(&ipmi_manager, now);
+			ipmi_manager_host_cleanup(&ipmi_manager, now, ipmi_manager_args_in->get_config_forks);
 			nextcleanup = now + ZBX_IPMI_MANAGER_CLEANUP_DELAY;
 		}
 	}
@@ -1094,9 +1059,6 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&ipmi_service);
-	ipmi_manager_destroy(&ipmi_manager);
 #undef STAT_INTERVAL
 }
 

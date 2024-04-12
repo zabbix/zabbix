@@ -238,8 +238,8 @@ class CControllerHostList extends CController {
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectHostDiscovery' => ['parent_hostid', 'ts_delete'],
+			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
+			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
@@ -257,19 +257,11 @@ class CControllerHostList extends CController {
 
 		order_result($hosts, $sort_field, $sort_order);
 
-		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7).
-		$db_items_active_count = API::Item()->get([
-			'groupCount' => true,
-			'countOutput' => true,
-			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-			'hostids' => array_column($hosts, 'hostid')
-		]);
+		$hostids = array_column($hosts, 'hostid');
 
-		$item_active_by_hostid = [];
-
-		foreach ($db_items_active_count as $value) {
-			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
-		}
+		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7) and ITEM_TYPE_ZABBIX (0).
+		$active_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
+		$passive_item_count_by_hostid = getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, $hostids);
 
 		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
@@ -313,8 +305,8 @@ class CControllerHostList extends CController {
 			]);
 
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
-			if (array_key_exists($host['hostid'], $item_active_by_hostid)
-					&& $item_active_by_hostid[$host['hostid']] > 0) {
+			if (array_key_exists($host['hostid'], $active_item_count_by_hostid)
+					&& $active_item_count_by_hostid[$host['hostid']] > 0) {
 				$host['interfaces'][] = [
 					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
 					'available' => $host['active_available'],
@@ -322,6 +314,9 @@ class CControllerHostList extends CController {
 				];
 			}
 			unset($host['active_available']);
+
+			$host['has_passive_checks'] = array_key_exists($host['hostid'], $passive_item_count_by_hostid)
+				&& $passive_item_count_by_hostid[$host['hostid']] > 0;
 
 			if ($host['proxyid']) {
 				$proxyids[$host['proxyid']] = $host['proxyid'];

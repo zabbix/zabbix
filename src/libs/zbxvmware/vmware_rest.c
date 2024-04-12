@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxcurl.h"
 
 typedef struct
 {
@@ -76,8 +77,8 @@ void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value)
 	zbx_str_free(value.value);
 }
 
-ZBX_PTR_VECTOR_IMPL(vmware_entity_tags, zbx_vmware_entity_tags_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_tag, zbx_vmware_tag_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_entity_tags_ptr, zbx_vmware_entity_tags_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_tag_ptr, zbx_vmware_tag_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -113,9 +114,8 @@ static void	vmware_tag_free(zbx_vmware_tag_t *value)
  ******************************************************************************/
 static void	vmware_entity_tags_free(zbx_vmware_entity_tags_t *value)
 {
-
-	zbx_vector_vmware_tag_clear_ext(&value->tags, vmware_tag_free);
-	zbx_vector_vmware_tag_destroy(&value->tags);
+	zbx_vector_vmware_tag_ptr_clear_ext(&value->tags, vmware_tag_free);
+	zbx_vector_vmware_tag_ptr_destroy(&value->tags);
 	zbx_str_free(value->uuid);
 	zbx_str_free(value->error);
 	zbx_str_free(value->obj_id->id);
@@ -126,11 +126,11 @@ static void	vmware_entity_tags_free(zbx_vmware_entity_tags_t *value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create entity tag object                                          *
+ * Purpose: creates entity tag object                                         *
  *                                                                            *
  * Parameters: type - [IN] VirtualMachine, HostSystem etc                     *
- *             id   - [IN] the id of vm, hv or ds                             *
- *             uuid - [IN] the uuid of vm, hv or ds                           *
+ *             id   - [IN] id of vm, hv or ds                                 *
+ *             uuid - [IN] uuid of vm, hv or ds                               *
  *                                                                            *
  * Return value: pointer to tag object                                        *
  *                                                                            *
@@ -141,7 +141,7 @@ static zbx_vmware_entity_tags_t	*vmware_entity_tag_create(const char *type, cons
 
 	entry_tag = (zbx_vmware_entity_tags_t *)zbx_malloc(NULL, sizeof(zbx_vmware_entity_tags_t));
 	entry_tag->obj_id = (zbx_vmware_obj_id_t *)zbx_malloc(NULL, sizeof(zbx_vmware_obj_id_t));
-	zbx_vector_vmware_tag_create(&entry_tag->tags);
+	zbx_vector_vmware_tag_ptr_create(&entry_tag->tags);
 	entry_tag->obj_id->type = zbx_strdup(NULL, type);
 	entry_tag->obj_id->id = zbx_strdup(NULL, id);
 	entry_tag->uuid = zbx_strdup(NULL, uuid);
@@ -154,13 +154,12 @@ static zbx_vmware_entity_tags_t	*vmware_entity_tag_create(const char *type, cons
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service data     *
  *                                                                            *
- * Parameters: data        - [IN] the vmware service data                     *
+ * Parameters: data        - [IN] vmware service data                         *
  *             entity_tags - [OUT] set of query tags objects                  *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_entity_tags_t *entity_tags)
+static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_entity_tags_ptr_t *entity_tags)
 {
-	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_index_t	*vmi;
@@ -171,7 +170,7 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_HV, hv->id, hv->uuid));
 	}
 
@@ -179,49 +178,49 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 
 	while (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_VM, vmi->vm->id, vmi->vm->uuid));
 	}
 
-	for (i = 0; i < data->datastores.values_num; i++)
+	for (int i = 0; i < data->datastores.values_num; i++)
 	{
 		zbx_vmware_datastore_t	*ds = data->datastores.values[i];
 
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DS, ds->id, ds->uuid));
 	}
 
-	for (i = 0; i < data->datacenters.values_num; i++)
+	for (int i = 0; i < data->datacenters.values_num; i++)
 	{
 		zbx_vmware_datacenter_t	*dc = data->datacenters.values[i];
 		char			uuid[VMWARE_SHORT_STR_LEN];
 
 		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_DC, dc->id);
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DC, dc->id, uuid));
 	}
 
-	for (i = 0; i < data->clusters.values_num; i++)
+	for (int i = 0; i < data->clusters.values_num; i++)
 	{
 		zbx_vmware_cluster_t	*cl = (zbx_vmware_cluster_t *)data->clusters.values[i];
 		char			uuid[VMWARE_SHORT_STR_LEN];
 
 		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_CLUSTER, cl->id);
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_CLUSTER, cl->id, uuid));
 	}
 
-	for (i = 0; i < data->resourcepools.values_num; i++)
+	for (int i = 0; i < data->resourcepools.values_num; i++)
 	{
 		zbx_vmware_resourcepool_t	*rp = data->resourcepools.values[i];
 		char				uuid[VMWARE_SHORT_STR_LEN];
 
 		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id);
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, uuid));
 	}
 
-	zbx_vector_vmware_entity_tags_sort(entity_tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_entity_tags_ptr_sort(entity_tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity tags:%d", __func__, entity_tags->values_num);
 }
@@ -231,17 +230,15 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
  * Parameters: url                   - [IN] vmware service url                *
- *             is_new_api            - [IN] flag to use new api version       *
- *                                          syntax                            *
+ *             is_new_api            - [IN]                                   *
  *             config_source_ip      - [IN]                                   *
  *             config_vmware_timeout - [IN]                                   *
  *             easyhandle            - [OUT] cURL handle                      *
  *             page                  - [OUT] response buffer for cURL         *
  *             headers               - [OUT] request headers for cURL         *
- *             error                 - [OUT] error message in the case of     *
- *                                           failure                          *
+ *             error                 - [OUT] error message in case of failure *
  *                                                                            *
- * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
+ * Return value: SUCCEED if cURL prepared, FAIL otherwise                     *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_curl_init(const char *url, unsigned char is_new_api, const char *config_source_ip,
@@ -304,7 +301,7 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, const cha
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
 			(long)config_vmware_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 	}
@@ -322,13 +319,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: open the json document and check the errors                       *
+ * Purpose: opens json document and checks errors                             *
  *                                                                            *
- * Parameters: data  - [IN] the json data                                     *
- *             jp    - [OUT] the prepared json document (optional)            *
- *             error - [OUT] the error message in the case of failure         *
+ * Parameters: data  - [IN] json data                                         *
+ *             jp    - [OUT] prepared json document (optional)                *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
- * Return value: SUCCEED if the json prepared, FAIL otherwise                 *
+ * Return value: SUCCEED if json prepared, FAIL otherwise                     *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp, char **error)
@@ -402,16 +399,14 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
 
 /******************************************************************************
  *                                                                            *
- * Purpose: authenticate rest service                                         *
- *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             is_new_api - [IN] flag to use new api version syntax           *
+ * Parameters: service    - [IN] vmware service                               *
+ *             is_new_api - [IN]                                              *
  *             easyhandle - [IN/OUT] cURL handle                              *
- *             headers    - [IN/OUT] the request headers for cURL             *
- *             page       - [IN/OUT] the response buffer for cURL             *
- *             error      - [OUT] the error message in the case of failure    *
+ *             headers    - [IN/OUT] request headers for cURL                 *
+ *             page       - [IN/OUT] response buffer for cURL                 *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED if the rest authenticated, FAIL otherwise            *
+ * Return value: SUCCEED if rest authenticated, FAIL otherwise                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service, unsigned char is_new_api,
@@ -495,10 +490,8 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: logout rest service                                               *
- *                                                                            *
  * Parameters: easyhandle - [IN/OUT] cURL handle                              *
- *             page       - [IN/OUT] the response buffer for cURL             *
+ *             page       - [IN/OUT] response buffer for cURL                 *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE_REST *page)
@@ -529,14 +522,15 @@ static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE_REST *page
  *                                                                            *
  * Purpose: unification of vmware web service call with REST error validation *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name                     *
- *             easyhandle - [IN] the CURL handle                              *
- *             url_suffix - [IN] the second part of url request               *
- *             jp         - [OUT] the json response document                  *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: fn_parent  - [IN] parent function name                         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             url_suffix - [IN] second part of url request                   *
+ *             jp         - [OUT] json response document                      *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the REST request was completed successfully        *
- *               FAIL    - the REST request has failed                        *
+ * Return value: SUCCEED - REST request was completed successfully            *
+ *               FAIL    - REST request has failed                            *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const char *url_suffix,
 		struct zbx_json_parse *jp, char **error)
@@ -583,15 +577,16 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
  *                                                                            *
  * Purpose: vmware web service GET call with REST error validation            *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
- *             url_suffix - [IN] the second part of url request               *
- *             param      - [IN] the url parameter                            *
- *             jp         - [OUT] the json document response                  *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: fn_parent  - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             url_suffix - [IN] second part of url request                   *
+ *             param      - [IN] url parameter                                *
+ *             jp         - [OUT] json document response                      *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the SOAP request was completed successfully        *
- *               FAIL    - the SOAP request has failed                        *
+ * Return value: SUCCEED - SOAP request was completed successfully            *
+ *               FAIL    - SOAP request has failed                            *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_rest_get(const char *fn_parent, CURL *easyhandle, const char *url_suffix, const char *param,
 		struct zbx_json_parse *jp, char **error)
@@ -615,14 +610,16 @@ static int	vmware_rest_get(const char *fn_parent, CURL *easyhandle, const char *
  *                                                                            *
  * Purpose: vmware web service POST call with REST error validation           *
  *                                                                            *
- * Parameters: fn_parent  - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
- *             request    - [IN] the http request                             *
- *             jdoc       - [OUT] the json document response                  *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: fn_parent  - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             url_suffix - [IN]                                              *
+ *             request    - [IN] http request                                 *
+ *             jp         - [OUT]                                             *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the POST rest request was completed successfully   *
- *               FAIL    - the POST rest request has failed                   *
+ * Return value: SUCCEED - POST rest request was completed successfully       *
+ *               FAIL    - POST rest request has failed                       *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char *url_suffix, const char *request,
 		struct zbx_json_parse *jp, char **error)
@@ -652,15 +649,15 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get list of tags linked with object                               *
+ * Purpose: gets list of tags linked with object                              *
  *                                                                            *
- * Parameters: obj_id     - [IN] the parent function name for Log records     *
- *             easyhandle - [IN] the CURL handle                              *
+ * Parameters: obj_id     - [IN] parent function name for Log records         *
+ *             easyhandle - [IN] CURL handle                                  *
  *             is_new_api - [IN] flag to use new api version syntax           *
- *             ids        - [OUT] the vector with tags id                     *
- *             error      - [OUT] the error message in the case of failure    *
+ *             ids        - [OUT] vector with tags id                         *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED if the receive list of tags id, FAIL otherwise       *
+ * Return value: SUCCEED if receive list of tags id, FAIL otherwise           *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, unsigned char is_new_api,
@@ -703,20 +700,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get tag details and save to cache vectors                         *
+ * Purpose: gets tag details and saves it to cache vectors                    *
  *                                                                            *
- * Parameters: tag_id     - [IN] the tag id                                   *
- *             easyhandle - [IN] the CURL handle                              *
- *             is_new_api - [IN] flag to use new api version syntax           *
- *             tags       - [OUT] the vector with tags info                   *
- *             categories - [OUT] the vector with categories info             *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: tag_id     - [IN]                                              *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             is_new_api - [IN]                                              *
+ *             tags       - [OUT]                                             *
+ *             categories - [OUT]                                             *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED if the receive tag details, FAIL otherwise           *
+ * Return value: SUCCEED if received tag details, FAIL otherwise              *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, unsigned char is_new_api,
-		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, char **error)
+		zbx_vector_vmware_tag_ptr_t *tags, zbx_vector_vmware_key_value_t *categories, char **error)
 {
 	struct zbx_json_parse	jp, jp_data;
 	int			i;
@@ -795,10 +792,10 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, unsigned 
 	tag->name = zbx_strdup(NULL, name);
 	tag->description = zbx_strdup(NULL, desc);
 	tag->category  = zbx_strdup(NULL, categories->values[i].value);
-	zbx_vector_vmware_tag_append(tags, tag);
-	zbx_vector_vmware_tag_sort(tags, zbx_vmware_tag_id_compare);
+	zbx_vector_vmware_tag_ptr_append(tags, tag);
+	zbx_vector_vmware_tag_ptr_sort(tags, zbx_vmware_tag_id_compare);
 
-	if (FAIL == (i = zbx_vector_vmware_tag_bsearch(tags, tag, zbx_vmware_tag_id_compare)))
+	if (FAIL == (i = zbx_vector_vmware_tag_ptr_bsearch(tags, tag, zbx_vmware_tag_id_compare)))
 	{
 		*error = zbx_strdup(NULL, "Cannot append tag info");
 		return FAIL;
@@ -815,21 +812,21 @@ json_err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create vector with tags details                                   *
+ * Purpose: creates vector with tags details                                  *
  *                                                                            *
- * Parameters: is_new_api  - [IN] flag to use new api version syntax          *
- *             entity_tags - [IN/OUT] the tag entity                          *
- *             tags        - [IN/OUT] the vector with tags info               *
- *             categories  - [IN/OUT] the vector with categories info         *
- *             easyhandle  - [IN/OUT] the CURL handle                         *
+ * Parameters: is_new_api  - [IN]                                             *
+ *             entity_tags - [IN/OUT]                                         *
+ *             tags        - [IN/OUT]                                         *
+ *             categories  - [IN/OUT]                                         *
+ *             easyhandle  - [IN/OUT] CURL handle                             *
  *                                                                            *
- * Return value: SUCCEED if the create tags vector, FAIL otherwise            *
+ * Return value: SUCCEED if create tags vector, FAIL otherwise                *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *entity_tags,
-		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
+		zbx_vector_vmware_tag_ptr_t *tags, zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {
-	int			i, found_tags = 0;
+	int			found_tags = 0;
 	zbx_vector_str_t	tag_ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() obj_id:%s", __func__, entity_tags->obj_id->id);
@@ -839,12 +836,12 @@ static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *e
 	if (FAIL == vmware_tags_linked_id(entity_tags->obj_id, easyhandle, is_new_api, &tag_ids, &entity_tags->error))
 		goto out;
 
-	for (i = 0; i < tag_ids.values_num; i++)
+	for (int i = 0; i < tag_ids.values_num; i++)
 	{
 		int			j;
 		zbx_vmware_tag_t	*tag, cmp = {.id = tag_ids.values[i]};
 
-		if (FAIL == (j = zbx_vector_vmware_tag_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
+		if (FAIL == (j = zbx_vector_vmware_tag_ptr_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
 				FAIL == (j = vmware_vectors_update(tag_ids.values[i], easyhandle, is_new_api, tags,
 				categories, &entity_tags->error)))
 		{
@@ -858,11 +855,11 @@ static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *e
 		tag->description = zbx_strdup(NULL, tags->values[j]->description);
 		tag->category = zbx_strdup(NULL, tags->values[j]->category);
 		tag->id = NULL;
-		zbx_vector_vmware_tag_append(&entity_tags->tags, tag);
+		zbx_vector_vmware_tag_ptr_append(&entity_tags->tags, tag);
 		found_tags++;
 	}
 
-	zbx_vector_vmware_tag_sort(&entity_tags->tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_tag_ptr_sort(&entity_tags->tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 out:
 	zbx_vector_str_clear_ext(&tag_ids, zbx_str_free);
 	zbx_vector_str_destroy(&tag_ids);
@@ -883,19 +880,19 @@ out:
 int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout)
 {
-	int				i, version, found_tags = 0, ret = FAIL;
-	char				*error = NULL;
-	unsigned char			is_new_api;
-	zbx_vector_vmware_entity_tags_t	entity_tags;
-	zbx_vector_vmware_tag_t		tags;
-	zbx_vector_vmware_key_value_t	categories;
-	CURL				*easyhandle = NULL;
-	struct curl_slist		*headers = NULL;
+	int					version, found_tags = 0, ret = FAIL;
+	char					*error = NULL;
+	unsigned char				is_new_api;
+	zbx_vector_vmware_entity_tags_ptr_t	entity_tags;
+	zbx_vector_vmware_tag_ptr_t		tags;
+	zbx_vector_vmware_key_value_t		categories;
+	CURL					*easyhandle = NULL;
+	struct curl_slist			*headers = NULL;
 	ZBX_HTTPPAGE_REST			page = {.data = NULL, .url = NULL};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_vmware_entity_tags_create(&entity_tags);
+	zbx_vector_vmware_entity_tags_ptr_create(&entity_tags);
 
 	zbx_vmware_lock();
 	version = service->major_version * 100 + service->minor_version * 10 + service->update_version;
@@ -912,7 +909,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() vc version:%d", __func__, version);
 
-	zbx_vector_vmware_tag_create(&tags);
+	zbx_vector_vmware_tag_ptr_create(&tags);
 	zbx_vector_vmware_key_value_create(&categories);
 	is_new_api = (702 <= version) ? 1 : 0;
 
@@ -925,7 +922,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 		goto clean;
 	}
 
-	for (i = 0; i < entity_tags.values_num; i++)
+	for (int i = 0; i < entity_tags.values_num; i++)
 		found_tags += vmware_tags_get(is_new_api, entity_tags.values[i], &tags, &categories, easyhandle);
 
 	if (NULL != headers)
@@ -935,17 +932,17 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 
 	ret = SUCCEED;
 clean:
-	zbx_vector_vmware_tag_clear_ext(&tags, vmware_tag_free);
+	zbx_vector_vmware_tag_ptr_clear_ext(&tags, vmware_tag_free);
 	zbx_vector_vmware_key_value_clear_ext(&categories, zbx_vmware_key_value_free);
-	zbx_vector_vmware_tag_destroy(&tags);
+	zbx_vector_vmware_tag_ptr_destroy(&tags);
 	zbx_vector_vmware_key_value_destroy(&categories);
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 	zbx_free(page.data);
 	zbx_free(page.url);
 out:
-	zbx_vector_vmware_entity_tags_clear_ext(&entity_tags, vmware_entity_tags_free);
-	zbx_vector_vmware_entity_tags_destroy(&entity_tags);
+	zbx_vector_vmware_entity_tags_ptr_clear_ext(&entity_tags, vmware_entity_tags_free);
+	zbx_vector_vmware_entity_tags_ptr_destroy(&entity_tags);
 
 	if (FAIL == ret)
 	{

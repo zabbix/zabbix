@@ -52,19 +52,29 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 /* mirrors the vector creation function to vector destroying function.                    */
 #define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
-int	zbx_history_init(char **error);
+int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
+		char **error);
 void	zbx_history_destroy(void);
 
-int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush);
+int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
-void	zbx_history_check_version(struct zbx_json *json, int *result);
+void	zbx_history_check_version(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
+		const char *config_history_storage_url);
 
 #define FLUSH_SUCCEED		0
 #define FLUSH_FAIL		-1
 #define FLUSH_DUPL_REJECTED	-2
+
+#define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
+#define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
+#define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
+#define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
+#define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
+#define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
+#define ZBX_DC_FLAG_HASTRIGGER	0x40	/* value is used in trigger expression */
 
 typedef struct
 {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,14 +83,15 @@ class testPermissions extends CIntegrationTest {
 	const LLD_HP_PREFIX_01 = 'hp01';
 	const LLD_GP_PREFIX_01 = 'gp01';
 	const LLD_GP_PREFIX_02 = 'gp02';
+	const HP01_NAME = self::LLD_HP_PREFIX_01.self::LLD_MACRO_HP;
 	const HP01_HOST_NAME_01 = self::LLD_HP_PREFIX_01.self::HOST_NAME_01;
 	const HP01_HOSTGROUP_NAME_01 = self::LLD_GP_PREFIX_01.self::HOSTGROUP_NAME_01;
 	const HP01_HOSTGROUP_NAME_02 = self::LLD_GP_PREFIX_02.self::HOSTGROUP_NAME_01;
 
 	private static $discovered_hostgroupid;
+	private static $discovered_hostgroup;
 	private static $triggerid;
 	private static $lldid;
-	private static $hpid;
 	private static $ts = 0;
 
 	private static $userids = [];
@@ -144,6 +145,7 @@ class testPermissions extends CIntegrationTest {
 
 		$this->assertCount(1, $response['result']);
 		self::$discovered_hostgroupid = $response['result']['discovery_groupid'];
+		self::$discovered_hostgroup = $this->getHostGroupName(self::$discovered_hostgroupid);
 
 		// Get template group ID
 		$response = $this->call('templategroup.get', [
@@ -221,7 +223,7 @@ class testPermissions extends CIntegrationTest {
 		// Create host prototype.
 		$response = $this->call('hostprototype.create', [
 			'ruleid' => self::$lldid,
-			'host' => self::LLD_HP_PREFIX_01.self::LLD_MACRO_HP,
+			'host' => self::HP01_NAME,
 			'groupLinks' => [
 				[
 					'groupid' => self::$discovered_hostgroupid
@@ -234,11 +236,16 @@ class testPermissions extends CIntegrationTest {
 				[
 					'name' => self::LLD_GP_PREFIX_02.self::LLD_MACRO_GP
 				]
+			],
+			'templates' => [
+				[
+					'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
+				]
 			]
 		]);
 
 		$this->assertCount(1, $response['result']['hostids']);
-		self::$hpid = $response['result']['hostids'][0];
+		self::$hostids[self::HP01_NAME] = $response['result']['hostids'][0];
 
 		// Create host groups
 		$hostgroups = [
@@ -857,6 +864,20 @@ class testPermissions extends CIntegrationTest {
 		return $response['result'][0]['groupid'];
 	}
 
+	private function getHostGroupName($hostGroupId) {
+		$response = $this->call('hostgroup.get', [
+			'filter' => [
+				'groupid' => [
+					$hostGroupId
+				]
+			]
+		]);
+
+		$this->assertCount(1, $response['result']);
+
+		return $response['result'][0]['name'];
+	}
+
 	/**
 	 * @required-components agent
 	 * @configurationDataProvider agentConfigurationProvider
@@ -1003,8 +1024,11 @@ class testPermissions extends CIntegrationTest {
 		self::$hostids[self::HOST_NAME_11] = $this->waitForHost(self::HOST_NAME_11);
 		$this->reloadConfigurationCache();
 
-		$this->sendSenderValue(self::HOST_NAME_11, self::LLD_NAME, ['data' => [[self::LLD_MACRO_HP => self::HOST_NAME_01], [self::LLD_MACRO_GP => self::HOSTGROUP_NAME_01]]]);
-		$this->waitForHost(self::HP01_HOST_NAME_01);
+		$this->sendSenderValue(self::HOST_NAME_11, self::LLD_NAME,
+			['data' => [[self::LLD_MACRO_HP => self::HOST_NAME_01, self::LLD_MACRO_GP => self::HOSTGROUP_NAME_01]]]
+		);
+
+		self::$hostids[self::HP01_HOST_NAME_01] = $this->waitForHost(self::HP01_HOST_NAME_01);
 
 		self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01] = $this->getHostGroupId(self::HP01_HOSTGROUP_NAME_01);
 		self::$hostgroupids[self::HP01_HOSTGROUP_NAME_02] = $this->getHostGroupId(self::HP01_HOSTGROUP_NAME_02);
@@ -1129,7 +1153,8 @@ class testPermissions extends CIntegrationTest {
 		$hosts = [
 			self::HOST_NAME_12,
 			self::HOST_NAME_13,
-			self::HOST_NAME_14
+			self::HOST_NAME_14,
+			self::HP01_HOST_NAME_01
 		];
 
 		$triggerids = $this->setTriggers($hosts);
@@ -1137,7 +1162,7 @@ class testPermissions extends CIntegrationTest {
 		$response = $this->call('alert.get', [
 			'time_from' => self::$ts
 		]);
-		$this->assertCount(2, $response['result']);
+		$this->assertCount(3, $response['result']);
 
 		$ts = self::$ts;
 
@@ -1150,8 +1175,98 @@ class testPermissions extends CIntegrationTest {
 
 		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HOST_NAME_13], 1, $ts);
 		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HOST_NAME_14], 1, $ts);
+		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HP01_HOST_NAME_01], 1, $ts);
 
 		$this->setTriggers($hosts, false, $triggerids);
+	}
+
+	/**
+	 * @depends testPermissions_addLldHost
+	 */
+	public function testPermissions_updateLldHostGroupAdd()
+	{
+		$response = $this->call('hostprototype.update', [
+			'hostid' => self::$hostids[self::HP01_NAME],
+			'groupLinks' => [
+				[
+					'groupid' => self::$discovered_hostgroupid
+				],
+				[
+					'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_12]
+				]
+			]
+		]);
+
+		$this->assertCount(1, $response['result']['hostids']);
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME_11, self::LLD_NAME,
+			['data' => [[self::LLD_MACRO_HP => self::HOST_NAME_01, self::LLD_MACRO_GP => self::HOSTGROUP_NAME_01]]]
+		);
+
+		$this->waitForHost(self::HP01_HOST_NAME_01, [
+			['name' => self::HOSTGROUP_NAME_12],
+			['name' => self::HP01_HOSTGROUP_NAME_01],
+			['name' => self::HP01_HOSTGROUP_NAME_02],
+			['name' => self::$discovered_hostgroup]
+		]);
+
+		$triggerids = $this->setTriggers([self::HP01_HOST_NAME_01]);
+
+		$response = $this->call('alert.get', [
+			'time_from' => self::$ts
+		]);
+		$this->assertCount(0, $response['result']);
+
+		$this->setTriggers([self::HP01_HOST_NAME_01], false, $triggerids);
+	}
+
+	/**
+	 * @depends testPermissions_updateLldHostGroupAdd
+	 */
+	public function testPermissions_updateLldHostGroupRemove()
+	{
+		$response = $this->call('hostprototype.update', [
+			'hostid' => self::$hostids[self::HP01_NAME],
+			'groupLinks' => [
+				[
+					'groupid' => self::$discovered_hostgroupid
+				]
+			]
+		]);
+
+		$this->assertCount(1, $response['result']['hostids']);
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME_11, self::LLD_NAME,
+			['data' => [[self::LLD_MACRO_HP => self::HOST_NAME_01, self::LLD_MACRO_GP => self::HOSTGROUP_NAME_01]]]
+		);
+
+		$this->waitForHost(self::HP01_HOST_NAME_01, [
+			['name' => self::HP01_HOSTGROUP_NAME_01],
+			['name' => self::HP01_HOSTGROUP_NAME_02],
+			['name' => self::$discovered_hostgroup]
+		]);
+
+		$triggerids = $this->setTriggers([self::HP01_HOST_NAME_01]);
+
+		$response = $this->call('alert.get', [
+			'time_from' => self::$ts
+		]);
+		$this->assertCount(1, $response['result']);
+
+		$ts = self::$ts;
+
+		foreach ($response['result'] as $alert) {
+			if ($alert['clock'] > self::$ts)
+				self::$ts = $alert['clock'];
+		}
+
+		self::$ts++;
+
+		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HP01_HOST_NAME_01], 1, $ts);
+
+		$this->setTriggers([self::HP01_HOST_NAME_01], false, $triggerids);
 
 		self::$LLD_HOST_METADATA = self::HOST_METADATA5;
 	}
@@ -1159,7 +1274,7 @@ class testPermissions extends CIntegrationTest {
 	/**
 	 * @required-components agent
 	 * @configurationDataProvider agentConfigurationProviderLld
-	 * @depends testPermissions_addLldHost
+	 * @depends testPermissions_updateLldHostGroupRemove
 	 */
 	public function testPermissions_removeLldHost()
 	{

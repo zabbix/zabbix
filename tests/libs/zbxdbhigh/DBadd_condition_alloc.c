@@ -84,7 +84,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (NULL == zbx_regexp_match(sql, sql_rgx, NULL))
 	{
-		unsigned int len;
+		int	len;
 
 		if (sql_offset > (len = 4 * ZBX_KIBIBYTE) * 2)
 		{

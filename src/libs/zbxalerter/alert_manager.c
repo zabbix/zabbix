@@ -201,6 +201,7 @@ typedef struct
 	zbx_es_t			es;
 
 	zbx_ipc_service_t		ipc;
+	zbx_ipc_client_t		*syncer_client;
 }
 zbx_am_t;
 
@@ -939,17 +940,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees alerter                                                     *
- *                                                                            *
- ******************************************************************************/
-static void	am_alerter_free(zbx_am_alerter_t *alerter)
-{
-	zbx_ipc_client_close(alerter->client);
-	zbx_free(alerter);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: registers alerter                                                 *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
@@ -988,6 +978,25 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		zbx_hashset_insert(&manager->alerters_client, &alerter, sizeof(zbx_am_alerter_t *));
 		zbx_queue_ptr_push(&manager->free_alerters, alerter);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	pid_t	ppid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memcpy(&ppid, message->data, sizeof(ppid));
+
+	if (ppid != getppid())
+	{
+		zbx_ipc_client_close(client);
+		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
+	}
+	else
+		manager->syncer_client = client;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1166,48 +1175,11 @@ static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char 
 	zbx_binary_heap_create(&manager->queue, am_mediatype_queue_compare, ZBX_BINARY_HEAP_OPTION_DIRECT);
 
 	zbx_es_init(&manager->es);
+	manager->syncer_client = NULL;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: destroys alert manager                                            *
- *                                                                            *
- * Parameters: manager - [IN]                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	am_destroy(zbx_am_t *manager)
-{
-	zbx_am_alert_t		*alert;
-	zbx_hashset_iter_t	iter;
-	zbx_am_media_t		*media;
-
-	zbx_es_destroy(&manager->es);
-
-	zbx_hashset_destroy(&manager->alerters_client);
-	zbx_queue_ptr_destroy(&manager->free_alerters);
-	zbx_vector_am_alerter_ptr_clear_ext(&manager->alerters, am_alerter_free);
-	zbx_vector_am_alerter_ptr_destroy(&manager->alerters);
-
-	while (NULL != (alert = am_pop_alert(manager)))
-		am_remove_alert(manager, alert);
-
-	zbx_binary_heap_destroy(&manager->queue);
-
-	zbx_hashset_iter_reset(&manager->watchdog, &iter);
-	while (NULL != (media = (zbx_am_media_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_free(media->sendto);
-		zbx_hashset_iter_remove(&iter);
-	}
-	zbx_hashset_destroy(&manager->watchdog);
-
-	zbx_hashset_destroy(&manager->results);
-	zbx_hashset_destroy(&manager->alertpools);
-	zbx_hashset_destroy(&manager->mediatypes);
 }
 
 /******************************************************************************
@@ -2389,7 +2361,11 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
-			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager), scripts_path))
+			zbx_am_alert_t	*alert;
+			if (NULL == (alert = am_pop_alert(&manager)))
+				break;
+
+			if (FAIL == am_process_alert(&manager, alerter, alert, scripts_path))
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 
@@ -2415,6 +2391,16 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			{
 				case ZBX_IPC_ALERTER_REGISTER:
 					am_register_alerter(&manager, client, message);
+					break;
+				case ZBX_IPC_ALERT_SYNCER_REGISTER:
+					am_register_alert_syncer(&manager, client, message);
+					break;
+				case ZBX_IPC_ALERTER_SYNC_ALERTS:
+					if (FAIL == zbx_ipc_client_send(manager.syncer_client,
+							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to send message to sync alerts");
+					}
 					break;
 				case ZBX_IPC_ALERTER_RESULT:
 					if (SUCCEED == am_process_result(&manager, client, message))
@@ -2474,9 +2460,6 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&manager.ipc);
-	am_destroy(&manager);
 #undef ZBX_DB_PING_FREQUENCY
 #undef ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY
 }

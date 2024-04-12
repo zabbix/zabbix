@@ -2377,12 +2377,14 @@ function getMainItemFieldNames(array $input): array {
 
 		case ZBX_FLAG_DISCOVERY_RULE:
 			if ($input['templateid'] == 0) {
-				$field_names = ['name', 'type', 'key_', 'lifetime', 'description', 'status', 'preprocessing',
-					'lld_macro_paths', 'overrides'
+				$field_names = ['name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime','description', 'status', 'preprocessing', 'lld_macro_paths', 'overrides'
 				];
 			}
 			else {
-				$field_names = ['lifetime', 'description', 'status'];
+				$field_names = ['lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime', 'description',
+					'status'
+				];
 			}
 
 			if (array_key_exists('itemid', $input) || $input['filter']['conditions']) {
@@ -2516,6 +2518,11 @@ function getTypeItemFieldNames(array $input): array {
 function getConditionalItemFieldNames(array $field_names, array $input): array {
 	return array_filter($field_names, static function ($field_name) use ($input): bool {
 		switch ($field_name) {
+			case 'lifetime':
+				return $input['lifetime_type'] == ZBX_LLD_DELETE_AFTER;
+			case 'enabled_lifetime':
+				return in_array($input['lifetime_type'], [ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_AFTER])
+					&& $input['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER;
 			case 'units':
 			case 'trends':
 				return in_array($input['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
@@ -2665,4 +2672,21 @@ function getInheritedTimeouts(string $proxyid): array {
 			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
 		]
 	];
+}
+
+/**
+ * @param int   $item_type
+ * @param array $hostids
+ *
+ * @return array
+ */
+function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+	$items_count = API::Item()->get([
+		'countOutput' => true,
+		'groupCount' => true,
+		'hostids' => $hostids,
+		'filter' => ['type' => $item_type]
+	]);
+
+	return array_column($items_count, 'rowscount', 'hostid');
 }

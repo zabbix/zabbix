@@ -57,7 +57,7 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcompress}.c{..\..\..\src\libs\zbxcompress}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\libs\zbxconf}.c{..\..\..\src\libs\zbxconf}.o:
+{..\..\..\src\libs\zbxcfg}.c{..\..\..\src\libs\zbxcfg}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxcrypto}.c{..\..\..\src\libs\zbxcrypto}.o:
@@ -91,6 +91,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxhttp}.c{..\..\..\src\libs\zbxhttp}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxcurl}.c{..\..\..\src\libs\zbxcurl}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxsysinfo}.c{..\..\..\src\libs\zbxsysinfo}.o:
@@ -133,6 +136,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\zabbix_agent\active_checks}.c{..\..\..\src\zabbix_agent\active_checks}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\zabbix_agent\metrics}.c{..\..\..\src\zabbix_agent\metrics}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\zabbix_agent\eventlog}.c{..\..\..\src\zabbix_agent\eventlog}.o:

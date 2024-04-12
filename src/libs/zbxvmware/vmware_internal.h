@@ -19,11 +19,27 @@
 #ifndef ZABBIX_VMWARE_INTERNAL_H
 #define ZABBIX_VMWARE_INTERNAL_H
 
-#include "config.h"
+#include "zbxvmware.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "zbxxml.h"
+#endif
 
-#include "zbxxml.h"
+typedef struct
+{
+	time_t			nextcheck;
+#define ZBX_VMWARE_UPDATE_CONF		1
+#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
+#define ZBX_VMWARE_UPDATE_REST_TAGS	3
+	int			type;
+	int			expired;
+	zbx_vmware_service_t	*service;
+}
+zbx_vmware_job_t;
+
+zbx_vmware_t			*zbx_vmware_get_vmware(void);
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
@@ -63,7 +79,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 		int config_vmware_timeout);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst);
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *src, zbx_vmware_data_tags_t *dst);
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
@@ -87,7 +103,7 @@ typedef struct
 }
 zbx_vmware_cq_value_t;
 
-ZBX_PTR_VECTOR_DECL(cq_value, zbx_vmware_cq_value_t *)
+ZBX_PTR_VECTOR_DECL(cq_value_ptr, zbx_vmware_cq_value_t *)
 
 /* VMware alarms cache information */
 typedef struct
@@ -100,12 +116,12 @@ typedef struct
 }
 zbx_vmware_alarm_details_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
+ZBX_PTR_VECTOR_DECL(vmware_alarm_details_ptr, zbx_vmware_alarm_details_t *)
 
 typedef struct
 {
-	zbx_vector_vmware_alarm_t		*alarms;
-	zbx_vector_vmware_alarm_details_t	details;
+	zbx_vector_vmware_alarm_ptr_t		*alarms;
+	zbx_vector_vmware_alarm_details_ptr_t	details;
 }
 zbx_vmware_alarms_data_t;
 /* VMware alarms cache information END */
@@ -143,8 +159,8 @@ void	zbx_property_collection_free(zbx_property_collection_iter *iter);
 
 int	vmware_ds_id_compare(const void *d1, const void *d2);
 
-char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const char *soap_type,
-		const char *obj_id, zbx_vector_cq_value_t *cqvs);
+char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_ptr_t *cq_values, const char *soap_type,
+		const char *obj_id, zbx_vector_cq_value_ptr_t *cqvs);
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
 
@@ -163,7 +179,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		CURL *easyhandle, xmlDoc *xdoc, xmlNode *node, zbx_vector_str_t *ids,
 		zbx_vmware_alarms_data_t *alarms_data, char **error);
 
-void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_t *cqvs);
+void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_ptr_t *cqvs);
 
 #define ZBX_XPATH_VM_HARDWARE(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
@@ -175,6 +191,36 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len);
 void	evt_msg_strpool_strfree(char *str);
 
+#define ZBX_XNN(NN)			"*[local-name()='" NN "']"
+#define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
+#define ZBX_XPATH_LN(LN)			"/" ZBX_XPATH_NN(LN)
+#define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
+#define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
+#define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
+
+typedef struct
+{
+	char	*data;
+	size_t	alloc;
+	size_t	offset;
+}
+ZBX_HTTPPAGE;
+
+int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
+		const char *config_source_ip, int config_vmware_timeout, char **error);
+
+typedef struct
+{
+	char	*key;
+	char	*value;
+}
+zbx_vmware_key_value_t;
+ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
+void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
+
+char	*vmware_shared_strdup(const char *str);
+void	vmware_shared_strfree(char *str);
+int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_INTERNAL_H */

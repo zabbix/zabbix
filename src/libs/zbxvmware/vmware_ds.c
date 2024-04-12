@@ -29,20 +29,13 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_VMWARE_DS_REFRESH_VERSION	6
-
-ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
-
-#define ZBX_XPATH_PROP_SUFFIX(property)									\
-	"*[local-name()='propSet'][*[local-name()='name']"						\
-	"[substring(text(),string-length(text())-string-length('" property "')+1)='" property "']]"	\
-	"/*[local-name()='val']"
+ZBX_PTR_VECTOR_IMPL(vmware_datastore_ptr, zbx_vmware_datastore_t *)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees resources allocated to store Datastore name data            *
+ * Purpose: frees resources allocated to store datastore name data            *
  *                                                                            *
- * Parameters: dsname   - [IN] the Datastore name                             *
+ * Parameters: dsname - [IN] datastore name                                   *
  *                                                                            *
  ******************************************************************************/
 void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
@@ -57,7 +50,7 @@ void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
  *                                                                            *
  * Purpose: frees resources allocated to store diskextent data                *
  *                                                                            *
- * Parameters: diskextent   - [IN] the diskextent                             *
+ * Parameters: diskextent - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_diskextent_free(zbx_vmware_diskextent_t *diskextent)
@@ -68,7 +61,7 @@ static void	vmware_diskextent_free(zbx_vmware_diskextent_t *diskextent)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free memory of vector element                                     *
+ * Purpose: frees memory of vector element                                    *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_str_uint64_pair_free(zbx_str_uint64_pair_t data)
@@ -80,7 +73,7 @@ static void	zbx_str_uint64_pair_free(zbx_str_uint64_pair_t data)
  *                                                                            *
  * Purpose: frees resources allocated to store datastore data                 *
  *                                                                            *
- * Parameters: datastore   - [IN] the datastore                               *
+ * Parameters: datastore - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
@@ -88,8 +81,8 @@ void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 	zbx_vector_str_uint64_pair_clear_ext(&datastore->hv_uuids_access, zbx_str_uint64_pair_free);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
 
-	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_diskextent_free);
-	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
+	zbx_vector_vmware_diskextent_ptr_clear_ext(&datastore->diskextents, vmware_diskextent_free);
+	zbx_vector_vmware_diskextent_ptr_destroy(&datastore->diskextents);
 
 	zbx_vector_str_clear_ext(&datastore->alarm_ids, zbx_str_free);
 	zbx_vector_str_destroy(&datastore->alarm_ids);
@@ -103,24 +96,23 @@ void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find DS by canonical disk name (perf counter instance)            *
+ * Purpose: finds DS by canonical disk name (perf counter instance)           *
  *                                                                            *
- * Parameters: dss      - [IN] all known Datastores                           *
+ * Parameters: dss      - [IN] all known datastores                           *
  *             diskname - [IN] canonical disk name                            *
  *                                                                            *
- * Return value: uuid of Datastore or NULL                                    *
+ * Return value: uuid of datastore or NULL                                    *
  *                                                                            *
  ******************************************************************************/
-char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname)
+char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_ptr_t *dss, char *diskname)
 {
 	zbx_vmware_diskextent_t	dx_cmp = {.diskname = diskname};
-	int			i;
 
-	for (i = 0; i< dss->values_num; i++)
+	for (int i = 0; i< dss->values_num; i++)
 	{
 		zbx_vmware_datastore_t	*ds = dss->values[i];
 
-		if (FAIL == zbx_vector_vmware_diskextent_bsearch(&ds->diskextents, &dx_cmp,
+		if (FAIL == zbx_vector_vmware_diskextent_ptr_bsearch(&ds->diskextents, &dx_cmp,
 				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC))
 		{
 			continue;
@@ -134,12 +126,10 @@ char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_ds_uuid_compare                                           *
- *                                                                            *
- * Purpose: sorting function to sort Datastore vector by uuid                 *
+ * Purpose: sorting function to sort datastore vector by uuid                 *
  *                                                                            *
  ******************************************************************************/
-int	vmware_ds_uuid_compare(const void *d1, const void *d2)
+int	zbx_vmware_ds_uuid_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
 	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
@@ -149,12 +139,10 @@ int	vmware_ds_uuid_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_ds_name_compare                                           *
- *                                                                            *
- * Purpose: sorting function to sort Datastore vector by name                 *
+ * Purpose: sorting function to sort datastore vector by name                 *
  *                                                                            *
  ******************************************************************************/
-int	vmware_ds_name_compare(const void *d1, const void *d2)
+int	zbx_vmware_ds_name_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
 	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
@@ -164,7 +152,7 @@ int	vmware_ds_name_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort Datastore vector by id                   *
+ * Purpose: sorting function to sort datastore vector by id                   *
  *                                                                            *
  ******************************************************************************/
 int	vmware_ds_id_compare(const void *d1, const void *d2)
@@ -180,11 +168,11 @@ int	vmware_ds_id_compare(const void *d1, const void *d2)
  * Purpose: Refreshes all storage related information including free-space,   *
  *          capacity, and detailed usage of virtual machines.                 *
  *                                                                            *
- * Parameters: easyhandle   - [IN] the CURL handle                            *
- *             id           - [IN] the datastore id                           *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: easyhandle   - [IN] CURL handle                                *
+ *             id           - [IN] datastore id                               *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Comments: This is required for ESX/ESXi hosts version < 6.0 only           *
+ * Comments: This is required for ESX/ESXi hosts version < 6.0 only.          *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *id, char **error)
@@ -209,26 +197,29 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef ZBX_POST_REFRESH_DATASTORE
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create vmware hypervisor datastore object                         *
+ * Purpose: creates vmware hypervisor datastore object                        *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             id           - [IN] the datastore id                           *
- *             cq_values    - [IN/OUT] the custom query values                *
- *             alarms_data  - [IN/OUT] the all alarms with cache              *
+ * Parameters: service     - [IN] vmware service                              *
+ *             easyhandle  - [IN] CURL handle                                 *
+ *             id          - [IN] datastore id                                *
+ *             cq_values   - [IN/OUT] custom query values                     *
+ *             alarms_data - [IN/OUT] all alarms with cache                   *
  *                                                                            *
  * Return value: The created datastore object or NULL if an error was         *
- *                detected                                                    *
+ *               detected.                                                    *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *id, zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data)
+		const char *id, zbx_vector_cq_value_ptr_t *cq_values, zbx_vmware_alarms_data_t *alarms_data)
 {
-#	define ZBX_XPATH_DATASTORE_SUMMARY(property)						\
+#define ZBX_VMWARE_DS_REFRESH_VERSION	6
+
+#	define ZBX_XPATH_DATASTORE_SUMMARY(property)			\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
@@ -252,16 +243,18 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char			*tmp, *cq_prop, *uuid = NULL, *name = NULL, *path, *id_esc, *value, *error = NULL;
-	int			ret;
-	zbx_vmware_datastore_t	*datastore = NULL;
-	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
-	xmlDoc			*doc = NULL;
-	zbx_vector_cq_value_t	cqvs;
+	char				*tmp, *cq_prop, *uuid = NULL, *name = NULL, *path, *id_esc, *value,
+					*error = NULL;
+	int				ret;
+	zbx_vmware_datastore_t		*datastore = NULL;
+	zbx_uint64_t			capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64,
+					uncommitted = ZBX_MAX_UINT64;
+	xmlDoc				*doc = NULL;
+	zbx_vector_cq_value_ptr_t	cqvs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __func__, id);
 
-	zbx_vector_cq_value_create(&cqvs);
+	zbx_vector_cq_value_ptr_create(&cqvs);
 	id_esc = zbx_xml_escape_dyn(id);
 
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
@@ -271,7 +264,6 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 		zbx_free(id_esc);
 		goto out;
 	}
-
 
 	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_DS, id, &cqvs);
 	tmp = zbx_dsprintf(NULL, ZBX_POST_DATASTORE_GET, get_vmware_service_objects()[service->type].property_collector,
@@ -343,7 +335,7 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 	datastore->uncommitted = uncommitted;
 	zbx_vector_str_create(&datastore->alarm_ids);
 	zbx_vector_str_uint64_pair_create(&datastore->hv_uuids_access);
-	zbx_vector_vmware_diskextent_create(&datastore->diskextents);
+	zbx_vector_vmware_diskextent_ptr_create(&datastore->diskextents);
 	vmware_service_get_diskextents_list(doc, &datastore->diskextents);
 
 	if (0 != cqvs.values_num)
@@ -357,7 +349,7 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 	}
 out:
 	zbx_xml_free_doc(doc);
-	zbx_vector_cq_value_destroy(&cqvs);
+	zbx_vector_cq_value_ptr_destroy(&cqvs);
 
 	if (NULL != error)
 	{
@@ -368,6 +360,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return datastore;
+#undef ZBX_VMWARE_DS_REFRESH_VERSION
 
 #	undef ZBX_XPATH_DATASTORE_SUMMARY
 #	undef ZBX_POST_DATASTORE_GET
@@ -375,9 +368,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: populate array of values from an xml data                         *
+ * Purpose: populates array of values from xml data                           *
  *                                                                            *
- * Parameters: xdoc    - [IN] XML document                                    *
+ * Parameters: xdoc    - [IN] xml document                                    *
  *             ds_node - [IN] xml node with datastore info                    *
  *             ds_id   - [IN] datastore id (for logging)                      *
  *                                                                            *
@@ -386,6 +379,11 @@ out:
  ******************************************************************************/
 static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, const char *ds_id)
 {
+#	define ZBX_XPATH_PROP_SUFFIX(property)									\
+		"*[local-name()='propSet'][*[local-name()='name']"						\
+		"[substring(text(),string-length(text())-string-length('" property "')+1)='" property "']]"	\
+		"/*[local-name()='val']"
+
 	zbx_uint64_t	mi_access = ZBX_VMWARE_DS_NONE;
 	char		*value;
 
@@ -426,26 +424,26 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mountinfo:" ZBX_FS_UI64, __func__, mi_access);
 
 	return mi_access;
+#	undef ZBX_XPATH_PROP_SUFFIX
 }
 
 /******************************************************************************
- * Function: vmware_hv_ds_access_parse                                        *
  *                                                                            *
- * Purpose: read access state of hv to ds                                     *
+ * Purpose: reads access state of hv to ds                                    *
  *                                                                            *
- * Parameters: xdoc    - [IN] the xml data with DS access info                *
- *             hv_dss  - [IN] the vector with all DS connected to HV          *
- *             hv_uuid - [IN] the uuid of HV                                  *
- *             hv_id   - [IN] the id of HV (for logging)                      *
- *             dss     - [IN/OUT] the vector with all Datastores              *
+ * Parameters: xdoc    - [IN] xml data with DS access info                    *
+ *             hv_dss  - [IN] vector with all DS connected to HV              *
+ *             hv_uuid - [IN] uuid of HV                                      *
+ *             hv_id   - [IN] id of HV (for logging)                          *
+ *             dss     - [IN/OUT] vector with all datastores                  *
  *                                                                            *
  * Return value: count of updated DS                                          *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_dss, const char *hv_uuid,
-		const char *hv_id, zbx_vector_vmware_datastore_t *dss)
+		const char *hv_id, zbx_vector_vmware_datastore_ptr_t *dss)
 {
-	int		i, parsed_num = 0;
+	int		parsed_num = 0;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
@@ -469,7 +467,7 @@ static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_ds
 
 	nodeset = xpathObj->nodesetval;
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		int				j;
 		char				*value;
@@ -493,7 +491,7 @@ static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_ds
 
 		ds_cmp.id = hv_dss->values[j];
 
-		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
+		if (FAIL == (j = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Datastore \"%s\" not found on hypervisor \"%s\".", __func__,
 					ds_cmp.id, hv_id);
@@ -516,24 +514,23 @@ clean:
 }
 
 /******************************************************************************
- * Function: vmware_hv_ds_access_update                                       *
  *                                                                            *
- * Purpose: update access state of hv to ds                                   *
+ * Purpose: updates access state of hv to ds                                  *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             hv_uuid      - [IN] the vmware hypervisor uuid                 *
- *             hv_id        - [IN] the vmware hypervisor id                   *
- *             hv_dss       - [IN] the vector with all DS connected to HV     *
- *             dss          - [IN/OUT] the vector with all Datastores         *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             hv_uuid      - [IN] vmware hypervisor uuid                     *
+ *             hv_id        - [IN] vmware hypervisor id                       *
+ *             hv_dss       - [IN] vector with all DS connected to HV         *
+ *             dss          - [IN/OUT] vector with all datastores             *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the access state was updated successfully          *
+ * Return value: SUCCEED - access state was updated successfully              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyhandle, const char *hv_uuid,
-		const char *hv_id, const zbx_vector_str_t *hv_dss, zbx_vector_vmware_datastore_t *dss, char **error)
+		const char *hv_id, const zbx_vector_str_t *hv_dss, zbx_vector_vmware_datastore_ptr_t *dss, char **error)
 {
 #	define ZBX_POST_HV_DS_ACCESS 									\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -604,10 +601,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get statically defined default value for maxquerymetrics for      *
+ * Purpose: Gets statically defined default value for maxquerymetrics for     *
  *          vcenter when it could not be retrieved from soap, depending on    *
- *          vcenter version (https://kb.vmware.com/s/article/2107096)         *
- * Parameters: service   - [IN] the vmware service                            *
+ *          vcenter version (https://kb.vmware.com/s/article/2107096).        *
+ *                                                                            *
+ * Parameters: service - [IN] vmware service                                  *
  *                                                                            *
  * Return value: maxquerymetrics                                              *
  *                                                                            *
@@ -625,16 +623,16 @@ static int	get_default_maxquerymetrics_for_vcenter(const zbx_vmware_service_t *s
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get vpxd.stats.maxquerymetrics parameter from vcenter only        *
+ * Purpose: gets vpxd.stats.maxquerymetrics parameter from vcenter only       *
  *                                                                            *
- * Parameters: easyhandle   - [IN] the CURL handle                            *
- *             service      - [IN] the vmware service                         *
- *             max_qm       - [OUT] max count of Datastore metrics in one     *
- *                                  request                                   *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             service    - [IN] vmware service                               *
+ *             max_qm     - [OUT] max count of datastore metrics in one       *
+ *                                request                                     *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_service_t *service, int *max_qm,
@@ -675,10 +673,10 @@ int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_service_t *s
 		goto out;
 	}
 
-	/* vmware article 2107096                                                                    */
-	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server */
-	/* To disable the limit, set a value to -1                                                   */
-	/* Edit the web.xml file. To disable the limit, set a value 0                                */
+	/* vmware article 2107096                                                                     */
+	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server. */
+	/* To disable the limit, set a value to -1.                                                   */
+	/* Edit the web.xml file. To disable the limit, set a value 0.                                */
 	if (-1 == atoi(val))
 	{
 		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;

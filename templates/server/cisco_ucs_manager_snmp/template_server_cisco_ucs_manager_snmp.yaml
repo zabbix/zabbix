@@ -1700,7 +1700,7 @@ zabbix_export:
           value: '1'
         - macro: '{$NET.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore notPresent(6) by default.'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
         - macro: '{$NET.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore down(2) administrative status by default.'

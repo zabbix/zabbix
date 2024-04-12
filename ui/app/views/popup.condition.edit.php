@@ -29,7 +29,7 @@ $inline_js = getPagePostJs().$this->readJsFile('popup.condition.edit.js.php');
 $form = (new CForm())
 	->setId('popup.condition')
 	->setName('popup.condition')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('row_index', $data['row_index'] ? $data['row_index'] : 0)
 	->addVar('type', $data['type']);
@@ -634,7 +634,7 @@ switch ($data['type']) {
 				foreach ($operators_by_condition[ZBX_CONDITION_TYPE_DUPTIME] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
-				$new_condition_value = (new CNumericBox('value', 600, 15))
+				$new_condition_value = (new CNumericBox('value', 600, 7))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH)
 					->setId('value');
 

@@ -22,15 +22,16 @@ package version
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 )
 
 const (
-	ZABBIX_REVDATE          = "19 December 2023"
+	ZABBIX_REVDATE          = "20 March 2024"
 	ZABBIX_VERSION_MAJOR    = 7
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "beta1"
+	ZABBIX_VERSION_RC       = "beta3"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2024 Zabbix SIA\n" +
@@ -144,9 +145,15 @@ func TitleMessage() string {
 	return title
 }
 
+// Display shows program version.
+// Program version includes Zabbix revision and it's time and date, compilation time and date, Go compiler tree's
+// version string, copyright message, and additionalMessages provided by the caller function.
 func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
-	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
+	fmt.Printf(
+		"Revision %s %s, compilation time: %s %s, built with: %s\n",
+		Revision(), RevDate(), CompileDate(), CompileTime(), runtime.Version(),
+	)
 
 	for _, msg := range additionalMessages {
 		fmt.Println(msg)

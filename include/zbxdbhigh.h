@@ -270,6 +270,17 @@ zbx_db_event;
 
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
 
+/* data structures used to create new and recover existing escalations */
+typedef struct
+{
+	zbx_uint64_t	actionid;
+	zbx_uint64_t	escalationid;
+	zbx_db_event	*event;
+}
+zbx_escalation_new_t;
+
+ZBX_PTR_VECTOR_DECL(escalation_new_ptr, zbx_escalation_new_t *)
+
 /* temporary cache of trigger related data */
 typedef struct
 {
@@ -610,7 +621,8 @@ typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned cha
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
+		zbx_vector_escalation_new_ptr_t *escalations);
 typedef void	(*zbx_clean_events_func_t)(void);
 typedef void	(*zbx_reset_event_recovery_func_t)(void);
 typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
@@ -715,11 +727,13 @@ typedef struct
 	int			value;
 	int			severity;
 
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_t	tags;
 	int			suppressed;
 	int			mtime;
 }
 zbx_event_t;
+
+ZBX_PTR_VECTOR_DECL(events_ptr, zbx_event_t *)
 
 int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
@@ -929,21 +943,6 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
-
-typedef struct
-{
-	zbx_uint64_t	autoreg_hostid;
-	zbx_uint64_t	hostid;
-	char		*host;
-	char		*ip;
-	char		*dns;
-	char		*host_metadata;
-	int		now;
-	unsigned short	port;
-	unsigned short	flag;
-	unsigned int	connection_type;
-}
-zbx_autoreg_host_t;
 
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1

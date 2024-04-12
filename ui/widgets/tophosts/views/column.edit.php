@@ -45,9 +45,10 @@ if (array_key_exists('edit', $data)) {
 
 // Name.
 $form_grid->addItem([
-	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+	(new CLabel(_('Name'), 'column_name'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('name', $data['name'], false))
+			->setId('column_name')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
@@ -65,6 +66,7 @@ $form_grid->addItem([
 				CWidgetFieldColumnsList::DATA_HOST_NAME => _('Host name'),
 				CWidgetFieldColumnsList::DATA_TEXT => _('Text')
 			]))
+			->setFocusableElementId('data')
 	)
 ]);
 
@@ -81,7 +83,7 @@ $form_grid->addItem([
 // Item.
 $parameters = [
 	'srctbl' => 'items',
-	'srcfld1' => 'itemid',
+	'srcfld1' => 'name',
 	'dstfrm' => $form->getName(),
 	'dstfld1' => 'item',
 	'value_types' => [
@@ -118,7 +120,7 @@ $item_select = (new CPatternSelect([
 $scripts[] = $item_select->getPostJS();
 
 $form_grid->addItem([
-	(new CLabel(_('Item'), 'item'))->setAsteriskMark(),
+	(new CLabel(_('Item name'), 'item_ms'))->setAsteriskMark(),
 	new CFormField($item_select)
 ]);
 
@@ -163,7 +165,7 @@ $form_grid->addItem([
 
 // Base color.
 $form_grid->addItem([
-	new CLabel(_('Base color'), 'base_color'),
+	new CLabel(_('Base color'), 'lbl_base_color'),
 	new CFormField(new CColor('base_color', $data['base_color']))
 ]);
 
@@ -225,10 +227,11 @@ $form_grid->addItem([
 			(makeWarningIcon(_('With this setting only numeric items will be displayed.')))
 				->setId('tophosts-column-aggregate-function-warning')
 		],
-		'aggregate_function'
+		'column_aggregate_function'
 	),
 	new CFormField(
-		(new CSelect('aggregate_function'))->setId('aggregate_function')
+		(new CSelect('aggregate_function'))
+			->setId('aggregate_function')
 			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
 				AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
@@ -240,6 +243,7 @@ $form_grid->addItem([
 				AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
 				AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 			]))
+			->setFocusableElementId('column_aggregate_function')
 	)
 ]);
 

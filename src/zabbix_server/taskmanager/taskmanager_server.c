@@ -22,8 +22,8 @@
 #include "../db_lengths_constants.h"
 #include "../events/events.h"
 #include "../actions/actions.h"
+#include "../audit/audit_server.h"
 
-#include "zbxservice.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -35,7 +35,6 @@
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
-#include "audit/zbxaudit_proxy.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
@@ -62,10 +61,11 @@ static zbx_export_file_t	*get_problems_export(void)
  *             triggerid         - [IN] source trigger id                     *
  *             eventid           - [IN] problem eventid to close              *
  *             userid            - [IN] user that requested to close problem  *
+ *             rtc                 [IN] RTC socket                            *
  *                                                                            *
  ******************************************************************************/
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
-		zbx_uint64_t userid)
+		zbx_uint64_t userid, zbx_ipc_async_socket_t *rtc)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
@@ -74,7 +74,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 	/* check if the task hasn't been already closed by another process */
 	if (NULL != zbx_db_fetch(result))
-		zbx_close_problem(triggerid, eventid, userid);
+		zbx_close_problem(triggerid, eventid, userid, rtc);
 
 	zbx_db_free_result(result);
 
@@ -88,12 +88,13 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  * Purpose: tries to close problem by event acknowledgment action             *
  *                                                                            *
  * Parameters: taskid - [IN]                                                  *
+ *             rtc    - [IN] RTC socket                                       *
  *                                                                            *
  * Return value: SUCCEED - task was executed and removed                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_try_task_close_problem(zbx_uint64_t taskid)
+static int	tm_try_task_close_problem(zbx_uint64_t taskid, zbx_ipc_async_socket_t *rtc)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -138,7 +139,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			{
 				ZBX_STR2UINT64(userid, row[0]);
 				ZBX_STR2UINT64(eventid, row[1]);
-				tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
+				tm_execute_task_close_problem(taskid, triggerid, eventid, userid, rtc);
 
 				zbx_dc_config_unlock_triggers(&locked_triggerids);
 
@@ -1331,7 +1332,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 		{
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
 				/* close problem tasks will never have 'in progress' status */
-				if (SUCCEED == tm_try_task_close_problem(taskid))
+				if (SUCCEED == tm_try_task_close_problem(taskid, rtc))
 					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:

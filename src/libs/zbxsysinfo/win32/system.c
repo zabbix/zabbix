@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxtime.h"
 
 #include "zbxwin32.h"
@@ -160,7 +160,8 @@ out:
 static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, char **var,
 		double time_first_query_started, double *time_previous_query_finished)
 {
-	double	time_left = sysinfo_get_config_timeout() - (*time_previous_query_finished - time_first_query_started);
+	double	time_left = sysinfo_get_config_timeout() - (*time_previous_query_finished -
+			time_first_query_started);
 
 	if (0 >= time_left)
 		return;

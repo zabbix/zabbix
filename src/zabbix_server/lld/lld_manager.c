@@ -139,16 +139,6 @@ static void	lld_rule_clear(zbx_lld_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees LLD worker                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	lld_worker_free(zbx_lld_worker_t *worker)
-{
-	zbx_free(worker);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: initializes LLD manager                                           *
  *                                                                            *
  ******************************************************************************/
@@ -183,21 +173,6 @@ static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f 
 	manager->queued_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: destroys LLD manager                                              *
- *                                                                            *
- ******************************************************************************/
-static void	lld_manager_destroy(zbx_lld_manager_t *manager)
-{
-	zbx_binary_heap_destroy(&manager->rule_queue);
-	zbx_hashset_destroy(&manager->rule_index);
-	zbx_queue_ptr_destroy(&manager->free_workers);
-	zbx_hashset_destroy(&manager->workers_client);
-	zbx_vector_ptr_clear_ext(&manager->workers, (zbx_clean_func_t)lld_worker_free);
-	zbx_vector_ptr_destroy(&manager->workers);
 }
 
 /******************************************************************************
@@ -649,7 +624,4 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&lld_service);
-	lld_manager_destroy(&manager);
 }

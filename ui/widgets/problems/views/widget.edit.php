@@ -43,7 +43,11 @@ $form
 	)
 	->addField(array_key_exists('hostids', $data['fields'])
 		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
-			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+			->setFilterPreselect([
+				'id' => $groupids->getId(),
+				'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+				'submit_as' => 'groupid'
+			])
 		: null
 	)
 	->addField(
@@ -102,7 +106,7 @@ function getAcknowledgementStatusFieldsViews(CWidgetFormView $form, array $field
 	$acknowledged_by_me_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']));
 
 	return [
-		new CLabel(_('Acknowledgement status')),
+		new CLabel(_('Acknowledgement status'), 'acknowledgement_status'),
 		new CFormField(new CHorList([
 			$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

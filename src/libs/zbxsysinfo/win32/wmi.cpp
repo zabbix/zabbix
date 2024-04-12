@@ -26,7 +26,6 @@ extern "C"
 #	include "zbxlog.h"
 #	include "zbxalgo.h"
 #	include "zbxjson.h"
-#	include "cfg.h"
 }
 
 #include <comdef.h>
@@ -399,7 +398,10 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		*error = zbx_strdup(*error, "Empty WMI search result.");
 exit:
 	if (0 != pEnumerator)
+	{
+		while (WBEM_S_NO_ERROR == pEnumerator->Skip((long)(1000 * timeout), 1)) {}
 		pEnumerator->Release();
+	}
 
 	if (0 != pService)
 		pService->Release();

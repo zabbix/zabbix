@@ -36,6 +36,7 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
+	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
@@ -487,19 +488,22 @@ class CIntegrationTest extends CAPITest {
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_SERVER_HANODE1 => array_merge($db, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_PROXY => array_merge($db, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_AGENT => [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
@@ -832,6 +836,21 @@ class CIntegrationTest extends CAPITest {
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
 
 		sleep(self::CACHE_RELOAD_DELAY);
+	}
+
+	/**
+	 * Reload user parameters.
+	 *
+	 * @param string $component    component name or null for active component
+	 */
+	protected function reloadUserParameters($component = null) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'userparameter_reload']);
+
+		sleep(self::USER_PARAM_RELOAD_DELAY);
 	}
 
 	/**
