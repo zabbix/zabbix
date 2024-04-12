@@ -85,7 +85,7 @@ class CControllerMfaCheck extends CController {
 			$data['client_secret'] = $this->getInput('client_secret');
 		}
 
-		$data['type_name'] = ($data['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
+		$data['type_name'] = ($data['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('Duo Universal Prompt');
 
 		switch ($data['type']) {
 			case MFA_TYPE_TOTP:

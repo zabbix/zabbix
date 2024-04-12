@@ -148,15 +148,6 @@ class CControllerUserList extends CController {
 		}
 		unset($user);
 
-		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
-			$userids_with_totp = CUser::getUseridsWithMfaTotpSecrets();
-
-			foreach ($data['users'] as &$user) {
-				$user['totp_enabled'] = in_array($user['userid'], $userids_with_totp);
-			}
-			unset($user);
-		}
-
 		// data sort and pager
 		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);
 

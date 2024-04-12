@@ -337,7 +337,7 @@ class CControllerAuthenticationEdit extends CController {
 				$mfa_method['usrgrps'] = $db_mfa_methods[$mfa_method['mfaid']]['usrgrps'];
 			}
 
-			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
+			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('Duo Universal Prompt');
 		}
 		unset($mfa_method);
 
@@ -454,7 +454,7 @@ class CControllerAuthenticationEdit extends CController {
 		$mfa_methods = array_values($mfa_methods);
 
 		foreach ($mfa_methods as &$mfa_method) {
-			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
+			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('Duo Universal Prompt');
 		}
 		unset($mfa_method);
 
