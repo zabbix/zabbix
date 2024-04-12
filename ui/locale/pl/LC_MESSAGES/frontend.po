@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-02 13:32+0000\n"
+"PO-Revision-Date: 2024-04-08 12:36+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -7353,6 +7353,12 @@ msgstr "Rozwijane menu"
 msgid "Dropdown options"
 msgstr "Opcje menu rozwijanego"
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
 msgstr "Stan Duo nie jest zgodny ze stanem zapisanym."
@@ -8760,6 +8766,18 @@ msgstr "Globalnie"
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Globalne wyrażenia regularne \"%1$s\" nie istnieją."
+
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -11807,7 +11825,7 @@ msgstr "Lista pozycji"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr ""
+msgstr "Nazwa pozycji"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16764,7 +16782,7 @@ msgstr "Atrybut odniesienia"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
-msgstr ""
+msgstr "Wskazany widżet nie jest już dostępny. Proszę zaktualizować konfigurację."
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -23310,6 +23328,10 @@ msgstr "Wewnętrzne uwierzytelnianie Zabbix"
 msgid "Zabbix login form"
 msgstr "Formularz logowania Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Serwer Zabbix"
@@ -24074,7 +24096,7 @@ msgstr "d.M"
 
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
 msgid "data is missing"
-msgstr ""
+msgstr "brakuje danych"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -24277,6 +24299,10 @@ msgstr "oczekiwano współrzędnej geograficznej (wartość zawierająca szeroko
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globalne ustawienia porządkowania"
+
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
