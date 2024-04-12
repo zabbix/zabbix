@@ -158,12 +158,7 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$output_fields = self::getOutputFields();
-
-		$output_fields[] = 'configid';
-
-		$db_auth = DB::select('config', ['output' => $output_fields]);
-		$db_auth = reset($db_auth);
+		$db_auth = DB::select('config', ['output' => array_merge(['configid'], self::getOutputFields())])[0];
 		$auth += $db_auth;
 
 		// Check if at least one LDAP server exists.
