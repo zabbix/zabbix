@@ -209,6 +209,7 @@
 #define ZBX_PROTO_TAG_ACKNOWLEDGEID		"acknowledgeid"
 #define ZBX_PROTO_TAG_WAIT			"wait"
 #define ZBX_PROTO_TAG_RUNTIME_ERROR		"runtime_error"
+#define ZBX_PROTO_TAG_VARIANT			"variant"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

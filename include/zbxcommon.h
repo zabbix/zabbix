@@ -777,4 +777,6 @@ void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
 void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
 #endif
 
+#define ZBX_AGENT_VARIANT	1
+
 #endif
