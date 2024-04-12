@@ -1176,9 +1176,6 @@ abstract class CControllerPopupItemTest extends CController {
 		if ($data['item']['type'] == ITEM_TYPE_CALCULATED) {
 			$data['host']['hostid'] = $this->getInput('hostid');
 		}
-		else {
-			unset($data['item']['value_type']);
-		}
 
 		// Rename form fields according to API conventions.
 		$data['item'] = CArrayHelper::renameKeys($data['item'], [
