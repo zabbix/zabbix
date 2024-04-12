@@ -31,15 +31,6 @@ SUBDIRS = \
 
 sbin_PROGRAMS = zabbix_server
 
-noinst_LIBRARIES = libzbxserver.a
-
-libzbxserver_a_SOURCES = \
-	db_lengths_constants.h
-
-libzbxserver_a_CFLAGS = \
-	-DZABBIX_DAEMON \
-	$(TLS_CFLAGS)
-
 zabbix_server_SOURCES = \
 	server_constants.h \
 	server.c
@@ -79,7 +70,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
-	libzbxserver.a \
 	postinit/libzbxpostinit.a \
 	operations/libzbxoperations.a \
 	stats/libzbxstats_server.a \
