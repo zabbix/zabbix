@@ -2483,7 +2483,7 @@ out:
 static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 		const zbx_vector_lld_group_prototype_ptr_t *group_prototypes, char **error)
 {
-	int				i, j, groups_insert_num = 0, groups_update_num = 0, gd_insert_num = 0,
+	int				groups_insert_num = 0, groups_update_num = 0, gd_insert_num = 0,
 					gd_update_num = 0;
 	zbx_db_insert_t			db_insert_group, db_insert_gdiscovery;
 	zbx_vector_uint64_t		groupids;
