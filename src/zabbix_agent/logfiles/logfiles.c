@@ -1981,10 +1981,10 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		const int *mtime, int *big_rec, const char *encoding, zbx_vector_expression_t *regexps,
 		const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
-		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		zbx_uint64_t itemid, const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size, char **err_msg)
+		int config_buffer_send, int config_buffer_size, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2115,7 +2115,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						if (-1 == prep_vec_idx || 0 == prep_vec->values_num)
 						{
 							prep_vec_idx = zbx_find_or_create_prep_vec_element(prep_vec,
-									key, persistent_file_name);
+									itemid, persistent_file_name);
 							zbx_init_prep_vec_data(logfile,
 									prep_vec->values + prep_vec_idx);
 						}
@@ -2132,8 +2132,9 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
 							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
-									hostname, key, item_value, ITEM_STATE_NORMAL,
-									&processed_size, mtime, NULL, NULL, NULL, NULL,
+									itemid, hostname, key, item_value,
+									ITEM_STATE_NORMAL, &processed_size, mtime, NULL,
+									NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT,
 									config_tls, config_timeout, config_source_ip,
 									config_buffer_send, config_buffer_size)))
@@ -2252,7 +2253,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						if (-1 == prep_vec_idx || 0 == prep_vec->values_num)
 						{
 							prep_vec_idx = zbx_find_or_create_prep_vec_element(prep_vec,
-									key, persistent_file_name);
+									itemid, persistent_file_name);
 							zbx_init_prep_vec_data(logfile,
 									prep_vec->values + prep_vec_idx);
 						}
@@ -2266,8 +2267,9 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
 							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
-									hostname, key, item_value, ITEM_STATE_NORMAL,
-									&processed_size, mtime, NULL, NULL, NULL, NULL,
+									itemid, hostname, key, item_value,
+									ITEM_STATE_NORMAL, &processed_size, mtime, NULL,
+									NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT,
 									config_tls, config_timeout, config_source_ip,
 									config_buffer_send, config_buffer_size)))
@@ -2444,9 +2446,9 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
 				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
-				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec,
-				config_tls, config_timeout, config_source_ip, itemid, config_buffer_send,
-				config_buffer_size, err_msg)))
+				itemid, hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec,
+				config_tls, config_timeout, config_source_ip, config_buffer_send, config_buffer_size,
+				err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3845,7 +3847,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
 	char				*encoding_uc = NULL;
 	int				max_lines_per_sec, ret = FAIL, s_count, p_count, s_count_orig, is_count_item,
-					mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
+					mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0, delay;
 	zbx_log_rotation_options_t	rotation_type;
 	zbx_uint64_t			lastlogsize_orig;
 	float				max_delay;
@@ -3961,7 +3963,10 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	}
 
 	/* do not flood Zabbix server if file grows too fast */
-	s_count = max_lines_per_sec * metric->refresh;
+	if (0 >= (delay = metric->nextcheck - (int)time(NULL)))
+		delay = 1;
+
+	s_count = max_lines_per_sec * delay;
 
 	/* do not flood local system if file grows too fast */
 	if (0 == is_count_item)
@@ -4070,7 +4075,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
 			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, config_hostname,
-			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
+			metric->key, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type, metric->persistent_file_name, prep_vec, config_tls, config_timeout,
 			config_source_ip, itemid, config_buffer_send, config_buffer_size);
 
@@ -4098,10 +4103,11 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
-					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
-					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout,
-					config_source_ip, config_buffer_send, config_buffer_size) || 0 != jumped)
+			if (SUCCEED == process_value_cb(addrs, agent2_result, metric->itemid, config_hostname,
+					metric->key, buf, ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL,
+					NULL, NULL, NULL, metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
+					config_timeout, config_source_ip, config_buffer_send, config_buffer_size) ||
+					0 != jumped)
 			{
 				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
 				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */

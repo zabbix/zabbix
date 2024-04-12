@@ -48,8 +48,11 @@ ZBX_VECTOR_IMPL(persistent_inactive, zbx_persistent_inactive_t)
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static int	zbx_persistent_inactive_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(((const zbx_persistent_inactive_t *)d1)->key_orig,
-			((const zbx_persistent_inactive_t *)d2)->key_orig);
+	const zbx_persistent_inactive_t	*p1 = (const zbx_persistent_inactive_t *)d1;
+	const zbx_persistent_inactive_t	*p2 = (const zbx_persistent_inactive_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+	return 0;
 }
 
 /******************************************************************************
@@ -543,7 +546,6 @@ void	zbx_clean_pre_persistent_elements(zbx_vector_pre_persistent_t *prep_vec)
 
 	for (i = 0; i < prep_vec->values_num; i++)
 	{
-		zbx_free(prep_vec->values[i].key_orig);
 		zbx_free(prep_vec->values[i].persistent_file_name);
 		zbx_free(prep_vec->values[i].filename);
 	}
@@ -551,35 +553,34 @@ void	zbx_clean_pre_persistent_elements(zbx_vector_pre_persistent_t *prep_vec)
 	zbx_vector_pre_persistent_clear(prep_vec);
 }
 
-void	zbx_add_to_persistent_inactive_list(zbx_vector_persistent_inactive_t *inactive_vec, char *key,
+void	zbx_add_to_persistent_inactive_list(zbx_vector_persistent_inactive_t *inactive_vec, zbx_uint64_t itemid,
 		const char *filename)
 {
 	zbx_persistent_inactive_t	el;
 
-	el.key_orig = key;
+	el.itemid = itemid;
 
 	if (FAIL == zbx_vector_persistent_inactive_search(inactive_vec, el,
 			zbx_persistent_inactive_compare_func))
 	{
 		/* create and initialize a new vector element */
 
-		el.key_orig = zbx_strdup(NULL, key);
 		el.not_received_time = time(NULL);
 		el.persistent_file_name = zbx_strdup(NULL, filename);
 
 		zbx_vector_persistent_inactive_append(inactive_vec, el);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): added element %d with key '%s' for file '%s'", __func__,
-				inactive_vec->values_num - 1, key, filename);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): added element %d with itemid '" ZBX_FS_UI64 "' for file '%s'",
+				__func__, inactive_vec->values_num - 1, itemid, filename);
 	}
 }
 
-void	zbx_remove_from_persistent_inactive_list(zbx_vector_persistent_inactive_t *inactive_vec, char *key)
+void	zbx_remove_from_persistent_inactive_list(zbx_vector_persistent_inactive_t *inactive_vec, zbx_uint64_t itemid)
 {
 	zbx_persistent_inactive_t	el;
 	int				idx;
 
-	el.key_orig = key;
+	el.itemid = itemid;
 
 	if (FAIL == (idx = zbx_vector_persistent_inactive_search(inactive_vec, el,
 			zbx_persistent_inactive_compare_func)))
@@ -587,11 +588,10 @@ void	zbx_remove_from_persistent_inactive_list(zbx_vector_persistent_inactive_t *
 		return;
 	}
 
-	zbx_free(inactive_vec->values[idx].key_orig);
 	zbx_free(inactive_vec->values[idx].persistent_file_name);
 	zbx_vector_persistent_inactive_remove(inactive_vec, idx);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): removed element %d with key '%s'", __func__, idx, key);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): removed element %d with itemid " ZBX_FS_UI64 , __func__, idx, itemid);
 }
 
 void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inactive_vec)
@@ -612,8 +612,8 @@ void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inac
 		{
 			char	*err_msg = NULL;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): removing element %d with key '%s'", __func__, i,
-					el->key_orig);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): removing element %d with itemid '" ZBX_FS_UI64 "'",
+					__func__, i, el->itemid);
 
 			if (SUCCEED != zbx_remove_persistent_file(el->persistent_file_name, &err_msg))
 			{
@@ -622,7 +622,6 @@ void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inac
 				zbx_free(err_msg);
 			}
 
-			zbx_free(el->key_orig);
 			zbx_free(el->persistent_file_name);
 			zbx_vector_persistent_inactive_remove(inactive_vec, i);
 		}
@@ -632,7 +631,11 @@ void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inac
 
 static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(((const zbx_pre_persistent_t *)d1)->key_orig, ((const zbx_pre_persistent_t *)d2)->key_orig);
+	const zbx_pre_persistent_t	*p1 = (const zbx_pre_persistent_t *)d1;
+	const zbx_pre_persistent_t	*p2 = (const zbx_pre_persistent_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+	return 0;
 }
 
 /******************************************************************************
@@ -643,17 +646,17 @@ static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
  * Parameters:                                                                *
  *    prep_vec             - [IN/OUT] preparation vector for persistent data  *
  *                                files                                       *
- *    key                  - [IN] log*[] item key                             *
+ *    itemid                  - [IN] log*[]                                   *
  *    persistent_file_name - [IN] file name for copying into new element      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_find_or_create_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, const char *key,
+int	zbx_find_or_create_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, zbx_uint64_t itemid,
 		const char *persistent_file_name)
 {
 	zbx_pre_persistent_t	prep_element;
 	int			prep_vec_idx;
 
-	prep_element.key_orig = (char *)key;
+	prep_element.itemid = itemid;
 
 	if (FAIL == (prep_vec_idx = zbx_vector_pre_persistent_search(prep_vec, prep_element,
 			zbx_pre_persistent_compare_func)))
@@ -666,13 +669,15 @@ int	zbx_find_or_create_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, c
 
 		/* fill in 'key_orig' and 'persistent_file_name' values - they never change for the specified */
 		/* log*[] item (otherwise it is not the same item anymore) */
-		prep_vec->values[prep_vec_idx].key_orig = zbx_strdup(NULL, key);
+		prep_vec->values[prep_vec_idx].itemid = itemid;
 		prep_vec->values[prep_vec_idx].persistent_file_name = zbx_strdup(NULL, persistent_file_name);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): key:[%s] created element %d", __func__, key, prep_vec_idx);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): itemid:" ZBX_FS_UI64 " created element %d",
+				__func__, itemid, prep_vec_idx);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): key:[%s] found element %d", __func__, key, prep_vec_idx);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): itemid:" ZBX_FS_UI64 " found element %d",
+				__func__, itemid, prep_vec_idx);
 
 	return prep_vec_idx;
 }
