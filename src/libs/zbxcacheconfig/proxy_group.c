@@ -156,7 +156,8 @@ int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 
 			group = (zbx_pg_group_t *)zbx_hashset_insert(groups, &group_local, sizeof(group_local));
 			zbx_vector_pg_proxy_ptr_create(&group->proxies);
-			zbx_vector_uint64_create(&group->hostids);
+			zbx_hashset_create(&group->hostids, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_create(&group->unassigned_hostids);
 			group->flags = ZBX_PG_GROUP_SYNC_ADDED;
 		}

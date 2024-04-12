@@ -82,7 +82,7 @@ static void	pgm_db_get_hosts(zbx_pg_cache_t *cache)
 			continue;
 		}
 
-		zbx_vector_uint64_append(&group->hostids, hostid);
+		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
 	}
 
 	pg_cache_unlock(cache);
@@ -138,9 +138,7 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 		host = (zbx_pg_host_t *)zbx_hashset_insert(&cache->hostmap, &host_local, sizeof(host_local));
 
 		if (NULL == (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&cache->proxies, &proxyid)) ||
-				NULL == proxy->group ||
-				FAIL == zbx_vector_uint64_search(&proxy->group->hostids, hostid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				NULL == proxy->group || NULL == zbx_hashset_search(&proxy->group->hostids, &hostid))
 		{
 			zbx_vector_uint64_append(&group->unassigned_hostids, hostid);
 			pg_cache_set_host_proxy(cache, hostid, 0);
@@ -163,10 +161,14 @@ static void	pgm_db_get_hpmap(zbx_pg_cache_t *cache)
 	zbx_hashset_iter_reset(&cache->groups, &iter);
 	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		for (int i = 0; i < group->hostids.values_num; i++)
+		zbx_hashset_iter_t	hostid_iter;
+		zbx_uint64_t		*phostid;
+
+		zbx_hashset_iter_reset(&group->hostids, &hostid_iter);
+		while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 		{
-			if (NULL == zbx_hashset_search(&cache->hostmap, &group->hostids.values[i]))
-				zbx_vector_uint64_append(&group->unassigned_hostids, group->hostids.values[i]);
+			if (NULL == zbx_hashset_search(&cache->hostmap, phostid))
+				zbx_vector_uint64_append(&group->unassigned_hostids, *phostid);
 		}
 	}
 

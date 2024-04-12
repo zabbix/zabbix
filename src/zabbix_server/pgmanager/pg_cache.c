@@ -77,7 +77,7 @@ void	pg_group_clear(zbx_pg_group_t *group)
 		group->proxies.values[i]->group = NULL;
 
 	zbx_vector_pg_proxy_ptr_destroy(&group->proxies);
-	zbx_vector_uint64_destroy(&group->hostids);
+	zbx_hashset_destroy(&group->hostids);
 	zbx_vector_uint64_destroy(&group->unassigned_hostids);
 
 	zbx_free(group->name);
@@ -103,7 +103,7 @@ static void	pg_cache_add_standalone_proxy_group(zbx_pg_cache_t *cache)
 
 	group = (zbx_pg_group_t *)zbx_hashset_insert(&cache->groups, &group_local, sizeof(group_local));
 	zbx_vector_pg_proxy_ptr_create(&group->proxies);
-	zbx_vector_uint64_create(&group->hostids);
+	zbx_hashset_create(&group->hostids, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&group->unassigned_hostids);
 	group->state = ZBX_PG_GROUP_STATE_DISABLED;
 	group->min_online = zbx_strdup(NULL, "0");
@@ -282,8 +282,7 @@ void	pg_cache_group_remove_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zb
 	int		i;
 	zbx_pg_host_t	*host;
 
-	if (FAIL != (i = zbx_vector_uint64_search(&group->hostids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		zbx_vector_uint64_remove_noorder(&group->hostids, i);
+	zbx_hashset_remove(&group->hostids, &hostid);
 
 	if (FAIL != (i = zbx_vector_uint64_search(&group->unassigned_hostids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		zbx_vector_uint64_remove_noorder(&group->unassigned_hostids, i);
@@ -318,11 +317,9 @@ void	pg_cache_group_remove_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zb
  ******************************************************************************/
 void	pg_cache_group_add_host(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_uint64_t hostid)
 {
-	int	i;
-
-	if (FAIL == (i = zbx_vector_uint64_search(&group->hostids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	if (NULL == zbx_hashset_search(&group->hostids, &hostid))
 	{
-		zbx_vector_uint64_append(&group->hostids, hostid);
+		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
 		zbx_vector_uint64_append(&group->unassigned_hostids, hostid);
 	}
 
@@ -1316,9 +1313,14 @@ static void	pg_cache_dump_group(zbx_pg_group_t *group)
 			group->state, group->failover_delay, group->min_online, group->revision,
 			group->hostmap_revision);
 
-	zabbix_log(LOG_LEVEL_TRACE, "    hostids: [%d]", group->hostids.values_num);
-	for (int i = 0; i < group->hostids.values_num; i++)
-		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, group->hostids.values[i]);
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		*hostid;
+
+	zbx_hashset_iter_reset(&group->hostids, &iter);
+
+	zabbix_log(LOG_LEVEL_TRACE, "    hostids: [%d]", group->hostids.num_data);
+	while (NULL != (hostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+		zabbix_log(LOG_LEVEL_TRACE, "        " ZBX_FS_UI64, *hostid);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    new hostids: [%d]", group->unassigned_hostids.values_num);
 	for (int i = 0; i < group->unassigned_hostids.values_num; i++)

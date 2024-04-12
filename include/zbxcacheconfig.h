@@ -1457,7 +1457,7 @@ struct zbx_pg_group
 	time_t				balance_time;
 	zbx_uint32_t			flags;
 	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
-	zbx_vector_uint64_t		hostids;		/* hostids assigned to proxy group */
+	zbx_hashset_t			hostids;		/* hostids assigned to proxy group */
 	zbx_vector_uint64_t		unassigned_hostids;	/* hostids to be assigned to proxies */
 };
 
