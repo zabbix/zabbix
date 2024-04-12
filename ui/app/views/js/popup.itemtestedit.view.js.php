@@ -32,16 +32,20 @@
  * @return {jQuery}
  */
 function makeStepResult(step) {
-	if (typeof step.error !== 'undefined') {
+	if (step.error !== undefined) {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: escapeHtml(step.error) || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
+			{error: escapeHtml(step.error) || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>}
 		));
 	}
-	else if (typeof step.result === 'undefined' || step.result === null) {
+
+	if (step.result === undefined || step.result === null) {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('No value')) ?>);
 	}
 	else if (step.result === '') {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
+	}
+	else if (step.warning !== undefined) {
+		return jQuery(new Template(jQuery('#preprocessing-step-result-warning').html()).evaluate(step));
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
@@ -210,6 +214,10 @@ function itemGetValueTest(overlay) {
 			<?php endif ?>
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_warning', $form)
+				.toggle('value_warning' in ret)
+				.toggleClass('js-retrieved', 'value_warning' in ret)
+				.attr('data-hintbox-contents', ret.value_warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -309,6 +317,10 @@ function itemCompleteTest(overlay) {
 			}
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_warning', $form)
+				.toggle('value_warning' in ret)
+				.toggleClass('js-retrieved', 'value_warning' in ret)
+				.attr('data-hintbox-contents', ret.value_warning);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
@@ -320,8 +332,9 @@ function itemCompleteTest(overlay) {
 
 			if (typeof ret.final !== 'undefined') {
 				var result = makeStepResult(ret.final);
+
 				if (result !== null) {
-					$result = jQuery(result).css('float', 'right');
+					$result = result.css('float', 'right');
 				}
 
 				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
@@ -379,6 +392,7 @@ function processItemPreprocessingTestResults(steps) {
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
+					step.result = step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result;
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
 					]) ?>, {failed: step.result, failed_hint: escapeHtml(step.result)})));
@@ -512,6 +526,8 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+				$('#value_warning.js-retrieved').show();
+
 				$not_supported.prop('disabled', true);
 				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 
@@ -590,6 +606,7 @@ jQuery(document).ready(function($) {
 				else {
 					$('#value', $form).multilineInput('unsetReadOnly');
 				}
+				$('#value_warning').hide();
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

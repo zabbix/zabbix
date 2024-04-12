@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for action notifications
  *
  * @required-components server
- * @configurationDataProvider serverConfigurationProvider
  * @backup items,actions,triggers,alerts,hosts,users,scripts,history_uint
  * @hosts test_actions
  */
@@ -205,6 +204,10 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertArrayHasKey('userids', $response['result']);
 		self::$userid = $response['result']['userids'][0];
 
+		return true;
+	}
+
+	private function createScripts() {
 		$response = $this->call('script.create', [
 			'name' => 'explain/function value test script',
 			'command' => 'echo -n "{TRIGGER.EXPRESSION.EXPLAIN} {FUNCTION.VALUE1} {FUNCTION.VALUE2} {{TRIGGER.EXPRESSION.EXPLAIN}.regsub(max,\0)} {{$GLOBMACRO}.regsub(b,\0)}"',
@@ -225,7 +228,6 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_recovery = $response['result']['scriptids'][0];
 
-		return true;
 	}
 
 	/**
@@ -247,6 +249,7 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testExpressionTriggerMacros_testOperation() {
+		$this->createScripts();
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
 
