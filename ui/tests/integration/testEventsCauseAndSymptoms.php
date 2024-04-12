@@ -416,7 +416,9 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_startEvents
+	 *
 	 */
 	public function testEventsCauseAndSymptoms_rankAsSymptom() {
 		$this->markAsSymptoms([
@@ -458,6 +460,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)          <-- no change is expected here
 	 * |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankAsSymptom
 	 *
 	 */
@@ -500,6 +503,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_swapCauseAndSymptom
 	 *
 	 */
@@ -541,6 +545,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankCauseAsSymptomOfSymptom
 	 *
 	 */
@@ -588,6 +593,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * [C] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankAsCause1
 	 *
 	 */

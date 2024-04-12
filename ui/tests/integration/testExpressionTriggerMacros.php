@@ -243,6 +243,9 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		];
 	}
 
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
 	public function testExpressionTriggerMacros_testOperation() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
@@ -263,6 +266,9 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertEquals('51 50 max b', $response['result'][0]['message']);
 	}
 
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
 	public function testExpressionTriggerMacros_checkManualEventActionScript() {
 		$response = $this->callUntilDataIsPresent('script.execute', [
 			'scriptid' => self::$scriptid,
@@ -272,6 +278,9 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertEquals('(51+50)>max(10,100) 51 50 max b', $response['result']['value']);
 	}
 
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
 	public function testExpressionTriggerMacros_checkEventName() {
 		$response = $this->call('event.get', [
 			'eventids' => [self::$eventid]
@@ -280,6 +289,9 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertEquals('Fired (51+50)>max(10,100) 51 50 max b', $response['result'][0]['name']);
 	}
 
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
 	public function testExpressionTriggerMacros_testUpdateOperation() {
 		$this->clearLog(self::COMPONENT_SERVER);
 
@@ -302,6 +314,9 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertEquals('Update 51 50 max b', $response['result'][1]['message']);
 	}
 
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
 	public function testExpressionTriggerMacros_testRecoveryOperation() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_1, 1);
@@ -320,6 +335,9 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertEquals('1 2 max b', $response['result'][4]['message']);
 	}
 
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 */
 	public function testExpressionTriggerMacros_checkManualEventActionScript_recovery() {
 		$response = $this->callUntilDataIsPresent('script.execute', [
 			'scriptid' => self::$scriptid_recovery,
