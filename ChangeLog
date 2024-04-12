@@ -1,6 +1,9 @@
 Changes for 7.0.0beta3
 
 New features:
+A.F.....S. [ZBXNEXT-8880] added options for disallow script execution and user HTTP authentication (dfofanovs, dgoloscapov)
+........S. [ZBXNEXT-8970] implemented faster action execution on Zabbix server (akozlovs)
+.........T [ZBXCTR-22] refactored JavaScript filter functions for Kubernetes templates (ebbex)
 ...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
 .......PS. [ZBXNEXT-9117] updated max supported MariaDB version to 11.3 (mprihodko)
 .D........ [ZBXNEXT-9096] removed experimental status from PDF reporting (solonkins)
@@ -15,6 +18,13 @@ A.F.I...S. [ZBXNEXT-2020,ZBXNEXT-8918] implemented the option to disable no-long
 ..F.I..... [ZBXNEXT-8683] implemented new Honeycomb widget (apoga, ashubin, averza, ddauksa)
 
 Bug fixes:
+...G...... [ZBX-23719] update plugin-support to add duplicate flag handling (rzvejs)
+....I..... [ZBX-22429] fixed typo in Zabbix proxy automake file (MVekslers)
+.......PS. [ZBX-24089] optimized configuration re-sync after empty initial syncs (wiper)
+........S. [ZBX-24264] fixed value cache being filled with values of newly added items with triggers (wiper)
+..F....... [ZBX-24088] fixed problem filtering in maps with nested maps (miks)
+.........T [ZBX-24206] fixed line breaks in JavaScript in Cloudflare template (abrosimovs)
+.........T [ZBX-24134] added Sensor discovery for VMware Hypervisor template (akotsegubov)
 ..F....... [ZBX-23884] removed possibility to manually add provisioned user to user group (epulke)
 ..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
 ..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
