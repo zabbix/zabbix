@@ -7576,7 +7576,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init_changelog(&connector_sync, changelog_sync_mode);
 	zbx_dbsync_init_changelog(&connector_tag_sync, changelog_sync_mode);
 
-	zbx_dbsync_init(&proxy_sync, changelog_sync_mode);
+	zbx_dbsync_init_changelog(&proxy_sync, changelog_sync_mode);
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */

@@ -3436,8 +3436,8 @@ out:
  *             config_ssh_key_location - [IN]                                   *
  *             get_config_forks        - [IN]                                   *
  *             program_type            - [IN]                                   *
- *             escalationids             [IN]                                   *
- *             triggerids                [IN]                                   *
+ *             escalationids           - [IN]                                   *
+ *             triggerids              - [IN]                                   *
  *                                                                              *
  * Return value: count of deleted escalations                                   *
  *                                                                              *
@@ -3470,8 +3470,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_uint64_create(&problem_eventids);
 
-	if ((NULL != escalationids && 0 != escalationids->values_num) ||
-			(NULL != triggerids && 0 != triggerids->values_num))
+	if (((NULL != escalationids) && (NULL != triggerids)) && ((0 != escalationids->values_num) ||
+			(0 != triggerids->values_num)))
 	{
 		zbx_db_add_condition_alloc(&filter, &filter_alloc, &filter_offset, "escalationid",
 				escalationids->values, escalationids->values_num);
