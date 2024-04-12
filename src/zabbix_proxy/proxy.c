@@ -1468,6 +1468,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_log_remote_commands, config_hostname,
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
+								zbx_config_enable_remote_commands,
 								config_ssh_key_location};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
@@ -1487,6 +1488,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_stats_allowed_ip,
 								config_java_gateway, config_java_gateway_port,
 								config_externalscripts,
+								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
 								config_ssh_key_location, trapper_process_request_proxy,
 								zbx_autoreg_update_host_proxy};

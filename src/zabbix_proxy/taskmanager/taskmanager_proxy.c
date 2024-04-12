@@ -57,6 +57,7 @@
  *             config_ssh_key_location       - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
+ *             config_enable_global_scripts  - [IN]                                   *
  *             get_config_forks              - [IN]                                   *
  *             program_type                  - [IN]                                   *
  *                                                                                    *
@@ -66,7 +67,7 @@
  **************************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, time_t now, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
-		int config_enable_remote_commands, int config_log_remote_commands,
+		int config_enable_remote_commands, int config_log_remote_commands, int config_enable_global_scripts,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	zbx_db_row_t	row;
@@ -148,8 +149,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	}
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_trapper_timeout,
-			config_source_ip, config_ssh_key_location, get_config_forks, program_type, 0 == alertid ?
-			&info : NULL, error, sizeof(error), NULL)))
+			config_source_ip, config_ssh_key_location, config_enable_global_scripts, get_config_forks,
+			program_type, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
@@ -359,7 +360,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands,
 		unsigned char program_type, const char *progname, zbx_get_config_forks_f get_config_forks,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
-		const char *config_ssh_key_location)
+		int config_enable_global_scripts, const char *config_ssh_key_location)
 {
 	zbx_db_row_t		row;
 	int			processed_num = 0, clock, ttl;
@@ -390,7 +391,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 						config_comms->config_timeout, config_comms->config_trapper_timeout,
 						config_comms->config_source_ip, config_ssh_key_location,
 						config_enable_remote_commands, config_log_remote_commands,
-						get_config_forks, program_type))
+						config_enable_global_scripts, get_config_forks, program_type))
 				{
 					processed_num++;
 				}
@@ -544,6 +545,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				taskmanager_args_in->config_java_gateway,
 				taskmanager_args_in->config_java_gateway_port,
 				taskmanager_args_in->config_externalscripts,
+				taskmanager_args_in->config_enable_global_scripts,
 				taskmanager_args_in->config_ssh_key_location);
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)

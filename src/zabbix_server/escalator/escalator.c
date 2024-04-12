@@ -1163,8 +1163,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, zbx_uint64_t actionid,
 		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1459,8 +1458,9 @@ fail:
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
 							config_trapper_timeout, config_source_ip,
-							config_ssh_key_location, get_config_forks, program_type, NULL,
-							error, sizeof(error), NULL);
+							config_ssh_key_location, config_enable_global_scripts,
+							get_config_forks, program_type, NULL, error,
+							sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else
@@ -1890,7 +1890,7 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 		const zbx_db_action *action, const zbx_db_service *service, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -1958,7 +1958,7 @@ static void	escalation_execute_operations(zbx_db_escalation *escalation, zbx_db_
 							operationid, escalation->esc_step,
 							ZBX_MACRO_TYPE_MESSAGE_NORMAL, default_timezone, config_timeout,
 							config_trapper_timeout, config_source_ip,
-							config_ssh_key_location, get_config_forks, program_type);
+							config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
 					break;
 			}
 		}
@@ -2031,7 +2031,7 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 		const zbx_db_action *action, const zbx_db_service *service, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -2072,7 +2072,7 @@ static void	escalation_execute_recovery_operations(zbx_db_event *event, const zb
 				execute_commands(event, r_event, NULL, NULL, service, action->actionid, operationid, 1,
 						ZBX_MACRO_TYPE_MESSAGE_RECOVERY, default_timezone, config_timeout,
 						config_trapper_timeout, config_source_ip, config_ssh_key_location,
-						get_config_forks, program_type);
+						get_config_forks, config_enable_global_scripts, program_type);
 				break;
 		}
 	}
@@ -2109,7 +2109,7 @@ static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_
 		const zbx_db_action *action, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
 		const zbx_db_service *service, const char *default_timezone, zbx_hashset_t *roles, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -2157,7 +2157,8 @@ static void	escalation_execute_update_operations(zbx_db_event *event, const zbx_
 				execute_commands(event, r_event, ack, service_alarm, service, action->actionid,
 						operationid, 1, ZBX_MACRO_TYPE_MESSAGE_UPDATE, default_timezone,
 						config_timeout, config_trapper_timeout, config_source_ip,
-						config_ssh_key_location, get_config_forks, program_type);
+						config_ssh_key_location, get_config_forks,
+						config_enable_global_scripts, program_type);
 				break;
 		}
 	}
@@ -2567,14 +2568,14 @@ static void	escalation_cancel(zbx_db_escalation *escalation, const zbx_db_action
 static void	escalation_execute(zbx_db_escalation *escalation, const zbx_db_action *action, zbx_db_event *event,
 		const zbx_db_service *service, const char *default_timezone, zbx_hashset_t *roles, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_operations(escalation, event, action, service, default_timezone, roles, config_timeout,
 			config_trapper_timeout, config_source_ip, config_ssh_key_location, get_config_forks,
-			program_type);
+			config_enable_global_scripts, program_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2602,14 +2603,14 @@ static void	escalation_recover(zbx_db_escalation *escalation, const zbx_db_actio
 		const zbx_db_event *r_event, const zbx_db_service *service, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		int config_enable_global_scripts, unsigned char program_type)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
 	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles,
 			config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
-			get_config_forks, program_type);
+			get_config_forks, config_enable_global_scripts, program_type);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2638,7 +2639,7 @@ static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_a
 		zbx_db_event *event, const zbx_db_event *r_event, const char *default_timezone,
 		zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type)
+		int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -2667,7 +2668,7 @@ static void	escalation_acknowledge(zbx_db_escalation *escalation, const zbx_db_a
 
 		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles,
 				config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
-				get_config_forks, program_type);
+				get_config_forks, config_enable_global_scripts, program_type);
 	}
 
 	zbx_db_free_result(result);
@@ -2700,7 +2701,7 @@ static void	escalation_update(zbx_db_escalation *escalation, const zbx_db_action
 		zbx_db_event *event, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *default_timezone, zbx_hashset_t *roles, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
@@ -2708,7 +2709,7 @@ static void	escalation_update(zbx_db_escalation *escalation, const zbx_db_action
 
 	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone,
 			roles, config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
-			get_config_forks, program_type);
+			get_config_forks, config_enable_global_scripts, program_type);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -3040,7 +3041,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *problem_eventids, zbx_vector_uint64_t *actionids,
 		const char *default_timezone, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
 {
 	int					ret;
 	zbx_vector_uint64_t			escalationids, symptom_eventids;
@@ -3233,7 +3234,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			/* the escalation is cancelled and this code will not be reached     */
 			escalation_update(escalation, action, event, service_alarm, service, default_timezone,
 					&service_roles, config_timeout, config_trapper_timeout, config_source_ip,
-					config_ssh_key_location, get_config_forks, program_type);
+					config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
 		}
 		else if (0 != escalation->acknowledgeid)
 		{
@@ -3258,7 +3259,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 
 			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &service_roles,
 					config_timeout, config_trapper_timeout, config_source_ip,
-					config_ssh_key_location, get_config_forks, program_type);
+					config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
 		}
 		else if (NULL != r_event)
 		{
@@ -3266,14 +3267,15 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			{
 				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
 						config_timeout, config_trapper_timeout, config_source_ip,
-						config_ssh_key_location, get_config_forks, program_type);
+						config_ssh_key_location, get_config_forks,
+						config_enable_global_scripts, program_type);
 			}
 			else
 			{
 				escalation_recover(escalation, action, event, r_event, service, default_timezone,
 						&service_roles, config_timeout, config_trapper_timeout,
 						config_source_ip, config_ssh_key_location, get_config_forks,
-						program_type);
+						config_enable_global_scripts, program_type);
 			}
 		}
 		else if (escalation->nextcheck <= now)
@@ -3282,7 +3284,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			{
 				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
 						config_timeout, config_trapper_timeout, config_source_ip,
-						config_ssh_key_location, get_config_forks, program_type);
+						config_ssh_key_location, get_config_forks,
+						config_enable_global_scripts, program_type);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
@@ -3448,8 +3451,8 @@ out:
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source,
 		const char *default_timezone, int process_num, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type, zbx_vector_uint64_t *escalationids,
-		zbx_vector_uint64_t *triggerids)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type,
+		zbx_vector_uint64_t *escalationids, zbx_vector_uint64_t *triggerids)
 {
 	int				ret = 0;
 	zbx_db_result_t			result;
@@ -3593,7 +3596,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 					&actionids, default_timezone, config_timeout, config_trapper_timeout,
-					config_source_ip, config_ssh_key_location, get_config_forks, program_type);
+					config_source_ip, config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
 			zbx_vector_db_escalation_ptr_clear_ext(&escalations,
 					(void (*)(zbx_db_escalation *))zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
@@ -3609,7 +3612,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	{
 		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
 				&actionids, default_timezone, config_timeout, config_trapper_timeout,
-				config_source_ip, config_ssh_key_location, get_config_forks, program_type);
+				config_source_ip, config_ssh_key_location, get_config_forks, config_enable_global_scripts, program_type);
 		zbx_vector_db_escalation_ptr_clear_ext(&escalations, (void (*)(zbx_db_escalation *))zbx_ptr_free);
 	}
 
@@ -3722,22 +3725,23 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				info->program_type, &escalationids, &triggerids);
+				escalator_args_in->config_enable_global_scripts, info->program_type, &escalationids,
+				&triggerids);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
 
 		zbx_vector_uint64_destroy(&escalationids);
 		zbx_vector_uint64_destroy(&triggerids);
