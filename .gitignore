@@ -141,15 +141,12 @@ tests/libs/zbxalgo/evaluate_unknown
 tests/libs/zbxalgo/list
 tests/libs/zbxalgo/queue
 tests/libs/zbxcfg/parse_cfg_file
-tests/libs/zbxcommon/calculate_item_nextcheck
-tests/libs/zbxcommon/calculate_item_nextcheck_unreachable
 tests/libs/zbxcommon/init_library_common
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib
 tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
-tests/libs/zbxconf/parse_cfg_file
 tests/libs/zbxdbcache/dc_check_maintenance_period
 tests/libs/zbxdbcache/dc_expand_user_macros_in_func_params
 tests/libs/zbxdbcache/dc_function_calculate_nextcheck
