@@ -791,7 +791,7 @@ abstract class CControllerLatest extends CController {
 	/**
 	 * Check if at least one of subfilters is set.
 	 *
-	 * @param array $subfilters
+	 * @param array $filter
 	 *
 	 * @return bool
 	 */
