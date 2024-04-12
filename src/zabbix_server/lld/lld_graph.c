@@ -421,13 +421,12 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	itemids;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&itemids);
 
-	for (i = 0; i < gitems_proto->values_num; i++)
+	for (int i = 0; i < gitems_proto->values_num; i++)
 	{
 		const zbx_lld_gitem_t	*gitem = gitems_proto->values[i];
 
@@ -487,18 +486,17 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
  ******************************************************************************/
 static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
 {
-	int		i, j;
 	zbx_lld_graph_t	*graph;
 	zbx_lld_gitem_t	*gitem;
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
 		if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
 
-		for (j = 0; j < graph->gitems.values_num; j++)
+		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
 			gitem = graph->gitems.values[j];
 
@@ -521,10 +519,9 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zb
 static zbx_lld_graph_t	*lld_graph_get(zbx_vector_lld_graph_ptr_t *graphs,
 		const zbx_vector_lld_item_link_ptr_t *item_links)
 {
-	int		i;
 	zbx_lld_graph_t	*graph;
 
-	for (i = 0; i < item_links->values_num; i++)
+	for (int i = 0; i < item_links->values_num; i++)
 	{
 		const zbx_lld_item_link_t	*item_link = item_links->values[i];
 
@@ -551,9 +548,7 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_lld_item_ptr
 	zbx_lld_item_link_t	*item_link;
 
 	if (FAIL == (index = zbx_vector_lld_item_ptr_bsearch(items, &lld_item_cmp, lld_item_compare_func)))
-	{
 		return FAIL;
-	}
 
 	item_proto = items->values[index];
 
@@ -798,9 +793,7 @@ static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_
 		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, const zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
-	int	i;
-
-	for (i = 0; i < lld_rows->values_num; i++)
+	for (int i = 0; i < lld_rows->values_num; i++)
 	{
 		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
@@ -857,7 +850,6 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
  ******************************************************************************/
 static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t *graphs, char **error)
 {
-	int			i, j;
 	zbx_lld_graph_t		*graph, *graph_b;
 	zbx_vector_uint64_t	graphids;
 	zbx_vector_str_t	names;
@@ -869,7 +861,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 	/* checking a validity of the fields */
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -878,7 +870,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 	}
 
 	/* checking duplicated graph names */
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -889,7 +881,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 		if (0 != graph->graphid && 0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			continue;
 
-		for (j = 0; j < graphs->values_num; j++)
+		for (int j = 0; j < graphs->values_num; j++)
 		{
 			graph_b = graphs->values[j];
 
@@ -917,7 +909,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 	/* checking duplicated graphs in DB */
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -967,7 +959,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < graphs->values_num; i++)
+			for (int i = 0; i < graphs->values_num; i++)
 			{
 				graph = graphs->values[i];
 
@@ -1017,7 +1009,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
 		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
-	int				ret = SUCCEED, i, j, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
+	int				ret = SUCCEED, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
 	zbx_vector_lld_gitem_ptr_t	upd_gitems;	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t		del_gitemids;
 
@@ -1031,7 +1023,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	zbx_vector_lld_gitem_ptr_create(&upd_gitems);
 	zbx_vector_uint64_create(&del_gitemids);
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		const zbx_lld_graph_t	*graph = graphs->values[i];
 
@@ -1050,7 +1042,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
-		for (j = 0; j < graph->gitems.values_num; j++)
+		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
 			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
@@ -1118,7 +1110,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		zbx_lld_graph_t	*graph = graphs->values[i];
 
@@ -1324,7 +1316,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					graph->graphid);
 		}
 
-		for (j = 0; j < graph->gitems.values_num; j++)
+		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
 			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
@@ -1350,7 +1342,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		}
 	}
 
-	for (i = 0; i < upd_gitems.values_num; i++)
+	for (int i = 0; i < upd_gitems.values_num; i++)
 	{
 		const char		*d = "";
 		const zbx_lld_gitem_t	*gitem = (const zbx_lld_gitem_t *)upd_gitems.values[i];

@@ -719,7 +719,6 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			i, j;
 	zbx_lld_host_t		*host, *host_b;
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	tnames, vnames;
@@ -731,7 +730,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	zbx_vector_str_create(&vnames);		/* list of visible host names */
 
 	/* checking a host name validity */
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		char	*ch_error;
 
@@ -763,7 +762,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	}
 
 	/* checking a visible host name validity */
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -795,7 +794,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	}
 
 	/* checking duplicated host names */
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -806,7 +805,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
-		for (j = 0; j < hosts->values_num; j++)
+		for (int j = 0; j < hosts->values_num; j++)
 		{
 			host_b = (zbx_lld_host_t *)hosts->values[j];
 
@@ -831,7 +830,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	}
 
 	/* checking duplicated visible host names */
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -842,7 +841,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
 
-		for (j = 0; j < hosts->values_num; j++)
+		for (int j = 0; j < hosts->values_num; j++)
 		{
 			host_b = hosts->values[j];
 
@@ -868,7 +867,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 
 	/* checking duplicated host names and visible host names in DB */
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -932,7 +931,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < hosts->values_num; i++)
+			for (int i = 0; i < hosts->values_num; i++)
 			{
 				host = hosts->values[i];
 
@@ -989,7 +988,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const cha
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
-	int			i, host_found = 0;
+	int			host_found = 0;
 	zbx_lld_host_t		*host = NULL;
 	zbx_vector_db_tag_ptr_t	override_tags;
 	zbx_vector_uint64_t	lnk_templateids;
@@ -1000,7 +999,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const cha
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_db_tag_ptr_create(&new_tags);
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -1147,19 +1146,19 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const cha
 	{
 		zbx_db_tag_t	*db_tag;
 
-		for (i = 0; i < tags->values_num; i++)
+		for (int i = 0; i < tags->values_num; i++)
 		{
 			db_tag = zbx_db_tag_create(tags->values[i]->tag, tags->values[i]->value);
 			zbx_vector_db_tag_ptr_append(&new_tags, db_tag);
 		}
 
-		for (i = 0; i < override_tags.values_num; i++)
+		for (int i = 0; i < override_tags.values_num; i++)
 		{
 			db_tag = zbx_db_tag_create(override_tags.values[i]->tag, override_tags.values[i]->value);
 			zbx_vector_db_tag_ptr_append(&new_tags, db_tag);
 		}
 
-		for (i = 0; i < new_tags.values_num; i++)
+		for (int i = 0; i < new_tags.values_num; i++)
 		{
 			zbx_substitute_lld_macros(&new_tags.values[i]->tag, host->jp_row, lld_macros, ZBX_MACRO_FUNC,
 					NULL, 0);
@@ -1247,7 +1246,6 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			i, j;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostgroupid, hostid, groupid;
 	zbx_lld_host_t		*host;
@@ -1257,7 +1255,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 	zbx_vector_uint64_create(&hostids);
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -1266,21 +1264,21 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 		zbx_vector_uint64_reserve(&host->new_groupids, (size_t)groupids->values_num);
 
-		for (j = 0; j < groupids->values_num; j++)
+		for (int j = 0; j < groupids->values_num; j++)
 			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
 
 		if (0 != host->hostid)
 			zbx_vector_uint64_append(&hostids, host->hostid);
 	}
 
-	for (i = 0; i < groups->values_num; i++)
+	for (int i = 0; i < groups->values_num; i++)
 	{
 		group = groups->values[i];
 
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
-		for (j = 0; j < group->hosts.values_num; j++)
+		for (int j = 0; j < group->hosts.values_num; j++)
 		{
 			host = group->hosts.values[j];
 
@@ -1288,7 +1286,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 		}
 	}
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
@@ -1322,16 +1320,18 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 			zbx_lld_host_t	cmp = {.hostid = hostid};
 
-			if (FAIL == (i = zbx_vector_lld_host_ptr_bsearch(hosts, &cmp, lld_host_compare_func)))
+			int	j;
+
+			if (FAIL == (j = zbx_vector_lld_host_ptr_bsearch(hosts, &cmp, lld_host_compare_func)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			host = hosts->values[i];
+			host = hosts->values[j];
 			zbx_vector_uint64_append(&host->old_groupids, groupid);
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->new_groupids, groupid,
+			if (FAIL == (j = zbx_vector_uint64_bsearch(&host->new_groupids, groupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				/* host groups which should be unlinked */
@@ -1347,7 +1347,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 			else
 			{
 				/* host groups which are already added */
-				zbx_vector_uint64_remove(&host->new_groupids, i);
+				zbx_vector_uint64_remove(&host->new_groupids, j);
 			}
 		}
 		zbx_db_free_result(result);
@@ -5562,12 +5562,9 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 static int	another_main_interface_exists(const zbx_vector_lld_interface_ptr_t *interfaces,
 		const zbx_lld_interface_t *interface)
 {
-	const zbx_lld_interface_t	*interface_b;
-	int				i;
-
-	for (i = 0; i < interfaces->values_num; i++)
+	for (int i = 0; i < interfaces->values_num; i++)
 	{
-		interface_b = interfaces->values[i];
+		const zbx_lld_interface_t	*interface_b = interfaces->values[i];
 
 		if (interface_b == interface)
 			continue;
@@ -5595,7 +5592,6 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			i, j;
 	zbx_vector_uint64_t	interfaceids;
 	zbx_uint64_t		interfaceid;
 	zbx_lld_host_t		*host;
@@ -5610,11 +5606,11 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 
 	zbx_vector_uint64_create(&interfaceids);
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
-		for (j = 0; j < host->interfaces.values_num; j++)
+		for (int j = 0; j < host->interfaces.values_num; j++)
 		{
 			interface = host->interfaces.values[j];
 
@@ -5644,11 +5640,11 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 			{
 				ZBX_STR2UINT64(interfaceid, row[0]);
 
-				for (i = 0; i < hosts->values_num; i++)
+				for (int i = 0; i < hosts->values_num; i++)
 				{
 					host = hosts->values[i];
 
-					for (j = 0; j < host->interfaces.values_num; j++)
+					for (int j = 0; j < host->interfaces.values_num; j++)
 					{
 						interface = host->interfaces.values[j];
 
@@ -5678,11 +5674,11 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 
 	zbx_vector_uint64_clear(&interfaceids);
 
-	for (i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts->values_num; i++)
 	{
 		host = hosts->values[i];
 
-		for (j = 0; j < host->interfaces.values_num; j++)
+		for (int j = 0; j < host->interfaces.values_num; j++)
 		{
 			interface = host->interfaces.values[j];
 
@@ -5709,11 +5705,11 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 		{
 			ZBX_STR2UINT64(interfaceid, row[0]);
 
-			for (i = 0; i < hosts->values_num; i++)
+			for (int i = 0; i < hosts->values_num; i++)
 			{
 				host = hosts->values[i];
 
-				for (j = 0; j < host->interfaces.values_num; j++)
+				for (int j = 0; j < host->interfaces.values_num; j++)
 				{
 					interface = host->interfaces.values[j];
 
@@ -5861,7 +5857,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		const char			*host_proto, *name_proto;
 		zbx_lld_host_t			*host;
 		unsigned char			status, discover, use_custom_interfaces;
-		int				i;
 		zbx_vector_lld_interface_ptr_t	interfaces_custom;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
@@ -5893,7 +5888,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
 
-		for (i = 0; i < lld_rows->values_num; i++)
+		for (int i = 0; i < lld_rows->values_num; i++)
 		{
 			const zbx_lld_row_t	*lld_row = lld_rows->values[i];
 

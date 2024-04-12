@@ -302,7 +302,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row,
 static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **info)
 {
-	int			i, ret = SUCCEED, error_num = 0, res;
+	int			ret = SUCCEED, error_num = 0, res;
 	double			result;
 	char			*lastmacro = NULL;
 	lld_condition_t		*condition;
@@ -314,7 +314,7 @@ static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const st
 
 	zbx_vector_str_create(&errmsgs);
 
-	for (i = 0; i < filter->conditions.values_num; i++)
+	for (int i = 0; i < filter->conditions.values_num; i++)
 	{
 		condition = filter->conditions.values[i];
 
@@ -405,7 +405,7 @@ out:
 static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **err_msg)
 {
-	int			i, ret, res, error_num = 0;
+	int			ret, res, error_num = 0;
 	char			*expression = NULL, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256], value[16],
 				*errmsg = NULL;
 	double			result;
@@ -421,7 +421,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
 
 	zbx_vector_str_create(&errmsgs);
 
-	for (i = 0; i < filter->conditions.values_num; i++)
+	for (int i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = filter->conditions.values[i];
 
@@ -744,15 +744,13 @@ void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const cha
 		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,
 		unsigned char *status, unsigned char *discover)
 {
-	int	i, j, k;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < overrides->values_num; i++)
+	for (int i = 0; i < overrides->values_num; i++)
 	{
 		const zbx_lld_override_t	*override = overrides->values[i];
 
-		for (j = 0; j < override->override_operations.values_num; j++)
+		for (int j = 0; j < override->override_operations.values_num; j++)
 		{
 			const zbx_lld_override_operation_t	*override_operation =
 					override->override_operations.values[j];
@@ -782,7 +780,7 @@ void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const cha
 			if (NULL != override_operation->trends)
 				*trends = override_operation->trends;
 
-			for (k = 0; k < override_operation->tags.values_num; k++)
+			for (int k = 0; k < override_operation->tags.values_num; k++)
 				zbx_vector_db_tag_ptr_append(override_tags, override_operation->tags.values[k]);
 
 			if (NULL != status)
@@ -813,15 +811,13 @@ void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const cha
 void	lld_override_trigger(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover)
 {
-	int	i, j, k;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < overrides->values_num; i++)
+	for (int i = 0; i < overrides->values_num; i++)
 	{
 		const zbx_lld_override_t	*override = overrides->values[i];
 
-		for (j = 0; j < override->override_operations.values_num; j++)
+		for (int j = 0; j < override->override_operations.values_num; j++)
 		{
 			const zbx_lld_override_operation_t	*override_operation =
 					override->override_operations.values[j];
@@ -845,7 +841,7 @@ void	lld_override_trigger(const zbx_vector_lld_override_ptr_t *overrides, const 
 			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
 				*severity = override_operation->severity;
 
-			for (k = 0; k < override_operation->tags.values_num; k++)
+			for (int k = 0; k < override_operation->tags.values_num; k++)
 				zbx_vector_db_tag_ptr_append(override_tags, override_operation->tags.values[k]);
 
 			if (NULL != status)
@@ -877,15 +873,13 @@ void	lld_override_host(const zbx_vector_lld_override_ptr_t *overrides, const cha
 		zbx_vector_uint64_t *lnk_templateids, signed char *inventory_mode,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover)
 {
-	int	i, j, k;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < overrides->values_num; i++)
+	for (int i = 0; i < overrides->values_num; i++)
 	{
 		const zbx_lld_override_t	*override = overrides->values[i];
 
-		for (j = 0; j < override->override_operations.values_num; j++)
+		for (int j = 0; j < override->override_operations.values_num; j++)
 		{
 			const zbx_lld_override_operation_t	*override_operation =
 					override->override_operations.values[j];
@@ -906,13 +900,13 @@ void	lld_override_host(const zbx_vector_lld_override_ptr_t *overrides, const cha
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
 
-			for (k = 0; k < override_operation->templateids.values_num; k++)
+			for (int k = 0; k < override_operation->templateids.values_num; k++)
 				zbx_vector_uint64_append(lnk_templateids, override_operation->templateids.values[k]);
 
 			if (HOST_INVENTORY_COUNT != override_operation->inventory_mode)
 				*inventory_mode = override_operation->inventory_mode;
 
-			for (k = 0; k < override_operation->tags.values_num; k++)
+			for (int k = 0; k < override_operation->tags.values_num; k++)
 				zbx_vector_db_tag_ptr_append(override_tags, override_operation->tags.values[k]);
 
 			if (NULL != status)
@@ -942,15 +936,13 @@ void	lld_override_host(const zbx_vector_lld_override_ptr_t *overrides, const cha
 
 void	lld_override_graph(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *discover)
 {
-	int	i, j;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < overrides->values_num; i++)
+	for (int i = 0; i < overrides->values_num; i++)
 	{
 		const zbx_lld_override_t	*override = overrides->values[i];
 
-		for (j = 0; j < override->override_operations.values_num; j++)
+		for (int j = 0; j < override->override_operations.values_num; j++)
 		{
 			const zbx_lld_override_operation_t	*override_operation =
 					override->override_operations.values[j];
@@ -982,13 +974,11 @@ void	lld_override_graph(const zbx_vector_lld_override_ptr_t *overrides, const ch
 int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		unsigned char override_default)
 {
-	int	i, j;
-
-	for (i = 0; i < overrides->values_num; i++)
+	for (int i = 0; i < overrides->values_num; i++)
 	{
 		const zbx_lld_override_t	*override = overrides->values[i];
 
-		for (j = 0; j < override->override_operations.values_num; j++)
+		for (int j = 0; j < override->override_operations.values_num; j++)
 		{
 			const zbx_lld_override_operation_t	*override_operation =
 					override->override_operations.values[j];
@@ -1012,7 +1002,7 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 	struct zbx_json_parse	jp, jp_array, jp_row;
 	const char		*p;
 	zbx_lld_row_t		*lld_row;
-	int			ret = FAIL, i;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1051,7 +1041,7 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 
 #define OVERRIDE_STOP_TRUE	1
 
-		for (i = 0; i < overrides->values_num; i++)
+		for (int i = 0; i < overrides->values_num; i++)
 		{
 			zbx_lld_override_t	*override = overrides->values[i];
 
@@ -1071,17 +1061,15 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
-		for (i = 0; i < lld_rows->values_num; i++)
+		for (int i = 0; i < lld_rows->values_num; i++)
 		{
-			int	j;
-
 			lld_row = lld_rows->values[i];
 
 			zabbix_log(LOG_LEVEL_TRACE, "lld_row '%.*s' overrides:",
 					(int)(lld_row->jp_row.end - lld_row->jp_row.start + 1),
 					lld_row->jp_row.start);
 
-			for (j = 0; j < lld_row->overrides.values_num; j++)
+			for (int j = 0; j < lld_row->overrides.values_num; j++)
 			{
 				zabbix_log(LOG_LEVEL_TRACE, "  lld_overrideid: " ZBX_FS_UI64,
 						*(const zbx_uint64_t *)lld_row->overrides.values[j]);
