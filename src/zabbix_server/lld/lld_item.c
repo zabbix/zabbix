@@ -1499,7 +1499,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			i, j;
 	zbx_lld_item_full_t	*item;
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	keys;
@@ -2592,7 +2591,7 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
 static void	lld_items_preproc_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_ptr_t *items)
 {
-	int				j, index, preproc_num;
+	int				index, preproc_num;
 	zbx_lld_item_full_t		*item;
 	zbx_lld_item_prototype_t	*item_proto;
 	zbx_lld_item_preproc_t		*ppsrc, *ppdst;
