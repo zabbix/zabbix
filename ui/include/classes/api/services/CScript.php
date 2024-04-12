@@ -718,11 +718,11 @@ class CScript extends CApiService {
 	 */
 	private static function checkScriptExecutionEnabled(array $scripts): void {
 		if (!CSettingsHelper::isGlobalScriptsEnabled()) {
-			foreach ($scripts as $script) {
+			foreach ($scripts as $index => $script) {
 				if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 						&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/execute_on',
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1).'/execute_on',
 							_('global script execution on Zabbix server is disabled by server configuration')
 						)
 					);
