@@ -6,7 +6,6 @@
 The template to monitor HPE MSA 2040 by HTTP.
 It works without any external scripts and uses the script item.
 
-
 ## Requirements
 
 Zabbix version: 7.0 and higher.
@@ -24,15 +23,15 @@ This template has been tested on:
 
 1. Create user "zabbix" with monitor role on the storage.
 2. Link the template to a host.
-3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
-4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
-
+3. Set the hostname or IP address of the host in the {$HPE.MSA.API.HOST} macro and configure password the {$HPE.MSA.API.PASSWORD} macro.
+4. Change the {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$HPE.MSA.API.SCHEME}|<p>Connection scheme for API.</p>|`https`|
+|{$HPE.MSA.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.MSA.API.PORT}|<p>Connection port for API.</p>|`443`|
 |{$HPE.MSA.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`30s`|
 |{$HPE.MSA.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|
@@ -70,7 +69,7 @@ This template has been tested on:
 |System name|<p>The name of the storage system.</p>|Dependent item|hpe.msa.system.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['system-name']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Vendor name|<p>The vendor name.</p>|Dependent item|hpe.msa.system.vendor_name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['vendor-name']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |System health|<p>System health status.</p>|Dependent item|hpe.msa.system.health<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li></ul>|
-|HPE MSA: Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|HPE MSA: Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -80,7 +79,7 @@ This template has been tested on:
 |System health is in degraded state|<p>System health is in degraded state.</p>|`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=1`|Warning||
 |System health is in fault state|<p>System health is in fault state.</p>|`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=2`|Average||
 |System health is in unknown state|<p>System health is in unknown state.</p>|`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=3`|Info||
-|Service is down or unavailable|<p>HTTP/HTTPS service is down or unable to establish TCP connection.</p>|`max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0`|High||
+|Service is down or unavailable|<p>HTTP/HTTPS service is down or unable to establish TCP connection.</p>|`max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0`|High||
 
 ### LLD rule Controllers discovery
 

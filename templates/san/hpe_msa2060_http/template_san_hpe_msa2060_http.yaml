@@ -14,8 +14,8 @@ zabbix_export:
         Setup:
         1. Create user "zabbix" with monitor role on the storage.
         2. Link the template to a host.
-        3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
-        4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
+        3. Set the hostname or IP address of the host in the {$HPE.MSA.API.HOST} macro and configure password the {$HPE.MSA.API.PASSWORD} macro.
+        4. Change the {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -207,7 +207,7 @@ zabbix_export:
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
+              value: '{$HPE.MSA.API.SCHEME}://{$HPE.MSA.API.HOST}:{$HPE.MSA.API.PORT}/'
             - name: password
               value: '{$HPE.MSA.API.PASSWORD}'
             - name: username
@@ -301,7 +301,7 @@ zabbix_export:
               description: 'There are errors in method requests to API.'
               dependencies:
                 - name: 'Service is down or unavailable'
-                  expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
+                  expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0'
               tags:
                 - tag: scope
                   value: availability
@@ -639,7 +639,7 @@ zabbix_export:
         - uuid: 3831060089ff497993088472e922df38
           name: 'HPE MSA: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"]'
+          key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]'
           history: 7d
           description: 'Check if HTTP/HTTPS service accepts TCP connections.'
           preprocessing:
@@ -653,7 +653,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 9c1bf26f95d946f386bbf613d3d55779
-              expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
+              expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0'
               name: 'Service is down or unavailable'
               priority: HIGH
               description: 'HTTP/HTTPS service is down or unable to establish TCP connection.'
@@ -4001,6 +4001,9 @@ zabbix_export:
         - tag: target
           value: msa-2060
       macros:
+        - macro: '{$HPE.MSA.API.HOST}'
+          value: '<SET API HOST>'
+          description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.MSA.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for API.'
