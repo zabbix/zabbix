@@ -1790,6 +1790,27 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 
 		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip, config_hostname,
 				config_buffer_send, config_buffer_size);
+
+		if (metric->nextcheck <= (now = (int)time(NULL)))
+		{
+			/* reschedule metric if polling took it past is scheduled next poll */
+
+			if (SUCCEED != zbx_get_agent_item_nextcheck(metric->itemid, metric->delay, now,
+					&metric->nextcheck, &scheduling, &error))
+			{
+				/* while not likely that another nextcheck calculation with the same     */
+				/* delay could result in an error - still it can be handled and reported */
+				process_value(addrs, NULL, metric->itemid, config_hostname, metric->key, error,
+						ITEM_STATE_NOTSUPPORTED, &metric->lastlogsize, &metric->mtime, NULL,
+						NULL, NULL, NULL, metric->flags, config_tls, config_timeout,
+						config_source_ip, config_buffer_send, config_buffer_size);
+
+				metric->state = ITEM_STATE_NOTSUPPORTED;
+				metric->error_count = 0;
+
+				zbx_free(error);
+			}
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
