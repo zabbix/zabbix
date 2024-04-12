@@ -639,6 +639,14 @@ New features:
 .........T [ZBXNEXT-8240] added a new set of templates for integration with Oracle Cloud Infrastructure (knaglis)
 
 Bug fixes:
+...G...... [ZBX-23719] update plugin-support to add duplicate flag handling (rzvejs)
+....I..... [ZBX-22429] fixed typo in Zabbix proxy automake file (MVekslers)
+.......PS. [ZBX-24089] optimized configuration re-sync after empty initial syncs (wiper)
+........S. [ZBX-24264] fixed value cache being filled with values of newly added items with triggers (wiper)
+A......... [ZBX-24219] fixed user HTTP basic authentication when user belongs to LDAP group (gcalenko)
+..F....... [ZBX-24088] fixed problem filtering in maps with nested maps (miks)
+.........T [ZBX-24206] fixed line breaks in JavaScript in Cloudflare template (abrosimovs)
+.........T [ZBX-24134] added Sensor discovery for VMware Hypervisor template (akotsegubov)
 ..F....... [ZBX-23918] fixed item pattern select popup to display all available items (esekace)
 ..F....... [ZBX-24190] fixed items being updated incorrectly when configuring graph (esekace)
 ..F....... [ZBX-23884] removed possibility to manually add provisioned user to user group (epulke)
