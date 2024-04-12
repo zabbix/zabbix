@@ -548,7 +548,7 @@ out:
  * Purpose: retrieves existing hosts for specified host prototype             *
  *                                                                            *
  * Parameters: parent_hostid - [IN] host prototype id                         *
- *             hosts         - [OUT] list of hosts                            *
+ *             hosts         - [OUT]                                          *
  *             ...           - [IN] new values which should be updated if     *
  *                                  different from original                   *
  *                                                                            *
@@ -2498,7 +2498,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 
 	zbx_vector_uint64_create(&groupids);
 
-	for (i = 0; i < groups->values_num; i++)
+	for (int i = 0; i < groups->values_num; i++)
 	{
 		zbx_lld_group_t	*group = groups->values[i];
 
@@ -2517,7 +2517,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 				groups_update_num++;
 		}
 
-		for (j = 0; j < group->discovery.values_num; j++)
+		for (int j = 0; j < group->discovery.values_num; j++)
 		{
 			zbx_lld_group_discovery_t	*discovery = group->discovery.values[j];
 
@@ -2569,9 +2569,9 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 		zbx_db_free_result(result);
 
 		/* if existing discovered groups were removed convert them to newly discovered - */
-		for (i = 0; i < groupids.values_num; i++)
+		for (int i = 0; i < groupids.values_num; i++)
 		{
-			for (j = 0; j < groups->values_num; j++)
+			for (int j = 0; j < groups->values_num; j++)
 			{
 				zbx_lld_group_t	*group = groups->values[j];
 
@@ -2617,7 +2617,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 
 		zbx_vector_str_create(&names);
 
-		for (i = 0; i < groups->values_num; i++)
+		for (int i = 0; i < groups->values_num; i++)
 		{
 			if (0 == groups->values[i]->groupid)
 				zbx_vector_str_append(&names, groups->values[i]->name);
@@ -2636,7 +2636,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < groups->values_num; i++)
+			for (int i = 0; i < groups->values_num; i++)
 			{
 				zbx_lld_group_t	*group = groups->values[i];
 
@@ -2674,7 +2674,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 
 	/* first handle groups before inserting group_discovery links */
 
-	for (i = 0; i < groups->values_num; i++)
+	for (int i = 0; i < groups->values_num; i++)
 	{
 		zbx_lld_group_t	*group = groups->values[i];
 
@@ -2726,14 +2726,14 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 		zbx_vector_lld_group_ptr_destroy(&new_groups);
 	}
 
-	for (i = 0; i < groups->values_num; i++)
+	for (int i = 0; i < groups->values_num; i++)
 	{
 		zbx_lld_group_t	*group = groups->values[i];
 
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
-		for (j = 0; j < group->discovery.values_num; j++)
+		for (int j = 0; j < group->discovery.values_num; j++)
 		{
 			zbx_lld_group_discovery_t	*discovery = group->discovery.values[j];
 
@@ -5553,8 +5553,9 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 
 /******************************************************************************
  *                                                                            *
- * Return value: SUCCEED if interface with same type exists in the list of    *
- *               interfaces; FAIL - otherwise                                 *
+ * Return value: SUCCEED - if interface with same type exists in list of      *
+ *                         interfaces                                         *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: interfaces with ZBX_FLAG_LLD_INTERFACE_REMOVE flag are ignored   *
  *           auxiliary function for lld_interfaces_validate()                 *

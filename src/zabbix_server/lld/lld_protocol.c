@@ -125,7 +125,6 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, item_len = 0;
-	int		i;
 
 	if (0 != num)
 	{
@@ -140,7 +139,7 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, num);
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		ptr += zbx_serialize_value(ptr, rule_infos[i]->itemid);
 		ptr += zbx_serialize_value(ptr, rule_infos[i]->values_num);
@@ -151,7 +150,7 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 
 static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
 {
-	int	i, items_num;
+	int	items_num;
 
 	data += zbx_deserialize_value(data, &items_num);
 
@@ -159,7 +158,7 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
 	{
 		zbx_vector_uint64_pair_reserve(items, items_num);
 
-		for (i = 0; i < items_num; i++)
+		for (int i = 0; i < items_num; i++)
 		{
 			zbx_uint64_pair_t	pair;
 			int			value;

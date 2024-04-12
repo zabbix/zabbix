@@ -1983,7 +1983,7 @@ static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype
  * Purpose: creates trigger tag                                               *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
+static void	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
 		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
@@ -3455,7 +3455,6 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_lld_trigger_
 
 			zbx_db_free_result(result);
 		}
-
 	}
 
 	zbx_free(sql);

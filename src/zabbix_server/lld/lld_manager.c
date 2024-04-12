@@ -119,7 +119,7 @@ static void	lld_data_free(zbx_lld_data_t *data)
 }
 
 static void	lld_rule_clear(zbx_lld_rule_t *rule)
-
+{
 	zbx_lld_data_t	*data;
 
 	while (NULL != rule->head)

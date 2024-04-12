@@ -118,11 +118,6 @@ static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
 	return strcmp(condition1->macro, condition2->macro);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes LLD filter                                            *
- *                                                                            *
- ******************************************************************************/
 static void	lld_filter_init(zbx_lld_filter_t *filter)
 {
 	zbx_vector_lld_condition_ptr_create(&filter->conditions);
@@ -304,9 +299,9 @@ static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const st
 {
 	int			ret = SUCCEED, error_num = 0, res;
 	double			result;
-	char			*lastmacro = NULL;
 	lld_condition_t		*condition;
-	char			*ops[] = {NULL, "and", "or"}, error[256], *expression = NULL, *errmsg = NULL;
+	char			*lastmacro = NULL, *ops[] = {NULL, "and", "or"}, error[256], *expression = NULL,
+				*errmsg = NULL;
 	size_t			expression_alloc = 0, expression_offset = 0;
 	zbx_vector_str_t	errmsgs;
 
@@ -635,6 +630,7 @@ static void	lld_dump_overrides(const zbx_vector_lld_override_ptr_t *overrides)
 			zabbix_log(LOG_LEVEL_TRACE, "    history '%s'", ZBX_NULL2STR(override_operation->history));
 			zabbix_log(LOG_LEVEL_TRACE, "    trends '%s'", ZBX_NULL2STR(override_operation->trends));
 			zabbix_log(LOG_LEVEL_TRACE, "    inventory_mode: %d", (int)override_operation->inventory_mode);
+
 			for (int k = 0; k < override_operation->tags.values_num; k++)
 			{
 				zabbix_log(LOG_LEVEL_TRACE, "    tag:'%s' value:'%s'",
@@ -690,6 +686,7 @@ static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, zbx_uint
 		zbx_vector_lld_override_ptr_append(overrides, override);
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 	}
+
 	zbx_db_free_result(result);
 
 	if (0 != overrideids.values_num && SUCCEED == (ret = lld_override_conditions_load(overrides, &overrideids,
