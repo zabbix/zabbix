@@ -523,6 +523,7 @@ class CHost extends CHostGeneral {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
 			$all_keys[] = 'active_available';
+			$all_keys[] = 'assigned_proxyid';
 			$options['output'] = array_diff($all_keys, $write_only_keys);
 		}
 		/*
