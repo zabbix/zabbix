@@ -994,7 +994,7 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 
 void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags);
 
-int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
+int	zbx_dc_get_interfaces_availability(zbx_vector_availability_ptr_t *interfaces, int *ts);
 void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
 
 void	zbx_set_availability_diff_ts(int ts);

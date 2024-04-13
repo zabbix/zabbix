@@ -13803,7 +13803,7 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
  *               FAIL    - no interface availability was changed               *
  *                                                                             *
  *******************************************************************************/
-int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts)
+int	zbx_dc_get_interfaces_availability(zbx_vector_availability_ptr_t *interfaces, int *ts)
 {
 	const ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
@@ -13827,13 +13827,13 @@ int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts)
 			zbx_agent_availability_init(&ia->agent, interface->available, interface->error,
 					interface->errors_from, interface->disable_until);
 
-			zbx_vector_ptr_append(interfaces, ia);
+			zbx_vector_availability_ptr_append(interfaces, ia);
 		}
 	}
 
 	UNLOCK_CACHE;
 
-	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_sort(interfaces, zbx_interface_availability_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
