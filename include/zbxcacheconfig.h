@@ -548,21 +548,25 @@ typedef struct
 }
 zbx_corr_condition_t;
 
+ZBX_PTR_VECTOR_DECL(corr_condition_ptr, zbx_corr_condition_t *)
+
 typedef struct
 {
 	unsigned char	type;
 }
 zbx_corr_operation_t;
 
+ZBX_PTR_VECTOR_DECL(corr_operation_ptr, zbx_corr_operation_t *)
+
 typedef struct
 {
-	zbx_uint64_t		correlationid;
-	char			*name;
-	char			*formula;
-	unsigned char		evaltype;
+	zbx_uint64_t			correlationid;
+	char				*name;
+	char				*formula;
+	unsigned char			evaltype;
 
-	zbx_vector_ptr_t	conditions;
-	zbx_vector_ptr_t	operations;
+	zbx_vector_corr_condition_ptr_t	conditions;
+	zbx_vector_corr_operation_ptr_t	operations;
 }
 zbx_correlation_t;
 

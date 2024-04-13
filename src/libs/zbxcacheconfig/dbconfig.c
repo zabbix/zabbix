@@ -64,6 +64,10 @@
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
+ZBX_PTR_VECTOR_IMPL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
+ZBX_PTR_VECTOR_IMPL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
+ZBX_PTR_VECTOR_IMPL(corr_condition_ptr, zbx_corr_condition_t *)
+ZBX_PTR_VECTOR_IMPL(corr_operation_ptr, zbx_corr_operation_t *)
 
 int	sync_in_progress = 0;
 

@@ -866,7 +866,7 @@ static int	correlation_has_old_event_operation(const zbx_correlation_t *correlat
 
 	for (i = 0; i < correlation->operations.values_num; i++)
 	{
-		operation = (zbx_corr_operation_t *)correlation->operations.values[i];
+		operation = correlation->operations.values[i];
 
 		switch (operation->type)
 		{
@@ -1106,7 +1106,7 @@ static void	correlation_execute_operations(const zbx_correlation_t *correlation,
 
 	for (i = 0; i < correlation->operations.values_num; i++)
 	{
-		operation = (zbx_corr_operation_t *)correlation->operations.values[i];
+		operation = correlation->operations.values[i];
 
 		switch (operation->type)
 		{
