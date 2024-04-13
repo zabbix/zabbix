@@ -62,6 +62,9 @@
 #include "zbxexpression.h"
 #include "zbxinterface.h"
 
+ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
+ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
+
 int	sync_in_progress = 0;
 
 #define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
@@ -10402,7 +10405,8 @@ void	zbx_dc_config_clean_triggers(zbx_dc_trigger_t *triggers, int *errcodes, siz
  * Return value: the number of items available for processing (unlocked).     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_config_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids)
+int	zbx_dc_config_lock_triggers_by_history_items(zbx_vector_hc_item_ptr_t *history_items,
+		zbx_vector_uint64_t *triggerids)
 {
 	int			i, j, locked_num = 0;
 	const ZBX_DC_ITEM	*dc_item;
@@ -10413,7 +10417,7 @@ int	zbx_dc_config_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items
 
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		history_item = (zbx_hc_item_t *)history_items->values[i];
+		history_item = history_items->values[i];
 
 		if (0 != (ZBX_DC_FLAG_NOVALUE & history_item->tail->flags))
 			continue;
@@ -14610,7 +14614,7 @@ void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_di
  * Purpose: update automatic inventory in configuration cache                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
+void	zbx_dc_config_update_inventory_values(const zbx_vector_inventory_value_ptr_t *inventory_values)
 {
 	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
 	int			i;
@@ -14619,7 +14623,7 @@ void	zbx_dc_config_update_inventory_values(const zbx_vector_ptr_t *inventory_val
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
-		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const zbx_inventory_value_t	*inventory_value = inventory_values->values[i];
 		const char			**value;
 
 		if (NULL == host_inventory || inventory_value->hostid != host_inventory->hostid)

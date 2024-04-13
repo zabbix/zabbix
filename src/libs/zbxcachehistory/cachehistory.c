@@ -1648,14 +1648,14 @@ static void	DCsync_trends(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
+static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_inventory_value_ptr_t *inventory_values)
 {
 	char	*value_esc;
 	int	i;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
-		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const zbx_inventory_value_t	*inventory_value = inventory_values->values[i];
 
 		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name,
 				inventory_value->value);
@@ -1734,7 +1734,8 @@ void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num)
  *             inventory_values - inventory values                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
+void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
+		const zbx_vector_inventory_value_ptr_t *inventory_values)
 {
 	size_t	sql_offset = 0;
 	int	i;

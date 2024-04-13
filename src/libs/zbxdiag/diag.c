@@ -956,20 +956,19 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 
 		if (0 != tops.values_num)
 		{
-			int	i;
-
 			zbx_json_addobject(json, "top");
 
-			for (i = 0; i < tops.values_num; i++)
+			for (int i = 0; i < tops.values_num; i++)
 			{
 				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
 
 				if (0 == strcmp(map->name, "values"))
 				{
-					zbx_vector_ptr_t	connector_stats;
+					zbx_vector_connector_stat_ptr_t	connector_stats;
 
-					zbx_vector_ptr_create(&connector_stats);
+					zbx_vector_connector_stat_ptr_create(&connector_stats);
 					time1 = zbx_time();
+
 					if (0 == strcmp(map->name, "values"))
 					{
 						ret = zbx_connector_get_top_connectors((int)map->value,
@@ -978,15 +977,16 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 
 					if (FAIL == ret)
 					{
-						zbx_vector_ptr_destroy(&connector_stats);
+						zbx_vector_connector_stat_ptr_destroy(&connector_stats);
 						goto out;
 					}
+
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
 					diag_add_connector_items(json, map->name, &connector_stats);
-					zbx_vector_ptr_clear_ext(&connector_stats, zbx_ptr_free);
-					zbx_vector_ptr_destroy(&connector_stats);
+					zbx_vector_connector_stat_ptr_clear_ext(&connector_stats, zbx_ptr_free);
+					zbx_vector_connector_stat_ptr_destroy(&connector_stats);
 				}
 				else
 				{
