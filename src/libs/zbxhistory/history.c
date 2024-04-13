@@ -25,6 +25,8 @@
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
+ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)
+
 zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
 
 /************************************************************************************
@@ -94,12 +96,13 @@ void	zbx_history_destroy(void)
  * Parameters:                                                                      *
  *    history                          - [IN] values to store                       *
  *    ret_flush                        - [OUT]                                      *
- *    config_history_storage_pipelines - [IN] values to store                       *
+ *    config_history_storage_pipelines - [IN]                                       *
  *                                                                                  *
  * Comments: add history values to the configured storage backends                  *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
+int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_flush,
+		int config_history_storage_pipelines)
 {
 	int	i, flags = 0;
 

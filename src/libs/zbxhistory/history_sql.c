@@ -655,7 +655,7 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
  *                                           compatible with elastic version of _add_values   *
  *                                                                                            *
  *********************************************************************************************/
-static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history,
+static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_history_ptr_t *history,
 		int config_history_storage_pipelines)
 {
 	int	i, h_num = 0;
@@ -664,7 +664,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (h->value_type == hist->value_type)
 			h_num++;

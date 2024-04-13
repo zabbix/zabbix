@@ -1059,19 +1059,20 @@ static void	DCdump_actions(void)
 
 static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 {
-	int			i;
-	zbx_vector_ptr_t	index;
+	int					i;
+	zbx_vector_dc_corr_condition_ptr_t	index;
 
-	zbx_vector_ptr_create(&index);
+	zbx_vector_dc_corr_condition_ptr_create(&index);
 
-	zbx_vector_ptr_append_array(&index, correlation->conditions.values, correlation->conditions.values_num);
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_dc_corr_condition_ptr_append_array(&index, correlation->conditions.values,
+			correlation->conditions.values_num);
+	zbx_vector_dc_corr_condition_ptr_sort(&index, zbx_dc_corr_condition_compare_func);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 
 	for (i = 0; i < index.values_num; i++)
 	{
-		zbx_dc_corr_condition_t	*condition = (zbx_dc_corr_condition_t *)index.values[i];
+		zbx_dc_corr_condition_t	*condition = index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "      conditionid:" ZBX_FS_UI64 " type:%d",
 				condition->corr_conditionid, condition->type);
 
@@ -1097,18 +1098,19 @@ static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 		}
 	}
 
-	zbx_vector_ptr_destroy(&index);
+	zbx_vector_dc_corr_condition_ptr_destroy(&index);
 }
 
 static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 {
-	int			i;
-	zbx_vector_ptr_t	index;
+	int					i;
+	zbx_vector_dc_corr_operation_ptr_t	index;
 
-	zbx_vector_ptr_create(&index);
+	zbx_vector_dc_corr_operation_ptr_create(&index);
 
-	zbx_vector_ptr_append_array(&index, correlation->operations.values, correlation->operations.values_num);
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_dc_corr_operation_ptr_append_array(&index, correlation->operations.values,
+			correlation->operations.values_num);
+	zbx_vector_dc_corr_operation_ptr_sort(&index, zbx_dc_corr_operation_compare_func);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  operations:");
 
@@ -1119,7 +1121,7 @@ static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 				operation->corr_operationid, operation->type);
 	}
 
-	zbx_vector_ptr_destroy(&index);
+	zbx_vector_dc_corr_operation_ptr_destroy(&index);
 }
 
 static void	DCdump_correlations(void)

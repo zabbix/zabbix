@@ -69,6 +69,31 @@ ZBX_PTR_VECTOR_IMPL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
 ZBX_PTR_VECTOR_IMPL(corr_condition_ptr, zbx_corr_condition_t *)
 ZBX_PTR_VECTOR_IMPL(corr_operation_ptr, zbx_corr_operation_t *)
 
+void    zbx_corr_operation_free(zbx_corr_operation_t *corr_operation)
+{
+	zbx_free(corr_operation);
+}
+
+int	zbx_dc_corr_condition_compare_func(const void *d1, const void *d2)
+{
+	const zbx_dc_corr_condition_t	*corr_cond_1 = *(zbx_dc_corr_condition_t **)d1;
+	const zbx_dc_corr_condition_t	*corr_cond_2 = *(zbx_dc_corr_condition_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(corr_cond_1->corr_conditionid, corr_cond_2->corr_conditionid);
+
+	return 0;
+}
+
+int	zbx_dc_corr_operation_compare_func(const void *d1, const void *d2)
+{
+	const zbx_dc_corr_operation_t	*corr_oper_1 = *(zbx_dc_corr_operation_t **)d1;
+	const zbx_dc_corr_operation_t	*corr_oper_2 = *(zbx_dc_corr_operation_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(corr_oper_1->corr_operationid, corr_oper_2->corr_operationid);
+
+	return 0;
+}
+
 int	sync_in_progress = 0;
 
 #define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
@@ -4973,11 +4998,13 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 
 		if (0 == found)
 		{
-			zbx_vector_ptr_create_ext(&correlation->conditions, __config_shmem_malloc_func,
-					__config_shmem_realloc_func, __config_shmem_free_func);
+			zbx_vector_dc_corr_condition_ptr_create_ext(&correlation->conditions,
+					__config_shmem_malloc_func, __config_shmem_realloc_func,
+					__config_shmem_free_func);
 
-			zbx_vector_ptr_create_ext(&correlation->operations, __config_shmem_malloc_func,
-					__config_shmem_realloc_func, __config_shmem_free_func);
+			zbx_vector_dc_corr_operation_ptr_create_ext(&correlation->operations,
+					__config_shmem_malloc_func, __config_shmem_realloc_func,
+					__config_shmem_free_func);
 		}
 
 		dc_strpool_replace(found, &correlation->name, row[1]);
@@ -4996,8 +5023,8 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 		dc_strpool_release(correlation->name);
 		dc_strpool_release(correlation->formula);
 
-		zbx_vector_ptr_destroy(&correlation->conditions);
-		zbx_vector_ptr_destroy(&correlation->operations);
+		zbx_vector_dc_corr_condition_ptr_destroy(&correlation->conditions);
+		zbx_vector_dc_corr_operation_ptr_destroy(&correlation->operations);
 
 		zbx_hashset_remove_direct(&config->correlations, correlation);
 	}
@@ -5191,7 +5218,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 		dc_corr_condition_init_data(condition, found, row + 3);
 
 		if (0 == found)
-			zbx_vector_ptr_append(&correlation->conditions, condition);
+			zbx_vector_dc_corr_condition_ptr_append(&correlation->conditions, condition);
 
 		/* sort the conditions later */
 		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
@@ -5212,14 +5239,14 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 		if (NULL != (correlation = (zbx_dc_correlation_t *)zbx_hashset_search(&config->correlations,
 				&condition->correlationid)))
 		{
-			if (FAIL != (index = zbx_vector_ptr_search(&correlation->conditions, condition,
-					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			if (FAIL != (index = zbx_vector_dc_corr_condition_ptr_search(&correlation->conditions,
+					condition, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				/* sort the conditions later */
 				if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 					zbx_vector_ptr_append(&correlations, correlation);
 
-				zbx_vector_ptr_remove_noorder(&correlation->conditions, index);
+				zbx_vector_dc_corr_condition_ptr_remove_noorder(&correlation->conditions, index);
 			}
 		}
 
@@ -5235,7 +5262,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 	for (i = 0; i < correlations.values_num; i++)
 	{
 		correlation = (zbx_dc_correlation_t *)correlations.values[i];
-		zbx_vector_ptr_sort(&correlation->conditions, dc_compare_corr_conditions_by_type);
+		zbx_vector_dc_corr_condition_ptr_sort(&correlation->conditions, dc_compare_corr_conditions_by_type);
 	}
 
 	zbx_vector_ptr_destroy(&correlations);
@@ -5294,7 +5321,7 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			operation->correlationid = correlationid;
-			zbx_vector_ptr_append(&correlation->operations, operation);
+			zbx_vector_dc_corr_operation_ptr_append(&correlation->operations, operation);
 		}
 	}
 
@@ -5313,10 +5340,10 @@ static void	DCsync_corr_operations(zbx_dbsync_t *sync)
 		if (NULL != (correlation = (zbx_dc_correlation_t *)zbx_hashset_search(&config->correlations,
 				&operation->correlationid)))
 		{
-			if (FAIL != (index = zbx_vector_ptr_search(&correlation->operations, operation,
-					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			if (FAIL != (index = zbx_vector_dc_corr_operation_ptr_search(&correlation->operations,
+					operation, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
-				zbx_vector_ptr_remove_noorder(&correlation->operations, index);
+				zbx_vector_dc_corr_operation_ptr_remove_noorder(&correlation->operations, index);
 			}
 		}
 		zbx_hashset_remove_direct(&config->corr_operations, operation);
@@ -13900,9 +13927,9 @@ static void	dc_correlation_free(zbx_correlation_t *correlation)
 	zbx_free(correlation->name);
 	zbx_free(correlation->formula);
 
-	zbx_vector_ptr_clear_ext(&correlation->operations, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&correlation->operations);
-	zbx_vector_ptr_destroy(&correlation->conditions);
+	zbx_vector_corr_operation_ptr_clear_ext(&correlation->operations, zbx_corr_operation_free);
+	zbx_vector_corr_operation_ptr_destroy(&correlation->operations);
+	zbx_vector_corr_condition_ptr_destroy(&correlation->conditions);
 
 	zbx_free(correlation);
 }
@@ -14125,8 +14152,8 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 		correlation->evaltype = dc_correlation->evaltype;
 		correlation->name = zbx_strdup(NULL, dc_correlation->name);
 		correlation->formula = dc_correlation_formula_dup(dc_correlation);
-		zbx_vector_ptr_create(&correlation->conditions);
-		zbx_vector_ptr_create(&correlation->operations);
+		zbx_vector_corr_condition_ptr_create(&correlation->conditions);
+		zbx_vector_corr_operation_ptr_create(&correlation->operations);
 
 		for (i = 0; i < dc_correlation->conditions.values_num; i++)
 		{
@@ -14135,12 +14162,12 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 			condition = (zbx_corr_condition_t *)zbx_hashset_insert(&rules->conditions, &condition_local,
 					sizeof(condition_local));
 			dc_corr_condition_copy(dc_condition, condition);
-			zbx_vector_ptr_append(&correlation->conditions, condition);
+			zbx_vector_corr_condition_ptr_append(&correlation->conditions, condition);
 		}
 
 		for (i = 0; i < dc_correlation->operations.values_num; i++)
 		{
-			zbx_vector_ptr_append(&correlation->operations, zbx_dc_corr_operation_dup(
+			zbx_vector_corr_operation_ptr_append(&correlation->operations, zbx_dc_corr_operation_dup(
 					(const zbx_dc_corr_operation_t *)dc_correlation->operations.values[i]));
 		}
 

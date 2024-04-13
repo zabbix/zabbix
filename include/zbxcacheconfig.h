@@ -558,6 +558,8 @@ zbx_corr_operation_t;
 
 ZBX_PTR_VECTOR_DECL(corr_operation_ptr, zbx_corr_operation_t *)
 
+void	zbx_corr_operation_free(zbx_corr_operation_t *corr_operation);
+
 typedef struct
 {
 	zbx_uint64_t			correlationid;

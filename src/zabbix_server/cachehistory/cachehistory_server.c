@@ -820,7 +820,7 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *history_values,
+static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_dc_history_ptr_t *history_values,
 		int *ret_flush, int config_history_storage_pipelines)
 {
 	int	i, ret = SUCCEED;
@@ -832,7 +832,7 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_pt
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
 
-		zbx_vector_ptr_append(history_values, h);
+		zbx_vector_dc_history_ptr_append(history_values, h);
 	}
 
 	if (0 != history_values->values_num)
