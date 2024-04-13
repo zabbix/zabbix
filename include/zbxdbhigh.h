@@ -583,7 +583,7 @@ zbx_trigger_diff_t;
 
 ZBX_PTR_VECTOR_DECL(trigger_diff_ptr, zbx_trigger_diff_t *)
 
-int     zbx_trigger_diff_compare_func(const void *d1, const void *d2);
+int	zbx_trigger_diff_compare_func(const void *d1, const void *d2);
 
 void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);

@@ -1381,7 +1381,8 @@ static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance,
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_ptr_t *tags)
+static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance,
+		const zbx_vector_tags_ptr_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 

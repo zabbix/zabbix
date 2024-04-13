@@ -574,7 +574,7 @@ zbx_correlation_t;
 
 ZBX_PTR_VECTOR_DECL(correlation_ptr, zbx_correlation_t *)
 
-int     zbx_correlation_compare_func(const void *d1, const void *d2);
+int	zbx_correlation_compare_func(const void *d1, const void *d2);
 
 typedef struct
 {

@@ -22,7 +22,7 @@
 
 #include "zbxipcservice.h"
 
-int     zbx_interface_availability_compare_func(const void *d1, const void *d2)
+int	zbx_interface_availability_compare_func(const void *d1, const void *d2)
 {
 	const zbx_interface_availability_t *int_aval_1 = *(const zbx_interface_availability_t **)d1;
 	const zbx_interface_availability_t *int_aval_2 = *(const zbx_interface_availability_t **)d2;

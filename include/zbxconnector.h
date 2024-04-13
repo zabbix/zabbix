@@ -68,7 +68,7 @@ zbx_connector_stat_t;
 
 ZBX_PTR_VECTOR_DECL(connector_stat_ptr, zbx_connector_stat_t *)
 
-void     connector_stat_free(zbx_connector_stat_t *connector_stat);
+void	connector_stat_free(zbx_connector_stat_t *connector_stat);
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object);

@@ -453,10 +453,8 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_dc_history_p
  * Purpose: frees zbx_dc_history_t structure                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_free_dc_history(void *ptr)
+void	zbx_vcmock_free_dc_history(zbx_dc_history_t *h)
 {
-	zbx_dc_history_t	*h = (zbx_dc_history_t *)ptr;
-
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
