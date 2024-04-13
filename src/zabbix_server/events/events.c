@@ -2504,7 +2504,7 @@ static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_pt
 	{
 		zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = dep->masterids.values[i]};
 
-		if (FAIL == (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &dep->masterids.values[i],
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &trigger_diff_cmp,
 				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -2764,7 +2764,9 @@ static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_
 	{
 		event = (zbx_db_event *)internal_events->values[i];
 
-		if (FAIL == (index = zbx_vector_trigger_diff_ptr_search(trigger_diff, &event->objectid,
+		zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = event->objectid};
+
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_search(trigger_diff, &trigger_diff_cmp,
 				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
