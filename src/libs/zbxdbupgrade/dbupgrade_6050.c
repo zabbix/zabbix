@@ -3626,6 +3626,21 @@ static int	DBpatch_6050255(void)
 
 	return DBadd_field("mfa_totp_secret", &field);
 }
+
+static int	DBpatch_6050256(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3886,5 +3901,6 @@ DBPATCH_ADD(6050252, 0, 1)
 DBPATCH_ADD(6050253, 0, 1)
 DBPATCH_ADD(6050254, 0, 1)
 DBPATCH_ADD(6050255, 0, 1)
+DBPATCH_ADD(6050256, 0, 1)
 
 DBPATCH_END()

@@ -1,7 +1,16 @@
+Changes for 7.0.0rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0beta3
 
 New features:
-A.F.....S. [ZBXNEXT-8880] added options for disallow script execution and user HTTP authentication (dfofanovs, dgoloscapov)
+..F.I..... [ZBXNEXT-8685] implemented new Host navigator widget (apoga, ddauksa)
+..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that Zabbix server returns to Zabbix frontend (jfreibergs, kprutkovs)
+A.F.....S. [ZBXNEXT-8880] added options for disallowing script execution and user HTTP authentication (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8970] implemented faster action execution on Zabbix server (akozlovs)
 .........T [ZBXCTR-22] refactored JavaScript filter functions for Kubernetes templates (ebbex)
 ...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
@@ -18,6 +27,8 @@ A.F.I...S. [ZBXNEXT-2020,ZBXNEXT-8918] implemented the option to disable no-long
 ..F.I..... [ZBXNEXT-8683] implemented new Honeycomb widget (apoga, ashubin, averza, ddauksa)
 
 Bug fixes:
+..F....... [ZBX-23468] fixed radio button text alignment in network discovery form and modal window resizing when zooming in or out (esekace)
+..F....... [ZBX-24205] fixed the position of warning icon in breadcrumbs for no-longer discovered host (esekace)
 ...G...... [ZBX-23719] updated plugin-support to add duplicate flag handling (rzvejs)
 ....I..... [ZBX-22429] fixed typo in Zabbix proxy automake file (MVekslers)
 .......PS. [ZBX-24089] optimized configuration re-sync after empty initial syncs (wiper)

@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -17,17 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_REPORT_MANAGER_H
-#define ZABBIX_REPORT_MANAGER_H
 
-#include "zbxthreads.h"
+/**
+ * Host navigator widget view.
+ *
+ * @var CView $this
+ * @var array $data
+ */
 
-typedef struct
-{
-	zbx_get_config_forks_f	get_process_forks_cb_arg;
+$view = new CWidgetView($data);
+
+foreach ($data['vars'] as $name => $value) {
+	if ($value !== null) {
+		$view->setVar($name, $value);
+	}
 }
-zbx_thread_report_manager_args;
 
-ZBX_THREAD_ENTRY(report_manager_thread, args);
-
-#endif
+$view->show();

@@ -17,17 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CONNECTOR_MANAGER_H
-#define ZABBIX_CONNECTOR_MANAGER_H
+#ifndef ZBX_EVENTLOG_H
+#define ZBX_EVENTLOG_H
 
-#include "zbxthreads.h"
+#include "../../logfiles/logfiles.h"
+#include "../../metrics/metrics.h"
 
-typedef struct
-{
-	zbx_get_config_forks_f	get_process_forks_cb_arg;
-}
-zbx_thread_connector_manager_args;
+#include "zbxcomms.h"
+#include "zbxalgo.h"
 
-ZBX_THREAD_ENTRY(connector_manager_thread, args);
-
-#endif
+int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char
+		*eventlog_name, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
+		const char *key_source, const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, int config_buffer_send, int config_buffer_size, zbx_active_metric_t *metric,
+		zbx_uint64_t *lastlogsize_sent, char **error);
+#endif /* ZBX_EVENTLOG_H */

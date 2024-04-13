@@ -19,6 +19,8 @@
 
 #include "proxyconfig.h"
 
+#include "proxyconfigwrite/proxyconfigwrite.h"
+
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxcachehistory.h"
@@ -28,7 +30,6 @@
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
-#include "proxyconfigwrite/proxyconfig_write.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
