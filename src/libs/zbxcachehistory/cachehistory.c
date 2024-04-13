@@ -2924,7 +2924,7 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
  *           zbx_hc_push_items() function after they have been processed.         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
+void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 {
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
@@ -2932,8 +2932,8 @@ void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
 	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
-		item = (zbx_hc_item_t *)elem->data;
-		zbx_vector_ptr_append(history_items, item);
+		item = elem->data;
+		zbx_vector_hc_item_ptr_append(history_items, item);
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
 	}
@@ -2947,7 +2947,7 @@ void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
  *             history_items - [IN] the history items                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items)
+void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t *history_items)
 {
 	int		i, history_num = 0;
 	zbx_hc_item_t	*item;
@@ -2956,7 +2956,7 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history
 	/* change item's history data until it is pushed back to history queue */
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		item = (zbx_hc_item_t *)history_items->values[i];
+		item = history_items->values[i];
 
 		if (ZBX_HC_ITEM_STATUS_BUSY == item->status)
 			continue;
@@ -2977,7 +2977,7 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history
  *           removed from history index.                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_push_items(zbx_vector_ptr_t *history_items)
+void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
@@ -2985,7 +2985,7 @@ void	zbx_hc_push_items(zbx_vector_ptr_t *history_items)
 
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		item = (zbx_hc_item_t *)history_items->values[i];
+		item = history_items->values[i];
 
 		switch (item->status)
 		{

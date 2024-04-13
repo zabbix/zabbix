@@ -25,6 +25,11 @@
 
 ZBX_PTR_VECTOR_IMPL(connector_stat_ptr, zbx_connector_stat_t *)
 
+void     connector_stat_free(zbx_connector_stat_t *connector_stat)
+{
+	zbx_free(connector_stat);
+}
+
 static int	connector_initialized;
 
 #define CONNECTOR_INITIALIZED_YES	1

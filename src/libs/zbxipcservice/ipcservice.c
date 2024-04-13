@@ -1540,7 +1540,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 
 	zbx_free(service->path);
 
-	zbx_vector_ptr_destroy(&service->clients);
+	zbx_vector_ipc_client_ptr_destroy(&service->clients);
 	zbx_queue_ptr_destroy(&service->clients_recv);
 
 	event_free(service->ev_alert);
