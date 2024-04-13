@@ -67,6 +67,8 @@ ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
+ZBX_PTR_VECTOR_IMPL(db_field_ptr, zbx_db_field_t *)
+ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
@@ -2647,11 +2649,11 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{
-		zbx_db_value_t	*row = (zbx_db_value_t *)self->rows.values[i];
+		zbx_db_value_t	*row = self->rows.values[i];
 
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			zbx_db_field_t	*field = (zbx_db_field_t *)self->fields.values[j];
+			zbx_db_field_t	*field = self->fields.values[j];
 
 			switch (field->type)
 			{
@@ -2669,9 +2671,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 		zbx_free(row);
 	}
 
-	zbx_vector_ptr_destroy(&self->rows);
+	zbx_vector_db_value_ptr_destroy(&self->rows);
 
-	zbx_vector_ptr_destroy(&self->fields);
+	zbx_vector_db_field_ptr_destroy(&self->fields);
 }
 
 /******************************************************************************
@@ -2711,13 +2713,13 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 	self->autoincrement = -1;
 	self->lastid = 0;
 
-	zbx_vector_ptr_create(&self->fields);
-	zbx_vector_ptr_create(&self->rows);
+	zbx_vector_db_field_ptr_create(&self->fields);
+	zbx_vector_db_value_ptr_create(&self->rows);
 
 	self->table = table;
 
 	for (i = 0; i < fields_num; i++)
-		zbx_vector_ptr_append(&self->fields, (zbx_db_field_t *)fields[i]);
+		zbx_vector_db_field_ptr_append(&self->fields, (zbx_db_field_t *)fields[i]);
 }
 
 /******************************************************************************
@@ -2798,7 +2800,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		zbx_db_field_t		*field = (zbx_db_field_t *)self->fields.values[i];
+		zbx_db_field_t		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
@@ -2828,7 +2830,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 		}
 	}
 
-	zbx_vector_ptr_append(&self->rows, row);
+	zbx_vector_db_value_ptr_append(&self->rows, row);
 }
 
 /******************************************************************************

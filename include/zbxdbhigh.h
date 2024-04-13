@@ -694,21 +694,24 @@ void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_db_check_character_set(void);
 
+ZBX_PTR_VECTOR_DECL(db_field_ptr, zbx_db_field_t *)
+ZBX_PTR_VECTOR_DECL(db_value_ptr, zbx_db_value_t *)
+
 /* bulk insert support */
 
 /* database bulk insert data */
 typedef struct
 {
 	/* the target table */
-	const zbx_db_table_t	*table;
+	const zbx_db_table_t		*table;
 	/* the fields to insert (pointers to the zbx_db_field_t structures from database schema) */
-	zbx_vector_ptr_t	fields;
+	zbx_vector_db_field_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
-	zbx_vector_ptr_t	rows;
+	zbx_vector_db_value_ptr_t	rows;
 	/* index of autoincrement field */
-	int			autoincrement;
+	int				autoincrement;
 	/* the last id assigned by autoincrement */
-	zbx_uint64_t		lastid;
+	zbx_uint64_t			lastid;
 }
 zbx_db_insert_t;
 
