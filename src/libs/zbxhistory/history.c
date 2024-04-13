@@ -27,6 +27,11 @@ ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
 ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)
 
+void	zbx_dc_history_free(zbx_dc_history_t *dc_history)
+{
+	zbx_free(dc_history);
+}
+
 zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
 
 /************************************************************************************

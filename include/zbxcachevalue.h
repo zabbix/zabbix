@@ -92,6 +92,10 @@ typedef struct
 }
 zbx_vc_item_stats_t;
 
+ZBX_PTR_VECTOR_DECL(vc_item_stats_ptr, zbx_vc_item_stats_t *)
+
+void	zbx_vc_item_stats_free(zbx_vc_item_stats_t *vc_item_stats);
+
 int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error);
 
 void	zbx_vc_destroy(void);
@@ -116,7 +120,7 @@ void	zbx_vc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
 void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode);
 void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem);
-void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
+void	zbx_vc_get_item_stats(zbx_vector_vc_item_stats_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
 
 void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items);

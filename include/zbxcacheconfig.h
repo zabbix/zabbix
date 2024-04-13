@@ -572,10 +572,14 @@ typedef struct
 }
 zbx_correlation_t;
 
+ZBX_PTR_VECTOR_DECL(correlation_ptr, zbx_correlation_t *)
+
+int     zbx_correlation_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
-	zbx_vector_ptr_t	correlations;
-	zbx_hashset_t		conditions;
+	zbx_vector_correlation_ptr_t	correlations;
+	zbx_hashset_t			conditions;
 
 	/* Configuration synchronization timestamp of the rules. */
 	/* Update the cache if this timestamp is less than the   */
@@ -1043,7 +1047,11 @@ typedef struct
 }
 zbx_trigger_dep_t;
 
-void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
+ZBX_PTR_VECTOR_DECL(trigger_dep_ptr, zbx_trigger_dep_t *)
+
+int	zbx_trigger_dep_compare_func(const void *d1, const void *d2);
+
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_trigger_dep_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
 
@@ -1184,12 +1192,14 @@ typedef struct
 }
 zbx_trigger_timer_t;
 
-void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
-void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit);
-void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers);
+ZBX_PTR_VECTOR_DECL(trigger_timer_ptr, zbx_trigger_timer_t *)
+
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now);
+void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, int soft_limit, int hard_limit);
+void	zbx_dc_clear_timer_queue(zbx_vector_trigger_timer_ptr_t *timers);
 void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order,
-		const zbx_vector_ptr_t *timers);
-void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
+		const zbx_vector_trigger_timer_ptr_t *timers);
+void	zbx_dc_free_timers(zbx_vector_trigger_timer_ptr_t *timers);
 
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
 

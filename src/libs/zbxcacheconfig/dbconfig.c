@@ -68,6 +68,9 @@ ZBX_PTR_VECTOR_IMPL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
 ZBX_PTR_VECTOR_IMPL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
 ZBX_PTR_VECTOR_IMPL(corr_condition_ptr, zbx_corr_condition_t *)
 ZBX_PTR_VECTOR_IMPL(corr_operation_ptr, zbx_corr_operation_t *)
+ZBX_PTR_VECTOR_IMPL(correlation_ptr, zbx_correlation_t *)
+ZBX_PTR_VECTOR_IMPL(trigger_dep_ptr, zbx_trigger_dep_t *)
+ZBX_PTR_VECTOR_IMPL(trigger_timer_ptr, zbx_trigger_timer_t *)
 
 void    zbx_corr_operation_free(zbx_corr_operation_t *corr_operation)
 {
@@ -90,6 +93,26 @@ int	zbx_dc_corr_operation_compare_func(const void *d1, const void *d2)
 	const zbx_dc_corr_operation_t	*corr_oper_2 = *(zbx_dc_corr_operation_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(corr_oper_1->corr_operationid, corr_oper_2->corr_operationid);
+
+	return 0;
+}
+
+int	zbx_correlation_compare_func(const void *d1, const void *d2)
+{
+	const zbx_correlation_t	*corr_1 = *(zbx_correlation_t **)d1;
+	const zbx_correlation_t	*corr_2 = *(zbx_correlation_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(corr_1->correlationid, corr_2->correlationid);
+
+	return 0;
+}
+
+int	zbx_trigger_dep_compare_func(const void *d1, const void *d2)
+{
+	const zbx_trigger_dep_t	*trigger_dep_1 = *(zbx_trigger_dep_t **)d1;
+	const zbx_trigger_dep_t	*trigger_dep_2 = *(zbx_trigger_dep_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(trigger_dep_1->triggerid, trigger_dep_2->triggerid);
 
 	return 0;
 }
@@ -10630,7 +10653,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order,
-		const zbx_vector_ptr_t *timers)
+		const zbx_vector_trigger_timer_ptr_t *timers)
 {
 	int		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
@@ -10639,7 +10662,7 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_tr
 
 	for (i = 0; i < timers->values_num; i++)
 	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+		zbx_trigger_timer_t	*timer = timers->values[i];
 
 		/* skip timers of 'busy' (being processed) triggers */
 		if (0 == timer->lock)
@@ -10781,7 +10804,7 @@ static void	dc_remove_invalid_timer(zbx_trigger_timer_t *timer)
  *           already being processed and should not be recalculated.          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit)
+void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, int soft_limit, int hard_limit)
 {
 	zbx_trigger_timer_t	*first_timer = NULL, *timer;
 	int			found = 0;
@@ -10836,7 +10859,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 			continue;
 		}
 
-		zbx_vector_ptr_append(timers, timer);
+		zbx_vector_trigger_timer_ptr_append(timers, timer);
 
 		/* timers scheduled to executed in future are taken from queue only */
 		/* for rescheduling later - skip locking                            */
@@ -10884,13 +10907,13 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
  * Comments: Triggers are unlocked by zbx_dc_config_unlock_triggers()         *
  *                                                                            *
  ******************************************************************************/
-static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
+static void	dc_reschedule_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now)
 {
 	int	i;
 
 	for (i = 0; i < timers->values_num; i++)
 	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+		zbx_trigger_timer_t	*timer = timers->values[i];
 
 		timer->lock = 0;
 
@@ -10909,7 +10932,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
  * Comments: Triggers are unlocked by zbx_dc_config_unlock_triggers()         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now)
 {
 	int			i;
 	zbx_dc_um_handle_t	*um_handle;
@@ -10920,7 +10943,7 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	/* (timers with reset execution time)                                 */
 	for (i = 0; i < timers->values_num; i++)
 	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+		zbx_trigger_timer_t	*timer = timers->values[i];
 
 		if (0 == timer->check_ts.sec)
 		{
@@ -10944,25 +10967,25 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
  * Purpose: clears timer trigger queue                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
+void	zbx_dc_clear_timer_queue(zbx_vector_trigger_timer_ptr_t *timers)
 {
 	ZBX_DC_FUNCTION	*function;
 	int		i;
 
-	zbx_vector_ptr_reserve(timers, config->trigger_queue.elems_num);
+	zbx_vector_trigger_timer_ptr_reserve(timers, config->trigger_queue.elems_num);
 
 	WRLOCK_CACHE;
 
 	for (i = 0; i < config->trigger_queue.elems_num; i++)
 	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)config->trigger_queue.elems[i].data;
+		zbx_trigger_timer_t	*timer = config->trigger_queue.elems[i].data;
 
 		if (ZBX_TRIGGER_TIMER_FUNCTION_TREND == timer->type &&
 				NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 						&timer->objectid)) &&
 				function->timer_revision == timer->revision)
 		{
-			zbx_vector_ptr_append(timers, timer);
+			zbx_vector_trigger_timer_ptr_append(timers, timer);
 		}
 		else
 			dc_trigger_timer_free(timer);
@@ -10973,7 +10996,7 @@ void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_free_timers(zbx_vector_ptr_t *timers)
+void	zbx_dc_free_timers(zbx_vector_trigger_timer_ptr_t *timers)
 {
 	int	i;
 
@@ -13833,7 +13856,7 @@ int	zbx_dc_get_interfaces_availability(zbx_vector_availability_ptr_t *interfaces
 
 	UNLOCK_CACHE;
 
-	zbx_vector_ptr_sort(interfaces, zbx_interface_availability_compare_func);
+	zbx_vector_availability_ptr_sort(interfaces, zbx_interface_availability_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
@@ -14094,7 +14117,7 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 
 void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
 {
-	zbx_vector_ptr_create(&rules->correlations);
+	zbx_vector_correlation_ptr_create(&rules->correlations);
 	zbx_hashset_create_ext(&rules->conditions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
@@ -14104,14 +14127,14 @@ void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
 
 void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules)
 {
-	zbx_vector_ptr_clear_ext(&rules->correlations, (zbx_clean_func_t)dc_correlation_free);
+	zbx_vector_correlation_ptr_clear_ext(&rules->correlations, dc_correlation_free);
 	zbx_hashset_clear(&rules->conditions);
 }
 
 void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules)
 {
 	zbx_dc_correlation_rules_clean(rules);
-	zbx_vector_ptr_destroy(&rules->correlations);
+	zbx_vector_correlation_ptr_destroy(&rules->correlations);
 	zbx_hashset_destroy(&rules->conditions);
 }
 
@@ -14171,14 +14194,14 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 					(const zbx_dc_corr_operation_t *)dc_correlation->operations.values[i]));
 		}
 
-		zbx_vector_ptr_append(&rules->correlations, correlation);
+		zbx_vector_correlation_ptr_append(&rules->correlations, correlation);
 	}
 
 	rules->sync_ts = config->sync_ts;
 
 	UNLOCK_CACHE;
 
-	zbx_vector_ptr_sort(&rules->correlations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_correlation_ptr_sort(&rules->correlations, zbx_correlation_compare_func);
 }
 
 /******************************************************************************
@@ -14764,7 +14787,7 @@ int	zbx_dc_get_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replac
  *           have OK value and are not being processed in this batch.         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps)
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_trigger_dep_ptr_t *deps)
 {
 	int				i, ret;
 	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
@@ -14799,7 +14822,7 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 			else
 				dep->status = ZBX_TRIGGER_DEPENDENCY_FAIL;
 
-			zbx_vector_ptr_append(deps, dep);
+			zbx_vector_trigger_dep_ptr_append(deps, dep);
 		}
 
 		zbx_vector_uint64_clear(&masterids);

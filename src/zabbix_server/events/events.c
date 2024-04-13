@@ -1207,7 +1207,7 @@ static void	correlate_event_by_global_rules(zbx_db_event *event, zbx_problem_sta
 	{
 		zbx_correlation_scope_t	scope;
 
-		correlation = (zbx_correlation_t *)correlation_rules.correlations.values[i];
+		correlation = correlation_rules.correlations.values[i];
 
 		switch (correlation_match_new_event(correlation, event, SUCCEED))
 		{
@@ -2484,17 +2484,19 @@ static void	trigger_dep_free(zbx_trigger_dep_t *dep)
  *                                 trigger values (sorted by triggerid)       *
  *                                                                            *
  ******************************************************************************/
-static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_ptr_t *deps,
+static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_trigger_dep_ptr_t *deps,
 		const zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_trigger_dep_t	*dep;
 	zbx_trigger_diff_t	*diff;
 
-	if (FAIL == (index = zbx_vector_ptr_bsearch(deps, &event->objectid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	zbx_trigger_dep_t	cmp = {.triggerid = event->objectid};
+
+	if (FAIL == (index = zbx_vector_trigger_dep_ptr_bsearch(deps, &cmp, zbx_trigger_dep_compare_func)))
 		return SUCCEED;
 
-	dep = (zbx_trigger_dep_t *)deps->values[index];
+	dep = deps->values[index];
 
 	if (ZBX_TRIGGER_DEPENDENCY_FAIL == dep->status)
 		return FAIL;
@@ -2571,13 +2573,14 @@ static int	match_tag(const char *name, const zbx_vector_tags_ptr_t *tags1, const
 static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 		const zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
-	int			i, j, index;
-	zbx_vector_uint64_t	triggerids;
-	zbx_vector_ptr_t	problems, deps;
-	zbx_db_event		*event;
-	zbx_event_problem_t	*problem;
-	zbx_trigger_diff_t	*diff;
-	unsigned char		value;
+	int				i, j, index;
+	zbx_vector_uint64_t		triggerids;
+	zbx_vector_ptr_t		problems;
+	zbx_vector_trigger_dep_ptr_t	deps;
+	zbx_db_event			*event;
+	zbx_event_problem_t		*problem;
+	zbx_trigger_diff_t		*diff;
+	unsigned char			value;
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, trigger_events->values_num);
@@ -2585,8 +2588,8 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 	zbx_vector_ptr_create(&problems);
 	zbx_vector_ptr_reserve(&problems, trigger_events->values_num);
 
-	zbx_vector_ptr_create(&deps);
-	zbx_vector_ptr_reserve(&deps, trigger_events->values_num);
+	zbx_vector_trigger_dep_ptr_create(&deps);
+	zbx_vector_trigger_dep_ptr_reserve(&deps, trigger_events->values_num);
 
 	/* cache relevant problems */
 
@@ -2713,8 +2716,8 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 	zbx_vector_ptr_clear_ext(&problems, (zbx_clean_func_t)event_problem_free);
 	zbx_vector_ptr_destroy(&problems);
 
-	zbx_vector_ptr_clear_ext(&deps, (zbx_clean_func_t)trigger_dep_free);
-	zbx_vector_ptr_destroy(&deps);
+	zbx_vector_trigger_dep_ptr_clear_ext(&deps, trigger_dep_free);
+	zbx_vector_trigger_dep_ptr_destroy(&deps);
 
 	zbx_vector_uint64_destroy(&triggerids);
 }
@@ -2732,17 +2735,17 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_events,
 		const zbx_vector_ptr_t *trigger_events, const zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
-	int			i, index;
-	zbx_db_event		*event;
-	zbx_vector_uint64_t	triggerids;
-	zbx_vector_ptr_t	deps;
-	zbx_trigger_diff_t	*diff;
+	int				i, index;
+	zbx_db_event			*event;
+	zbx_vector_uint64_t		triggerids;
+	zbx_vector_trigger_dep_ptr_t	deps;
+	zbx_trigger_diff_t		*diff;
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, internal_events->values_num + trigger_events->values_num);
 
-	zbx_vector_ptr_create(&deps);
-	zbx_vector_ptr_reserve(&deps, internal_events->values_num + trigger_events->values_num);
+	zbx_vector_trigger_dep_ptr_create(&deps);
+	zbx_vector_trigger_dep_ptr_reserve(&deps, internal_events->values_num + trigger_events->values_num);
 
 	for (i = 0; i < internal_events->values_num; i++)
 	{
@@ -2784,8 +2787,8 @@ static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_
 		}
 	}
 
-	zbx_vector_ptr_clear_ext(&deps, (zbx_clean_func_t)trigger_dep_free);
-	zbx_vector_ptr_destroy(&deps);
+	zbx_vector_trigger_dep_ptr_clear_ext(&deps, trigger_dep_free);
+	zbx_vector_trigger_dep_ptr_destroy(&deps);
 
 	zbx_vector_uint64_destroy(&triggerids);
 }

@@ -62,10 +62,10 @@ static zbx_export_file_t	*get_trends_export(void)
  ******************************************************************************/
 static void	zbx_db_flush_timer_queue(void)
 {
-	zbx_vector_ptr_t	persistent_timers;
-	zbx_db_insert_t		db_insert;
+	zbx_vector_trigger_timer_ptr_t	persistent_timers;
+	zbx_db_insert_t			db_insert;
 
-	zbx_vector_ptr_create(&persistent_timers);
+	zbx_vector_trigger_timer_ptr_create(&persistent_timers);
 	zbx_dc_clear_timer_queue(&persistent_timers);
 
 	if (0 != persistent_timers.values_num)
@@ -75,7 +75,7 @@ static void	zbx_db_flush_timer_queue(void)
 
 		for (int i = 0; i < persistent_timers.values_num; i++)
 		{
-			zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)persistent_timers.values[i];
+			zbx_trigger_timer_t	*timer = persistent_timers.values[i];
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), timer->objectid, timer->type,
 					timer->eval_ts.sec, timer->eval_ts.ns);
@@ -88,7 +88,7 @@ static void	zbx_db_flush_timer_queue(void)
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	zbx_vector_ptr_destroy(&persistent_timers);
+	zbx_vector_trigger_timer_ptr_destroy(&persistent_timers);
 }
 
 static void	db_trigger_queue_cleanup(void)

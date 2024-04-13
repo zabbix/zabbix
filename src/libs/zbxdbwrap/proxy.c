@@ -423,12 +423,12 @@ int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const 
 int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 {
 	int				i, ret = FAIL;
-	zbx_vector_ptr_t		interfaces;
+	zbx_vector_availability_ptr_t	interfaces;
 	zbx_interface_availability_t	*ia;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&interfaces);
+	zbx_vector_availability_ptr_create(&interfaces);
 
 	if (SUCCEED != zbx_dc_get_interfaces_availability(&interfaces, ts))
 		goto out;
@@ -437,7 +437,7 @@ int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 
 	for (i = 0; i < interfaces.values_num; i++)
 	{
-		ia = (zbx_interface_availability_t *)interfaces.values[i];
+		ia = interfaces.values[i];
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, ZBX_PROTO_TAG_INTERFACE_ID, ia->interfaceid);
@@ -452,8 +452,8 @@ int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
-	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_availability_ptr_clear_ext(&interfaces, zbx_interface_availability_free);
+	zbx_vector_availability_ptr_destroy(&interfaces);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

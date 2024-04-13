@@ -285,11 +285,11 @@ out:
  ******************************************************************************/
 static void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
-		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
-		zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
-		zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order)
+		const int *history_errcodes, const zbx_vector_trigger_timer_ptr_t *timers,
+		zbx_add_event_func_t add_event_cb, zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t *itemids,
+		zbx_timespec_t *timespecs, zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order)
 {
-	int			i, item_num = 0, timers_num = 0;
+	int	i, item_num = 0, timers_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -310,7 +310,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 
 	for (i = 0; i < timers->values_num; i++)
 	{
-		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+		zbx_trigger_timer_t	*timer = timers->values[i];
 
 		if (0 != timer->lock)
 			timers_num++;
@@ -699,7 +699,7 @@ static int	history_value_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t *duplicates)
+static void	vc_flag_duplicates(zbx_vector_dc_history_ptr_t *history_index, zbx_vector_dc_history_ptr_t *duplicates)
 {
 	int	i;
 
@@ -709,10 +709,10 @@ static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t
 	{
 		int	idx_cached;
 
-		if (FAIL != (idx_cached = zbx_vector_ptr_bsearch(history_index, duplicates->values[i],
+		if (FAIL != (idx_cached = zbx_vector_dc_history_ptr_bsearch(history_index, duplicates->values[i],
 				history_value_compare_func)))
 		{
-			zbx_dc_history_t	*cached_value = (zbx_dc_history_t *)history_index->values[idx_cached];
+			zbx_dc_history_t	*cached_value = history_index->values[idx_cached];
 
 			zbx_dc_history_clean_value(cached_value);
 			cached_value->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
@@ -723,7 +723,7 @@ static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t
 }
 
 static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char value_type,
-		zbx_vector_ptr_t *duplicates)
+		zbx_vector_dc_history_ptr_t *duplicates)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -743,14 +743,14 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 
 		d->value_type = value_type;
 
-		zbx_vector_ptr_append(duplicates, d);
+		zbx_vector_dc_history_ptr_append(duplicates, d);
 	}
 	zbx_db_free_result(result);
 
 	zbx_free(query->sql);
 }
 
-static void	remove_history_duplicates(zbx_vector_ptr_t *history)
+static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 {
 	int				i;
 	zbx_history_dupl_select_t	select_flt = {.table_name = "history"},
@@ -759,15 +759,15 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 					select_log = {.table_name = "history_log"},
 					select_text = {.table_name = "history_text"},
 					select_bin = {.table_name = "history_bin"};
-	zbx_vector_ptr_t		duplicates, history_index;
+	zbx_vector_dc_history_ptr_t	duplicates, history_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&duplicates);
-	zbx_vector_ptr_create(&history_index);
+	zbx_vector_dc_history_ptr_create(&duplicates);
+	zbx_vector_dc_history_ptr_create(&history_index);
 
-	zbx_vector_ptr_append_array(&history_index, history->values, history->values_num);
-	zbx_vector_ptr_sort(&history_index, history_value_compare_func);
+	zbx_vector_dc_history_ptr_append_array(&history_index, history->values, history->values_num);
+	zbx_vector_dc_history_ptr_sort(&history_index, history_value_compare_func);
 
 	for (i = 0; i < history_index.values_num; i++)
 	{
@@ -813,9 +813,9 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 
 	vc_flag_duplicates(&history_index, &duplicates);
 
-	zbx_vector_ptr_clear_ext(&duplicates, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_destroy(&duplicates);
-	zbx_vector_ptr_destroy(&history_index);
+	zbx_vector_dc_history_ptr_clear_ext(&duplicates, zbx_dc_history_free);
+	zbx_vector_dc_history_ptr_destroy(&duplicates);
+	zbx_vector_dc_history_ptr_destroy(&history_index);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -854,20 +854,20 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_dc
  ******************************************************************************/
 static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int config_history_storage_pipelines)
 {
-	int			ret, ret_flush = FLUSH_SUCCEED, num;
-	zbx_vector_ptr_t	history_values;
+	int				ret, ret_flush = FLUSH_SUCCEED, num;
+	zbx_vector_dc_history_ptr_t	history_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&history_values);
-	zbx_vector_ptr_reserve(&history_values, history_num);
+	zbx_vector_dc_history_ptr_create(&history_values);
+	zbx_vector_dc_history_ptr_reserve(&history_values, history_num);
 
 	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush,
 			config_history_storage_pipelines)) && FLUSH_DUPL_REJECTED == ret_flush)
 	{
 		num = history_values.values_num;
 		remove_history_duplicates(&history_values);
-		zbx_vector_ptr_clear(&history_values);
+		zbx_vector_dc_history_ptr_clear(&history_values);
 
 		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush,
 				config_history_storage_pipelines)))
@@ -878,7 +878,7 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num, int co
 
 	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
 
-	zbx_vector_ptr_destroy(&history_values);
+	zbx_vector_dc_history_ptr_destroy(&history_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -1235,7 +1235,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	unsigned int				item_retrieve_mode;
 	time_t					sync_start;
 	zbx_vector_uint64_t			triggerids;
-	zbx_vector_ptr_t			trigger_timers;
+	zbx_vector_trigger_timer_ptr_t		trigger_timers;
 	zbx_vector_trigger_diff_ptr_t		trigger_diff;
 	zbx_vector_hc_item_ptr_t		history_items;
 	zbx_vector_inventory_value_ptr_t	inventory_values;
@@ -1301,8 +1301,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
 
-	zbx_vector_ptr_create(&trigger_timers);
-	zbx_vector_ptr_reserve(&trigger_timers, ZBX_HC_TIMER_MAX);
+	zbx_vector_trigger_timer_ptr_create(&trigger_timers);
+	zbx_vector_trigger_timer_ptr_reserve(&trigger_timers, ZBX_HC_TIMER_MAX);
 
 	zbx_vector_hc_item_ptr_create(&history_items);
 	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
@@ -1451,8 +1451,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 			{
 				for (i = 0; i < trigger_timers.values_num; i++)
 				{
-					zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)
-							trigger_timers.values[i];
+					zbx_trigger_timer_t	*timer = trigger_timers.values[i];
 
 					if (0 != timer->lock)
 						zbx_vector_uint64_append(&triggerids, timer->triggerid);
@@ -1467,8 +1466,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
 							&trigger_timers, events_cbs->add_event_cb, &trigger_diff,
-							trigger_itemids,
-							trigger_timespecs, &trigger_info, &trigger_order);
+							trigger_itemids, trigger_timespecs, &trigger_info,
+							&trigger_order);
 
 					if (NULL != events_cbs->process_events_cb)
 					{
@@ -1515,7 +1514,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		if (0 != trigger_timers.values_num)
 		{
 			zbx_dc_reschedule_trigger_timers(&trigger_timers, time(NULL));
-			zbx_vector_ptr_clear(&trigger_timers);
+			zbx_vector_trigger_timer_ptr_clear(&trigger_timers);
 		}
 
 		if (0 != proxy_subscriptions.values_num)
@@ -1672,7 +1671,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);
 
-	zbx_vector_ptr_destroy(&trigger_timers);
+	zbx_vector_trigger_timer_ptr_destroy(&trigger_timers);
 	zbx_vector_uint64_destroy(&triggerids);
 #undef ZBX_HC_SYNC_MIN_PCNT
 }

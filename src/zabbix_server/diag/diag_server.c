@@ -159,10 +159,10 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 		if (0 != tops.values_num)
 		{
-			zbx_vector_ptr_t	items;
-			int			i;
+			zbx_vector_vc_item_stats_ptr_t	items;
+			int				i;
 
-			zbx_vector_ptr_create(&items);
+			zbx_vector_vc_item_stats_ptr_create(&items);
 
 			time1 = zbx_time();
 			zbx_vc_get_item_stats(&items);
@@ -178,11 +178,11 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 				if (0 == strcmp(map->name, "values"))
 				{
-					zbx_vector_ptr_sort(&items, diag_valuecache_item_compare_values);
+					zbx_vector_vc_item_stats_ptr_sort(&items, diag_valuecache_item_compare_values);
 				}
 				else if (0 == strcmp(map->name, "request.values"))
 				{
-					zbx_vector_ptr_sort(&items, diag_valuecache_item_compare_hourly);
+					zbx_vector_vc_item_stats_ptr_sort(&items, diag_valuecache_item_compare_hourly);
 				}
 				else
 				{
@@ -192,12 +192,13 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 				}
 
 				limit = MIN((int)map->value, items.values_num);
-				diag_valuecache_add_items(json, map->name, (zbx_vc_item_stats_t **)items.values, limit);
+				//diag_valuecache_add_items(json, map->name, (zbx_vc_item_stats_t **)items.values, limit);
+				diag_valuecache_add_items(json, map->name, items.values, limit);
 			}
 			zbx_json_close(json);
 
-			zbx_vector_ptr_clear_ext(&items, zbx_ptr_free);
-			zbx_vector_ptr_destroy(&items);
+			zbx_vector_vc_item_stats_ptr_clear_ext(&items, zbx_vc_item_stats_free);
+			zbx_vector_vc_item_stats_ptr_destroy(&items);
 		}
 
 		zbx_json_addfloat(json, "time", time_total);

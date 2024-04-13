@@ -72,6 +72,8 @@ zbx_dc_history_t;
 
 ZBX_PTR_VECTOR_DECL(dc_history_ptr, zbx_dc_history_t *)
 
+void	zbx_dc_history_free(zbx_dc_history_t *dc_history);
+
 int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_flush,
 		int config_history_storage_pipelines);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
