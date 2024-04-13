@@ -450,7 +450,7 @@ out:
 typedef struct
 {
 	zbx_uint64_t		eventid;
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 	int			need_to_add_problem_tag;
 }
 zbx_event_tags_t;
@@ -470,8 +470,8 @@ static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 
 static void	event_tags_free(zbx_event_tags_t *event_tags)
 {
-	zbx_vector_tags_clear_ext(&event_tags->tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&event_tags->tags);
+	zbx_vector_tags_ptr_clear_ext(&event_tags->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&event_tags->tags);
 	zbx_free(event_tags);
 }
 
@@ -532,7 +532,7 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 	{
 		event_tags = (zbx_event_tags_t*) zbx_malloc(NULL, sizeof(zbx_event_tags_t));
 		event_tags->eventid = eventid;
-		zbx_vector_tags_create(&(event_tags->tags));
+		zbx_vector_tags_ptr_create(&(event_tags->tags));
 		event_tags->need_to_add_problem_tag = need_to_add_problem_tag;
 		zbx_vector_events_tags_append(events_tags, event_tags);
 	}
@@ -560,12 +560,12 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 		zbx_rtrim(key, ZBX_WHITESPACE);
 		zbx_rtrim(value, ZBX_WHITESPACE);
 
-		if (FAIL == zbx_vector_tags_search(&(event_tags->tags), &tag_local, zbx_compare_tags_and_values))
+		if (FAIL == zbx_vector_tags_ptr_search(&(event_tags->tags), &tag_local, zbx_compare_tags_and_values))
 		{
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, key);
 			tag->value = zbx_strdup(NULL, value);
-			zbx_vector_tags_append(&(event_tags->tags), tag);
+			zbx_vector_tags_ptr_append(&(event_tags->tags), tag);
 		}
 	}
 out:
@@ -610,11 +610,11 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 				tag_local.tag = row[0];
 				tag_local.value = row[1];
 
-				if (FAIL != (index = zbx_vector_tags_search(&(local_event_tags->tags), &tag_local,
+				if (FAIL != (index = zbx_vector_tags_ptr_search(&(local_event_tags->tags), &tag_local,
 						zbx_compare_tags_and_values)))
 				{
 					zbx_free_tag(local_event_tags->tags.values[index]);
-					zbx_vector_tags_remove_noorder(&(local_event_tags->tags), index);
+					zbx_vector_tags_ptr_remove_noorder(&(local_event_tags->tags), index);
 				}
 			}
 

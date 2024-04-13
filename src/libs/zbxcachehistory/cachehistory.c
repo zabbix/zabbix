@@ -1030,7 +1030,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			*name;
 	zbx_history_sync_item_t	*item;
-	zbx_vector_tags_t	item_tags;
+	zbx_vector_tags_ptr_t	item_tags;
 }
 zbx_item_info_t;
 
@@ -1104,7 +1104,7 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 		{
 			if (NULL != item_info)
 			{
-				zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
+				zbx_vector_tags_ptr_sort(&item_info->item_tags, zbx_compare_tags);
 			}
 			if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
 			{
@@ -1116,12 +1116,12 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 		item_tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(*item_tag));
 		item_tag->tag = zbx_strdup(NULL, row[1]);
 		item_tag->value = zbx_strdup(NULL, row[2]);
-		zbx_vector_tags_append(&item_info->item_tags, item_tag);
+		zbx_vector_tags_ptr_append(&item_info->item_tags, item_tag);
 	}
 
 	if (NULL != item_info)
 	{
-		zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
+		zbx_vector_tags_ptr_sort(&item_info->item_tags, zbx_compare_tags);
 	}
 
 	zbx_db_free_result(result);
@@ -1150,8 +1150,8 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
  ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_vector_tags_clear_ext(&item_info->item_tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&item_info->item_tags);
+	zbx_vector_tags_ptr_clear_ext(&item_info->item_tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
 }
 
@@ -1480,7 +1480,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 		item_info.itemid = item->itemid;
 		item_info.name = NULL;
 		item_info.item = item;
-		zbx_vector_tags_create(&item_info.item_tags);
+		zbx_vector_tags_ptr_create(&item_info.item_tags);
 		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
@@ -1508,7 +1508,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 			item_info.itemid = item->itemid;
 			item_info.name = NULL;
 			item_info.item = item;
-			zbx_vector_tags_create(&item_info.item_tags);
+			zbx_vector_tags_ptr_create(&item_info.item_tags);
 			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}

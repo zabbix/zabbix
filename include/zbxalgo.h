@@ -365,7 +365,7 @@ ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_DECL(dbl, double)
 
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+ZBX_PTR_VECTOR_DECL(tags_ptr, zbx_tag_t*)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 

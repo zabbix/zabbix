@@ -254,7 +254,7 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
@@ -289,7 +289,7 @@ typedef struct
 	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_db_event_t	events;
-	zbx_vector_tags_t	service_tags;
+	zbx_vector_tags_ptr_t	service_tags;
 }
 zbx_db_service;
 
@@ -609,10 +609,10 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 
 typedef struct
 {
-	zbx_uint64_t		connectorid;
-	int			tags_evaltype;
-	zbx_vector_match_tags_t	connector_tags;
-	int			item_value_type;
+	zbx_uint64_t			connectorid;
+	int				tags_evaltype;
+	zbx_vector_match_tags_ptr_t	connector_tags;
+	int				item_value_type;
 }
 zbx_connector_filter_t;
 
@@ -622,7 +622,7 @@ ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_type, const zbx_vector_tags_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
@@ -732,7 +732,7 @@ typedef struct
 	int			value;
 	int			severity;
 
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 	int			suppressed;
 	int			mtime;
 }

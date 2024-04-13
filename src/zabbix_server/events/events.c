@@ -58,7 +58,7 @@ typedef struct
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		triggerid;
 
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 }
 zbx_event_problem_t;
 
@@ -124,7 +124,7 @@ static void	validate_and_add_tag(zbx_db_event* event, zbx_tag_t *tag)
 	zbx_rtrim(tag->value, ZBX_WHITESPACE);
 
 	if (SUCCEED == validate_event_tag(event, tag))
-		zbx_vector_tags_append(&event->tags, tag);
+		zbx_vector_tags_ptr_append(&event->tags, tag);
 	else
 		zbx_free_tag(tag);
 }
@@ -207,7 +207,7 @@ static void	get_item_tags_by_expression(const zbx_db_trigger *trigger, zbx_vecto
 zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_type, const zbx_vector_tags_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error)
 {
@@ -262,12 +262,12 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&event->name, ZBX_MACRO_TYPE_EVENT_NAME, err, sizeof(err));
 
-		zbx_vector_tags_create(&event->tags);
+		zbx_vector_tags_ptr_create(&event->tags);
 
 		if (NULL != trigger_tags)
 		{
 			for (int i = 0; i < trigger_tags->values_num; i++)
-				process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);
+				process_trigger_tag(event, trigger_tags->values[i]);
 		}
 
 		zbx_vector_item_tag_create(&item_tags);
@@ -292,7 +292,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		if (NULL != error)
 			event->name = zbx_strdup(NULL, error);
 
-		zbx_vector_tags_create(&event->tags);
+		zbx_vector_tags_ptr_create(&event->tags);
 		zbx_vector_item_tag_create(&item_tags);
 
 		switch (object)
@@ -304,7 +304,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 				event->trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
 
 				for (int i = 0; i < trigger_tags->values_num; i++)
-					process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);
+					process_trigger_tag(event, trigger_tags->values[i]);
 
 				get_item_tags_by_expression(&event->trigger, &item_tags);
 				break;
@@ -1734,8 +1734,8 @@ static void	zbx_clean_event(zbx_db_event *event)
 
 	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 	{
-		zbx_vector_tags_clear_ext(&event->tags, zbx_free_tag);
-		zbx_vector_tags_destroy(&event->tags);
+		zbx_vector_tags_ptr_clear_ext(&event->tags, zbx_free_tag);
+		zbx_vector_tags_ptr_destroy(&event->tags);
 	}
 
 	zbx_free(event);
@@ -1816,11 +1816,11 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 		if (0 != connector_filters->values_num)
 		{
 			int			k;
-			zbx_vector_tags_t	event_tags;
+			zbx_vector_tags_ptr_t	event_tags;
 
-			zbx_vector_tags_create(&event_tags);
-			zbx_vector_tags_append_array(&event_tags, event->tags.values, event->tags.values_num);
-			zbx_vector_tags_sort(&event_tags, zbx_compare_tags);
+			zbx_vector_tags_ptr_create(&event_tags);
+			zbx_vector_tags_ptr_append_array(&event_tags, event->tags.values, event->tags.values_num);
+			zbx_vector_tags_ptr_sort(&event_tags, zbx_compare_tags);
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
@@ -1832,7 +1832,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 				}
 			}
 
-			zbx_vector_tags_destroy(&event_tags);
+			zbx_vector_tags_ptr_destroy(&event_tags);
 
 			if (0 == connector_object.ids.values_num && FAIL == events_export_enabled)
 				continue;
@@ -1923,12 +1923,12 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 		if (0 != connector_filters->values_num)
 		{
 			int			k;
-			zbx_vector_tags_t	event_tags;
+			zbx_vector_tags_ptr_t	event_tags;
 
-			zbx_vector_tags_create(&event_tags);
-			zbx_vector_tags_append_array(&event_tags, recovery->r_event->tags.values,
+			zbx_vector_tags_ptr_create(&event_tags);
+			zbx_vector_tags_ptr_append_array(&event_tags, recovery->r_event->tags.values,
 					recovery->r_event->tags.values_num);
-			zbx_vector_tags_sort(&event_tags, zbx_compare_tags);
+			zbx_vector_tags_ptr_sort(&event_tags, zbx_compare_tags);
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
@@ -1940,7 +1940,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 				}
 			}
 
-			zbx_vector_tags_destroy(&event_tags);
+			zbx_vector_tags_ptr_destroy(&event_tags);
 
 			if (0 == connector_object.ids.values_num && FAIL == events_export_enabled)
 				continue;
@@ -2052,9 +2052,9 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 		zbx_vector_uint64_create(&query->functionids);
 		zbx_db_trigger_get_all_functionids(&event->trigger, &query->functionids);
 
-		zbx_vector_tags_create(&query->tags);
+		zbx_vector_tags_ptr_create(&query->tags);
 		if (0 != event->tags.values_num)
-			zbx_vector_tags_append_array(&query->tags, event->tags.values, event->tags.values_num);
+			zbx_vector_tags_ptr_append_array(&query->tags, event->tags.values, event->tags.values_num);
 
 		zbx_vector_uint64_pair_create(&query->maintenances);
 
@@ -2105,7 +2105,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 		{
 			query = event_queries.values[j];
 			/* reset tags vector to avoid double freeing copied tag name/value pointers */
-			zbx_vector_tags_clear(&query->tags);
+			zbx_vector_tags_ptr_clear(&query->tags);
 		}
 		zbx_vector_event_suppress_query_ptr_clear_ext(&event_queries, zbx_event_suppress_query_free);
 	}
@@ -2406,7 +2406,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 
 		ZBX_STR2UINT64(problem->eventid, row[0]);
 		ZBX_STR2UINT64(problem->triggerid, row[1]);
-		zbx_vector_tags_create(&problem->tags);
+		zbx_vector_tags_ptr_create(&problem->tags);
 		zbx_vector_ptr_append(problems, problem);
 
 		zbx_vector_uint64_append(&eventids, problem->eventid);
@@ -2439,7 +2439,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[1]);
 			tag->value = zbx_strdup(NULL, row[2]);
-			zbx_vector_tags_append(&problem->tags, tag);
+			zbx_vector_tags_ptr_append(&problem->tags, tag);
 		}
 		zbx_db_free_result(result);
 	}
@@ -2456,8 +2456,8 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
  ******************************************************************************/
 static void	event_problem_free(zbx_event_problem_t *problem)
 {
-	zbx_vector_tags_clear_ext(&problem->tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&problem->tags);
+	zbx_vector_tags_ptr_clear_ext(&problem->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&problem->tags);
 	zbx_free(problem);
 }
 
@@ -2536,7 +2536,7 @@ static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_pt
  *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	match_tag(const char *name, const zbx_vector_tags_t *tags1, const zbx_vector_tags_t *tags2)
+static int	match_tag(const char *name, const zbx_vector_tags_ptr_t *tags1, const zbx_vector_tags_ptr_t *tags2)
 {
 	int		i, j;
 	zbx_tag_t	*tag1, *tag2;

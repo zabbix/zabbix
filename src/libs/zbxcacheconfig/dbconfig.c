@@ -9806,11 +9806,11 @@ void	DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trig
 	dst_trigger->eval_ctx = NULL;
 	dst_trigger->eval_ctx_r = NULL;
 
-	zbx_vector_ptr_create(&dst_trigger->tags);
+	zbx_vector_tags_ptr_create(&dst_trigger->tags);
 
 	if (0 != src_trigger->tags.values_num)
 	{
-		zbx_vector_ptr_reserve(&dst_trigger->tags, src_trigger->tags.values_num);
+		zbx_vector_tags_ptr_reserve(&dst_trigger->tags, src_trigger->tags.values_num);
 
 		for (i = 0; i < src_trigger->tags.values_num; i++)
 		{
@@ -9822,7 +9822,7 @@ void	DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trig
 			tag->tag = zbx_strdup(NULL, dc_trigger_tag->tag);
 			tag->value = zbx_strdup(NULL, dc_trigger_tag->value);
 
-			zbx_vector_ptr_append(&dst_trigger->tags, tag);
+			zbx_vector_tags_ptr_append(&dst_trigger->tags, tag);
 		}
 	}
 
@@ -9860,8 +9860,8 @@ static void	DCclean_trigger(zbx_dc_trigger_t *trigger)
 	zbx_free(trigger->expression_bin);
 	zbx_free(trigger->recovery_expression_bin);
 
-	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
-	zbx_vector_ptr_destroy(&trigger->tags);
+	zbx_vector_tags_ptr_clear_ext(&trigger->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&trigger->tags);
 
 	if (NULL != trigger->eval_ctx)
 	{

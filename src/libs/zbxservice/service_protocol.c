@@ -24,7 +24,7 @@
 #include "zbxdbhigh.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags, int suppressed)
+		int clock, int ns, int value, int severity, const zbx_vector_tags_ptr_t *tags, int suppressed)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
@@ -94,7 +94,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 		int		values_num, i;
 
 		event = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
-		zbx_vector_tags_create(&event->tags);
+		zbx_vector_tags_ptr_create(&event->tags);
 		zbx_vector_events_ptr_append(events, event);
 
 		data += zbx_deserialize_value(data, &event->eventid);
@@ -106,7 +106,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 
 		if (0 != values_num)
 		{
-			zbx_vector_tags_reserve(&event->tags, (size_t)values_num);
+			zbx_vector_tags_ptr_reserve(&event->tags, (size_t)values_num);
 
 			for (i = 0; i < values_num; i++)
 			{
@@ -117,7 +117,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 				data += zbx_deserialize_str(data, &tag->tag, len);
 				data += zbx_deserialize_str(data, &tag->value, len);
 
-				zbx_vector_tags_append(&event->tags, tag);
+				zbx_vector_tags_ptr_append(&event->tags, tag);
 			}
 		}
 
@@ -127,7 +127,7 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 }
 
 void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		zbx_uint64_t eventid, const zbx_vector_tags_t *tags)
+		zbx_uint64_t eventid, const zbx_vector_tags_ptr_t *tags)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
@@ -187,7 +187,7 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 		int		values_num, i;
 
 		event = (zbx_event_t *)zbx_malloc(NULL, sizeof(zbx_event_t));
-		zbx_vector_tags_create(&event->tags);
+		zbx_vector_tags_ptr_create(&event->tags);
 		zbx_vector_events_ptr_append(events, event);
 
 		data += zbx_deserialize_value(data, &event->eventid);
@@ -195,7 +195,7 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 
 		if (0 != values_num)
 		{
-			zbx_vector_tags_reserve(&event->tags, (size_t)values_num);
+			zbx_vector_tags_ptr_reserve(&event->tags, (size_t)values_num);
 
 			for (i = 0; i < values_num; i++)
 			{
@@ -206,7 +206,7 @@ void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_
 				data += zbx_deserialize_str(data, &tag->tag, len);
 				data += zbx_deserialize_str(data, &tag->value, len);
 
-				zbx_vector_tags_append(&event->tags, tag);
+				zbx_vector_tags_ptr_append(&event->tags, tag);
 			}
 		}
 	}
