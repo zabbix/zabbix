@@ -26,7 +26,6 @@
 #include "zbxexport.h"
 #include "zbxprof.h"
 #include "zbxtimekeeper.h"
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
