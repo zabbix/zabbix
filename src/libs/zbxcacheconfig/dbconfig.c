@@ -72,7 +72,7 @@ ZBX_PTR_VECTOR_IMPL(correlation_ptr, zbx_correlation_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_dep_ptr, zbx_trigger_dep_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_timer_ptr, zbx_trigger_timer_t *)
 
-void    zbx_corr_operation_free(zbx_corr_operation_t *corr_operation)
+void	zbx_corr_operation_free(zbx_corr_operation_t *corr_operation)
 {
 	zbx_free(corr_operation);
 }
@@ -166,7 +166,7 @@ ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
 ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
 ZBX_PTR_VECTOR_IMPL(proxy_counter_ptr, zbx_proxy_counter_t *)
 
-void     zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
+void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 {
 	zbx_free(proxy_counter);
 }

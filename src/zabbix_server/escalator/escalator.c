@@ -372,7 +372,8 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 	return perm;
 }
 
-static int	check_service_tags_rule_match(const zbx_vector_tags_ptr_t *service_tags, const zbx_vector_tags_ptr_t *role_tags)
+static int	check_service_tags_rule_match(const zbx_vector_tags_ptr_t *service_tags,
+		const zbx_vector_tags_ptr_t *role_tags)
 {
 	for (int i = 0; i < role_tags->values_num; i++)
 	{

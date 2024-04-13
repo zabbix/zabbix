@@ -192,7 +192,6 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 				}
 
 				limit = MIN((int)map->value, items.values_num);
-				//diag_valuecache_add_items(json, map->name, (zbx_vc_item_stats_t **)items.values, limit);
 				diag_valuecache_add_items(json, map->name, items.values, limit);
 			}
 			zbx_json_close(json);
