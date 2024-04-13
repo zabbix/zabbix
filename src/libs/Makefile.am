@@ -8,6 +8,7 @@ DIST_SUBDIRS = \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
+	zbxbincommon \
 	zbxconnector \
 	zbxcommon \
 	zbxcomms \
@@ -95,6 +96,7 @@ SERVER_SUBDIRS = \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
+	zbxbincommon \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
@@ -162,6 +164,7 @@ PROXY_SUBDIRS = \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
+	zbxbincommon \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
@@ -228,6 +231,7 @@ SUBDIRS = \
 	zbxalerter \
 	zbxasyncpoller \
 	zbxasynchttppoller \
+	zbxbincommon \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \

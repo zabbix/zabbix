@@ -394,25 +394,16 @@ do				\
 }				\
 while (0)
 
-#define THIS_SHOULD_NEVER_HAPPEN										\
-														\
-do														\
-{														\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
-	zbx_backtrace();											\
-}														\
-while (0)
+#define THIS_SHOULD_NEVER_HAPPEN zbx_this_should_never_happen()
+void	zbx_this_should_never_happen(void);
 
-/* to avoid dependency on libzbxnix.a */
+///* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
 			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname);
-void	zbx_print_usage(const char **usage_message, const char *progname);
 void	zbx_print_version(const char *title_message);
 
 const char	*get_program_name(const char *path);
@@ -421,6 +412,7 @@ typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
 typedef int		(*zbx_get_config_int_f)(void);
+typedef void		(*zbx_backtrace_f)(void);
 
 typedef enum
 {
@@ -578,7 +570,7 @@ void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 /* misc functions */
 int	zbx_validate_hostname(const char *hostname);
 
-void	zbx_backtrace(void);
+//void	zbx_backtrace(void);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
@@ -754,7 +746,7 @@ static	type2	get_##varname(void) \
 
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
-void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname);
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
 void	zbx_log_handle(int level, const char *fmt, ...);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);

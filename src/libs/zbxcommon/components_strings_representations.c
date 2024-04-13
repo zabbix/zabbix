@@ -129,7 +129,7 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "configuration syncer worker";
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN;
+	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
 	exit(EXIT_FAILURE);
 }
 

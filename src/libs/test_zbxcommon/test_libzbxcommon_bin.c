@@ -30,7 +30,7 @@ ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_progname")
 
 int	main(void)
 {
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, NULL);
 
 	return SUCCEED;
 }

@@ -8,8 +8,4 @@ bin_PROGRAMS = test_libzbxcommon_bin
 test_libzbxcommon_bin_SOURCES = test_libzbxcommon_bin.c
 
 test_libzbxcommon_bin_LDADD =  \
-        $(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
-        $(top_builddir)/src/libs/zbxnix/libzbxnix.a \
-        $(top_builddir)/src/libs/zbxlog/libzbxlog.a \
-        $(top_builddir)/src/libs/zbxstr/libzbxstr.a \
         $(top_builddir)/src/libs/zbxcommon/libzbxcommon.a
