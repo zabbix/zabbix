@@ -56,7 +56,7 @@ void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key);
 void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		int *seconds, int *count, zbx_timespec_t *end);
 
-void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *history);
+void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_dc_history_ptr_t *history);
 void	zbx_vcmock_free_dc_history(void *ptr);
 
 #endif

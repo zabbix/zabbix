@@ -17,6 +17,7 @@ COMMON_SRC_FILES = \
 
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \

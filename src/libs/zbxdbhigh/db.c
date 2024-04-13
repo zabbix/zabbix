@@ -3005,7 +3005,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	}
 #ifdef HAVE_MYSQL
 	/* MySQL workaround - explicitly add missing text fields with '' default value */
-	for (field = (const zbx_db_field_t *)self->table->fields; NULL != field->name; field++)
+	for (field = self->table->fields; NULL != field->name; field++)
 	{
 		switch (field->type)
 		{
@@ -3014,7 +3014,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
-				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field,
+				if (FAIL != zbx_vector_db_field_ptr_search(&self->fields, (void *)field,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
 					continue;
