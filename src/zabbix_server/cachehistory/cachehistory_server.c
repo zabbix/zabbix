@@ -149,7 +149,8 @@ static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)
  *        '-' - should never happen                                           *
  *                                                                            *
  ******************************************************************************/
-static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *diffs)
+static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_event_cb,
+		zbx_vector_trigger_diff_ptr_t *diffs)
 {
 	const char		*new_error;
 	int			new_state, new_value, ret = FAIL;
@@ -243,7 +244,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_func_t add_event_cb,
-		zbx_vector_ptr_t *trigger_diff)
+		zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int	i;
 
@@ -257,7 +258,7 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 	for (i = 0; i < triggers->values_num; i++)
 		process_trigger(triggers->values[i], add_event_cb, trigger_diff);
 
-	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_trigger_diff_ptr_sort(trigger_diff, zbx_trigger_diff_compare_func);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -285,7 +286,7 @@ out:
 static void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
 		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
-		zbx_vector_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
+		zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
 		zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order)
 {
 	int			i, item_num = 0, timers_num = 0;
@@ -1234,7 +1235,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	unsigned int				item_retrieve_mode;
 	time_t					sync_start;
 	zbx_vector_uint64_t			triggerids;
-	zbx_vector_ptr_t			trigger_diff, trigger_timers;
+	zbx_vector_ptr_t			trigger_timers;
+	zbx_vector_trigger_diff_ptr_t		trigger_diff;
 	zbx_vector_hc_item_ptr_t		history_items;
 	zbx_vector_inventory_value_ptr_t	inventory_values;
 	zbx_vector_item_diff_ptr_t		item_diff;
@@ -1292,7 +1294,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_connector_filter_create(&connector_filters_events);
 	zbx_vector_inventory_value_ptr_create(&inventory_values);
 	zbx_vector_item_diff_ptr_create(&item_diff);
-	zbx_vector_ptr_create(&trigger_diff);
+	zbx_vector_trigger_diff_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
 	zbx_vector_uint64_pair_create(&proxy_subscriptions);
 
@@ -1491,8 +1493,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 						events_cbs->clean_events_cb();
 					}
 
-					zbx_vector_ptr_clear_ext(&trigger_diff,
-							(zbx_clean_func_t)zbx_trigger_diff_free);
+					zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diff, zbx_trigger_diff_free);
 					zbx_vector_escalation_new_ptr_clear_ext(&escalations,
 							zbx_escalation_new_ptr_free);
 					zbx_vector_escalation_new_ptr_destroy(&escalations);
@@ -1667,7 +1668,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 	zbx_vector_hc_item_ptr_destroy(&history_items);
 	zbx_vector_inventory_value_ptr_destroy(&inventory_values);
 	zbx_vector_item_diff_ptr_destroy(&item_diff);
-	zbx_vector_ptr_destroy(&trigger_diff);
+	zbx_vector_trigger_diff_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);
 

@@ -1328,7 +1328,8 @@ static void	correlate_event_by_global_rules(zbx_db_event *event, zbx_problem_sta
  *          rules                                                             *
  *                                                                            *
  ******************************************************************************/
-static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, zbx_vector_ptr_t *trigger_diff)
+static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events,
+		zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_trigger_diff_t	*diff;
@@ -1355,10 +1356,12 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_events, z
 		/* events closed by 'close new' correlation operation                */
 		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION))
 		{
-			if (FAIL != (index = zbx_vector_ptr_bsearch(trigger_diff, &event->objectid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = event->objectid};
+
+			if (FAIL != (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &trigger_diff_cmp,
+					zbx_trigger_diff_compare_func)))
 			{
-				diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+				diff = trigger_diff->values[index];
 				diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
 			}
 		}
@@ -1374,7 +1377,8 @@ out:
  *          correlation rules                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+static void	flush_correlation_queue(zbx_vector_trigger_diff_ptr_t *trigger_diff,
+		zbx_vector_uint64_t *triggerids_lock)
 {
 	zbx_vector_uint64_t	triggerids, lockids, eventids;
 	zbx_hashset_iter_t	iter;
@@ -1449,19 +1453,21 @@ static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_u
 
 			trigger = &triggers[i];
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &triggerids.values[i],
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = triggerids.values[i]};
+
+			if (FAIL == (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &trigger_diff_cmp,
+					zbx_trigger_diff_compare_func)))
 			{
 				zbx_append_trigger_diff(trigger_diff, trigger->triggerid, trigger->priority,
 						ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT, trigger->value,
 						TRIGGER_STATE_NORMAL, 0, NULL);
 
 				/* TODO: should we store trigger diffs in hashset rather than vector? */
-				zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+				zbx_vector_trigger_diff_ptr_sort(trigger_diff, zbx_trigger_diff_compare_func);
 			}
 			else
 			{
-				diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+				diff = trigger_diff->values[index];
 				diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT;
 			}
 		}
@@ -1543,7 +1549,7 @@ out:
  *           correctly calculate new trigger value.                           *
  *                                                                            *
  ******************************************************************************/
-static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
+static void	update_trigger_problem_count(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1558,7 +1564,7 @@ static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
+		diff = trigger_diff->values[i];
 
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_RECALCULATE_PROBLEM_COUNT))
 		{
@@ -1590,14 +1596,16 @@ static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &triggerid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = triggerid};
+
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &trigger_diff_cmp,
+				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+		diff = trigger_diff->values[index];
 		diff->problem_count = atoi(row[1]);
 		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT;
 	}
@@ -1614,7 +1622,7 @@ out:
  *          and recovered events                                              *
  *                                                                            *
  ******************************************************************************/
-static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
+static void	update_trigger_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, index;
 	unsigned char		new_value;
@@ -1630,14 +1638,16 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
 			continue;
 
-		if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &event->objectid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = event->objectid};
+
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &trigger_diff_cmp,
+				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+		diff = trigger_diff->values[index];
 
 		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
 		{
@@ -1654,7 +1664,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 	/* recalculate trigger value from problem_count and mark for updating if necessary */
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
+		diff = trigger_diff->values[i];
 
 		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT))
 			continue;
@@ -2475,7 +2485,7 @@ static void	trigger_dep_free(zbx_trigger_dep_t *dep)
  *                                                                            *
  ******************************************************************************/
 static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_ptr_t *deps,
-		const zbx_vector_ptr_t *trigger_diff)
+		const zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_trigger_dep_t	*dep;
@@ -2492,14 +2502,16 @@ static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_pt
 	/* check the trigger dependency based on actual (currently being processed) trigger values */
 	for (i = 0; i < dep->masterids.values_num; i++)
 	{
-		if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &dep->masterids.values[i],
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = dep->masterids.values[i]};
+
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_bsearch(trigger_diff, &dep->masterids.values[i],
+				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+		diff = trigger_diff->values[index];
 
 		if (0 == (ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE & diff->flags))
 			continue;
@@ -2556,7 +2568,8 @@ static int	match_tag(const char *name, const zbx_vector_tags_t *tags1, const zbx
  *             trigger_diff   - [IN] trigger changeset                        *
  *                                                                            *
  ******************************************************************************/
-static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events, const zbx_vector_ptr_t *trigger_diff)
+static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
+		const zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, j, index;
 	zbx_vector_uint64_t	triggerids;
@@ -2609,14 +2622,16 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events, const
 	{
 		event = (zbx_db_event *)trigger_events->values[i];
 
-		if (FAIL == (index = zbx_vector_ptr_search(trigger_diff, &event->objectid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		zbx_trigger_diff_t	trigger_diff_cmp = {.triggerid = event->objectid};
+
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_search(trigger_diff, &trigger_diff_cmp,
+				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+		diff = trigger_diff->values[index];
 
 		if (FAIL == (event_check_dependency(event, &deps, trigger_diff)))
 		{
@@ -2715,7 +2730,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events, const
  *                                                                            *
  ******************************************************************************/
 static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_events,
-		const zbx_vector_ptr_t *trigger_events, const zbx_vector_ptr_t *trigger_diff)
+		const zbx_vector_ptr_t *trigger_events, const zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_db_event		*event;
@@ -2749,8 +2764,8 @@ static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_
 	{
 		event = (zbx_db_event *)internal_events->values[i];
 
-		if (FAIL == (index = zbx_vector_ptr_search(trigger_diff, &event->objectid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_trigger_diff_ptr_search(trigger_diff, &event->objectid,
+				zbx_trigger_diff_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -2794,7 +2809,7 @@ static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_
  * Return value: number of processed events                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
+int	zbx_process_events(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
 		zbx_vector_escalation_new_ptr_t *escalations)
 {
 	int			i, processed_num = 0;
@@ -2917,10 +2932,10 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 	if (SUCCEED == errcode)
 	{
-		zbx_vector_ptr_t		trigger_diff;
+		zbx_vector_trigger_diff_ptr_t	trigger_diff;
 		zbx_vector_escalation_new_ptr_t	escalations;
 
-		zbx_vector_ptr_create(&trigger_diff);
+		zbx_vector_trigger_diff_ptr_create(&trigger_diff);
 		zbx_vector_escalation_new_ptr_create(&escalations);
 
 		zbx_append_trigger_diff(&trigger_diff, triggerid, trigger.priority,
@@ -2978,8 +2993,8 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		}
 
 		zbx_clean_events();
-		zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-		zbx_vector_ptr_destroy(&trigger_diff);
+		zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diff, zbx_trigger_diff_free);
+		zbx_vector_trigger_diff_ptr_destroy(&trigger_diff);
 
 		zbx_vector_escalation_new_ptr_clear_ext(&escalations, zbx_escalation_new_ptr_free);
 		zbx_vector_escalation_new_ptr_destroy(&escalations);

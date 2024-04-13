@@ -887,7 +887,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
-void	zbx_dc_config_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
+void	zbx_dc_config_triggers_apply_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff);
 void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);
 
 void	zbx_dc_config_update_inventory_values(const zbx_vector_inventory_value_ptr_t *inventory_values);

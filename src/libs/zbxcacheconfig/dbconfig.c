@@ -12295,7 +12295,7 @@ static void	DCconfig_sort_triggers_topologically(void)
  *          configuration cache after committed to database                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
+void	zbx_dc_config_triggers_apply_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i;
 	zbx_trigger_diff_t	*diff;
@@ -12308,7 +12308,7 @@ void	zbx_dc_config_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
-		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
+		diff = trigger_diff->values[i];
 
 		if (NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &diff->triggerid)))
 			continue;

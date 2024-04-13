@@ -37,7 +37,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid,
 		zbx_ipc_async_socket_t *rtc);
 
-int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
+int	zbx_process_events(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
 		zbx_vector_escalation_new_ptr_t *escalations);
 void	zbx_clean_events(void);
 void	zbx_reset_event_recovery(void);

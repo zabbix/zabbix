@@ -581,10 +581,15 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
+ZBX_PTR_VECTOR_DECL(trigger_diff_ptr, zbx_trigger_diff_t *)
+
+int     zbx_trigger_diff_compare_func(const void *d1, const void *d2);
+
+void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
-void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
-		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
+void	zbx_append_trigger_diff(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t triggerid,
+		unsigned char priority, zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange,
+		const char *error);
 
 char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*zbx_db_dyn_escape_string(const char *src);
@@ -621,8 +626,8 @@ typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned cha
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
-		zbx_vector_escalation_new_ptr_t *escalations);
+typedef int	(*zbx_process_events_func_t)(zbx_vector_trigger_diff_ptr_t *trigger_diff,
+		zbx_vector_uint64_t *triggerids_lock, zbx_vector_escalation_new_ptr_t *escalations);
 typedef void	(*zbx_clean_events_func_t)(void);
 typedef void	(*zbx_reset_event_recovery_func_t)(void);
 typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
