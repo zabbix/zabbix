@@ -97,9 +97,9 @@ static void	print_fatal_info(CONTEXT *pctx)
 
 static zbx_get_progname_f	get_progname_cb = NULL;
 
-//void	zbx_backtrace(void)
-//{
-//}
+void	zbx_backtrace(void)
+{
+}
 
 static void	print_backtrace(CONTEXT *pctx)
 {
