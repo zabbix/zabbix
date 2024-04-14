@@ -30,6 +30,8 @@
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 
 typedef enum
