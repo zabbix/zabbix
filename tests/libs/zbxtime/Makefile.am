@@ -35,7 +35,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-TIME_LIB_FILES = \
+TIME_LIBS = \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -49,7 +49,7 @@ zbx_iso8601_utc_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_iso8601_utc_LDADD = \
-	$(TIME_LIB_FILES)
+	$(TIME_LIBS)
 
 zbx_iso8601_utc_LDADD += @SERVER_LIBS@
 
@@ -63,7 +63,7 @@ zbx_get_week_number_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_get_week_number_LDADD = \
-	$(TIME_LIB_FILES)
+	$(TIME_LIBS)
 
 zbx_get_week_number_LDADD += @SERVER_LIBS@
 
@@ -77,7 +77,7 @@ zbx_tm_add_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tm_add_LDADD = \
-	$(TIME_LIB_FILES)
+	$(TIME_LIBS)
 
 zbx_tm_add_LDADD += @SERVER_LIBS@
 
@@ -91,7 +91,7 @@ zbx_tm_round_down_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tm_round_down_LDADD = \
-	$(TIME_LIB_FILES)
+	$(TIME_LIBS)
 
 zbx_tm_round_down_LDADD += @SERVER_LIBS@
 
@@ -105,7 +105,7 @@ zbx_tm_round_up_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tm_round_up_LDADD = \
-	$(TIME_LIB_FILES)
+	$(TIME_LIBS)
 
 zbx_tm_round_up_LDADD += @SERVER_LIBS@
 
@@ -119,7 +119,7 @@ zbx_tm_sub_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tm_sub_LDADD = \
-	$(TIME_LIB_FILES)
+	$(TIME_LIBS)
 
 zbx_tm_sub_LDADD += @SERVER_LIBS@
 

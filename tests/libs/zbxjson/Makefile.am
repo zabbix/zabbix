@@ -26,12 +26,12 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-MUTEX_LIB_FILES = \
+MUTEX_LIBS = \
         $(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
         $(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-CFG_TEST_DEPS = \
+CFG_LIBS = \
         $(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
         $(top_srcdir)/src/libs/zbxip/libzbxip.a \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -39,28 +39,28 @@ CFG_TEST_DEPS = \
         $(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-LOG_LIB_FILES = \
+LOG_LIBS = \
         $(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-        $(MUTEX_LIB_FILES) \
-        $(CFG_TEST_DEPS) \
+        $(MUTEX_LIBS) \
+        $(CFG_LIBS) \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
         $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 REGEXP_LIBS = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(LOG_LIB_FILES) \
+	$(LOG_LIBS) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-VARIANT_LIB_FILES = \
+VARIANT_LIBS = \
         $(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
         $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
         $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-EXPR_LIB_FILES = \
+EXPR_LIBS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -71,9 +71,9 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(REGEXP_LIBS) \
-	$(VARIANT_LIB_FILES) \
+	$(VARIANT_LIBS) \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(EXPR_LIB_FILES) \
+	$(EXPR_LIBS) \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \

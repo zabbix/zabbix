@@ -30,7 +30,7 @@ MUTEX_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-CFG_TEST_DEPS = \
+CFG_LIB_FILES = \
         $(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
         $(top_srcdir)/src/libs/zbxip/libzbxip.a \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -41,7 +41,7 @@ CFG_TEST_DEPS = \
 LOG_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(MUTEX_LIB_FILES) \
-	$(CFG_TEST_DEPS) \
+	$(CFG_LIB_FILES) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
