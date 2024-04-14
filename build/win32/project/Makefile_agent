@@ -124,9 +124,9 @@ OBJS = \
 	..\..\..\src\libs\zbxwinservice\service.o \
 	..\..\..\src\zabbix_agent\active_checks\active_checks.o \
 	..\..\..\src\zabbix_agent\metrics\metrics.o \
-	..\..\..\src\zabbix_agent\eventlog\eventlog.o \
-	..\..\..\src\zabbix_agent\eventlog\process_eventslog.o \
-	..\..\..\src\zabbix_agent\eventlog\process_eventslog6.o \
+	..\..\..\src\zabbix_agent\active_checks\eventlog_win32\eventlog.o \
+	..\..\..\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog.o \
+	..\..\..\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog6.o \
 	..\..\..\src\zabbix_agent\listener\listener.o \
 	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \
 	..\..\..\src\zabbix_agent\logfiles\logfiles.o \

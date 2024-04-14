@@ -81,6 +81,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr ""
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -8833,6 +8838,12 @@ msgstr "Grup \"%1$s\" untuk host \"%2$s\" tidak ada."
 msgid "Group base DN"
 msgstr ""
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr ""
@@ -9415,6 +9426,10 @@ msgstr ""
 msgid "Host name"
 msgstr "Nama host"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Jaringan host"
@@ -9488,6 +9503,10 @@ msgstr ""
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Router host"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -17047,6 +17066,14 @@ msgstr "Hasilnya adalah SALAH"
 msgid "Result is TRUE"
 msgstr "Hasilnya adalah BENAR"
 
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
+
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
 msgstr "Tipe hasil"
@@ -20804,6 +20831,10 @@ msgstr ""
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "Membuka blokir user yang dipilih?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -24890,6 +24921,10 @@ msgstr ""
 msgid "round() - Rounds a value to decimal places"
 msgstr ""
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr ""
@@ -25031,6 +25066,10 @@ msgstr ""
 #: include/classes/html/widgets/fields/CWidgetFieldTagsView.php:90
 #: include/forms.inc.php:1823
 msgid "tag"
+msgstr ""
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055

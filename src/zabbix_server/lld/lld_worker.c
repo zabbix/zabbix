@@ -228,7 +228,8 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_socket_read(&lld_socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
+			if (ZBX_IS_RUNNING())
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
 			exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

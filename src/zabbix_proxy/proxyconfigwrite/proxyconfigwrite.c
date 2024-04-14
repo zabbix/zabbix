@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "proxyconfig_write.h"
+#include "proxyconfigwrite.h"
 
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"

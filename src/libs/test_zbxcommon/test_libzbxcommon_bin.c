@@ -17,21 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_REPORT_WRITER_H
-#define ZABBIX_REPORT_WRITER_H
+#include "zbxcommon.h"
 
-#include "zbxthreads.h"
-
-typedef struct
+static void	zbx_log_impl(int level, const char *fmt, va_list args)
 {
-	char	*config_tls_ca_file;
-	char	*config_tls_cert_file;
-	char	*config_tls_key_file;
-	char	*config_source_ip;
-	char	*config_webservice_url;
+	ZBX_UNUSED(level);
+	ZBX_UNUSED(fmt);
+	ZBX_UNUSED(args);
 }
-zbx_thread_report_writer_args;
 
-ZBX_THREAD_ENTRY(report_writer_thread, args);
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_progname")
 
-#endif
+int	main(void)
+{
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+
+	return SUCCEED;
+}

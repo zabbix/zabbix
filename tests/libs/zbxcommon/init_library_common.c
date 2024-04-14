@@ -17,20 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CONNECTOR_WORKER_H
-#define ZABBIX_CONNECTOR_WORKER_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
-#include "zbxthreads.h"
+#include "zbxcommon.h"
 
-typedef struct
+static void	zbx_log_impl(int level, const char *fmt, va_list args)
 {
-	const char	*config_source_ip;
-	const char	*config_ssl_ca_location;
-	const char	*config_ssl_cert_location;
-	const char	*config_ssl_key_location;
+	ZBX_UNUSED(level);
+	ZBX_UNUSED(fmt);
+	ZBX_UNUSED(args);
 }
-zbx_thread_connector_worker_args;
 
-ZBX_THREAD_ENTRY(connector_worker_thread, args);
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_mock_progname")
 
-#endif
+void	zbx_mock_test_entry(void **state)
+{
+	ZBX_UNUSED(state);
+
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+}
