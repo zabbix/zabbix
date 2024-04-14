@@ -121,18 +121,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func exportDnsPerf(params []string) (result interface{}, err error) {
 	time_before := time.Now()
-
-	answer, err := getDNSAnswers(params)
+	_, err = getDNSAnswers(params)
 	if err != nil {
 		if errors.Is(err, zbxerr.ErrorCannotFetchData.Unwrap()) {
 			return 0, nil
 		}
 
 		return
-	}
-
-	if len(answer) < 1 {
-		return 0, nil
 	}
 
 	t := time.Since(time_before).Seconds()

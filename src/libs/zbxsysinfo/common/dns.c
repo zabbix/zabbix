@@ -380,7 +380,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (DNS_RCODE_NOERROR != res)
+		if (DNS_RCODE_NOERROR != res && DNS_RCODE_NXDOMAIN != res)
 		{
 			SET_DBL_RESULT(result, 0.0);
 			goto clean_dns;
@@ -711,7 +711,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (1 == dns_is_down)
+		if (1 == dns_is_down && NXDOMAIN != hp->rcode)
 		{
 			SET_DBL_RESULT(result, 0.0);
 		}
