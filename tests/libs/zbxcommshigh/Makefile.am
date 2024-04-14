@@ -87,10 +87,10 @@ NIX_LIBS = \
 
 # commshigh depends on zbxcomms, zbxcfg, zbxjson, zbxlog, zbxtime, zbxnix and zbxcommon
 
-COMMSHIGH_LIB_FILES = 
+COMMSHIGH_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(COMMS_LIB_FILES) \
-	$(CFG_LIB_FILES) \
+	$(COMMS_LIBS) \
+	$(CFG_LIBS) \
 	$(JSON_LIBS) \
 	$(LOG_LIBS) \
 	$(TIME_LIBS) \
@@ -107,7 +107,7 @@ zbx_tcp_recv_ext_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_recv_ext_LDADD = \
-	$(COMMSHIGH_LIB_FILES)
+	$(COMMSHIGH_LIBS)
 
 zbx_tcp_recv_ext_LDADD += @AGENT_LIBS@ $(TLS_LIBS)
 
@@ -121,7 +121,7 @@ zbx_tcp_recv_ext_zlib_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_recv_ext_zlib_LDADD = \
-	$(COMMSHIGH_LIB_FILES)
+	$(COMMSHIGH_LIBS)
 
 zbx_tcp_recv_ext_zlib_LDADD += @AGENT_LIBS@ $(TLS_LIBS)
 
@@ -135,7 +135,7 @@ zbx_tcp_recv_raw_ext_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_recv_raw_ext_LDADD = \
-	$(COMMSHIGH_LIB_FILES)
+	$(COMMSHIGH_LIBS)
 
 zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@ $(TLS_LIBS)
 

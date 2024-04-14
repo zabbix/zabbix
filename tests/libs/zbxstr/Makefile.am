@@ -36,7 +36,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-STR_LIB_FILES = \
+STR_LIBS = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
@@ -51,7 +51,7 @@ zbx_str_extract_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_str_extract_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 zbx_str_extract_LDADD += @SERVER_LIBS@
 
@@ -64,7 +64,7 @@ convert_to_utf8_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 convert_to_utf8_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 convert_to_utf8_LDADD += @SERVER_LIBS@
 
@@ -78,7 +78,7 @@ zbx_truncate_itemkey_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_truncate_itemkey_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 zbx_truncate_itemkey_LDADD += @SERVER_LIBS@
 
@@ -92,7 +92,7 @@ zbx_truncate_value_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_truncate_value_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 zbx_truncate_value_LDADD += @SERVER_LIBS@
 
@@ -106,7 +106,7 @@ zbx_dyn_escape_string_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_dyn_escape_string_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
 
@@ -122,7 +122,7 @@ zbx_ltrim_utf8_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_ltrim_utf8_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 zbx_ltrim_utf8_LDADD += @SERVER_LIBS@
 
@@ -138,7 +138,7 @@ zbx_rtrim_utf8_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_rtrim_utf8_LDADD = \
-	$(STR_LIB_FILES)
+	$(STR_LIBS)
 
 zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
 

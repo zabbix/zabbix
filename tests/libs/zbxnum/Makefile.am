@@ -31,7 +31,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-NUM_LIB_FILES = \
+NUM_LIBS = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
@@ -46,7 +46,7 @@ is_double_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 is_double_LDADD = \
-	$(NUM_LIB_FILES)
+	$(NUM_LIBS)
 
 is_double_LDADD += @SERVER_LIBS@
 
@@ -60,7 +60,7 @@ zbx_trim_float_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_trim_float_LDADD = \
-	$(NUM_LIB_FILES)
+	$(NUM_LIBS)
 
 zbx_trim_float_LDADD += @SERVER_LIBS@
 
@@ -74,7 +74,7 @@ zbx_trim_integer_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_trim_integer_LDADD = \
-	$(NUM_LIB_FILES)
+	$(NUM_LIBS)
 
 zbx_trim_integer_LDADD += @SERVER_LIBS@
 

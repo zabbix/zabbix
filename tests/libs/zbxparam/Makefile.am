@@ -30,7 +30,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-PARAM_LIB_FILES = \
+PARAM_LIBS = \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -48,7 +48,7 @@ replace_key_params_dyn_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 replace_key_params_dyn_LDADD = \
-	$(PARAM_LIB_FILES)
+	$(PARAM_LIBS)
 
 replace_key_params_dyn_LDADD += @SERVER_LIBS@
 

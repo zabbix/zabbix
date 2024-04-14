@@ -34,21 +34,63 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-JSON_LIB_FILES = \
-	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a 
+MUTEX_LIBS = \
+        $(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+        $(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-XML_LIB_FILES = \
+CFG_LIBS = \
+        $(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
+        $(top_srcdir)/src/libs/zbxip/libzbxip.a \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+        $(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+LOG_LIBS = \
+        $(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+        $(MUTEX_LIBS) \
+        $(CFG_LIBS) \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+REGEXP_LIBS = \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(LOG_LIBS) \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+VARIANT_LIBS = \
+        $(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+EXPR_LIBS = \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+JSON_LIBS = \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(REGEXP_LIBS) \
+	$(VARIANT_LIBS) \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(EXPR_LIBS) \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+XML_LIBS = \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(JSON_LIB_FILES) \
+	$(JSON_LIBS) \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
@@ -63,7 +105,7 @@ zbx_json_to_xml_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_json_to_xml_LDADD = \
-	$(XML_LIB_FILES)
+	$(XML_LIBS)
 
 zbx_json_to_xml_LDADD += @SERVER_LIBS@
 
@@ -76,7 +118,7 @@ zbx_xml_to_json_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_xml_to_json_LDADD = \
-	$(XML_LIB_FILES)
+	$(XML_LIBS)
 
 zbx_xml_to_json_LDADD += @SERVER_LIBS@
 

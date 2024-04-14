@@ -26,12 +26,12 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-MUTEX_LIB_FILES = \
+MUTEX_LIBS = \
         $(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
         $(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-CFG_TEST_DEPS = \
+CFG_LIBS = \
         $(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
         $(top_srcdir)/src/libs/zbxip/libzbxip.a \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -39,17 +39,17 @@ CFG_TEST_DEPS = \
         $(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-LOG_LIB_FILES = \
+LOG_LIBS = \
         $(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-        $(MUTEX_LIB_FILES) \
-        $(CFG_TEST_DEPS) \
+        $(MUTEX_LIBS) \
+        $(CFG_LIBS) \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
         $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 REGEXP_LIBS = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(LOG_LIB_FILES) \
+	$(LOG_LIBS) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \

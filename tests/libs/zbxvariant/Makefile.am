@@ -9,8 +9,7 @@ if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) zbxvariant depends on zbxalgo, zbxstr, zbxnum and zbxcommon
-# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
+# zbxvariant depends on zbxalgo, zbxstr, zbxnum and zbxcommon
 #
 # 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
@@ -34,7 +33,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-VARIANT_LIB_FILES = \
+VARIANT_LIBS = \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -52,7 +51,7 @@ zbx_variant_compare_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_variant_compare_LDADD = \
-	$(VARIANT_LIB_FILES)
+	$(VARIANT_LIBS)
 
 zbx_variant_compare_LDADD += @SERVER_LIBS@
 

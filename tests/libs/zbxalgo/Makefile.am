@@ -29,7 +29,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-ALGO_LIB_FILES = \
+ALGO_LIBS = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
@@ -42,7 +42,7 @@ queue_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 queue_LDADD = \
-	$(ALGO_LIB_FILES)
+	$(ALGO_LIBS)
 
 queue_LDADD += @SERVER_LIBS@
 
@@ -56,7 +56,7 @@ list_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 list_LDADD = \
-	$(ALGO_LIB_FILES)
+	$(ALGO_LIBS)
 
 list_LDADD += @SERVER_LIBS@
 

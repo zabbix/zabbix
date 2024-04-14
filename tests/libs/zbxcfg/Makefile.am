@@ -23,7 +23,7 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-CFG_TEST_DEPS = \
+CFG_LIBS = \
 	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -33,7 +33,7 @@ CFG_TEST_DEPS = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
-parse_cfg_file_LDADD = $(CFG_TEST_DEPS)
+parse_cfg_file_LDADD = $(CFG_LIBS)
 
 parse_cfg_file_LDFLAGS = \
 	@SERVER_LDFLAGS@ \
