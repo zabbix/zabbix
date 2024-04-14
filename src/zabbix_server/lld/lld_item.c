@@ -307,7 +307,7 @@ static void	zbx_item_discovery_free(zbx_item_discovery_t *data)
 }
 
 static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
-		zbx_vector_uint64_t *intemids, int *index)
+		const zbx_vector_uint64_t *intemids, int *index)
 {
 #define ZBX_LLD_ITEMS_BATCH_SIZE	1000
 	int	new_index = *index + ZBX_LLD_ITEMS_BATCH_SIZE;
@@ -1197,7 +1197,7 @@ out:
  *                                                                            *
  * Parameters: item           - [IN] discovered item                          *
  *             item_prototype - [IN] item prototype to be checked for limit   *
- *             dependencies   - [IN] item dependencies                        *
+ *             dependencies   - [IN/OUT] item dependencies                    *
  *                                                                            *
  * Returns: SUCCEED - check was successful                                    *
  *          FAIL    - limit of dependencies is exceeded                       *
@@ -2043,7 +2043,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
  * Parameters: item_prototype  - [IN]                                          *
  *             lld_row         - [IN]                                          *
  *             lld_macro_paths - [IN] use JSON path to extract from jp_row     *
- *             item            - [IN] existing item or NULL                    *
+ *             item            - [IN/OUT] existing item or NULL                *
  *             error           - [OUT] error message                           *
  *                                                                             *
  *******************************************************************************/
@@ -2870,7 +2870,7 @@ static void	lld_items_tags_make(const zbx_vector_lld_item_prototype_ptr_t *item_
 /******************************************************************************
  *                                                                            *
  * Purpose: Recursively prepares LLD item bulk inserts and updates dependent  *
- *          dependent items with their masters.                               *
+ *          items with their masters.                                         *
  *                                                                            *
  * Parameters: hostid               - [IN] parent host id                     *
  *             item_prototypes      - [IN]                                    *
@@ -2885,6 +2885,7 @@ static void	lld_items_tags_make(const zbx_vector_lld_item_prototype_ptr_t *item_
  *                                         insert                             *
  *             db_insert_irtdata    - [IN] prepared item real-time data bulk  *
  *                                         insert                             *
+ *             db_insert_irtname    - [IN]                                    *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
@@ -4514,8 +4515,8 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
  *                                                                            *
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
-		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error,
+		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_vector_item_dependence_ptr_t	item_dependencies;

@@ -1232,8 +1232,8 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
 /*******************************************************************************
  *                                                                             *
  * Parameters: groupids         - [IN] Sorted list of host group ids which     *
- *                                     should be present on the each           *
- *                                     discovered host (Groups).               *
+ *                                     should be present on each discovered    *
+ *                                     host (Groups).                          *
  *             hosts            - [IN/OUT] List of hosts which should be       *
  *                                         sorted by hostid.                   *
  *             groups           - [IN] list of host groups (Group prototypes)  *
@@ -2010,7 +2010,7 @@ static void	lld_group_candidates_validate(zbx_vector_lld_group_ptr_t *groups_in,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Merges groups with candidates by names and add merged groups to   *
+ * Purpose: Merges groups with candidates by names and adds merged groups to  *
  *          discovered groups.                                                *
  *                                                                            *
  ******************************************************************************/
@@ -2813,7 +2813,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieves list of host macros which should be present on the each *
+ * Purpose: Retrieves list of host macros which should be present on each     *
  *          discovered host.                                                  *
  *                                                                            *
  * Parameters: lld_ruleid - [IN]                                              *
@@ -2877,7 +2877,7 @@ static int	macro_str_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieves list of host macros which should be present on the each *
+ * Purpose: Retrieves list of host macros which should be present on each     *
  *          discovered host.                                                  *
  *                                                                            *
  * Parameters: parent_hostid    - [IN] host prototype id                      *
@@ -3014,7 +3014,7 @@ static void	lld_hostmacro_make(zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_u
 /*******************************************************************************
  *                                                                             *
  * Parameters: hostmacros - [IN] List of host macros which should be present   *
- *                               on the each discovered host.                  *
+ *                               on each discovered host.                      *
  *             hosts      - [IN/OUT] list of hosts, should be sorted by hostid *
  *             lld_macros - [IN]                                               *
  *                                                                             *
@@ -3115,7 +3115,7 @@ static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieves list of host tags which should be present on the each   *
+ * Purpose: Retrieves list of host tags which should be present on each       *
  *          discovered host.                                                  *
  *                                                                            *
  * Parameters: parent_hostid - [IN] host prototype id                         *
@@ -4562,8 +4562,8 @@ static int	lld_host_delete_validate(zbx_uint64_t hostid)
  * Purpose: Updates host_discovery fields. Removes or disables lost resources. *
  *                                                                             *
  *******************************************************************************/
-static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lifetime_t *lifetime,
-		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
+static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_lld_lifetime_t *lifetime,
+		const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -4603,7 +4603,7 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lif
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 		{
-			int	ts_delete, ts_disable;
+			int	ts_disable, ts_delete = 0;
 
 			if ((ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == lifetime->type ||
 					(ZBX_LLD_LIFETIME_TYPE_AFTER == lifetime->type && lastcheck > (ts_delete =
@@ -4803,7 +4803,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, zbx_lld_lif
  * Purpose: Updates group_discovery fields. Removes lost resources.           *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, zbx_lld_lifetime_t *lifetime, int lastcheck)
+static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zbx_lld_lifetime_t *lifetime,
+		int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -5351,7 +5352,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_pt
 /******************************************************************************
  *                                                                            *
  * Parameters: interfaces - [IN] Sorted list of interfaces which should be    *
- *                               present on the each discovered host.         *
+ *                               present on each discovered host.             *
  *             hosts      - [IN/OUT] sorted list of hosts                     *
  *             lld_macros - [IN]                                              *
  *                                                                            *

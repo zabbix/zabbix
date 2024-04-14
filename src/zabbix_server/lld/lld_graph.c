@@ -484,21 +484,18 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
  * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
+static zbx_lld_graph_t	*lld_graph_by_item(const zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
 {
-	zbx_lld_graph_t	*graph;
-	zbx_lld_gitem_t	*gitem;
-
 	for (int i = 0; i < graphs->values_num; i++)
 	{
-		graph = graphs->values[i];
+		zbx_lld_graph_t	*graph = graphs->values[i];
 
 		if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
 
 		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
-			gitem = graph->gitems.values[j];
+			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
 			if (gitem->itemid == itemid)
 				return graph;
@@ -516,7 +513,7 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zb
  * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_get(zbx_vector_lld_graph_ptr_t *graphs,
+static zbx_lld_graph_t	*lld_graph_get(const zbx_vector_lld_graph_ptr_t *graphs,
 		const zbx_vector_lld_item_link_ptr_t *item_links)
 {
 	zbx_lld_graph_t	*graph;
@@ -1498,8 +1495,8 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
-		int lastcheck)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error,
+		const zbx_lld_lifetime_t *lifetime, int lastcheck)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;

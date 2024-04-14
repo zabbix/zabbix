@@ -1096,7 +1096,7 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *                                                                            *
  * Purpose: adds or updates items, triggers and graphs for discovery item     *
  *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery item id from database              *
+ * Parameters: lld_ruleid - [IN] discovery rule id from database              *
  *             value      - [IN] received value from agent                    *
  *             error      - [OUT] Error or informational message. Will be set *
  *                               to empty string on successful discovery      *

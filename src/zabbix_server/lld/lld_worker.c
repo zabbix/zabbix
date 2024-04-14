@@ -58,7 +58,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
  * Parameters: message - [IN] message with LLD request                        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_process_task(zbx_ipc_message_t *message)
+static void	lld_process_task(const zbx_ipc_message_t *message)
 {
 	zbx_uint64_t		itemid, hostid, lastlogsize;
 	char			*value, *error;
