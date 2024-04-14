@@ -23,6 +23,8 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
 #include "zbxcommon.h"
+#include "zbxwin32.h"
+#include "zbxnix.h"
 
 int	zbx_agent_pid;
 

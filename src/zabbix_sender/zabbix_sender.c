@@ -33,6 +33,8 @@
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
