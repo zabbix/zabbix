@@ -397,7 +397,7 @@ while (0)
 #define THIS_SHOULD_NEVER_HAPPEN zbx_this_should_never_happen()
 void	zbx_this_should_never_happen(void);
 
-///* to avoid dependency on libzbxnix.a */
+/* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
 			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
@@ -569,8 +569,6 @@ void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
 int	zbx_validate_hostname(const char *hostname);
-
-//void	zbx_backtrace(void);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
