@@ -258,7 +258,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		while (0 != sleeptime_after_notify);
 	}
 end_loop:
-	if (SUCCEED == zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
+	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
 		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */

@@ -3,6 +3,7 @@ Changes for 7.0.0rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
