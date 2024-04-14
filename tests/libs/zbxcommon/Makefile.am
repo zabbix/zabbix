@@ -7,7 +7,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 # 1) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-# 2) zbxcommon should not depend on any other zabbix library
+# 2) zbxcommon MUST not depend on any other zabbix library
 #
 # 1) mockdata needs zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon

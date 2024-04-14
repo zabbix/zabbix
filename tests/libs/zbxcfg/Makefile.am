@@ -5,28 +5,35 @@ parse_cfg_file_SOURCES = \
 	parse_cfg_file.c \
 	../../zbxmocktest.h
 
-parse_cfg_file_LDADD = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+MOCK_DATA_DEPS = \
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+MOCK_TEST_DEPS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-parse_cfg_file_LDADD += \
-	@SERVER_LIBS@ \
-	$(CMOCKA_LIBS) \
-	$(YAML_LIBS)
+CFG_TEST_DEPS = \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
+
+parse_cfg_file_LDADD = $(CFG_TEST_DEPS)
 
 parse_cfg_file_LDFLAGS = \
 	@SERVER_LDFLAGS@ \
