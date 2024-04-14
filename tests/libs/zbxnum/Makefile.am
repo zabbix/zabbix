@@ -8,21 +8,17 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) zbxnum depends only on zbxcommon
-# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
+# zbxnum depends only on zbxcommon
 #
 # 1) mockdata needs zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-
-COMMON_LIB_DEPS = \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 MOCK_DATA_DEPS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(COMMON_LIB_DEPS) \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 MOCK_TEST_DEPS = \
@@ -33,11 +29,11 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(COMMON_LIB_DEPS)
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 NUM_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(COMMON_LIB_DEPS) \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
