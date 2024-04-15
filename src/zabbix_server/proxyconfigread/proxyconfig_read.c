@@ -1157,7 +1157,7 @@ static int	proxyconfig_get_hostmap(const zbx_dc_proxy_t *proxy, zbx_uint64_t rev
 			"select hp.hostproxyid,h.host,hp.proxyid,hp.revision,h.tls_accept,h.tls_issuer,h.tls_subject,"
 				"h.tls_psk_identity,h.tls_psk"
 			" from proxy p,host_proxy hp"
-			" left join hosts h on"
+			" join hosts h on"
 				" h.hostid=hp.hostid"
 			" where hp.proxyid=p.proxyid"
 				" and h.proxy_groupid=" ZBX_FS_UI64
