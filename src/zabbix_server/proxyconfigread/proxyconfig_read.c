@@ -1160,8 +1160,9 @@ static int	proxyconfig_get_hostmap(const zbx_dc_proxy_t *proxy, zbx_uint64_t rev
 			" left join hosts h on"
 				" h.hostid=hp.hostid"
 			" where hp.proxyid=p.proxyid"
+				" and h.proxy_groupid=" ZBX_FS_UI64
 				" and p.proxy_groupid=" ZBX_FS_UI64,
-			proxy->proxy_groupid);
+				proxy->proxy_groupid, proxy->proxy_groupid);
 
 	if (0 < revision)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and revision>" ZBX_FS_UI64, revision);
