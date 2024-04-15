@@ -61,7 +61,7 @@ $zi-expand: "\ea3a";
 $zi-eye-alt-off: "\ea3b";
 $zi-eye-off: "\ea3c";
 $zi-eye: "\ea3d";
-$zi-filter-small: "\ea3e";
+$zi-filter-large: "\ea3e";
 $zi-filter: "\ea3f";
 $zi-fullscreen: "\ea40";
 $zi-help-circled: "\ea41";
@@ -85,7 +85,7 @@ $zi-reference: "\ea52";
 $zi-reload: "\ea53";
 $zi-remove: "\ea54";
 $zi-reports: "\ea55";
-$zi-search-small: "\ea56";
+$zi-search-large: "\ea56";
 $zi-search: "\ea57";
 $zi-services: "\ea58";
 $zi-sign-out: "\ea59";
@@ -117,10 +117,10 @@ $zi-wrench: "\ea72";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1712654503350") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1712654503350") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1712654503350') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1712654503350#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1713164933374") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1713164933374") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1713164933374') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1713164933374#zabbix-icons') format('svg');
 }
 
 %icons-font {
@@ -209,7 +209,7 @@ $zi-wrench: "\ea72";
 .zi-eye-alt-off:before { content: "\ea3b"; }
 .zi-eye-off:before { content: "\ea3c"; }
 .zi-eye:before { content: "\ea3d"; }
-.zi-filter-small:before { content: "\ea3e"; }
+.zi-filter-large:before { content: "\ea3e"; }
 .zi-filter:before { content: "\ea3f"; }
 .zi-fullscreen:before { content: "\ea40"; }
 .zi-help-circled:before { content: "\ea41"; }
@@ -233,7 +233,7 @@ $zi-wrench: "\ea72";
 .zi-reload:before { content: "\ea53"; }
 .zi-remove:before { content: "\ea54"; }
 .zi-reports:before { content: "\ea55"; }
-.zi-search-small:before { content: "\ea56"; }
+.zi-search-large:before { content: "\ea56"; }
 .zi-search:before { content: "\ea57"; }
 .zi-services:before { content: "\ea58"; }
 .zi-sign-out:before { content: "\ea59"; }

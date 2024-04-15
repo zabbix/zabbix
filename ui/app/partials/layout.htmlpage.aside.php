@@ -56,7 +56,7 @@ $server_name = ($data['server_name'] !== '')
 	? (new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
 	: null;
 
-$search_icon = (new CButtonIcon(ZBX_ICON_SEARCH_SMALL, _('Search')))
+$search_icon = (new CButtonIcon(ZBX_ICON_SEARCH, _('Search')))
 	->addClass('js-search')
 	->setAttribute('type', 'submit');
 

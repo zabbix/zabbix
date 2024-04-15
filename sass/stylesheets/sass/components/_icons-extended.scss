@@ -93,7 +93,7 @@
 	@extend %icon-small;
 }
 
-.zi-filter {
+.zi-filter-large {
 	&::before {
 		font-size: 45px;
 	}
@@ -169,7 +169,7 @@
 	@extend %icon-smaller;
 }
 
-.zi-search {
+.zi-search-large {
 	&::before {
 		font-size: 45px;
 	}
