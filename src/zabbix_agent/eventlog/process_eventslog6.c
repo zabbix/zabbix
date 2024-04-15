@@ -921,7 +921,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 		for (i = 0; i < required_buf_size; i++)
 		{
-			int	gather_evt_msg = 1;
+			int	gather_evt_msg = 1, refresh;
 
 			if (EVT_LOG_COUNT_ITEM == evt_item_type && 1 > strlen(pattern))
 				gather_evt_msg = 0;
@@ -1044,8 +1044,8 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 			{
 				if (EVT_LOG_ITEM == evt_item_type)
 				{
-					send_err = process_value_cb(addrs, agent2_result, config_hostname,
-							metric->key_orig, evt_message, ITEM_STATE_NORMAL, &lastlogsize,
+					send_err = process_value_cb(addrs, agent2_result, metric->itemid, config_hostname,
+							metric->key, evt_message, ITEM_STATE_NORMAL, &lastlogsize,
 							NULL, &evt_timestamp, evt_provider, &evt_severity, &evt_eventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
 							config_timeout, config_source_ip, config_buffer_send,
@@ -1080,12 +1080,15 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 				}
 			}
 
+			if (0 >= (refresh = (int)time(NULL) - metric->nextcheck))
+					refresh = 1;
+
 			/* do not flood Zabbix server if file grows too fast */
-			if (s_count >= (rate * metric->refresh))
+			if (s_count >= (rate * refresh))
 				break;
 
 			/* do not flood local system if file grows too fast */
-			if (p_count >= (4 * rate * metric->refresh))
+			if (p_count >= (4 * rate * refresh))
 				break;
 		}
 
@@ -1100,7 +1103,7 @@ finish:
 		char	buf[ZBX_MAX_UINT64_LEN];
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
-		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
+		send_err = process_value_cb(addrs, agent2_result, metric->itemid, config_hostname, metric->key, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip,
 				config_buffer_send, config_buffer_size);

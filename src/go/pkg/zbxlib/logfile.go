@@ -35,13 +35,12 @@ typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 typedef zbx_vector_pre_persistent_t * zbx_vector_pre_persistent_lp_t;
 
-zbx_active_metric_t *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
+zbx_active_metric_t *new_metric(zbx_uint64_t itemid, char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
 {
 	zbx_active_metric_t *metric = malloc(sizeof(zbx_active_metric_t));
 	memset(metric, 0, sizeof(zbx_active_metric_t));
+	metric->itemid = itemid;
 	metric->key = key;
-	// key_orig is used in error messages, consider using "itemid: <itemid>" instead of the key
-	metric->key_orig = zbx_strdup(NULL, key);
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
 	metric->flags = (unsigned char)flags;
@@ -51,9 +50,9 @@ zbx_active_metric_t *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, 
 	return metric;
 }
 
-void metric_set_refresh(zbx_active_metric_t *metric, int refresh)
+void metric_set_nextcheck(zbx_active_metric_t *metric, int nextcheck)
 {
-	metric->refresh = refresh;
+	metric->nextcheck = nextcheck;
 }
 
 void metric_get_meta(zbx_active_metric_t *metric, zbx_uint64_t *lastlogsize, int *mtime)
@@ -103,7 +102,7 @@ void	metric_free(zbx_active_metric_t *metric)
 		return;
 
 	zbx_free(metric->key);
-	zbx_free(metric->key_orig);
+	zbx_free(metric->delay);
 
 	for (i = 0; i < metric->logfiles_num; i++)
 		zbx_free(metric->logfiles[i].filename);
@@ -313,7 +312,13 @@ type LogResult struct {
 	Mtime       int
 }
 
-func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int32) (data unsafe.Pointer, err error) {
+func NewActiveMetric(
+	itemid uint64,
+	key string,
+	params []string,
+	lastLogsize uint64,
+	mtime int32,
+) (data unsafe.Pointer, err error) {
 	flags := MetricFlagNew | MetricFlagPersistent
 	switch key {
 	case "log":
@@ -350,7 +355,8 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	ckey := C.CString(itemutil.MakeKey(key, params))
 
 	log.Tracef("Calling C function \"new_metric()\"")
-	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
+	return unsafe.Pointer(C.new_metric(C.zbx_uint64_t(itemid), ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime),
+		C.int(flags))), nil
 }
 
 func FreeActiveMetric(data unsafe.Pointer) {
@@ -358,9 +364,9 @@ func FreeActiveMetric(data unsafe.Pointer) {
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
-func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer, itemid uint64) {
-	log.Tracef("Calling C function \"metric_set_refresh()\"")
-	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
+func ProcessLogCheck(data unsafe.Pointer, item *LogItem, nextcheck int, cblob unsafe.Pointer, itemid uint64) {
+	log.Tracef("Calling C function \"metric_set_nextcheck()\"")
+	C.metric_set_nextcheck(C.ZBX_ACTIVE_METRIC_LP(data), C.int(nextcheck))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cmtimeSent, cmtimeLast C.int

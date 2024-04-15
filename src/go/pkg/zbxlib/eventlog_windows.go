@@ -38,7 +38,7 @@ typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 
-void metric_set_refresh(zbx_active_metric_t *metric, int refresh);
+void metric_set_nextcheck(zbx_active_metric_t *metric, int nextcheck);
 void metric_get_meta(zbx_active_metric_t *metric, zbx_uint64_t *lastlogsize, int *mtime);
 void metric_set_unsupported(zbx_active_metric_t *metric);
 int metric_set_supported(zbx_active_metric_t *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
@@ -201,6 +201,7 @@ import (
 )
 
 type EventLogItem struct {
+	Itemid  uint64
 	LastTs  time.Time // the last log value timestamp + 1ns
 	Results []*EventLogResult
 	Output  ResultWriter
@@ -218,9 +219,9 @@ type EventLogResult struct {
 	Mtime          int
 }
 
-func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, cblob unsafe.Pointer, isCountItem bool) {
-	log.Tracef("Calling C function \"metric_set_refresh()\"")
-	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
+func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, nextcheck int, cblob unsafe.Pointer, isCountItem bool) {
+	log.Tracef("Calling C function \"metric_set_nextcheck()\"")
+	C.metric_set_nextcheck(C.ZBX_ACTIVE_METRIC_LP(data), C.int(nextcheck))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cstate, cmtime C.int

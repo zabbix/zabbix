@@ -54,6 +54,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\function.o \
 	..\..\..\src\libs\zbxexpr\host.o \
+	..\..\..\src\libs\zbxexpr\interval.o \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \

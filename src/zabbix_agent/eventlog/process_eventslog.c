@@ -659,6 +659,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 		while (pELR < pEndOfRecords)
 		{
+			int	refresh;
 			/* to prevent mismatch in comparing with RecordNumber in case of wrap-around, */
 			/* we look for using '=' */
 			if (0 != timestamp || (DWORD)FirstID == ((PEVENTLOGRECORD)pELR)->RecordNumber)
@@ -773,8 +774,8 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 				{
 					if (EVT_LOG_ITEM == evt_item_type)
 					{
-						send_err = process_value_cb(addrs, agent2_result, config_hostname,
-								metric->key_orig, value, ITEM_STATE_NORMAL,
+						send_err = process_value_cb(addrs, agent2_result, metric->itemid, config_hostname,
+								metric->key, value, ITEM_STATE_NORMAL,
 								&lastlogsize, NULL, &timestamp, source, &severity,
 								&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT,
 								config_tls, config_timeout, config_source_ip, config_buffer_send,
@@ -808,12 +809,15 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 					}
 				}
 
+				if (0 >= (refresh = (int)time(NULL) - metric->nextcheck))
+					refresh = 1;
+
 				/* do not flood Zabbix server if file grows too fast */
-				if (s_count >= (rate * metric->refresh))
+				if (s_count >= (rate * refresh))
 					break;
 
 				/* do not flood local system if file grows too fast */
-				if (p_count >= (4 * rate * metric->refresh))
+				if (p_count >= (4 * rate * refresh))
 					break;
 			}
 
@@ -831,7 +835,7 @@ finish:
 		char	buf[ZBX_MAX_UINT64_LEN];
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
-		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
+		send_err = process_value_cb(addrs, agent2_result, metric->itemid, config_hostname, metric->key, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip,
 				config_buffer_send, config_buffer_size);
