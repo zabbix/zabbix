@@ -25,7 +25,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]) ?>
+	<?= renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]) ?>
 </script>
 
 <script type="text/javascript">
