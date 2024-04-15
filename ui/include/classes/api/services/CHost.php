@@ -583,8 +583,9 @@ class CHost extends CHostGeneral {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
-			if ($options['filter']['inventory_mode'] !== null) {
+		if (is_array($options['filter'])) {
+			if (array_key_exists('inventory_mode', $options['filter'])
+					&& $options['filter']['inventory_mode'] !== null) {
 				$inventory_mode_query = (array) $options['filter']['inventory_mode'];
 
 				$inventory_mode_where = [];
@@ -602,6 +603,11 @@ class CHost extends CHostGeneral {
 				$sqlParts['where'][] = (count($inventory_mode_where) > 1)
 					? '('.implode(' OR ', $inventory_mode_where).')'
 					: $inventory_mode_where[0];
+			}
+
+			if (array_key_exists('assigned_proxyid', $options['filter'])
+					&& $options['filter']['assigned_proxyid'] !== null) {
+				$sqlParts['where'][] = dbConditionId('p.proxyid', $options['filter']['assigned_proxyid']);
 			}
 		}
 
@@ -630,8 +636,13 @@ class CHost extends CHostGeneral {
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('assigned_proxyid', $options['output']))
-				|| (is_array($options['filter']) && array_key_exists('assigned_proxyid', $options['filter']))) {
+				|| (is_array($options['filter']) && array_key_exists('assigned_proxyid', $options['filter'])
+					&& $options['filter']['assigned_proxyid'] !== null)) {
 			$sqlParts['left_join'][] = ['alias' => 'hp', 'table' => 'host_proxy', 'using' => 'hostid'];
+			// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
+			$sqlParts['left_join'][] = ['alias' => 'p', 'table' => 'proxy', 'use_distinct' => false,
+				'condition' => 'h.proxy_groupid=p.proxy_groupid AND hp.proxyid=p.proxyid'
+			];
 			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
@@ -646,7 +657,7 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($this->outputIsRequested('assigned_proxyid', $options['output'])) {
-				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('hp.proxyid', 0, 'assigned_proxyid'), $sqlParts);
+				$sqlParts = $this->addQuerySelect('p.proxyid AS assigned_proxyid', $sqlParts);
 			}
 		}
 
