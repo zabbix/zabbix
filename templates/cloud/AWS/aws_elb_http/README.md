@@ -32,7 +32,7 @@ This template has been tested on:
 
 The template gets AWS ELB Application Load Balancer metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit see the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
 
 Add the following required permissions to your Zabbix IAM policy in order to collect AWS ELB Application Load Balancer metrics.
 ```json
@@ -155,7 +155,7 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Load Balancer alarm discovery|<p>Discovery of alarm balancers.</p>|Dependent item|aws.elb.alb.alarms.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Load Balancer alarm discovery|<p>Used for the discovery of alarm balancers.</p>|Dependent item|aws.elb.alb.alarms.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Load Balancer alarm discovery
 
@@ -163,7 +163,7 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|----|-----------------------|
 |AWS ELB ALB Alarms: [{#ALARM_NAME}]: Get metrics|<p>Get metrics about the alarm state and its reason.</p>|Dependent item|aws.elb.alb.alarm.get_metrics["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB ALB Alarms: [{#ALARM_NAME}]: State reason|<p>An explanation for the alarm state reason in text format.</p><p>Alarm description:</p><p>`{#ALARM_DESCRIPTION}`</p>|Dependent item|aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StateReason`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|AWS ELB ALB Alarms: [{#ALARM_NAME}]: State|<p>The value of the alarm state. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>`{#ALARM_DESCRIPTION}`</p>|Dependent item|aws.elb.alb.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StateValue`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|AWS ELB ALB Alarms: [{#ALARM_NAME}]: State|<p>The value of the alarm state. Possible values:</p><p>0 - OK;</p><p>1 - INSUFFICIENT_DATA;</p><p>2 - ALARM.</p><p>Alarm description:</p><p>`{#ALARM_DESCRIPTION}`</p>|Dependent item|aws.elb.alb.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StateValue`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Load Balancer alarm discovery
 
@@ -176,7 +176,7 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Target groups discovery|<p>Discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.</p>|Dependent item|aws.elb.alb.target_groups.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Target groups discovery|<p>Used for the discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.</p>|Dependent item|aws.elb.alb.target_groups.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Target groups discovery
 
@@ -231,7 +231,7 @@ This template has been tested on:
 
 The template gets AWS ELB Network Load Balancer metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit see the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
 
 Add the following required permissions to your Zabbix IAM policy in order to collect AWS ELB Network Load Balancer metrics.
 ```json
@@ -301,7 +301,7 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.ELB.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.ELB.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ELB.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.ELB.UNHEALTHY.HOST.MAX}|<p>Maximum number of Unhealthy Host for a trigger expression.</p>|`0`|
+|{$AWS.ELB.UNHEALTHY.HOST.MAX}|<p>Maximum number of unhealthy hosts for a trigger expression.</p>|`0`|
 
 ### Items
 
@@ -312,21 +312,21 @@ See the section below for a list of macros used for LLD filters.
 |AWS CloudWatch: Get ELB NLB alarms data|<p>`DescribeAlarms` API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.elb.nlb.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Get metrics check|<p>Check that the Network Load Balancer metrics data has been received correctly.</p>|Dependent item|aws.elb.nlb.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS ELB NLB: Get alarms check|<p>Check that the alarm data has been received correctly.</p>|Dependent item|aws.elb.nlb.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|AWS ELB NLB: Active Flow Count|<p>The total number of concurrent flows (or connections) from clients to targets.</p><p>This metric includes connections in the SYN_SENT and ESTABLISHED states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ActiveFlowCount")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: Active Flow Count TCP|<p>The total number of concurrent TCP flows (or connections) from clients to targets.</p><p>This metric includes connections in the SYN_SENT and ESTABLISHED states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: Active Flow Count TLS|<p>The total number of concurrent TLS flows (or connections) from clients to targets.</p><p>This metric includes connections in the SYN_SENT and ESTABLISHED state.</p>|Dependent item|aws.elb.nlb.active_flow_count_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: Active Flow Count|<p>The total number of concurrent flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ActiveFlowCount")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: Active Flow Count TCP|<p>The total number of concurrent TCP flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p><p>TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.</p>|Dependent item|aws.elb.nlb.active_flow_count_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: Active Flow Count TLS|<p>The total number of concurrent TLS flows (or connections) from clients to targets.</p><p>This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.</p>|Dependent item|aws.elb.nlb.active_flow_count_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Active Flow Count UDP|<p>The total number of concurrent UDP flows (or connections) from clients to targets.</p>|Dependent item|aws.elb.nlb.active_flow_count_udp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Client TLS Negotiation Error Count|<p>The total number of TLS handshakes that failed during negotiation between a client and a TLS listener.</p>|Dependent item|aws.elb.nlb.client_tls_negotiation_error_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Consumed LCUs|<p>The number of load balancer capacity units (LCU) used by your load balancer.</p><p>You pay for the number of LCUs that you use per hour.</p><p>More information on Elastic Load Balancing pricing here: https://aws.amazon.com/elasticloadbalancing/pricing/</p>|Dependent item|aws.elb.nlb.capacity_units<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ConsumedLCUs")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Consumed LCUs TCP|<p>The number of load balancer capacity units (LCU) used by your load balancer for TCP.</p><p>You pay for the number of LCUs that you use per hour.</p><p>More information on Elastic Load Balancing pricing here: https://aws.amazon.com/elasticloadbalancing/pricing/</p>|Dependent item|aws.elb.nlb.capacity_units_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ConsumedLCUs_TCP")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Consumed LCUs TLS|<p>The number of load balancer capacity units (LCU) used by your load balancer for TLS.</p><p>You pay for the number of LCUs that you use per hour.</p><p>More information on Elastic Load Balancing pricing here: https://aws.amazon.com/elasticloadbalancing/pricing/</p>|Dependent item|aws.elb.nlb.capacity_units_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ConsumedLCUs_TLS")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Consumed LCUs UDP|<p>The number of load balancer capacity units (LCU) used by your load balancer for UDP.</p><p>You pay for the number of LCUs that you use per hour.</p><p>More information on Elastic Load Balancing pricing here: https://aws.amazon.com/elasticloadbalancing/pricing/</p>|Dependent item|aws.elb.nlb.capacity_units_udp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ConsumedLCUs_UDP")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: New Flow Count|<p>The total number of new flows (or connections) established from clients to targets in the time period.</p>|Dependent item|aws.elb.nlb.new_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: New Flow Count TCP|<p>The total number of new TCP flows (or connections) established from clients to targets in the time period.</p>|Dependent item|aws.elb.nlb.new_flow_count_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount_TCP")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: New Flow Count TLS|<p>The total number of new TLS flows (or connections) established from clients to targets in the time period.</p>|Dependent item|aws.elb.nlb.new_flow_count_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount_TLS")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: New Flow Count UDP|<p>The total number of new UDP flows (or connections) established from clients to targets in the time period.</p>|Dependent item|aws.elb.nlb.new_flow_count_udp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount_UDP")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: New Flow Count|<p>The total number of new flows (or connections) established from clients to targets in the specified time period.</p>|Dependent item|aws.elb.nlb.new_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: New Flow Count TCP|<p>The total number of new TCP flows (or connections) established from clients to targets in the specified time period.</p>|Dependent item|aws.elb.nlb.new_flow_count_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount_TCP")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: New Flow Count TLS|<p>The total number of new TLS flows (or connections) established from clients to targets in the specified time period.</p>|Dependent item|aws.elb.nlb.new_flow_count_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount_TLS")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: New Flow Count UDP|<p>The total number of new UDP flows (or connections) established from clients to targets in the specified time period.</p>|Dependent item|aws.elb.nlb.new_flow_count_udp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NewFlowCount_UDP")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Peak Packets per second|<p>Highest average packet rate (packets processed per second), calculated every 10 seconds during the sampling window.</p><p>This metric includes health check traffic.</p>|Dependent item|aws.elb.nlb.peak_packets.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: Port Allocation Error Count|<p>The total number of ephemeral port allocation errors during a client IP translation operation. A non-zero value indicates dropped client connections.</p><p></p><p>Note: Network Load Balancers support 55,000 simultaneous connections or about 55,000 connections per minute to each unique target (IP address and port) when performing client address translation.</p><p>To fix port allocation errors, add more targets to the target group.</p>|Dependent item|aws.elb.nlb.port_allocation_error_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: Port Allocation Error Count|<p>The total number of ephemeral port allocation errors during a client IP translation operation. A non-zero value indicates dropped client connections.</p><p>Note: Network Load Balancers support 55,000 simultaneous connections or about 55,000 connections per minute to each unique target (IP address and port) when performing client address translation.</p><p>To fix port allocation errors, add more targets to the target group.</p>|Dependent item|aws.elb.nlb.port_allocation_error_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Processed Bytes|<p>The total number of bytes processed by the load balancer, including TCP/IP headers. This count includes traffic to and from targets, minus health check traffic.</p>|Dependent item|aws.elb.nlb.processed_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ProcessedBytes")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Processed Bytes TCP|<p>The total number of bytes processed by TCP listeners.</p>|Dependent item|aws.elb.nlb.processed_bytes_tcp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Processed Bytes TLS|<p>The total number of bytes processed by TLS listeners.</p>|Dependent item|aws.elb.nlb.processed_bytes_tls<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -340,7 +340,7 @@ See the section below for a list of macros used for LLD filters.
 |AWS ELB NLB: Security Group Blocked Flow Count Outbound UDP|<p>The number of new UDP flows rejected by the outbound rules of the load balancer security groups.</p>|Dependent item|aws.elb.nlb.sg_blocked_outbound_udp<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Target TLS Negotiation Error Count|<p>The total number of TLS handshakes that failed during negotiation between a TLS listener and a target.</p>|Dependent item|aws.elb.nlb.target_tls_negotiation_error_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: TCP Client Reset Count|<p>The total number of reset (RST) packets sent from a client to a target.</p><p>These resets are generated by the client and forwarded by the load balancer.</p>|Dependent item|aws.elb.nlb.tcp_client_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS ELB NLB: TCP ELB Reset Count|<p>The total number of reset (RST) packets generated by the load balancer.</p><p>For more information, see Troubleshooting: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html#elb-reset-count-metric</p>|Dependent item|aws.elb.nlb.tcp_elb_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS ELB NLB: TCP ELB Reset Count|<p>The total number of reset (RST) packets generated by the load balancer.</p><p>For more information, see: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html#elb-reset-count-metric</p>|Dependent item|aws.elb.nlb.tcp_elb_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: TCP Target Reset Count|<p>The total number of reset (RST) packets sent from a target to a client.</p><p>These resets are generated by the target and forwarded by the load balancer.</p>|Dependent item|aws.elb.nlb.tcp_target_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB: Unhealthy Routing Flow Count|<p>The number of flows (or connections) that are routed using the routing failover action (fail open).</p>|Dependent item|aws.elb.nlb.unhealthy_routing_flow_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
@@ -355,7 +355,7 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Load Balancer alarm discovery|<p>Discovery of alarm balancers.</p>|Dependent item|aws.elb.nlb.alarms.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Load Balancer alarm discovery|<p>Used for the discovery of alarm balancers.</p>|Dependent item|aws.elb.nlb.alarms.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Load Balancer alarm discovery
 
@@ -363,7 +363,7 @@ See the section below for a list of macros used for LLD filters.
 |----|-----------|----|-----------------------|
 |AWS ELB NLB Alarms: [{#ALARM_NAME}]: Get metrics|<p>Get metrics about the alarm state and its reason.</p>|Dependent item|aws.elb.nlb.alarm.get_metrics["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS ELB NLB Alarms: [{#ALARM_NAME}]: State reason|<p>An explanation for the alarm state reason in text format.</p><p>Alarm description:</p><p>`{#ALARM_DESCRIPTION}`</p>|Dependent item|aws.elb.nlb.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StateReason`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|AWS ELB NLB Alarms: [{#ALARM_NAME}]: State|<p>The value of the alarm state. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>`{#ALARM_DESCRIPTION}`</p>|Dependent item|aws.elb.nlb.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StateValue`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|AWS ELB NLB Alarms: [{#ALARM_NAME}]: State|<p>The value of the alarm state. Possible values:</p><p>0 - OK;</p><p>1 - INSUFFICIENT_DATA;</p><p>2 - ALARM.</p><p>Alarm description:</p><p>`{#ALARM_DESCRIPTION}`</p>|Dependent item|aws.elb.nlb.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.StateValue`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Load Balancer alarm discovery
 
@@ -376,7 +376,7 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Target groups discovery|<p>Discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.</p>|Dependent item|aws.elb.nlb.target_groups.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Target groups discovery|<p>Used for the discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.</p>|Dependent item|aws.elb.nlb.target_groups.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Target groups discovery
 
@@ -390,8 +390,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy|<p>This trigger help in identifying when your targets have become unhealthy.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0`|Average||
-|AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have unhealthy host|<p>This trigger allows you to become aware when there are no longer any registered targets.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) > {$AWS.ELB.UNHEALTHY.HOST.MAX}`|Warning|**Depends on**:<br><ul><li>AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy</li></ul>|
+|AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy|<p>This trigger helps in identifying when your targets have become unhealthy.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0`|Average||
+|AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have unhealthy host|<p>This trigger allows you to become aware when there are no more registered targets.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) > {$AWS.ELB.UNHEALTHY.HOST.MAX}`|Warning|**Depends on**:<br><ul><li>AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy</li></ul>|
 
 ## Feedback
 

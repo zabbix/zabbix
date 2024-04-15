@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-09T15:39:10Z'
+  date: '2024-04-15T08:42:07Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1379,7 +1379,7 @@ zabbix_export:
                 value: '{$AWS.ELB.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Discovery of alarm balancers.'
+          description: 'Used for the discovery of alarm balancers.'
           item_prototypes:
             - uuid: fca522690827426bb63f93e90d98aa54
               name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: Get metrics'
@@ -1407,7 +1407,10 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                The value of the alarm state. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
+                The value of the alarm state. Possible values:
+                0 - OK;
+                1 - INSUFFICIENT_DATA;
+                2 - ALARM.
                 Alarm description:
                 `{#ALARM_DESCRIPTION}`
               valuemap:
@@ -1517,7 +1520,7 @@ zabbix_export:
                 value: '{$AWS.ELB.LLD.FILTER.TARGET.GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
+          description: 'Used for the discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
           item_prototypes:
             - uuid: 21d1830526e14fb99b2288d79747d472
               name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Anomalous Host Count'
@@ -2454,7 +2457,7 @@ zabbix_export:
           history: 7d
           description: |
             The total number of concurrent flows (or connections) from clients to targets.
-            This metric includes connections in the SYN_SENT and ESTABLISHED states.
+            This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.
             TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.
           preprocessing:
             - type: JSONPATH
@@ -2474,7 +2477,7 @@ zabbix_export:
           history: 7d
           description: |
             The total number of concurrent TCP flows (or connections) from clients to targets.
-            This metric includes connections in the SYN_SENT and ESTABLISHED states.
+            This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.
             TCP connections are not terminated at the load balancer, so a client opening a TCP connection to a target counts as a single flow.
           preprocessing:
             - type: JSONPATH
@@ -2496,7 +2499,7 @@ zabbix_export:
           history: 7d
           description: |
             The total number of concurrent TLS flows (or connections) from clients to targets.
-            This metric includes connections in the SYN_SENT and ESTABLISHED state.
+            This metric includes connections in the `SYN_SENT` and `ESTABLISHED` states.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3438,7 +3441,7 @@ zabbix_export:
           key: aws.elb.nlb.new_flow_count
           delay: '0'
           history: 7d
-          description: 'The total number of new flows (or connections) established from clients to targets in the time period.'
+          description: 'The total number of new flows (or connections) established from clients to targets in the specified time period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3455,7 +3458,7 @@ zabbix_export:
           key: aws.elb.nlb.new_flow_count_tcp
           delay: '0'
           history: 7d
-          description: 'The total number of new TCP flows (or connections) established from clients to targets in the time period.'
+          description: 'The total number of new TCP flows (or connections) established from clients to targets in the specified time period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3474,7 +3477,7 @@ zabbix_export:
           key: aws.elb.nlb.new_flow_count_tls
           delay: '0'
           history: 7d
-          description: 'The total number of new TLS flows (or connections) established from clients to targets in the time period.'
+          description: 'The total number of new TLS flows (or connections) established from clients to targets in the specified time period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3493,7 +3496,7 @@ zabbix_export:
           key: aws.elb.nlb.new_flow_count_udp
           delay: '0'
           history: 7d
-          description: 'The total number of new UDP flows (or connections) established from clients to targets in the time period.'
+          description: 'The total number of new UDP flows (or connections) established from clients to targets in the specified time period.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3535,7 +3538,6 @@ zabbix_export:
           history: 7d
           description: |
             The total number of ephemeral port allocation errors during a client IP translation operation. A non-zero value indicates dropped client connections.
-            
             Note: Network Load Balancers support 55,000 simultaneous connections or about 55,000 connections per minute to each unique target (IP address and port) when performing client address translation.
             To fix port allocation errors, add more targets to the target group.
           preprocessing:
@@ -3807,7 +3809,7 @@ zabbix_export:
           history: 7d
           description: |
             The total number of reset (RST) packets generated by the load balancer.
-            For more information, see Troubleshooting: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html#elb-reset-count-metric
+            For more information, see: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html#elb-reset-count-metric
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3881,7 +3883,7 @@ zabbix_export:
                 value: '{$AWS.ELB.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Discovery of alarm balancers.'
+          description: 'Used for the discovery of alarm balancers.'
           item_prototypes:
             - uuid: c9f5791fe83743739ab74289126c7843
               name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}]: Get metrics'
@@ -3909,7 +3911,10 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                The value of the alarm state. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
+                The value of the alarm state. Possible values:
+                0 - OK;
+                1 - INSUFFICIENT_DATA;
+                2 - ALARM.
                 Alarm description:
                 `{#ALARM_DESCRIPTION}`
               valuemap:
@@ -4019,7 +4024,7 @@ zabbix_export:
                 value: '{$AWS.ELB.LLD.FILTER.TARGET.GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
+          description: 'Used for the discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
           item_prototypes:
             - uuid: 9438a03b48bd4617a2363f83f758f107
               name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Get metrics'
@@ -4299,7 +4304,7 @@ zabbix_export:
                   event_name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count = 0'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This trigger help in identifying when your targets have become unhealthy.'
+                  description: 'This trigger helps in identifying when your targets have become unhealthy.'
                   tags:
                     - tag: scope
                       value: availability
@@ -4335,7 +4340,7 @@ zabbix_export:
                   event_name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count > {$AWS.ELB.UNHEALTHY.HOST.MAX}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'This trigger allows you to become aware when there are no longer any registered targets.'
+                  description: 'This trigger allows you to become aware when there are no more registered targets.'
                   dependencies:
                     - name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy'
                       expression: 'last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0'
@@ -4414,7 +4419,7 @@ zabbix_export:
           description: 'Filter to exclude discovered target groups by name.'
         - macro: '{$AWS.ELB.UNHEALTHY.HOST.MAX}'
           value: '0'
-          description: 'Maximum number of Unhealthy Host for a trigger expression.'
+          description: 'Maximum number of unhealthy hosts for a trigger expression.'
         - macro: '{$AWS.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, no proxy is used.'
         - macro: '{$AWS.REGION}'
