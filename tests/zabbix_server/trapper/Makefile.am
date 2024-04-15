@@ -80,10 +80,13 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
+if HAVE_IPMI
+TRAPPER_LIBS += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
+endif
+
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
-	../../../src/libs/zbxtrapper/trapper_preproc.c  \
-	../../../src/libs/zbxtrapper/trapper_auth.c  \
+	../../../src/libs/zbxtrapper/trapper_preproc.c \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)
