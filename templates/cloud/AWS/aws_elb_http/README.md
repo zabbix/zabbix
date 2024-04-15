@@ -41,7 +41,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:"DescribeAlarms",
+              "cloudwatch:DescribeAlarms",
               "cloudwatch:GetMetricData",
               "elasticloadbalancing:DescribeTargetGroups"
           ],
@@ -66,8 +66,8 @@ If you are using role-based authorization, set the appropriate permissions:
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": [
-                "cloudwatch:"DescribeAlarms",
-                "cloudwatch:GetMetricData"
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:AssociateIamInstanceProfile",
                 "ec2:ReplaceIamInstanceProfileAssociation"
@@ -240,7 +240,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:"DescribeAlarms",
+              "cloudwatch:DescribeAlarms",
               "cloudwatch:GetMetricData",
               "elasticloadbalancing:DescribeTargetGroups"
           ],
@@ -265,8 +265,8 @@ If you are using role-based authorization, set the appropriate permissions:
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": [
-                "cloudwatch:"DescribeAlarms",
-                "cloudwatch:GetMetricData"
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:AssociateIamInstanceProfile",
                 "ec2:ReplaceIamInstanceProfileAssociation"
