@@ -420,6 +420,7 @@ $form->addItem([
 				->setHint('#{result_hint}', 'hintbox-wrap')
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass('item-test-result')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 	),
 	(new CTemplateTag('preprocessing-step-result-warning'))->addItem(
@@ -430,8 +431,9 @@ $form->addItem([
 				->setHint('#{result}', 'hintbox-wrap'),
 			makeWarningIcon('#{warning}')
 		]))
-			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: inline-flex;')
-	),
+			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass('item-test-result')
+		),
 	(new CTemplateTag('preprocessing-step-action-done'))->addItem(
 		(new CDiv([
 			'#{action_name} ',
