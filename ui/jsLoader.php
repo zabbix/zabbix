@@ -44,7 +44,6 @@ $available_js = [
 	'class.widget.misconfigured.js' => '',
 	'class.widget.paste-placeholder.js' => '',
 	'class.widget-field.checkbox-list.js' => '',
-	'class.widget-field.host-grouping.js' => '',
 	'class.widget-field.multiselect.js' => '',
 	'class.widget-field.time-period.js' => '',
 	'class.widget-select.popup.js' => '',

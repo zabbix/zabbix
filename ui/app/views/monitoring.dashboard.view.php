@@ -46,7 +46,6 @@ $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.widget-field.checkbox-list.js');
-$this->addJsFile('class.widget-field.host-grouping.js');
 $this->addJsFile('class.widget-field.multiselect.js');
 $this->addJsFile('class.widget-field.time-period.js');
 $this->addJsFile('class.widget-select.popup.js');

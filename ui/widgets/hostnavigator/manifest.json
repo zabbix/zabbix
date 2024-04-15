@@ -31,6 +31,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.hostnavigator.js", "class.widget.js"]
+		"js": ["class.hostnavigator.js", "class.widget.js", "class.widget-field.host-grouping.js"]
 	}
 }
