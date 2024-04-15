@@ -46,11 +46,11 @@ class CHostNavigator {
 	#container;
 
 	/**
-	 * Navigation tree container element.
+	 * Navigation tree instance.
 	 *
-	 * @type {HTMLElement}
+	 * @type {CNavigationTree|null}
 	 */
-	#navigation_tree;
+	#navigation_tree = null;
 
 	/**
 	 * Array of hosts. Grouped in tree structure if grouping provided.
@@ -112,10 +112,11 @@ class CHostNavigator {
 
 			this.#navigation_tree = new CNavigationTree(this.#nodes, {
 				selected_id: this.#selected_host_id,
-				show_problems: this.#config.show_problems
-			}).getContainer();
+				show_problems: this.#config.show_problems,
+				severity_names: this.#config.severity_names
+			});
 
-			this.#container.appendChild(this.#navigation_tree);
+			this.#container.appendChild(this.#navigation_tree.getContainer());
 
 			if (is_limit_exceeded) {
 				this.#createLimit(hosts.length);
@@ -310,7 +311,7 @@ class CHostNavigator {
 						if (host.problem_count[i] > 0) {
 							const new_group = {
 								...CHostNavigator.#getGroupTemplate(),
-								name: CNavigationTree.getSeverity(i).name,
+								name: this.#config.severity_names[i],
 								group_by: {
 									attribute: CHostNavigator.GROUP_BY_SEVERITY,
 									name: t('Severity')
@@ -509,8 +510,12 @@ class CHostNavigator {
 	 * Activate events of host navigator widget.
 	 */
 	#activateEvents() {
-		this.#navigation_tree.addEventListener(CNavigationTree.EVENT_ITEM_SELECT, this.#events.hostSelect);
-		this.#navigation_tree.addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE, this.#events.groupToggle);
+		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_ITEM_SELECT,
+			this.#events.hostSelect
+		);
+		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE,
+			this.#events.groupToggle
+		);
 	}
 
 	/**

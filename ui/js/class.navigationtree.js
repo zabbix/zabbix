@@ -92,20 +92,30 @@ class CNavigationTree {
 	#show_problems = true;
 
 	/**
+	 * Severity names.
+	 *
+	 * @type {Array}
+	 */
+	#severity_names = [];
+
+	/**
 	 * Create CNavigationTree instance.
 	 *
-	 * @param {Array}   nodes          Array of nodes data.
-	 * @param {string}  selected_id    ID of selected item. Empty string if none selected.
-	 * @param {boolean} show_problems  Whether to show problems or not.
+	 * @param {Array}   nodes           Array of nodes data.
+	 * @param {string}  selected_id     ID of selected item. Empty string if none selected.
+	 * @param {boolean} show_problems   Whether to show problems or not.
+	 * @param {Array}   severity_names  Severity names.
 	 *
 	 * @returns {CNavigationTree}
 	 */
 	constructor(nodes, {
 		selected_id = '',
-		show_problems = true
+		show_problems = true,
+		severity_names = []
 	} = {}) {
 		this.#selected_id = selected_id;
 		this.#show_problems = show_problems;
+		this.#severity_names = severity_names;
 
 		this.#tree_elements = {
 			nodes: [],
@@ -156,35 +166,35 @@ class CNavigationTree {
 	 *
 	 * @returns {Object}  Severity object with necessary info.
 	 */
-	static getSeverity(index) {
+	#getSeverity(index) {
 		const severities = {
 			[TRIGGER_SEVERITY_NOT_CLASSIFIED]: {
-				name: t('Not classified'),
+				name: this.#severity_names[TRIGGER_SEVERITY_NOT_CLASSIFIED],
 				class: ZBX_STYLE_NA_BG,
 				class_status: ZBX_STYLE_STATUS_NA_BG
 			},
 			[TRIGGER_SEVERITY_INFORMATION]: {
-				name: t('Information'),
+				name: this.#severity_names[TRIGGER_SEVERITY_INFORMATION],
 				class: ZBX_STYLE_INFO_BG,
 				class_status: ZBX_STYLE_STATUS_INFO_BG
 			},
 			[TRIGGER_SEVERITY_WARNING]: {
-				name: t('Warning'),
+				name: this.#severity_names[TRIGGER_SEVERITY_WARNING],
 				class: ZBX_STYLE_WARNING_BG,
 				class_status: ZBX_STYLE_STATUS_WARNING_BG
 			},
 			[TRIGGER_SEVERITY_AVERAGE]: {
-				name: t('Average'),
+				name: this.#severity_names[TRIGGER_SEVERITY_AVERAGE],
 				class: ZBX_STYLE_AVERAGE_BG,
 				class_status: ZBX_STYLE_STATUS_AVERAGE_BG
 			},
 			[TRIGGER_SEVERITY_HIGH]: {
-				name: t('High'),
+				name: this.#severity_names[TRIGGER_SEVERITY_HIGH],
 				class: ZBX_STYLE_HIGH_BG,
 				class_status: ZBX_STYLE_STATUS_HIGH_BG
 			},
 			[TRIGGER_SEVERITY_DISASTER]: {
-				name: t('Disaster'),
+				name: this.#severity_names[TRIGGER_SEVERITY_DISASTER],
 				class: ZBX_STYLE_DISASTER_BG,
 				class_status: ZBX_STYLE_STATUS_DISASTER_BG
 			}
@@ -454,7 +464,7 @@ class CNavigationTree {
 			const is_severity_allowed = node.severity_filter !== undefined ? i === node.severity_filter : true;
 
 			if (node.problem_count[i] > 0 && is_severity_allowed) {
-				const severity = CNavigationTree.getSeverity(i);
+				const severity = this.#getSeverity(i);
 
 				problems.push({
 					severity: severity.name,
