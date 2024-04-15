@@ -37,8 +37,10 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext(const DC_ITEM *item, const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(item);
+
 	if (0 == strcmp(param1, "proxy_history"))
 	{
 		if (1 != get_rparams_num(request))
