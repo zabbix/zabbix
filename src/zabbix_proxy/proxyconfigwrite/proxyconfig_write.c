@@ -1995,8 +1995,8 @@ static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tabl
 	return proxyconfig_update_rows(td, error);
 }
 
-static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_tables, struct zbx_json_parse *jp,
-		zbx_uint64_t *hostmap_revision, char **error)
+static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_tables, int full_sync,
+		struct zbx_json_parse *jp, zbx_uint64_t *hostmap_revision, char **error)
 {
 	if (NULL == jp->start)
 	{
@@ -2005,7 +2005,7 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 
 		zbx_dc_get_upstream_revision(&cfg_revision, &cfg_hostmap_revision);
 
-		if (0 != cfg_hostmap_revision)
+		if (0 != cfg_hostmap_revision || 0 != full_sync)
 		{
 			*hostmap_revision = 0;
 			if (ZBX_DB_OK <= zbx_db_execute("delete from host_proxy") &&
@@ -2041,11 +2041,6 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 	}
 
 	zbx_dc_set_proxy_failover_delay(tmp);
-
-	int	full_sync = 0;
-
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FULL_SYNC, tmp, sizeof(tmp), NULL))
-		full_sync = atoi(tmp);
 
 	return proxyconfig_sync_proxy_group(config_tables, jp, full_sync, error);
 }
@@ -2166,7 +2161,10 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 		ret = proxyconfig_delete_globalmacros(error);
 
 	if (SUCCEED == ret)
-		ret = proxyconfig_prepare_proxy_group(&config_tables, &jp_proxy_group, &hostmap_revision, error);
+	{
+		ret = proxyconfig_prepare_proxy_group(&config_tables, full_sync, &jp_proxy_group, &hostmap_revision,
+				error);
+	}
 
 	if (SUCCEED == ret)
 	{
