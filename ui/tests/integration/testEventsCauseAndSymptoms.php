@@ -331,7 +331,22 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			$trigger_id = $response['result']['triggerids'][0];
 			self::$trigger_ids[$i] = $trigger_id;
 		}
+	}
 
+	/**
+	 * Component configuration provider for server.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableGlobalScripts' => 1
+			]
+		];
+	}
+
+	private function createScripts() {
 		// create a script for testing cause events
 		$response = $this->call('script.create', [
 			'name' => self::TEST_CAUSE_EVENTS_SCRIPT_NAME,
@@ -356,19 +371,6 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider for server.
-	 *
-	 * @return array
-	 */
-	public function serverConfigurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'EnableGlobalScripts' => 1
-			]
-		];
-	}
-
-	/**
 	 * Start 5 events/problems. All events/problems are expected to be causes with no symptoms.
 	 *
 	 * Expected result:
@@ -384,6 +386,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 */
 	public function testEventsCauseAndSymptoms_startEvents()
 	{
+		$this->createScripts();
 		// start events/problems
 		for ($i = 1; $i <= self::EVENT_COUNT ; $i++) {
 			$item_key = self::TRAPPER_ITEM_KEY_PREFIX . (string) $i;
