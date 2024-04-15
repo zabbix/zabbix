@@ -19,9 +19,19 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldHostGrouping;
+namespace Widgets\HostNavigator\Includes;
 
-use Widgets\HostNavigator\Includes\WidgetForm;
+use CButton,
+	CButtonLink,
+	CCol,
+	CDiv,
+	CRow,
+	CSelect,
+	CSpan,
+	CTable,
+	CTemplateTag,
+	CTextBox,
+	CWidgetFieldView;
 
 class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 

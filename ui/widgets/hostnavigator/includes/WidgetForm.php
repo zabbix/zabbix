@@ -30,7 +30,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldHostPatternSelect,
 	CWidgetFieldIntegerBox,
-	CWidgetFieldHostGrouping,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,

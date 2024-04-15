@@ -19,15 +19,13 @@
 **/
 
 
-namespace Zabbix\Widgets\Fields;
+namespace Widgets\HostNavigator\Includes;
 
 use Zabbix\Widgets\CWidgetField;
 
-use Widgets\HostNavigator\Includes\WidgetForm;
-
 class CWidgetFieldHostGrouping extends CWidgetField {
 
-	public const DEFAULT_VIEW = \CWidgetFieldHostGroupingView::class;
+	public const DEFAULT_VIEW = CWidgetFieldHostGroupingView::class;
 	public const DEFAULT_VALUE = [];
 	public const MAX_ROWS = 10;
 
