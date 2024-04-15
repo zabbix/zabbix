@@ -28,7 +28,10 @@ use API,
 	CProfile,
 	CSeverityHelper;
 
-use Widgets\HostNavigator\Includes\WidgetForm;
+use Widgets\HostNavigator\Includes\{
+	CWidgetFieldHostGrouping,
+	WidgetForm
+};
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -88,13 +91,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
 			switch ($group_by_attribute['attribute']) {
-				case WidgetForm::GROUP_BY_TAG_VALUE:
+				case CWidgetFieldHostGrouping::GROUP_BY_TAG_VALUE:
 					$tags_to_keep[] = $group_by_attribute['tag_name'];
 					break;
-				case WidgetForm::GROUP_BY_HOST_GROUP:
+				case CWidgetFieldHostGrouping::GROUP_BY_HOST_GROUP:
 					$group_by_host_groups = true;
 					break;
-				case WidgetForm::GROUP_BY_SEVERITY:
+				case CWidgetFieldHostGrouping::GROUP_BY_SEVERITY:
 					$group_by_severity = true;
 					break;
 			}
@@ -277,8 +280,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$severity_names = [];
 
-		if (in_array(WidgetForm::GROUP_BY_SEVERITY, array_column($this->fields_values['group_by'], 'attribute'))
-				|| $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
+		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE
+				|| in_array(CWidgetFieldHostGrouping::GROUP_BY_SEVERITY,
+					array_column($this->fields_values['group_by'], 'attribute')
+				)) {
 			foreach (CSeverityHelper::getSeverities() as $severity) {
 				$severity_names[$severity['value']] = $severity['label'];
 			}

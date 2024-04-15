@@ -27,6 +27,9 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 	public const DEFAULT_VIEW = CWidgetFieldHostGroupingView::class;
 	public const DEFAULT_VALUE = [];
+	public const GROUP_BY_HOST_GROUP = 0;
+	public const GROUP_BY_TAG_VALUE = 1;
+	public const GROUP_BY_SEVERITY = 2;
 	public const MAX_ROWS = 10;
 
 	public function __construct(string $name, string $label = null) {
@@ -35,7 +38,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'length' => self::MAX_ROWS, 'fields' => [
-				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_TAG_VALUE, WidgetForm::GROUP_BY_SEVERITY])],
+				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::GROUP_BY_HOST_GROUP, self::GROUP_BY_TAG_VALUE, self::GROUP_BY_SEVERITY])],
 				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()]
 			]]);
 	}
@@ -48,7 +51,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 		}
 
 		foreach ($this->getValue() as $value) {
-			if ($value['attribute'] != WidgetForm::GROUP_BY_TAG_VALUE) {
+			if ($value['attribute'] != self::GROUP_BY_TAG_VALUE) {
 				continue;
 			}
 
@@ -63,7 +66,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 		foreach ($this->getValue() as $value) {
 			$attribute = $value['attribute'];
-			$tag_name = $attribute == WidgetForm::GROUP_BY_TAG_VALUE ? $value['tag_name'] : '';
+			$tag_name = $attribute == self::GROUP_BY_TAG_VALUE ? $value['tag_name'] : '';
 
 			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('rows must be unique'));
@@ -86,7 +89,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 				'value' => $value['attribute']
 			];
 
-			if ($value['attribute'] == WidgetForm::GROUP_BY_TAG_VALUE) {
+			if ($value['attribute'] == self::GROUP_BY_TAG_VALUE) {
 				$widget_fields[] = [
 					'type' => $this->save_type,
 					'name' => $this->name.'.'.$index.'.'.'tag_name',

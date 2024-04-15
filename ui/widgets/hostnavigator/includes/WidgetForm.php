@@ -50,10 +50,6 @@ class WidgetForm extends CWidgetForm {
 	public const PROBLEMS_UNSUPPRESSED = 1;
 	public const PROBLEMS_NONE = 2;
 
-	public const GROUP_BY_HOST_GROUP = 0;
-	public const GROUP_BY_TAG_VALUE = 1;
-	public const GROUP_BY_SEVERITY = 2;
-
 	private const LINES_MIN = 1;
 	private const LINES_MAX = 9999;
 	private const LINES_DEFAULT = 100;

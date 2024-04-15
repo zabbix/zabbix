@@ -75,9 +75,9 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 					(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
 						->addOptions(CSelect::createOptionsFromArray([
-							WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
-							WidgetForm::GROUP_BY_TAG_VALUE => _('Tag value'),
-							WidgetForm::GROUP_BY_SEVERITY => _('Severity')
+							CWidgetFieldHostGrouping::GROUP_BY_HOST_GROUP => _('Host group'),
+							CWidgetFieldHostGrouping::GROUP_BY_TAG_VALUE => _('Tag value'),
+							CWidgetFieldHostGrouping::GROUP_BY_SEVERITY => _('Severity')
 						]))
 						->setValue('#{attribute}')
 						->setId($this->field->getName().'_#{rowNum}_attribute')
