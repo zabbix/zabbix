@@ -81,7 +81,6 @@ class CWidgetFieldHostGroupingView extends CWidgetFieldView {
 						]))
 						->setValue('#{attribute}')
 						->setId($this->field->getName().'_#{rowNum}_attribute')
-						->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CCol(
 						(new CTextBox($this->field->getName().'[#{rowNum}][tag_name]', '#{tag_name}', false))
