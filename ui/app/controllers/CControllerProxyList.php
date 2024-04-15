@@ -110,8 +110,8 @@ class CControllerProxyList extends CController {
 			'output' => ['proxyid', 'name', 'proxy_groupid', 'operating_mode', 'lastaccess', 'tls_connect',
 				'tls_accept', 'version', 'compatibility', 'state'
 			],
-			'selectAssignedHosts' => ['hostid', 'name', 'status'],
-			'selectHosts' => ['hostid', 'name', 'status'],
+			'selectAssignedHosts' => ['hostid', 'name', 'monitored_by', 'status'],
+			'selectHosts' => ['hostid', 'name', 'monitored_by', 'status'],
 			'selectProxyGroup' => ['name'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,

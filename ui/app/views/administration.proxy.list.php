@@ -171,11 +171,16 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			break;
 	}
 
+	$can_enable_disable_hosts = false;
 	$host_count_total = '';
 	$hosts = [];
 
 	if ($proxy['hosts']) {
 		foreach ($proxy['hosts'] as $host) {
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				$can_enable_disable_hosts = true;
+			}
+
 			$hosts[] = $data['user']['can_edit_hosts']
 				? (new CLink($host['name']))
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
@@ -196,7 +201,8 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 	}
 
 	$proxy_list->addRow([
-		new CCheckBox('proxyids['.$proxyid.']', $proxyid),
+		(new CCheckBox('proxyids['.$proxyid.']', $proxyid))
+			->setAttribute('data-actions', $can_enable_disable_hosts ? 'enable_hosts disable_hosts' : null),
 		(new CCol([
 			$proxy_name_prefix,
 			(new CLink($proxy['name']))
@@ -232,12 +238,14 @@ $form->addItem(
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-proxy-host')
 				->addClass('js-no-chkbxrange')
+				->setAttribute('data-required', 'enable_hosts')
 		],
 		'proxy.host.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-proxy-host')
 				->addClass('js-no-chkbxrange')
+				->setAttribute('data-required', 'disable_hosts')
 		],
 		'proxy.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
