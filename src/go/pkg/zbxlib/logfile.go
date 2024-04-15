@@ -180,10 +180,10 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
-		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
+		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, unsigned long *timestamp, const char *source, unsigned short *severity,
+		unsigned long *logeventid, unsigned char flags)
 {
 	ZBX_UNUSED(addrs);
 
