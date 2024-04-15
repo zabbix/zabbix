@@ -27,9 +27,11 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 
 	public const DEFAULT_VIEW = CWidgetFieldHostGroupingView::class;
 	public const DEFAULT_VALUE = [];
+
 	public const GROUP_BY_HOST_GROUP = 0;
 	public const GROUP_BY_TAG_VALUE = 1;
 	public const GROUP_BY_SEVERITY = 2;
+
 	public const MAX_ROWS = 10;
 
 	public function __construct(string $name, string $label = null) {
