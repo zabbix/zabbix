@@ -447,12 +447,6 @@ $translate_strings = [
 		'URL opening confirmation' => _('URL opening confirmation')
 	],
 	'class.navigationtree.js' => [
-		'Not classified' => _('Not classified'),
-		'Information' => _('Information'),
-		'Warning' => _('Warning'),
-		'Average' => _('Average'),
-		'High' => _('High'),
-		'Disaster' => _('Disaster'),
 		'Maintenance with data collection' => _('Maintenance with data collection'),
 		'Maintenance without data collection' => _('Maintenance without data collection')
 	]

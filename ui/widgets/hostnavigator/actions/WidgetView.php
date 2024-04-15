@@ -25,7 +25,8 @@ use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CProfile;
+	CProfile,
+	CSeverityHelper;
 
 use Widgets\HostNavigator\Includes\WidgetForm;
 
@@ -274,10 +275,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
+		$severity_names = [];
+
+		if (in_array(WidgetForm::GROUP_BY_SEVERITY, array_column($this->fields_values['group_by'], 'attribute'))
+				|| $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
+			foreach (CSeverityHelper::getSeverities() as $severity) {
+				$severity_names[$severity['value']] = $severity['label'];
+			}
+		}
+
 		return [
 			'group_by' => $this->fields_values['group_by'],
 			'open_groups' => $open_groups,
-			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE
+			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
+			'severity_names' => $severity_names
 		];
 	}
 }
