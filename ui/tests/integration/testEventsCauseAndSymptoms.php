@@ -378,6 +378,9 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (3)
 	 * [C] (4)
 	 * [C] (5)
+	 *
+	 * @configurationDataProvider serverConfigurationProvider
+	 *
 	 */
 	public function testEventsCauseAndSymptoms_startEvents()
 	{
