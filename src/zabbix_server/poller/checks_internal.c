@@ -348,7 +348,8 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 			result->ui64 = 2 - result->ui64;
 		}
-		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
+		else if (0 == strcmp(tmp, "maintenance") &&
+				(0 != (program_type & ZBX_PROGRAM_TYPE_SERVER)))	/* zabbix["host",,"maintenance"] */
 		{
 			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
@@ -362,7 +363,8 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			else
 				SET_UI64_RESULT(result, 0);
 		}
-		else if (0 == strcmp(tmp, "items"))	/* zabbix["host",,"items"] */
+		else if (0 == strcmp(tmp, "items") &&
+				(0 != (program_type & ZBX_PROGRAM_TYPE_SERVER)))	/* zabbix["host",,"items"] */
 		{
 			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
@@ -373,7 +375,8 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 			SET_UI64_RESULT(result, DCget_item_count(item->host.hostid));
 		}
-		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
+		else if (0 == strcmp(tmp, "items_unsupported") &&
+				(0 != (program_type & ZBX_PROGRAM_TYPE_SERVER)))	/* zabbix["host",,"items_unsupported"] */
 		{
 			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
