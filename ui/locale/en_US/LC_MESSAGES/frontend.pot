@@ -7232,6 +7232,12 @@ msgstr ""
 msgid "Dropdown options"
 msgstr ""
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
 msgstr ""
@@ -8634,6 +8640,18 @@ msgstr ""
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
+msgstr ""
+
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
 msgstr ""
 
 #: app/views/popup.proxy.edit.php:199
@@ -23116,6 +23134,10 @@ msgstr ""
 msgid "Zabbix login form"
 msgstr ""
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr ""
@@ -24079,6 +24101,10 @@ msgstr ""
 #: include/views/configuration.item.edit.php:923
 msgctxt "item_form"
 msgid "global housekeeping settings"
+msgstr ""
+
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
 msgstr ""
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
