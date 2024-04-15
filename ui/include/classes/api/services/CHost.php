@@ -2651,7 +2651,7 @@ class CHost extends CHostGeneral {
 				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 					$host += array_intersect_key($db_hosts[$host['hostid']], array_flip(['proxyid']));
 				}
-				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
 					$host += array_intersect_key($db_hosts[$host['hostid']], array_flip(['proxy_groupid']));
 				}
 			}
