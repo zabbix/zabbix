@@ -659,7 +659,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 		while (pELR < pEndOfRecords)
 		{
-			int	refresh;
+			int	delay;
 			/* to prevent mismatch in comparing with RecordNumber in case of wrap-around, */
 			/* we look for using '=' */
 			if (0 != timestamp || (DWORD)FirstID == ((PEVENTLOGRECORD)pELR)->RecordNumber)
@@ -809,15 +809,15 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 					}
 				}
 
-				if (0 >= (refresh = (int)time(NULL) - metric->nextcheck))
-					refresh = 1;
+				if (0 >= (delay = metric->nextcheck - (int)time(NULL)))
+					delay = 1;
 
 				/* do not flood Zabbix server if file grows too fast */
-				if (s_count >= (rate * refresh))
+				if (s_count >= (rate * delay))
 					break;
 
 				/* do not flood local system if file grows too fast */
-				if (p_count >= (4 * rate * refresh))
+				if (p_count >= (4 * rate * delay))
 					break;
 			}
 

@@ -921,7 +921,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 		for (i = 0; i < required_buf_size; i++)
 		{
-			int	gather_evt_msg = 1, refresh;
+			int	gather_evt_msg = 1, delay;
 
 			if (EVT_LOG_COUNT_ITEM == evt_item_type && 1 > strlen(pattern))
 				gather_evt_msg = 0;
@@ -1080,15 +1080,15 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 				}
 			}
 
-			if (0 >= (refresh = (int)time(NULL) - metric->nextcheck))
-					refresh = 1;
+			if (0 >= (delay = metric->nextcheck - (int)time(NULL)))
+					delay = 1;
 
 			/* do not flood Zabbix server if file grows too fast */
-			if (s_count >= (rate * refresh))
+			if (s_count >= (rate * delay))
 				break;
 
 			/* do not flood local system if file grows too fast */
-			if (p_count >= (4 * rate * refresh))
+			if (p_count >= (4 * rate * delay))
 				break;
 		}
 

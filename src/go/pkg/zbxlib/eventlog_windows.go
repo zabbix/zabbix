@@ -134,13 +134,14 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(itemid);
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(mtime);
@@ -157,13 +158,14 @@ int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 
 	return SUCCEED;
 }
-int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(itemid);
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(mtime);
