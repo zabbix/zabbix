@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for action notifications
  *
  * @required-components server
- * @configurationDataProvider serverConfigurationProvider
  * @backup items,actions,triggers,alerts,hosts,users,scripts,history_uint
  * @hosts test_actions
  */
