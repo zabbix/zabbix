@@ -1697,7 +1697,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		{
 			ret = process_log_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
 					&mtime_sent, &error, &pre_persistent_vec, config_tls, config_timeout,
-					config_source_ip, config_hostname, 0, config_buffer_send, config_buffer_size,
+					config_source_ip, config_hostname, config_buffer_send, config_buffer_size,
 					config_max_lines_per_second);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))

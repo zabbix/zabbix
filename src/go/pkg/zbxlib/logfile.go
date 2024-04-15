@@ -212,8 +212,8 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
 		zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		int *mtime_sent, char **error, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, zbx_uint64_t itemid,
-		int config_buffer_send, int config_buffer_size, int config_max_lines_per_second)
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send, int config_buffer_size,
+		 int config_max_lines_per_second)
 {
 	int	ret;
 	zbx_vector_pre_persistent_t	vect;
@@ -229,8 +229,8 @@ static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_
 	zbx_vector_pre_persistent_create(&vect);
 
 	ret = process_log_check(NULL, agent2_result, regexps, metric, process_value_cb, lastlogsize_sent, mtime_sent, error,
-		&vect, config_tls, config_timeout, config_source_ip, config_hostname, itemid, config_buffer_send,
-		config_buffer_size, config_max_lines_per_second);
+		&vect, config_tls, config_timeout, config_source_ip, config_hostname, config_buffer_send, config_buffer_size,
+		config_max_lines_per_second);
 
 #if !defined(__MINGW32__)
 	sigaction(SIGSEGV, &sa_old, NULL);
@@ -447,7 +447,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, nextcheck int, cblob un
 		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, ctlsConfig_p, (C.int)(agent.Options.Timeout),
-		cSourceIP, cHostname, C.zbx_uint64_t(itemid), (C.int)(agent.Options.BufferSend),
+		cSourceIP, cHostname, (C.int)(agent.Options.BufferSend),
 		(C.int)(agent.Options.BufferSize), (C.zbx_config_max_lines_per_second))
 
 	// add cached results

@@ -3840,8 +3840,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		zbx_vector_expression_t *regexps, zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		const char *config_hostname, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size,
-		int config_max_lines_per_second)
+		const char *config_hostname, int config_buffer_send, int config_buffer_size, int config_max_lines_per_second)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4077,7 +4076,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, config_hostname,
 			metric->key, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type, metric->persistent_file_name, prep_vec, config_tls, config_timeout,
-			config_source_ip, itemid, config_buffer_send, config_buffer_size);
+			config_source_ip, metric->itemid, config_buffer_send, config_buffer_size);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
