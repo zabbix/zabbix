@@ -41,7 +41,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1713164933374") format("woff2"), url("../fonts/zabbix-icons.woff?t=1713164933374") format("woff"), url("../fonts/zabbix-icons.ttf?t=1713164933374") format("truetype"), url("../fonts/zabbix-icons.svg?t=1713164933374#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1713182914816") format("woff2"), url("../fonts/zabbix-icons.woff?t=1713182914816") format("woff"), url("../fonts/zabbix-icons.ttf?t=1713182914816") format("truetype"), url("../fonts/zabbix-icons.svg?t=1713182914816#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .z-select .focusable::after,
 z-select .focusable::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
@@ -1330,6 +1330,9 @@ button {
   .btn-debug.visible {
     opacity: 0.75; }
 
+.zi-filter-large::before, .zi-search-large::before {
+  font-size: 45px; }
+
 .sidebar .sidebar-header-buttons .btn-icon::before, .zi-chevron-down::before, .zi-chevron-down-small::before,
 .zi-chevron-left::before,
 .zi-chevron-right::before,
@@ -1373,9 +1376,6 @@ button {
 .zi-bullet-right-with-content.btn-icon {
   color: #dddddd; }
 
-.zi-filter-large::before {
-  font-size: 45px; }
-
 .zi-help-filled-small::before {
   padding: 1px;
   border-radius: 50%; }
@@ -1395,9 +1395,6 @@ button {
 .zi-i-warning, .zi-i-warning.btn-icon {
   color: #000000;
   background-color: #ffa20d; }
-
-.zi-search-large::before {
-  font-size: 45px; }
 
 .checkbox-list {
   display: grid;
