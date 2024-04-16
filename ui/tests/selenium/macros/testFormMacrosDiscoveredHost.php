@@ -452,12 +452,11 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	/**
 	 * @dataProvider getRemoveInheritedMacrosData
 	 */
-	// TODO: Uncomment this test when ZBX-23397 is ready.
-//	public function testFormMacrosDiscoveredHost_RemoveInheritedMacro($data) {
-//		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null,
-//				self::$hosts[1]['name']
-//		);
-//	}
+	public function testFormMacrosDiscoveredHost_RemoveInheritedMacro($data) {
+		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null,
+				self::$hosts[1]['name']
+		);
+	}
 
 	/**
 	 * @dataProvider getSecretMacrosLayoutData
@@ -545,10 +544,9 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
-	// TODO: Uncomment this test when ZBX-23397 is ready.
-//	public function testFormMacrosDiscoveredHost_UpdateSecretMacros($data) {
-//		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[4]['name'], true);
-//	}
+	public function testFormMacrosDiscoveredHost_UpdateSecretMacros($data) {
+		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', self::$hosts[4]['name'], true);
+	}
 
 	/**
 	 * Check Vault macros validation.
