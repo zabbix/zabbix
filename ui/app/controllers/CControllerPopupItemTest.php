@@ -510,13 +510,29 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		if (in_array($this->item_type, $this->items_support_proxy)) {
-			if (array_key_exists('data', $input)) {
-				$data_host += CArrayHelper::getByKeys($input['data'], ['proxyid']);
+			if (array_key_exists('data', $input) && array_key_exists('test_with', $input['data'])) {
+				$test_with = $input['data']['test_with'];
+			}
+			elseif (array_key_exists('test_with', $input)) {
+				$test_with = $input['test_with'];
+			}
+			else {
+				$test_with = self::TEST_WITH_SERVER;
 			}
 
-			$data_host += CArrayHelper::getByKeys($input, ['proxyid'])
-				+ CArrayHelper::getByKeys($this->host, ['proxyid'])
-				+ ['proxyid' => '0'];
+			$data_host['proxyid'] = 0;
+
+			if ($test_with == self::TEST_WITH_PROXY) {
+				if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
+					$data_host['proxyid'] = $input['data']['proxyid'];
+				}
+				elseif (array_key_exists('proxyid', $input)) {
+					$data_host['proxyid'] = $input['proxyid'];
+				}
+				elseif ($this->host['status'] != HOST_STATUS_TEMPLATE) {
+					$data_host['proxyid'] = $this->host['proxyid'];
+				}
+			}
 		}
 
 		return ['item' => $data_item, 'host' => $data_host];
