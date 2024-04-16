@@ -217,18 +217,9 @@ foreach ($data['users'] as $user) {
 			->setArgument('action', 'user.edit')
 			->setArgument('userid', $userid)
 	);
-	$btn_actions = [];
 
 	if ($user['userdirectoryid'] && $data['idp_names'][$user['userdirectoryid']]['idp_type'] == IDP_TYPE_LDAP) {
-		$btn_actions[] = 'ldap';
-	}
-
-	if (array_key_exists('totp_enabled', $user) && $user['totp_enabled']) {
-		$btn_actions[] = 'totp';
-	}
-
-	if ($btn_actions) {
-		$checkbox->setAttribute('data-actions', implode(' ', $btn_actions));
+		$checkbox->setAttribute('data-actions', 'ldap');
 	}
 
 	if ($user['userdirectoryid']) {
@@ -317,10 +308,10 @@ $form->addItem([
 		],
 		'user.reset.totp' => [
 			'name' => _('Reset TOTP secret'),
-			'attributes' => ['data-required' => 'totp'],
 			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
 			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
-			'csrf_token' => $csrf_token
+			'csrf_token' => $csrf_token,
+			'disabled' => CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_DISABLED
 		],
 		'user.unblock' => [
 			'name' => _('Unblock'),

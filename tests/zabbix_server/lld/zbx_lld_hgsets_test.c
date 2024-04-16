@@ -83,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 	int				i, param_num = 0;
 	zbx_mock_error_t 		error;
 	zbx_mock_handle_t		vector, element;
-	zbx_vector_ptr_t		hosts;
+	zbx_vector_lld_host_ptr_t	hosts;
 	zbx_vector_lld_hgset_ptr_t	hgsets;
 	zbx_vector_uint64_t		del_hgsetids_act, del_hgsetids_exp;
 	zbx_lld_host_t			*host;
@@ -95,7 +95,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_uint64_create(&del_hgsetids_act);
 	zbx_vector_uint64_create(&del_hgsetids_exp);
 	zbx_vector_lld_hgset_ptr_create(&hgsets);
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_lld_host_ptr_create(&hosts);
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("hosts", &vector)))
 		fail_msg("Cannot get description of in.hosts from test case data: %s", zbx_mock_error_string(error));
@@ -125,7 +125,7 @@ void	zbx_mock_test_entry(void **state)
 			}
 		}
 
-		zbx_vector_ptr_append(&hosts, host);
+		zbx_vector_lld_host_ptr_append(&hosts, host);
 	}
 
 	if (ZBX_MOCK_END_OF_VECTOR != error)
@@ -249,8 +249,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_vector_uint64_eq("del_hgsetids", &del_hgsetids_exp, &del_hgsetids_act);
 
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)host_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_lld_host_ptr_clear_ext(&hosts, host_free);
+	zbx_vector_lld_host_ptr_destroy(&hosts);
 
 	zbx_vector_lld_hgset_ptr_clear_ext(&hgsets, lld_hgset_free);
 	zbx_vector_lld_hgset_ptr_destroy(&hgsets);

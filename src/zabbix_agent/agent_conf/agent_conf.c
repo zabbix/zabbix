@@ -226,10 +226,10 @@ static int	load_config_user_params(const char *config_file, char **config_user_p
 	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,		MIN,			MAX */
+				MANDATORY,		MIN,			MAX */
 		{"UserParameter",		&config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
-		{NULL}
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{0}
 	};
 
 	return zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
