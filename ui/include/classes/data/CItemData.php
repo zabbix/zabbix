@@ -2874,7 +2874,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[proxy,discovery]' => [
-				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), state (unknown/offline/online), proxy group name if proxy belongs to group. Returns JSON.'),
+				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.discovery'
@@ -2902,7 +2902,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[proxy group,<name>,proxies]' => [
-				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), state (unknown/offline/online), proxy group name if proxy belongs to group. Returns JSON.'),
+				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.group'
