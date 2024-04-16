@@ -1,15 +1,18 @@
-BINARIES_tests = \
-	init_library_common
+if SERVER
+SERVER_tests = \
+	zbx_variant_compare
+endif
 
-noinst_PROGRAMS = $(BINARIES_tests)
+noinst_PROGRAMS = $(SERVER_tests)
 
+if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-# 2) zbxcommon should not depend on any other zabbix library
+# 1) zbxvariant depends on zbxalgo, zbxstr, zbxnum and zbxcommon
+# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
-# 1) mockdata needs zbxalgo, zbxstr, zbxnum and zbxcommon
+# 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 
 COMMON_LIB_DEPS = \
@@ -23,6 +26,7 @@ COMMON_LIB_DEPS = \
 
 MOCK_DATA_DEPS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
@@ -38,24 +42,30 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(COMMON_LIB_DEPS)
 
-
-COMMON_LIB_FILES = \
+VARIANT_LIB_FILES = \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(COMMON_LIB_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
+VARIANT_COMPILER_FLAGS = \
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS)
 
-COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
-
-init_library_common_SOURCES = \
-	init_library_common.c \
+zbx_variant_compare_SOURCES = \
+	zbx_variant_compare.c \
 	$(COMMON_SRC_FILES)
 
-init_library_common_LDADD = $(COMMON_LIB_FILES)
+zbx_variant_compare_LDADD = \
+	$(VARIANT_LIB_FILES)
 
-init_library_common_LDADD += @SERVER_LIBS@
+zbx_variant_compare_LDADD += @SERVER_LIBS@
 
-init_library_common_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-init_library_common_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_variant_compare_CFLAGS = $(VARIANT_COMPILER_FLAGS)
 
+endif

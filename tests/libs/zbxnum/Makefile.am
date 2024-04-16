@@ -1,13 +1,15 @@
 BINARIES_tests = \
-	init_library_common
+	is_double \
+	zbx_trim_float \
+	zbx_trim_integer
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-# 2) zbxcommon should not depend on any other zabbix library
+# 1) zbxnum depends only on zbxcommon
+# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 #
 # 1) mockdata needs zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
@@ -38,24 +40,53 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(COMMON_LIB_DEPS)
 
-
-COMMON_LIB_FILES = \
+NUM_LIB_FILES = \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(COMMON_LIB_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
+NUM_COMPILER_FLAGS = \
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS)
 
-COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
-
-init_library_common_SOURCES = \
-	init_library_common.c \
+is_double_SOURCES = \
+	is_double.c \
 	$(COMMON_SRC_FILES)
 
-init_library_common_LDADD = $(COMMON_LIB_FILES)
+is_double_LDADD = \
+	$(NUM_LIB_FILES)
 
-init_library_common_LDADD += @SERVER_LIBS@
+is_double_LDADD += @SERVER_LIBS@
 
-init_library_common_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+is_double_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-init_library_common_CFLAGS = $(COMMON_COMPILER_FLAGS)
+is_double_CFLAGS = $(NUM_COMPILER_FLAGS)
 
+
+zbx_trim_float_SOURCES = \
+	zbx_trim_float.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_float_LDADD = \
+	$(NUM_LIB_FILES)
+
+zbx_trim_float_LDADD += @SERVER_LIBS@
+
+zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_trim_float_CFLAGS = $(NUM_COMPILER_FLAGS)
+
+
+zbx_trim_integer_SOURCES = \
+	zbx_trim_integer.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_integer_LDADD = \
+	$(NUM_LIB_FILES)
+
+zbx_trim_integer_LDADD += @SERVER_LIBS@
+
+zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_trim_integer_CFLAGS = $(NUM_COMPILER_FLAGS)
