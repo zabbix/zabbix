@@ -41,7 +41,8 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const DC_ITEM *item, const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext(const DC_ITEM *item, const char *param1, const AGENT_REQUEST *request,
+	AGENT_RESULT *result)
 {
 	int	nparams, ret = NOTSUPPORTED;
 	char	*param2, *param3;
@@ -239,7 +240,7 @@ int	zbx_get_value_internal_ext(const DC_ITEM *item, const char *param1, const AG
 
 		SET_TEXT_RESULT(result, nodes);
 	}
-	else  if (0 == strcmp(param1, "host")) /* zabbix["host",*] */
+	else if (0 == strcmp(param1, "host")) /* zabbix["host",*] */
 	{
 		if (3 != nparams)
 		{
