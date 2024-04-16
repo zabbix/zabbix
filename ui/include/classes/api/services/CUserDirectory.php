@@ -1404,7 +1404,10 @@ class CUserDirectory extends CApiService {
 		$del_user_groupids = [];
 
 		foreach ($provision_groups as &$provision_group) {
-			$db_user_groups = $db_provision_groups !== null ? array_column($db_provision_groups, null, 'usrgrpid') : [];
+			$idpgroupid = $provision_group['userdirectory_idpgroupid'];
+			$db_user_groups = $db_provision_groups !== null && array_key_exists($idpgroupid, $db_provision_groups)
+				? array_column($db_provision_groups[$idpgroupid]['user_groups'], null, 'usrgrpid')
+				: [];
 
 			foreach ($provision_group['user_groups'] as &$user_group) {
 				if (array_key_exists($user_group['usrgrpid'], $db_user_groups)) {
