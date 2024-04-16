@@ -114,7 +114,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 			}
 
 			zbx_db_begin();
-			zbx_process_events(NULL, NULL);
+			zbx_process_events(NULL, NULL, NULL);
 			zbx_db_commit();
 
 			zbx_clean_events();
@@ -144,13 +144,13 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	if (ZBX_FLAGS_ITEM_DIFF_UNSET != diff.flags)
 	{
-		zbx_vector_ptr_t	diffs;
-		char			*sql = NULL;
-		size_t			sql_alloc = 0, sql_offset = 0;
+		zbx_vector_item_diff_ptr_t	diffs;
+		char				*sql = NULL;
+		size_t				sql_alloc = 0, sql_offset = 0;
 
-		zbx_vector_ptr_create(&diffs);
+		zbx_vector_item_diff_ptr_create(&diffs);
 		diff.itemid = itemid;
-		zbx_vector_ptr_append(&diffs, &diff);
+		zbx_vector_item_diff_ptr_append(&diffs, &diff);
 
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
@@ -160,7 +160,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 		zbx_dc_config_items_apply_changes(&diffs);
 
-		zbx_vector_ptr_destroy(&diffs);
+		zbx_vector_item_diff_ptr_destroy(&diffs);
 		zbx_free(sql);
 	}
 

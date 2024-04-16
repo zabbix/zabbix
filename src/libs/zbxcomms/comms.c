@@ -48,10 +48,6 @@
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
 
-#ifdef HAVE_OPENSSL
-extern ZBX_THREAD_LOCAL char	info_buf[256];
-#endif
-
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size, short *events);
@@ -1541,6 +1537,8 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
 
 	for (i = 0; i < s->num_socks; i++)
 		zbx_socket_close(s->sockets[i]);
+
+	zbx_socket_clean(s);
 }
 
 /******************************************************************************

@@ -184,6 +184,10 @@ window.script_edit_popup = new class {
 	clone({title, buttons}) {
 		this.scriptid = null;
 
+		for (const input of this.form.querySelectorAll('input[name=scope]')) {
+			input.disabled = false;
+		}
+
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();

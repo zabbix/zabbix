@@ -28,6 +28,18 @@
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
+static int	sig_parent_pid = -1;
+
+void	set_sig_parent_pid(int in)
+{
+	sig_parent_pid = in;
+}
+
+int	get_sig_parent_pid(void)
+{
+	return sig_parent_pid;
+}
+
 typedef struct
 {
 	int	sig;
@@ -38,10 +50,10 @@ typedef struct
 }
 zbx_siginfo_t;
 
-int				sig_parent_pid = -1;
 static volatile sig_atomic_t	sig_exiting;
 static volatile sig_atomic_t	sig_exit_on_terminate = 1;
 static zbx_on_exit_t		zbx_on_exit_cb = NULL;
+static void 			*zbx_on_exit_args = NULL;
 
 static zbx_siginfo_t	siginfo_exit = {-1, -1, -1, -1, -1};
 
@@ -209,7 +221,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 != sig_exit_on_terminate)
 			{
 				zbx_log_exit_signal();
-				zbx_on_exit_cb(SUCCEED);
+				zbx_on_exit_cb(SUCCEED, zbx_on_exit_args);
 			}
 		}
 	}
@@ -371,4 +383,9 @@ void	zbx_unblock_signals(const sigset_t *orig_mask)
 {
 	if (0 > zbx_sigmask(SIG_SETMASK, orig_mask, NULL))
 		zabbix_log(LOG_LEVEL_WARNING,"cannot restore signal mask");
+}
+
+void	zbx_set_on_exit_args(void *args)
+{
+	zbx_on_exit_args = args;
 }

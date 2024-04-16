@@ -47,7 +47,7 @@ void	zbx_audit_httptest_create_entry(int audit_context_mode, int audit_action, z
 		zbx_audit_entry_t	*local_audit_httptest_entry_insert;
 
 		local_audit_httptest_entry_insert = zbx_audit_entry_init(httptestid, AUDIT_HTTPTEST_ID, name,
-				audit_action, AUDIT_RESOURCE_SCENARIO);
+				audit_action, ZBX_AUDIT_RESOURCE_SCENARIO);
 
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_httptest_entry_insert,
 				sizeof(local_audit_httptest_entry_insert));

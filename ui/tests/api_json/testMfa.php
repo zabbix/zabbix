@@ -22,9 +22,9 @@
 require_once dirname(__FILE__) . '/../include/CAPITest.php';
 
 /**
- * @backup mfa, config, usrgrp, users
+ * @backup mfa, config, usrgrp, users, mfa_totp_secret
  *
- * @onBefore  prepareTestData
+ * @onBefore prepareTestData
  *
  * @onAfter cleanTestData
  */
@@ -83,16 +83,17 @@ class testMfa extends CAPITest {
 			'passwd' => 'Z@bb1x1234',
 			'usrgrps' => [
 				['usrgrpid' => 7]
-			],
-			'mfa_totp_secrets' => [
-				[
-					'mfaid' => self::$data['mfaids']['TOTP test case 1'],
-					'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-				]
 			]
 		]);
 		$this->assertArrayHasKey('userids', $userids);
 		self::$data['userids'] = array_combine(['User with MFA TOTP method'], $userids['userids']);
+
+		DB::insert('mfa_totp_secret', [[
+			'mfaid' => self::$data['mfaids']['TOTP test case 1'],
+			'userid' => self::$data['userids']['User with MFA TOTP method'],
+			'totp_secret' => '123asdf123asdf13asdf123asdf123as',
+			'status' => TOTP_SECRET_CONFIRMED
+		]]);
 	}
 
 	public function resolveids($mfas) {

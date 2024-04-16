@@ -49,7 +49,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
@@ -81,6 +81,9 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
@@ -174,6 +177,9 @@ PROXY_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \

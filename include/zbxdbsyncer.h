@@ -27,6 +27,8 @@ typedef struct
 {
 	const zbx_events_funcs_t	*events_cbs;
 	int				config_histsyncer_frequency;
+	int				config_timeout;
+	int				config_history_storage_pipelines;
 }
 zbx_thread_dbsyncer_args;
 

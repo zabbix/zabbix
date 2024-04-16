@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0beta3');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050230);
+define('ZABBIX_DB_VERSION',		6050255);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -119,6 +119,15 @@ define('TOTP_CODE_LENGTH_8',	8);
 
 define('TOTP_VERIFICATION_DELAY_WINDOW', 1);
 define('TOTP_SECRET_LENGTH_32', 32);
+
+/**
+ * The number of TOTP used codes stored in database. Depends on TOTP_VERIFICATION_DELAY_WINDOW. If it is 1, it means
+ * that current, previous and future codes are valid and they should be stored if entered correctly.
+ */
+define('TOTP_MAX_USED_CODES', 3);
+
+define('TOTP_SECRET_CONFIRMATION_REQUIRED', 0);
+define('TOTP_SECRET_CONFIRMED', 1);
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
@@ -565,7 +574,6 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
-define('ZBX_LLD_RULE_DELAY_DEFAULT',		'1h');
 define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
@@ -751,6 +759,23 @@ define('OPERATION_OBJECT_ITEM_PROTOTYPE', 0);
 define('OPERATION_OBJECT_TRIGGER_PROTOTYPE', 1);
 define('OPERATION_OBJECT_GRAPH_PROTOTYPE', 2);
 define('OPERATION_OBJECT_HOST_PROTOTYPE', 3);
+
+// LLD rule
+define('ZBX_LLD_DELETE_AFTER',			0);
+define('ZBX_LLD_DELETE_NEVER',			1);
+define('ZBX_LLD_DELETE_IMMEDIATELY',	2);
+define('ZBX_LLD_DISABLE_AFTER',			0);
+define('ZBX_LLD_DISABLE_NEVER',			1);
+define('ZBX_LLD_DISABLE_IMMEDIATELY',	2);
+
+define('ZBX_DISABLE_SOURCE_LLD',		1);
+define('ZBX_DISABLE_DEFAULT',			0);
+
+define('ZBX_LLD_STATUS_DISCOVERED',		0);
+define('ZBX_LLD_STATUS_LOST',			1);
+
+define('ZBX_LLD_RULE_ENABLED_LIFETIME',	'1h');
+define('ZBX_LLD_RULE_DELAY_DEFAULT',	'1h');
 
 define('GRAPH_DISCOVER',	0);
 define('GRAPH_NO_DISCOVER',	1);
@@ -1469,7 +1494,8 @@ define('VALUEMAP_MAPPING_TYPE_IN_RANGE',		3);
 define('VALUEMAP_MAPPING_TYPE_REGEXP',			4);
 define('VALUEMAP_MAPPING_TYPE_DEFAULT',			5);
 
-define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 32); // socket response size limit
+// Socket response size limit.
+define('ZBX_SOCKET_BYTES_LIMIT', ZBX_MEBIBYTE * 16);
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);

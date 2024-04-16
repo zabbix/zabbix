@@ -28,6 +28,7 @@
 #include "zbxvault.h"
 #include "zbxregexp.h"
 #include "zbxtagfilter.h"
+#include "zbxautoreg.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -60,13 +61,6 @@ zbx_session_type_t;
 #define ZBX_MAX_ITEMS			1000
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
-
-#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
-#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
-#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
-#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
-#define ZBX_AGENT_UNKNOWN	255
-#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
 typedef struct
 {
@@ -839,7 +833,7 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
-void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
+void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
@@ -863,7 +857,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	zbx_dc_config_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
-void	zbx_dc_config_items_apply_changes(const zbx_vector_ptr_t *item_diff);
+void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);
 
 void	zbx_dc_config_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
 int	zbx_dc_get_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
@@ -1145,12 +1139,13 @@ typedef struct
 }
 zbx_lld_macro_path_t;
 
-ZBX_PTR_VECTOR_DECL(lld_macro_path, zbx_lld_macro_path_t *)
+ZBX_PTR_VECTOR_DECL(lld_macro_path_ptr, zbx_lld_macro_path_t *)
 
-int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_t *lld_macro_paths, char **error);
+int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		char **error);
 void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
 int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, const char *macro, char **value);
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, const char *macro, char **value);
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags);

@@ -2434,7 +2434,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Hosts in edit view opens in overlay and need to be closed manually.
 			if ($source === 'hosts' || $source === 'templates') {
 				COverlayDialogElement::find()->one()->close();
-				COverlayDialogElement::ensureNotPresent();
 			}
 
 			// Change Vault in settings to correct one.
@@ -2451,6 +2450,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 			$form->submit();
 			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
+			CMessageElement::find()->one()->close();
 
 			// Create macros with correct value.
 			$this->fillMacros([$vault_values['fields']]);
@@ -2459,6 +2459,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			if ($discovered && $i === 0) {
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
+				CMessageElement::find()->one()->close();
 				$this->openMacrosTab($url, $source, false, $name);
 				$form->invalidate();
 				$this->fillMacros([$vault_values['fields']]);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ typedef struct
 	zbx_uint64_t				druleid;
 	char					*ip;
 	char					*dnsname;
-	int					now;
+	time_t					now;
 	zbx_uint64_t				unique_dcheckid;
 	unsigned int				processed_checks_per_ip;
 }

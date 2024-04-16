@@ -628,7 +628,6 @@ zabbix_export:
                 value: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Discovers OpenStack Nova availability zones.'
           item_prototypes:
             - uuid: 46f1348ce86742a6a645e137b0ecea63
@@ -751,7 +750,6 @@ zabbix_export:
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          lifetime: 7d
           description: 'Discovers OpenStack Nova hypervisors.'
           item_prototypes:
             - uuid: 3edd8fcf7d3643119b7b21111155fcc0
@@ -927,7 +925,6 @@ zabbix_export:
                 value: '{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          lifetime: 7d
           description: 'Discovers OpenStack Nova servers.'
           item_prototypes:
             - uuid: 84fd4be0c5f84744ac6bd93d4d4e8f0e
@@ -1042,7 +1039,6 @@ zabbix_export:
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          lifetime: 7d
           description: 'Discovers OpenStack compute services.'
           item_prototypes:
             - uuid: 3bd724dad043411187a86466cf8ee2c6

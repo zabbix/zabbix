@@ -36,6 +36,7 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
+	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
@@ -835,6 +836,21 @@ class CIntegrationTest extends CAPITest {
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
 
 		sleep(self::CACHE_RELOAD_DELAY);
+	}
+
+	/**
+	 * Reload user parameters.
+	 *
+	 * @param string $component    component name or null for active component
+	 */
+	protected function reloadUserParameters($component = null) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'userparameter_reload']);
+
+		sleep(self::USER_PARAM_RELOAD_DELAY);
 	}
 
 	/**
