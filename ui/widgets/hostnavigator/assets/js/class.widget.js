@@ -49,7 +49,7 @@ class CWidgetHostNavigator extends CWidget {
 		this.#contents_scroll_top = this._contents.scrollTop;
 	}
 
-	onEdit() {
+	onDestroy() {
 		this.#updateProfiles(false, [], this._widgetid);
 	}
 
