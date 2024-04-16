@@ -187,13 +187,13 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
+			$sqlParts['from'][] = 'permission p1';
 			$sqlParts['where'][] = 'h.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
-			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+			$sqlParts['where'][] = 'hh.hgsetid=p1.hgsetid';
+			$sqlParts['where'][] = 'p1.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
-				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				$sqlParts['where'][] = 'p1.permission='.PERM_READ_WRITE;
 			}
 		}
 
