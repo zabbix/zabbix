@@ -30,24 +30,6 @@ class CTableInfo extends CTable {
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
 	}
 
-	public function toString($destroy = true) {
-		$tableid = $this->getId();
-
-		if (!$tableid) {
-			$tableid = uniqid('t', true);
-			$tableid = str_replace('.', '', $tableid);
-			$this->setId($tableid);
-		}
-
-		if ($this->rownum == 0) {
-			if ($this->message === null) {
-				$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
-			}
-		}
-
-		return parent::toString($destroy);
-	}
-
 	public function setNoDataMessage($message, $description = null, $icon = null) {
 		$message = new CDiv([
 			(new CDiv($message))
@@ -74,10 +56,26 @@ class CTableInfo extends CTable {
 		return $this;
 	}
 
+	public function toString($destroy = true) {
+		$tableid = $this->getId();
+
+		if (!$tableid) {
+			$tableid = uniqid('t', true);
+			$tableid = str_replace('.', '', $tableid);
+			$this->setId($tableid);
+		}
+
+		if ($this->rownum == 0 && $this->message === null) {
+			$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
+		}
+
+		return parent::toString($destroy);
+	}
+
 	protected function endToString() {
 		$ret = '';
 
-		if ($this->rownum == 0 && $this->message !== null) {
+		if ($this->rownum == 0) {
 			$ret .= $this->prepareRow($this->message, ZBX_STYLE_NOTHING_TO_SHOW)->toString();
 		}
 
