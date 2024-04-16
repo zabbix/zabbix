@@ -135,7 +135,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'status' => $this->fields_values['status'] == WidgetForm::HOST_STATUS_ANY
 						? null
 						: $this->fields_values['status'],
-					'maintenance_status' => $is_show_in_maintenance_on	? null : HOST_MAINTENANCE_STATUS_OFF
+					'maintenance_status' => $is_show_in_maintenance_on ? null : HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $tags_to_keep ? ['tag', 'value'] : null,
