@@ -273,7 +273,14 @@ class CDService extends CApiService {
 				' FROM dservices ds,dchecks dc,drules dr,hosts h,interface i'.
 				' WHERE ds.dcheckid=dc.dcheckid'.
 					' AND dc.druleid=dr.druleid'.
-					' AND (dr.proxyid=h.proxyid OR (dr.proxyid IS NULL AND h.proxyid IS NULL))'.
+					' AND (dr.proxyid=h.proxyid'.
+						' OR (dr.proxyid IS NULL AND h.proxyid IS NULL)'.
+						' OR dr.proxyid IN ('.
+							'SELECT p.proxyid'.
+							' FROM proxy p'.
+							' WHERE h.proxy_groupid=p.proxy_groupid'.
+						')'.
+					')'.
 					' AND h.hostid=i.hostid'.
 					' AND ds.ip=i.ip'.
 					' AND '.dbConditionId('ds.dserviceid', $dserviceIds)
