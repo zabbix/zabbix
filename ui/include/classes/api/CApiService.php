@@ -434,7 +434,7 @@ class CApiService {
 
 				// Increase count when table linked by non-unique column.
 				if ((array_key_exists('using', $left_join) && $left_join['using'] !== $r_table['key'])
-						|| (array_key_exists('use_distinct', $left_join) && $left_join['use_distinct'])) {
+						|| (!array_key_exists('using', $left_join) && $left_join['use_distinct'])) {
 					$count++;
 					break;
 				}
