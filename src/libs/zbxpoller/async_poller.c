@@ -18,6 +18,7 @@
 **/
 
 #include "async_poller.h"
+#include "zbxcachehistory.h"
 #include "zbxpoller.h"
 
 #include "async_manager.h"
@@ -87,9 +88,20 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item->itemid,
-				item->hostid,item->value_type,item->flags,
-				&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
+			if (0 == ZBX_ISSET_VALUE(&item->result))
+			{
+				zbx_timespec_t	ts;
+
+				zbx_timespec(&ts);
+				zbx_dc_add_history(item->itemid, item->value_type, 0, &item->result, &ts,
+						ITEM_STATE_NORMAL, NULL);
+			}
+			else
+			{
+				zbx_preprocess_item_value(item->itemid,
+					item->hostid,item->value_type,item->flags,
+					&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
+			}
 		}
 	}
 	else
@@ -582,7 +594,10 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		}
 
 		if (ZBX_IS_RUNNING())
+		{
 			zbx_preprocessor_flush();
+			zbx_dc_flush_history();
+		}
 
 		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
