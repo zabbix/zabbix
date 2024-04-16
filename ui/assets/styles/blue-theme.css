@@ -4950,8 +4950,11 @@ pre, pre a, pre td, pre span {
   .header-navigation > ul {
     flex-wrap: wrap; }
     .header-navigation > ul > li .status-container {
-      margin-right: 5px;
-      vertical-align: text-bottom; }
+      margin-right: 5px; }
+    .header-navigation > ul > li .status-container,
+    .header-navigation > ul > li .rel-container {
+      line-height: 17px;
+      vertical-align: baseline; }
     .header-navigation > ul li > span.selected {
       background-color: #ffffff;
       border-radius: 2px;
