@@ -269,21 +269,19 @@ class CDService extends CApiService {
 			}
 
 			$db_services = DBselect(
-				'SELECT DISTINCT ds.dserviceid,h.hostid'.
-				' FROM dservices ds,dchecks dc,drules dr,hosts h,interface i'.
-				' WHERE ds.dcheckid=dc.dcheckid'.
-					' AND dc.druleid=dr.druleid'.
-					' AND (dr.proxyid=h.proxyid'.
-						' OR (dr.proxyid IS NULL AND h.proxyid IS NULL)'.
-						' OR dr.proxyid IN ('.
-							'SELECT p.proxyid'.
-							' FROM proxy p'.
-							' WHERE h.proxy_groupid=p.proxy_groupid'.
-						')'.
-					')'.
-					' AND h.hostid=i.hostid'.
-					' AND ds.ip=i.ip'.
-					' AND '.dbConditionId('ds.dserviceid', $dserviceIds)
+				'SELECT ds.dserviceid,h.hostid'.
+				' FROM dservices ds'.
+				' LEFT JOIN dchecks dc ON ds.dcheckid=dc.dcheckid'.
+				' LEFT JOIN drules dr ON dc.druleid=dr.druleid'.
+				' LEFT JOIN interface i ON ds.ip=i.ip'.
+				' LEFT JOIN hosts h ON h.hostid=i.hostid'.
+				' LEFT JOIN proxy p ON dr.proxyid=p.proxyid'.
+				' WHERE '.dbConditionId('ds.dserviceid', $dserviceIds).
+					' AND ('.
+						'(h.monitored_by='.ZBX_MONITORED_BY_SERVER.' AND dr.proxyid IS NULL)'.
+						' OR (h.monitored_by='.ZBX_MONITORED_BY_PROXY.' AND dr.proxyid=h.proxyid)'.
+						' OR (h.monitored_by='.ZBX_MONITORED_BY_PROXY_GROUP.' AND h.proxy_groupid=p.proxy_groupid)
+					)'
 			);
 
 			$host_services = [];
