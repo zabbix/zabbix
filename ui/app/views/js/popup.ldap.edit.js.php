@@ -405,7 +405,10 @@ window.ldap_edit_popup = new class {
 
 		const template = document.createElement('template');
 		template.innerHTML = template_ldap_media_mapping_row.evaluate(provision_media).trim();
-		template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"][value="0"]')?.remove();
+
+		if (provision_media.userdirectory_mediaid === undefined) {
+			template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
+		}
 
 		return template.content.firstChild;
 	}

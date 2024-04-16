@@ -59,13 +59,16 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'userdirectory_mediaid' => 0,
 			'name' => '',
 			'attribute' => '',
 			'period' => ZBX_DEFAULT_INTERVAL,
 			'active' => MEDIA_STATUS_DISABLED
 		];
 		$this->getInputs($data, array_keys($data));
+
+		if ($this->hasInput('userdirectory_mediaid')) {
+			$data['userdirectory_mediaid'] = $this->getInput('userdirectory_mediaid');
+		}
 
 		$data['severity'] = 0;
 		foreach ($this->getInput('severity', []) as $severity) {

@@ -32,6 +32,10 @@ $form = (new CForm('post', $form_action))
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form');
 
+if (array_key_exists('userdirectory_mediaid', $data)) {
+	$form->addVar('userdirectory_mediaid', $data['userdirectory_mediaid']);
+}
+
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
@@ -115,7 +119,6 @@ if ($data['add_media_type_mapping']) {
 	];
 }
 else {
-	$form->addVar('userdirectory_mediaid', $data['userdirectory_mediaid']);
 	$title = _('Media type mapping');
 	$buttons = [
 		[

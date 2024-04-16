@@ -69,7 +69,6 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	protected function doAction(): void {
 		$data = [
 			'add_media_type_mapping' => 0,
-			'userdirectory_mediaid' => 0,
 			'name' => '',
 			'attribute' => '',
 			'mediatypeid' => 0,
@@ -85,6 +84,10 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		if ($this->hasInput('userdirectory_mediaid')) {
+			$data['userdirectory_mediaid'] = $this->getInput('userdirectory_mediaid');
+		}
 
 		foreach (CSeverityHelper::getSeverities() as $severity) {
 			if (pow(2, $severity['value']) & $data['severity']) {

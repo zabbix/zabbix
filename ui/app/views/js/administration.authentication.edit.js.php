@@ -641,7 +641,10 @@
 			const template = document.createElement('template');
 
 			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
-			template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"][value="0"]')?.remove();
+
+			if (saml_media.userdirectory_mediaid === undefined) {
+				template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
+			}
 
 			return template.content.firstChild;
 		}
