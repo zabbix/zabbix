@@ -1081,19 +1081,31 @@ footer {
     .form-grid fieldset.collapsible.collapsed .fields-group,
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
-  .form-grid label {
+  .form-grid > label,
+  .form-grid .collapsible > label,
+  .form-grid .fields-group > label {
     align-self: start;
     line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
-    .form-grid label.fields-group-label {
+    .form-grid > label.fields-group-label,
+    .form-grid .collapsible > label.fields-group-label,
+    .form-grid .fields-group > label.fields-group-label {
       margin-top: 6px; }
-    .form-grid label .btn-icon,
-    .form-grid label .icon {
+    .form-grid > label .btn-icon,
+    .form-grid > label .icon,
+    .form-grid .collapsible > label .btn-icon,
+    .form-grid .collapsible > label .icon,
+    .form-grid .fields-group > label .btn-icon,
+    .form-grid .fields-group > label .icon {
       margin-left: 5px; }
-    .form-grid label:not([for]) {
+    .form-grid > label:not([for]),
+    .form-grid .collapsible > label:not([for]),
+    .form-grid .fields-group > label:not([for]) {
       pointer-events: none; }
-      .form-grid label:not([for]) .btn-icon {
+      .form-grid > label:not([for]) .btn-icon,
+      .form-grid .collapsible > label:not([for]) .btn-icon,
+      .form-grid .fields-group > label:not([for]) .btn-icon {
         pointer-events: initial; }
   .form-grid .fields-group {
     grid-column: 2 / -1;
@@ -5256,7 +5268,8 @@ form.is-loading {
   padding: 4px 0; }
 
 .list-check-radio li {
-  display: block; }
+  display: block;
+  line-height: 24px; }
 .list-check-radio.hor-list li {
   margin-right: 15px; }
   .list-check-radio.hor-list li:last-child {
@@ -5264,9 +5277,9 @@ form.is-loading {
 .list-check-radio label {
   display: inline-block;
   max-width: 600px;
-  padding: 0 0 0 18px;
-  line-height: 24px;
-  text-indent: -18px; }
+  padding-left: 20px;
+  line-height: 1.4em;
+  text-indent: -20px; }
   .list-check-radio label input[type="checkbox"] {
     left: -3px;
     margin: 0; }

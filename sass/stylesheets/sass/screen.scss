@@ -838,6 +838,7 @@ form {
 .list-check-radio {
 	li {
 		display: block;
+		line-height: 24px;
 	}
 
 	&.hor-list li {
@@ -851,9 +852,9 @@ form {
 	label {
 		display: inline-block;
 		max-width: 600px;
-		padding: 0 0 0 18px;
-		line-height: 24px;
-		text-indent: -18px;
+		padding-left: 20px;
+		line-height: $body-line-height;
+		text-indent: -20px;
 
 		input[type="checkbox"] {
 			left: -3px;
