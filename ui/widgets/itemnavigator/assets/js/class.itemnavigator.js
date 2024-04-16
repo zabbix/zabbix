@@ -47,11 +47,11 @@ class CItemNavigator {
 	#container;
 
 	/**
-	 * Navigation tree container element.
+	 * Navigation tree instance.
 	 *
-	 * @type {HTMLElement}
+	 * @type {CNavigationTree|null}
 	 */
-	#navigation_tree;
+	#navigation_tree = null;
 
 	/**
 	 * Array of items. Grouped in tree structure if grouping provided.
@@ -113,10 +113,11 @@ class CItemNavigator {
 
 			this.#navigation_tree = new CNavigationTree(this.#nodes, {
 				selected_id: this.#selected_item_id,
-				show_problems: this.#config.show_problems
-			}).getContainer();
+				show_problems: this.#config.show_problems,
+				severity_names: this.#config.severity_names
+			});
 
-			this.#container.appendChild(this.#navigation_tree);
+			this.#container.appendChild(this.#navigation_tree.getContainer());
 
 			if (is_limit_exceeded) {
 				this.#createLimit(items.length);
@@ -477,8 +478,12 @@ class CItemNavigator {
 	 * Activate events of item navigator widget.
 	 */
 	#activateEvents() {
-		this.#navigation_tree.addEventListener(CNavigationTree.EVENT_ITEM_SELECT, this.#events.itemSelect);
-		this.#navigation_tree.addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE, this.#events.groupToggle);
+		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_ITEM_SELECT,
+			this.#events.itemSelect
+		);
+		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE,
+			this.#events.groupToggle
+		);
 	}
 
 	/**
