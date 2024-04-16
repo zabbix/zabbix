@@ -68,35 +68,35 @@ class CNavigationTree {
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#events;
 
 	/**
 	 * Navigation tree elements (nodes, arrows, names, etc.).
 	 *
 	 * @type {Object}
 	 */
-	#tree_elements = {};
+	#tree_elements;
 
 	/**
 	 * ID of selected item.
 	 *
 	 * @type {string}
 	 */
-	#selected_id = '';
+	#selected_id;
 
 	/**
 	 * Whether to show problems or not.
 	 *
 	 * @type {boolean}
 	 */
-	#show_problems = true;
+	#show_problems;
 
 	/**
 	 * Severity names.
 	 *
 	 * @type {Array}
 	 */
-	#severity_names = [];
+	#severity_names;
 
 	/**
 	 * Create CNavigationTree instance.
