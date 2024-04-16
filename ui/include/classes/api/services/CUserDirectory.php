@@ -653,6 +653,7 @@ class CUserDirectory extends CApiService {
 					|| ($userdirectory['provision_status'] != $db_userdirectory['provision_status']
 						&& $db_userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED)) {
 				$userdirectoryids[] = $userdirectory['userdirectoryid'];
+				$db_userdirectories[$userdirectory['userdirectoryid']]['provision_groups'] = [];
 				$db_userdirectories[$userdirectory['userdirectoryid']]['provision_media'] = [];
 			}
 		}
