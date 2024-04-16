@@ -461,7 +461,7 @@ class CApiService {
 				$sql_left_join .= array_key_exists('condition', $left_join)
 					? $left_join['condition']
 					: $sqlParts['left_table']['alias'].'.'.$l_table['key'].'='.
-					$left_join['alias'].'.'.$left_join['using'];
+						$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.
