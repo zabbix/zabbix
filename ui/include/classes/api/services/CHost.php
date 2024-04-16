@@ -1128,10 +1128,57 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
+		$_hosts = $data['hosts'];
+
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
 			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
 		if ($data) {
+			foreach ($_hosts as &$host) {
+				$host += array_intersect_key($data, array_flip(['monitored_by', 'proxyid', 'proxy_groupid']));
+			}
+			unset($host);
+
+			$_hosts = $this->extendObjectsByKey($_hosts, $db_hosts, 'hostid', ['monitored_by']);
+
+			self::addDbFieldsByMonitoredBy($_hosts, $db_hosts);
+
+			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'monitored_by' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
+				'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+				]],
+				'proxy_groupid' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+				]]
+			]];
+
+			foreach ($_hosts as $host) {
+				if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
+			self::checkProxiesAndProxyGroups($_hosts, $db_hosts);
+
+			if (array_key_exists('monitored_by', $data)) {
+				switch ($data['monitored_by']) {
+					case ZBX_MONITORED_BY_SERVER:
+						$data += ['proxyid' => 0, 'proxy_groupid' => 0];
+						break;
+
+					case ZBX_MONITORED_BY_PROXY:
+						$data += ['proxy_groupid' => 0];
+						break;
+
+					case ZBX_MONITORED_BY_PROXY_GROUP:
+						$data += ['proxyid' => 0];
+						break;
+				}
+			}
+
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
@@ -1302,7 +1349,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'status', 'name', 'monitored_by', 'proxy_groupid'],
+			'output' => ['hostid', 'host', 'flags', 'status', 'name', 'monitored_by', 'proxyid', 'proxy_groupid'],
 			'hostids' => array_column($data['hosts'], 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
