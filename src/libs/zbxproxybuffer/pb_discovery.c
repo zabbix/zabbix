@@ -38,7 +38,7 @@ static zbx_history_table_t	dht = {
 		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
 		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
 		{"error",		ZBX_PROTO_TAG_ERROR,		ZBX_JSON_TYPE_STRING,	""},
-		{NULL}
+		{0}
 		}
 };
 

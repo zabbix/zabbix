@@ -342,7 +342,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		& > li {
 			.status-container {
 				margin-right: 5px;
-				vertical-align: text-bottom;
+			}
+
+			.status-container,
+			.rel-container {
+				line-height: 17px;
+				vertical-align: baseline;
 			}
 		}
 
@@ -3357,6 +3362,10 @@ svg {
 		.multilineinput-control {
 			width: 250px;
 		}
+	}
+
+	.item-test-result {
+		display: inline-flex;
 	}
 }
 

@@ -204,7 +204,7 @@ struct zbx_option	longopts[] =
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
 	{"protocol",			1,	NULL,	'P'},
-	{NULL}
+	{0}
 };
 
 /* short options */
