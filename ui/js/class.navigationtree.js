@@ -535,11 +535,7 @@ class CNavigationTree {
 				this.#selected_id = selected_id;
 
 				for (const node of this.#tree_elements.nodes) {
-					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED);
-
-					if (node.dataset.id === selected_id) {
-						node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED);
-					}
+					node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED, node.dataset.id === selected_id);
 				}
 
 				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
