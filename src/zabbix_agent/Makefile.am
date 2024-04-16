@@ -4,7 +4,8 @@ SUBDIRS = \
 	listener \
 	active_checks \
 	agent_conf \
-	logfiles
+	logfiles \
+	metrics
 
 EXTRA_DIST = \
 	eventlog
@@ -18,6 +19,7 @@ zabbix_agentd_LDADD = \
 	listener/libzbxlistener.a \
 	agent_conf/libagent_conf.a \
 	logfiles/libzbxlogfiles.a \
+	metrics/libzbxmetrics.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
@@ -36,7 +38,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_builddir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
@@ -55,6 +57,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(AGENT_LIBS)
 
 zabbix_agentd_LDFLAGS = $(AGENT_LDFLAGS)

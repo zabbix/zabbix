@@ -218,6 +218,8 @@ void	zbx_mock_test_entry(void **state)
 
 	while (ZBX_MOCK_SUCCESS == (mock_error = zbx_mock_vector_element(handle, &elem_handle)))
 	{
+		ZBX_DC_SNMPITEM	snmpitem_local = {0};
+
 		read_test(&elem_handle, &test_config);
 
 		memset((void*)&host, 0, sizeof(host));
@@ -230,18 +232,11 @@ void	zbx_mock_test_entry(void **state)
 
 		if (ITEM_TYPE_SNMP == item.type)
 		{
-			int		found;
-			const char	*snmp_oid = test_config.snmp_oid;
+			item.itemtype.snmpitem = &snmpitem_local;
 
-			ZBX_DC_SNMPITEM	*snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&config->snmpitems, item.itemid,
-					sizeof(ZBX_DC_SNMPITEM), &found);
+			ZBX_DC_SNMPITEM	*snmpitem = item.itemtype.snmpitem;
 
-			if (0 == found)
-			{
-				snmpitem->snmp_oid = NULL;
-			}
-
-			snmpitem->snmp_oid = zbx_strdup((char *)snmpitem->snmp_oid, snmp_oid);
+			snmpitem->snmp_oid = test_config.snmp_oid;
 
 			if (0 == strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;

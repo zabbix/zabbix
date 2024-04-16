@@ -305,6 +305,13 @@ $form->addItem([
 			'confirm_plural' => _('Provision selected LDAP users?'),
 			'csrf_token' => $csrf_token
 		],
+		'user.reset.totp' => [
+			'name' => _('Reset TOTP secret'),
+			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
+			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
+			'csrf_token' => $csrf_token,
+			'disabled' => CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_DISABLED
+		],
 		'user.unblock' => [
 			'name' => _('Unblock'),
 			'confirm_singular' => _('Unblock selected user?'),

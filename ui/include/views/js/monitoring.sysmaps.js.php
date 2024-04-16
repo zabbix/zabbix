@@ -85,7 +85,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('formDragHandler')
 			->toString()
 	?>
@@ -221,7 +221,7 @@ function createFontSelect(string $name): CSelect {
 							->setAriaRequired(),
 						'mapSelectRow'
 					)
-					->addRow(_('Tags'),
+					->addRow(_('Problem tags'),
 						(new CDiv([
 							(new CTable())
 								->setId('selement-tags')
@@ -347,7 +347,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('shapeDragHandler')
 			->toString().
 		(new CForm())
@@ -509,7 +509,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('massShapeDragHandler')
 			->toString().
 		(new CForm())
@@ -642,7 +642,7 @@ function createFontSelect(string $name): CSelect {
 				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
 				->setTitle(_('Close'))
 		]))
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
+			->addClass(ZBX_STYLE_OVERLAY_DIALOGUE_HEADER)
 			->setId('massDragHandler')
 			->toString()
 	?>

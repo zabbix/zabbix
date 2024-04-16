@@ -38,7 +38,7 @@ static zbx_metric_t	parameters_agent[] =
 	{"agent.variant",	0,		agent_variant,		NULL},
 	{"agent.version",	0,		agent_version,		NULL},
 	{"modbus.get",		CF_HAVEPARAMS,	modbus_get,		"tcp://127.0.0.1"},
-	{NULL}
+	{0}
 };
 
 zbx_metric_t	*get_parameters_agent(void)

@@ -77,6 +77,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPieChartWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPlainTextWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidget.php';
@@ -261,6 +262,7 @@ require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 
 // Tags.
 require_once dirname(__FILE__).'/tags/testFormTagsConnectors.php';
+require_once dirname(__FILE__).'/tags/testFormTagsDiscoveredHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
@@ -399,6 +401,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
+		$suite->addTestSuite('testDashboardPieChartWidget');
 		$suite->addTestSuite('testDashboardPlainTextWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
@@ -583,6 +586,7 @@ class SeleniumTests {
 
 		// Tags.
 		$suite->addTestSuite('testFormTagsConnectors');
+		$suite->addTestSuite('testFormTagsDiscoveredHost');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
 		$suite->addTestSuite('testFormTagsServices');

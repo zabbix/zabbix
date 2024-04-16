@@ -28,6 +28,9 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
+#include "zbxalgo.h"
+#include "zbxcfg.h"
+#include "zbxmutexs.h"
 
 static char	*config_pid_file = NULL;
 
@@ -61,6 +64,24 @@ static char	**config_perf_counters = NULL;
 static char	**config_perf_counters_en = NULL;
 #endif
 
+#define ZBX_SERVICE_NAME_LEN	64
+char	zabbix_service_name[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+static const char	*get_zbx_service_name(void)
+{
+	return zabbix_service_name;
+}
+
+char	zabbix_event_source[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+#if defined(_WINDOWS)
+static const char	*get_zbx_event_source(void)
+{
+	return zabbix_event_source;
+}
+#endif
+#undef ZBX_SERVICE_NAME_LEN
+
 static char	*config_user = NULL;
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
@@ -87,8 +108,6 @@ int	zbx_config_heartbeat_frequency	= 60;
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif
-
-#include "zbxcrypto.h"
 
 /* application TITLE */
 static const char	title_message[] = "zabbix_agentd"
@@ -209,7 +228,7 @@ static struct zbx_option	longopts[] =
 
 	{"multiple-agents",	0,	NULL,	'm'},
 #endif
-	{NULL}
+	{0}
 };
 
 static char	shortopts[] =
@@ -253,7 +272,7 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_SELFMON */
 	0, /* ZBX_PROCESS_TYPE_VMWARE */
 	1, /* ZBX_PROCESS_TYPE_COLLECTOR */
-	3, /* ZBX_PROCESS_TYPE_LISTENER */
+	10, /* ZBX_PROCESS_TYPE_LISTENER */
 	0, /* ZBX_PROCESS_TYPE_ACTIVE_CHECKS */
 	0, /* ZBX_PROCESS_TYPE_TASKMANAGER */
 	0, /* ZBX_PROCESS_TYPE_IPMIMANAGER */
@@ -285,10 +304,10 @@ static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 void	zbx_co_uninitialize();
 #endif
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 void	zbx_free_service_resources(int ret);
 
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
+static int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num)
 {
 	int	server_count = 0;
 
@@ -720,34 +739,34 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSConnect", zbx_config_tls->connect, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSAccept", zbx_config_tls->accept, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", zbx_config_tls->server_cert_issuer,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSConnect", zbx_config_tls->connect, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSAccept", zbx_config_tls->accept, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSServerCertIssuer", zbx_config_tls->server_cert_issuer,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", zbx_config_tls->server_cert_subject,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSServerCertSubject", zbx_config_tls->server_cert_subject,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", zbx_config_tls->psk_identity,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSPSKIdentity", zbx_config_tls->psk_identity,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", zbx_config_tls->psk_file, "TLS support"));
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSPSKFile", zbx_config_tls->psk_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
+	err |= (FAIL == zbx_check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
 			"OpenSSL 1.1.1 or newer"));
 #endif
 
@@ -844,7 +863,7 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
  ******************************************************************************/
-static int	load_enable_remote_commands(const char *value, const struct cfg_line *cfg)
+static int	load_enable_remote_commands(const char *value, const zbx_cfg_line_t *cfg)
 {
 	unsigned char	rule_type;
 	char		sysrun[] = "system.run[*]";
@@ -876,128 +895,128 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #define MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY	SEC_PER_DAY
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
-	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
+	zbx_cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
-	struct cfg_line	cfg[] =
+	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,	MIN,			MAX */
-		{"Server",			&zbx_config_hosts_allowed,			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"ServerActive",		&active_hosts,				TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"Hostname",			&zbx_config_hostnames,			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"HostnameItem",		&config_hostname_item,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"HostMetadata",		&zbx_config_host_metadata,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"HostMetadataItem",		&zbx_config_host_metadata_item,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"HostInterface",		&zbx_config_host_interface,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"HostInterfaceItem",		&zbx_config_host_interface_item,	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"BufferSize",			&zbx_config_buffer_size,		TYPE_INT,
-			PARM_OPT,	2,			65535},
-		{"BufferSend",			&zbx_config_buffer_send,		TYPE_INT,
-			PARM_OPT,	1,			SEC_PER_HOUR},
+				MANDATORY,		MIN,			MAX */
+		{"Server",			&zbx_config_hosts_allowed,		ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"ServerActive",		&active_hosts,				ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"Hostname",			&zbx_config_hostnames,			ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"HostnameItem",		&config_hostname_item,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"HostMetadata",		&zbx_config_host_metadata,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"HostMetadataItem",		&zbx_config_host_metadata_item,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"HostInterface",		&zbx_config_host_interface,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"HostInterfaceItem",		&zbx_config_host_interface_item,	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"BufferSize",			&zbx_config_buffer_size,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	2,			65535},
+		{"BufferSend",			&zbx_config_buffer_send,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	1,			SEC_PER_HOUR},
 #ifndef _WINDOWS
-		{"PidFile",			&config_pid_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
+		{"PidFile",			&config_pid_file,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 #endif
-		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LogFile",			&log_file_cfg.log_file_name,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
-			PARM_OPT,	0,			1024},
-		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
-			PARM_OPT,	1,			30},
-		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
-			PARM_OPT,	1024,			32767},
-		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"DebugLevel",			&config_log_level,			TYPE_INT,
-			PARM_OPT,	0,			5},
-		{"StartAgents",			&config_forks[ZBX_PROCESS_TYPE_LISTENER],TYPE_INT,
-			PARM_OPT,	0,			100},
-		{"RefreshActiveChecks",		&zbx_config_refresh_active_checks,	TYPE_INT,
-			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
-			MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
-		{"MaxLinesPerSecond",		&zbx_config_max_lines_per_second,	TYPE_INT,
-			PARM_OPT,	1,			1000},
-		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
-			PARM_OPT,	0,			1},
-		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"UnsafeUserParameters",	&zbx_config_unsafe_user_parameters,	TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"Alias",			&config_aliases,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
-		{"UserParameter",		&zbx_config_user_parameters,		TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
-		{"UserParameterDir",		&config_user_parameter_dir,		TYPE_STRING,
-			PARM_OPT,	0,			0},
+		{"LogType",			&log_file_cfg.log_type_str,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"LogFile",			&log_file_cfg.log_file_name,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"LogFileSize",			&log_file_cfg.log_file_size,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1024},
+		{"Timeout",			&zbx_config_timeout,			ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	1,			30},
+		{"ListenPort",			&zbx_config_listen_port,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	1024,			32767},
+		{"ListenIP",			&zbx_config_listen_ip,			ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"SourceIP",			&zbx_config_source_ip,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"DebugLevel",			&config_log_level,			ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			5},
+		{"StartAgents",			&config_forks[ZBX_PROCESS_TYPE_LISTENER],ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			100},
+		{"RefreshActiveChecks",		&zbx_config_refresh_active_checks,	ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
+				MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
+		{"MaxLinesPerSecond",		&zbx_config_max_lines_per_second,	ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	1,			1000},
+		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	ZBX_CFG_TYPE_CUSTOM,
+				ZBX_CONF_PARM_OPT,	0,			1},
+		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
+		{"UnsafeUserParameters",	&zbx_config_unsafe_user_parameters,	ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
+		{"Alias",			&config_aliases,			ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"UserParameter",		&zbx_config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"UserParameterDir",		&config_user_parameter_dir,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 #ifndef _WINDOWS
-		{"LoadModulePath",		&config_load_module_path,		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"LoadModule",			&config_load_module,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
-		{"AllowRoot",			&config_allow_root,			TYPE_INT,
-			PARM_OPT,	0,			1},
-		{"User",			&config_user,				TYPE_STRING,
-			PARM_OPT,	0,			0},
+		{"LoadModulePath",		&config_load_module_path,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"LoadModule",			&config_load_module,			ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"AllowRoot",			&config_allow_root,			ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1},
+		{"User",			&config_user,				ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 #endif
 #ifdef _WINDOWS
-		{"PerfCounter",			&config_perf_counters,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
-		{"PerfCounterEn",		&config_perf_counters_en,		TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
+		{"PerfCounter",			&config_perf_counters,			ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"PerfCounterEn",		&config_perf_counters_en,		ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 #endif
-		{"TLSConnect",			&(zbx_config_tls->connect),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSAccept",			&(zbx_config_tls->accept),		TYPE_STRING_LIST,
-			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"AllowKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
-			PARM_OPT,	0,			0},
-		{"DenyKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
-			PARM_OPT,	0,			0},
-		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
-			PARM_OPT,	0,			INT_MAX},
-		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	TYPE_INT,
-			PARM_OPT,	0,			3600},
-		{NULL}
+		{"TLSConnect",			&(zbx_config_tls->connect),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSAccept",			&(zbx_config_tls->accept),		ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCertFile",			&(zbx_config_tls->cert_file),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"AllowKey",			&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"DenyKey",			&parser_load_key_access_rule,		ZBX_CFG_TYPE_CUSTOM,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"ListenBacklog",		&config_tcp_max_backlog_size,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
+		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			3600},
+		{0}
 	};
 
 	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
@@ -1013,7 +1032,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_strarr_init(&config_perf_counters);
 	zbx_strarr_init(&config_perf_counters_en);
 #endif
-	parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_finalize_key_access_rules_configuration();
 
@@ -1112,10 +1131,27 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 }
 #endif	/* _WINDOWS */
 
-static void	zbx_on_exit(int ret)
+typedef struct
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+	zbx_socket_t	*listen_sock;
+}
+zbx_on_exit_args_t;
 
+static void	zbx_on_exit(int ret, void *on_exit_args)
+{
+#ifdef _WINDOWS
+	ZBX_UNUSED(on_exit_args);
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+#ifndef _WINDOWS
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+	}
+#endif
 	zbx_free_service_resources(ret);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1128,6 +1164,7 @@ static void	zbx_on_exit(int ret)
 	while (0 == WSACleanup())
 		;
 #endif
+
 	exit(EXIT_SUCCESS);
 }
 
@@ -1177,11 +1214,12 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	zbx_socket_t	listen_sock;
-	char		*error = NULL;
-	int		i, j = 0, ret = SUCCEED;
+	zbx_socket_t		listen_sock = {0};
+	zbx_on_exit_args_t	exit_args = {NULL};
+	char			*error = NULL;
+	int			i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
-	DWORD		res;
+	DWORD			res;
 
 #ifdef _M_X64
 	if (NULL == AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler))
@@ -1201,7 +1239,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, zabbix_event_source, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1256,6 +1294,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_LISTENER])
 	{
+#ifndef _WINDOWS
+		exit_args.listen_sock = &listen_sock;
+		zbx_set_on_exit_args(&exit_args);
+#endif
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -1338,7 +1381,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
-				zbx_thread_start(collector_thread, thread_args, &zbx_threads[i]);
+				zbx_thread_start(zbx_collector_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listener_args;
@@ -1400,7 +1443,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	ret = ZBX_EXIT_STATUS();
 
 #endif
-	zbx_on_exit(ret);
+	zbx_on_exit(ret, &exit_args);
 
 	return SUCCEED;
 }
@@ -1446,7 +1489,7 @@ void	zbx_free_service_resources(int ret)
 
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t = {ZBX_TASK_START};
+	ZBX_TASK_EX	t = {ZBX_TASK_START, 0, 0, NULL};
 	char		*error = NULL;
 #ifdef _WINDOWS
 	int		ret;
@@ -1458,11 +1501,11 @@ int	main(int argc, char **argv)
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
-			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
+			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item, get_zbx_service_name);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(get_zbx_progname);
 #else
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 #endif
 #ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
@@ -1482,7 +1525,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, zabbix_event_source, NULL);
 	}
 #endif
 
@@ -1530,9 +1573,9 @@ int	main(int argc, char **argv)
 				first_hostname = NULL != (p = strchr(zbx_config_hostnames, ',')) ? zbx_dsprintf(NULL,
 						"%.*s", (int)(p - zbx_config_hostnames), zbx_config_hostnames) :
 						zbx_strdup(NULL, zbx_config_hostnames);
-				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
+				zbx_snprintf(zabbix_service_name, sizeof(zabbix_service_name), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
-				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
+				zbx_snprintf(zabbix_event_source, sizeof(zabbix_event_source), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_free(first_hostname);
 			}
@@ -1650,7 +1693,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags);
+	zbx_service_start(t.flags, get_zbx_service_name, get_zbx_event_source);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,

@@ -61,10 +61,9 @@ window.widget_svggraph_form = new class {
 
 		jQuery(`#${form_tabs_id}`)
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', (e) => this.onGraphConfigChange(e));
+			.on('change', 'input, z-select, .multiselect', () => this.onGraphConfigChange());
 
 		this._datasetTabInit();
-		this._legendTabInit();
 		this._problemsTabInit();
 
 		this.onGraphConfigChange();
@@ -239,32 +238,6 @@ window.widget_svggraph_form = new class {
 		this._initDataSetSortable();
 
 		this._initSingleItemSortable(this._getOpenedDataset());
-	}
-
-	_legendTabInit() {
-		document.getElementById('legend')
-			.addEventListener('click', (e) => {
-				jQuery('#legend_lines').rangeControl(
-					e.target.checked ? 'enable' : 'disable'
-				);
-				if (!e.target.checked) {
-					jQuery('#legend_columns').rangeControl('disable');
-				}
-				else if (!document.getElementById('legend_statistic').checked) {
-					jQuery('#legend_columns').rangeControl('enable');
-				}
-				document.getElementById('legend_statistic').disabled = !e.target.checked;
-				document.getElementById('legend_aggregation').disabled = (!e.target.checked
-					|| !this._any_ds_aggregation_function_enabled
-				);
-			});
-
-		document.getElementById('legend_statistic')
-			.addEventListener('click', (e) => {
-				jQuery('#legend_columns').rangeControl(
-					!e.target.checked ? 'enable' : 'disable'
-				);
-			});
 	}
 
 	_problemsTabInit() {
@@ -765,8 +738,6 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
-		document.getElementById('legend_aggregation').disabled = !this._any_ds_aggregation_function_enabled;
-
 		// Displaying options tab.
 		const percentile_left_checkbox = document.getElementById('percentile_left');
 		percentile_left_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>];
@@ -812,6 +783,27 @@ window.widget_svggraph_form = new class {
 
 		document.getElementById('righty_static_units').disabled = !righty_on
 			|| document.getElementById('righty_units').value != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>;
+
+		// Legend tab.
+		const show_legend = document.getElementById('legend').checked;
+		const legend_statistic = document.getElementById('legend_statistic');
+
+		legend_statistic.disabled = !show_legend;
+
+		document.getElementById('legend_aggregation').disabled = !show_legend
+			|| !this._any_ds_aggregation_function_enabled;
+
+		for (const input of this._form.querySelectorAll('[name=legend_lines_mode]')) {
+			input.disabled = !show_legend;
+		}
+
+		jQuery('#legend_lines').rangeControl(show_legend ? 'enable' : 'disable');
+		jQuery('#legend_columns').rangeControl(show_legend && !legend_statistic.checked ? 'enable' : 'disable');
+
+		document.querySelector('[for=legend_lines]')
+			.textContent = document.querySelector('[name=legend_lines_mode]:checked').value === '1'
+				? '<?= _('Maximum number of rows') ?>'
+				: '<?= _('Number of rows') ?>';
 
 		// Trigger event to update tab indicators.
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
@@ -947,7 +939,7 @@ window.widget_svggraph_form = new class {
 			});
 		}
 
-		if (time_period === undefined) {
+		if (time_period === undefined || time_period === null) {
 			time_period = ZABBIX.EventHub.getData({
 				context: 'dashboard',
 				event_type: 'broadcast',

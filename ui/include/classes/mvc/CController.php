@@ -423,6 +423,10 @@ abstract class CController {
 			return false;
 		}
 
+		if (strpos(get_class($this), 'Modules\\') === 0) {
+			return CCsrfTokenHelper::check($csrf_token_form, $this->action);
+		}
+
 		foreach (explode('.', $this->action) as $segment) {
 			if (!in_array($segment, $skip, true)) {
 				return CCsrfTokenHelper::check($csrf_token_form, $segment);

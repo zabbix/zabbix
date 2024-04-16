@@ -102,6 +102,8 @@ class CSetupWizard extends CForm {
 
 		if ($this->getStep() == self::STAGE_REQUIREMENTS) {
 			if (hasRequest('next') && array_key_exists(self::STAGE_REQUIREMENTS, getRequest('next'))) {
+				$default_lang = getRequest('default_lang', $this->getConfig('default_lang'));
+				$this->frontend_setup->setDefaultLang($default_lang);
 				$finalResult = CFrontendSetup::CHECK_OK;
 
 				foreach ($this->frontend_setup->checkRequirements() as $req) {
@@ -443,16 +445,18 @@ class CSetupWizard extends CForm {
 		// Restoring original locale.
 		setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
 
-		$language_error = '';
+		$language_error = null;
+
 		if (!function_exists('bindtextdomain')) {
-			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+			$language_error = makeErrorIcon('Translations are unavailable because the PHP gettext module is missing.');
+
 			$lang_select->setReadonly();
 		}
 		elseif (!$all_locales_available) {
-			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+			$language_error = makeWarningIcon(
+				_('You are not able to choose some of the languages, because locales for them are not installed on the web server.')
+			);
 		}
-
-		$language_error = $language_error !== '' ? makeErrorIcon($language_error) : null;
 
 		$language_select = (new CFormList())
 			->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [
@@ -468,6 +472,8 @@ class CSetupWizard extends CForm {
 			->setHeader(['', _('Current value'), _('Required'), '']);
 
 		$messages = [];
+		$default_lang = getRequest('default_lang', $this->getConfig('default_lang'));
+		$this->frontend_setup->setDefaultLang($default_lang);
 		$finalResult = CFrontendSetup::CHECK_OK;
 
 		foreach ($this->frontend_setup->checkRequirements() as $req) {

@@ -47,18 +47,6 @@ class testDashboardGraphWidget extends testWidgets {
 		];
 	}
 
-	/*
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
-
 	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=1030';
 
 	/*
@@ -697,7 +685,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:lefty_min' => 'abc'
 					],
-					'error' => 'Invalid parameter "Left Y/Min": a number is expected.'
+					'error' => 'Invalid parameter "Left Y: Min": a number is expected.'
 				]
 			],
 			[
@@ -705,7 +693,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:lefty_max' => 'abc'
 					],
-					'error' => 'Invalid parameter "Left Y/Max": a number is expected.'
+					'error' => 'Invalid parameter "Left Y: Max": a number is expected.'
 				]
 			],
 			[
@@ -715,7 +703,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:lefty_max' => '5',
 						'id:lefty_units' => 'Auto'
 					],
-					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			[
@@ -726,7 +714,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:lefty_units' => 'Static',
 						'id:lefty_static_units' => 500
 					],
-					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			// Change default Y-axis option on Right.
@@ -740,7 +728,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:righty_min' => 'abc'
 					],
-					'error' => 'Invalid parameter "Right Y/Min": a number is expected.'
+					'error' => 'Invalid parameter "Right Y: Min": a number is expected.'
 				]
 			],
 			[
@@ -753,7 +741,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:righty_max' => 'abc'
 					],
-					'error' => 'Invalid parameter "Right Y/Max": a number is expected.'
+					'error' => 'Invalid parameter "Right Y: Max": a number is expected.'
 				]
 			],
 			[
@@ -769,7 +757,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_units' => 'Static',
 						'id:righty_static_units' => 500
 					],
-					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			[
@@ -784,7 +772,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '-10',
 						'id:righty_units' => 'Auto'
 					],
-					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			// Both axes validation.
@@ -805,8 +793,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => 'abc'
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Max": a number is expected.',
-						'Invalid parameter "Right Y/Max": a number is expected.'
+						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			],
@@ -829,8 +817,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '5'
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.',
-						'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+						'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.',
+						'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 					]
 				]
 			],
@@ -853,10 +841,10 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '('
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Min": a number is expected.',
-						'Invalid parameter "Left Y/Max": a number is expected.',
-						'Invalid parameter "Right Y/Min": a number is expected.',
-						'Invalid parameter "Right Y/Max": a number is expected.'
+						'Invalid parameter "Left Y: Min": a number is expected.',
+						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Min": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			]
@@ -1505,7 +1493,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Number of rows' => '5',
-						'Display min/max/avg' => true
+						'Display min/avg/max' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -1797,8 +1785,9 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Number of rows' => '5',
-						'Display min/max/avg' => true
+						'Rows' => 'Variable',
+						'Maximum number of rows' => '5',
+						'Display min/avg/max' => true
 					],
 					'Problems' => [
 						'fields' => [
@@ -2338,14 +2327,27 @@ class testDashboardGraphWidget extends testWidgets {
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
+		$fields = ['Rows', 'Number of rows', 'Display min/avg/max', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
 		$form->fill(['Show legend' => false]);
 		$this->assertEnabledFields($fields, false);
-		$form->fill(['Show legend' => true, 'Display min/max/avg' => true]);
+		$form->fill(['Show legend' => true, 'Display min/avg/max' => true]);
 		$this->assertEnabledFields('Number of columns', false);
+
+		// Check that the label "Number of rows" changes to "Maximum number of rows" when setting "Rows" to "Variable".
+		foreach (['Variable', 'Fixed'] as $rows_type) {
+			$form->fill(['Rows' => $rows_type]);
+
+			$visible_label = ($rows_type === 'Variable') ? 'Maximum number of rows' : 'Number of rows';
+			$removed_label = array_values(array_diff(['Number of rows', 'Maximum number of rows'], [$visible_label]))[0];
+
+			$this->assertTrue($form->getLabel($visible_label)->isValid());
+			$this->assertFalse($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($removed_label).']')
+					->one(false)->isValid()
+			);
+		}
 
 		foreach (['lines' => 2, 'columns' => 1] as $id => $maxlength) {
 			$this->assertEquals($maxlength, $form->getField('id:legend_'.$id)->getAttribute('maxlength'));

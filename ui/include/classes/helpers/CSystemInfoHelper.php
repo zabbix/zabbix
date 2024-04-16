@@ -35,6 +35,7 @@ class CSystemInfoHelper {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
+			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
 			'failover_delay' => 0
@@ -105,6 +106,7 @@ class CSystemInfoHelper {
 		}
 
 		$setup = new CFrontendSetup();
+		$setup->setDefaultLang(CWebUser::$data['lang']);
 		$requirements = $setup->checkRequirements();
 		$requirements[] = $setup->checkSslFiles();
 

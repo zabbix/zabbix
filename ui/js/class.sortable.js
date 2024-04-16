@@ -461,6 +461,10 @@ class CSortable {
 				dim: this.#is_horizontal ? rect.width : rect.height
 			};
 
+			if (loc.dim === 0) {
+				continue;
+			}
+
 			if (pos === 0 && pos_to === 0) {
 				pos = loc.pos;
 				pos_to = loc.pos + loc.dim;

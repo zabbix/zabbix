@@ -83,10 +83,10 @@ class CSettings extends CApiService {
 	 * Get the fields of the Settings API object that are used by parts of the UI where authentication is not required.
 	 */
 	public static function getPublic(): array {
-		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
-			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
-			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'default_timezone', 'x_frame_options', 'auditlog_enabled'
+		$output_fields = ['default_theme', 'server_check_interval', 'show_technical_errors', 'severity_color_0',
+			'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5',
+			'custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color',
+			'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'x_frame_options', 'auditlog_enabled'
 		];
 
 		return DB::select('config', ['output' => $output_fields])[0];
@@ -101,6 +101,9 @@ class CSettings extends CApiService {
 		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 
 		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
+
+		$db_settings['server_status'] = json_decode($db_settings['server_status'], true) ?: [];
+		$db_settings['server_status'] += ['configuration' => ['enable_global_scripts' => true]];
 
 		return $db_settings;
 	}
