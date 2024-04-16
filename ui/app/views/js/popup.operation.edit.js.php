@@ -22,7 +22,7 @@
 
 window.operation_popup = new class {
 
-	init({eventsource, recovery_phase, data, actionid}) {
+	init({eventsource, recovery_phase, data, scripts_with_warning, actionid}) {
 		this.recovery_phase = recovery_phase;
 		this.eventsource = eventsource;
 		this.overlay = overlays_stack.getById('operations');
@@ -31,6 +31,7 @@ window.operation_popup = new class {
 		this.actionid = actionid;
 		this.row_index = data.row_index;
 		this.data = data;
+		this.scripts_with_warning = scripts_with_warning;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -50,16 +51,16 @@ window.operation_popup = new class {
 		this._customMessageFields();
 		this.#loadHostTags(this.data.optag);
 		this._removeAllFields();
-		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
+		const operation_type = document.getElementById('operation-type-select').value;
+		this.#toggleScriptWarningIcon(operation_type);
 		this._changeView(operation_type);
 
-		document.querySelector('#operation-type-select').onchange = () => {
-			const operation_type = document.getElementById('operation-type-select').value;
-
+		document.getElementById('operation-type-select').addEventListener('change', (e) => {
+			this.#toggleScriptWarningIcon(e.target.value);
 			this._removeAllFields();
-			this._changeView(operation_type);
+			this._changeView(e.target.value);
 			this._processTypeOfCalculation();
-		}
+		});
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-condition-list-footer')) {
@@ -86,6 +87,19 @@ window.operation_popup = new class {
 				e.target.closest('tr').remove();
 			}
 		});
+	}
+
+	/**
+	 * Show/hides warning icon for script operation type.
+	 *
+	 * @param {string} operation_type  Type of operation selected.
+	 */
+	#toggleScriptWarningIcon(operation_type) {
+		if (this.scripts_with_warning.length > 0) {
+			const has_warning = this.scripts_with_warning.includes(operation_type);
+
+			this.form.querySelector('.js-script-warning-icon').style.display = has_warning ? '' : 'none';
+		}
 	}
 
 	/**

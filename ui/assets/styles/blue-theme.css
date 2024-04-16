@@ -1210,7 +1210,8 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
   min-width: 18px;
   height: 18px; }
 
-button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
+.form-grid table .btn-icon.btn-small,
+.form-grid table .icon.btn-small, button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
   min-width: 16px;
   height: 16px; }
 
@@ -6996,6 +6997,8 @@ svg {
     display: inline-flex; }
   #preprocessing-test-form .runtime-error-fields .multilineinput-control {
     width: 250px; }
+#preprocessing-test-form .item-test-result {
+  display: inline-flex; }
 
 .totals-list:not(.list-table) {
   display: flex;

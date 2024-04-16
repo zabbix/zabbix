@@ -54,8 +54,9 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len);
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type, char **result, char *error, size_t max_error_len, char **debug);
+		const char *config_ssh_key_location, int config_enable_global_scripts,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
+		size_t max_error_len, char **debug);
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
 		int now);
 int	zbx_init_remote_commands_cache(char **error);
