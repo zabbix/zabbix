@@ -10429,6 +10429,18 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => ''
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'used_codes' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			]
 		]
 	],

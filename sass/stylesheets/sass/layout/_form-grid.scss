@@ -241,6 +241,10 @@
 		.btn-icon,
 		.icon {
 			@extend %button-size-medium;
+
+			&.btn-small {
+				@extend %button-size-small;
+			}
 		}
 	}
 

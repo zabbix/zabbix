@@ -17,6 +17,10 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
+	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
@@ -67,6 +71,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 SERVICE_WRAP_FUNCS = \

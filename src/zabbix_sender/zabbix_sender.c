@@ -315,7 +315,7 @@ static struct zbx_option	longopts[] =
 	{"tls-psk-file",		1,	NULL,	'9'},
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
-	{NULL}
+	{0}
 };
 
 /* short options */
@@ -805,42 +805,42 @@ static void	zbx_load_config(const char *config_file_in)
 	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
-			MANDATORY,		MIN,			MAX */
+				MANDATORY,		MIN,			MAX */
 		{"SourceIP",			&cfg_source_ip,				ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ServerActive",		&cfg_active_hosts,			ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"Hostname",			&cfg_hostname,				ZBX_CFG_TYPE_STRING_LIST,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSConnect",			&cfg_tls_connect,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCAFile",			&cfg_tls_ca_file,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCRLFile",			&cfg_tls_crl_file,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCertFile",			&cfg_tls_cert_file,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&cfg_tls_key_file,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&cfg_tls_psk_file,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherCert13",		&cfg_tls_cipher_cert13,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherCert",		&cfg_tls_cipher_cert,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherPSK13",		&cfg_tls_cipher_psk13,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			ZBX_CFG_TYPE_STRING,
-			ZBX_CONF_PARM_OPT,	0,			0},
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			INT_MAX},
-		{NULL}
+				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
+		{0}
 	};
 
 	/* do not complain about unknown parameters in agent configuration file */

@@ -56,7 +56,7 @@ $form
 					->setFocusableElementId('type')
 					->setValue($data['type'])
 					->addOption(new CSelectOption(MFA_TYPE_TOTP, _('TOTP')))
-					->addOption((new CSelectOption(MFA_TYPE_DUO, _('DUO Universal Prompt')))
+					->addOption((new CSelectOption(MFA_TYPE_DUO, _('Duo Universal Prompt')))
 						->setDisabled($data['curl_error'])),
 				$curl_warning
 			])

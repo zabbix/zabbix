@@ -27,8 +27,8 @@
  *          database                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
-		zbx_uint64_t mask)
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_vector_item_diff_ptr_t *item_diff, zbx_uint64_t mask)
 {
 	int			i;
 	const zbx_item_diff_t	*diff;
@@ -39,7 +39,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	{
 		char	delim = ' ';
 
-		diff = (const zbx_item_diff_t *)item_diff->values[i];
+		diff = item_diff->values[i];
 		flags = diff->flags & mask;
 
 		if (0 == (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & flags))

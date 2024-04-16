@@ -959,12 +959,12 @@ class testFormUserRoles extends CWebTest {
 						'templategroup.update', 'token.create', 'token.delete', 'token.generate', 'token.get', 'token.update',
 						'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.provision', 'user.unblock', 'user.update', 'userdirectory.create',
-						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update',
-						'usergroup.create', 'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
-						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',
-						'usermacro.update', 'usermacro.updateglobal', 'valuemap.create', 'valuemap.delete',
-						'valuemap.get', 'valuemap.update'
+						'user.delete', 'user.get', 'user.logout', 'user.provision', 'user.resettotp', 'user.unblock',
+						'user.update', 'userdirectory.create', 'userdirectory.delete', 'userdirectory.get',
+						'userdirectory.test', 'userdirectory.update', 'usergroup.create', 'usergroup.delete',
+						'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
+						'usermacro.delete',	'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update',
+						'usermacro.updateglobal', 'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'
 					]
 				]
 			]
