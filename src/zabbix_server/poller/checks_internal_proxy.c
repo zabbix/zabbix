@@ -26,7 +26,8 @@
  *                                                                            *
  * Purpose: processes program type (proxy) specific internal checks           *
  *                                                                            *
- * Parameters: param1  - [IN] the first parameter                             *
+ * Parameters: item    - [IN] item to process                                 *
+ *             param1  - [IN] the first parameter                             *
  *             request - [IN] the request                                     *
  *             result  - [OUT] the result                                     *
  *                                                                            *
