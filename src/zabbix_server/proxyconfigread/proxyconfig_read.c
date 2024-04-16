@@ -1539,7 +1539,6 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 				&del_hostproxyids);
 	}
 
-
 	if (proxy_config_revision != dc_revision.config || proxy_hostmap_revision != hostmap_revision)
 	{
 		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision,

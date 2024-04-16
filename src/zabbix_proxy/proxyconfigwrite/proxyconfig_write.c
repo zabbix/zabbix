@@ -1936,13 +1936,42 @@ static int	proxyconfig_delete_globalmacros(char **error)
 	return ret;
 }
 
+static int	proxyconfig_clear_host_proxy(zbx_table_data_t *proxy, char **error)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_proxy where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "proxyid", proxy->del_ids.values,
+			proxy->del_ids.values_num);
+
+	ret = zbx_db_execute("%s", sql);
+	zbx_free(sql);
+
+	if (ZBX_DB_OK > ret)
+	{
+		*error = zbx_strdup(NULL, "cannot delete host_proxy records");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tables, struct zbx_json_parse *jp,
 		int full_sync, char **error)
 {
-	zbx_table_data_t	*td;
+	zbx_table_data_t	*host_proxy, *proxy;
 
-	if (NULL == (td = proxyconfig_get_table(config_tables, "host_proxy")))
+	if (NULL == (host_proxy = proxyconfig_get_table(config_tables, "host_proxy")))
 		return proxyconfig_sync_table(config_tables, "proxy", error);
+
+	if (NULL == (proxy = proxyconfig_get_table(config_tables, "proxy")))
+	{
+		/* proxy table is always added if host_proxy table is sent */
+		*error = zbx_strdup(NULL, "cannot find proxy data");
+		return FAIL;
+	}
 
 	if (0 == full_sync)
 	{
@@ -1952,11 +1981,11 @@ static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tabl
 
 		zbx_vector_uint64_create(&recids);
 
-		zbx_hashset_iter_reset(&td->rows, &iter);
+		zbx_hashset_iter_reset(&host_proxy->rows, &iter);
 		while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
 			zbx_vector_uint64_append(&recids, row->recid);
 
-		proxyconfig_prepare_table(td, "hostproxyid", &recids, NULL);
+		proxyconfig_prepare_table(host_proxy, "hostproxyid", &recids, NULL);
 
 		/* read deleted hotsproxyids and add to table data */
 
@@ -1971,28 +2000,45 @@ static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tabl
 			for (p = 0; NULL != (p = zbx_json_next_value(&jp_del, p, tmp, sizeof(tmp), NULL));)
 			{
 				if (SUCCEED == zbx_is_uint64(tmp, &hostproxyid))
-					zbx_vector_uint64_append(&td->del_ids, hostproxyid);
+					zbx_vector_uint64_append(&host_proxy->del_ids, hostproxyid);
 			}
 		}
 
 		zbx_vector_uint64_destroy(&recids);
+
+		proxyconfig_prepare_table(proxy, NULL, NULL, NULL);
+
+		if (0 != proxy->del_ids.values_num && SUCCEED != proxyconfig_clear_host_proxy(proxy, error))
+			return FAIL;
 	}
 	else
-		proxyconfig_prepare_table(td, NULL, NULL, NULL);
+	{
+		proxyconfig_prepare_table(host_proxy, NULL, NULL, NULL);
+		proxyconfig_prepare_table(proxy, NULL, NULL, NULL);
+	}
 
-	if (SUCCEED != proxyconfig_prepare_rows(td, error))
+	if (SUCCEED != proxyconfig_prepare_rows(host_proxy, error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_delete_rows(td, error))
+	if (SUCCEED != proxyconfig_delete_rows(host_proxy, error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_sync_table(config_tables, "proxy", error))
+	if (SUCCEED != proxyconfig_prepare_rows(proxy, error))
 		return FAIL;
 
-	if (SUCCEED != proxyconfig_insert_rows(td, error))
+	if (SUCCEED != proxyconfig_delete_rows(proxy, error))
 		return FAIL;
 
-	return proxyconfig_update_rows(td, error);
+	if (SUCCEED != proxyconfig_insert_rows(proxy, error))
+		return FAIL;
+
+	if (SUCCEED != proxyconfig_update_rows(proxy, error))
+		return FAIL;
+
+	if (SUCCEED != proxyconfig_insert_rows(host_proxy, error))
+		return FAIL;
+
+	return proxyconfig_update_rows(host_proxy, error);
 }
 
 static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_tables, int full_sync,
