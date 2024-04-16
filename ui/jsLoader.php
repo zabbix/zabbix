@@ -44,7 +44,6 @@ $available_js = [
 	'class.widget.misconfigured.js' => '',
 	'class.widget.paste-placeholder.js' => '',
 	'class.widget-field.checkbox-list.js' => '',
-	'class.widget-field.item-grouping.js' => '',
 	'class.widget-field.multiselect.js' => '',
 	'class.widget-field.time-period.js' => '',
 	'class.widget-select.popup.js' => '',
@@ -447,12 +446,6 @@ $translate_strings = [
 		'URL opening confirmation' => _('URL opening confirmation')
 	],
 	'class.navigationtree.js' => [
-		'Not classified' => _('Not classified'),
-		'Information' => _('Information'),
-		'Warning' => _('Warning'),
-		'Average' => _('Average'),
-		'High' => _('High'),
-		'Disaster' => _('Disaster'),
 		'Maintenance with data collection' => _('Maintenance with data collection'),
 		'Maintenance without data collection' => _('Maintenance without data collection')
 	]

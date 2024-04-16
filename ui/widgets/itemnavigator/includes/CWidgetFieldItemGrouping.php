@@ -19,16 +19,20 @@
 **/
 
 
-namespace Zabbix\Widgets\Fields;
+namespace Widgets\ItemNavigator\Includes;
 
 use Zabbix\Widgets\CWidgetField;
 
-use Widgets\ItemNavigator\Includes\WidgetForm;
-
 class CWidgetFieldItemGrouping extends CWidgetField {
 
-	public const DEFAULT_VIEW = \CWidgetFieldItemGroupingView::class;
+	public const DEFAULT_VIEW = CWidgetFieldItemGroupingView::class;
 	public const DEFAULT_VALUE = [];
+
+	public const GROUP_BY_HOST_GROUP = 0;
+	public const GROUP_BY_HOST_NAME = 1;
+	public const GROUP_BY_HOST_TAG = 2;
+	public const GROUP_BY_ITEM_TAG = 3;
+
 	public const MAX_ROWS = 10;
 
 	public function __construct(string $name, string $label = null) {
@@ -37,7 +41,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'length' => self::MAX_ROWS, 'fields' => [
-				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [WidgetForm::GROUP_BY_HOST_GROUP, WidgetForm::GROUP_BY_HOST_NAME, WidgetForm::GROUP_BY_HOST_TAG, WidgetForm::GROUP_BY_ITEM_TAG])],
+				'attribute'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::GROUP_BY_HOST_GROUP, self::GROUP_BY_HOST_NAME, self::GROUP_BY_HOST_TAG, self::GROUP_BY_ITEM_TAG])],
 				'tag_name'	=> ['type' => API_STRING_UTF8, 'length' => $this->getMaxLength()]
 			]]);
 	}
@@ -50,8 +54,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 		}
 
 		foreach ($this->getValue() as $value) {
-			if ($value['attribute'] == WidgetForm::GROUP_BY_HOST_GROUP
-					|| $value['attribute'] == WidgetForm::GROUP_BY_HOST_NAME) {
+			if ($value['attribute'] == self::GROUP_BY_HOST_GROUP || $value['attribute'] == self::GROUP_BY_HOST_NAME) {
 				continue;
 			}
 
@@ -66,7 +69,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 
 		foreach ($this->getValue() as $value) {
 			$attribute = $value['attribute'];
-			$tag_name = $attribute == WidgetForm::GROUP_BY_HOST_TAG || $attribute == WidgetForm::GROUP_BY_ITEM_TAG
+			$tag_name = $attribute == self::GROUP_BY_HOST_TAG || $attribute == self::GROUP_BY_ITEM_TAG
 				? $value['tag_name']
 				: '';
 
@@ -91,8 +94,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 				'value' => $value['attribute']
 			];
 
-			if ($value['attribute'] == WidgetForm::GROUP_BY_HOST_TAG
-					|| $value['attribute'] == WidgetForm::GROUP_BY_ITEM_TAG) {
+			if ($value['attribute'] == self::GROUP_BY_HOST_TAG || $value['attribute'] == self::GROUP_BY_ITEM_TAG) {
 				$widget_fields[] = [
 					'type' => $this->save_type,
 					'name' => $this->name.'.'.$index.'.'.'tag_name',

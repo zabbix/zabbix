@@ -45,7 +45,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class=<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>>:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -124,7 +124,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class=<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>>:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -194,7 +194,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class=<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>>:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -265,7 +265,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class=<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>>:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->

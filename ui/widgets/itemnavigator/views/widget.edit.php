@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\ItemNavigator\Includes\CWidgetFieldItemGroupingView;
+
 $form = new CWidgetFormView($data);
 
 $groupids_field = array_key_exists('groupids', $data['fields'])

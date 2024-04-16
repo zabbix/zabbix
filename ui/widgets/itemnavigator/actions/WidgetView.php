@@ -25,9 +25,13 @@ use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CProfile;
+	CProfile,
+	CSeverityHelper;
 
-use Widgets\ItemNavigator\Includes\WidgetForm;
+use Widgets\ItemNavigator\Includes\{
+	CWidgetFieldItemGrouping,
+	WidgetForm
+};
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -80,16 +84,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($this->fields_values['group_by'] as $group_by_attribute) {
 			switch ($group_by_attribute['attribute']) {
-				case WidgetForm::GROUP_BY_HOST_GROUP:
+				case CWidgetFieldItemGrouping::GROUP_BY_HOST_GROUP:
 					$group_by_host_groups = true;
 					break;
-				case WidgetForm::GROUP_BY_HOST_NAME:
+				case CWidgetFieldItemGrouping::GROUP_BY_HOST_NAME:
 					$group_by_host_name = true;
 					break;
-				case WidgetForm::GROUP_BY_HOST_TAG:
+				case CWidgetFieldItemGrouping::GROUP_BY_HOST_TAG:
 					$host_tags_to_keep[] = $group_by_attribute['tag_name'];
 					break;
-				case WidgetForm::GROUP_BY_ITEM_TAG:
+				case CWidgetFieldItemGrouping::GROUP_BY_ITEM_TAG:
 					$item_tags_to_keep[] = $group_by_attribute['tag_name'];
 					break;
 			}
@@ -282,10 +286,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
+		$severity_names = [];
+
+		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
+			foreach (CSeverityHelper::getSeverities() as $severity) {
+				$severity_names[$severity['value']] = $severity['label'];
+			}
+		}
+
 		return [
 			'group_by' => $this->fields_values['group_by'],
 			'open_groups' => $open_groups,
-			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE
+			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
+			'severity_names' => $severity_names
 		];
 	}
 

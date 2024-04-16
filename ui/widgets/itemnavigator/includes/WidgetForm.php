@@ -28,7 +28,6 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldIntegerBox,
-	CWidgetFieldItemGrouping,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
 	CWidgetFieldMultiSelectOverrideHost,
@@ -49,11 +48,6 @@ class WidgetForm extends CWidgetForm {
 	public const PROBLEMS_ALL = 0;
 	public const PROBLEMS_UNSUPPRESSED = 1;
 	public const PROBLEMS_NONE = 2;
-
-	public const GROUP_BY_HOST_GROUP = 0;
-	public const GROUP_BY_HOST_NAME = 1;
-	public const GROUP_BY_HOST_TAG = 2;
-	public const GROUP_BY_ITEM_TAG = 3;
 
 	private const LINES_MIN = 1;
 	private const LINES_MAX = 9999;

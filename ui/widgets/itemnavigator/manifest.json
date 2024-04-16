@@ -34,6 +34,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.itemnavigator.js", "class.widget.js"]
+		"js": ["class.itemnavigator.js", "class.widget.js", "class.widget-field.item-grouping.js"]
 	}
 }

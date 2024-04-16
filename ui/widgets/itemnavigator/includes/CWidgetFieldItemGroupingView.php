@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types=0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -19,9 +19,19 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldItemGrouping;
+namespace Widgets\ItemNavigator\Includes;
 
-use Widgets\ItemNavigator\Includes\WidgetForm;
+use CButton,
+	CButtonLink,
+	CCol,
+	CDiv,
+	CRow,
+	CSelect,
+	CSpan,
+	CTable,
+	CTemplateTag,
+	CTextBox,
+	CWidgetFieldView;
 
 class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 
@@ -65,14 +75,13 @@ class CWidgetFieldItemGroupingView extends CWidgetFieldView {
 					(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 					(new CSelect($this->field->getName().'[#{rowNum}][attribute]'))
 						->addOptions(CSelect::createOptionsFromArray([
-							WidgetForm::GROUP_BY_HOST_GROUP => _('Host group'),
-							WidgetForm::GROUP_BY_HOST_NAME => _('Host name'),
-							WidgetForm::GROUP_BY_HOST_TAG => _('Host tag value'),
-							WidgetForm::GROUP_BY_ITEM_TAG => _('Item tag value')
+							CWidgetFieldItemGrouping::GROUP_BY_HOST_GROUP => _('Host group'),
+							CWidgetFieldItemGrouping::GROUP_BY_HOST_NAME => _('Host name'),
+							CWidgetFieldItemGrouping::GROUP_BY_HOST_TAG => _('Host tag value'),
+							CWidgetFieldItemGrouping::GROUP_BY_ITEM_TAG => _('Item tag value')
 						]))
 						->setValue('#{attribute}')
 						->setId($this->field->getName().'_#{rowNum}_attribute')
-						->setFocusableElementId($this->field->getName().'-#{rowNum}-attribute-select')
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CCol(
 						(new CTextBox($this->field->getName().'[#{rowNum}][tag_name]', '#{tag_name}', false))
