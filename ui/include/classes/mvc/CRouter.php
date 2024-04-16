@@ -389,6 +389,7 @@ class CRouter {
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
 		'webscenario.step.check'					=> ['CControllerWebScenarioStepCheck',					'layout.json',			null],
 		'webscenario.step.edit'						=> ['CControllerWebScenarioStepEdit',					'layout.json',			'webscenario.step.edit'],
+		'widget.navigation.tree.toggle'				=> ['CControllerWidgetNavigationTreeToggle',			'layout.json',			null],
 
 		// legacy actions
 		'auditacts.php'					=> ['CLegacyAction', null, null],
