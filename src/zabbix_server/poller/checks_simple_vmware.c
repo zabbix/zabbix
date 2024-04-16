@@ -717,7 +717,8 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_ptr_t *events, const DC_ITEM *item, zbx_vector_ptr_t *add_results)
+static void	vmware_get_events(const zbx_vector_ptr_t *events, const zbx_vmware_eventlog_state_t *evt_state,
+		const DC_ITEM *item, zbx_vector_ptr_t *add_results)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -726,6 +727,9 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, const DC_ITEM *ite
 	{
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;
+
+		if (event->timestamp <= evt_state->last_ts && event->key <= evt_state->last_key)
+			continue;
 
 		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
 		init_result(add_result);
@@ -808,7 +812,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	}
 	else if (0 < service->data->events.values_num)
 	{
-		vmware_get_events(&service->data->events, item, add_results);
+		vmware_get_events(&service->data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
 		service->eventlog.last_ts = ((const zbx_vmware_event_t *)service->data->events.values[0])->timestamp;
 	}
