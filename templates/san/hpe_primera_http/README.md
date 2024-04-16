@@ -21,7 +21,7 @@ This template has been tested on:
 
 ## Setup
 
-1. Create user zabbix on the storage with browse role and enable it for all domains.
+1. Create a user on the storage with a browse role and enable it for all domains, for example "zabbix".
 2. The WSAPI server does not start automatically.
    Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
    Start the WSAPI server by command: `startwsapi`.

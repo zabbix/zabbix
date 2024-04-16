@@ -21,9 +21,9 @@ This template has been tested on:
 
 ## Setup
 
-1. Create user "zabbix" with monitor role on the storage.
+1. Create a user with a monitor role on the storage, for example "zabbix".
 2. Link the template to a host.
-3. Set the hostname or IP address of the host in the {$HPE.MSA.API.HOST} macro and configure password the {$HPE.MSA.API.PASSWORD} macro.
+3. Set the hostname or IP address of the host in the {$HPE.MSA.API.HOST} macro and configure the username and password in the {$HPE.MSA.API.USERNAME} and {$HPE.MSA.API.PASSWORD} macros.
 4. Change the {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
 
 ### Macros used
