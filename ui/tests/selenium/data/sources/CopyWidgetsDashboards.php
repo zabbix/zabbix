@@ -1899,7 +1899,7 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'honeycomb',
 								'name' => 'Honeycomb for copying',
-								'x' => 0,
+								'x' => 9,
 								'y' => 17,
 								'width' => 8,
 								'height' => 5,

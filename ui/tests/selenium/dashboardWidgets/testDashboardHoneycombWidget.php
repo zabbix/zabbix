@@ -56,7 +56,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' ON w.widgetid=wf.widgetid'.
+			' WHERE wf.name!=\'reference\''.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_hostid, wf.value_itemid, wf.value_graphid';
 
 	/**
@@ -589,7 +591,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'id:host_tags_0_value' => 255,
 			'id:item_tags_0_tag' => 255,
 			'id:item_tags_0_value' => 255,
-			'id:secondary_label_decimal_places' => 1
+			'id:primary_label' => 2048,
+			'id:primary_label_decimal_places' => 1,
+			'id:primary_label_units' => 2048,
+			'id:primary_label_size' => 3,
+			'id:secondary_label' => 2048,
+			'id:secondary_label_decimal_places' => 1,
+			'id:secondary_label_units' => 2048,
+			'id:secondary_label_size' => 3
 		];
 
 		foreach ($maxlengths as $field => $maxlength) {
@@ -637,8 +646,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 			// Check Select dropdown menu button.
 			$menu = $field->query($popup_menu_selector)->asPopupButton()->one()->getMenu();
-			$popup_menu_value = ($label === 'Host groups') ? $host_groups : $hosts;
-			$this->assertEquals($popup_menu_value, $menu->getItems()->asText());
+			$this->assertEquals(($label === 'Host groups') ? $host_groups : $hosts, $menu->getItems()->asText());
 
 			// After selecting Dashboard from dropdown menu, check hint and field value.
 			if ($label === 'Hosts') {
@@ -652,7 +660,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
 			$field->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Widget');
 			$dialogs = COverlayDialogElement::find()->all();
-			$this->assertEquals('Widget', $dialogs->last()->getTitle());
+			$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
 			$dialogs->last()->close(true);
 		}
 
@@ -660,9 +668,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 		foreach (['Host groups', 'Hosts', 'Item pattern'] as $label) {
 			$field = $form->getField($label);
 			$field->query('button:Select')->waitUntilCLickable()->one()->click();
-			$dialogs = COverlayDialogElement::find()->all()->waitUntilReady();
+			$dialogs = COverlayDialogElement::find()->all();
 			$label = ($label === 'Item pattern') ? 'Items' : $label;
-			$this->assertEquals($label, $dialogs->last()->getTitle());
+			$this->assertEquals($label, $dialogs->last()->waitUntilReady()->getTitle());
 			$dialogs->last()->close(true);
 		}
 
@@ -687,8 +695,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$advanced_configuration = ['Primary label' => '{HOST.NAME}', 'Secondary label' => '{{ITEM.LASTVALUE}.fmtnum(2)}'];
 
 		foreach ($advanced_configuration as $label => $text) {
-			$label_fields = $form->getLabel($label)->
-					query('xpath:./following::div[contains(@class, "fields-group ")]')->one();
+			$label_fields = $form->getLabel($label)->query('xpath:./following::div[contains(@class, "fields-group ")]')->one();
 			$this->assertTrue($label_fields->isVisible());
 
 			// Type radio button. After changing them, some fields appears and other disappear.
@@ -708,7 +715,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 						"\n{INVENTORY.*}".
 						"\nUser macros";
 
-					$this->assertEquals(2048, $label_fields->query('xpath:.//textarea')->one()->getAttribute('maxlength'));
 					$form->getLabel('Text')->query('xpath:./button[@data-hintbox]')->one()->click();
 					$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
 					$this->assertEquals($hint_text, $hint->one()->getText());
@@ -721,7 +727,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 							->asCheckbox()->one();
 					$units_input = $label_fields->query('xpath:.//div[contains(@class, "form-field")]//input[contains(@id,'.
 							' "_label_units")]')->one();
-					$this->assertEquals(2048, $units_input->getAttribute('maxlength'));
 					$position_dropdown = $label_fields->query('tag:z-select')->asDropdown()->one();
 					$this->assertEquals(['Before value', 'After value'], $position_dropdown->getOptions()->asText());
 
@@ -754,8 +759,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 			// Check Bold checkbox. Primary label bold - unchecked. Secondary label bold - checked-in.
 			$bold = $label_fields->query('xpath:.//input[contains(@id, "_label_bold")]')->asCheckbox()->one();
-			$checkbox_status = ($label === 'Secondary label');
-			$this->assertTrue($bold->isChecked($checkbox_status));
+			$this->assertTrue($bold->isChecked($label === 'Secondary label'));
 
 			// Uncheck Primary/Secondary label.
 			$show->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).
@@ -771,8 +775,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$warning->waitUntilNotPresent();
 
 		// Color interpolation checkbox should be disabled and checked-in.
-		$color_interpolation = $form->query('xpath:.//label[text()="Color interpolation"]/../input[@type="checkbox"]')->
-				asCheckbox()->one();
+		$color_interpolation = $form->query('id:interpolation')->asCheckbox()->one();
 		$this->assertFalse($color_interpolation->isEnabled());
 		$this->assertTrue($color_interpolation->isChecked());
 
@@ -1821,8 +1824,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		$form = ($action === 'create')
-				? $dashboard->edit()->addWidget()->waitUntilReady()->asForm()
-				: $dashboard->getWidget('UpdateHoneycomb')->edit()->asForm();
+			? $dashboard->edit()->addWidget()->waitUntilReady()->asForm()
+			: $dashboard->getWidget('UpdateHoneycomb')->edit()->asForm();
 
 		if ($form->getField('Type')->getValue() !== 'Honeycomb') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
@@ -1864,8 +1867,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 				// Check widget amount that it is added.
-				$amount = ($action === 'create') ? 1 : 0;
-				$this->assertEquals($old_widget_count + $amount, $dashboard->getWidgets()->count());
+				$this->assertEquals($old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
 
 				$form = $dashboard->getWidget($header)->edit()->asForm();
 				$form->fill(['Advanced configuration' => true]);
