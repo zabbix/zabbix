@@ -278,9 +278,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$open_groupids = CProfile::findByIdxPattern('web.dashboard.widget.open.%', $widgetid);
 
 			foreach ($open_groupids as $open_groupid) {
-				$open_group = CProfile::get($open_groupid, [], $widgetid);
+				$open_group = CProfile::get($open_groupid, null, $widgetid);
 
-				if ($open_group) {
+				if ($open_group !== null) {
 					$open_groups[] = $open_group;
 				}
 			}
