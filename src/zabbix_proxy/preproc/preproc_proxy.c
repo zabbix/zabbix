@@ -23,6 +23,14 @@
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
 
+int	preproc_prepare_value_proxy(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt)
+{
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(value_opt);
+
+	return SUCCEED;
+}
+
 void	preproc_flush_value_proxy(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
 {

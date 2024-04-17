@@ -48,6 +48,7 @@
 #	include <libxml/parser.h>
 #endif
 
+static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
 static zbx_get_progname_f	get_progname_func_cb = NULL;
 
@@ -99,8 +100,10 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_progname_f get_progname_cb)
+void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb, zbx_flush_value_func_t flush_value_cb,
+		zbx_get_progname_f get_progname_cb)
 {
+	prepare_value_func_cb = prepare_value_cb;
 	flush_value_func_cb = flush_value_cb;
 	get_progname_func_cb = get_progname_cb;
 }
@@ -956,7 +959,9 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 	zbx_pp_value_opt_t	*value_opt;
 
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
-	preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
+
+	if (SUCCEED == prepare_value_func_cb(value, value_opt))
+		preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
 }
 
 /******************************************************************************
