@@ -258,7 +258,7 @@ class CHostInterface extends CApiService {
 	public function checkInput(array &$interfaces, $method) {
 		$update = ($method == 'update');
 		$allowed_fields = array_flip([
-			'hostid', 'type', 'ip', 'dns', 'port', 'useip', 'main', 'details', 'interface_ref', 'items'
+			'hostid', 'type', 'ip', 'dns', 'port', 'useip', 'main', 'details', 'interface_ref', 'items', 'interfaceid'
 		]);
 
 		// permissions
@@ -270,7 +270,6 @@ class CHostInterface extends CApiService {
 				'editable' => true,
 				'preservekeys' => true
 			]);
-			$allowed_fields['interfaceid'] = true;
 		}
 		else {
 			$interfaceDBfields = [
