@@ -84,6 +84,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "Найдено %1$d совпадений для %2$s"
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -9064,6 +9069,12 @@ msgstr "Группа \"%1$s\" для узла сети \"%2$s\" не сущес�
 msgid "Group base DN"
 msgstr "База для поиска группы (Base DN)"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr "Настройка группы"
@@ -9656,6 +9667,10 @@ msgstr "Метаданные узлов сети"
 msgid "Host name"
 msgstr "Имя узла сети"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Сети узла сети"
@@ -9734,6 +9749,10 @@ msgstr "Прототипы узлов сети"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Роутер узла сети"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -17352,6 +17371,14 @@ msgstr "Результат ЛОЖЬ"
 msgid "Result is TRUE"
 msgstr "Результат ИСТИНА"
 
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
+
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
 msgstr "Тип результата"
@@ -21149,6 +21176,10 @@ msgstr "Разблокировать выбранного пользовател
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "Разблокировать выбранных пользователей?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -25257,6 +25288,10 @@ msgstr "right() - Возвращает количество самых прав�
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Округление значение до десятичных знаков"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Удаление указанных символов с конца строки"
@@ -25399,6 +25434,10 @@ msgstr "заданная учётная запись не уникальна"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "тег"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

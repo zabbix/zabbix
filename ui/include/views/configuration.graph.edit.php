@@ -373,7 +373,7 @@ else {
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
-	->addClass('list-numbered')
+	->addClass(ZBX_STYLE_LIST_NUMBERED)
 	->setColumns([
 		(new CTableColumn())->addClass('table-col-handle'),
 		(new CTableColumn())->addClass('table-col-no'),
