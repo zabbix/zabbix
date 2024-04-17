@@ -286,19 +286,22 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$severity_names = [];
+		$severities = [];
 
 		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
-			foreach (CSeverityHelper::getSeverities() as $severity) {
-				$severity_names[$severity['value']] = $severity['label'];
+			$severities = CSeverityHelper::getSeverities();
+
+			foreach ($severities as &$severity) {
+				$severity['status_style'] = CSeverityHelper::getStatusStyle($severity['value']);
 			}
+			unset($severity);
 		}
 
 		return [
 			'group_by' => $this->fields_values['group_by'],
 			'open_groups' => $open_groups,
 			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
-			'severity_names' => $severity_names
+			'severities' => $severities
 		];
 	}
 
