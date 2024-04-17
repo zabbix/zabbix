@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-06T08:27:33Z'
+  date: '2024-03-15T08:09:43Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -620,6 +620,8 @@ zabbix_export:
             		data = AWS.getField(AWS.request('filter_id', 'GET', region, 's3', AWS.prepareParams(payload), '', bucket_name), 'ListMetricsConfigurationsResult');
             
             		if (typeof data === 'object' && data.hasOwnProperty('MetricsConfiguration') === true) {
+            			if (!Array.isArray(data.MetricsConfiguration))
+            				data.MetricsConfiguration = [data.MetricsConfiguration]
             			data.MetricsConfiguration.forEach(function (item) {
             				item.region = region;
             			});
