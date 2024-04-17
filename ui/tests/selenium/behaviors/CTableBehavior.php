@@ -86,7 +86,7 @@ class CTableBehavior extends CBehavior {
 		$rows = $this->getTable($selector)->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->test->assertEquals(['No data found.'], $rows->asText());
+			$this->test->assertEquals(['No data found'], $rows->asText());
 
 			return;
 		}
@@ -122,7 +122,7 @@ class CTableBehavior extends CBehavior {
 
 		if (!$data) {
 			// Check that table contains one row with text "No data found."
-			$this->test->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->test->assertEquals(['No data found'], $table->getRows()->asText());
 
 			return;
 		}

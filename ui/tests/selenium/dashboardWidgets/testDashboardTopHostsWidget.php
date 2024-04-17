@@ -2455,7 +2455,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #3 Text item, display Indicators - value not displayed.
@@ -2472,7 +2472,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Indicators'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #4 Text item, Aggregation function max - value not displayed.
@@ -2489,7 +2489,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #5 Text item, Threshold - value is displayed ignoring thresholds.
@@ -2560,7 +2560,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #9 Log item, display Indicators - value not displayed.
@@ -2577,7 +2577,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Indicators'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #10 Log item, Aggregation function max - value not displayed.
@@ -2594,7 +2594,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #11 Log item, Threshold - value is displayed ignoring thresholds.
@@ -2665,7 +2665,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #15 Char item, display Indicators - value not displayed.
@@ -2682,7 +2682,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Indicators'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #16 Char item, Aggregation function max - value not displayed.
@@ -2699,7 +2699,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #17 Char item, Threshold - value is displayed ignoring thresholds.

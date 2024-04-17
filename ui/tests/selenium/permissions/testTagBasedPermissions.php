@@ -191,7 +191,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
+		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found');
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
