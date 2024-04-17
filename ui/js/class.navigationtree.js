@@ -68,35 +68,35 @@ class CNavigationTree {
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#events;
 
 	/**
 	 * Navigation tree elements (nodes, arrows, names, etc.).
 	 *
 	 * @type {Object}
 	 */
-	#tree_elements = {};
+	#tree_elements;
 
 	/**
 	 * ID of selected item.
 	 *
 	 * @type {string}
 	 */
-	#selected_id = '';
+	#selected_id;
 
 	/**
 	 * Whether to show problems or not.
 	 *
 	 * @type {boolean}
 	 */
-	#show_problems = true;
+	#show_problems;
 
 	/**
 	 * Severity names.
 	 *
 	 * @type {Array}
 	 */
-	#severity_names = [];
+	#severity_names;
 
 	/**
 	 * Create CNavigationTree instance.
@@ -535,11 +535,7 @@ class CNavigationTree {
 				this.#selected_id = selected_id;
 
 				for (const node of this.#tree_elements.nodes) {
-					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED);
-
-					if (node.dataset.id === selected_id) {
-						node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED);
-					}
+					node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED, node.dataset.id === selected_id);
 				}
 
 				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {

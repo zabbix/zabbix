@@ -1057,19 +1057,31 @@ footer {
     .form-grid fieldset.collapsible.collapsed .fields-group,
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
-  .form-grid label {
+  .form-grid > label,
+  .form-grid .collapsible > label,
+  .form-grid .fields-group > label {
     align-self: start;
     line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
-    .form-grid label.fields-group-label {
+    .form-grid > label.fields-group-label,
+    .form-grid .collapsible > label.fields-group-label,
+    .form-grid .fields-group > label.fields-group-label {
       margin-top: 6px; }
-    .form-grid label .btn-icon,
-    .form-grid label .icon {
+    .form-grid > label .btn-icon,
+    .form-grid > label .icon,
+    .form-grid .collapsible > label .btn-icon,
+    .form-grid .collapsible > label .icon,
+    .form-grid .fields-group > label .btn-icon,
+    .form-grid .fields-group > label .icon {
       margin-left: 5px; }
-    .form-grid label:not([for]) {
+    .form-grid > label:not([for]),
+    .form-grid .collapsible > label:not([for]),
+    .form-grid .fields-group > label:not([for]) {
       pointer-events: none; }
-      .form-grid label:not([for]) .btn-icon {
+      .form-grid > label:not([for]) .btn-icon,
+      .form-grid .collapsible > label:not([for]) .btn-icon,
+      .form-grid .fields-group > label:not([for]) .btn-icon {
         pointer-events: initial; }
   .form-grid .fields-group {
     grid-column: 2 / -1;
@@ -4169,6 +4181,25 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
 div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   background-color: transparent; }
 
+form.dashboard-widget-hostnavigator .host-grouping {
+  line-height: 1.4em; }
+  form.dashboard-widget-hostnavigator .host-grouping tr:not(.form_row):first-child {
+    line-height: 24px; }
+
+div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
+  display: flex;
+  justify-content: flex-end;
+  height: 18px;
+  padding: 9px 8px;
+  color: #cacaca; }
+div.dashboard-widget-hostnavigator .host-navigator .host-navigator-no-data {
+  display: flex;
+  justify-content: center;
+  height: 18px;
+  padding: 9px 8px;
+  color: #cacaca;
+  border-bottom: 1px solid #333333; }
+
 .dashboard-widget-inaccessible {
   display: grid;
   align-items: center;
@@ -5331,7 +5362,8 @@ form.is-loading {
   padding: 4px 0; }
 
 .list-check-radio li {
-  display: block; }
+  display: block;
+  line-height: 24px; }
 .list-check-radio.hor-list li {
   margin-right: 15px; }
   .list-check-radio.hor-list li:last-child {
@@ -5339,9 +5371,9 @@ form.is-loading {
 .list-check-radio label {
   display: inline-block;
   max-width: 600px;
-  padding: 0 0 0 18px;
-  line-height: 24px;
-  text-indent: -18px; }
+  padding-left: 20px;
+  line-height: 1.4em;
+  text-indent: -20px; }
   .list-check-radio label input[type="checkbox"] {
     left: -3px;
     margin: 0; }
