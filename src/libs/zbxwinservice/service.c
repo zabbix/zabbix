@@ -434,9 +434,136 @@ int	ZabbixStopService(void)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: changes service startup type for installed service                *
+ *                                                                            *
+ * Parameters: flags - [IN] flags specifying service startup type to set      *
+ *                                                                            *
+ * Return value: SUCCEED - successfully set                                   *
+ *               FAIL    - failed to set                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_service_startup_type_change(unsigned int flags)
+{
+	int		ret = SUCCEED;
+	DWORD		dwStartType;
+	SC_HANDLE	mgr, service;
+
+	if (FAIL == svc_OpenSCManager(&mgr))
+		return FAIL;
+
+	if (SUCCEED != svc_OpenService(mgr, &service, SERVICE_CHANGE_CONFIG))
+	{
+		zbx_error("failed to set service startup type, failed to open service: %s",
+				zbx_strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto close_mgr;
+	}
+
+	if (0 != (flags & ZBX_TASK_FLAG_SERVICE_ENABLED))
+	{
+		if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART))
+			dwStartType = SERVICE_AUTO_START;
+		else
+			dwStartType = SERVICE_DEMAND_START;
+	}
+	else
+		dwStartType = SERVICE_DISABLED;
+
+	if (0 == ChangeServiceConfig(service, SERVICE_NO_CHANGE, dwStartType, SERVICE_NO_CHANGE, NULL, NULL,
+			NULL, NULL, NULL, NULL, NULL))
+	{
+		zbx_error("failed to set service startup type: %s",
+				zbx_strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto close_service;
+	}
+
+	if (SERVICE_AUTO_START == dwStartType)
+	{
+		const OSVERSIONINFOEX		*vi;
+		SERVICE_DELAYED_AUTO_START_INFO	scdasi;
+
+		/* SERVICE_DELAYED_AUTO_START_INFO is available on Windows Server 2008/Vista and onwards */
+		if (NULL == (vi = zbx_win_getversion()))
+		{
+			if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED))
+			{
+				zbx_error("cannot retrieve system version to check if delayed auto-start can be"
+						" configured");
+				ret = FAIL;
+			}
+			goto close_service;
+		}
+
+		if (6 > vi->dwMajorVersion)
+		{
+			if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED))
+			{
+				zbx_error("delayed auto-start can be configured on Windows Server 2008/Vista and"
+						" onwards");
+				ret = FAIL;
+			}
+			goto close_service;
+		}
+
+		scdasi.fDelayedAutostart = (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED) ? TRUE : FALSE);
+
+		if (0 == ChangeServiceConfig2(service, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, &scdasi))
+		{
+			zbx_error("failed to set service delayed auto-start flag to %s: %s",
+					(TRUE == scdasi.fDelayedAutostart ? "TRUE" : "FALSE"),
+					zbx_strerror_from_system(GetLastError()));
+			ret = FAIL;
+		}
+	}
+close_service:
+	CloseServiceHandle(service);
+close_mgr:
+	CloseServiceHandle(mgr);
+
+	if (SUCCEED == ret)
+		zbx_error("service startup-type configured successfully");
+
+	return ret;
+}
+
 void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
 {
 	zbx_on_exit_cb = zbx_on_exit_cb_arg;
 	signal(SIGINT, parent_signal_handler);
 	signal(SIGTERM, parent_signal_handler);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets service startup type flags from command line option argument *
+ *                                                                            *
+ * Parameters: optarg - [IN]                                                  *
+ *             flags  - [OUT]                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - successfully set                                   *
+ *               FAIL    - unknown argument                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_service_startup_flags_set(const char *optarg, unsigned int *flags) {
+	if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_AUTOMATIC))
+		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART;
+	else if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_DELAYED))
+	{
+		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART |
+			ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED;
+	}
+	else if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_MANUAL))
+		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED;
+	else if (0 != strcmp(optarg, ZBX_SERVICE_STARTUP_DISABLED))
+	{
+		zbx_error("unknown startup-type option argument, allowed values: %s, %s, %s, %s",
+				ZBX_SERVICE_STARTUP_AUTOMATIC, ZBX_SERVICE_STARTUP_DELAYED, ZBX_SERVICE_STARTUP_MANUAL,
+				ZBX_SERVICE_STARTUP_DISABLED);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }

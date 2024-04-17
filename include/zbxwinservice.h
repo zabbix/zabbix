@@ -26,6 +26,11 @@
 
 #include "zbxthreads.h"
 
+#define ZBX_SERVICE_STARTUP_AUTOMATIC	"automatic"
+#define ZBX_SERVICE_STARTUP_DELAYED	"delayed"
+#define ZBX_SERVICE_STARTUP_MANUAL	"manual"
+#define ZBX_SERVICE_STARTUP_DISABLED	"disabled"
+
 typedef void	(*zbx_on_exit_t)(int);
 
 void	zbx_service_start(int flags);
@@ -34,8 +39,10 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 int	ZabbixRemoveService(void);
 int	ZabbixStartService(void);
 int	ZabbixStopService(void);
+int	zbx_service_startup_type_change(unsigned int flags);
 
 void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg);
+int	zbx_service_startup_flags_set(const char *opt, unsigned int *flags);
 
 int	ZBX_IS_RUNNING(void);
 void	ZBX_DO_EXIT(void);
