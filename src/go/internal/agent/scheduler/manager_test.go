@@ -76,9 +76,10 @@ func (p *mockExporterPlugin) Export(
 	key string,
 	params []string,
 	ctx plugin.ContextProvider,
-) (result interface{}, err error) {
+) (any, error) {
 	p.call(key)
-	return
+
+	return nil, nil //nolint:nilnil
 }
 
 type mockCollectorPlugin struct {
@@ -106,9 +107,10 @@ func (p *mockCollectorExporterPlugin) Export(
 	key string,
 	params []string,
 	ctx plugin.ContextProvider,
-) (result interface{}, err error) {
+) (any, error) {
 	p.call(key)
-	return
+
+	return nil, nil //nolint:nilnil
 }
 
 func (p *mockCollectorExporterPlugin) Collect() (err error) {
@@ -142,8 +144,8 @@ func (p *mockPassiveRunnerPlugin) Export(
 	key string,
 	params []string,
 	ctx plugin.ContextProvider,
-) (result interface{}, err error) {
-	return
+) (any, error) {
+	return nil, nil //nolint:nilnil
 }
 
 func (p *mockPassiveRunnerPlugin) Start() {
@@ -393,6 +395,8 @@ func (m *mockManager) mockTasks() {
 
 // checks if the times timestamps match the offsets within the specified range
 func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time, offsets []int, iters int) {
+	t.Helper()
+
 	start := m.now.Add(-time.Second * time.Duration(iters-1))
 	to := int(m.now.Sub(m.startTime) / time.Second)
 	from := to - iters + 1
@@ -457,6 +461,8 @@ func (m *mockManager) checkPluginTimeline(
 	calls []map[string][]int,
 	iters int,
 ) {
+	t.Helper()
+
 	for i, p := range plugins {
 		tracker := p.(callTracker).called()
 		for key, offsets := range calls[i] {

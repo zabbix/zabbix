@@ -634,7 +634,7 @@ func NewManager(options *agent.AgentOptions) (*Manager, error) {
 
 	pagent := &pluginAgent{}
 	for _, metric := range metrics {
-		if metric.Plugin != pagent.impl {
+		if metric.Plugin != pagent.impl { //nolint:nestif
 			capacity, forceActiveChecksOnStart := getPluginOptions(
 				agent.Options.Plugins[metric.Plugin.Name()],
 				metric.Plugin.Name(),
