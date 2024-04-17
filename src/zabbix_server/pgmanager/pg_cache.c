@@ -250,9 +250,15 @@ static void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_proxy_t *p
 		zbx_vector_uint64_append(&proxy->group->unassigned_hostids, ref->host->hostid);
 
 		if (PG_REMOVE_REASSIGNED_PROXY == flags)
+		{
 			pg_cache_set_host_proxy(cache, ref->host->hostid, 0);
+		}
 		else
+		{
+			/* proxy will perform host_proxy table cleanup when deleting proxies,  */
+			/* so there is no need to add proxy hosts to proxy.deleted_group_hosts */
 			zbx_hashset_remove_direct(&cache->hostmap, ref->host);
+		}
 	}
 
 	if (FAIL != (i = zbx_vector_pg_proxy_ptr_search(&proxy->group->proxies, proxy, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
