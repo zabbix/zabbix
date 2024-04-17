@@ -31,21 +31,19 @@ class CTableInfo extends CTable {
 	}
 
 	public function setNoDataMessage($message, $description = null, $icon = null) {
-		$message = new CDiv([
+		$container = new CDiv([
 			(new CDiv($message))
-				->addClass('no-data-message')
+				->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
 				->addClass($icon),
-			$description
-				? (new CDiv($description))->addClass('no-data-description')
-				: null
+			$description !== null ? (new CDiv($description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION) : null
 		]);
 
 		if ($icon !== null) {
-			$this->addClass(ZBX_STYLE_LIST_TABLE_FULL_HEIGHT);
-			$message->addClass(ZBX_STYLE_NO_DATA_FOUND);
+			$this->addClass(ZBX_STYLE_FULL_HEIGHT);
+			$container->addClass(ZBX_STYLE_NO_DATA_FOUND);
 		}
 
-		$this->message = new CCol($message);
+		$this->message = new CCol($container);
 
 		return $this;
 	}

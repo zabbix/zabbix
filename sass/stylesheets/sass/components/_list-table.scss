@@ -173,7 +173,6 @@
 
 	.nothing-to-show {
 		td {
-			color: $font-alt-color;
 			text-align: center;
 
 			&:hover {
@@ -184,22 +183,6 @@
 		.no-data-found {
 			margin-top: 100px;
 			margin-bottom: 100px;
-
-			[class^="zi-"], [class*=" zi-"] {
-				&::before {
-					display: block;
-					margin-bottom: 8px;
-				}
-			}
-
-			.no-data-message {
-				font-size: 16px;
-			}
-
-			.no-data-description {
-				font-size: 14px;
-				margin-top: 4px;
-			}
 		}
 	}
 

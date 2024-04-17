@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+const ZBX_STYLE_FULL_HEIGHT = 'full-height';
 
 const ZBX_COLOR_SCHEME_DARK = 'dark';
 const ZBX_COLOR_SCHEME_LIGHT = 'light';
@@ -41,6 +42,10 @@ const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 
+const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
+const ZBX_STYLE_NO_DATA_FOUND = 'no-data-found';
+const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
+
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';
@@ -64,6 +69,7 @@ const ZBX_ICON_PLUS = 'zi-plus';
 const ZBX_ICON_REFERENCE = 'zi-reference';
 const ZBX_ICON_REMOVE_SMALL = 'zi-remove-small';
 const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
+const ZBX_ICON_SEARCH_LARGE = 'zi-search-large';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
