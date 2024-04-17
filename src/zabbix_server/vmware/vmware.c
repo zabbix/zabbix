@@ -4849,7 +4849,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 
 			zabbix_log(LOG_LEVEL_TRACE, "event key reset, key: '" ZBX_FS_UI64 "', last_key: '"
 					ZBX_FS_UI64 "', createdTime: '%d', last_ts: '%d'", key, last_key,
-					xml_event.created_time, (int)last_ts);
+					(int)xml_event.created_time, (int)last_ts);
 			*skip_old = 1;
 			goto clean;
 		}
@@ -5017,7 +5017,7 @@ out:
 	zbx_free(event_session);
 	zbx_xml_free_doc(doc);
 
-	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num)
+	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old)
 		zabbix_log(LOG_LEVEL_WARNING, "vmware events collector returned empty result");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);

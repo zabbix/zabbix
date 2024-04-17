@@ -720,7 +720,10 @@ out:
 static void	vmware_get_events(const zbx_vector_ptr_t *events, const zbx_vmware_eventlog_state_t *evt_state,
 		const DC_ITEM *item, zbx_vector_ptr_t *add_results)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:%d events:%d top event id:" ZBX_FS_UI64
+			" top event ts:%d", __func__, evt_state->last_key, (int)evt_state->last_ts, events->values_num,
+			((zbx_vmware_event_t *)events->values[0])->key,
+			(int)((zbx_vmware_event_t *)events->values[0])->timestamp);
 
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
@@ -728,6 +731,7 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, const zbx_vmware_e
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;
 
+		/* Event id of ESXi will reset when ESXi is rebooted */
 		if (event->timestamp <= evt_state->last_ts && event->key <= evt_state->last_key)
 			continue;
 
@@ -741,7 +745,7 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, const zbx_vmware_e
 			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
 				add_result->log->logeventid = event->key;
-				add_result->log->timestamp = event->timestamp;
+				add_result->log->timestamp = (int)event->timestamp;
 			}
 
 			zbx_vector_ptr_append(add_results, add_result);

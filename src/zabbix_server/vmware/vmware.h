@@ -242,7 +242,7 @@ typedef struct
 {
 	zbx_uint64_t	key;		/* event's key, used to fill logeventid */
 	char		*message;	/* event's fullFormattedMessage */
-	int		timestamp;	/* event's time stamp */
+	time_t		timestamp;	/* event's time stamp */
 }
 zbx_vmware_event_t;
 
