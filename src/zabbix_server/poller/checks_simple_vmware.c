@@ -720,10 +720,10 @@ out:
 static void	vmware_get_events(const zbx_vector_ptr_t *events, const zbx_vmware_eventlog_state_t *evt_state,
 		const DC_ITEM *item, zbx_vector_ptr_t *add_results)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:%d events:%d top event id:" ZBX_FS_UI64
-			" top event ts:%d", __func__, evt_state->last_key, (int)evt_state->last_ts, events->values_num,
-			((zbx_vmware_event_t *)events->values[0])->key,
-			(int)((zbx_vmware_event_t *)events->values[0])->timestamp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T " events:%d top event id:"
+			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key, evt_state->last_ts,
+			events->values_num, ((zbx_vmware_event_t *)events->values[0])->key,
+			((zbx_vmware_event_t *)events->values[0])->timestamp);
 
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
