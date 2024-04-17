@@ -35,7 +35,6 @@ class CTabFilter extends CBaseComponent {
 		// Array of CTabFilterItem objects.
 		this._items = [];
 		this._active_item = null;
-		this._selected_filter_item = null;
 		this._filters_footer = null;
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
