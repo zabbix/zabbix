@@ -479,6 +479,37 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
 	];
 
+	private $OPERATION_OBJECT_TARGETS = [
+		'opstatus' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+		],
+		'opperiod' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+		],
+		'ophistory' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+		],
+		'optrends' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+		],
+		'opseverity' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+		],
+		'optag' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+		],
+		'optemplate' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+		],
+		'opinventory' => [
+			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+		]
+	];
+
 	private $CONDITION_OPERATOR = [
 		CXmlConstantValue::CONDITION_OPERATOR_EQUAL => CXmlConstantName::CONDITION_OPERATOR_EQUAL,
 		CXmlConstantValue::CONDITION_OPERATOR_NOT_EQUAL => CXmlConstantName::CONDITION_OPERATOR_NOT_EQUAL,
@@ -933,16 +964,29 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+							'filter' =>					['type' => XML_ARRAY, 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-								'formula' =>				['type' => XML_STRING, 'default' => ''],
-								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+								'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 										'value' =>					['type' => XML_STRING, 'default' => ''],
 										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
 										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
+															]],
+															['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+									'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+										'value' =>					['type' => XML_STRING, 'default' => ''],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+										'formulaid' =>				['type' => XML_IGNORE_TAG]
+									]]
+															]]
 								]]
 							]],
 							'lifetime_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
@@ -1489,14 +1533,27 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-										'formula' =>				['type' => XML_STRING, 'default' => ''],
-										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+										'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
+																		['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+																		['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
 											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 												'value' =>					['type' => XML_STRING, 'default' => ''],
 												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
 												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 											]]
+																	]],
+																	['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+												'value' =>					['type' => XML_STRING, 'default' => ''],
+												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+												'formulaid' =>				['type' => XML_IGNORE_TAG]
+											]]
+																	]]
 										]]
 									]],
 									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
@@ -1504,24 +1561,48 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+											'status' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opstatus']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-											'delay' =>					['type' => XML_STRING, 'default' => ''],
-											'history' =>				['type' => XML_STRING, 'default' => ''],
-											'trends' =>					['type' => XML_STRING, 'default' => ''],
-											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' =>					['type' => XML_ARRAY, 'rules' => [
-													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-													'value' =>					['type' => XML_STRING, 'default' => '']
-												]]
+											'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opperiod']], 'type' => XML_STRING, 'default' => ''],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
-											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-												'template' =>				['type' => XML_ARRAY, 'rules' => [
-													'name' =>					['type' => XML_STRING | XML_REQUIRED]
-												]]
+											'history' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['ophistory']], 'type' => XML_STRING, 'default' => ''],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
-											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
+											'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optrends']], 'type' => XML_STRING, 'default' => ''],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'severity' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opseverity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'tags' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+																				'tag' =>					['type' => XML_ARRAY, 'rules' => [
+																					'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+																					'value' =>					['type' => XML_STRING, 'default' => '']
+																				]]
+																			]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+																		]],
+											'templates' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optemplate']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+																				'template' =>				['type' => XML_ARRAY, 'rules' => [
+																					'name' =>					['type' => XML_STRING | XML_REQUIRED]
+																				]]
+																			]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'inventory_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opinventory']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]]
 										]]
 									]]
 								]]
@@ -2055,16 +2136,29 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+							'filter' =>					['type' => XML_ARRAY, 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-								'formula' =>				['type' => XML_STRING, 'default' => ''],
-								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+								'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+								]],
+								'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 										'value' =>					['type' => XML_STRING, 'default' => ''],
 										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
 										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
+															]],
+															['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+									'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+										'value' =>					['type' => XML_STRING, 'default' => ''],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+										'formulaid' =>				['type' => XML_IGNORE_TAG]
+									]]
+															]]
 								]]
 							]],
 							'lifetime_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
@@ -2607,14 +2701,27 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-										'formula' =>				['type' => XML_STRING, 'default' => ''],
-										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+										'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
+																		['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
+																		['else' => true, 'type' => XML_IGNORE_TAG]
+										]],
+										'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
 											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 												'value' =>					['type' => XML_STRING, 'default' => ''],
 												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
 												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 											]]
+																	]],
+																	['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+												'value' =>					['type' => XML_STRING, 'default' => ''],
+												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+												'formulaid' =>				['type' => XML_IGNORE_TAG]
+											]]
+																	]]
 										]]
 									]],
 									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
@@ -2622,24 +2729,48 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+											'status' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opstatus']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-											'delay' =>					['type' => XML_STRING, 'default' => ''],
-											'history' =>				['type' => XML_STRING, 'default' => ''],
-											'trends' =>					['type' => XML_STRING, 'default' => ''],
-											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' =>					['type' => XML_ARRAY, 'rules' => [
-													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-													'value' =>					['type' => XML_STRING, 'default' => '']
-												]]
+											'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opperiod']], 'type' => XML_STRING, 'default' => ''],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
-											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-												'template' =>				['type' => XML_ARRAY, 'rules' => [
-													'name' =>					['type' => XML_STRING | XML_REQUIRED]
-												]]
+											'history' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['ophistory']], 'type' => XML_STRING, 'default' => ''],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
-											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
+											'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optrends']], 'type' => XML_STRING, 'default' => ''],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'severity' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opseverity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'tags' =>					['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+																				'tag' =>					['type' => XML_ARRAY, 'rules' => [
+																					'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+																					'value' =>					['type' => XML_STRING, 'default' => '']
+																				]]
+																			]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+																		]],
+											'templates' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optemplate']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+																				'template' =>				['type' => XML_ARRAY, 'rules' => [
+																					'name' =>					['type' => XML_STRING | XML_REQUIRED]
+																				]]
+																			]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]],
+											'inventory_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opinventory']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
+											]]
 										]]
 									]]
 								]]
@@ -3364,25 +3495,5 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 			default:
 				return ['type' => XML_STRING | XML_REQUIRED];
 		}
-	}
-
-	/**
-	 * Import check for filter tag.
-	 * API validation throws an error when filter tag is an empty array.
-	 *
-	 * @param array $data  Import data.
-	 *
-	 * @return array
-	 */
-	public function itemFilterImport(array $data) {
-		if (!array_key_exists('filter', $data)) {
-			return [
-				'conditions' => '',
-				'evaltype' => CXmlConstantName::AND_OR,
-				'formula' => ''
-			];
-		}
-
-		return $data['filter'];
 	}
 }

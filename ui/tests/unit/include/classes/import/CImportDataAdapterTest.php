@@ -668,8 +668,7 @@ class CImportDataAdapterTest extends TestCase {
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
-						'evaltype' => 0,
-						'formula' => '',
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => []
 					],
 					'lifetime' => '30d',
@@ -695,8 +694,7 @@ class CImportDataAdapterTest extends TestCase {
 					'username' => '',
 					'password' => '',
 					'filter' => [
-						'evaltype' => 0,
-						'formula' => '',
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => []
 					],
 					'lifetime' => '30d',
@@ -720,20 +718,17 @@ class CImportDataAdapterTest extends TestCase {
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
-						'evaltype' => '0',
-						'formula' => '',
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							[
 								'macro' => '{#FSTYPE}',
 								'value' => '1',
-								'operator' => '8',
-								'formulaid' => 'A'
+								'operator' => '8'
 							],
 							[
 								'macro' => '{#FSTYPE2}',
 								'value' => '2',
-								'operator' => '8',
-								'formulaid' => 'B'
+								'operator' => '8'
 							]
 						]
 					],
@@ -905,8 +900,7 @@ class CImportDataAdapterTest extends TestCase {
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
-						'evaltype' => 0,
-						'formula' => '',
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => []
 					],
 					'lifetime' => '30d',
@@ -932,8 +926,7 @@ class CImportDataAdapterTest extends TestCase {
 					'username' => '',
 					'password' => '',
 					'filter' => [
-						'evaltype' => 0,
-						'formula' => '',
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => []
 					],
 					'lifetime' => '30d',
@@ -957,20 +950,17 @@ class CImportDataAdapterTest extends TestCase {
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
-						'evaltype' => '0',
-						'formula' => '',
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 						'conditions' => [
 							[
 								'macro' => '{#FSTYPE}',
 								'value' => '1',
-								'operator' => '8',
-								'formulaid' => 'A'
+								'operator' => '8'
 							],
 							[
 								'macro' => '{#FSTYPE2}',
 								'value' => '2',
-								'operator' => '8',
-								'formulaid' => 'B'
+								'operator' => '8'
 							]
 						]
 					],
@@ -2384,8 +2374,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'filter' => [
 						'conditions' => [],
-						'evaltype' => '0',
-						'formula' => ''
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR
 					],
 					'delay' => '1m',
 					'status' => '0',
@@ -2431,8 +2420,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'filter' => [
 						'conditions' => [],
-						'evaltype' => '0',
-						'formula' => ''
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR
 					],
 					'delay' => '1m',
 					'status' => '0',
@@ -2478,8 +2466,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'filter' => [
 						'conditions' => [],
-						'evaltype' => '0',
-						'formula' => ''
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR
 					],
 					'delay' => '1m',
 					'status' => '0',
@@ -2850,8 +2837,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'filter' => [
 						'conditions' => [],
-						'evaltype' => '0',
-						'formula' => ''
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR
 					],
 					'delay' => '1m',
 					'status' => '0',
@@ -2897,8 +2883,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'filter' => [
 						'conditions' => [],
-						'evaltype' => '0',
-						'formula' => ''
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR
 					],
 					'delay' => '1m',
 					'status' => '0',
@@ -2944,8 +2929,7 @@ class CImportDataAdapterTest extends TestCase {
 					],
 					'filter' => [
 						'conditions' => [],
-						'evaltype' => '0',
-						'formula' => ''
+						'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR
 					],
 					'delay' => '1m',
 					'status' => '0',

@@ -1155,29 +1155,6 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
-				if (array_key_exists('filter', $discovery_rule)) {
-					foreach ($discovery_rule['filter']['conditions'] as &$condition) {
-						if ($discovery_rule['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							unset($condition['formulaid']);
-						}
-					}
-					unset($condition);
-				}
-
-				foreach ($discovery_rule['overrides'] as &$override) {
-					if (!array_key_exists('filter', $override)) {
-						continue;
-					}
-
-					foreach ($override['filter']['conditions'] as &$condition) {
-						if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							unset($condition['formulaid']);
-						}
-					}
-					unset($condition);
-				}
-				unset($override);
-
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
 					$discovery_rules_to_update[] = array_diff_key($discovery_rule, array_flip(['hostid']));
