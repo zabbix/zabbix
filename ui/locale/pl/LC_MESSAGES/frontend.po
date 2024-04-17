@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-04-04 13:04+0000\n"
+"PO-Revision-Date: 2024-04-12 14:18+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13248,7 +13248,7 @@ msgstr "Paź"
 
 #: include/items.inc.php:1990
 msgid "Octal to decimal"
-msgstr "System ósekmowy do dziesiętnego"
+msgstr "System ósemkowy do dziesiętnego"
 
 #: include/func.inc.php:109 include/func.inc.php:262 jsLoader.php:246
 msgid "October"
@@ -14487,7 +14487,7 @@ msgstr "Wykorzystanie CPU przez proces. Zwraca liczbę zmiennoprzecinkową"
 
 #: app/views/administration.mediatype.edit.php:235
 msgid "Process tags"
-msgstr "Znaczniki procesu"
+msgstr "Przetwarzanie znaczników"
 
 #: include/classes/helpers/CMenuHelper.php:395
 msgid "Profile"
@@ -17085,7 +17085,7 @@ msgstr "Temat"
 #: include/views/configuration.host.prototype.edit.php:426
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr "Temat"
+msgstr "Podmiot"
 
 #: jsLoader.php:387
 msgid "Submap"

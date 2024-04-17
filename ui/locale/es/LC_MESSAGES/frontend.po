@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-03-10 17:35+0000\n"
+"PO-Revision-Date: 2024-04-12 15:57+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -17321,7 +17321,7 @@ msgstr "Nombre de plantilla"
 
 #: report2.php:387
 msgid "Template trigger"
-msgstr "Iniciador de plantilla"
+msgstr "Plantilla de iniciador"
 
 #: templates.php:240
 msgid "Template updated"
@@ -18288,7 +18288,7 @@ msgstr "Iniciadores eliminados"
 #: include/classes/helpers/CMenuHelper.php:145
 #: include/classes/helpers/CRoleHelper.php:381
 msgid "Triggers top 100"
-msgstr "Top 100 iniciadores"
+msgstr "Los 100 iniciadores principales"
 
 #: include/items.inc.php:1946
 msgid "Trim"
