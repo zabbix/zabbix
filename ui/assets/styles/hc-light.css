@@ -2520,7 +2520,7 @@ button {
 
 .no-data-found {
   display: grid;
-  align-items: center;
+  align-content: center;
   height: 100%;
   color: #333333;
   text-align: center; }
