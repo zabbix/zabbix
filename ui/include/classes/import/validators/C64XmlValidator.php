@@ -578,7 +578,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -871,7 +871,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																		['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																		['else' => true, 'type' => XML_IGNORE_TAG]
 																	]],
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -1558,7 +1558,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -1849,7 +1849,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																		['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																		['else' => true, 'type' => XML_IGNORE_TAG]
 																	]],
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],

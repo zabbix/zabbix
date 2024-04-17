@@ -327,16 +327,14 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
 	];
 
-	private $ITEM_TYPE_DRULE_DELAY_SUBSET = [
+	private $ITEM_TYPE_TIMEOUT_SET = [
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
 		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
-		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
+		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
 		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
 		CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC,
-		CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI,
 		CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH,
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
-		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
@@ -533,6 +531,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS
 	];
 
+	private $ENABLED_LIFETIME_TYPES = [
+		CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER,
+		CXmlConstantValue::LLD_DISABLE_NEVER => CXmlConstantName::LLD_DISABLE_NEVER,
+		CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY
+	];
+
 	/**
 	 * Get validation rules schema.
 	 *
@@ -605,7 +609,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -730,7 +734,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_STRING, 'default' => '3s'],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT_SET], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -784,12 +788,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
 							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -867,10 +874,10 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DRULE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -887,7 +894,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'params' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => array_diff_key($this->ITEM_TYPE_PARAMS, array_flip([CXmlConstantValue::ITEM_TYPE_CALCULATED => CXmlConstantName::CALCULATED]))], 'type' => XML_STRING, 'default' => ''],
+															['if' => ['tag' => 'type', 'in' => array_diff_key($this->ITEM_TYPE_PARAMS, array_flip([CXmlConstantValue::ITEM_TYPE_CALCULATED]))], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ipmi_sensor' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -947,12 +954,14 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'enabled_lifetime_type' =>	['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
-															['else' => true, 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER, CXmlConstantValue::LLD_DISABLE_NEVER => CXmlConstantName::LLD_DISABLE_NEVER, CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY]]
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'enabled_lifetime' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
-															['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
@@ -971,7 +980,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																		['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																		['else' => true, 'type' => XML_IGNORE_TAG]
 																	]],
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -1093,7 +1102,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_STRING, 'default' => '3s'],
+																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT_SET], 'type' => XML_STRING, 'default' => ''],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -1147,12 +1156,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
-									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																	['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
 									'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+																		['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+																		['else' => true, 'type' => XML_IGNORE_TAG]
+																	]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -1365,7 +1377,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_STRING, 'default' => '3s'],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT_SET], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -1419,12 +1431,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
 							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -1727,7 +1742,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -1848,7 +1863,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_STRING, 'default' => '3s'],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT_SET], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -1902,12 +1917,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
 							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -1987,10 +2005,10 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DRULE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -2007,7 +2025,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'params' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => array_diff_key($this->ITEM_TYPE_PARAMS, array_flip([CXmlConstantValue::ITEM_TYPE_CALCULATED => CXmlConstantName::CALCULATED]))], 'type' => XML_STRING, 'default' => ''],
+															['if' => ['tag' => 'type', 'in' => array_diff_key($this->ITEM_TYPE_PARAMS, array_flip([CXmlConstantValue::ITEM_TYPE_CALCULATED]))], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ipmi_sensor' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -2067,12 +2085,14 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'enabled_lifetime_type' =>	['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
-															['else' => true, 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER, CXmlConstantValue::LLD_DISABLE_NEVER => CXmlConstantName::LLD_DISABLE_NEVER, CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY]]
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
+															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'enabled_lifetime' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]], 'type' => XML_IGNORE_TAG],
-															['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
@@ -2088,7 +2108,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => static fn($data) => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
+																		['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
 																		['else' => true, 'type' => XML_IGNORE_TAG]
 																	]],
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
@@ -2206,7 +2226,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_STRING, 'default' => '3s'],
+																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT_SET], 'type' => XML_STRING, 'default' => ''],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -2260,12 +2280,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
-									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																	['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
 									'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
+									]],
+									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+																		['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+																		['else' => true, 'type' => XML_IGNORE_TAG]
+																	]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -2481,7 +2504,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_STRING, 'default' => '3s'],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT_SET], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -2535,12 +2558,15 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
 							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
+																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+																['else' => true, 'type' => XML_IGNORE_TAG]
+															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [

@@ -353,7 +353,7 @@ class CImportDataAdapterTest extends TestCase {
 			'export-host' => [
 				'item' => [
 					'name' => 'item',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
@@ -367,11 +367,12 @@ class CImportDataAdapterTest extends TestCase {
 					'interface_ref' => 'if1',
 					'triggers' => [],
 					'key_' => 'item',
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => ''
 				],
 				'item-jmx' => [
 					'name' => 'item-jmx',
-					'type' => '16',
+					'type' => (string) ITEM_TYPE_JMX,
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
@@ -392,7 +393,7 @@ class CImportDataAdapterTest extends TestCase {
 				],
 				'item2' => [
 					'name' => 'item2',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
@@ -411,14 +412,15 @@ class CImportDataAdapterTest extends TestCase {
 					'interface_ref' => 'if1',
 					'triggers' => [],
 					'key_' => 'item2',
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => ''
 				]
 			],
 			'export-template' => [
 				'item' => [
 					'uuid' => 'cfe34a246c054d0483796f5bb71631b6',
 					'name' => 'item',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
@@ -431,12 +433,13 @@ class CImportDataAdapterTest extends TestCase {
 					'valuemap' => [],
 					'triggers' => [],
 					'key_' => 'item',
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => ''
 				],
 				'item-jmx' => [
 					'uuid' => '4164d2d034dc41ccb151a46b546110bc',
 					'name' => 'item-jmx',
-					'type' => '16',
+					'type' => (string) ITEM_TYPE_JMX,
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
@@ -457,7 +460,7 @@ class CImportDataAdapterTest extends TestCase {
 				'item2' => [
 					'uuid' => '3dc664d55caf4f008fb8d6db770d22e8',
 					'name' => 'item2',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
@@ -475,7 +478,8 @@ class CImportDataAdapterTest extends TestCase {
 					'valuemap' => [],
 					'triggers' => [],
 					'key_' => 'item2',
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => ''
 				]
 			]
 		], $adapter->getItems());
@@ -660,7 +664,7 @@ class CImportDataAdapterTest extends TestCase {
 			'export-host' => [
 				'empty-lld-rule' => [
 					'name' => 'empty-lld-rule',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
@@ -678,13 +682,14 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'empty-lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER
 				],
 				'empty-lld-rule-jmx' => [
 					'name' => 'empty-lld-rule-jmx',
-					'type' => '16',
+					'type' => (string) ITEM_TYPE_JMX,
 					'delay' => '30',
 					'status' => '0',
 					'username' => '',
@@ -706,12 +711,12 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER
 				],
 				'lld-rule' => [
 					'name' => 'lld-rule',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
@@ -738,7 +743,7 @@ class CImportDataAdapterTest extends TestCase {
 					'item_prototypes' => [
 						[
 							'name' => 'lld-item',
-							'type' => '0',
+							'type' => (string) ITEM_TYPE_ZABBIX,
 							'discover' => '0',
 							'delay' => '30',
 							'history' => '90d',
@@ -752,11 +757,12 @@ class CImportDataAdapterTest extends TestCase {
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item',
 							'trigger_prototypes' => [],
-							'preprocessing' => []
+							'preprocessing' => [],
+							'timeout' => ''
 						],
 						[
 							'name' => 'lld-item-jmx',
-							'type' => '16',
+							'type' => (string) ITEM_TYPE_JMX,
 							'discover' => '0',
 							'delay' => '30',
 							'history' => '90d',
@@ -777,7 +783,7 @@ class CImportDataAdapterTest extends TestCase {
 						],
 						[
 							'name' => 'lld-item2',
-							'type' => '0',
+							'type' => (string) ITEM_TYPE_ZABBIX,
 							'discover' => '0',
 							'delay' => '30',
 							'history' => '90d',
@@ -796,7 +802,8 @@ class CImportDataAdapterTest extends TestCase {
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item2',
 							'trigger_prototypes' => [],
-							'preprocessing' => []
+							'preprocessing' => [],
+							'timeout' => ''
 						]
 					],
 					'trigger_prototypes' => [
@@ -884,16 +891,17 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER
 				]
 			],
 			'export-template' => [
 				'empty-lld-rule' => [
 					'uuid' => '6ff04b5a5e8443c7aa9d5ce5f60ea4f9',
 					'name' => 'empty-lld-rule',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
@@ -910,14 +918,15 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'empty-lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER
 				],
 				'lld-rule-jmx' => [
 					'uuid' => '96c257b7f1104833ad3bb18f6a2e8d96',
 					'name' => 'lld-rule-jmx',
-					'type' => '16',
+					'type' => (string) ITEM_TYPE_JMX,
 					'delay' => '30',
 					'status' => '0',
 					'username' => '',
@@ -938,13 +947,13 @@ class CImportDataAdapterTest extends TestCase {
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
 					'overrides' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER
 				],
 				'lld-rule' => [
 					'uuid' => 'cdcd6fb3277e481baa22573c8c349b3b',
 					'name' => 'lld-rule',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'delay' => '30',
 					'status' => '0',
 					'filter' => [
@@ -971,7 +980,7 @@ class CImportDataAdapterTest extends TestCase {
 						[
 							'uuid' => '2d2820fb2c2244df8dc75c92b2fc0f52',
 							'name' => 'lld-item',
-							'type' => '0',
+							'type' => (string) ITEM_TYPE_ZABBIX,
 							'discover' => '0',
 							'delay' => '30',
 							'history' => '90d',
@@ -983,13 +992,14 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'lld-item',
 							'trigger_prototypes' => []
 						],
 						[
 							'uuid' => 'd51ab907cd2840d99a1deda0bc6ba887',
 							'name' => 'lld-item-jmx',
-							'type' => '16',
+							'type' => (string) ITEM_TYPE_JMX,
 							'discover' => '0',
 							'delay' => '30',
 							'history' => '90d',
@@ -1010,7 +1020,7 @@ class CImportDataAdapterTest extends TestCase {
 						[
 							'uuid' => '350f8c141fd94a8385a83a3dca077126',
 							'name' => 'lld-item2',
-							'type' => '0',
+							'type' => (string) ITEM_TYPE_ZABBIX,
 							'discover' => '0',
 							'delay' => '30',
 							'history' => '90d',
@@ -1027,6 +1037,7 @@ class CImportDataAdapterTest extends TestCase {
 							],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'lld-item2',
 							'trigger_prototypes' => []
 						]
@@ -1119,9 +1130,10 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'lld-rule',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER
 				]
 			]
 		], $adapter->getDiscoveryRules());
@@ -1584,7 +1596,7 @@ class CImportDataAdapterTest extends TestCase {
 			'Template_Linux' => [
 				'vfs.fs.size[/,pfree]' => [
 					'uuid' => '1af0599983904849aed77e1bc145a8c2',
-					'type' => '0',
+					'type' => (string) ITEM_TYPE_ZABBIX,
 					'value_type' => '0',
 					'delay' => '30',
 					'history' => '7d',
@@ -1607,13 +1619,14 @@ class CImportDataAdapterTest extends TestCase {
 					'description' => 'Free disk space on / in %',
 					'inventory_link' => '0',
 					'preprocessing' => [],
+					'timeout' => '',
 					'valuemap' => []
 				]
 			],
 			'Template_Simple' => [
 				'net.tcp.service[ftp,,21]' => [
 					'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
-					'type' => '3',
+					'type' => (string) ITEM_TYPE_SIMPLE,
 					'value_type' => '3',
 					'delay' => '30',
 					'history' => '90d',
@@ -1634,11 +1647,12 @@ class CImportDataAdapterTest extends TestCase {
 					'description' => 'FTP check',
 					'inventory_link' => '0',
 					'preprocessing' => [],
+					'timeout' => '',
 					'valuemap' => []
 				],
 				'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 					'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
-					'type' => '3',
+					'type' => (string) ITEM_TYPE_SIMPLE,
 					'value_type' => '3',
 					'delay' => '30',
 					'history' => '90d',
@@ -1659,6 +1673,7 @@ class CImportDataAdapterTest extends TestCase {
 					'description' => 'FTP check with macro',
 					'inventory_link' => '0',
 					'preprocessing' => [],
+					'timeout' => '',
 					'valuemap' => []
 				]
 			]
@@ -1941,7 +1956,7 @@ class CImportDataAdapterTest extends TestCase {
 			'Template_Simple' => [
 				'net.tcp.service[ftp,,21]' => [
 					'uuid' => 'c1e7021d16814cde8d17c783a987bb18',
-					'type' => '3',
+					'type' => (string) ITEM_TYPE_SIMPLE,
 					'value_type' => '3',
 					'description' => 'FTP check',
 					'delay' => '30',
@@ -1958,6 +1973,7 @@ class CImportDataAdapterTest extends TestCase {
 					'inventory_link' => '0',
 					'password' => '',
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'units' => '',
 					'username' => '',
@@ -1966,13 +1982,14 @@ class CImportDataAdapterTest extends TestCase {
 				],
 				'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 					'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
-					'type' => '3',
+					'type' => (string) ITEM_TYPE_SIMPLE,
 					'value_type' => '3',
 					'description' => 'FTP check with macro',
 					'delay' => '30',
 					'history' => '90d',
 					'trends' => '365d',
 					'status' => '0',
+					'timeout' => '',
 					'tags' => [
 						[
 							'tag' => 'Application',
@@ -2229,6 +2246,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test'
 				],
@@ -2248,6 +2266,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test2'
 				],
@@ -2267,6 +2286,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test3'
 				],
@@ -2286,6 +2306,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test4'
 				],
@@ -2305,6 +2326,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test5'
 				],
@@ -2324,6 +2346,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test6'
 				]
@@ -2354,6 +2377,7 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'test7',
 							'trigger_prototypes' => []
 						]
@@ -2370,10 +2394,11 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
 					'key_' => 'drule'
 				],
@@ -2399,6 +2424,7 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'test8',
 							'trigger_prototypes' => []
 						]
@@ -2415,10 +2441,11 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
 					'key_' => 'drule2'
 				],
@@ -2444,6 +2471,7 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'test9',
 							'trigger_prototypes' => []
 						]
@@ -2460,10 +2488,11 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
 					'key_' => 'drule3'
 				]
@@ -2683,6 +2712,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test'
 				],
@@ -2702,6 +2732,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test2'
 				],
@@ -2721,6 +2752,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test3'
 				],
@@ -2740,6 +2772,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test4'
 				],
@@ -2759,6 +2792,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test5'
 				],
@@ -2778,6 +2812,7 @@ class CImportDataAdapterTest extends TestCase {
 					'tags' => [],
 					'valuemap' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'triggers' => [],
 					'key_' => 'test6'
 				]
@@ -2808,6 +2843,7 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'test7',
 							'trigger_prototypes' => []
 						]
@@ -2824,10 +2860,11 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
 					'key_' => 'drule'
 				],
@@ -2853,6 +2890,7 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'test8',
 							'trigger_prototypes' => []
 						]
@@ -2869,10 +2907,11 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
 					'key_' => 'drule2'
 				],
@@ -2898,6 +2937,7 @@ class CImportDataAdapterTest extends TestCase {
 							'tags' => [],
 							'valuemap' => [],
 							'preprocessing' => [],
+							'timeout' => '',
 							'key_' => 'test9',
 							'trigger_prototypes' => []
 						]
@@ -2914,10 +2954,11 @@ class CImportDataAdapterTest extends TestCase {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [],
-					'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-					'enabled_lifetime_type' => ZBX_LLD_DELETE_NEVER,
+					'lifetime_type' => (string) ZBX_LLD_DELETE_AFTER,
+					'enabled_lifetime_type' => (string) ZBX_LLD_DELETE_NEVER,
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'timeout' => '',
 					'overrides' => [],
 					'key_' => 'drule3'
 				]
