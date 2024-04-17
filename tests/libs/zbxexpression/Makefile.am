@@ -26,6 +26,10 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
+	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
+	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
@@ -90,6 +94,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 if HAVE_IPMI

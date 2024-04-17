@@ -2633,6 +2633,24 @@ class testDocumentationLinks extends CWebTest {
 					'widget_type' => 'Pie chart',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
 				]
+			],
+			// #239 Start creating Host navigator widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Host navigator',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator'
+				]
 			]
 		];
 	}

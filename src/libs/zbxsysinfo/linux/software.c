@@ -698,7 +698,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		NULL,
 		portage_details
 	},
-	{NULL}
+	{0}
 };
 
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)

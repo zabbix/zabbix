@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-05 00:12+0000\n"
+"PO-Revision-Date: 2024-04-14 17:30+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -82,6 +82,11 @@ msgstr[1] "%1$d días"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%1$d coincidencias para %2$s encontradas"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -2063,7 +2068,7 @@ msgstr "Por mí"
 
 #: report2.php:192
 msgid "By trigger template"
-msgstr "Por plantilla de disparador"
+msgstr "Por plantilla de iniciador"
 
 #: app/views/administration.proxy.list.php:161
 #: app/views/administration.proxy.list.php:177
@@ -7241,6 +7246,12 @@ msgstr "Desplegable"
 msgid "Dropdown options"
 msgstr "Opciones desplegables"
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr "Duo Universal Prompt"
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
 msgstr "El estado de Duo no coincide con el estado guardado."
@@ -8645,6 +8656,18 @@ msgstr "Global"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "No existe la expresión regular global \"%1$s\"."
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr "La ejecución de script global en el servidor Zabbix está deshabilitada por la configuración del servidor."
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr "Scripts globales en el servidor Zabbix"
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr "Tiempos de espera globales"
@@ -8924,6 +8947,12 @@ msgstr "El grupo \"%1$s\" del equipo \"%2$s\" no existe."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "DN de base del grupo"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9511,6 +9540,10 @@ msgstr "Metadatos de equipo"
 msgid "Host name"
 msgstr "Nombre de equipo"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Redes del equipo"
@@ -9586,6 +9619,10 @@ msgstr "Prototipos de equipo"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Enrutador de equipo"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11674,7 +11711,7 @@ msgstr "Lista de métricas"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr ""
+msgstr "Nombre de la métrica"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16609,7 +16646,7 @@ msgstr "Atributo de referencia"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
-msgstr ""
+msgstr "El widget referido dejó de estar disponible. Por favor actualice la configuración."
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -17168,6 +17205,14 @@ msgstr "Resultado es FALSO"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "RESULTADO is VERDADERO"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -19585,7 +19630,7 @@ msgstr "Permisos de plantillas"
 
 #: report2.php:398
 msgid "Template trigger"
-msgstr "Iniciador de plantilla"
+msgstr "Plantilla de iniciador"
 
 #: app/controllers/CControllerTemplateMassupdate.php:361
 #: app/controllers/CControllerTemplateUpdate.php:188
@@ -20208,7 +20253,7 @@ msgstr "Encima"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr "Los 100 principales iniciadores"
+msgstr "Los 100 iniciadores principales"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -20941,6 +20986,10 @@ msgstr "¿Desbloquear al usuario seleccionado?"
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "¿Desbloquear los usuarios seleccionados?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -23125,6 +23174,10 @@ msgstr "Autenticación interna de Zabbix"
 msgid "Zabbix login form"
 msgstr "Formulario de inicio de sesión de Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr "Proxy o servidor Zabbix"
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
@@ -23889,7 +23942,7 @@ msgstr "d.M"
 
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
 msgid "data is missing"
-msgstr ""
+msgstr "faltan datos"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -24092,6 +24145,10 @@ msgstr "se esperan coordenadas geográficas (valores de latitud y longitud separ
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "configuración global de limpieza"
+
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr "la ejecución del script global en el servidor Zabbix está deshabilitada por la configuración del servidor."
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -25031,6 +25088,10 @@ msgstr "right() - Devuelve los caracteres más a la derecha del contador"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Redondea un valor a un número de decimales"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Elimina los caracteres especificados del final de una cadena"
@@ -25173,6 +25234,10 @@ msgstr "las credenciales proporcionadas no son únicas"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "etiqueta"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

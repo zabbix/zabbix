@@ -1327,7 +1327,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		for (j = 0; j < graph->gitems.values_num; j++)
 		{
-			zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)graph->gitems.values[j];
+			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
 			if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_DELETE))
 				continue;

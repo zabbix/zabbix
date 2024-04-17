@@ -270,6 +270,17 @@ zbx_db_event;
 
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
 
+/* data structures used to create new and recover existing escalations */
+typedef struct
+{
+	zbx_uint64_t	actionid;
+	zbx_uint64_t	escalationid;
+	zbx_db_event	*event;
+}
+zbx_escalation_new_t;
+
+ZBX_PTR_VECTOR_DECL(escalation_new_ptr, zbx_escalation_new_t *)
+
 /* temporary cache of trigger related data */
 typedef struct
 {
@@ -610,7 +621,8 @@ typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned cha
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
+		zbx_vector_escalation_new_ptr_t *escalations);
 typedef void	(*zbx_clean_events_func_t)(void);
 typedef void	(*zbx_reset_event_recovery_func_t)(void);
 typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
@@ -748,6 +760,12 @@ typedef struct
 }
 zbx_item_diff_t;
 
+ZBX_PTR_VECTOR_DECL(item_diff_ptr, zbx_item_diff_t *)
+
+void	zbx_item_diff_free(zbx_item_diff_t *item_diff);
+
+int	zbx_item_diff_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
 	zbx_uint64_t			hostid;
@@ -777,8 +795,8 @@ zbx_proxy_diff_t;
 
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
-		zbx_uint64_t mask);
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_vector_item_diff_ptr_t *item_diff, zbx_uint64_t mask);
 
 int	zbx_db_check_instanceid(void);
 

@@ -201,7 +201,7 @@ static int	DBpatch_6050013(void)
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -3315,7 +3315,7 @@ static int	DBpatch_6050219(void)
 					{"api_hostname", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, 0, 0},
 					{"clientid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
 					{"client_secret", "", NULL, NULL, 64, ZBX_TYPE_CHAR, 0, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -3351,7 +3351,7 @@ static int	DBpatch_6050223(void)
 					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"totp_secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -3615,17 +3615,45 @@ static int	DBpatch_6050253(void)
 
 static int	DBpatch_6050254(void)
 {
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("mfa_totp_secret", &field);
+}
+
+static int	DBpatch_6050255(void)
+{
+	const zbx_db_field_t	field = {"used_codes", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("mfa_totp_secret", &field);
+}
+
+static int	DBpatch_6050256(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050257(void)
+{
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("media", &field);
 }
 
-static int	DBpatch_6050255(void)
+static int	DBpatch_6050258(void)
 {
 	return DBcreate_index("media", "media_3", "userdirectory_mediaid", 0);
 }
 
-static int	DBpatch_6050256(void)
+static int	DBpatch_6050259(void)
 {
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, "userdirectory_media", "userdirectory_mediaid",
 			0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -3633,28 +3661,28 @@ static int	DBpatch_6050256(void)
 	return DBadd_foreign_key("media", 3, &field);
 }
 
-static int	DBpatch_6050257(void)
+static int	DBpatch_6050260(void)
 {
 	const zbx_db_field_t	field = {"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050258(void)
+static int	DBpatch_6050261(void)
 {
 	const zbx_db_field_t	field = {"severity", "63", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050259(void)
+static int	DBpatch_6050262(void)
 {
 	const zbx_db_field_t	field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050260(void)
+static int	DBpatch_6050263(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -3742,6 +3770,7 @@ static int	DBpatch_6050260(void)
 out:
 	return ret;
 }
+
 #endif
 
 DBPATCH_START(6050)
@@ -4007,5 +4036,8 @@ DBPATCH_ADD(6050257, 0, 1)
 DBPATCH_ADD(6050258, 0, 1)
 DBPATCH_ADD(6050259, 0, 1)
 DBPATCH_ADD(6050260, 0, 1)
+DBPATCH_ADD(6050261, 0, 1)
+DBPATCH_ADD(6050262, 0, 1)
+DBPATCH_ADD(6050263, 0, 1)
 
 DBPATCH_END()

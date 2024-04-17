@@ -190,13 +190,18 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
+		if (isset($ALLOW_HTTP_AUTH)) {
+			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
+			$ALLOW_HTTP_AUTH;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -205,6 +210,7 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
+		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 	}
 
 	public function save() {
@@ -301,6 +307,9 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO[\'SP_CERT\']			= \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 //$SSO[\'SETTINGS\']		= [];
+
+// If set to false, support for HTTP authentication will be disabled.
+// $ALLOW_HTTP_AUTH = true;
 ';
 	}
 
@@ -333,6 +342,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
+		$this->config['ALLOW_HTTP_AUTH'] = true;
 	}
 
 	protected function check() {

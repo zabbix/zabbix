@@ -109,14 +109,19 @@ $form_grid = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel(_('Execute on'), 'execute_on'))->setId('execute-on-label'),
-		(new CFormField(
+		(new CFormField([
 			(new CRadioButtonList('execute_on', (int) $data['execute_on']))
 				->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-				->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
-				->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+				->addValue(_('Zabbix proxy or server'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
+				->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER, null, null,
+					!$data['is_global_scripts_enabled']
+				)
 				->setModern()
-				->setId('execute-on')
-		))->setId('execute-on')
+				->setId('execute-on'),
+			!$data['is_global_scripts_enabled']
+				? makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration.'))
+				: null
+		]))->setId('execute-on')
 	])
 	->addItem([
 		(new CLabel(_('Authentication method'), 'authentication'))->setId('auth-type-label'),
