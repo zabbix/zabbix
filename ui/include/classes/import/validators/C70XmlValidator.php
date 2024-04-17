@@ -788,15 +788,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
+							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -894,7 +891,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'params' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => array_diff_key($this->ITEM_TYPE_PARAMS, array_flip([CXmlConstantValue::ITEM_TYPE_CALCULATED]))], 'type' => XML_STRING, 'default' => ''],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ipmi_sensor' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -1156,15 +1153,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
-									'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
-									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																		['else' => true, 'type' => XML_IGNORE_TAG]
-																	]],
+									'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -1431,15 +1425,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
+							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -1917,15 +1908,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
+							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -2025,7 +2013,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'params' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => array_diff_key($this->ITEM_TYPE_PARAMS, array_flip([CXmlConstantValue::ITEM_TYPE_CALCULATED]))], 'type' => XML_STRING, 'default' => ''],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ipmi_sensor' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -2280,15 +2268,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	]],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
-									'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
-									'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																		['else' => true, 'type' => XML_IGNORE_TAG]
-																	]],
+									'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
@@ -2558,15 +2543,12 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'request_method', 'in' => array_diff_key($this->ITEM_REQUEST_METHOD, array_flip([CXmlConstantValue::HEAD]))], 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
+							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [
