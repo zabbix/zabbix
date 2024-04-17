@@ -66,6 +66,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'an item prototype.',
 		'Honeycomb' => 'Displays item values as a honeycomb.',
 		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
+		'Host navigator' => 'Displays host hierarchy with ability to control other widgets based on selected host.',
 		'Item value' => 'Displays the value of a single item prominently.',
 		'Map' => 'Displays either a single configured network map or one of the configured network maps in the map '.
 				'navigation tree.',
