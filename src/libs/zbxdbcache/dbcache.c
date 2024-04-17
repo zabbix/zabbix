@@ -1318,7 +1318,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
-					zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, NULL, host_info->groups.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 
@@ -1471,6 +1471,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		goto clean;
 
 	zbx_vector_uint64_sort(&item_info_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
