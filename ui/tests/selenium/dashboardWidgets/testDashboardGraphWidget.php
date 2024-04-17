@@ -87,14 +87,12 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @param string $name		name of graphic widget to be checked
 	 */
 	private function saveGraphWidget($name) {
+		COverlayDialogElement::ensureNotPresent();
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget($name);
-		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		$widget = $dashboard->getWidget($name)->waitUntilReady();
 		$widget->getContent()->query('class:svg-graph')->waitUntilVisible();
 		$dashboard->save();
-		$message = CMessageElement::find()->waitUntilPresent()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	/*
@@ -1858,7 +1856,6 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check values in updated widget.
@@ -1878,7 +1875,6 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
