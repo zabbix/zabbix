@@ -55,7 +55,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'Name' => 'With MACROS',
+					'Name' => '1 With MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -110,7 +110,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'Name' => 'With lowercase MACROS',
+					'Name' => '2 With lowercase MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -125,7 +125,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in MACROS',
+					'Name' => '3 Without dollar in MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -139,7 +139,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With two dollars in MACROS',
+					'Name' => '4 With two dollars in MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -153,7 +153,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With wrong symbols in MACROS',
+					'Name' => '5 With wrong symbols in MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -167,7 +167,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With LLD macro in MACROS',
+					'Name' => '6 With LLD macro in MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -181,7 +181,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With empty MACRO',
+					'Name' => '7 With empty MACRO',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -197,7 +197,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With repeated MACROS',
+					'Name' => '8 With repeated MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -218,7 +218,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex in MACROS',
+					'Name' => '9 With repeated regex in MACROS',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
