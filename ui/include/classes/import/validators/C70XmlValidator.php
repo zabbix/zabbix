@@ -480,32 +480,32 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 	];
 
 	private $OPERATION_OBJECT_TARGETS = [
-		'opstatus' => [
+		'status' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
 		],
-		'opperiod' => [
+		'delay' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
 		],
-		'ophistory' => [
+		'history' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
 		],
-		'optrends' => [
+		'trends' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
 		],
-		'opseverity' => [
+		'severity' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE
 		],
-		'optag' => [
+		'tag' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
 		],
-		'optemplate' => [
+		'template' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
 		],
-		'opinventory' => [
+		'inventory_mode' => [
 			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
 		]
 	];
@@ -1561,29 +1561,29 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
+											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'status' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opstatus']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
-											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opperiod']], 'type' => XML_STRING, 'default' => ''],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'history' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['ophistory']], 'type' => XML_STRING, 'default' => ''],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optrends']], 'type' => XML_STRING, 'default' => ''],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'severity' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opseverity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'tags' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
 																				'tag' =>					['type' => XML_ARRAY, 'rules' => [
 																					'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 																					'value' =>					['type' => XML_STRING, 'default' => '']
@@ -1592,7 +1592,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 																		]],
 											'templates' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optemplate']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 																				'template' =>				['type' => XML_ARRAY, 'rules' => [
 																					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 																				]]
@@ -1600,7 +1600,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'inventory_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opinventory']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]]
 										]]
@@ -2729,29 +2729,29 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
+											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'status' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opstatus']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
-											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opperiod']], 'type' => XML_STRING, 'default' => ''],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'history' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['ophistory']], 'type' => XML_STRING, 'default' => ''],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optrends']], 'type' => XML_STRING, 'default' => ''],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'severity' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opseverity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'tags' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
 																				'tag' =>					['type' => XML_ARRAY, 'rules' => [
 																					'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 																					'value' =>					['type' => XML_STRING, 'default' => '']
@@ -2760,7 +2760,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 																		]],
 											'templates' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['optemplate']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 																				'template' =>				['type' => XML_ARRAY, 'rules' => [
 																					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 																				]]
@@ -2768,7 +2768,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]],
 											'inventory_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['opinventory']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
+																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
 																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]]
 										]]
