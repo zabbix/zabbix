@@ -141,7 +141,7 @@ class CHostNavigator {
 		else {
 			this.#container.classList.add(ZBX_STYLE_FULL_HEIGHT);
 			this.#container.appendChild(
-				this.#setNoDataMessage(t('No data found.'), null, ZBX_ICON_SEARCH_LARGE)
+				this.#setNoDataMessage(t('No data found'), null, ZBX_ICON_SEARCH_LARGE)
 			);
 		}
 	}

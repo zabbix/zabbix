@@ -2348,6 +2348,7 @@ button {
       flex-shrink: 0;
       margin-right: 4px; }
   .list-table .nothing-to-show td {
+    color: #cacaca;
     text-align: center; }
     .list-table .nothing-to-show td:hover {
       background-color: #000000; }
@@ -2528,7 +2529,6 @@ button {
     margin-bottom: 8px; }
   .no-data-found .no-data-message {
     font-size: 16px;
-    color: #cacaca;
     text-align: center; }
   .no-data-found .no-data-description {
     font-size: 14px;
