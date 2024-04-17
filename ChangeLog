@@ -3,7 +3,7 @@ Changes for 7.0.0beta3
 New features:
 ..F.I..... [ZBXNEXT-8685] implemented new Host navigator widget (apoga, ddauksa)
 ..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that Zabbix server returns to Zabbix frontend (jfreibergs, kprutkovs)
-A.F.....S. [ZBXNEXT-8880] added options for disallow script execution and user HTTP authentication (dfofanovs, dgoloscapov)
+A.F.....S. [ZBXNEXT-8880] added options for disallowing script execution and user HTTP authentication (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8970] implemented faster action execution on Zabbix server (akozlovs)
 .........T [ZBXCTR-22] refactored JavaScript filter functions for Kubernetes templates (ebbex)
 ...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
