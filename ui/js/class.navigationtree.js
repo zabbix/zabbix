@@ -25,6 +25,7 @@ class CNavigationTree {
 	static ZBX_STYLE_NODE =										'navigation-tree-node';
 	static ZBX_STYLE_NODE_IS_GROUP =							'navigation-tree-node-is-group';
 	static ZBX_STYLE_NODE_IS_OPEN =								'navigation-tree-node-is-open';
+	static ZBX_STYLE_NODE_IS_ITEM =								'navigation-tree-node-is-item';
 	static ZBX_STYLE_NODE_IS_SELECTED =							'navigation-tree-node-is-selected';
 	static ZBX_STYLE_NODE_INFO =								'navigation-tree-node-info';
 	static ZBX_STYLE_NODE_INFO_HELPERS =						'navigation-tree-node-info-helpers';
@@ -64,18 +65,11 @@ class CNavigationTree {
 	#container_nodes;
 
 	/**
-	 * Events of navigation tree.
+	 * Listeners of navigation tree.
 	 *
 	 * @type {Object}
 	 */
-	#events;
-
-	/**
-	 * Navigation tree elements (nodes, arrows, names, etc.).
-	 *
-	 * @type {Object}
-	 */
-	#tree_elements;
+	#listeners;
 
 	/**
 	 * ID of selected item.
@@ -117,12 +111,6 @@ class CNavigationTree {
 		this.#show_problems = show_problems;
 		this.#severities = severities;
 
-		this.#tree_elements = {
-			nodes: [],
-			items: [],
-			arrows: []
-		};
-
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CNavigationTree.ZBX_STYLE_CLASS);
 
@@ -135,17 +123,16 @@ class CNavigationTree {
 			this.#container_nodes.appendChild(this.#createNode(node));
 		}
 
-		this.#registerEvents();
-		this.#activateEvents();
+		this.#registerListeners();
+		this.#activateListeners();
 
 		if (this.#selected_id !== '') {
-			const item = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_id}"]
-					.${CNavigationTree.ZBX_STYLE_NODE_INFO}`
-			);
+			const node = this.#container.querySelector(`
+				.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_id}"]
+			`);
 
-			if (item !== null) {
-				this.#events.itemSelect({target: item});
+			if (node !== null) {
+				this.#selectItem(node);
 			}
 		}
 	}
@@ -174,14 +161,18 @@ class CNavigationTree {
 		if (node.children?.length > 0) {
 			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_GROUP);
 			container.dataset.group_identifier = JSON.stringify(node.group_identifier);
-		}
 
-		if (node.is_open) {
-			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-		}
+			if (node.is_open) {
+				container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+			}
 
-		if (node.is_uncategorized) {
-			container.classList.add(CNavigationTree.ZBX_STYLE_GROUP_UNCATEGORIZED);
+			if (node.is_uncategorized) {
+				container.classList.add(CNavigationTree.ZBX_STYLE_GROUP_UNCATEGORIZED);
+			}
+		}
+		else {
+			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_ITEM);
+			container.dataset.id = node.id;
 		}
 
 		const info = document.createElement('div');
@@ -217,8 +208,6 @@ class CNavigationTree {
 			secondary.appendChild(this.#createProblems(node));
 		}
 
-		this.#tree_elements.nodes.push(container);
-
 		if (node.children?.length > 0) {
 			const children = document.createElement('div');
 			children.classList.add(CNavigationTree.ZBX_STYLE_NODE_CHILDREN);
@@ -228,11 +217,6 @@ class CNavigationTree {
 			for (const child of node.children) {
 				children.appendChild(this.#createNode(child));
 			}
-		}
-		else {
-			container.dataset.id = node.id;
-
-			this.#tree_elements.items.push(info);
 		}
 
 		return container;
@@ -270,8 +254,6 @@ class CNavigationTree {
 
 			button.appendChild(span);
 			arrow.appendChild(button);
-
-			this.#tree_elements.arrows.push(button);
 		}
 
 		return arrow;
@@ -474,78 +456,97 @@ class CNavigationTree {
 	}
 
 	/**
-	 * Register events of navigation tree.
+	 * Register listeners of navigation tree.
 	 */
-	#registerEvents() {
-		this.#events = {
-			itemSelect: (e) => {
+	#registerListeners() {
+		this.#listeners = {
+			containerClick: e => {
 				if (e.target.closest('[data-hintbox="1"]') !== null) {
 					return;
 				}
 
-				const selected_node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
-				const selected_id = selected_node.dataset.id;
-
-				this.#selected_id = selected_id;
-
-				for (const node of this.#tree_elements.nodes) {
-					node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED, node.dataset.id === selected_id);
-				}
-
-				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
-					detail: {
-						id: selected_id
-					}
-				}));
-			},
-
-			groupToggle: (e) => {
 				const node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
-				const arrow = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-				let is_open = false;
 
-				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
-					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-					arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
-
-					const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
-
-					for (const inner_open_node of inner_open_nodes) {
-						inner_open_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-
-						const inner_arrow = inner_open_node
-							.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-
-						inner_arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
-					}
-				}
-				else {
-					node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-					arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_RIGHT, ZBX_STYLE_ARROW_DOWN);
-
-					is_open = true;
+				if (node === null) {
+					return;
 				}
 
-				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_GROUP_TOGGLE, {
-					detail: {
-						group_identifier: JSON.parse(node.dataset.group_identifier),
-						is_open
-					}
-				}));
+				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_ITEM)) {
+					this.#selectItem(node);
+				}
+				else if (e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`)) {
+					this.#toggleGroup(node);
+				}
 			}
 		};
 	}
 
 	/**
-	 * Activate events of navigation tree.
+	 * Activate listeners of navigation tree.
 	 */
-	#activateEvents() {
-		for (const item of this.#tree_elements.items) {
-			item.addEventListener('click', this.#events.itemSelect);
+	#activateListeners() {
+		this.#container.addEventListener('click', this.#listeners.containerClick);
+	}
+
+	/**
+	 * Select item of navigation tree.
+	 *
+	 * @param {HTMLElement} node  Node element of item to select.
+	 */
+	#selectItem(node) {
+		this.#selected_id = node.dataset.id;
+
+		const item_nodes = this.#container.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
+
+		for (const item_node of item_nodes) {
+			item_node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED,
+				item_node.dataset.id === this.#selected_id
+			);
 		}
 
-		for (const arrow of this.#tree_elements.arrows) {
-			arrow.addEventListener('click', this.#events.groupToggle);
+		this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
+			detail: {
+				id: this.#selected_id
+			}
+		}));
+	}
+
+	/**
+	 * Toggle group of navigation tree.
+	 *
+	 * @param {HTMLElement} node  Node element of group to toggle.
+	 */
+	#toggleGroup(node) {
+		const arrow = node.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
+		let is_open = false;
+
+		if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
+			node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+			arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
+
+			const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
+
+			for (const inner_open_node of inner_open_nodes) {
+				inner_open_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+
+				const inner_arrow = inner_open_node
+					.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
+
+				inner_arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
+			}
 		}
+		else {
+			node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+			arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_RIGHT, ZBX_STYLE_ARROW_DOWN);
+
+			is_open = true;
+		}
+
+		this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_GROUP_TOGGLE, {
+			detail: {
+				group_identifier: JSON.parse(node.dataset.group_identifier),
+				is_open
+			}
+		}));
 	}
 }

@@ -67,11 +67,11 @@ class CHostNavigator {
 	#maintenances = {};
 
 	/**
-	 * Events of host navigator widget.
+	 * Listeners of host navigator widget.
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#listeners = {};
 
 	/**
 	 * ID of selected host.
@@ -89,7 +89,7 @@ class CHostNavigator {
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CHostNavigator.ZBX_STYLE_CLASS);
 
-		this.#registerEvents();
+		this.#registerListeners();
 	}
 
 	/**
@@ -122,7 +122,7 @@ class CHostNavigator {
 				this.#createLimit(hosts.length);
 			}
 
-			this.#activateEvents();
+			this.#activateListeners();
 
 			const first_selected_host = this.#container.querySelector(
 				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
@@ -452,10 +452,10 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Register events of host navigator widget.
+	 * Register listeners of host navigator widget.
 	 */
-	#registerEvents() {
-		this.#events = {
+	#registerListeners() {
+		this.#listeners = {
 			hostSelect: e => {
 				if (e.detail.id !== this.#selected_host_id) {
 					this.#selected_host_id = e.detail.id;
@@ -507,14 +507,14 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Activate events of host navigator widget.
+	 * Activate listeners of host navigator widget.
 	 */
-	#activateEvents() {
+	#activateListeners() {
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_ITEM_SELECT,
-			this.#events.hostSelect
+			this.#listeners.hostSelect
 		);
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE,
-			this.#events.groupToggle
+			this.#listeners.groupToggle
 		);
 	}
 

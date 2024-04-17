@@ -28,11 +28,11 @@ class CWidgetItemNavigator extends CWidget {
 	#item_navigator = null;
 
 	/**
-	 * Events of item navigator widget.
+	 * Listeners of item navigator widget.
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#listeners = {};
 
 	/**
 	 * Scroll amount of contents.
@@ -66,8 +66,8 @@ class CWidgetItemNavigator extends CWidget {
 
 			this._body.appendChild(this.#item_navigator.getContainer());
 
-			this.#registerEvents();
-			this.#activateEvents();
+			this.#registerListeners();
+			this.#activateListeners();
 		}
 
 		this.#item_navigator.setValue({
@@ -77,8 +77,8 @@ class CWidgetItemNavigator extends CWidget {
 		});
 	}
 
-	#registerEvents() {
-		this.#events = {
+	#registerListeners() {
+		this.#listeners = {
 			itemSelect: e => {
 				this.broadcast({_itemid: e.detail._itemid});
 			},
@@ -91,12 +91,12 @@ class CWidgetItemNavigator extends CWidget {
 		};
 	}
 
-	#activateEvents() {
+	#activateListeners() {
 		this.#item_navigator.getContainer().addEventListener(CItemNavigator.EVENT_ITEM_SELECT,
-			this.#events.itemSelect
+			this.#listeners.itemSelect
 		);
 		this.#item_navigator.getContainer().addEventListener(CItemNavigator.EVENT_GROUP_TOGGLE,
-			this.#events.groupToggle
+			this.#listeners.groupToggle
 		);
 	}
 

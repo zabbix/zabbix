@@ -68,11 +68,11 @@ class CItemNavigator {
 	#hosts = [];
 
 	/**
-	 * Events of item navigator widget.
+	 * Listeners of item navigator widget.
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#listeners = {};
 
 	/**
 	 * ID of selected item.
@@ -90,7 +90,7 @@ class CItemNavigator {
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CItemNavigator.ZBX_STYLE_CLASS);
 
-		this.#registerEvents();
+		this.#registerListeners();
 	}
 
 	/**
@@ -123,7 +123,7 @@ class CItemNavigator {
 				this.#createLimit(items.length);
 			}
 
-			this.#activateEvents();
+			this.#activateListeners();
 
 			const first_selected_item = this.#container.querySelector(
 				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_item_id}"]`
@@ -420,10 +420,10 @@ class CItemNavigator {
 	}
 
 	/**
-	 * Register events of item navigator widget.
+	 * Register listeners of item navigator widget.
 	 */
-	#registerEvents() {
-		this.#events = {
+	#registerListeners() {
+		this.#listeners = {
 			itemSelect: e => {
 				if (e.detail.id !== this.#selected_item_id) {
 					this.#selected_item_id = e.detail.id;
@@ -475,14 +475,14 @@ class CItemNavigator {
 	}
 
 	/**
-	 * Activate events of item navigator widget.
+	 * Activate listeners of item navigator widget.
 	 */
-	#activateEvents() {
+	#activateListeners() {
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_ITEM_SELECT,
-			this.#events.itemSelect
+			this.#listeners.itemSelect
 		);
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE,
-			this.#events.groupToggle
+			this.#listeners.groupToggle
 		);
 	}
 
