@@ -1,1 +1,0 @@
-........S. [ZBX-24049] fixed Zabbix server template linking logic so that it does not wrongfully update triggers on host when there is a corresponding trigger on template with same description but different expression (arimdjonoks) 

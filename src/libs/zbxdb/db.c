@@ -1953,6 +1953,18 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 #endif
 }
 
+int	zbx_db_get_row_num(DB_RESULT result)
+{
+#if defined(HAVE_POSTGRESQL)
+	return result->row_num;
+#elif defined(HAVE_MYSQL)
+	return (int)mysql_num_rows(result->result);
+#else
+	ZBX_UNUSED(result);
+	return 0;
+#endif
+}
+
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_ORACLE)

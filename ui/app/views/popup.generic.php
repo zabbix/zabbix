@@ -426,7 +426,7 @@ switch ($data['popup_type']) {
 		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
-				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];
+				$item_pattern = $options['patternselect'] ? $item['name'] : $item['itemid'];
 
 				$table->addRow([
 					$data['multiselect']
@@ -462,6 +462,10 @@ switch ($data['popup_type']) {
 				];
 			}
 			unset($item);
+
+			if ($options['patternselect']) {
+				$data['table_records'] = array_column($data['table_records'], null, 'name');
+			}
 		}
 		break;
 
