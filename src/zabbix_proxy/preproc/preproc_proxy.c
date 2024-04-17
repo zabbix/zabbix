@@ -25,6 +25,7 @@
 
 int	preproc_prepare_value_proxy(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt)
 {
+	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	ZBX_UNUSED(value);
 	ZBX_UNUSED(value_opt);
 

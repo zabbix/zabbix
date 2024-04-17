@@ -887,6 +887,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
+			/* allow empty values */
 			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
 
