@@ -101,6 +101,7 @@ class CPage {
 				'--enable-font-antialiasing=false',
 				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
 				'--disable-dev-shm-usage',
+				'--remote-debugging-pipe',
 				'--autoplay-policy=no-user-gesture-required'
 			]);
 
