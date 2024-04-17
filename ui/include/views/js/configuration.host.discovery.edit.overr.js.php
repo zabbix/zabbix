@@ -141,7 +141,7 @@
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="lldoverride-tag-row">
-	<?= renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['field_name' => 'optag', 'add_post_js' => false]) ?>
+	<?= renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['field_name' => 'optag', 'add_post_js' => false]) ?>
 </script>
 <script type="text/javascript">
 	jQuery(function($) {

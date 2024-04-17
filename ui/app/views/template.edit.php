@@ -171,7 +171,7 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 
 $form->addItem(
 	(new CTemplateTag('tag-row-tmpl'))
-		->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
+		->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
 );
 
 // Macros tab.

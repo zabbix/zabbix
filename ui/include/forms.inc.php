@@ -886,43 +886,129 @@ function getTriggerMassupdateFormData() {
  * Renders tag table row.
  *
  * @param int|string $index
- * @param string     $tag        (optional)
- * @param string     $value      (optional)
- * @param int        $automatic  (optional)
- * @param array      $options    (optional)
+ * @param array	     $tag
+ * @param string     $tag['tag']                      Tag name.
+ * @param string     $tag['value']                    Tag value.
+ * @param int        $tag['type']                     (optional) Tag ownership type.
+ * @param int        $tag['automatic']                (optional) Tag automatic flag.
+ * @param array      $tag['parent_templates']         (optional) List of templates that tags are inherited from.
+ * @param array      $options
+ * @param bool       $options['add_post_js']          (optional) Parameter passed to CTextAreaFlexible.
+ * @param bool       $options['show_inherited_tags']  (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
+ * @param bool       $options['with_automatic']       (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
+ * @param string     $options['field_name']           (optional) Re-define default field name.
+ * @param bool       $options['readonly']             (optional) Render row in read-only mode.
+ * @param string     $options['source']               (optional) The origin of tag.
  *
  * @return CRow
  */
-function renderTagTableRow($index, $tag = '', $value = '', int $automatic = ZBX_TAG_MANUAL, array $options = []) {
+function renderTagTableRow($index, array $tag, array $options = []) {
 	$options += [
 		'readonly' => false,
 		'field_name' => 'tags',
-		'with_automatic' => false
+		'with_automatic' => false,
+		'show_inherited_tags' => false,
+		'source' => null
 	];
 
-	return (new CRow([
-		(new CCol([
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
-				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-				->setAttribute('placeholder', _('tag')),
-			$options['with_automatic']
-				? new CVar($options['field_name'].'['.$index.'][automatic]', $automatic)
-				: null
-		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
-				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-				->setAttribute('placeholder', _('value'))
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
+	if ($options['with_automatic'] && !array_key_exists('automatic', $tag)) {
+		$tag['automatic'] = ZBX_TAG_MANUAL;
+	}
+
+	if ($options['show_inherited_tags'] && !array_key_exists('type', $tag)) {
+		$tag['type'] = ZBX_PROPERTY_INHERITED;
+	}
+
+	if ($options['show_inherited_tags'] && !array_key_exists('parent_templates', $tag)) {
+		$tag['parent_templates'] = [];
+	}
+
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'],
+			array_intersect_key($options, array_flip(['readonly', 'add_post_js']))
+		))
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
+		->setAttribute('placeholder', _('tag'));
+
+	$type_field = $options['show_inherited_tags'] && array_key_exists('type', $tag)
+		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
+		: null;
+
+	$automatic_field = $options['with_automatic']
+		? new CVar($options['field_name'].'['.$index.'][automatic]', $tag['automatic'])
+		: null;
+
+	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
+			array_intersect_key($options, array_flip(['readonly', 'add_post_js']))
+		))
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
+		->setAttribute('placeholder', _('value'));
+
+	if ($options['with_automatic'] && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
+		switch ($options['source']) {
+			case 'host':
+				$actions = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
+				break;
+
+			default:
+				$actions = null;
+				break;
+		}
+	}
+	else {
+		$actions = $options['show_inherited_tags'] && ($tag['type'] & ZBX_PROPERTY_INHERITED) != 0
+			? (new CButton($options['field_name'].'['.$index.'][disable]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-disable')
+				->setEnabled(!$options['readonly'])
+			: (new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-				->setEnabled(!$options['readonly'])
-		))
+				->setEnabled(!$options['readonly']);
+	}
+
+	return (new CRow([
+		(new CCol([$tag_field, $type_field, $automatic_field]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($value_field))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($actions))
 			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass(ZBX_STYLE_TOP)
+			->addClass(ZBX_STYLE_TOP),
+		$options['show_inherited_tags']
+			? new CCol(makeParentTemplatesList($tag['parent_templates']))
+			: null
 	]))->addClass('form_row');
+}
+
+/**
+ * Function to render templates as HTML links or span tags, based on user permissions to edit each particular template.
+ */
+function makeParentTemplatesList(array $parent_templates): array {
+	if (!$parent_templates) {
+		return [];
+	}
+
+	CArrayHelper::sort($parent_templates, ['name']);
+
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$template_list = [];
+
+	foreach ($parent_templates as $templateid => $template) {
+		if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
+			$template_list[] = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $templateid)
+			))->setTarget('_blank');
+		}
+		else {
+			$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$template_list[] = ', ';
+	}
+
+	array_pop($template_list);
+
+	return $template_list;
 }
 
 /**
@@ -952,9 +1038,9 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 	}
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'],
-			$with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL, $row_options
-		));
+		$tag = ['automatic' => $with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL] + $tag;
+
+		$table->addRow(renderTagTableRow($index, $tag, $row_options));
 	}
 
 	return $table->setFooter(new CCol(

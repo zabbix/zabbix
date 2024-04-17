@@ -26,7 +26,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, [
+	<?= renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], [
 		'add_post_js' => false,
 		'with_automatic' => array_key_exists('with_automatic', $data) && $data['with_automatic']
 	]) ?>

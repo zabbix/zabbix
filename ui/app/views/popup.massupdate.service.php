@@ -47,7 +47,7 @@ $tags_form_grid = (new CFormGrid())
 					->setHeader([_('Name'), _('Value'), _('Action')])
 					->addClass('tags-table'),
 				(new CTemplateTag('tag-row-tmpl'))
-					->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
+					->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
 			]))
 				->setId('tags-field')
 				->addClass(ZBX_STYLE_TABLE_FORMS)
