@@ -668,7 +668,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '7'
                   fields:
                     - type: GRAPH
@@ -681,7 +681,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -694,7 +694,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -709,9 +709,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -723,9 +723,9 @@ zabbix_export:
                       name: reference
                       value: AAAAC
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

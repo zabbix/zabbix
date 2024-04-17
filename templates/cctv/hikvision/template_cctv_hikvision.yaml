@@ -1449,7 +1449,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'Hikvision camera: CPU utilization'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: GRAPH
@@ -1462,8 +1462,8 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Hikvision camera: Memory'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: GRAPH

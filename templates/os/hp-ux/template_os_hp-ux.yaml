@@ -572,7 +572,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'CPU load'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -586,7 +586,7 @@ zabbix_export:
                 - type: graph
                   name: 'Memory usage'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -599,8 +599,8 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   name: 'CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

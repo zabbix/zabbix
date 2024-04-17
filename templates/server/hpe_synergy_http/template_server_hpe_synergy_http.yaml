@@ -7159,7 +7159,7 @@ zabbix_export:
             - name: Enclosures
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -7176,7 +7176,7 @@ zabbix_export:
             - name: 'Storage pools'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -7193,7 +7193,7 @@ zabbix_export:
             - name: 'Storage systems'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -7210,7 +7210,7 @@ zabbix_export:
             - name: 'Storage volumes'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

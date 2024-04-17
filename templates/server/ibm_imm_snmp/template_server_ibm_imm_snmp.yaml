@@ -825,7 +825,7 @@ zabbix_export:
             - name: Temperature
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -844,7 +844,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '4'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -863,7 +863,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '8'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -883,7 +883,7 @@ zabbix_export:
             - name: Fan
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER

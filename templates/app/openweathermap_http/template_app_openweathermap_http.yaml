@@ -621,7 +621,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: Atmospheric.pressure
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -638,7 +638,7 @@ zabbix_export:
                 - type: graphprototype
                   name: 'Snow volume'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -654,8 +654,8 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   name: 'Rain volume'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -671,9 +671,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: Temperature
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

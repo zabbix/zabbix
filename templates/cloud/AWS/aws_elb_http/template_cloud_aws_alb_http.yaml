@@ -2292,7 +2292,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'AWS ELB ALB: HTTP Code'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: STRING
@@ -2334,7 +2334,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'AWS ELB ALB: Connection Count'
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: STRING
@@ -2384,7 +2384,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'AWS ELB ALB: Requests Count and Response Time'
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: STRING
@@ -2421,7 +2421,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'AWS ELB ALB: Consumed LCUs and Processed Bytes'
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: STRING
@@ -2459,7 +2459,7 @@ zabbix_export:
               widgets:
                 - type: piechart
                   name: 'Healthy Host Count'
-                  width: '4'
+                  width: '12'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -2483,7 +2483,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'HTTP Code Target Group'
                   'y': '4'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: STRING
@@ -2504,7 +2504,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'Request Count Per Target'
                   'y': '9'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: STRING
@@ -2527,14 +2527,14 @@ zabbix_export:
                       value: '7'
                     - type: INTEGER
                       name: ds.0.width
-                      value: '2'
+                      value: '6'
                     - type: STRING
                       name: reference
                       value: COJBR
                 - type: piechart
                   name: 'Unhealthy Host Count'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -2554,8 +2554,8 @@ zabbix_export:
                       value: '1'
                 - type: piechart
                   name: 'Healthy State Routing'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -2578,8 +2578,8 @@ zabbix_export:
                       value: '1'
                 - type: piechart
                   name: 'Unhealthy State Routing'
-                  x: '12'
-                  width: '4'
+                  x: '36'
+                  width: '12'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -2599,8 +2599,8 @@ zabbix_export:
                       value: '1'
                 - type: piechart
                   name: 'Healthy State DNS'
-                  x: '16'
-                  width: '4'
+                  x: '48'
+                  width: '12'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -2623,8 +2623,8 @@ zabbix_export:
                       value: '1'
                 - type: piechart
                   name: 'Unhealthy State DNS'
-                  x: '20'
-                  width: '4'
+                  x: '60'
+                  width: '12'
                   height: '4'
                   fields:
                     - type: INTEGER
