@@ -114,7 +114,7 @@ class CItemNavigator {
 			this.#navigation_tree = new CNavigationTree(this.#nodes, {
 				selected_id: this.#selected_item_id,
 				show_problems: this.#config.show_problems,
-				severity_names: this.#config.severity_names
+				severities: this.#config.severities
 			});
 
 			this.#container.appendChild(this.#navigation_tree.getContainer());

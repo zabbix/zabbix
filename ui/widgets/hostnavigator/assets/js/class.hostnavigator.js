@@ -113,7 +113,7 @@ class CHostNavigator {
 			this.#navigation_tree = new CNavigationTree(this.#nodes, {
 				selected_id: this.#selected_host_id,
 				show_problems: this.#config.show_problems,
-				severity_names: this.#config.severity_names
+				severities: this.#config.severities
 			});
 
 			this.#container.appendChild(this.#navigation_tree.getContainer());
@@ -311,7 +311,7 @@ class CHostNavigator {
 						if (host.problem_count[i] > 0) {
 							const new_group = {
 								...CHostNavigator.#getGroupTemplate(),
-								name: this.#config.severity_names[i],
+								name: this.#config.severities[i].label,
 								group_by: {
 									attribute: CHostNavigator.GROUP_BY_SEVERITY,
 									name: t('Severity')

@@ -92,30 +92,30 @@ class CNavigationTree {
 	#show_problems;
 
 	/**
-	 * Severity names.
+	 * Severities with necessary info.
 	 *
 	 * @type {Array}
 	 */
-	#severity_names;
+	#severities;
 
 	/**
 	 * Create CNavigationTree instance.
 	 *
-	 * @param {Array}   nodes           Array of nodes data.
-	 * @param {string}  selected_id     ID of selected item. Empty string if none selected.
-	 * @param {boolean} show_problems   Whether to show problems or not.
-	 * @param {Array}   severity_names  Severity names.
+	 * @param {Array}   nodes          Array of nodes data.
+	 * @param {string}  selected_id    ID of selected item. Empty string if none selected.
+	 * @param {boolean} show_problems  Whether to show problems or not.
+	 * @param {Array}   severities     Severities with necessary info.
 	 *
 	 * @returns {CNavigationTree}
 	 */
 	constructor(nodes, {
 		selected_id = '',
 		show_problems = true,
-		severity_names = []
+		severities = []
 	} = {}) {
 		this.#selected_id = selected_id;
 		this.#show_problems = show_problems;
-		this.#severity_names = severity_names;
+		this.#severities = severities;
 
 		this.#tree_elements = {
 			nodes: [],
@@ -157,50 +157,6 @@ class CNavigationTree {
 	 */
 	getContainer() {
 		return this.#container;
-	}
-
-	/**
-	 * Get severity object at provided index.
-	 *
-	 * @param {number} index  Which severity to return.
-	 *
-	 * @returns {Object}  Severity object with necessary info.
-	 */
-	#getSeverity(index) {
-		const severities = {
-			[TRIGGER_SEVERITY_NOT_CLASSIFIED]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_NOT_CLASSIFIED],
-				class: ZBX_STYLE_NA_BG,
-				class_status: ZBX_STYLE_STATUS_NA_BG
-			},
-			[TRIGGER_SEVERITY_INFORMATION]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_INFORMATION],
-				class: ZBX_STYLE_INFO_BG,
-				class_status: ZBX_STYLE_STATUS_INFO_BG
-			},
-			[TRIGGER_SEVERITY_WARNING]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_WARNING],
-				class: ZBX_STYLE_WARNING_BG,
-				class_status: ZBX_STYLE_STATUS_WARNING_BG
-			},
-			[TRIGGER_SEVERITY_AVERAGE]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_AVERAGE],
-				class: ZBX_STYLE_AVERAGE_BG,
-				class_status: ZBX_STYLE_STATUS_AVERAGE_BG
-			},
-			[TRIGGER_SEVERITY_HIGH]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_HIGH],
-				class: ZBX_STYLE_HIGH_BG,
-				class_status: ZBX_STYLE_STATUS_HIGH_BG
-			},
-			[TRIGGER_SEVERITY_DISASTER]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_DISASTER],
-				class: ZBX_STYLE_DISASTER_BG,
-				class_status: ZBX_STYLE_STATUS_DISASTER_BG
-			}
-		};
-
-		return severities[index];
 	}
 
 	/**
@@ -441,7 +397,7 @@ class CNavigationTree {
 
 		for (const severity of problems_data) {
 			const box = document.createElement('span');
-			box.classList.add(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM, severity.class_status);
+			box.classList.add(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM, severity.status_style);
 			box.innerText = severity.count;
 
 			contents.appendChild(box);
@@ -464,12 +420,10 @@ class CNavigationTree {
 			const is_severity_allowed = node.severity_filter !== undefined ? i === node.severity_filter : true;
 
 			if (node.problem_count[i] > 0 && is_severity_allowed) {
-				const severity = this.#getSeverity(i);
-
 				problems.push({
-					severity: severity.name,
-					class: severity.class,
-					class_status: severity.class_status,
+					label: this.#severities[i].label,
+					style: this.#severities[i].style,
+					status_style: this.#severities[i].status_style,
 					count: node.problem_count[i],
 					order: i,
 				});
@@ -499,13 +453,13 @@ class CNavigationTree {
 			hint.appendChild(row);
 
 			const color = document.createElement('span');
-			color.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY_COLOR, severity.class);
+			color.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY_COLOR, severity.style);
 
 			row.appendChild(color);
 
 			const name = document.createElement('span');
 			name.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY_NAME);
-			name.innerText = `${severity.severity}: `;
+			name.innerText = `${severity.label}: `;
 
 			row.appendChild(name);
 
