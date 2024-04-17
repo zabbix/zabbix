@@ -30,6 +30,7 @@ class CTabFilter extends CBaseComponent {
 		// Array of CTabFilterItem objects.
 		this._items = [];
 		this._active_item = null;
+		this._selected_filter_item = null;
 		this._filters_footer = null;
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
@@ -302,12 +303,15 @@ class CTabFilter extends CBaseComponent {
 	 * @param {CTabFilterItem} item  Item object to be set as selected item.
 	 */
 	setSelectedItem(item) {
-		const prev_item = this._active_item;
+		if (this._active_item !== this._timeselector) {
+			this._selected_filter_item = this._active_item;
+		}
+
 		this._active_item = item;
 		this._active_item.unsetExpandedSubfilters();
 		item.setSelected();
 
-		if (item !== this._timeselector && prev_item !== this._timeselector) {
+		if (item !== this._timeselector && item !== this._selected_filter_item) {
 			item._target.setAttribute('tabindex', 0);
 			this.scrollIntoView(item);
 			item.setBrowserLocationToApplyUrl();
@@ -395,6 +399,7 @@ class CTabFilter extends CBaseComponent {
 						value_int: item._expanded ? 0 : 1
 					}).then(() => {
 						this._options.expanded_timeselector = +item._expanded;
+						this._options.expanded = false;
 					});
 				}
 				else {
@@ -403,6 +408,7 @@ class CTabFilter extends CBaseComponent {
 							value_int: item._expanded ? 0 : 1
 						}).then(() => {
 							this._options.expanded = +item._expanded;
+							this._options.expanded_timeselector = false;
 						});
 					}
 

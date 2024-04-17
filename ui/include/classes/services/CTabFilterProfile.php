@@ -287,7 +287,7 @@ class CTabFilterProfile {
 		$this->expanded = (bool) CProfile::get($this->namespace.'.expanded', true);
 
 		if (!$this->expanded) {
-			$this->expanded_timeselector = (bool)CProfile::get($this->namespace . '.expanded_timeselector', true);
+			$this->expanded_timeselector = (bool) CProfile::get($this->namespace . '.expanded_timeselector', false);
 		}
 
 		// CProfile::updateArray assign new idx2 values do not need to store order in profile
