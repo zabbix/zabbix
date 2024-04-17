@@ -434,7 +434,7 @@ class testFormAlarmNotification extends CWebTest {
 					'all_off' => true
 				]
 			],
-			// #7 Not classified and High turned off.
+			// #7 Not classified and High severities turned off.
 			[
 				[
 					'severity_status' => ['Not classified' => false, 'High' => false],
@@ -498,6 +498,9 @@ class testFormAlarmNotification extends CWebTest {
 		$this->closeProblem();
 	}
 
+	/**
+	 * Update Problems severity display.
+	 */
 	protected function updateSeverity($parameters) {
 		$all_severity = [
 				'Not classified' => true,
@@ -519,6 +522,9 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->waitUntilReady();
 	}
 
+	/**
+	 * Manually close problem from Problems page.
+	 */
 	protected function closeProblem() {
 		$this->selectTableRows();
 		$this->query('button:Mass update')->one()->click();
