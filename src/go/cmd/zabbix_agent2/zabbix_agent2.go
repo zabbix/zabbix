@@ -573,7 +573,7 @@ func parseArgs() (string, *Arguments, error) {
 
 func usageMessage() string {
 	return fmt.Sprintf(
-		usageMessageFormat,
+		usageMessageFormat+osDependentUsageMessageFormat,
 		filepath.Base(os.Args[0]),
 	)
 }

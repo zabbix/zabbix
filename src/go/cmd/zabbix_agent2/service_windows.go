@@ -26,9 +26,12 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxflag"
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -40,6 +43,13 @@ import (
 
 const usageMessageExampleConfPath = `C:\zabbix\zabbix_agent2.conf`
 
+const (
+	startTypeAutomatic = "automatic"
+	startTypeDelayed   = "delayed"
+	startTypeManual    = "manual"
+	startTypeDisabled  = "disabled"
+)
+
 var (
 	serviceName = "Zabbix Agent 2"
 
@@ -48,6 +58,7 @@ var (
 	svcStartFlag         bool
 	svcStopFlag          bool
 	svcMultipleAgentFlag bool
+	svcStartType         string
 
 	winServiceRun bool
 
@@ -110,11 +121,28 @@ func osDependentFlags() zbxflag.Flags {
 			Default: false,
 			Dest:    &svcStopFlag,
 		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "startup-type",
+				Shorthand: "S",
+				Description: fmt.Sprintf(
+					"Set startup type of the Zabbix Windows agent service to be installed."+
+						" Allowed values: %s (default), %s, %s, %s",
+					startTypeAutomatic,
+					startTypeDelayed,
+					startTypeManual,
+					startTypeDisabled,
+				),
+			},
+			Default: "",
+			Dest:    &svcStartType,
+		},
 	}
 }
 
 func isWinLauncher() bool {
-	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcMultipleAgentFlag {
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcMultipleAgentFlag ||
+		svcStartType != "" {
 		return true
 	}
 	return false
@@ -171,7 +199,9 @@ func eventLogErr(err error) error {
 }
 
 func validateMultipleAgentFlag() bool {
-	if svcMultipleAgentFlag && !(svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag) && !winServiceRun {
+	if svcMultipleAgentFlag &&
+		!(svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcStartType != "") &&
+		!winServiceRun {
 		return false
 	}
 
@@ -185,6 +215,7 @@ func validateExclusiveFlags(args *Arguments) error {
 			svcUninstallFlag,
 			svcStartFlag,
 			svcStopFlag,
+			svcStartType != "",
 			args.print,
 			args.test != "",
 			args.runtimeCommand != "",
@@ -256,7 +287,7 @@ func handleWindowsService(confPath string) error {
 		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.FirstHostname)
 	}
 
-	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcStartType != "" {
 		absPath, err := filepath.Abs(confPath)
 		if err != nil {
 			return err
@@ -300,6 +331,11 @@ func resolveWindowsService(confPath string) error {
 			return fmt.Errorf("failed to stop %s service: %s", serviceName, err)
 		}
 		msg = fmt.Sprintf("'%s' stopped successfully", serviceName)
+	case svcStartType != "":
+		if err := svcStartupTypeSet(); err != nil {
+			return errs.Wrapf(err, "failed to set service '%s' startup type", serviceName)
+		}
+		msg = fmt.Sprintf("service '%s' startup type configured successfully", serviceName)
 	}
 
 	msg = fmt.Sprintf("zabbix_agent2 [%d]: %s\n", os.Getpid(), msg)
@@ -451,6 +487,67 @@ func svcStop() error {
 		if status, err = s.Query(); err != nil {
 			return fmt.Errorf("failed to get service status: %s", err.Error())
 		}
+	}
+
+	return nil
+}
+
+func svcStartupTypeSet() error {
+	var dwStartType uint32
+	var serviceAutostart, serviceAutostartDelayed bool
+
+	m, err := mgr.Connect()
+	if err != nil {
+		return errs.Wrap(err, "failed to connect to service manager")
+	}
+	defer m.Disconnect()
+
+	s, err := m.OpenService(serviceName)
+	if err != nil {
+		return errs.Wrap(err, "failed to open service")
+	}
+	defer s.Close()
+
+	switch svcStartType {
+	case startTypeAutomatic:
+		serviceAutostart = true
+		dwStartType = windows.SERVICE_AUTO_START
+	case startTypeDelayed:
+		serviceAutostart = true
+		serviceAutostartDelayed = true
+		dwStartType = windows.SERVICE_AUTO_START
+	case startTypeManual:
+		dwStartType = windows.SERVICE_DEMAND_START
+	case startTypeDisabled:
+		dwStartType = windows.SERVICE_DISABLED
+	default:
+		return fmt.Errorf("unknown service start type: '%s'", svcStartType)
+	}
+
+	windows.ChangeServiceConfig(
+		s.Handle,
+		windows.SERVICE_NO_CHANGE,
+		dwStartType,
+		windows.SERVICE_NO_CHANGE,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+	)
+
+	if serviceAutostart {
+		var scdasi windows.SERVICE_DELAYED_AUTO_START_INFO
+
+		if serviceAutostartDelayed {
+			scdasi.IsDelayedAutoStartUp = 1
+		}
+
+		windows.ChangeServiceConfig2(
+			s.Handle, windows.SERVICE_CONFIG_DELAYED_AUTO_START_INFO, (*byte)(unsafe.Pointer(&scdasi)),
+		)
 	}
 
 	return nil

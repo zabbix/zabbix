@@ -30,6 +30,17 @@ import (
 	"zabbix.com/pkg/pdh"
 )
 
+const osDependentUsageMessageFormat = //
+`  %[1]s [-c config-file] [-s automatic] [-m]
+  %[1]s [-c config-file] [-s delayed] [-m]
+  %[1]s [-c config-file] [-s manual] [-m]
+  %[1]s [-c config-file] [-s disabled] [-m]
+  %[1]s [-c config-file] -i [-m]
+  %[1]s [-c config-file] -d [-m]
+  %[1]s [-c config-file] -s [-m]
+  %[1]s [-c config-file] -x [-m]
+`
+
 func loadOSDependentItems() error {
 	if err := pdh.LocateObjectsAndDefaultCounters(true); err != nil {
 		log.Warningf("cannot load objects and default counters: %s", err.Error())

@@ -30,6 +30,8 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 )
 
+const osDependentUsageMessageFormat = ""
+
 func loadOSDependentItems() error {
 	return nil
 }
