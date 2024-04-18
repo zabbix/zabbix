@@ -1379,7 +1379,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 										]]
 									]],
 									'custom_interfaces' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-									'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
+									'interfaces' =>				['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'custom_interfaces', 'in' => [CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
 										'interface' =>				['type' => XML_ARRAY, 'rules' => [
 											'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
@@ -1387,20 +1388,64 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
 											'dns' =>					['type' => XML_STRING, 'default' => ''],
 											'port' =>					['type' => XML_STRING, 'default' => '10050'],
-											'details' =>				['type' => XML_ARRAY, 'rules' => [
+											'details' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
 												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-												'community' =>				['type' => XML_STRING, 'default' => ''],
-												'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
-												'contextname' =>			['type' => XML_STRING, 'default' => ''],
-												'securityname' =>			['type' => XML_STRING, 'default' => ''],
-												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+												'community' =>				['type' => XML_MULTIPLE, 'rules' => [
+																				['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'max_repetitions' =>		['type' => XML_MULTIPLE, 'rules' => [
+																				['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'contextname' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_STRING, 'default' => ''],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'securityname' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_STRING, 'default' => ''],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'securitylevel' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'authprotocol' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'authpassphrase' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'privprotocol' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'privpassphrase' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]]
+																			]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]]
 										]]
+																	]],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]]
 								]]
 							]],
@@ -2515,6 +2560,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -2547,7 +2593,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 										]]
 									]],
 									'custom_interfaces' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-									'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
+									'interfaces' =>				['type' => XML_MULTIPLE, 'rules' => [
+																	['if' => ['tag' => 'custom_interfaces', 'in' => [CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
 										'interface' =>				['type' => XML_ARRAY, 'rules' => [
 											'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
@@ -2555,21 +2602,65 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
 											'dns' =>					['type' => XML_STRING, 'default' => ''],
 											'port' =>					['type' => XML_STRING, 'default' => '10050'],
-											'details' =>				['type' => XML_ARRAY, 'rules' => [
+											'details' =>				['type' => XML_MULTIPLE, 'rules' => [
+																			['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::SNMP => CXmlConstantName::SNMP]], 'type' => XML_ARRAY, 'rules' => [
 												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-												'community' =>				['type' => XML_STRING, 'default' => ''],
-												'contextname' =>			['type' => XML_STRING, 'default' => ''],
-												'securityname' =>			['type' => XML_STRING, 'default' => ''],
-												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
-												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
-												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+												'community' =>				['type' => XML_MULTIPLE, 'rules' => [
+																				['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2]], 'type' => XML_STRING, 'default' => ''],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'max_repetitions' =>		['type' => XML_MULTIPLE, 'rules' => [
+																				['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_STRING, 'default' => '10'],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'contextname' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_STRING, 'default' => ''],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'securityname' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_STRING, 'default' => ''],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'securitylevel' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'authprotocol' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => $this->SNMPV3_AUTHPROTOCOL],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'authpassphrase' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'privprotocol' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_DES, 'in' => $this->SNMPV3_PRIVPROTOCOL],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]],
+												'privpassphrase' =>			['if' => ['tag' => 'version', 'in' => [CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]], 'type' => XML_MULTIPLE, 'rules' => [
+																				['type' => XML_MULTIPLE, 'rules' => [
+																					['if' => ['tag' => 'securitylevel', 'in' => [CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV]], 'type' => XML_STRING, 'default' => ''],
+																					['else' => true, 'type' => XML_IGNORE_TAG]
+																				]],
+																				['else' => true, 'type' => XML_IGNORE_TAG]
+												]]
+																			]],
+																			['else' => true, 'type' => XML_IGNORE_TAG]
 											]]
 										]]
-									]],
-									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE]
+																	]],
+																	['else' => true, 'type' => XML_IGNORE_TAG]
+									]]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [

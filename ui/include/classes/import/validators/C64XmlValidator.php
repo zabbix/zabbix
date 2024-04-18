@@ -376,8 +376,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CHAR => CXmlConstantName::CHAR,
 		CXmlConstantValue::LOG => CXmlConstantName::LOG,
 		CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED,
-		CXmlConstantValue::TEXT => CXmlConstantName::TEXT,
-		CXmlConstantValue::BINARY => CXmlConstantName::BINARY
+		CXmlConstantValue::TEXT => CXmlConstantName::TEXT
 	];
 
 	private $TRIGGER_PRIORITY = [
@@ -2187,6 +2186,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -2230,6 +2230,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 											'details' =>				['type' => XML_ARRAY, 'rules' => [
 												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 												'community' =>				['type' => XML_STRING, 'default' => ''],
+												'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
 												'contextname' =>			['type' => XML_STRING, 'default' => ''],
 												'securityname' =>			['type' => XML_STRING, 'default' => ''],
 												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
@@ -2240,8 +2241,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 											]]
 										]]
-									]],
-									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_DISABLED, 'in' => $this->INVENTORY_MODE]
+									]]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
