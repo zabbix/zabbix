@@ -1060,6 +1060,7 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 		}
 
 		zbx_vector_ptr_append(&host_info->groups, zbx_strdup(NULL, row[1]));
+		zbx_vector_ptr_sort(&host_info->groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
 	}
 	DBfree_result(result);
 }
@@ -1202,7 +1203,6 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		zbx_vector_ptr_sort(&host_info->groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		zbx_json_clean(&json);
 
@@ -1306,7 +1306,6 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		zbx_vector_ptr_sort(&host_info->groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		zbx_json_clean(&json);
 
