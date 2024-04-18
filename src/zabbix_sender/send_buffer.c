@@ -162,8 +162,8 @@ static zbx_send_batch_t	*sb_add_value(zbx_send_buffer_t *buf, const char *host, 
  *                                                                            *
  * Purpose: parse input line and cache parsed data                            *
  *                                                                            *
- * Parameters: buf   - [IN/OUT] send buffer                                   *
- *             line  - [IN] input line                                        *
+ * Parameters: buf        - [IN/OUT] send buffer                              *
+ *             line       - [IN] input line                                   *
  *             line_alloc - [IN] number of bytes allocated for line buffer    *
  *             send_mode  - [IN] ZBX_SEND_BATCHED - cache the parsed data to  *
  *                                                  send in batches           *

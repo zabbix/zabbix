@@ -1565,9 +1565,9 @@ static int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, s
  *                                                                            *
  * Purpose: process history data received from Zabbix active agent            *
  *                                                                            *
- * Parameters: sock         - [IN] the connection socket                      *
- *             jp           - [IN] the JSON with history data                 *
- *             ts           - [IN] the connection timestamp                   *
+ * Parameters: sock         - [IN] connection socket                          *
+ *             jp           - [IN] JSON with history data                     *
+ *             ts           - [IN] connection timestamp                       *
  *             info         - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
  *                                                                            *
@@ -1680,9 +1680,9 @@ out:
  *                                                                            *
  * Purpose: process history data received from Zabbix sender                  *
  *                                                                            *
- * Parameters: sock         - [IN] the connection socket                      *
- *             jp           - [IN] the JSON with history data                 *
- *             ts           - [IN] the connection timestamp                   *
+ * Parameters: sock         - [IN] connection socket                          *
+ *             jp           - [IN] JSON with history data                     *
+ *             ts           - [IN] connection timestamp                       *
  *             info         - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
  *                                                                            *

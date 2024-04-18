@@ -745,7 +745,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							" where hostid=" ZBX_FS_UI64, hostid);
 
-					zbx_db_execute("%s", sql);
+					(void)zbx_db_execute("%s", sql);
 					zbx_free(sql);
 				}
 

@@ -1133,7 +1133,7 @@ static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx
  *                                                                            *
  * Parameters: proxy            - [IN] syncing proxy                          *
  *             revision         - [IN] host mapping revision                  *
- *             j                - [OUT] the output json                       *
+ *             j                - [OUT] output json                           *
  *             error            - [OUT] error message                         *
  *                                                                            *
  ******************************************************************************/
@@ -1191,7 +1191,6 @@ out:
 	zbx_free(sql);
 
 	return ret;
-
 }
 
 static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,

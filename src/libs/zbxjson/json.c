@@ -1320,9 +1320,9 @@ zbx_json_type_t	zbx_json_valuetype(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates a copy of the specified json structure                    *
+ * Purpose: creates a copy of the specified JSON structure                    *
  *                                                                            *
- * Return value: The copied json structure.                                    *
+ * Return value: The copied JSON structure.                                   *
  *                                                                            *
  ******************************************************************************/
 struct zbx_json	*zbx_json_clone(const struct zbx_json *src)

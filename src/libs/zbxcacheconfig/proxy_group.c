@@ -36,19 +36,20 @@ ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
 ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
 ZBX_VECTOR_IMPL(pg_host_ref_ptr, zbx_pg_host_ref_t *)
 
-zbx_hash_t	pg_host_ref_hash(const void *d)
+static zbx_hash_t	pg_host_ref_hash(const void *d)
 {
 	const zbx_pg_host_ref_t	*host = (const zbx_pg_host_ref_t *)d;
 
 	return ZBX_DEFAULT_UINT64_HASH_FUNC(&host->host->hostid);
 }
 
-int	pg_host_ref_compare(const void *d1, const void *d2)
+static int	pg_host_ref_compare(const void *d1, const void *d2)
 {
 	const zbx_pg_host_ref_t	*h1 = (const zbx_pg_host_ref_t *)d1;
 	const zbx_pg_host_ref_t	*h2 = (const zbx_pg_host_ref_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(h1->host->hostid, h2->host->hostid);
+
 	return 0;
 }
 
@@ -190,6 +191,7 @@ int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s revision:" ZBX_FS_UI64 "->" ZBX_FS_UI64, __func__,
 			zbx_result_string(ret), old_revision, *revision);
+
 	return ret;
 }
 
@@ -305,7 +307,8 @@ static void	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
 
-	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+			&hpi_local)))
 	{
 		dc_strpool_release(hpi->host);
 		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
@@ -316,7 +319,8 @@ void	dc_update_host_proxy(const char *host_old, const char *host_new)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host_old};
 
-	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+			&hpi_local)))
 	{
 		dc_strpool_release(hpi->host);
 		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
@@ -373,8 +377,8 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(hostproxyid, row[0]);
 
-		hp = (zbx_dc_host_proxy_t *)DCfind_id(&get_dc_config()->host_proxy, hostproxyid, sizeof(zbx_dc_host_proxy_t),
-				&found);
+		hp = (zbx_dc_host_proxy_t *)DCfind_id(&get_dc_config()->host_proxy, hostproxyid,
+				sizeof(zbx_dc_host_proxy_t), &found);
 
 		ZBX_DBROW2UINT64(hp->hostid, row[1]);
 		ZBX_STR2UINT64(hp->proxyid, row[3]);
@@ -498,8 +502,11 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
 	ZBX_DC_PROXY			*proxy;
 
-	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
+	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+			&hpi_local)))
+	{
 		return FAIL;
+	}
 
 	if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&get_dc_config()->proxies, &hpi->host_proxy->proxyid)))
 		return FAIL;

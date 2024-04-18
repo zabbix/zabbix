@@ -1401,6 +1401,3 @@ void	pg_cache_dump(zbx_pg_cache_t *cache)
 	while (NULL != (host = (zbx_pg_host_t *)zbx_hashset_iter_next(&iter)))
 		pg_cache_dump_host(host);
 }
-
-
-
