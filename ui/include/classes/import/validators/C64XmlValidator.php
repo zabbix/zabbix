@@ -1271,10 +1271,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => '3s'],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
@@ -2251,10 +2248,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => '3s'],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
 							'url' =>					['type' => XML_STRING, 'default' => ''],
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
