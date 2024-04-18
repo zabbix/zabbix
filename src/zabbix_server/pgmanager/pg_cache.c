@@ -45,7 +45,7 @@ zbx_pg_proxy_hosts_t;
 ZBX_PTR_VECTOR_DECL(pg_proxy_hosts_ptr, zbx_pg_proxy_hosts_t *)
 ZBX_PTR_VECTOR_IMPL(pg_proxy_hosts_ptr, zbx_pg_proxy_hosts_t *)
 
-void	pg_proxy_hosts_free(zbx_pg_proxy_hosts_t *ph)
+static void	pg_proxy_hosts_free(zbx_pg_proxy_hosts_t *ph)
 {
 	zbx_vector_pg_host_ref_ptr_destroy(&ph->host_refs);
 	zbx_free(ph);
