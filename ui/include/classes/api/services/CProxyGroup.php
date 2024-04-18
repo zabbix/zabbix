@@ -124,6 +124,13 @@ class CProxyGroup extends CApiService {
 			$this->dbFilter('proxy_group_rtdata pgr', ['filter' => ['state' => $options['filter']['state']]] + $options,
 				$sql_parts
 			);
+
+			$sql_parts['left_join']['proxy_group_rtdata'] = [
+				'alias' => 'pgr',
+				'table' => 'proxy_group_rtdata',
+				'using' => 'proxy_groupid'
+			];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		return $sql_parts;
@@ -132,27 +139,14 @@ class CProxyGroup extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput']) {
-			$proxy_group_rtdata = false;
-
-			if ($this->outputIsRequested('state', $options['output'])) {
-				$sql_parts = $this->addQuerySelect('pgr.state', $sql_parts);
-				$proxy_group_rtdata = true;
-			}
-
-			if ($options['filter'] !== null && array_key_exists('state', $options['filter'])
-					&& $options['filter']['state'] !== null) {
-				$proxy_group_rtdata = true;
-			}
-
-			if ($proxy_group_rtdata) {
-				$sql_parts['left_join'][] = [
-					'alias' => 'pgr',
-					'table' => 'proxy_group_rtdata',
-					'using' => 'proxy_groupid'
-				];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-			}
+		if (!$options['countOutput'] && $this->outputIsRequested('state', $options['output'])) {
+			$sql_parts = $this->addQuerySelect('pgr.state', $sql_parts);
+			$sql_parts['left_join']['proxy_group_rtdata'] = [
+				'alias' => 'pgr',
+				'table' => 'proxy_group_rtdata',
+				'using' => 'proxy_groupid'
+			];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		return $sql_parts;

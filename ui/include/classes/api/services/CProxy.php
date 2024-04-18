@@ -146,6 +146,13 @@ class CProxy extends CApiService {
 
 			if ($rt_filter) {
 				$this->dbFilter('proxy_rtdata pr', ['filter' => $rt_filter] + $options, $sql_parts);
+
+				$sql_parts['left_join']['proxy_rtdata'] = [
+					'alias' => 'pr',
+					'table' => 'proxy_rtdata',
+					'using' => 'proxyid'
+				];
+				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 		}
 
@@ -167,15 +174,14 @@ class CProxy extends CApiService {
 					$sql_parts = $this->addQuerySelect('pr.'.$field, $sql_parts);
 					$proxy_rtdata = true;
 				}
-
-				if ($options['filter'] !== null && array_key_exists($field, $options['filter'])
-						&& $options['filter'][$field] !== null) {
-					$proxy_rtdata = true;
-				}
 			}
 
 			if ($proxy_rtdata) {
-				$sql_parts['left_join'][] = ['alias' => 'pr', 'table' => 'proxy_rtdata', 'using' => 'proxyid'];
+				$sql_parts['left_join']['proxy_rtdata'] = [
+					'alias' => 'pr',
+					'table' => 'proxy_rtdata',
+					'using' => 'proxyid'
+				];
 				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 		}
