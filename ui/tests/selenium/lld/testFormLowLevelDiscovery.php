@@ -85,6 +85,14 @@ class testFormLowLevelDiscovery extends CWebTest {
 			$this->assertEquals($fields, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		}
 
+		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
+			'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+			'Delete lost resources', 'Disable lost resources'
+		];
+		$this->assertEquals($required_labels, array_values($form->getLabels(CElementFilter::CLASSES_PRESENT,
+				'form-label-asterisk')->asText())
+		);
+
 		// Check default fields' values.
 		$fields = [
 			// Discovery rule.
