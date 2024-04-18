@@ -688,7 +688,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			}
 
 			COverlayDialogElement::ensureNotPresent();
-			$widget = $dashboard->getWidget($header)->waitUntilReady();
+			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
 			$dashboard->save()->waitUntilReady();

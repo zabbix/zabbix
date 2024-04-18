@@ -1327,7 +1327,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		else {
 			// Make sure that the widget is present before saving the dashboard.
 			$header = CTestArrayHelper::get($data['main_fields'], 'Name', self::DEFAULT_WIDGET_NAME);
-			$dashboard->getWidget($header)->waitUntilReady();
+			$dashboard->getWidget($header);
 			$dashboard->save();
 
 			// Check message that dashboard saved.

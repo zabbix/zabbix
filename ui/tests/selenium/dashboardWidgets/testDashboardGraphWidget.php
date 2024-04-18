@@ -89,7 +89,7 @@ class testDashboardGraphWidget extends testWidgets {
 	private function saveGraphWidget($name) {
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget($name)->waitUntilReady();
+		$widget = $dashboard->getWidget($name);
 		$widget->getContent()->query('class:svg-graph')->waitUntilVisible();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
