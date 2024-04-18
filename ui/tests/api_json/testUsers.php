@@ -901,7 +901,7 @@ class testUsers extends CAPITest {
 						'userdirectoryid' => 1234
 					]
 				],
-				'expected_error' => 'User directory with ID "1234" is not available.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
 			]
 		];
 	}
