@@ -30,6 +30,7 @@ class CTabFilter extends CBaseComponent {
 		// Array of CTabFilterItem objects.
 		this._items = [];
 		this._active_item = null;
+		this.selected_filter_item = null;
 		this._filters_footer = null;
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
@@ -302,13 +303,15 @@ class CTabFilter extends CBaseComponent {
 	 * @param {CTabFilterItem} item  Item object to be set as selected item.
 	 */
 	setSelectedItem(item) {
-		const item_was_selected = item.isSelected();
+		if (this._active_item !== this._timeselector) {
+			this.selected_filter_item = this._active_item;
+		}
 
 		this._active_item = item;
 		this._active_item.unsetExpandedSubfilters();
 		item.setSelected();
 
-		if (item !== this._timeselector && !item_was_selected) {
+		if (item !== this._timeselector && item !== this.selected_filter_item) {
 			item._target.setAttribute('tabindex', 0);
 			this.scrollIntoView(item);
 			item.setBrowserLocationToApplyUrl();
