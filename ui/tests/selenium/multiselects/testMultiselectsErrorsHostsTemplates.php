@@ -24,11 +24,26 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 /**
  * Test for assuring that bug from ZBX-23302 is not reproducing, respectively
  * that multiselects' dialogs do not contain any errors before and after filling.
+ *
+ * @onBefore prepareProxyData
+ *
+ * @backup hosts
  */
 class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
 	const HOST = 'Template inheritance test host';
 	const TEMPLATE = 'AIX by Zabbix agent';
+
+	public static function prepareProxyData() {
+		CDataHelper::call('proxy.create',
+			[
+				[
+					'name' => 'Proxy for Multiselects test',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				]
+			]
+		);
+	}
 
 	public static function getCheckDialogsData() {
 		return [
@@ -44,7 +59,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],
 					'filled_multiselects' => [
-						['Proxy' => 'Proxy for Actions']
+						['Proxy' => 'Proxy for Multiselects test']
 					]
 				]
 			],
