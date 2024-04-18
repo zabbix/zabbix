@@ -1027,6 +1027,7 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 	size_t		sql_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
+	zbx_host_info_t	*host_info;
 
 	for (i = 0; i < hostids->values_num; i++)
 	{
@@ -1049,7 +1050,6 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	hostid;
-		zbx_host_info_t	*host_info;
 
 		ZBX_DBROW2UINT64(hostid, row[0]);
 
@@ -1060,8 +1060,18 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 		}
 
 		zbx_vector_ptr_append(&host_info->groups, zbx_strdup(NULL, row[1]));
+	}
+
+	for(i = 0; i < hostids->values_num; i++)
+	{
+		if (NULL == (host_info = (zbx_host_info_t *)zbx_hashset_search(hosts_info, &hostids->values[i])))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
 		zbx_vector_ptr_sort(&host_info->groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
 	}
+
 	DBfree_result(result);
 }
 
