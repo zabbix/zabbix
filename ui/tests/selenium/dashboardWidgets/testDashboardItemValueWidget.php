@@ -1047,7 +1047,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'New Single Item Widget',
-						'Refresh interval' => '2 minutes',
+						'Refresh interval' => 'Default (1 minute)',
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.
@@ -1475,7 +1475,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
-				? '15 minutes'
+				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
