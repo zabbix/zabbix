@@ -38,6 +38,7 @@
 #include "zbx_item_constants.h"
 #include "zbxalgo.h"
 #include "zbxparam.h"
+#include "zbxexpr.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"

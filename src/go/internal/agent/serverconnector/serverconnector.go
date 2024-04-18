@@ -95,6 +95,8 @@ type heartbeatMessage struct {
 	Request            string `json:"request"`
 	Host               string `json:"host"`
 	HeartbeatFrequency int    `json:"heartbeat_freq"`
+	Version            string `json:"version"`
+	Variant            int    `json:"variant"`
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
@@ -155,7 +157,7 @@ func (c *Connector) refreshActiveChecks() {
 	a := activeChecksRequest{
 		Request:        "active checks",
 		Host:           c.hostname,
-		Version:        version.Short(),
+		Version:        version.Long(),
 		Variant:        agent.Variant,
 		Session:        c.session,
 		ConfigRevision: c.configRevision,
@@ -353,6 +355,8 @@ func (c *Connector) sendHeartbeatMsg() {
 		Request:            "active check heartbeat",
 		HeartbeatFrequency: c.options.HeartbeatFrequency,
 		Host:               c.hostname,
+		Version:            version.Long(),
+		Variant:            agent.Variant,
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.addresses)

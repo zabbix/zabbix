@@ -93,7 +93,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 	if err != nil {
 		errString := err.Error()
 		response = passiveChecksResponse{
-			Version: version.LongNoRC(),
+			Version: version.Long(),
 			Variant: agent.Variant,
 			Error:   &errString,
 		}
@@ -108,13 +108,13 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 		if err != nil {
 			errString := err.Error()
 			response = passiveChecksResponse{
-				Version: version.LongNoRC(),
+				Version: version.Long(),
 				Variant: agent.Variant,
 				Data:    []any{passiveChecksErrorResponseData{Error: &errString}},
 			}
 		} else {
 			response = passiveChecksResponse{
-				Version: version.LongNoRC(),
+				Version: version.Long(),
 				Variant: agent.Variant,
 				Data:    []any{passiveChecksResponseData{Value: value}},
 			}
