@@ -348,12 +348,12 @@ class CTabFilter extends CDiv {
 					->addClass(ZBX_STYLE_BTN)
 					->addClass(ZBX_ICON_CLOCK)
 					->addClass(ZBX_STYLE_BTN_TIME)
-					->addClass($expanded ? static::CSS_TAB_SELECTED : null)
-					->addClass($expanded ? static::CSS_TAB_EXPANDED : null)
 					->addClass($data['disabled'] ? ZBX_STYLE_DISABLED : null)
 			))
 				->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
 				->addClass(self::CSS_TABFILTER_ITEM)
+				->addClass($expanded ? static::CSS_TAB_SELECTED : null)
+				->addClass($expanded ? static::CSS_TAB_EXPANDED : null)
 				->addClass($enabled ? null : ZBX_STYLE_DISABLED)
 		];
 	}
