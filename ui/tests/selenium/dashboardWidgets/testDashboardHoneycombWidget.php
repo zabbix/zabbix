@@ -631,10 +631,26 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'id:secondary_label_size_type_0' => 'Auto',
 			'id:secondary_label_bold' => true,
 			'id:secondary_label_units' => '',
-			'id:secondary_label_units_pos' => 'After value'
+			'id:secondary_label_units_pos' => 'After value',
+			'id:interpolation' => true
 		];
 
 		$form->checkValue($default_values);
+
+		// Check color picker default values.
+		$color_pickers = [
+			// Primary label color.
+			'xpath:.//input[@id="primary_label_color"]/..' => 'lbl_primary_label_color',
+			// Secondary label color.
+			'xpath:.//input[@id="secondary_label_color"]/..' => 'lbl_secondary_label_color',
+			// Background color.
+			'xpath:.//input[@id="bg_color"]/..' => 'id:lbl_bg_color'
+		];
+
+		foreach ($color_pickers as $selector => $label) {
+			$this->assertEquals('', $form->query($selector)->asColorPicker()->one()->getValue());
+			$this->assertEquals('Use default', $form->query($label)->one()->getAttribute('title'));
+		}
 
 		// Check Select popup dropdowns for Host groups and Hosts.
 		$popup_menu_selector = 'xpath:.//button[contains(@class, "zi-chevron-down")]';
@@ -679,11 +695,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertEquals(['Primary label', 'Secondary label'], $show->getLabels()->asText());
 		$this->assertTrue($show->isEnabled());
 
-		// Check Add/Remove buttons for Tags.
-		foreach (['Host tags', 'Item tags'] as $tags) {
-			$tag_form = $form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($tags).']/following::table[1]')->one();
-			foreach (['Add', 'Remove'] as $button) {
-				$this->assertTrue($tag_form->query('button', $button)->one()->isClickable());
+		// Check Add/Remove buttons for Hosts and Items tags tables.
+		foreach (['Add', 'Remove'] as $button) {
+			foreach (['tags_table_host_tags', 'tags_table_item_tags'] as $id) {
+				$this->assertTrue($form->query('id', $id)->one()->query('button', $button)->one()->isClickable());
 			}
 		}
 
@@ -692,7 +707,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
 
 		// Check Primary and Secondary label fields that disappear after checking them.
-		$advanced_configuration = ['Primary label' => '{HOST.NAME}', 'Secondary label' => '{{ITEM.LASTVALUE}.fmtnum(2)}'];
+		$advanced_configuration = [
+			'Primary label' => '{HOST.NAME}',
+			'Secondary label' => '{{ITEM.LASTVALUE}.fmtnum(2)}'
+		];
 
 		foreach ($advanced_configuration as $label => $text) {
 			$label_fields = $form->getLabel($label)->query('xpath:./following::div[contains(@class, "fields-group ")]')->one();
@@ -774,10 +792,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$warning->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$warning->waitUntilNotPresent();
 
-		// Color interpolation checkbox should be disabled and checked-in.
-		$color_interpolation = $form->query('id:interpolation')->asCheckbox()->one();
-		$this->assertFalse($color_interpolation->isEnabled());
-		$this->assertTrue($color_interpolation->isChecked());
+		// Color interpolation checkbox should be disabled.
+		$this->assertFalse($form->query('id:interpolation')->asCheckbox()->one()->isEnabled());
 
 		// Threshold table with adding and removing lines.
 		$table = $form->query('id:thresholds-table')->asTable()->one();
@@ -785,8 +801,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		// Check added threshold colors.
 		$table->query('button:Add')->one()->click();
-		$colorpicker = $table->query('class:color-picker-preview')->one();
-		$this->assertEquals('#FF465C', $table->query('class:color-picker-preview')->one()->getAttribute('title'));
+		$colorpicker = $table->query('xpath:.//input[@id="thresholds_0_color"]/..')->asColorPicker()->one();
+		$this->assertEquals('FF465C', $colorpicker->getValue());
 		$this->assertTrue($colorpicker->isClickable());
 
 		// Check added threshold input field.
@@ -799,9 +815,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertFalse($colorpicker->isVisible());
 		$this->assertFalse($threshold_input->isVisible());
 		$this->assertFalse($remove->isVisible());
-
-		// Background color picker has default value.
-		$this->assertEquals('Use default', $form->query('id:lbl_bg_color')->one()->getAttribute('title'));
 	}
 
 	public static function getCreateData() {
