@@ -62,13 +62,24 @@ class testFormLowLevelDiscovery extends CWebTest {
 	public function testFormLowLevelDiscovery_Layout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
 		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
-
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
-
 		$this->page->assertHeader('Discovery rules');
 		$this->page->assertTitle('Configuration of discovery rules');
-
 		$this->assertEquals(['Discovery rule', 'Preprocessing', 'LLD macros', 'Filters', 'Overrides'], $form->getTabs());
+
+		// Check form footer buttons clickability.
+		foreach (['xpath://div[@class="form-actions"]/button[@id="add"]', 'button:Test', 'button:Cancel'] as $query) {
+			$this->assertTrue($form->query($query)->one()->isClickable());
+		}
+
+		// Check the whole form required labels.
+		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
+			'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+			'Delete lost resources', 'Disable lost resources'
+		];
+		$this->assertEquals($required_labels, array_values($form->getLabels(CElementFilter::CLASSES_PRESENT,
+				'form-label-asterisk')->asText())
+		);
 
 		// Check initial visible fields for each tab.
 		$visible_fields = [
@@ -83,15 +94,77 @@ class testFormLowLevelDiscovery extends CWebTest {
 		foreach ($visible_fields as $tab => $fields) {
 			$form->selectTab($tab);
 			$this->assertEquals($fields, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
-		}
 
-		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
-			'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
-			'Delete lost resources', 'Disable lost resources'
-		];
-		$this->assertEquals($required_labels, array_values($form->getLabels(CElementFilter::CLASSES_PRESENT,
-				'form-label-asterisk')->asText())
-		);
+			// Check buttons default values and parameters in fields in every tab.
+			switch ($tab) {
+				case 'Preprocessing':
+					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
+					$preprocessing_container->query('button:Add')->one()->waitUntilCLickable()->click();
+					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
+					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove'])->one()->isClickable());
+
+					$preprocessing_fields = [
+						'id:preprocessing_0_type' => ['value' => 'Regular expression'],
+						'id:preprocessing_0_params_0' => ['value' => '', 'placeholder' => 'pattern', 'maxlength' => 255],
+						'id:preprocessing_0_params_1' => ['value' => '', 'placeholder' => 'output', 'maxlength' => 255],
+						'id:preprocessing_0_on_fail' => ['value' => false]
+					];
+					$this->checkFieldsParameters($preprocessing_fields);
+
+					foreach (array_keys($preprocessing_fields) as $key) {
+						$this->assertTrue($form->getField($key)->isEnabled());
+					}
+					break;
+
+				case 'LLD macros':
+					$macros_table = $form->query('id:lld_macro_paths')->asTable()->one();
+					$this->assertTrue($macros_table->isVisible());
+					$this->assertTrue($macros_table->query('button', ['Add', 'Remove'])->one()->isClickable());
+					$this->assertEquals(['LLD macro', 'JSONPath', ''], $macros_table->getHeadersText());
+
+					$macros_fields = [
+						'id:lld_macro_paths_0_lld_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 255],
+						'id:lld_macro_paths_0_path' => ['value' => '', 'placeholder' => '$.path.to.node', 'maxlength' => 255]
+					];
+					$this->checkFieldsParameters($macros_fields);
+
+					foreach (array_keys($macros_fields) as $key) {
+						$this->assertTrue($form->getField($key)->isEnabled());
+					}
+					break;
+
+				case 'Filters':
+					$filters_field = $form->getFieldContainer('Filters');
+					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
+					$this->assertTrue($filters_field->query('button', ['Add', 'Remove'])->one()->isClickable());
+					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
+							$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
+					);
+
+					$filter_fields = [
+						'id:conditions_0_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 64],
+						'id:conditions_0_value' => ['value' => '', 'placeholder' => 'regular expression', 'maxlength' => 255],
+						'name:conditions[0][operator]' => [
+							'value' => 'matches',
+							'options' => ['matches', 'does not match', 'exists', 'does not exist']
+						]
+					];
+					$this->checkFieldsParameters($filter_fields);
+
+					foreach (array_keys($filter_fields) as $key) {
+						$this->assertTrue($form->getField($key)->isEnabled());
+					}
+					break;
+
+				case 'Overrides':
+					$filters_container = $form->getFieldContainer('Overrides');
+					$this->assertTrue($filters_container->query('button:Add')->one()->isClickable());
+					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
+							$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
+					);
+					break;
+			}
+		}
 
 		// Check default fields' values.
 		$fields = [
@@ -107,7 +180,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'name:parameters[0][name]' => ['maxlength' => 255],
 			'name:parameters[0][value]' => ['maxlength' => 2048],
 			'xpath://div[@id="script"]/input[@type="text"]' => ['value' => '', 'placeholder' => 'script'],
-			'Request type' => ['options' => ['GET', 'POST', 'PUT', 'HEAD', 'value' => 'GET'], 'value' => 'GET'],
+			'Request type' => ['options' => ['GET', 'POST', 'PUT', 'HEAD'], 'value' => 'GET'],
 			'Request body type' => ['labels' => ['Raw data', 'JSON data', 'XML data'], 'value' => 'Raw data'],
 			'Request body' => ['value' => ''],
 			'Headers' => ['value' => [['name' => '', 'value' => '']]],
@@ -115,7 +188,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'name:headers[0][value]' => ['maxlength' => 2000, 'placeholder' => 'value'],
 			'Required status codes' => ['value' => 200, 'maxlength' => 255],
 			'Follow redirects' => ['value' => true],
-			'Retrieve mode' => ['labels' => ['Body', 'Headers', 'Body and heraders'], 'value' => 'Body'],
+			'Retrieve mode' => ['labels' => ['Body', 'Headers', 'Body and headers'], 'value' => 'Body'],
 			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
 			'HTTP authentication' => ['options' => ['None', 'Basic', 'NTLM', 'Kerberos', 'Digest'], 'value' => 'None'],
 			'SSL verify peer' => ['value' => false],
@@ -151,43 +224,27 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Description' => ['value' => ''],
 			'Enabled' => ['value' => true],
 
-			// Preprocessing.
+			// Preprocessing tab.
 			'Preprocessing steps' => ['value' => NULL],
 
-			// LLD macros.
+			// LLD macros tab.
 			'LLD macros' => ['value' => [['lld_macro' => '', 'path' => '']]],
 			'id:lld_macro_paths_0_lld_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 255],
 			'id:lld_macro_paths_0_path' => ['placeholder' => '$.path.to.node', 'maxlength' => 255],
 
-			// Filters.
+			// Filters tab.
 			'Filters' => ['value' => [['macro' => '', 'operator' => 'matches']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
-			'name:conditions[0][operator]' => ['options' => ['matches', 'does ot match', 'exists', 'does not exist'],
+			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
 					'value' => 'matches'
 			],
 			'id:conditions_0_value' => ['placeholder' => 'regular expression', 'maxlength' => 255],
 
-			// Overrides.
+			// Overrides tab.
 			'Overrides' => ['value' => []]
 		];
 
-		foreach ( $fields as $field => $parameters) {
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'value', ''),
-					$form->getField($field)->getValue()
-			);
-
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder', null),
-					$form->getField($field)->getAttribute('placeholder')
-			);
-
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength', null),
-					$form->getField($field)->getAttribute('maxlength')
-			);
-		}
-
-		foreach (['xpath:.//div[@class="form-actions"]/button[@id="add"]', 'button:Test', 'button:Cancel'] as $query) {
-			$this->assertTrue($form->query($query)->one()->isClickable());
-		}
+		$this->checkFieldsParameters($fields);
 
 		// Check visible fields depending on LLD type.
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
@@ -262,6 +319,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					break;
 
 				case 'HTTP agent':
+					// Check common buttons clickability.
 					$buttons = [
 						'Query fields' => ['Add', 'Remove'],
 						'Headers' => ['Add', 'Remove'],
@@ -390,6 +448,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					$buttons = [
 						'Parameters' => 'button:Add',
 						'Parameters' => 'button:Remove',
+						// Pencil icon button.
 						'Script' => 'xpath:.//button[@title="Click to view or edit"]'
 					];
 
@@ -404,9 +463,41 @@ class testFormLowLevelDiscovery extends CWebTest {
 	/**
 	 * Check inputs are visible/editable depending on other field's value.
 	 *
-	 * @param CFormElement    $form                  LLD edit form
-	 * @param string          $master_field_value    input which is being checked
-	 * @param array           $dependant_array       given array of labels
+	 * @param array $fields_array    given fields
+	 *
+	 */
+	protected function checkFieldsParameters($fields_array) {
+		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+
+		foreach ($fields_array as $id => $parameters) {
+			$this->assertEquals(CTestArrayHelper::get($parameters, 'value', ''),
+					$form->getField($id)->getValue()
+			);
+
+			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder', null),
+					$form->getField($id)->getAttribute('placeholder')
+			);
+
+			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength', null),
+					$form->getField($id)->getAttribute('maxlength')
+			);
+
+			if (array_key_exists('options', $parameters)){
+				$this->assertEquals($parameters['options'], $form->getField($id)->getOptions()->asText());
+			}
+
+			if (array_key_exists('labels', $parameters)){
+				$this->assertEquals($parameters['labels'], $form->getField($id)->getLabels()->asText());
+			}
+		}
+	}
+
+	/**
+	 * Check inputs are visible/editable depending on other field's value.
+	 *
+	 * @param CFormElement $form                  LLD edit form
+	 * @param string       $master_field_value    input which is being changed
+	 * @param array        $dependant_array       given array of changed labels
 	 */
 	protected function checkFieldsDependency($form, $master_field_value, $dependant_array) {
 		$form->fill($master_field_value);
