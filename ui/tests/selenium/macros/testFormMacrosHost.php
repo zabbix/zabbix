@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
 /**
  * @backup hosts, config
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareHostMacrosData
  */
 class testFormMacrosHost extends testFormMacros {
