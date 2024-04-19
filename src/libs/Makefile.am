@@ -9,18 +9,19 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
-	zbxdbconfigworker \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxconf \
+	zbxcfg \
 	zbxcrypto \
+	zbxcurl \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
 	zbxdbhigh \
+	zbxdiscoverer \
 	zbxdbwrap \
 	zbxdbsyncer \
 	zbxdbschema \
@@ -28,6 +29,7 @@ DIST_SUBDIRS = \
 	zbxdiag \
 	zbxdiscovery \
 	zbxembed \
+	zbxescalations \
 	zbxeval \
 	zbxevent \
 	zbxexec \
@@ -38,7 +40,9 @@ DIST_SUBDIRS = \
 	zbxhash \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
+	zbxinterface \
 	zbxip \
 	zbxipcservice \
 	zbxipmi \
@@ -56,6 +60,7 @@ DIST_SUBDIRS = \
 	zbxpoller \
 	zbxagentget \
 	zbxpreproc \
+	zbxpreprocbase \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxregexp \
@@ -91,9 +96,10 @@ SERVER_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
-	zbxdbconfigworker \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -104,13 +110,16 @@ SERVER_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
+	zbxescalations \
 	zbxeval \
 	zbxevent \
 	zbxexport \
 	zbxexpr \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
+	zbxinterface \
 	zbxip \
 	zbxkvs \
 	zbxmedia \
@@ -120,6 +129,7 @@ SERVER_SUBDIRS = \
 	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
+	zbxpreprocbase \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
@@ -155,6 +165,8 @@ PROXY_SUBDIRS = \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \
+	zbxdiscovery \
+	zbxdiscoverer \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \
@@ -165,12 +177,15 @@ PROXY_SUBDIRS = \
 	zbxdbupgrade \
 	zbxdiag \
 	zbxembed \
+	zbxescalations \
 	zbxeval \
 	zbxevent \
 	zbxexport \
 	zbxhistory \
 	zbxhttp \
+	zbxhttppoller \
 	zbxicmpping \
+	zbxinterface \
 	zbxip \
 	zbxkvs \
 	zbxnum \
@@ -179,6 +194,7 @@ PROXY_SUBDIRS = \
 	zbxpinger \
 	zbxpoller \
 	zbxpreproc \
+	zbxpreprocbase \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
@@ -216,16 +232,20 @@ SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxconf \
+	zbxcfg \
 	zbxcrypto \
+	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
+	zbxescalations \
 	zbxexec \
 	zbxexpr \
 	zbxfile \
 	zbxgetopt \
 	zbxhash \
 	zbxhttp \
+	zbxhttppoller \
+	zbxinterface \
 	zbxip \
 	zbxipcservice \
 	zbxjson \

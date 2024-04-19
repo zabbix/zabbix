@@ -168,6 +168,10 @@ jQuery(function($) {
 				sections = getMenuPopupSubmenu(data);
 				break;
 
+			case 'drule':
+				sections = getMenuPopupDRule(data);
+				break;
+
 			default:
 				return;
 		}

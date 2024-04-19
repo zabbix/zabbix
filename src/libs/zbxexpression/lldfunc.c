@@ -32,7 +32,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand discovery macro in expression.                             *
+ * Purpose: expands discovery macro in expression                             *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression containing lld macro     *
  *             token           - [IN/OUT] token with lld macro location data  *
@@ -45,7 +45,7 @@
  *                                                                            *
  ******************************************************************************/
 static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, int esc)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int esc)
 {
 	char	c, *replace_to = NULL;
 	int	l ,r;
@@ -161,7 +161,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand discovery macro in user macro context.                     *
+ * Purpose: expands discovery macro in user macro context                     *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression containing lld macro     *
  *             token           - [IN/OUT] token with user macro location data *
@@ -172,7 +172,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
  *                                                                            *
  ******************************************************************************/
 static int	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	int			force_quote, ret;
 	size_t			context_r;
@@ -214,19 +214,19 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute lld macros in calculated item query filter.            *
+ * Purpose: substitutes lld macros in calculated item query filter            *
  *                                                                            *
- * Parameters: filter          - [IN/OUT] the filter                          *
+ * Parameters: filter          - [IN/OUT]                                     *
  *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT]                                        *
  *                                                                            *
- *  Return value: SUCCEED - the macros were expanded successfully             *
+ *  Return value: SUCCEED - macros were expanded successfully                 *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_query_filter_lld_macros(char **filter, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	char			*errmsg = NULL, err[128], *new_filter = NULL;
 	int			i, ret = FAIL;
@@ -281,7 +281,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute lld macros in history function item query argument     *
+ * Purpose: substitutes lld macros in history function item query argument    *
  *          /host/key?[filter].                                               *
  *                                                                            *
  * Parameters: ctx             - [IN] calculated item formula                 *
@@ -291,12 +291,12 @@ out:
  *             itemquery       - [OUT] item query with expanded macros        *
  *             error           - [OUT] error message                          *
  *                                                                            *
- *  Return value: SUCCEED - the macros were expanded successfully.            *
+ *  Return value: SUCCEED - macros were expanded successfully.                *
  *                FAIL    - otherwise.                                        *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_item_query_lld_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths,
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
 		char **itemquery, char **error)
 {
 	zbx_item_query_t	query;
@@ -337,17 +337,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitutes lld macros in an expression.                          *
+ * Purpose: substitutes lld macros in expression                              *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression                          *
  *             rules           - [IN] parsing rules                           *
- *             jp_row          - [IN] the lld data row                        *
+ *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	char			*exp = NULL;
 	int			i, ret = FAIL;
@@ -413,18 +413,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand discovery macro in expression macro.                       *
+ * Purpose: expands discovery macro in expression macro.                      *
  *                                                                            *
  * Parameters: data            - [IN/OUT] expression containing macro         *
  *             token           - [IN/OUT] macro token                         *
  *             jp_row          - [IN] discovery data                          *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT] error message                          *
- *             max_error_len   - [IN] size of error buffer                    *
+ *             error_len       - [IN] size of error buffer                    *
  *                                                                            *
  ******************************************************************************/
 static int	process_expression_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t error_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, size_t error_len)
 {
 	char	*errmsg = NULL, *expression;
 	size_t	right = token->data.expression_macro.expression.r;
@@ -451,11 +451,11 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token, const
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute lld macros in function macro parameters.               *
+ * Purpose: substitutes lld macros in function macro parameters               *
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to a buffer                 *
- *             token           - [IN/OUT] the token with function macro       *
- *                                        location data                       *
+ * Parameters: data            - [IN/OUT] pointer to buffer                   *
+ *             token           - [IN/OUT] token with function macro location  *
+ *                                        data                                *
  *             jp_row          - [IN] discovery data                          *
  *             lld_macro_paths - [IN]                                         *
  *             error           - [OUT] error buffer                           *
@@ -466,7 +466,7 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token, const
  *                                                                            *
  ******************************************************************************/
 static int	substitute_func_macro(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	int		ret, offset = 0;
 	char		*exp = NULL;
@@ -504,18 +504,18 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 
 /******************************************************************************
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to a buffer                 *
+ * Parameters: data            - [IN/OUT] pointer to buffer                   *
  *             jp_row          - [IN] discovery data                          *
  *             lld_macro_paths - [IN]                                         *
  *             flags           - [IN] ZBX_MACRO_ANY - all LLD macros will be  *
  *                                    resolved without validation of the      *
- *                                    value type                              *
+ *                                    value type.                             *
  *                                    ZBX_MACRO_NUMERIC - values for LLD      *
  *                                    macros should be numeric                *
  *                                    ZBX_MACRO_FUNC - function macros will   *
  *                                    be skipped (lld macros inside function  *
  *                                    macros will be ignored) for macros      *
- *                                    specified in func_macros array          *
+ *                                    specified in func_macros array.         *
  *             error           - [OUT] should be not NULL if                  *
  *                                     ZBX_MACRO_NUMERIC flag is set          *
  *             max_error_len   - [IN] size of error buffer                    *
@@ -526,7 +526,7 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, int flags, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len)
 {
 	int		ret = SUCCEED, pos = 0, prev_token_loc_r = -1, cur_token_inside_quote = 0;
 	size_t		i;
@@ -598,29 +598,29 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 
 /********************************************************************************
  *                                                                              *
- * Purpose: substitute lld macros in function parameters.                       *
+ * Purpose: substitutes lld macros in function parameters.                      *
  *                                                                              *
  * Parameters: e               - [IN] function parameter list without           *
  *                                    enclosing parentheses:                    *
  *                                       <p1>, <p2>, ...<pN>                    *
  *             len             - [IN] length of function parameter list         *
- *             key_in_param    - [IN] 1 - the first parameter must be host:key  *
+ *             key_in_param    - [IN] 1 - first parameter must be host:key      *
  *                                    0 - otherwise                             *
  *             exp             - [IN/OUT] output buffer                         *
  *             exp_alloc       - [IN/OUT] size of output buffer                 *
- *             exp_offset      - [IN/OUT] the current position in output buffer *
+ *             exp_offset      - [IN/OUT] current position in output buffer     *
  *             jp_row          - [IN] discovery data                            *
  *             lld_macro_paths - [IN]                                           *
  *             error           - [OUT] error message                            *
  *             max_error_len   - [IN] size of error buffer                      *
  *                                                                              *
- * Return value: SUCCEED - the lld macros were resolved successfully            *
+ * Return value: SUCCEED - lld macros were resolved successfully                *
  *               FAIL - otherwise                                               *
  *                                                                              *
  ********************************************************************************/
 int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	int		ret = SUCCEED;
 	size_t		sep_pos;
@@ -716,7 +716,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	struct zbx_json		json;

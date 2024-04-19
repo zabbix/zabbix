@@ -25,8 +25,8 @@
 #include "zbxjson.h"
 
 int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen);
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen);
 int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
 		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,

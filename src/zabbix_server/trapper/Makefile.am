@@ -11,4 +11,5 @@ libzbxtrapper_server_a_SOURCES = \
 	trapper_history_push.h
 
 libzbxtrapper_server_a_CFLAGS = \
+	-I$(top_srcdir)/src/zabbix_server \
 	$(TLS_CFLAGS)

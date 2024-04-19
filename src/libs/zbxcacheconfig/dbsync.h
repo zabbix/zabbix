@@ -45,6 +45,10 @@
 
 #define ZBX_DBSYNC_TRIGGER_ERROR	0x80
 
+
+#define ZBX_DBSYNC_TYPE_DIFF		0
+#define ZBX_DBSYNC_TYPE_CHANGELOG	1
+
 /******************************************************************************
  *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
@@ -57,7 +61,7 @@
  *           some columns.                                                    *
  *                                                                            *
  ******************************************************************************/
-typedef char **(*zbx_dbsync_preproc_row_func_t)(char **row);
+typedef char **(*zbx_dbsync_preproc_row_func_t)(zbx_dbsync_t *sync, char **row);
 
 typedef struct
 {
@@ -76,6 +80,9 @@ struct zbx_dbsync
 {
 	/* the synchronization mode (see ZBX_DBSYNC_* defines) */
 	unsigned char			mode;
+
+
+	unsigned char			type;
 
 	/* the number of columns in diff */
 	int				columns_num;
@@ -104,14 +111,17 @@ struct zbx_dbsync
 	zbx_uint64_t	remove_num;
 };
 
-void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache);
+void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
 int	zbx_dbsync_env_prepare(unsigned char mode);
 void	zbx_dbsync_env_flush_changelog(void);
 void	zbx_dbsync_env_clear(void);
 int	zbx_dbsync_env_changelog_num(void);
+int	zbx_dbsync_env_changelog_dbsyncs_new_records(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
 
 int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);

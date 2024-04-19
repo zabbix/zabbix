@@ -973,28 +973,21 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 {
 	void	*ptr;
+	int	tries = 0;
+	size_t	len;
 
-	ptr = zbx_hashset_search(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE);
+	len = strlen(str) + 1;
 
-	if (NULL == ptr)
+	while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
+			REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE, REFCOUNT_FIELD_SIZE + len,
+			ZBX_HASHSET_UNIQ_FALSE)))
 	{
-		int	tries = 0;
-		size_t	len;
-
-		len = strlen(str) + 1;
-
-		while (NULL == (ptr = zbx_hashset_insert_ext(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + len, REFCOUNT_FIELD_SIZE)))
-		{
-			/* If there is not enough space - free enough to store string + hashset entry overhead */
-			/* and try inserting one more time. If it fails again, then fail the function.         */
-			if (0 == tries++)
-				vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
-			else
-				return NULL;
-		}
-
-		*(zbx_uint32_t *)ptr = 0;
+		/* If there is not enough space - free enough to store string + hashset entry overhead */
+		/* and try inserting one more time. If it fails again, then fail the function.         */
+		if (0 == tries++)
+			vc_release_space(item, len + REFCOUNT_FIELD_SIZE + sizeof(ZBX_HASHSET_ENTRY_T));
+		else
+			return NULL;
 	}
 
 	(*(zbx_uint32_t *)ptr)++;
@@ -2156,15 +2149,9 @@ static void	vch_item_get_values_by_time(const zbx_vc_item_t *item, zbx_vector_hi
 	zbx_timespec_t	start = {ts->sec - seconds, ts->ns};
 	zbx_vc_chunk_t	*chunk;
 
-	/* Check if maximum request range is not set and all data are cached.  */
-	/* Because that indicates there was a count based request with unknown */
-	/* range which might be greater than the current request range.        */
-	if (0 != item->active_range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
-	{
-		now = (int)time(NULL);
-		/* add another second to include nanosecond shifts */
-		vc_cache_item_update(item->itemid, ZBX_VC_UPDATE_RANGE, seconds + now - ts->sec + 1, now);
-	}
+	now = (int)time(NULL);
+	/* add another second to include nanosecond shifts */
+	vc_cache_item_update(item->itemid, ZBX_VC_UPDATE_RANGE, seconds + now - ts->sec + 1, now);
 
 	if (FAIL == vch_item_get_last_value(item, ts, &chunk, &index))
 	{
@@ -2250,8 +2237,7 @@ out:
 		if (0 == seconds)
 			return;
 
-		/* not enough data in the requested period, set the range equal to the period plus */
-		/* one second to include nanosecond shifts                                         */
+		/* set the range equal to the period plus one second to include nanosecond shifts */
 		range_timestamp = ts->sec - seconds;
 	}
 	else
@@ -2514,21 +2500,24 @@ void	zbx_vc_reset(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds item values to the history and value cache                   *
+ * Purpose: adds item values to history and value cache                       *
  *                                                                            *
- * Parameters: history - [IN] item history values                             *
+ * Parameters:                                                                *
+ *   history                          - [IN] item history values              *
+ *   ret_flush                        - [OUT]                                 *
+ *   config_history_storage_pipelines - [IN]                                  *
  *                                                                            *
- * Return value: SUCCEED - the values were added successfully                 *
+ * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
+int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
 {
 	zbx_vc_item_t		*item;
 	int			i;
 	zbx_dc_history_t	*h;
 
-	if (SUCCEED != zbx_history_add_values(history, ret_flush))
+	if (SUCCEED != zbx_history_add_values(history, ret_flush, config_history_storage_pipelines))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)

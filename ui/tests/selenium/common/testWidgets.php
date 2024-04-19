@@ -24,6 +24,18 @@ class testWidgets extends CWebTest {
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
 
 	/**
+	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
+	 */
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid'.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_itemid,'.
+			' wf.value_graphid, wf.value_hostid';
+
+	/**
 	 * Function which checks that only permitted item types are accessible for widgets.
 	 *
 	 * @param string    $url       url provided which needs to be opened
@@ -65,7 +77,8 @@ class testWidgets extends CWebTest {
 
 			case 'Graph':
 			case 'Gauge':
-				// For Graph and Gauge only numeric items are available.
+			case 'Pie chart':
+				// For Graph, Gauge and Pie chart only numeric items are available.
 				$item_types = ['Float item', 'Unsigned item', 'Unsigned_dependent item'];
 				break;
 
@@ -78,7 +91,9 @@ class testWidgets extends CWebTest {
 				break;
 		}
 
-		$select_button = ($widget === 'Graph') ? 'xpath:(.//button[text()="Select"])[2]' : 'button:Select';
+		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
+			? 'xpath:(.//button[text()="Select"])[2]'
+			: 'button:Select';
 		$select_form->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
@@ -100,5 +115,38 @@ class testWidgets extends CWebTest {
 		}
 
 		$widget_dialog->close();
+	}
+
+	/**
+	 * Replace macro {date} with specified date in YYYY-MM-DD format for specified fields and for item data to be inserted in DB.
+	 *
+	 * @param array		$data				data provider
+	 * @param string	$new_date			dynamic date that is converted into YYYY-MM-DD format and replaces the {date} macro
+	 * @param array		$impacted_fields	array of fields that require to replace the {date} macro with a static date
+	 *
+	 * return array
+	 */
+	public function replaceDateMacroInData ($data, $new_date, $impacted_fields) {
+		$new_date = date('Y-m-d', strtotime($new_date));
+
+		if (array_key_exists('column_fields', $data)) {
+			foreach ($data['column_fields'] as &$column) {
+				foreach ($impacted_fields as $field) {
+					$column[$field] = str_replace('{date}', $new_date, $column[$field]);
+				}
+			}
+		}
+		else {
+			foreach ($impacted_fields as $field) {
+				$data['fields'][$field] = str_replace('{date}', $new_date, $data['fields'][$field]);
+			}
+		}
+
+		foreach ($data['item_data'] as &$item_value) {
+			$item_value['time'] = str_replace('{date}', $new_date, $item_value['time']);
+		}
+		unset($item_value);
+
+		return $data;
 	}
 }

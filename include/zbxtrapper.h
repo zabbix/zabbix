@@ -26,6 +26,7 @@
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxpoller.h"
+#include "zbxautoreg.h"
 
 zbx_get_program_type_f trapper_get_program_type(void);
 
@@ -50,9 +51,11 @@ typedef struct
 	const char				*config_java_gateway;
 	int					config_java_gateway_port;
 	const char				*config_externalscripts;
+	int					config_enable_global_scripts;
 	zbx_get_value_internal_ext_f		zbx_get_value_internal_ext_cb;
 	const char				*config_ssh_key_location;
 	zbx_trapper_process_request_func_t	trapper_process_request_func_cb;
+	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
 }
 zbx_thread_trapper_args;
 

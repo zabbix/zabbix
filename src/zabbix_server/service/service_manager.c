@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "service_manager.h"
+#include "service_server.h"
+
 #include "../server_constants.h"
 
 #include "zbxlog.h"

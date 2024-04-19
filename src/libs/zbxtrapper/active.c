@@ -32,36 +32,39 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxautoreg.h"
 #include "zbxscripts.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxautoreg.h"
 
-/**********************************************************************************
- *                                                                                *
- * Purpose: performs active agent auto registration                               *
- *                                                                                *
- * Parameters: host            - [IN] name of host to be added or updated         *
- *             ip              - [IN] IP address of host                          *
- *             port            - [IN] port of host                                *
- *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
- *                                    ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
- *                                    flag                                        *
- *             host_metadata   - [IN]                                             *
- *             flag            - [IN] flag describing interface type              *
- *             interface       - [IN] interface value if flag is not default      *
- *             events_cbs      - [IN]                                             *
- *             config_timeout  - [IN]                                             *
- *                                                                                *
- * Comments: helper function for get_hostid_by_host                               *
- *                                                                                *
- **********************************************************************************/
+/*************************************************************************************
+ *                                                                                   *
+ * Purpose: performs active agent auto registration                                  *
+ *                                                                                   *
+ * Parameters:                                                                       *
+ *    host                        - [IN] name of host to be added or updated         *
+ *    ip                          - [IN] IP address of host                          *
+ *    port                        - [IN] port of host                                *
+ *    connection_type             - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
+ *                                       ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
+ *                                       flag                                        *
+ *    host_metadata               - [IN]                                             *
+ *    flag                        - [IN] flag describing interface type              *
+ *    interface                   - [IN] interface value if flag is not default      *
+ *    events_cbs                  - [IN]                                             *
+ *    config_timeout              - [IN]                                             *
+ *    autoreg_update_host_func_cb - [IN]                                             *
+ *                                                                                   *
+ * Comments: helper function for get_hostid_by_host                                  *
+ *                                                                                   *
+ *************************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
-		const zbx_events_funcs_t *events_cbs, int config_timeout)
+		const zbx_events_funcs_t *events_cbs, int config_timeout,
+		zbx_autoreg_update_host_func_t autoreg_update_host_func_cb)
 {
 	char		dns[ZBX_INTERFACE_DNS_LEN_MAX], ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 	const char	*p, *p_ip, *p_dns;
@@ -96,8 +99,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
 	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
-	zbx_autoreg_update_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag, now,
-			events_cbs);
+	autoreg_update_host_func_cb(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
+			now, events_cbs);
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
@@ -144,35 +147,38 @@ out:
 	return ret;
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: checks for host name and returns hostid                              *
- *                                                                               *
- * Parameters: sock           - [IN] open socket of server-agent connection      *
- *             host           - [IN] host name                                   *
- *             ip             - [IN] IP address of host                          *
- *             port           - [IN] port of host                                *
- *             host_metadata  - [IN]                                             *
- *             flag           - [IN] flag describing interface type              *
- *             interface      - [IN] interface value if flag is not default      *
- *             events_cbs     - [IN]                                             *
- *             config_timeout - [IN]                                             *
- *             hostid         - [OUT]                                            *
- *             revision       - [OUT] host configuration revision                *
- *             error          - [OUT] error message (buffer provided by caller)  *
- *                                                                               *
- * Return value:  SUCCEED - host is found                                        *
- *                FAIL - error occurred or host not found                        *
- *                                                                               *
- * Comments: NB! adds host to the database if it does not exist or if it         *
- *           exists but metadata, interface, interface type or port has          *
- *           changed                                                             *
- *                                                                               *
- *********************************************************************************/
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: checks for host name and returns hostid                                 *
+ *                                                                                  *
+ * Parameters:                                                                      *
+ *    sock                        - [IN] open socket of server-agent connection     *
+ *    host                        - [IN] host name                                  *
+ *    ip                          - [IN] IP address of host                         *
+ *    port                        - [IN] port of host                               *
+ *    host_metadata               - [IN]                                            *
+ *    flag                        - [IN] flag describing interface type             *
+ *    interface                   - [IN] interface value if flag is not default     *
+ *    events_cbs                  - [IN]                                            *
+ *    config_timeout              - [IN]                                            *
+ *    autoreg_update_host_func_cb - [IN]                                            *
+ *    hostid                      - [OUT]                                           *
+ *    revision                    - [OUT] host configuration revision               *
+ *    error                       - [OUT] error message (buffer provided by caller) *
+ *                                                                                  *
+ * Return value:  SUCCEED - host is found                                           *
+ *                FAIL - error occurred or host not found                           *
+ *                                                                                  *
+ * Comments: NB! adds host to the database if it does not exist or if it            *
+ *           exists but metadata, interface, interface type or port has             *
+ *           changed                                                                *
+ *                                                                                  *
+ ************************************************************************************/
 static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
 		unsigned short port, const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
-		const zbx_events_funcs_t *events_cbs, int config_timeout, zbx_uint64_t *hostid, zbx_uint64_t *revision,
-		char *error)
+		const zbx_events_funcs_t *events_cbs, int config_timeout,
+		zbx_autoreg_update_host_func_t autoreg_update_host_func_cb, zbx_uint64_t *hostid,
+		zbx_uint64_t *revision, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -209,7 +215,8 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 						interface, (int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface, events_cbs, config_timeout);
+							interface, events_cbs, config_timeout,
+							autoreg_update_host_func_cb);
 				}
 			}
 		}
@@ -229,7 +236,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 				(int)time(NULL), heartbeat))
 		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
-					events_cbs, config_timeout);
+					events_cbs, config_timeout, autoreg_update_host_func_cb);
 		}
 	}
 
@@ -240,24 +247,26 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: sends list of active checks to host (older version agent)         *
- *                                                                            *
- * Parameters: sock           - [IN] open socket of server-agent connection   *
- *             request        - [IN] request buffer                           *
- *             events_cbs     - [IN]                                          *
- *             config_timeout - [IN]                                          *
- *                                                                            *
- * Return value:  SUCCEED - list of active checks sent successfully           *
- *                FAIL - error occurred                                       *
- *                                                                            *
- * Comments: format of the request: ZBX_GET_ACTIVE_CHECKS\n<host name>\n      *
- *           format of the list: key:delay:last_log_size                      *
- *                                                                            *
- ******************************************************************************/
+/***************************************************************************
+ *                                                                         *
+ * Purpose: sends list of active checks to host (older version agent)      *
+ *                                                                         *
+ * Parameters:                                                             *
+ *    sock                   - [IN] open socket of server-agent connection *
+ *    request                - [IN] request buffer                         *
+ *    events_cbs             - [IN]                                        *
+ *    config_timeout         - [IN]                                        *
+ *    autoreg_update_host_cb - [IN]                                        *
+ *                                                                         *
+ * Return value:  SUCCEED - list of active checks sent successfully        *
+ *                FAIL - error occurred                                    *
+ *                                                                         *
+ * Comments: format of the request: ZBX_GET_ACTIVE_CHECKS\n<host name>\n   *
+ *           format of the list: key:delay:last_log_size                   *
+ *                                                                         *
+ ***************************************************************************/
 int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_events_funcs_t *events_cbs,
-		int config_timeout)
+		int config_timeout, zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	char		*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
@@ -280,7 +289,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 
 	/* no host metadata in older versions of agent */
 	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",
-			events_cbs, config_timeout, &hostid, &revision, error))
+			events_cbs, config_timeout, autoreg_update_host_cb, &hostid, &revision, error))
 	{
 		goto out;
 	}
@@ -429,21 +438,24 @@ out:
 #undef ZBX_KEY_EVENTLOG
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: sends list of active checks to host                               *
- *                                                                            *
- * Parameters: sock           - [IN] open socket of server-agent connection   *
- *             jp             - [IN] request buffer                           *
- *             events_cbs     - [IN]                                          *
- *             config_timeout - [IN]                                          *
- *                                                                            *
- * Return value:  SUCCEED - list of active checks sent successfully           *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: sends list of active checks to host                                 *
+ *                                                                              *
+ * Parameters:                                                                  *
+ *    sock                        - [IN] open socket of server-agent connection *
+ *    jp                          - [IN] request buffer                         *
+ *    events_cbs                  - [IN]                                        *
+ *    config_timeout              - [IN]                                        *
+ *    autoreg_update_host_func_cb - [IN]                                        *
+ *                                                                              *
+ * Return value:  SUCCEED - list of active checks sent successfully             *
+ *                FAIL - an error occurred                                      *
+ *                                                                              *
+ ********************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
-		const zbx_events_funcs_t *events_cbs, int config_timeout)
+		const zbx_events_funcs_t *events_cbs, int config_timeout,
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
@@ -529,7 +541,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, ip, port, host_metadata, flag, interface, events_cbs,
-			config_timeout, &hostid, &revision, error))
+			config_timeout, autoreg_update_host_cb, &hostid, &revision, error))
 	{
 		goto error;
 	}

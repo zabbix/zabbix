@@ -28,22 +28,52 @@
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"
 
-/* lld rule filter condition (item_condition table record) */
-typedef struct
+ZBX_PTR_VECTOR_IMPL(lld_condition_ptr, lld_condition_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
+ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t*)
+ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
+ZBX_PTR_VECTOR_IMPL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
+
+int	lld_item_compare_func(const void *d1, const void *d2)
 {
-	zbx_uint64_t		id;
-	char			*macro;
-	char			*regexp;
-	zbx_vector_expression_t	regexps;
-	unsigned char		op;
+	const zbx_lld_item_t	*item_1 = *(const zbx_lld_item_t **)d1;
+	const zbx_lld_item_t	*item_2 = *(const zbx_lld_item_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
+
+	return 0;
 }
-lld_condition_t;
 
-ZBX_PTR_VECTOR_IMPL(lld_item_link, zbx_lld_item_link_t*)
+int	lld_item_link_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_link_t	*link_1 = *(const zbx_lld_item_link_t **)d1;
+	const zbx_lld_item_link_t	*link_2 = *(const zbx_lld_item_link_t **)d2;
 
-ZBX_PTR_VECTOR_IMPL(lld_override, zbx_lld_override_t*)
+	ZBX_RETURN_IF_NOT_EQUAL(link_1->parent_itemid, link_2->parent_itemid);
 
-ZBX_PTR_VECTOR_IMPL(lld_row, zbx_lld_row_t*)
+	return 0;
+}
+
+int	lld_item_full_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_full_t	*item_1 = *(const zbx_lld_item_full_t **)d1;
+	const zbx_lld_item_full_t	*item_2 = *(const zbx_lld_item_full_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(item_1->itemid, item_2->itemid);
+
+	return 0;
+}
+
+int	lld_item_prototype_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_prototype_t	*proto_1 = *(const zbx_lld_item_prototype_t **)d1;
+	const zbx_lld_item_prototype_t	*proto_2 = *(const zbx_lld_item_prototype_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(proto_1->itemid, proto_2->itemid);
+
+	return 0;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -69,10 +99,10 @@ static void	lld_condition_free(lld_condition_t *condition)
  * Parameters: conditions - [IN] filter conditions                            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_conditions_free(zbx_vector_ptr_t *conditions)
+static void	lld_conditions_free(zbx_vector_lld_condition_ptr_t *conditions)
 {
-	zbx_vector_ptr_clear_ext(conditions, (zbx_clean_func_t)lld_condition_free);
-	zbx_vector_ptr_destroy(conditions);
+	zbx_vector_lld_condition_ptr_clear_ext(conditions, lld_condition_free);
+	zbx_vector_lld_condition_ptr_destroy(conditions);
 }
 
 /******************************************************************************
@@ -95,7 +125,7 @@ static int	lld_condition_compare_by_macro(const void *cond1, const void *cond2)
  ******************************************************************************/
 static void	lld_filter_init(zbx_lld_filter_t *filter)
 {
-	zbx_vector_ptr_create(&filter->conditions);
+	zbx_vector_lld_condition_ptr_create(&filter->conditions);
 	filter->expression = NULL;
 	filter->evaltype = ZBX_CONDITION_EVAL_TYPE_AND_OR;
 }
@@ -111,7 +141,7 @@ static void	lld_filter_clean(zbx_lld_filter_t *filter)
 	lld_conditions_free(&filter->conditions);
 }
 
-static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id, const char *macro,
+static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, const char *id, const char *macro,
 		const char *regexp, const char *op, const zbx_dc_item_t *item, char **error)
 {
 	lld_condition_t	*condition;
@@ -124,7 +154,7 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
 
 	zbx_vector_expression_create(&condition->regexps);
 
-	zbx_vector_ptr_append(conditions, condition);
+	zbx_vector_lld_condition_ptr_append(conditions, condition);
 
 	if ('@' == *condition->regexp)
 	{
@@ -177,7 +207,7 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
 	zbx_db_free_result(result);
 
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
-		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
+		zbx_vector_lld_condition_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -199,7 +229,7 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
  *                                                                            *
  ******************************************************************************/
 static int	filter_condition_match(const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, const lld_condition_t *condition, int *result,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, const lld_condition_t *condition, int *result,
 		char **err_msg)
 {
 	char	*value = NULL;
@@ -270,7 +300,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row,
  *                                                                                      *
  ****************************************************************************************/
 static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **info)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **info)
 {
 	int			i, ret = SUCCEED, error_num = 0, res;
 	double			result;
@@ -286,7 +316,7 @@ static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const st
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		condition = (lld_condition_t *)filter->conditions.values[i];
+		condition = filter->conditions.values[i];
 
 		switch (filter->evaltype)
 		{
@@ -374,7 +404,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **err_msg)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **err_msg)
 {
 	int			i, ret, res, error_num = 0;
 	char			*expression = NULL, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256], value[16],
@@ -394,7 +424,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+		const lld_condition_t	*condition = filter->conditions.values[i];
 
 		if (SUCCEED == filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg))
 		{
@@ -456,7 +486,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **info)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **info)
 {
 	if (0 == filter->conditions.values_num)
 		return SUCCEED;
@@ -474,7 +504,17 @@ static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json
 	return FAIL;
 }
 
-static int	lld_override_conditions_load(zbx_vector_lld_override_t *overrides,
+static int	lld_override_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_override_t	*override_1 = *(const zbx_lld_override_t **)d1;
+	const zbx_lld_override_t	*override_2 = *(const zbx_lld_override_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(override_1->overrideid, override_2->overrideid);
+
+	return 0;
+}
+
+static int	lld_override_conditions_load(zbx_vector_lld_override_ptr_t *overrides,
 		const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc, const zbx_dc_item_t *item,
 		char **error)
 {
@@ -499,8 +539,11 @@ static int	lld_override_conditions_load(zbx_vector_lld_override_t *overrides,
 		zbx_uint64_t	overrideid;
 
 		ZBX_STR2UINT64(overrideid, row[0]);
-		if (FAIL == (i = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)overrides, (const void *)&overrideid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+
+		const zbx_lld_override_t	cmp = {.overrideid = overrideid};
+
+		if (FAIL == (i = zbx_vector_lld_override_ptr_bsearch(overrides, &cmp,
+				lld_override_compare_func)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -520,7 +563,7 @@ static int	lld_override_conditions_load(zbx_vector_lld_override_t *overrides,
 		override = overrides->values[i];
 
 		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == override->filter.evaltype)
-			zbx_vector_ptr_sort(&override->filter.conditions, lld_condition_compare_by_macro);
+			zbx_vector_lld_condition_ptr_sort(&override->filter.conditions, lld_condition_compare_by_macro);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -528,7 +571,7 @@ static int	lld_override_conditions_load(zbx_vector_lld_override_t *overrides,
 	return ret;
 }
 
-static void	lld_override_operations_load(zbx_vector_lld_override_t *overrides,
+static void	lld_override_operations_load(zbx_vector_lld_override_ptr_t *overrides,
 		const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc)
 {
 	zbx_vector_lld_override_operation_t	ops;
@@ -542,11 +585,11 @@ static void	lld_override_operations_load(zbx_vector_lld_override_t *overrides,
 
 	for (int i = 0; i < ops.values_num; i++)
 	{
-		zbx_lld_override_t		*override;
 		zbx_lld_override_operation_t	*op = ops.values[i];
+		zbx_lld_override_t		*override, cmp = {.overrideid = op->overrideid};
 
-		if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)overrides,
-				(const void *)&op->overrideid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_lld_override_ptr_bsearch(overrides,
+				&cmp, lld_override_compare_func)))
 		{
 			zbx_lld_override_operation_free(op);
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -568,7 +611,7 @@ static int	lld_overrides_compare_by_step(const void *override1, const void *over
 	return 0;
 }
 
-static void	lld_dump_overrides(const zbx_vector_lld_override_t *overrides)
+static void	lld_dump_overrides(const zbx_vector_lld_override_ptr_t *overrides)
 {
 	for (int i = 0; i < overrides->values_num; i++)
 	{
@@ -609,7 +652,7 @@ static void	lld_dump_overrides(const zbx_vector_lld_override_t *overrides)
 	}
 }
 
-static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t lld_ruleid,
+static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, zbx_uint64_t lld_ruleid,
 		const zbx_dc_item_t *item, char **error)
 {
 	zbx_db_result_t		result;
@@ -645,7 +688,7 @@ static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t
 
 		zbx_vector_lld_override_operation_create(&override->override_operations);
 
-		zbx_vector_lld_override_append(overrides, override);
+		zbx_vector_lld_override_ptr_append(overrides, override);
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 	}
 	zbx_db_free_result(result);
@@ -660,7 +703,7 @@ static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&overrideids);
 
-	zbx_vector_lld_override_sort(overrides, lld_overrides_compare_by_step);
+	zbx_vector_lld_override_ptr_sort(overrides, lld_overrides_compare_by_step);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		lld_dump_overrides(overrides);
@@ -698,7 +741,7 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 	return FAIL;
 }
 
-void	lld_override_item(const zbx_vector_lld_override_t *overrides, const char *name, const char **delay,
+void	lld_override_item(const zbx_vector_lld_override_ptr_t *overrides, const char *name, const char **delay,
 		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,
 		unsigned char *status, unsigned char *discover)
 {
@@ -768,7 +811,7 @@ void	lld_override_item(const zbx_vector_lld_override_t *overrides, const char *n
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_trigger(const zbx_vector_lld_override_t *overrides, const char *name, unsigned char *severity,
+void	lld_override_trigger(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *severity,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover)
 {
 	int	i, j, k;
@@ -831,7 +874,7 @@ void	lld_override_trigger(const zbx_vector_lld_override_t *overrides, const char
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_host(const zbx_vector_lld_override_t *overrides, const char *name,
+void	lld_override_host(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		zbx_vector_uint64_t *lnk_templateids, signed char *inventory_mode,
 		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover)
 {
@@ -898,7 +941,7 @@ void	lld_override_host(const zbx_vector_lld_override_t *overrides, const char *n
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_graph(const zbx_vector_lld_override_t *overrides, const char *name, unsigned char *discover)
+void	lld_override_graph(const zbx_vector_lld_override_ptr_t *overrides, const char *name, unsigned char *discover)
 {
 	int	i, j;
 
@@ -937,7 +980,7 @@ void	lld_override_graph(const zbx_vector_lld_override_t *overrides, const char *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_t *overrides, const char *name,
+int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *overrides, const char *name,
 		unsigned char override_default)
 {
 	int	i, j;
@@ -963,8 +1006,8 @@ int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_t *over
 	return ZBX_PROTOTYPE_NO_DISCOVER == override_default ? FAIL : SUCCEED;
 }
 
-static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, const zbx_vector_lld_override_t *overrides,
+static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_lld_row_ptr_t *lld_rows,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, const zbx_vector_lld_override_ptr_t *overrides,
 		char **info, char **error)
 {
 	struct zbx_json_parse	jp, jp_array, jp_row;
@@ -1001,11 +1044,11 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 			continue;
 
 		lld_row = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
-		zbx_vector_lld_row_append(lld_rows, lld_row);
+		zbx_vector_lld_row_ptr_append(lld_rows, lld_row);
 
 		lld_row->jp_row = jp_row;
-		zbx_vector_lld_item_link_create(&lld_row->item_links);
-		zbx_vector_lld_override_create(&lld_row->overrides);
+		zbx_vector_lld_item_link_ptr_create(&lld_row->item_links);
+		zbx_vector_lld_override_ptr_create(&lld_row->overrides);
 
 #define OVERRIDE_STOP_TRUE	1
 
@@ -1016,7 +1059,7 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 			if (SUCCEED != filter_evaluate(&override->filter, &jp_row, lld_macro_paths, info))
 				continue;
 
-			zbx_vector_lld_override_append(&lld_row->overrides, override);
+			zbx_vector_lld_override_ptr_append(&lld_row->overrides, override);
 
 			if (OVERRIDE_STOP_TRUE == override->stop)
 				break;
@@ -1059,9 +1102,9 @@ static void	lld_item_link_free(zbx_lld_item_link_t *item_link)
 
 static void	lld_row_free(zbx_lld_row_t *lld_row)
 {
-	zbx_vector_lld_item_link_clear_ext(&lld_row->item_links, lld_item_link_free);
-	zbx_vector_lld_item_link_destroy(&lld_row->item_links);
-	zbx_vector_lld_override_destroy(&lld_row->overrides);
+	zbx_vector_lld_item_link_ptr_clear_ext(&lld_row->item_links, lld_item_link_free);
+	zbx_vector_lld_item_link_ptr_destroy(&lld_row->item_links);
+	zbx_vector_lld_override_ptr_destroy(&lld_row->overrides);
 	zbx_free(lld_row);
 }
 
@@ -1078,27 +1121,51 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  ******************************************************************************/
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
 {
+#define LIFETIME_DURATION_GET(lt, lt_str)									\
+	do													\
+	{													\
+		char	*lt_res;										\
+														\
+		if (ZBX_LLD_LIFETIME_TYPE_AFTER != lt.type)							\
+			break;											\
+														\
+		lt_res = zbx_strdup(NULL, lt_str);								\
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,	\
+				NULL, NULL, &lt_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);				\
+														\
+		if (SUCCEED != zbx_is_time_suffix(lt_res, &lt.duration, ZBX_LENGTH_UNLIMITED))			\
+		{												\
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule "	\
+					" \"%s:%s\": \"%s\" is not a valid value", zbx_host_string(hostid),	\
+					discovery_key, lt_res);							\
+			lt.duration = 25 * SEC_PER_YEAR;	/* max value for the field */			\
+		}												\
+		zbx_free(lt_res);										\
+	}													\
+	while(0)
+
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
 	zbx_uint64_t			hostid;
 	char				*discovery_key = NULL, *info = NULL;
-	int				lifetime, ret = SUCCEED, errcode;
-	zbx_vector_lld_macro_path_t	lld_macro_paths;
+	int				errcode, ret = SUCCEED;
+	zbx_vector_lld_macro_path_ptr_t	lld_macro_paths;
 	zbx_lld_filter_t		filter;
+	zbx_lld_lifetime_t		lifetime, enabled_lifetime;
 	time_t				now;
 	zbx_dc_item_t			item;
 	zbx_config_t			cfg;
 	zbx_dc_um_handle_t		*um_handle;
-	zbx_vector_lld_override_t	overrides;
-	zbx_vector_lld_row_t		lld_rows;
+	zbx_vector_lld_override_ptr_t	overrides;
+	zbx_vector_lld_row_ptr_t	lld_rows;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
 
 	um_handle = zbx_dc_open_user_macros();
 
-	zbx_vector_lld_row_create(&lld_rows);
-	zbx_vector_lld_macro_path_create(&lld_macro_paths);
-	zbx_vector_lld_override_create(&overrides);
+	zbx_vector_lld_row_ptr_create(&lld_rows);
+	zbx_vector_lld_macro_path_ptr_create(&lld_macro_paths);
+	zbx_vector_lld_override_ptr_create(&overrides);
 
 	lld_filter_init(&filter);
 
@@ -1112,32 +1179,23 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	}
 
 	result = zbx_db_select(
-			"select hostid,key_,evaltype,formula,lifetime"
+			"select hostid,key_,evaltype,formula,lifetime_type,lifetime,enabled_lifetime_type,"
+				"enabled_lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		char	*lifetime_str;
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		filter.evaltype = atoi(row[2]);
 		filter.expression = zbx_strdup(NULL, row[3]);
-		lifetime_str = zbx_strdup(NULL, row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&lifetime_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-
-		if (SUCCEED != zbx_is_time_suffix(lifetime_str, &lifetime, ZBX_LENGTH_UNLIMITED))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
-					" \"%s\" is not a valid value",
-					zbx_host_string(hostid), discovery_key, lifetime_str);
-			lifetime = 25 * SEC_PER_YEAR;	/* max value for the field */
-		}
-
-		zbx_free(lifetime_str);
+		ZBX_STR2UCHAR(lifetime.type, row[4]);
+		LIFETIME_DURATION_GET(lifetime, row[5]);
+		ZBX_STR2UCHAR(enabled_lifetime.type, row[6]);
+		LIFETIME_DURATION_GET(enabled_lifetime, row[7]);
 	}
 	zbx_db_free_result(result);
 
@@ -1175,7 +1233,8 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
-	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime,
+			&enabled_lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -1184,21 +1243,22 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
+	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime,
+			&enabled_lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
+	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now);
+	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime, &enabled_lifetime, now);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
@@ -1211,16 +1271,17 @@ out:
 
 	lld_filter_clean(&filter);
 
-	zbx_vector_lld_override_clear_ext(&overrides, lld_override_free);
-	zbx_vector_lld_override_destroy(&overrides);
-	zbx_vector_lld_row_clear_ext(&lld_rows, lld_row_free);
-	zbx_vector_lld_row_destroy(&lld_rows);
-	zbx_vector_lld_macro_path_clear_ext(&lld_macro_paths, zbx_lld_macro_path_free);
-	zbx_vector_lld_macro_path_destroy(&lld_macro_paths);
+	zbx_vector_lld_override_ptr_clear_ext(&overrides, lld_override_free);
+	zbx_vector_lld_override_ptr_destroy(&overrides);
+	zbx_vector_lld_row_ptr_clear_ext(&lld_rows, lld_row_free);
+	zbx_vector_lld_row_ptr_destroy(&lld_rows);
+	zbx_vector_lld_macro_path_ptr_clear_ext(&lld_macro_paths, zbx_lld_macro_path_free);
+	zbx_vector_lld_macro_path_ptr_destroy(&lld_macro_paths);
 
 	zbx_dc_close_user_macros(um_handle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
+#undef LIFETIME_DURATION_GET
 }

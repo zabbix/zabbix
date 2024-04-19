@@ -2437,8 +2437,12 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	if (SUCCEED != function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
 			token->opt, args, ctx->data_cb, &ctx->ts, &value, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "%s at \"%s\".", errmsg, ctx->expression + token->loc.l);
+		char	*composed_expr = NULL;
+
+		zbx_eval_compose_expression_from_pos(ctx, &composed_expr, token->loc.l);
+		*error = zbx_dsprintf(*error, "%s at \"%s\".", errmsg, composed_expr);
 		zbx_free(errmsg);
+		zbx_free(composed_expr);
 
 		if (0 == (ctx->rules & ZBX_EVAL_PROCESS_ERROR))
 			return FAIL;

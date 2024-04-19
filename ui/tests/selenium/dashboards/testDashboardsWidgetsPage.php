@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 /**
  * @backup dashboard, profiles
  *
- * @dataSource Actions, LoginUsers, AllItemValueTypes, UserPermissions, Proxies
+ * @dataSource Actions, AllItemValueTypes, ItemValueWidgetLoginUsers, LoginUsers, Proxies, UserPermissions
  */
 class testDashboardsWidgetsPage extends CWebTest {
 
@@ -151,7 +151,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 20,
+			'Zabbix servers'					=> 19,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];
@@ -265,8 +265,8 @@ class testDashboardsWidgetsPage extends CWebTest {
 		}
 
 		// Check if widget can be found by a new name.
-		$dashboard->getWidget('New widget name');
-		$table = $widget->getContent()->asTable();
+		$table = $dashboard->getWidget('New widget name')->getContent()->asTable();
+
 		// Check if only selected host group is shown.
 		$this->assertEquals(['Zabbix servers'], array_keys($table->index('Host group')));
 

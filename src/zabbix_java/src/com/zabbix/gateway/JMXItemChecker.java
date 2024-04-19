@@ -85,18 +85,18 @@ class JMXItemChecker extends ItemChecker
 			// e. g. the second "rmi" in service:jmx:rmi:///jndi/rmi://
 			String[] parts = url.getURLPath().split(":", 2);
 
-			if (0 != parts.length)
+			if (0 != parts.length && !parts[0].equals(""))
 			{
 				parts = parts[0].split("/", 0);
 
-				if (0 != parts.length)
+				if (0 != parts.length && !parts[parts.length - 1].equals(""))
 				{
-					String rmiProtocol = parts[parts.length - 1];
+					String serviceProvider = parts[parts.length - 1];
 
-					if (!rmiProtocol.equals("rmi"))
+					if (!serviceProvider.equals("rmi"))
 					{
 						throw new ZabbixException("unsupported JNDI service provider, \"%s\"",
-								rmiProtocol);
+								serviceProvider);
 					}
 				}
 			}
@@ -208,47 +208,43 @@ class JMXItemChecker extends ItemChecker
 		if (item.getKeyId().equals("jmx"))
 		{
 			if (2 != argumentCount && 3 != argumentCount)
-				throw new ZabbixException("required key format: jmx[<object name>,<attribute name>,<unique short description>]");
+				throw new ZabbixException("required key format: jmx[<mbean name>,<attribute name>,<unique short description>]");
 
-			ObjectName objectName = new ObjectName(item.getArgument(1));
+			ObjectName mbeanName = new ObjectName(item.getArgument(1));
 			String attributeName = item.getArgument(2);
-			String realAttributeName;
-			String fieldNames = "";
 
 			// Attribute name and composite data field names are separated by dots. On the other hand the
 			// name may contain a dot too. In this case user needs to escape it with a backslash. Also the
 			// backslash symbols in the name must be escaped. So a real separator is unescaped dot and
 			// separatorIndex() is used to locate it.
 
-			int sep = HelperFunctionChest.separatorIndex(attributeName);
+			int separatorIndex = HelperFunctionChest.separatorIndex(attributeName);
 
-			if (-1 != sep)
+			// MBean needs the first part of the attribute. The rest (if available) is so called metric.
+			String mbeanAttribute;
+			String metric;
+
+			if (-1 != separatorIndex)
 			{
-				logger.trace("'{}' contains composite data", attributeName);
-
-				realAttributeName = attributeName.substring(0, sep);
-				fieldNames = attributeName.substring(sep + 1);
+				mbeanAttribute = attributeName.substring(0, separatorIndex);
+				metric = attributeName.substring(separatorIndex + 1);
 			}
 			else
-				realAttributeName = attributeName;
+			{
+				mbeanAttribute = attributeName;
+				metric = "";
+			}
 
 			// unescape possible dots or backslashes that were escaped by user
-			realAttributeName = HelperFunctionChest.unescapeUserInput(realAttributeName);
+			mbeanAttribute = HelperFunctionChest.unescapeUserInput(mbeanAttribute);
 
-			logger.trace("attributeName:'{}'", realAttributeName);
-			logger.trace("fieldNames:'{}'", fieldNames);
+			logger.debug("obtaining [{}] [{}] [{}]", mbeanName, mbeanAttribute, metric);
 
 			try
 			{
-				Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
+				Object dataObject = mbsc.getAttribute(mbeanName, mbeanAttribute);
 
-				if (dataObject instanceof TabularData)
-				{
-					logger.trace("'{}' contains tabular data", attributeName);
-					return getTabularData((TabularData)dataObject).toString();
-				}
-
-				return getPrimitiveAttributeValue(dataObject, fieldNames);
+				return getValueByMetric(dataObject, metric);
 			}
 			catch (AttributeNotFoundException e)
 			{
@@ -313,54 +309,72 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
 	}
 
-	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws Exception
+	private String getValueByMetric(Object dataObject, String metric) throws Exception
 	{
-		logger.trace("drilling down with data object '{}' and field names '{}'", dataObject, fieldNames);
-
 		if (null == dataObject)
 			throw new ZabbixException("data object is null");
 
-		if (fieldNames.equals(""))
+		logger.trace("drilling down the {} to find metric '{}'", dataObject, metric);
+
+		while (!metric.equals(""))
 		{
-			try
+			// get next objectName from the metric
+			int separatorIndex = HelperFunctionChest.separatorIndex(metric);
+			String objectName;
+
+			if (-1 != separatorIndex)
 			{
-				if (isPrimitiveAttributeType(dataObject))
-					return dataObject.toString();
-				else
-					throw new NoSuchMethodException();
-			}
-			catch (NoSuchMethodException e)
-			{
-				throw new ZabbixException("Data object type cannot be converted to string.");
-			}
-		}
-
-		if (dataObject instanceof CompositeData)
-		{
-			logger.trace("'{}' contains composite data", dataObject);
-
-			CompositeData comp = (CompositeData)dataObject;
-
-			String dataObjectName;
-			String newFieldNames = "";
-
-			int sep = HelperFunctionChest.separatorIndex(fieldNames);
-
-			if (-1 != sep)
-			{
-				dataObjectName = fieldNames.substring(0, sep);
-				newFieldNames = fieldNames.substring(sep + 1);
+				objectName = metric.substring(0, separatorIndex);
+				metric = metric.substring(separatorIndex + 1);
 			}
 			else
-				dataObjectName = fieldNames;
+			{
+				objectName = metric;
+				metric = "";
+			}
 
 			// unescape possible dots or backslashes that were escaped by user
-			dataObjectName = HelperFunctionChest.unescapeUserInput(dataObjectName);
+			objectName = HelperFunctionChest.unescapeUserInput(objectName);
 
-			return getPrimitiveAttributeValue(comp.get(dataObjectName), newFieldNames);
+			// get next object
+			if (dataObject instanceof CompositeData)
+			{
+				logger.trace("[{}] contains composite data", metric);
+
+				CompositeData obj = (CompositeData)dataObject;
+
+				dataObject = obj.get(objectName);
+			}
+			else if (dataObject instanceof TabularData)
+			{
+				logger.trace("[{}] contains tabular data", metric);
+
+				TabularData obj = (TabularData)dataObject;
+
+				dataObject = obj.get(new String[]{objectName});
+			}
+			else
+			{
+				throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
+			}
 		}
-		else
-			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
+
+		try
+		{
+			if (isPrimitiveMetricType(dataObject))
+			{
+				logger.trace("found: {}", dataObject.toString());
+				return dataObject.toString();
+			}
+			else
+			{
+				throw new NoSuchMethodException();
+			}
+		}
+		catch (NoSuchMethodException e)
+		{
+			throw new ZabbixException("The value cannot be converted to string.");
+		}
 	}
 
 	private JSONArray getTabularData(TabularData data) throws JSONException
@@ -609,7 +623,7 @@ class JMXItemChecker extends ItemChecker
 	private void getAttributeFields(JSONArray counters, ObjectName name, String descr, String attrPath,
 			Object attribute, boolean propertiesAsMacros) throws NoSuchMethodException, JSONException
 	{
-		if (null == attribute || isPrimitiveAttributeType(attribute))
+		if (null == attribute || isPrimitiveMetricType(attribute))
 		{
 			logger.trace("found attribute of a primitive type: {}", null == attribute ? "null" :
 					attribute.getClass());
@@ -665,7 +679,7 @@ class JMXItemChecker extends ItemChecker
 		counters.put(counter);
 	}
 
-	private boolean isPrimitiveAttributeType(Object obj) throws NoSuchMethodException
+	private boolean isPrimitiveMetricType(Object obj) throws NoSuchMethodException
 	{
 		Class<?>[] clazzez = {Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
 			Float.class, Double.class, String.class, java.math.BigDecimal.class, java.math.BigInteger.class,

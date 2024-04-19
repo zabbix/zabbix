@@ -47,18 +47,6 @@ class testDashboardGraphWidget extends testWidgets {
 		];
 	}
 
-	/*
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
-
 	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=1030';
 
 	/*
@@ -99,14 +87,12 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @param string $name		name of graphic widget to be checked
 	 */
 	private function saveGraphWidget($name) {
+		COverlayDialogElement::ensureNotPresent();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($name);
-		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$widget->getContent()->query('class:svg-graph')->waitUntilVisible();
 		$dashboard->save();
-		$message = CMessageElement::find()->waitUntilPresent()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	/*
@@ -700,7 +686,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:lefty_min' => 'abc'
 					],
-					'error' => 'Invalid parameter "Left Y/Min": a number is expected.'
+					'error' => 'Invalid parameter "Left Y: Min": a number is expected.'
 				]
 			],
 			[
@@ -708,7 +694,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:lefty_max' => 'abc'
 					],
-					'error' => 'Invalid parameter "Left Y/Max": a number is expected.'
+					'error' => 'Invalid parameter "Left Y: Max": a number is expected.'
 				]
 			],
 			[
@@ -718,7 +704,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:lefty_max' => '5',
 						'id:lefty_units' => 'Auto'
 					],
-					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			[
@@ -729,7 +715,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:lefty_units' => 'Static',
 						'id:lefty_static_units' => 500
 					],
-					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			// Change default Y-axis option on Right.
@@ -743,7 +729,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:righty_min' => 'abc'
 					],
-					'error' => 'Invalid parameter "Right Y/Min": a number is expected.'
+					'error' => 'Invalid parameter "Right Y: Min": a number is expected.'
 				]
 			],
 			[
@@ -756,7 +742,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Axes' => [
 						'id:righty_max' => 'abc'
 					],
-					'error' => 'Invalid parameter "Right Y/Max": a number is expected.'
+					'error' => 'Invalid parameter "Right Y: Max": a number is expected.'
 				]
 			],
 			[
@@ -772,7 +758,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_units' => 'Static',
 						'id:righty_static_units' => 500
 					],
-					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			[
@@ -787,7 +773,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '-10',
 						'id:righty_units' => 'Auto'
 					],
-					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
 			// Both axes validation.
@@ -808,8 +794,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => 'abc'
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Max": a number is expected.',
-						'Invalid parameter "Right Y/Max": a number is expected.'
+						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			],
@@ -832,8 +818,8 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '5'
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.',
-						'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
+						'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.',
+						'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 					]
 				]
 			],
@@ -856,10 +842,10 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_max' => '('
 					],
 					'error' => [
-						'Invalid parameter "Left Y/Min": a number is expected.',
-						'Invalid parameter "Left Y/Max": a number is expected.',
-						'Invalid parameter "Right Y/Min": a number is expected.',
-						'Invalid parameter "Right Y/Max": a number is expected.'
+						'Invalid parameter "Left Y: Min": a number is expected.',
+						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Min": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			]
@@ -1875,7 +1861,6 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check values in updated widget.
@@ -1897,7 +1882,6 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));

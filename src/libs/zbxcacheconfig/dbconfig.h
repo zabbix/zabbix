@@ -23,7 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "user_macro.h"
 #include "vps_monitor.h"
-#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
 #include "zbx_trigger_constants.h"
@@ -119,6 +118,151 @@ ZBX_DC_PREPROCITEM;
 
 typedef struct
 {
+	const char	*trapper_hosts;
+}
+ZBX_DC_TRAPITEM;
+
+typedef struct
+{
+	const char	*username;
+	const char	*password;
+}
+ZBX_DC_SIMPLEITEM;
+
+typedef struct
+{
+	const char	*params;
+	const char	*username;
+	const char	*password;
+}
+ZBX_DC_DBITEM;
+
+typedef struct
+{
+	const char	*ipmi_sensor;
+}
+ZBX_DC_IPMIITEM;
+
+typedef struct
+{
+	const char	*username;
+	const char	*publickey;
+	const char	*privatekey;
+	const char	*password;
+	const char	*params;
+	unsigned char	authtype;
+}
+ZBX_DC_SSHITEM;
+
+typedef struct
+{
+	const char	*username;
+	const char	*password;
+	const char	*params;
+}
+ZBX_DC_TELNETITEM;
+
+typedef struct
+{
+	const char		*params;
+	const unsigned char	*formula_bin;
+}
+ZBX_DC_CALCITEM;
+
+typedef struct
+{
+	const char	*username;
+	const char	*password;
+	const char	*jmx_endpoint;
+}
+ZBX_DC_JMXITEM;
+
+typedef struct
+{
+	zbx_uint64_t	master_itemid;
+	zbx_uint64_t	last_master_itemid;
+}
+ZBX_DC_DEPENDENTITEM;
+
+typedef struct
+{
+	const char	*url;
+	const char	*query_fields;
+	const char	*status_codes;
+	const char	*http_proxy;
+	const char	*headers;
+	const char	*username;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
+	const char	*password;
+	const char	*posts;
+	const char	*trapper_hosts;
+	unsigned char	authtype;
+	unsigned char	follow_redirects;
+	unsigned char	post_type;
+	unsigned char	retrieve_mode;
+	unsigned char	request_method;
+	unsigned char	output_format;
+	unsigned char	verify_peer;
+	unsigned char	verify_host;
+	unsigned char	allow_traps;
+}
+ZBX_DC_HTTPITEM;
+
+typedef struct
+{
+	const char	*snmp_oid;
+	unsigned char	snmp_oid_type;
+}
+ZBX_DC_SNMPITEM;
+
+typedef struct
+{
+	const char		*script;
+	zbx_vector_ptr_t	params;
+}
+ZBX_DC_SCRIPTITEM;
+
+typedef union
+{
+	ZBX_DC_TRAPITEM		*trapitem;
+	ZBX_DC_SIMPLEITEM	*simpleitem;
+	ZBX_DC_DBITEM		*dbitem;
+	ZBX_DC_IPMIITEM		*ipmiitem;
+	ZBX_DC_SSHITEM		*sshitem;
+	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_CALCITEM		*calcitem;
+	ZBX_DC_JMXITEM		*jmxitem;
+	ZBX_DC_DEPENDENTITEM	*depitem;
+	ZBX_DC_HTTPITEM		*httpitem;
+	ZBX_DC_SNMPITEM		*snmpitem;
+	ZBX_DC_SCRIPTITEM	*scriptitem;
+}
+ZBX_DC_ITEMTYPE;
+
+typedef struct
+{
+	const char	*units;
+	const char	*trends_period;
+}
+ZBX_DC_NUMITEM;
+
+typedef struct
+{
+	const char	*logtimefmt;
+}
+ZBX_DC_LOGITEM;
+
+typedef union
+{
+	ZBX_DC_NUMITEM	*numitem;
+	ZBX_DC_LOGITEM	*logitem;
+}
+ZBX_DC_ITEMVALUETYPE;
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
@@ -130,11 +274,18 @@ typedef struct
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;
+	const char		*timeout;
 	ZBX_DC_TRIGGER		**triggers;
+	ZBX_DC_ITEMTYPE		itemtype;
+	ZBX_DC_ITEMVALUETYPE	itemvaluetype;
+	zbx_uint64_t		revision;
+	zbx_uint64_t		templateid;
+	ZBX_DC_PREPROCITEM	*preproc_item;
+	ZBX_DC_MASTERITEM	*master_item;
+	zbx_vector_ptr_t	tags;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
-	zbx_uint64_t		revision;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -146,12 +297,6 @@ typedef struct
 	unsigned char		status;
 	unsigned char		queue_priority;
 	unsigned char		update_triggers;
-	zbx_uint64_t		templateid;
-	ZBX_DC_PREPROCITEM	*preproc_item;
-	ZBX_DC_MASTERITEM	*master_item;
-
-	zbx_vector_ptr_t	tags;
-	const char		*timeout;
 }
 ZBX_DC_ITEM;
 
@@ -185,142 +330,6 @@ typedef struct
 	ZBX_DC_ITEM	*item_ptr;
 }
 ZBX_DC_ITEM_HK;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*units;
-	const char	*trends_period;
-}
-ZBX_DC_NUMITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*snmp_oid;
-	unsigned char	snmp_oid_type;
-}
-ZBX_DC_SNMPITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*ipmi_sensor;
-}
-ZBX_DC_IPMIITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*trapper_hosts;
-}
-ZBX_DC_TRAPITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	master_itemid;
-	zbx_uint64_t	last_master_itemid;
-	unsigned char	flags;
-}
-ZBX_DC_DEPENDENTITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*logtimefmt;
-}
-ZBX_DC_LOGITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*params;
-	const char	*username;
-	const char	*password;
-}
-ZBX_DC_DBITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*username;
-	const char	*publickey;
-	const char	*privatekey;
-	const char	*password;
-	const char	*params;
-	unsigned char	authtype;
-}
-ZBX_DC_SSHITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*username;
-	const char	*password;
-	const char	*params;
-}
-ZBX_DC_TELNETITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*username;
-	const char	*password;
-}
-ZBX_DC_SIMPLEITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*username;
-	const char	*password;
-	const char	*jmx_endpoint;
-}
-ZBX_DC_JMXITEM;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	const char		*params;
-	const unsigned char	*formula_bin;
-}
-ZBX_DC_CALCITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*url;
-	const char	*query_fields;
-	const char	*status_codes;
-	const char	*http_proxy;
-	const char	*headers;
-	const char	*username;
-	const char	*ssl_cert_file;
-	const char	*ssl_key_file;
-	const char	*ssl_key_password;
-	const char	*password;
-	const char	*posts;
-	const char	*trapper_hosts;
-	unsigned char	authtype;
-	unsigned char	follow_redirects;
-	unsigned char	post_type;
-	unsigned char	retrieve_mode;
-	unsigned char	request_method;
-	unsigned char	output_format;
-	unsigned char	verify_peer;
-	unsigned char	verify_host;
-	unsigned char	allow_traps;
-}
-ZBX_DC_HTTPITEM;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	const char		*script;
-	zbx_vector_ptr_t	params;
-}
-ZBX_DC_SCRIPTITEM;
 
 typedef struct
 {
@@ -622,7 +631,7 @@ typedef struct
 
 	zbx_config_item_type_timeouts_t	item_timeouts;
 }
-ZBX_DC_CONFIG_TABLE;
+zbx_dc_config_table_t;
 
 typedef struct
 {
@@ -926,20 +935,6 @@ typedef struct
 	zbx_hashset_t		item_discovery;
 	zbx_hashset_t		template_items;		/* template items selected from items table */
 	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
-	zbx_hashset_t		numitems;
-	zbx_hashset_t		snmpitems;
-	zbx_hashset_t		ipmiitems;
-	zbx_hashset_t		trapitems;
-	zbx_hashset_t		dependentitems;
-	zbx_hashset_t		logitems;
-	zbx_hashset_t		dbitems;
-	zbx_hashset_t		sshitems;
-	zbx_hashset_t		telnetitems;
-	zbx_hashset_t		simpleitems;
-	zbx_hashset_t		jmxitems;
-	zbx_hashset_t		calcitems;
-	zbx_hashset_t		httpitems;
-	zbx_hashset_t		scriptitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -1001,7 +996,7 @@ typedef struct
 	zbx_binary_heap_t	trigger_queue;
 	zbx_binary_heap_t	drule_queue;
 	zbx_binary_heap_t	httptest_queue;		/* web scenario queue */
-	ZBX_DC_CONFIG_TABLE	*config;
+	zbx_dc_config_table_t	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
 	zbx_um_cache_t		*um_cache;
@@ -1009,21 +1004,28 @@ typedef struct
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
 }
-ZBX_DC_CONFIG;
+zbx_dc_config_t;
 
-extern int	sync_in_progress;
-extern ZBX_DC_CONFIG	*config;
-extern zbx_rwlock_t	config_lock;
+zbx_dc_config_t	*get_dc_config(void);
 
-#define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
-#define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
-#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
+/* for cmocka */
+void	set_dc_config(zbx_dc_config_t *in);
 
-extern zbx_rwlock_t	config_history_lock;
+#define	RDLOCK_CACHE	rdlock_cache()
+#define	WRLOCK_CACHE	wrlock_cache()
+#define	UNLOCK_CACHE	unlock_cache()
 
-#define	RDLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_rdlock(config_history_lock)
-#define	WRLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_wrlock(config_history_lock)
-#define	UNLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_unlock(config_history_lock)
+void	rdlock_cache(void);
+void	wrlock_cache(void);
+void	unlock_cache(void);
+
+void	rdlock_cache_config_history(void);
+void	wrlock_cache_config_history(void);
+void	unlock_cache_config_history(void);
+
+#define	RDLOCK_CACHE_CONFIG_HISTORY	rdlock_cache_config_history()
+#define	WRLOCK_CACHE_CONFIG_HISTORY	wrlock_cache_config_history()
+#define	UNLOCK_CACHE_CONFIG_HISTORY	unlock_cache_config_history()
 
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
@@ -1035,6 +1037,7 @@ void	DCdump_configuration(void);
 
 /* utility functions */
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
+void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, zbx_hashset_uniq_t uniq);
 
 /* string pool */
 const char	*dc_strpool_intern(const char *str);
@@ -1085,4 +1088,7 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
 		unsigned char program_type);
 
+void	dbconfig_shmem_free_func(void *ptr);
+void	*dbconfig_shmem_realloc_func(void *old, size_t size);
+void	*dbconfig_shmem_malloc_func(void *old, size_t size);
 #endif

@@ -45,7 +45,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -124,7 +124,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -194,7 +194,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -265,7 +265,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -613,37 +613,21 @@
 				$obj.attr('id', 'tmp' + $obj.attr('id'));
 			});
 
-			// Rewrite IDs to new order.
-			$('#itemsTable tbody tr.graph-item').each(function() {
-				const $obj = $(this);
+			for (const [index, row] of document.querySelectorAll('#itemsTable tbody tr.graph-item').entries()) {
+				row.id = row.id.substring(3).replace(/\d+/, `${index}`);
 
-				// Rewrite IDs in input fields.
-				$obj.find('*[id]').each(function() {
-					const $obj = $(this);
-					const id = $obj.attr('id').substring(3);
-					const part1 = id.substring(0, id.indexOf('items_') + 5);
-					let part2 = id.substring(id.indexOf('items_') + 6);
+				row.querySelectorAll('[id]').forEach(element => {
+					element.id = element.id.substring(3).replace(/\d+/, `${index}`);
 
-					part2 = part2.substring(part2.indexOf('_') + 1);
-
-					$obj.attr('id', part1 + '_' + i + '_' + part2);
-
-					// Set sortorder.
-					if (part2 === 'sortorder') {
-						$obj.val(i);
+					if (element.id.includes('sortorder')) {
+						element.value = index;
 					}
 				});
 
-				// Rewrite IDs in <tr>.
-				const id = $obj.attr('id').substring(3);
-				const part1 = id.substring(0, id.indexOf('items_') + 5);
-
-				$obj.attr('id', part1 + '_' + i);
-
-				i++;
-			});
-
-			i = 0;
+				row.querySelectorAll('[name]').forEach(element => {
+					element.name = element.name.replace(/\d+/, `${index}`);
+				});
+			}
 
 			$('#itemsTable tbody tr.graph-item').each(function() {
 				// Set remove number.

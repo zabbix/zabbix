@@ -20,7 +20,7 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
@@ -64,6 +64,24 @@
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
+ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
+
+ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
+
+void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
+{
+	zbx_free(item_diff);
+}
+
+int	zbx_item_diff_compare_func(const void *d1, const void *d2)
+{
+	const zbx_item_diff_t    *id_1 = *(const zbx_item_diff_t **)d1;
+	const zbx_item_diff_t    *id_2 = *(const zbx_item_diff_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(id_1->itemid, id_2->itemid);
+
+	return 0;
+}
 
 static int	connection_failure;
 
@@ -81,13 +99,13 @@ int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config
 	int	err = 0;
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
-	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", config_dbhigh->config_db_tls_connect,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSConnect", config_dbhigh->config_db_tls_connect,
 			"PostgreSQL or MySQL library version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file,
 			"PostgreSQL or MySQL library version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file,
 			"PostgreSQL or MySQL library version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file,
 			"PostgreSQL or MySQL library version that support TLS"));
 #endif
 
@@ -106,12 +124,12 @@ int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher,
 			"MySQL library version that support configuration of cipher"));
 #endif
 
 #if !defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13,
+	err |= (FAIL == zbx_check_cfg_feature_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13,
 			"MySQL library version that support configuration of TLSv1.3 ciphersuites"));
 #endif
 

@@ -66,8 +66,7 @@ $triggers_tab = (new CTabView())
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => $discovered_trigger,
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab',
-			'field_label' => _('Tags')
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)

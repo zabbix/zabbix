@@ -215,7 +215,7 @@ $steps_tab = (new CFormGrid())->addItem([
 		(new CDiv([
 			(new CTable())
 				->setId('steps')
-				->addClass('list-numbered')
+				->addClass(ZBX_STYLE_LIST_NUMBERED)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->setHeader([
 					(new CColHeader())->setWidth('12'),
@@ -252,7 +252,7 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][retrieve_mode]', '#{retrieve_mode}'))->removeId(),
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]),
-						(new CSpan(':'))->addClass('list-numbered-item'),
+						(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 						(new CCol(
 							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
 						))->addClass(ZBX_STYLE_WORDBREAK),
@@ -278,7 +278,7 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][retrieve_mode]', '#{retrieve_mode}'))->removeId(),
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CSpan(':'))->addClass('list-numbered-item'),
+						(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 						(new CCol(
 							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
 						))->addClass(ZBX_STYLE_WORDBREAK),
@@ -374,7 +374,8 @@ $webscenario_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'field_label' => _('Tags')
 		]),
 		TAB_INDICATOR_TAGS
 	)

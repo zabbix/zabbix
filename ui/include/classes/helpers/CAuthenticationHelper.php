@@ -40,6 +40,8 @@ class CAuthenticationHelper {
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
 	public const SAML_JIT_STATUS = 'saml_jit_status';
+	public const MFA_STATUS = 'mfa_status';
+	public const MFAID = 'mfaid';
 
 	private static $params = [];
 	private static $params_public = [];
@@ -60,14 +62,7 @@ class CAuthenticationHelper {
 	 */
 	public static function get(string $field): string {
 		if (!self::$params) {
-			self::$params = API::Authentication()->get([
-				'output' => [
-					'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-					'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
-					'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
-					'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
-				]
-			]);
+			self::$params = API::Authentication()->get(['output' => CAuthentication::getOutputFields()]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load authentication API parameters.'));

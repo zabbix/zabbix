@@ -24,6 +24,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxdbhigh.h"
+#include "zbxexpression.h"
 
 const char	*item_logtype_string(unsigned char logtype)
 {
@@ -145,7 +146,7 @@ const char	*zbx_dobject_status2str(int st)
 	}
 }
 
-const char	*dservice_type_string(zbx_dservice_type_t service)
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {
 	switch (service)
 	{

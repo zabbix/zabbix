@@ -19,8 +19,9 @@
 #ifndef ZABBIX_NIX_INTERNAL_H
 #define ZABBIX_NIX_INTERNAL_H
 
-#include "zbxcommon.h"
+#include "zbxnix.h"
 
-zbx_get_progname_f	nix_get_progname_cb(void);
+zbx_get_progname_f			nix_get_progname_cb(void);
+zbx_get_process_info_by_thread_f	nix_get_process_info_by_thread_func_cb(void);
 
 #endif /* ZABBIX_NIX_INTERNAL_H */

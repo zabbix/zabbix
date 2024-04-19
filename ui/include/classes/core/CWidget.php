@@ -217,6 +217,12 @@ class CWidget extends CModule {
 			'is_multiple' => $is_multiple
 		] = $data_types[$param['type']];
 
-		return (new $field_class($name, $label))->setMultiple($is_multiple);
+		$field = new $field_class($name, $label);
+
+		if ($is_multiple !== null) {
+			$field->setMultiple($is_multiple);
+		}
+
+		return $field;
 	}
 }

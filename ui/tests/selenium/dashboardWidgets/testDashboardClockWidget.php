@@ -965,7 +965,7 @@ class testDashboardClockWidget extends testWidgets {
 	 */
 	public function checkFormClockWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->sql);
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$linkid = $update
@@ -1043,7 +1043,7 @@ class testDashboardClockWidget extends testWidgets {
 			$this->assertMessage(TEST_BAD, null, $data['Error message']);
 
 			// Check that DB hash is not changed.
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 
 		COverlayDialogElement::find()->one()->close();
@@ -1127,7 +1127,7 @@ class testDashboardClockWidget extends testWidgets {
 	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
 	 */
 	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating clock widgets']);
@@ -1192,7 +1192,7 @@ class testDashboardClockWidget extends testWidgets {
 		}
 
 		// Check that DB hash is not changed.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**

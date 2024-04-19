@@ -39,6 +39,7 @@ typedef struct
 	const char			*config_java_gateway;
 	int				config_java_gateway_port;
 	const char			*config_externalscripts;
+	int				config_enable_global_scripts;
 	const char			*config_ssh_key_location;
 }
 zbx_thread_taskmanager_args;
