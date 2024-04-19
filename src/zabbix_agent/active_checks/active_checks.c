@@ -121,7 +121,7 @@ zbx_cmd_hash_t;
 static volatile sig_atomic_t	need_update_userparam;
 #endif
 
-void	send_back_unsupported_item(zbx_uint64_t itemid, const char *key, char *error, const char *config_hostname,
+static void	send_back_unsupported_item(zbx_uint64_t itemid, const char *key, char *error, const char *config_hostname,
 		zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, int config_buffer_send, int config_buffer_size);
 
@@ -2069,7 +2069,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #endif
 }
 
-void	send_back_unsupported_item(zbx_uint64_t itemid, const char *key, char *error, const char *config_hostname,
+static void	send_back_unsupported_item(zbx_uint64_t itemid, const char *key, char *error, const char *config_hostname,
 		zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, int config_buffer_send, int config_buffer_size)
 {
