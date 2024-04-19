@@ -369,7 +369,8 @@ static int	config_vps_limit			= 0;
 static int	config_vps_overcommit_limit		= 0;
 static char	*config_file				= NULL;
 static int	config_allow_root			= 0;
-static int	config_enable_global_scripts	= 1;
+static int	config_enable_global_scripts		= 1;
+static int	config_allow_software_update_check	= 1;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -1110,6 +1111,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"EnableGlobalScripts",		&config_enable_global_scripts,		ZBX_CFG_TYPE_INT,
 			ZBX_CONF_PARM_OPT,	0,			1},
+		{"AllowSoftwareUpdateCheck",	&config_allow_software_update_check,	ZBX_CFG_TYPE_INT,
+			ZBX_CONF_PARM_OPT,	0,			1},
 		{0}
 	};
 
@@ -1477,6 +1480,8 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_addobject(&json, "configuration");
 	zbx_json_addstring(&json, "enable_global_scripts", (1 == config_enable_global_scripts ? "true" : "false"),
+			ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "config_allow_software_update_check", (1 == config_allow_software_update_check ? "true" : "false"),
 			ZBX_JSON_TYPE_INT);
 	zbx_json_close(&json);
 
@@ -2259,6 +2264,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_db_save_server_status();
 
 	if (SUCCEED != zbx_db_check_instanceid())
+		exit(EXIT_FAILURE);
+
+	if (SUCCEED != zbx_db_update_software_update_checkid(config_allow_software_update_check))
 		exit(EXIT_FAILURE);
 
 	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))

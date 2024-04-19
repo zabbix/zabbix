@@ -3618,6 +3618,45 @@ int	zbx_db_check_instanceid(void)
 	return ret;
 }
 
+int	zbx_db_update_software_update_checkid(int config_allow_software_update_check)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = SUCCEED;
+
+	if (0 == config_allow_software_update_check)
+		return SUCCEED;
+
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+
+	result = zbx_db_select("select software_update_checkid from config");
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (SUCCEED == zbx_db_is_null(row[0]) || '\0' == *row[0])
+		{
+			char	*token;
+
+			token = zbx_create_token(0);
+			if (ZBX_DB_OK > zbx_db_execute("update config set software_update_checkid='%s'", token))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot update software_update_checkid in config table");
+				ret = FAIL;
+			}
+			zbx_free(token);
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read config record from database");
+		ret = FAIL;
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_close();
+
+	return ret;
+}
+
 #if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *

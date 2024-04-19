@@ -799,6 +799,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_vector_item_diff_ptr_t *item_diff, zbx_uint64_t mask);
 
 int	zbx_db_check_instanceid(void);
+int	zbx_db_update_software_update_checkid(int config_allow_software_update_check);
 
 /* tags */
 typedef struct
