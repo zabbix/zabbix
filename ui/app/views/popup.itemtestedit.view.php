@@ -32,29 +32,32 @@ if ($data['show_prev']) {
 		->addVar('upd_prev', '');
 }
 
-foreach ($data['inputs'] as $name => $value) {
-	if ($name === 'interface') {
-		// SNMPv3 additional details about interface.
-		if (array_key_exists('useip', $value)) {
-			$form->addVar('interface[useip]', $value['useip']);
-		}
-		if (array_key_exists('interfaceid', $value)) {
-			$form->addVar('interface[interfaceid]', $value['interfaceid']);
-		}
-		continue;
-	}
-	elseif ($name === 'host' && array_key_exists('hostid', $value)) {
-		$form->addVar('hostid', $value['hostid']);
-		continue;
-	}
-	elseif ($name === 'proxyid') {
-		continue;
-	}
-	elseif ($name === 'query_fields' || $name === 'headers' || $name === 'parameters') {
+foreach ($data['inputs']['item'] as $name => $value) {
+	if (in_array($name, ['query_fields', 'headers', 'parameters'])) {
 		foreach ($value as $num => $row) {
 			$form->addVar($name.'['.$num.'][name]', $row['name']);
 			$form->addVar($name.'['.$num.'][value]', $row['value']);
 		}
+	}
+	else {
+		$form->addItem((new CInput('hidden', $name, $value))->removeId());
+	}
+}
+
+foreach ($data['inputs']['host'] as $name => $value) {
+	if ($name === 'proxyid') {
+		continue;
+	}
+	elseif ($name === 'interface') {
+		// SNMPv3 additional details about interface.
+		if (array_key_exists('useip', $value)) {
+			$form->addVar('interface[useip]', $value['useip']);
+		}
+
+		if (array_key_exists('interfaceid', $value)) {
+			$form->addVar('interface[interfaceid]', $value['interfaceid']);
+		}
+
 		continue;
 	}
 
@@ -100,7 +103,7 @@ if ($data['is_item_testable']) {
 			->addClass('js-host-address-row'),
 		(new CFormField(
 			$data['interface_address_enabled']
-				? (new CTextBox('interface[address]', $data['inputs']['interface']['address'], false,
+				? (new CTextBox('interface[address]', $data['inputs']['host']['interface']['address'], false,
 						CControllerPopupItemTest::INPUT_MAX_LENGTH
 					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				: (new CTextBox('interface[address]', '', false, CControllerPopupItemTest::INPUT_MAX_LENGTH))
@@ -111,7 +114,7 @@ if ($data['is_item_testable']) {
 		(new CLabel(_('Port'), 'interface_port'))->addClass('js-host-address-row'),
 		(new CFormField(
 			$data['interface_port_enabled']
-				? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
+				? (new CTextBox('interface[port]', $data['inputs']['host']['interface']['port'], '', 64))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				: (new CTextBox('interface[port]'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -127,7 +130,7 @@ if ($data['is_item_testable']) {
 				(new CSelect('interface[details][version]'))
 					->setId('interface_details_version')
 					->setFocusableElementId('label-interface-details-version')
-					->setValue($data['inputs']['interface']['details']['version'])
+					->setValue($data['inputs']['host']['interface']['details']['version'])
 					->addOptions(CSelect::createOptionsFromArray([
 						SNMP_V1 => _('SNMPv1'),
 						SNMP_V2C => _('SNMPv2'),
@@ -141,8 +144,9 @@ if ($data['is_item_testable']) {
 				->setAsteriskMark()
 				->addClass('js-popup-row-snmp-community'),
 			(new CFormField(
-				(new CTextBox('interface[details][community]', $data['inputs']['interface']['details']['community'],
-					false, CControllerPopupItemTest::INPUT_MAX_LENGTH
+				(new CTextBox('interface[details][community]',
+					$data['inputs']['host']['interface']['details']['community'], false,
+					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
@@ -154,7 +158,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmp-max-repetition'),
 			(new CFormField(
 					(new CTextBox('interface[details][max_repetitions]',
-						$data['inputs']['interface']['details']['max_repetitions'], false,
+						$data['inputs']['host']['interface']['details']['max_repetitions'], false,
 						CControllerPopupItemTest::INPUT_MAX_LENGTH
 					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -166,8 +170,9 @@ if ($data['is_item_testable']) {
 			(new CLabel(_('Context name'), 'interface[details][contextname]'))
 				->addClass('js-popup-row-snmpv3-contextname'),
 			(new CFormField(
-				(new CTextBox('interface[details][contextname]', $data['inputs']['interface']['details']['contextname'],
-					false, CControllerPopupItemTest::INPUT_MAX_LENGTH
+				(new CTextBox('interface[details][contextname]',
+					$data['inputs']['host']['interface']['details']['contextname'], false,
+					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -177,7 +182,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmpv3-securityname'),
 			(new CFormField(
 				(new CTextBox('interface[details][securityname]',
-					$data['inputs']['interface']['details']['securityname'], false,
+					$data['inputs']['host']['interface']['details']['securityname'], false,
 					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
@@ -189,7 +194,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CSelect('interface[details][securitylevel]'))
 					->setId('interface_details_securitylevel')
-					->setValue($data['inputs']['interface']['details']['securitylevel'])
+					->setValue($data['inputs']['host']['interface']['details']['securitylevel'])
 					->setFocusableElementId('label-interface-details-securitylevel')
 					->addOptions(CSelect::createOptionsFromArray([
 						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
@@ -204,7 +209,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmpv3-authprotocol'),
 			(new CFormField(
 				(new CSelect('interfaces[details][authprotocol]'))
-					->setValue((int) $data['inputs']['interface']['details']['authprotocol'])
+					->setValue((int) $data['inputs']['host']['interface']['details']['authprotocol'])
 					->setFocusableElementId('label-authprotocol')
 					->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols()))
 			))
@@ -215,7 +220,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmpv3-authpassphrase'),
 			(new CFormField(
 				(new CTextBox('interface[details][authpassphrase]',
-					$data['inputs']['interface']['details']['authpassphrase'], false,
+					$data['inputs']['host']['interface']['details']['authpassphrase'], false,
 					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
@@ -225,7 +230,7 @@ if ($data['is_item_testable']) {
 			(new CLabel(_('Privacy protocol'), 'label-privprotocol'))->addClass('js-popup-row-snmpv3-privprotocol'),
 			(new CFormField(
 				(new CSelect('interfaces[details][privprotocol]'))
-					->setValue((int) $data['inputs']['interface']['details']['privprotocol'])
+					->setValue((int) $data['inputs']['host']['interface']['details']['privprotocol'])
 					->setFocusableElementId('label-privprotocol')
 					->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols()))
 			))
@@ -236,7 +241,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmpv3-privpassphrase'),
 			(new CFormField(
 				(new CTextBox('interface[details][privpassphrase]',
-					$data['inputs']['interface']['details']['privpassphrase'], false,
+					$data['inputs']['host']['interface']['details']['privpassphrase'], false,
 					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
@@ -252,7 +257,9 @@ if ($data['is_item_testable']) {
 				->setReadonly(!$data['proxies_enabled'])
 				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
 				->setFocusableElementId('label-proxy-hostid')
-				->setValue(array_key_exists('proxyid', $data['inputs']) ? $data['inputs']['proxyid'] : 0)
+				->setValue(
+					array_key_exists('proxyid', $data['inputs']['host']) ? $data['inputs']['host']['proxyid'] : 0
+				)
 				->setId('proxyid')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		))
@@ -271,7 +278,12 @@ if ($data['is_item_testable']) {
 }
 
 $form_grid->addItem([
-	new CLabel(_('Value'), 'value'),
+	new CLabel([
+		_('Value'),
+		makeWarningIcon('#{warning}')
+			->setId('value_warning')
+			->addStyle('display: none;')
+	], 'value'),
 	new CFormField(
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
@@ -408,8 +420,20 @@ $form->addItem([
 				->setHint('#{result_hint}', 'hintbox-wrap')
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass('item-test-result')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 	),
+	(new CTemplateTag('preprocessing-step-result-warning'))->addItem(
+		(new CDiv([
+			(new CDiv('#{result}'))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->setHint('#{result}', 'hintbox-wrap'),
+			makeWarningIcon('#{warning}')
+		]))
+			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addClass('item-test-result')
+		),
 	(new CTemplateTag('preprocessing-step-action-done'))->addItem(
 		(new CDiv([
 			'#{action_name} ',

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -45,7 +46,7 @@
 		(new CDiv([
 			(new CDiv(new CVar('preprocessing[#{rowNum}][sortorder]', '#{sortorder}')))->addClass(ZBX_STYLE_DRAG_ICON),
 			(new CDiv($preproc_types_select))
-				->addClass('list-numbered-item')
+				->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
 				->addClass('step-name'),
 			(new CDiv())->addClass('step-parameters'),
 			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))->addClass('step-on-fail'),

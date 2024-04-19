@@ -85,6 +85,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "找到%1$d个可匹配%2$s"
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -7132,6 +7137,12 @@ msgstr "下拉"
 msgid "Dropdown options"
 msgstr "下拉选项"
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
 msgstr "Duo 状态与保存的不匹配。"
@@ -8532,6 +8543,18 @@ msgstr "全局"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "找不到全局正则表达式 \"%1$s\" 。"
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr "全局超时"
@@ -8808,6 +8831,12 @@ msgstr "主机 \"%2$s\" 的群组 \"%1$s\" 不存在."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "基准目录(DN)组"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9390,6 +9419,10 @@ msgstr "主机元数据"
 msgid "Host name"
 msgstr "主机名称"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "主机网络"
@@ -9463,6 +9496,10 @@ msgstr "主机模板"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "主机路由"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11541,6 +11578,10 @@ msgstr "监控项在“不支持”的状态"
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "项目列表"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16451,6 +16492,10 @@ msgstr "矩形"
 msgid "Reference attribute"
 msgstr "引用属性"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "刷新"
@@ -17007,6 +17052,14 @@ msgstr "结果为假"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "结果为真"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -20761,6 +20814,10 @@ msgstr "解锁所选的用户?"
 msgid "Unblock selected users?"
 msgstr "解锁所选的用户?"
 
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
+
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
 #: include/views/js/item.preprocessing.js.php:177
@@ -22935,6 +22992,10 @@ msgstr "Zabbix内部认证"
 msgid "Zabbix login form"
 msgstr "Zabbix 登录表单"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "zabbix服务器"
@@ -23697,6 +23758,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - 当前日期"
@@ -23898,6 +23963,10 @@ msgstr "预计地理坐标（以逗号分隔的纬度和经度的值）"
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "全局管家设置"
+
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -24837,6 +24906,10 @@ msgstr "right() - 返回最右边指定个数字符"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - 将值四舍五入到小数位"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - 从字符串末尾删除指定字符"
@@ -24979,6 +25052,10 @@ msgstr "提供的凭据不是唯一的"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "标记"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

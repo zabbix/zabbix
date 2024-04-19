@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-03-21 19:34+0000\n"
+"PO-Revision-Date: 2024-04-14 17:30+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -82,6 +82,11 @@ msgstr[1] "%1$d días"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%1$d coincidencias para %2$s encontradas"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1117,7 +1122,7 @@ msgstr "Opciones avanzadas"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Después"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -2063,7 +2068,7 @@ msgstr "Por mí"
 
 #: report2.php:192
 msgid "By trigger template"
-msgstr "Por plantilla de disparador"
+msgstr "Por plantilla de iniciador"
 
 #: app/views/administration.proxy.list.php:161
 #: app/views/administration.proxy.list.php:177
@@ -4555,7 +4560,7 @@ msgstr "Color (OK)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Interpolación de colores"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -6154,7 +6159,7 @@ msgstr "¿Desea eliminar los enlaces entre los elementos seleccionados?"
 #: include/views/configuration.host.discovery.edit.php:716
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete lost resources"
-msgstr ""
+msgstr "Eliminar recursos perdidos"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6688,7 +6693,7 @@ msgstr "¿Desactivar los equipos monitorizados por el proxy seleccionado?"
 #: include/views/configuration.host.discovery.edit.php:730
 #: include/views/configuration.host.discovery.list.php:166
 msgid "Disable lost resources"
-msgstr ""
+msgstr "Deshabilitar recursos perdidos"
 
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
@@ -6857,7 +6862,7 @@ msgstr "Desactivado"
 #: app/views/configuration.host.list.php:511 app/views/item.list.php:219
 #: app/views/trigger.list.php:358
 msgid "Disabled automatically by an LLD rule."
-msgstr ""
+msgstr "Deshabilitado automáticamente por una regla LLD."
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -7240,6 +7245,12 @@ msgstr "Desplegable"
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
 msgstr "Opciones desplegables"
+
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr "Duo Universal Prompt"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
@@ -8645,6 +8656,18 @@ msgstr "Global"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "No existe la expresión regular global \"%1$s\"."
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr "La ejecución de script global en el servidor Zabbix está deshabilitada por la configuración del servidor."
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr "Scripts globales en el servidor Zabbix"
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr "Tiempos de espera globales"
@@ -8924,6 +8947,12 @@ msgstr "El grupo \"%1$s\" del equipo \"%2$s\" no existe."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "DN de base del grupo"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9206,7 +9235,7 @@ msgstr "Inicio"
 
 #: widgets/honeycomb/Widget.php:29
 msgid "Honeycomb"
-msgstr ""
+msgstr "Panal"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9511,6 +9540,10 @@ msgstr "Metadatos de equipo"
 msgid "Host name"
 msgstr "Nombre de equipo"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Redes del equipo"
@@ -9586,6 +9619,10 @@ msgstr "Prototipos de equipo"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Enrutador de equipo"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11671,6 +11708,10 @@ msgstr "Métrica en estado \"no soportada\""
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "Lista de métricas"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr "Nombre de la métrica"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16044,7 +16085,7 @@ msgstr "Nombre de usuario de la PdC principal"
 #: widgets/honeycomb/includes/WidgetForm.php:148
 #: widgets/honeycomb/views/widget.edit.php:84
 msgid "Primary label"
-msgstr ""
+msgstr "Etiqueta primaria"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16603,6 +16644,10 @@ msgstr "Rectángulo"
 msgid "Reference attribute"
 msgstr "Atributo de referencia"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr "El widget referido dejó de estar disponible. Por favor actualice la configuración."
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Actualizar"
@@ -17160,6 +17205,14 @@ msgstr "Resultado es FALSO"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "RESULTADO is VERDADERO"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17943,7 +17996,7 @@ msgstr "Nombre de usuario de la PdC secundaria"
 #: widgets/honeycomb/includes/WidgetForm.php:195
 #: widgets/honeycomb/views/widget.edit.php:98
 msgid "Secondary label"
-msgstr ""
+msgstr "Etiqueta secundaria"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -19266,7 +19319,7 @@ msgstr "Información del sistema"
 
 #: include/classes/setup/CFrontendSetup.php:693
 msgid "System locale"
-msgstr ""
+msgstr "Configuración regional del sistema"
 
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
@@ -19577,7 +19630,7 @@ msgstr "Permisos de plantillas"
 
 #: report2.php:398
 msgid "Template trigger"
-msgstr "Iniciador de plantilla"
+msgstr "Plantilla de iniciador"
 
 #: app/controllers/CControllerTemplateMassupdate.php:361
 #: app/controllers/CControllerTemplateUpdate.php:188
@@ -19751,13 +19804,13 @@ msgstr "El método \"%1$s.%2$s\" debe llamarse sin el parámetro \"auth\"."
 #: include/html.inc.php:775
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s, %3$s."
-msgstr ""
+msgstr "El %1$s ya no se descubre más y %2$s, %3$s."
 
 #: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s."
-msgstr ""
+msgstr "El %1$s ya no se descubre más y %2$s."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -19887,7 +19940,7 @@ msgstr "El iniciador no fue descubierto nuevamente y será eliminado la próxima
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
-msgstr ""
+msgstr "El valor debe ser mayor que el intervalo de actualización de la regla LLD."
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -20200,7 +20253,7 @@ msgstr "Encima"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr "Los 100 principales iniciadores"
+msgstr "Los 100 iniciadores principales"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -20933,6 +20986,10 @@ msgstr "¿Desbloquear al usuario seleccionado?"
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "¿Desbloquear los usuarios seleccionados?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -23117,6 +23174,10 @@ msgstr "Autenticación interna de Zabbix"
 msgid "Zabbix login form"
 msgstr "Formulario de inicio de sesión de Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr "Proxy o servidor Zabbix"
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
@@ -23726,12 +23787,12 @@ msgstr "no puede ser igual a cero sin intervalos personalizados"
 #: host_discovery.php:563
 #, c-format
 msgid "cannot be greater than or equal to the value of field \"%1$s\""
-msgstr ""
+msgstr "no puede ser mayor o igual al valor del campo \"%1$s\""
 
 #: include/classes/api/services/CDiscoveryRule.php:1678
 #, c-format
 msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
-msgstr ""
+msgstr "no puede ser mayor o igual que el valor del parámetro \"%1$s\""
 
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
@@ -23878,6 +23939,10 @@ msgstr "d"
 #: chart4.php:130
 msgid "d.M"
 msgstr "d.M"
+
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr "faltan datos"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -24081,9 +24146,13 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "configuración global de limpieza"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr "la ejecución del script global en el servidor Zabbix está deshabilitada por la configuración del servidor."
+
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
-msgstr ""
+msgstr "gráfico"
 
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
@@ -24113,11 +24182,11 @@ msgstr "H:i:s"
 
 #: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
 msgid "has been disabled"
-msgstr ""
+msgstr "ha sido deshabilitado"
 
 #: include/html.inc.php:725
 msgid "has been manually disabled"
-msgstr ""
+msgstr "ha sido deshabilitado manualmente"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24364,7 +24433,7 @@ msgstr "no está encerrado entre {} o tiene un formato incorrecto"
 
 #: app/views/item.list.php:175
 msgid "item"
-msgstr ""
+msgstr "métrica"
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -25019,6 +25088,10 @@ msgstr "right() - Devuelve los caracteres más a la derecha del contador"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Redondea un valor a un número de decimales"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Elimina los caracteres especificados del final de una cadena"
@@ -25161,6 +25234,10 @@ msgstr "las credenciales proporcionadas no son únicas"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "etiqueta"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25679,30 +25756,30 @@ msgstr "se pueden utilizar patrones comodín con '*'"
 #: include/html.inc.php:806
 #, c-format
 msgid "will be deleted in %1$s"
-msgstr ""
+msgstr "será eliminado en %1$s"
 
 #: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
 #: include/html.inc.php:801
 msgid "will be deleted the next time discovery rule is processed"
-msgstr ""
+msgstr "se eliminará la próxima vez que se procese la regla de descubrimiento"
 
 #: include/html.inc.php:747 include/html.inc.php:770
 #, c-format
 msgid "will be disabled in %1$s"
-msgstr ""
+msgstr "será deshabilitado en %1$s"
 
 #: include/html.inc.php:753 include/html.inc.php:764
 msgid "will be disabled the next time discovery rule is processed"
-msgstr ""
+msgstr "será deshabilitado la próxima vez que se procese la regla de descubrimiento"
 
 #: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
 #: include/html.inc.php:796
 msgid "will not be deleted"
-msgstr ""
+msgstr "no será eliminado"
 
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
-msgstr ""
+msgstr "no será deshabilitado"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

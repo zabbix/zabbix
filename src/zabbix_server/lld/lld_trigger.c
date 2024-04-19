@@ -252,7 +252,6 @@ zbx_lld_trigger_ref_t;
 
 static void	lld_trigger_ref_free(zbx_lld_trigger_ref_t *lld_trigger_ref)
 {
-	zbx_free(lld_trigger_ref->trigger);
 	zbx_free(lld_trigger_ref);
 }
 
@@ -3269,8 +3268,8 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 
 	for (i = 0; i < trigger->dependents.values_num; i++)
 	{
-		lld_trigger_cache_add_trigger_node(cache, (zbx_lld_trigger_t *)trigger->dependents.values[i],
-				triggerids_up, triggerids_down);
+		lld_trigger_cache_add_trigger_node(cache, trigger->dependents.values[i], triggerids_up,
+				triggerids_down);
 	}
 
 	for (i = 0; i < trigger->dependencies.values_num; i++)

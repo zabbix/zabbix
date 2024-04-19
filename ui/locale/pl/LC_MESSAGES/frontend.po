@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-03-26 11:43+0000\n"
+"PO-Revision-Date: 2024-04-15 08:49+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -83,6 +83,11 @@ msgstr[2] "%1$d dni"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "odnaleziono %1$d dopasowań na %2$s zapytań"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1140,7 +1145,7 @@ msgstr "Opcje zaawansowane"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Po"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -4657,7 +4662,7 @@ msgstr "Kolor (OK)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Interpolacja kolorów"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -6263,7 +6268,7 @@ msgstr "Usunąć powiązania między wybranymi elementami?"
 #: include/views/configuration.host.discovery.edit.php:716
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete lost resources"
-msgstr ""
+msgstr "Usuń utracone zasoby"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6797,7 +6802,7 @@ msgstr "Wyłączyć hosty monitorowane przez wybrane proxy?"
 #: include/views/configuration.host.discovery.edit.php:730
 #: include/views/configuration.host.discovery.list.php:166
 msgid "Disable lost resources"
-msgstr ""
+msgstr "Wyłącz utracone zasoby"
 
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
@@ -6966,7 +6971,7 @@ msgstr "Wyłączony"
 #: app/views/configuration.host.list.php:511 app/views/item.list.php:219
 #: app/views/trigger.list.php:358
 msgid "Disabled automatically by an LLD rule."
-msgstr ""
+msgstr "Wyłączone automatycznie przez regułę LLD."
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -7352,6 +7357,12 @@ msgstr "Rozwijane menu"
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
 msgstr "Opcje menu rozwijanego"
+
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr "Uniwersalny monit Duo"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
@@ -8761,6 +8772,18 @@ msgstr "Globalnie"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Globalne wyrażenia regularne \"%1$s\" nie istnieją."
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr "Globalne wykonywanie skryptów na serwerze Zabbix jest wyłączone przez konfigurację serwera."
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr "Globalne skrypty na serwerze Zabbix"
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr "Globalne limity czasu"
@@ -9044,6 +9067,12 @@ msgstr "Grupa \"%1$s\" dla hosta \"%2$s\" nie istnieje."
 msgid "Group base DN"
 msgstr "Bazowe DN grupy"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr "Konfiguracja grupy"
@@ -9325,7 +9354,7 @@ msgstr "Początek"
 
 #: widgets/honeycomb/Widget.php:29
 msgid "Honeycomb"
-msgstr ""
+msgstr "Plaster miodu"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9635,6 +9664,10 @@ msgstr "Meta-dane hosta"
 msgid "Host name"
 msgstr "Nazwa hosta"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Sieci hosta"
@@ -9712,6 +9745,10 @@ msgstr "Prototypy hostów"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Router hosta"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11804,6 +11841,10 @@ msgstr "Pozycja w stanie \"niewspierany\"."
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "Lista pozycji"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr "Nazwa pozycji"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16198,7 +16239,7 @@ msgstr "Pseudonim głównego punktu kontaktu"
 #: widgets/honeycomb/includes/WidgetForm.php:148
 #: widgets/honeycomb/views/widget.edit.php:84
 msgid "Primary label"
-msgstr ""
+msgstr "Etykieta podstawowa"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16758,6 +16799,10 @@ msgstr "Prostokąt"
 msgid "Reference attribute"
 msgstr "Atrybut odniesienia"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr "Wskazany widżet nie jest już dostępny. Proszę zaktualizować konfigurację."
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Odśwież"
@@ -17316,6 +17361,14 @@ msgstr "Wynik jest NIEPRAWDZIWY"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "Wynik jest PRAWDZIWY"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -18106,7 +18159,7 @@ msgstr "Pseudonim drugiego punktu kontaktu"
 #: widgets/honeycomb/includes/WidgetForm.php:195
 #: widgets/honeycomb/views/widget.edit.php:98
 msgid "Secondary label"
-msgstr ""
+msgstr "Etykieta pomocnicza"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -19430,7 +19483,7 @@ msgstr "Informacje o systemie"
 
 #: include/classes/setup/CFrontendSetup.php:693
 msgid "System locale"
-msgstr ""
+msgstr "Ustawienia regionalne systemu"
 
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
@@ -19918,13 +19971,13 @@ msgstr "Metoda \"%1$s.%2$s\" musi być wywoływana bez parametru \"auth\"."
 #: include/html.inc.php:775
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s, %3$s."
-msgstr ""
+msgstr "%1$s nie jest już wykrywany i %2$s, %3$s."
 
 #: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 #, c-format
 msgid "The %1$s is not discovered anymore and %2$s."
-msgstr ""
+msgstr "%1$s nie jest już wykrywany i %2$s."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -20056,7 +20109,7 @@ msgstr "Wyzwalacz nie jest już wykrywany i zostanie usunięty przy następnym p
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
-msgstr ""
+msgstr "Wartość powinna być większa niż interwał aktualizacji reguły LLD."
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -21109,6 +21162,10 @@ msgstr "Odblokować wybranego użytkownika?"
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "Odblokować wybranych użytkowników?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -23302,6 +23359,10 @@ msgstr "Wewnętrzne uwierzytelnianie Zabbix"
 msgid "Zabbix login form"
 msgstr "Formularz logowania Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr "Serwer proxy lub serwer Zabbix"
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Serwer Zabbix"
@@ -23911,12 +23972,12 @@ msgstr "nie może wynosić zero, bez zdefiniowanych okresów użytkownika"
 #: host_discovery.php:563
 #, c-format
 msgid "cannot be greater than or equal to the value of field \"%1$s\""
-msgstr ""
+msgstr "nie może być większa lub równa wartości pola \"%1$s\""
 
 #: include/classes/api/services/CDiscoveryRule.php:1678
 #, c-format
 msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
-msgstr ""
+msgstr "nie może być większa lub równa wartości parametru \"%1$s\""
 
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
@@ -24063,6 +24124,10 @@ msgstr "d"
 #: chart4.php:130
 msgid "d.M"
 msgstr "d.M"
+
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr "brakuje danych"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -24266,9 +24331,13 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globalne ustawienia porządkowania"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr "globalne wykonywanie skryptów na serwerze Zabbix jest wyłączone przez konfigurację serwera"
+
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
-msgstr ""
+msgstr "wykres"
 
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
@@ -24298,11 +24367,11 @@ msgstr "H:i:s"
 
 #: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
 msgid "has been disabled"
-msgstr ""
+msgstr "został wyłączony"
 
 #: include/html.inc.php:725
 msgid "has been manually disabled"
-msgstr ""
+msgstr "został ręcznie wyłączony"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24549,7 +24618,7 @@ msgstr "nie jest zamknięty w () albo jest zniekształcony"
 
 #: app/views/item.list.php:175
 msgid "item"
-msgstr ""
+msgstr "pozycja"
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -25204,6 +25273,10 @@ msgstr "right() - Zwraca określoną liczę znaków z prawej strony ciągu"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Zaokrągla wartość do wskazanego miejsca po przecinku"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Usuń podane znaki z końca ciągu znaków"
@@ -25346,6 +25419,10 @@ msgstr "dostarczone dane logowania nie są unikalne"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "znacznik"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25866,30 +25943,30 @@ msgstr "Można używać wzorców symboli wieloznacznych z „*”"
 #: include/html.inc.php:806
 #, c-format
 msgid "will be deleted in %1$s"
-msgstr ""
+msgstr "zostanie usunięte za %1$s"
 
 #: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
 #: include/html.inc.php:801
 msgid "will be deleted the next time discovery rule is processed"
-msgstr ""
+msgstr "zostanie usunięte przy następnym przetworzeniu reguły wykrywania"
 
 #: include/html.inc.php:747 include/html.inc.php:770
 #, c-format
 msgid "will be disabled in %1$s"
-msgstr ""
+msgstr "zostanie wyłączony za %1$s"
 
 #: include/html.inc.php:753 include/html.inc.php:764
 msgid "will be disabled the next time discovery rule is processed"
-msgstr ""
+msgstr "zostanie wyłączony przy następnym przetwarzaniu reguły wykrywania"
 
 #: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
 #: include/html.inc.php:796
 msgid "will not be deleted"
-msgstr ""
+msgstr "nie zostanie usunięty"
 
 #: include/html.inc.php:741 include/html.inc.php:776
 msgid "will not be disabled"
-msgstr ""
+msgstr "nie zostanie wyłączony"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

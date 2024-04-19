@@ -1057,19 +1057,31 @@ footer {
     .form-grid fieldset.collapsible.collapsed .fields-group,
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
-  .form-grid label {
+  .form-grid > label,
+  .form-grid .collapsible > label,
+  .form-grid .fields-group > label {
     align-self: start;
     line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
-    .form-grid label.fields-group-label {
+    .form-grid > label.fields-group-label,
+    .form-grid .collapsible > label.fields-group-label,
+    .form-grid .fields-group > label.fields-group-label {
       margin-top: 6px; }
-    .form-grid label .btn-icon,
-    .form-grid label .icon {
+    .form-grid > label .btn-icon,
+    .form-grid > label .icon,
+    .form-grid .collapsible > label .btn-icon,
+    .form-grid .collapsible > label .icon,
+    .form-grid .fields-group > label .btn-icon,
+    .form-grid .fields-group > label .icon {
       margin-left: 5px; }
-    .form-grid label:not([for]) {
+    .form-grid > label:not([for]),
+    .form-grid .collapsible > label:not([for]),
+    .form-grid .fields-group > label:not([for]) {
       pointer-events: none; }
-      .form-grid label:not([for]) .btn-icon {
+      .form-grid > label:not([for]) .btn-icon,
+      .form-grid .collapsible > label:not([for]) .btn-icon,
+      .form-grid .fields-group > label:not([for]) .btn-icon {
         pointer-events: initial; }
   .form-grid .fields-group {
     grid-column: 2 / -1;
@@ -1185,7 +1197,8 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
   min-width: 18px;
   height: 18px; }
 
-button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
+.form-grid table .btn-icon.btn-small,
+.form-grid table .icon.btn-small, button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, .navigation-tree .navigation-tree-node-info-arrow button, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
   min-width: 16px;
   height: 16px; }
 
@@ -2957,6 +2970,106 @@ output {
   font-weight: bold;
   color: #ffa20d; }
 
+.navigation-tree .navigation-tree-node-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 9px 8px;
+  border-bottom: 1px solid #333333; }
+  .navigation-tree .navigation-tree-node-info:hover {
+    background-color: #222222; }
+.navigation-tree .navigation-tree-node-info-helpers {
+  display: flex; }
+.navigation-tree .navigation-tree-node-info-primary {
+  display: flex;
+  flex-grow: 1;
+  gap: 4px;
+  min-width: 0;
+  height: 18px;
+  line-height: 18px; }
+.navigation-tree [data-level="0"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 0px; }
+.navigation-tree [data-level="1"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 15px; }
+.navigation-tree [data-level="2"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 30px; }
+.navigation-tree [data-level="3"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 45px; }
+.navigation-tree [data-level="4"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 60px; }
+.navigation-tree [data-level="5"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 75px; }
+.navigation-tree [data-level="6"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 90px; }
+.navigation-tree [data-level="7"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 105px; }
+.navigation-tree [data-level="8"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 120px; }
+.navigation-tree [data-level="9"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 135px; }
+.navigation-tree [data-level="10"] > .navigation-tree-node-info .navigation-tree-node-info-level {
+  width: 150px; }
+.navigation-tree .navigation-tree-node-info-arrow {
+  width: 16px; }
+  .navigation-tree .navigation-tree-node-info-arrow button {
+    display: block;
+    padding: 0;
+    cursor: pointer;
+    line-height: 16px;
+    text-align: center;
+    border: 0;
+    background-color: transparent; }
+    .navigation-tree .navigation-tree-node-info-arrow button .arrow-right {
+      border-left-color: #cacaca; }
+    .navigation-tree .navigation-tree-node-info-arrow button .arrow-down {
+      position: relative;
+      top: -1px;
+      border-top-color: #cacaca; }
+    .navigation-tree .navigation-tree-node-info-arrow button:hover .arrow-right, .navigation-tree .navigation-tree-node-info-arrow button:focus .arrow-right {
+      border-left-color: #f8f8f8; }
+    .navigation-tree .navigation-tree-node-info-arrow button:hover .arrow-down, .navigation-tree .navigation-tree-node-info-arrow button:focus .arrow-down {
+      border-top-color: #f8f8f8; }
+.navigation-tree .navigation-tree-node-children {
+  display: none; }
+.navigation-tree .navigation-tree-node-is-open > .navigation-tree-node-children {
+  display: block; }
+.navigation-tree .navigation-tree-node-info-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+.navigation-tree .navigation-tree-group-uncategorized > .navigation-tree-node-info .navigation-tree-node-info-name {
+  font-style: italic;
+  padding-left: 0.2em;
+  padding-right: 0.2em; }
+.navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info {
+  cursor: pointer; }
+  .navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info .navigation-tree-node-info-name {
+    color: #f8f8f8; }
+.navigation-tree .navigation-tree-node-info-problems {
+  display: flex; }
+
+.navigation-tree-node-info-group-hint .navigation-tree-group-uncategorized {
+  font-style: italic; }
+
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+  line-height: 18px; }
+  .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity .navigation-tree-node-info-problems-hint-severity-color {
+    margin-right: 10px; }
+
+.navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color {
+  width: 16px;
+  height: 16px; }
+  .navigation-tree-node-info-problems-hint .navigation-tree-node-info-problems-hint-severity-color::before {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    padding: 0;
+    border-radius: 3px; }
+
 .radio-list-control {
   display: inline-block;
   height: 24px;
@@ -4075,6 +4188,25 @@ div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
 div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   background-color: transparent; }
 
+form.dashboard-widget-hostnavigator .host-grouping {
+  line-height: 1.4em; }
+  form.dashboard-widget-hostnavigator .host-grouping tr:not(.form_row):first-child {
+    line-height: 24px; }
+
+div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
+  display: flex;
+  justify-content: flex-end;
+  height: 18px;
+  padding: 9px 8px;
+  color: #cacaca; }
+div.dashboard-widget-hostnavigator .host-navigator .host-navigator-no-data {
+  display: flex;
+  justify-content: center;
+  height: 18px;
+  padding: 9px 8px;
+  color: #cacaca;
+  border-bottom: 1px solid #333333; }
+
 .dashboard-widget-inaccessible {
   display: grid;
   align-items: center;
@@ -4913,8 +5045,11 @@ pre, pre a, pre td, pre span {
   .header-navigation > ul {
     flex-wrap: wrap; }
     .header-navigation > ul > li .status-container {
-      margin-right: 5px;
-      vertical-align: text-bottom; }
+      margin-right: 5px; }
+    .header-navigation > ul > li .status-container,
+    .header-navigation > ul > li .rel-container {
+      line-height: 17px;
+      vertical-align: baseline; }
     .header-navigation > ul li > span.selected {
       background-color: #000000;
       border-radius: 2px;
@@ -5215,7 +5350,8 @@ form.is-loading {
   padding: 4px 0; }
 
 .list-check-radio li {
-  display: block; }
+  display: block;
+  line-height: 24px; }
 .list-check-radio.hor-list li {
   margin-right: 15px; }
   .list-check-radio.hor-list li:last-child {
@@ -5223,9 +5359,9 @@ form.is-loading {
 .list-check-radio label {
   display: inline-block;
   max-width: 600px;
-  padding: 0 0 0 18px;
-  line-height: 24px;
-  text-indent: -18px; }
+  padding-left: 20px;
+  line-height: 1.4em;
+  text-indent: -20px; }
   .list-check-radio label input[type="checkbox"] {
     left: -3px;
     margin: 0; }
@@ -6372,7 +6508,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .ok-ack-fg {
   color: #00ff00; }
 
-div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+.navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
   background-color: #222222; }
 
 @keyframes is-loading-kf {
@@ -6835,6 +6971,8 @@ svg {
     display: inline-flex; }
   #preprocessing-test-form .runtime-error-fields .multilineinput-control {
     width: 250px; }
+#preprocessing-test-form .item-test-result {
+  display: inline-flex; }
 
 .totals-list:not(.list-table) {
   display: flex;

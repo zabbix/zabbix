@@ -85,6 +85,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "nájdené %1$d zhody pre %2$s "
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -7370,6 +7375,12 @@ msgstr ""
 msgid "Dropdown options"
 msgstr ""
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
 msgstr ""
@@ -8778,6 +8789,18 @@ msgstr ""
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Globálny regulárny výraz „%1$s“ neexistuje."
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr ""
@@ -9062,6 +9085,12 @@ msgstr "Skupina \"%1$s\" pre host \"%2$s\" neexistuje."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "Group base DN"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9655,6 +9684,10 @@ msgstr "Hostove metaúdaje"
 msgid "Host name"
 msgstr "Meno hosta"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Siete hosta"
@@ -9733,6 +9766,10 @@ msgstr "Prototypy hostov"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Hostov smerovač"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11827,6 +11864,10 @@ msgstr "Položka je v \"not supported\" stave"
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "Zoznam itemov"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16784,6 +16825,10 @@ msgstr "Obdĺžnik"
 msgid "Reference attribute"
 msgstr "Referenčný atribút"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Obnoviť"
@@ -17342,6 +17387,14 @@ msgstr "Výsledok je NEPRAVDA"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "Výsledok je PRAVDA"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -21141,6 +21194,10 @@ msgstr ""
 msgid "Unblock selected users?"
 msgstr "Odblokovať označených používateľov?"
 
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
+
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
 #: include/views/js/item.preprocessing.js.php:177
@@ -23334,6 +23391,10 @@ msgstr "Zabbix interná autentifikácia"
 msgid "Zabbix login form"
 msgstr "Prihlasovací formulár Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Zabbix server"
@@ -24096,6 +24157,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - Aktuálny dátum"
@@ -24297,6 +24362,10 @@ msgstr "očakávajú sa zemepisné súradnice (hodnoty zemepisnej šírky a dĺ�
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globálne nastavenia údržby"
+
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -25236,6 +25305,10 @@ msgstr "right() – Vráti počet znakov najviac vpravo"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() – Zaokrúhli hodnotu na desatinné miesta"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() – odstráni zadané znaky z konca reťazca"
@@ -25378,6 +25451,10 @@ msgstr "poskytnuté poverenia nie sú jedinečné"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "tag"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

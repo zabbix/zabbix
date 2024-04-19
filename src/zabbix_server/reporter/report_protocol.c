@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "reporter.h"
 #include "report_protocol.h"
-#include "report.h"
 
 #include "zbxalerter.h"
-
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxserialize.h"

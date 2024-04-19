@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-02 13:10+0000\n"
+"PO-Revision-Date: 2024-04-13 22:04+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -81,6 +81,11 @@ msgstr[1] "%1$d dies"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "S'han trobat %1$d coincidències per a %2$s"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -7240,6 +7245,12 @@ msgstr "Menú desplegable"
 msgid "Dropdown options"
 msgstr "Opcions desplegables"
 
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr "Prompt universal Duo"
+
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
 msgstr "L'estat de Duo no coincideix amb l'estat desat."
@@ -8644,6 +8655,18 @@ msgstr "Global"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "L'expressió regular global \"%1$s\" no existeix."
 
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr "L'execució global d'scripts al servidor Zabbix és desactivada per la configuració del servidor."
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr "Scripts globals al servidor Zabbix"
+
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
 msgstr "Temps d'espera global"
@@ -8923,6 +8946,12 @@ msgstr "El grup \"%1$s\" per a l'equip \"%2$s\" no existeix."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "DN de base del grup"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9510,6 +9539,10 @@ msgstr "Metadades dels equips"
 msgid "Host name"
 msgstr "Nom de l'equip"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Xarxes d'equips"
@@ -9585,6 +9618,10 @@ msgstr "Prototips d'equips"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Encaminador d'equips"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11670,6 +11707,10 @@ msgstr "Element amb estat \"no compatible\""
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
 msgstr "Llistat d'elements"
+
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr "Nom de l'element"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -16602,6 +16643,10 @@ msgstr "Rectangle"
 msgid "Reference attribute"
 msgstr "Atribut de referència"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr "El giny referit no és pas disponible. Actualitzeu la configuració."
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Recarregar"
@@ -17159,6 +17204,14 @@ msgstr "El resultat és FALS"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "El resultat és CERT"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -20933,6 +20986,10 @@ msgstr "Voleu desbloquejar l'usuari triat?"
 msgid "Unblock selected users?"
 msgstr "Vols desbloquejar els usuaris triats?"
 
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
+
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
 #: include/views/js/item.preprocessing.js.php:177
@@ -23116,6 +23173,10 @@ msgstr "Autenticació interna de Zabbix"
 msgid "Zabbix login form"
 msgstr "Formulari d'inici de sessió de Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr "Proxy o servidor Zabbix"
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
@@ -23878,6 +23939,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr "hi manquen dades"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - Data actual"
@@ -24079,6 +24144,10 @@ msgstr "s'esperen coordenades geogràfiques (valors de latitud i longitud separa
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "configuració global de neteja"
+
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr "l'execució global d'scripts al servidor Zabbix és desactivada per la configuració del servidor"
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -25018,6 +25087,10 @@ msgstr "right() - Retorna els caràcters de recompte més a la dreta"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arrodoneix un valor a decimal"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Elimina els caràcters especificats del final d'una cadena"
@@ -25160,6 +25233,10 @@ msgstr "les credencials donades no són pas úniques"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "etiqueta"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
