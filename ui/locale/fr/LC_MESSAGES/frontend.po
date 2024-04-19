@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-09 19:54+0000\n"
-"Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
+"PO-Revision-Date: 2024-04-19 14:14+0000\n"
+"Last-Translator: Jean-Christophe <jeanchristophemartin373@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -82,6 +82,11 @@ msgstr[1] "%1$d jours"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%1$d correspondances trouvées pour %2$s"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr "%1$d sur %1$d+ hôtes sont affichés"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -4555,7 +4560,7 @@ msgstr "Couleur (OK)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Interpolation des couleurs"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5594,7 +5599,7 @@ msgstr "Nom DNS"
 #: app/controllers/CControllerAuthenticationEdit.php:457
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
 msgid "DUO Universal Prompt"
-msgstr ""
+msgstr "Requête Universelle DUO"
 
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
@@ -7245,11 +7250,11 @@ msgstr "Options de liste déroulante"
 #: app/controllers/CControllerAuthenticationEdit.php:479
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
 msgid "Duo Universal Prompt"
-msgstr ""
+msgstr "Requête Universelle Duo"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
-msgstr ""
+msgstr "L'état du DUO ne correspond pas à l'état enregistré."
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7772,7 +7777,7 @@ msgstr "Marge d'erreur"
 
 #: include/classes/api/services/CUser.php:3506
 msgid "Error decoding Duo result."
-msgstr ""
+msgstr "Erreur de décodage du résultat du DUO."
 
 #: include/db.inc.php:554
 #, c-format
@@ -8549,7 +8554,7 @@ msgstr "Messages dans l'interface"
 #: app/views/administration.user.edit.php:731
 #: app/views/administration.user.edit.php:826
 msgid "Frontend notifications"
-msgstr ""
+msgstr "Notification de l'interface"
 
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
@@ -8657,11 +8662,11 @@ msgstr "L'expression régulière globale \"%1$s\" n'existe pas."
 #: app/views/popup.operation.edit.php:63
 #: include/classes/api/services/CScript.php:950
 msgid "Global script execution on Zabbix server is disabled by server configuration."
-msgstr ""
+msgstr "L'exécution du script global sur le serveur Zabbix est désactivée par la configuration du serveur."
 
 #: app/partials/administration.system.info.php:138
 msgid "Global scripts on Zabbix server"
-msgstr ""
+msgstr "Scripts globaux sur le serveur Zabbix"
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -8942,6 +8947,12 @@ msgstr "Le groupe \"%1$s\" pour l'hôte \"%2$s\" n'existe pas."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "DN de base du groupe"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr "Grouper par"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9224,7 +9235,7 @@ msgstr "Accueil"
 
 #: widgets/honeycomb/Widget.php:29
 msgid "Honeycomb"
-msgstr ""
+msgstr "Rayon de miel"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9529,6 +9540,10 @@ msgstr "Métadonnées de l'hôte"
 msgid "Host name"
 msgstr "Nom de l'hôte"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr "Navigateur d'hôte"
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Réseaux de l'hôte"
@@ -9604,6 +9619,10 @@ msgstr "Prototypes d'hôtes"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Hôte - Routeur"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr "Status de l’hôte"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -14465,7 +14484,7 @@ msgstr "Pas de rafraîchissement"
 
 #: include/classes/api/services/CUser.php:3489
 msgid "No saved state, please login again."
-msgstr ""
+msgstr "Aucun état enregistré, veuillez vous reconnecter."
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -17186,6 +17205,14 @@ msgstr "Le résultat est FAUX"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "Le résultat est VRAI"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr "Le résultat est tronqué en raison de sa taille (%1$s)."
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -20960,6 +20987,10 @@ msgstr "Débloquer l'utilisateur sélectionné ?"
 msgid "Unblock selected users?"
 msgstr "Débloquer les utilisateurs sélectionnés ?"
 
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr "Non classé"
+
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
 #: include/views/js/item.preprocessing.js.php:177
@@ -23145,7 +23176,7 @@ msgstr "Formulaire de connexion Zabbix"
 
 #: app/views/administration.script.edit.php:115
 msgid "Zabbix proxy or server"
-msgstr ""
+msgstr "Proxy ou serveur Zabbix"
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -24117,7 +24148,7 @@ msgstr "paramètres de nettoyage globaux"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
-msgstr ""
+msgstr "l'exécution du script global sur le serveur Zabbix est désactivée par la configuration du serveur"
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -25057,6 +25088,10 @@ msgstr "right() - Retourne le nombre de caractères le plus à droite"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arrondit une valeur aux décimales"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr "les lignes doivent être uniques"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Supprime les caractères spécifiés à la fin d'une chaîne de caractères"
@@ -25199,6 +25234,10 @@ msgstr "les informations d'identification fournies ne sont pas uniques"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "tag"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr "le tag ne peut pas être vide"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

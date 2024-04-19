@@ -83,6 +83,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%1$d correspondências para %2$s encontradas"
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -8964,6 +8969,12 @@ msgstr "O grupo \"%1$s\" para o host \"%2$s\" não existe."
 msgid "Group base DN"
 msgstr "Base do grupo DN"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr "Configuração do grupo"
@@ -9551,6 +9562,10 @@ msgstr "Metadados do host"
 msgid "Host name"
 msgstr "Nome do host"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Redes do host"
@@ -9627,6 +9642,10 @@ msgstr "Protótipos de host"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Roteador de host"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -17216,6 +17235,14 @@ msgstr "Resultado é FALSO"
 msgid "Result is TRUE"
 msgstr "Resultado VERDADEIRO"
 
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
+
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
 msgstr "Tipo de resultado"
@@ -20993,6 +21020,10 @@ msgstr "Desbloquear o usuário selecionado?"
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "Desbloquear usuários selecionados?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -25092,6 +25123,10 @@ msgstr "right() - Retorna a contagem de caracteres mais à direita"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arredonda um valor para casas decimais"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Remove os caracteres especificados do final de uma string"
@@ -25234,6 +25269,10 @@ msgstr "as credenciais informadas não são únicas"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "etiqueta"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

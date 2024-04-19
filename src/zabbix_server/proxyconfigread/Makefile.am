@@ -3,8 +3,8 @@
 noinst_LIBRARIES = libzbxproxyconfigread.a
 
 libzbxproxyconfigread_a_SOURCES = \
-	proxyconfig_read.c \
-	proxyconfig_read.h
+	proxyconfigread.c \
+	proxyconfigread.h
 
 libzbxproxyconfigread_a_CFLAGS = \
 	-I$(top_srcdir)/src \
