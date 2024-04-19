@@ -126,34 +126,24 @@ class testPageMonitoringLatestData extends CWebTest {
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
 
-		$subfilter = $this->query('id:latest-data-subfilter')->asTable()->one();
-		$this->assertTrue($subfilter->query('xpath:.//h4[text()="Subfilter "]/span[@class="grey" and '.
-				'text()="affects only filtered data"]')->one()->isValid()
+		// Subfilter is not visible if filter isn't set.
+		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
+		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+				explode("\n", $this->query('class:nothing-to-show')->one()->getText())
 		);
-
-		foreach (['Hosts', 'Tags', 'Tag values'] as $header) {
-			$this->assertTrue($subfilter->query("xpath:.//h3[text()=".CXPathHelper::escapeQuotes($header)."]")
-					->one()->isValid()
-			);
-		}
-
-		// With data/Without data subfilter is always present.
-		$subfilter_queries = ['xpath:.//h3[text()="Data"]', 'link:With data', 'link:Without data'];
-
-		foreach ($subfilter_queries as $query) {
-			$this->assertTrue($subfilter->query($query)->one()->isValid());
-		}
 
 		$form->fill(['Hosts' => self::HOSTNAME]);
 		$form->submit();
-		$subfilter->waitUntilReloaded();
 
-		foreach ($subfilter_queries as $query) {
+		$subfilter = $this->query('id:latest-data-subfilter')->waitUntilVisible()->asTable()->one();
+		$this->assertTrue($subfilter->query('xpath:.//h4[text()="Subfilter "]/span[@class="grey" and '.
+				'text()="affects only filtered data"]')->one()->isValid()
+		);
+		$this->assertEquals(['HOSTS', 'TAGS', 'TAG VALUES', 'DATA'], $subfilter->query('tag:h3')->all()->asText());
+
+		foreach (['link:With data', 'link:Without data'] as $query) {
 			$this->assertTrue($subfilter->query($query)->one()->isValid());
 		}
-
-		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$subfilter->waitUntilReloaded();
 
 		// Check table headers.
 		$details_headers = [
@@ -173,6 +163,13 @@ class testPageMonitoringLatestData extends CWebTest {
 		foreach (['Host', 'Name'] as $header) {
 			$this->assertTrue($this->getTable()->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
 		}
+
+		// Subfilter is not visible again after Reset.
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->assertFalse($this->query('id:latest-data-subfilter')->waitUntilNotVisible()->exists());
+		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+				explode("\n", $this->query('class:nothing-to-show')->one()->getText())
+		);
 
 		// Check filter collapse/expand.
 		$filter_tab = $this->query('xpath://a[contains(@class, "tabfilter-item-link")]')->one();
@@ -571,7 +568,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$link = (CTestArrayHelper::get($data['subfilter'], 'Data'))
 			? 'zabbix.php?action=latest.view&hostids%5B%5D='.$hostid
-			: 'zabbix.php?action=latest.view';
+			: 'zabbix.php?action=latest.view&name=item';
 
 		$this->page->login()->open($link)->waitUntilReady();
 
@@ -649,7 +646,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			)
 		];
 
-		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->page->login()->open('zabbix.php?action=latest.view&state=0');
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 
 		foreach ($result as $hosts) {

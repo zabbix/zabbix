@@ -44,7 +44,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	const HOST_ID = 90001;
 
-	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
+	private $selector = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');

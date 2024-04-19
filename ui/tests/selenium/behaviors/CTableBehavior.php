@@ -207,14 +207,22 @@ class CTableBehavior extends CBehavior {
 	/**
 	 * Assert text of displayed rows amount.
 	 *
-	 * @param integer $count	rows count per page
-	 * @param integer $total	total rows count
+	 * @param integer|string $count		rows count per page
+	 * @param integer $total			total rows count
 	 */
-	public function assertTableStats($count, $total = null) {
+	public function assertTableStats($count = null, $total = null) {
+		if ($count === null || $count === 0) {
+			$this->test->assertFalse($this->test->query('xpath://div[@class="table-stats"]')->one(false)->isValid(),
+					'Table rows amount is visible on page');
+
+			return;
+		}
+
 		if ($total === null) {
 			$total = $count;
 		}
-		$this->test->assertEquals('Displaying '.$count.' of '.$count.' found',
+
+		$this->test->assertEquals('Displaying '.$count.' of '.$total.' found',
 				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}

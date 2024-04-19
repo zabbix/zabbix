@@ -41,7 +41,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 	public $hostid = 99050;
 
-	private $selector = 'xpath://form[@name="trigger_form"]/table[@class="list-table"]';
+	private $selector = 'xpath://form[@name="trigger_form"]/table[contains(@class, "list-table"]';
 
 	public static function data() {
 		return CDBHelper::getDataProvider(

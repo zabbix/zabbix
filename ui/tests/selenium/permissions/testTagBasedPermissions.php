@@ -195,7 +195,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 
