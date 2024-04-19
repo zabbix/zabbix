@@ -88,6 +88,9 @@ typedef struct
 }
 zbx_ipmi_poller_t;
 
+ZBX_PTR_VECTOR_DECL(ipmi_poller_ptr, zbx_ipmi_poller_t *)
+ZBX_PTR_VECTOR_IMPL(ipmi_poller_ptr, zbx_ipmi_poller_t *)
+
 /* cached host data */
 typedef struct
 {
@@ -102,19 +105,19 @@ zbx_ipmi_manager_host_t;
 typedef struct
 {
 	/* IPMI poller vector, created during manager initialization */
-	zbx_vector_ptr_t	pollers;
+	zbx_vector_ipmi_poller_ptr_t	pollers;
 
 	/* IPMI pollers indexed by IPC service clients */
-	zbx_hashset_t		pollers_client;
+	zbx_hashset_t			pollers_client;
 
 	/* IPMI pollers sorted by number of hosts being monitored */
-	zbx_binary_heap_t	pollers_load;
+	zbx_binary_heap_t		pollers_load;
 
 	/* the next poller index to be assigned to new IPC service clients */
-	int			next_poller_index;
+	int				next_poller_index;
 
 	/* monitored hosts cache */
-	zbx_hashset_t		hosts;
+	zbx_hashset_t			hosts;
 }
 zbx_ipmi_manager_t;
 
@@ -317,7 +320,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER));
 
-	zbx_vector_ptr_create(&manager->pollers);
+	zbx_vector_ipmi_poller_ptr_create(&manager->pollers);
 	zbx_hashset_create(&manager->pollers_client, 0, poller_hash_func, poller_compare_func);
 	zbx_binary_heap_create(&manager->pollers_load, ipmi_poller_compare_load, 0);
 
@@ -333,7 +336,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_
 
 		zbx_binary_heap_create(&poller->requests, ipmi_request_compare, 0);
 
-		zbx_vector_ptr_append(&manager->pollers, poller);
+		zbx_vector_ipmi_poller_ptr_append(&manager->pollers, poller);
 
 		/* add poller to load balancing poller queue */
 		elem.data = (void *)poller;
@@ -376,7 +379,7 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,
 
 	for (i = 0; i < manager->pollers.values_num; i++)
 	{
-		poller = (zbx_ipmi_poller_t *)manager->pollers.values[i];
+		poller = manager->pollers.values[i];
 
 		if (NULL != poller->client)
 			zbx_ipc_client_send(poller->client, ZBX_IPC_IPMI_CLEANUP_REQUEST, NULL, 0);
@@ -416,7 +419,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 			exit(EXIT_FAILURE);
 		}
 
-		poller = (zbx_ipmi_poller_t *)manager->pollers.values[manager->next_poller_index++];
+		poller = manager->pollers.values[manager->next_poller_index++];
 		poller->client = client;
 
 		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(zbx_ipmi_poller_t *));
