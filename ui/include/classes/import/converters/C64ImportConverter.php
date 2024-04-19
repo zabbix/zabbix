@@ -92,12 +92,16 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertHosts(array $hosts): array {
 		foreach ($hosts as &$host) {
+			if (!array_key_exists('inventory_mode', $host)) {
+				$host['inventory_mode'] = CXmlConstantName::MANUAL;
+			}
+
 			if (array_key_exists('items', $host)) {
 				$host['items'] = self::convertItems($host['items']);
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules'], true);
 			}
 		}
 		unset($host);
@@ -236,10 +240,11 @@ class C64ImportConverter extends CConverter {
 	 * Convert discovery rules.
 	 *
 	 * @param array $discovery_rules
+	 * @param bool  $is_host
 	 *
 	 * @return array
 	 */
-	private static function convertDiscoveryRules(array $discovery_rules): array {
+	private static function convertDiscoveryRules(array $discovery_rules, bool $is_host = false): array {
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
 
@@ -270,6 +275,11 @@ class C64ImportConverter extends CConverter {
 
 			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
 				$discovery_rule['trigger_prototypes'] = self::convertTriggers($discovery_rule['trigger_prototypes']);
+			}
+
+			if ($is_host && array_key_exists('host_prototypes', $discovery_rule)) {
+				$discovery_rule['host_prototypes']
+					= self::convertHostPrototypes($discovery_rule['host_prototypes']);
 			}
 		}
 		unset($discovery_rule);
@@ -414,6 +424,24 @@ class C64ImportConverter extends CConverter {
 		unset($trigger);
 
 		return $triggers;
+	}
+
+	/**
+	 * Convert host prototypes.
+	 *
+	 * @param array $host_prototypes
+	 *
+	 * @return array
+	 */
+	private static function convertHostPrototypes(array $host_prototypes): array {
+		foreach ($host_prototypes as &$host_prototype) {
+			if (!array_key_exists('inventory_mode', $host_prototype)) {
+				$host_prototype['inventory_mode'] = CXmlConstantName::MANUAL;
+			}
+		}
+		unset($host_prototype);
+
+		return $host_prototypes;
 	}
 
 	/**
