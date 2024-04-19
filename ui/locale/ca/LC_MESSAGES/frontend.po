@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-13 22:04+0000\n"
+"PO-Revision-Date: 2024-04-17 12:16+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -85,7 +85,7 @@ msgstr "S'han trobat %1$d coincidències per a %2$s"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "Es veuen els equips %1$d de %1$d+"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -8951,7 +8951,7 @@ msgstr "DN de base del grup"
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 #: widgets/hostnavigator/includes/WidgetForm.php:102
 msgid "Group by"
-msgstr ""
+msgstr "Agrupar per"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9541,7 +9541,7 @@ msgstr "Nom de l'equip"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
-msgstr ""
+msgstr "Navegador d'equips"
 
 #: include/hosts.inc.php:284
 msgid "Host networks"
@@ -9621,7 +9621,7 @@ msgstr "Encaminador d'equips"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:69
 msgid "Host status"
-msgstr ""
+msgstr "Estat de l'equip"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -17211,7 +17211,7 @@ msgstr "El resultat és CERT"
 #: app/controllers/CControllerPopupItemTestSend.php:456
 #, c-format
 msgid "Result is truncated due to its size (%1$s)."
-msgstr ""
+msgstr "El resultat s'ha truncat per la seva mida (%1$s)."
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -20988,7 +20988,7 @@ msgstr "Vols desbloquejar els usuaris triats?"
 
 #: widgets/hostnavigator/Widget.php:38
 msgid "Uncategorized"
-msgstr ""
+msgstr "Sense categoria"
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -25089,7 +25089,7 @@ msgstr "round() - Arrodoneix un valor a decimal"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 msgid "rows must be unique"
-msgstr ""
+msgstr "les fileres han d'ésser úniques"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -25236,7 +25236,7 @@ msgstr "etiqueta"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
-msgstr ""
+msgstr "l'etiqueta no pot pas ésser buida"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
