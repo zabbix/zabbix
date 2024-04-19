@@ -1754,8 +1754,8 @@ void	zbx_export_events(void)
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		DC_HOST		*host;
-		DB_EVENT	*event;
+		DC_HOST			*host;
+		DB_EVENT		*event;
 		zbx_vector_str_t	groups;
 
 		event = (DB_EVENT *)events.values[i];

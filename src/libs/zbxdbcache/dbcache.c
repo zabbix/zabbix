@@ -1023,11 +1023,11 @@ static void	zbx_host_info_clean(zbx_host_info_t *host_info)
  ******************************************************************************/
 static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vector_uint64_t *hostids)
 {
-	int		i;
-	size_t		sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_host_info_t	*host_info;
+	int			i;
+	size_t			sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_host_info_t		*host_info;
 	zbx_hashset_iter_t	iter;
 
 	for (i = 0; i < hostids->values_num; i++)
