@@ -257,9 +257,6 @@ class CHostInterface extends CApiService {
 	 */
 	public function checkInput(array &$interfaces, $method) {
 		$update = ($method == 'update');
-		$allowed_fields = array_flip([
-			'hostid', 'type', 'ip', 'dns', 'port', 'useip', 'main', 'details', 'interface_ref', 'items', 'interfaceid'
-		]);
 
 		// permissions
 		if ($update) {
@@ -292,7 +289,7 @@ class CHostInterface extends CApiService {
 		$check_have_items = [];
 
 		foreach ($interfaces as &$interface) {
-			if (!check_db_fields($interfaceDBfields, $interface) || array_diff_key($interface, $allowed_fields)) {
+			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
