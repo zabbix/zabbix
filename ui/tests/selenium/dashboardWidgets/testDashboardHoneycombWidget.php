@@ -640,9 +640,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 		// Check color picker default values.
 		$color_pickers = [
 			// Primary label color.
-			'xpath:.//input[@id="primary_label_color"]/..' => 'lbl_primary_label_color',
+			'xpath:.//input[@id="primary_label_color"]/..' => 'id:lbl_primary_label_color',
 			// Secondary label color.
-			'xpath:.//input[@id="secondary_label_color"]/..' => 'lbl_secondary_label_color',
+			'xpath:.//input[@id="secondary_label_color"]/..' => 'id:lbl_secondary_label_color',
 			// Background color.
 			'xpath:.//input[@id="bg_color"]/..' => 'id:lbl_bg_color'
 		];
@@ -1014,8 +1014,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:secondary_label_size_type' => 'Custom', // Secondary label Size - custom.
-						'id:primary_label_size' => '', // Primary label Custom size input field.
-						'id:secondary_label_size' => '',  // Secondary label Custom size input field.
+						'id:primary_label_size' => 'text', // Primary label Custom size input field.
+						'id:secondary_label_size' => 'text',  // Secondary label Custom size input field.
 						'id:primary_label' => '', // Primary label text field.
 						'id:secondary_label' => '' // Secondary label text field.
 					],
@@ -1036,8 +1036,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:secondary_label_size_type' => 'Custom', // Secondary label Size - custom.
-						'id:primary_label_size' => '', // Primary label Custom size input field.
-						'id:secondary_label_size' => '',  // Secondary label Custom size input field.
+						'id:primary_label_size' => '🙂🙃', // Primary label Custom size input field.
+						'id:secondary_label_size' => '🙂🙃',  // Secondary label Custom size input field.
 						'id:primary_label' => '', // Primary label text field.
 						'id:secondary_label' => '', // Secondary label text field.
 						'xpath:.//input[@id="primary_label_color"]/..' => 'TESTS1', // Primary label Color.
@@ -1077,7 +1077,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Primary label only with Text, color, custom.',
+						'Name' => '',
 						'Item pattern' => 'Numeric for honeycomb 1',
 						'id:show_2' => false, // Show - Primary label.
 						'id:primary_label' => '{$RANDOM}, some text, {TIME}, 12345, !@#$%^&*, {#WHY}',
@@ -1203,7 +1203,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Host and items tags',
+						'Name' => 'Host and items tags 🙂🙃',
 						'Item pattern' => 'Numeric for honeycomb 1'
 					],
 					'tags' => [
@@ -1367,7 +1367,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Item last value macros',
+						'Name' => 'Item last value macros {ITEM.LASTVALUE}',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -1395,7 +1395,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Symbols displayed',
+						'Name' => 'Symbols displayed āēīõšŗ$%^&*()',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -1423,7 +1423,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'User macros displayed',
+						'Name' => 'User macros displayed {$TEXT}',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -1437,7 +1437,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Secret macros displayed',
+						'Name' => 'Secret macros displayed {$SECRET_TEXT}',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -1451,7 +1451,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'LLD macros displayed',
+						'Name' => 'LLD macros displayed {#LLD}',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -1465,7 +1465,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Non existing global macros displayed',
+						'Name' => 'Non existing global macros displayed {HELLO.WORLD}',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -1479,7 +1479,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Value decimal 6',
+						'Name' => '123',
 						'Item pattern' => 'Display item 1',
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Value',
@@ -1872,7 +1872,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 			}
 			else {
 				// Make sure that the widget is present before saving the dashboard.
-				$header = CTestArrayHelper::get($data['fields'], 'Name', 'Honeycomb');
+				$header = (array_key_exists('Name', $data['fields']))
+					? (($data['fields']['Name'] === '') ? 'Honeycomb' : $data['fields']['Name'])
+					: 'Honeycomb';
+
 				$dashboard->getWidget($header);
 				$dashboard->save();
 
@@ -1905,6 +1908,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 	/**
 	 * Check created tags.
+	 *
+	 * @param array  $tags      given tags
+	 * @param boolean $check    check tags' values after creation or not
 	 */
 	protected function checkCreateTags($tags, $check = true) {
 		foreach ($tags as $tag => $values) {
