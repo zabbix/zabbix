@@ -359,7 +359,11 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
+		{
+			if (ZBX_IS_RUNNING())
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
 			exit(EXIT_FAILURE);
+		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
