@@ -2305,12 +2305,16 @@ button {
     color: #737373; }
 
 .list-table {
-  width: 100%;
+  min-width: 100%;
   background-color: #2b2b2b;
   border-collapse: separate;
   border: 1px solid #303030; }
   .list-table.fixed {
     table-layout: fixed; }
+  .list-table.full-height {
+    min-height: 100%; }
+    .list-table.full-height thead th, .list-table.full-height thead td {
+      height: 1%; }
   .list-table thead th {
     height: 100%;
     overflow: hidden;
@@ -2321,6 +2325,7 @@ button {
     vertical-align: bottom; }
     .list-table thead th .text-vertical {
       max-height: 150px;
+      min-width: 22px;
       overflow: hidden;
       text-overflow: ellipsis;
       writing-mode: vertical-lr;
@@ -2406,6 +2411,7 @@ button {
       flex-shrink: 0;
       margin-right: 4px; }
   .list-table .nothing-to-show td {
+    height: auto;
     color: #737373;
     text-align: center; }
     .list-table .nothing-to-show td:hover {

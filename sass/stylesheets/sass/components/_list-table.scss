@@ -1,11 +1,21 @@
 .list-table {
-	width: 100%;
+	min-width: 100%;
 	background-color: $ui-bg-color;
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
 	&.fixed {
 		table-layout: fixed;
+	}
+
+	&.full-height {
+		min-height: 100%;
+
+		thead {
+			th, td {
+				height: 1%;
+			}
+		}
 	}
 
 	thead {
@@ -20,6 +30,7 @@
 
 			.text-vertical {
 				max-height: 150px;
+				min-width: 22px;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				writing-mode: vertical-lr;
@@ -173,6 +184,7 @@
 
 	.nothing-to-show {
 		td {
+			height: auto;
 			color: $font-alt-color;
 			text-align: center;
 
