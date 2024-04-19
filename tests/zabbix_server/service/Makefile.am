@@ -13,7 +13,7 @@ COMMON_SRC_FILES = \
 
 COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/zabbix_server/service/libservice.a \
+	$(top_srcdir)/src/zabbix_server/service/libservice_server.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
@@ -26,7 +26,6 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
-	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \

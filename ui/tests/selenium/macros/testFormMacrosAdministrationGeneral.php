@@ -27,6 +27,8 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup globalmacro, config
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareHostMacrosData
  */
 class testFormMacrosAdministrationGeneral extends testFormMacros {

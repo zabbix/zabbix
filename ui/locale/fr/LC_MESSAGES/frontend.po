@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-09 19:54+0000\n"
+"PO-Revision-Date: 2024-04-13 12:08+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -82,6 +82,11 @@ msgstr[1] "%1$d jours"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%1$d correspondances trouvées pour %2$s"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -4555,7 +4560,7 @@ msgstr "Couleur (OK)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Interpolation des couleurs"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -8657,11 +8662,11 @@ msgstr "L'expression régulière globale \"%1$s\" n'existe pas."
 #: app/views/popup.operation.edit.php:63
 #: include/classes/api/services/CScript.php:950
 msgid "Global script execution on Zabbix server is disabled by server configuration."
-msgstr ""
+msgstr "L'exécution du script global sur le serveur Zabbix est désactivée par la configuration du serveur."
 
 #: app/partials/administration.system.info.php:138
 msgid "Global scripts on Zabbix server"
-msgstr ""
+msgstr "Scripts globaux sur le serveur Zabbix"
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -8942,6 +8947,12 @@ msgstr "Le groupe \"%1$s\" pour l'hôte \"%2$s\" n'existe pas."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "DN de base du groupe"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9529,6 +9540,10 @@ msgstr "Métadonnées de l'hôte"
 msgid "Host name"
 msgstr "Nom de l'hôte"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Réseaux de l'hôte"
@@ -9604,6 +9619,10 @@ msgstr "Prototypes d'hôtes"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Hôte - Routeur"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -17187,6 +17206,14 @@ msgstr "Le résultat est FAUX"
 msgid "Result is TRUE"
 msgstr "Le résultat est VRAI"
 
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
+
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
 msgstr "Type de résultat"
@@ -20960,6 +20987,10 @@ msgstr "Débloquer l'utilisateur sélectionné ?"
 msgid "Unblock selected users?"
 msgstr "Débloquer les utilisateurs sélectionnés ?"
 
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
+
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
 #: include/views/js/item.preprocessing.js.php:177
@@ -23145,7 +23176,7 @@ msgstr "Formulaire de connexion Zabbix"
 
 #: app/views/administration.script.edit.php:115
 msgid "Zabbix proxy or server"
-msgstr ""
+msgstr "Proxy ou serveur Zabbix"
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -24117,7 +24148,7 @@ msgstr "paramètres de nettoyage globaux"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
-msgstr ""
+msgstr "l'exécution du script global sur le serveur Zabbix est désactivée par la configuration du serveur"
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -25057,6 +25088,10 @@ msgstr "right() - Retourne le nombre de caractères le plus à droite"
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arrondit une valeur aux décimales"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim() - Supprime les caractères spécifiés à la fin d'une chaîne de caractères"
@@ -25199,6 +25234,10 @@ msgstr "les informations d'identification fournies ne sont pas uniques"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "tag"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
