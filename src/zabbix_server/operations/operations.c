@@ -985,7 +985,6 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 	{
 		char		*sql;
 		zbx_db_result_t	result;
-		zbx_db_row_t	row;
 
 		zbx_db_execute(
 				"update hosts"
@@ -1004,7 +1003,7 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 		result = zbx_db_select_n(sql, 1);
 		zbx_free(sql);
 
-		if (NULL != (row = zbx_db_fetch(result)))
+		if (NULL != zbx_db_fetch(result))
 		{
 			zbx_db_execute("update host_discovery"
 					" set disable_source=%d"
