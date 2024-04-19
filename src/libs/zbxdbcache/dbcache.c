@@ -1032,10 +1032,10 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 
 	for (i = 0; i < hostids->values_num; i++)
 	{
-		zbx_host_info_t	host_info = {.hostid = hostids->values[i]};
+		zbx_host_info_t	host_info_new = {.hostid = hostids->values[i]};
 
-		zbx_vector_ptr_create(&host_info.groups);
-		zbx_hashset_insert(hosts_info, &host_info, sizeof(host_info));
+		zbx_vector_ptr_create(&host_info_new.groups);
+		zbx_hashset_insert(hosts_info, &host_info_new, sizeof(host_info_new));
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
