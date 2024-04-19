@@ -1320,7 +1320,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 
-			// Check message that widget added.
+			// Check that new widget is not added.
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		}

@@ -1047,7 +1047,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'New Single Item Widget',
-						'Refresh interval' => '2 minutes',
+						'Refresh interval' => 'Default (1 minute)',
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.
@@ -1437,7 +1437,6 @@ class testDashboardItemValueWidget extends testWidgets {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		if (array_key_exists('trim', $data)) {
 			$data = CTestArrayHelper::trim($data);
@@ -1465,17 +1464,23 @@ class testDashboardItemValueWidget extends testWidgets {
 				? $data['fields']['Name']
 				: implode($data['fields']['Item']);
 
-			$dashboard->getWidget($header)->waitUntilReady();
+			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->save();
+			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widget count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+				? '1 minute'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
+
 			// Check new widget form fields and values in frontend.
-			$saved_form = $dashboard->getWidget($header)->edit();
+			$saved_form = $widget->edit();
 
 			// Open "Advanced configuration" block if it was filled with data.
 			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
@@ -1503,17 +1508,9 @@ class testDashboardItemValueWidget extends testWidgets {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM widget WHERE name='.zbx_dbstr($name)));
 			}
 
-			// Close widget popup and check update interval.
-			$saved_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$dashboard->save();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
-				? '15 minutes'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
-			$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
 
 			// Write new name to update widget for update scenario.
 			if ($update) {
