@@ -360,7 +360,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
+			if (ZBX_IS_RUNNING())
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
 			exit(EXIT_FAILURE);
 		}
 
