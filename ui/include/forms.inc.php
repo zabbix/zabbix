@@ -940,7 +940,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
 			array_intersect_key($options, array_flip(['readonly', 'add_post_js']))
 		))
-		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
 	if ($options['with_automatic'] && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {

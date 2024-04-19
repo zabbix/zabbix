@@ -33,7 +33,7 @@ $header_columns = [
 		->addStyle('width: '.ZBX_TEXTAREA_TAG_WIDTH.'px;')
 		->addClass('table-col-handle'),
 	(new CTableColumn(_('Value')))
-		->addStyle('width: '.ZBX_TEXTAREA_TAG_WIDTH.'px;')
+		->addStyle('width: '.ZBX_TEXTAREA_TAG_VALUE_WIDTH.'px;')
 		->addClass('table-col-handle'),
 	(new CTableColumn(''))->addClass('table-col-handle')
 ];
