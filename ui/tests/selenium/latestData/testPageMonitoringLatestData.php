@@ -648,8 +648,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		// TODO: should be fixed 'id:state_0' to filed label 'State'
-		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['id:state_0' => 'Normal']);
+		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
 		$table = $this->getTable();
 		$this->query('button:Apply')->one()->click();
 		$this->page->waitUntilReady();
