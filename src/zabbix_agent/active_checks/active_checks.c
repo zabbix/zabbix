@@ -588,6 +588,8 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		zbx_vector_uint64_append(&received_itemids, itemid);
 	}
 
+	zbx_vector_uint64_sort(&received_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	/* remove what wasn't received */
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
@@ -595,16 +597,9 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		metric = active_metrics.values[i];
 
-		for (j = 0; j < received_itemids.values_num; j++)
-		{
-			if (metric->itemid == received_itemids.values[j])
-			{
-				found = 1;
-				break;
-			}
-		}
+		found = zbx_vector_uint64_bsearch(&received_itemids, metric->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		if (0 == found)
+		if (FAIL == found)
 		{
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			if (NULL != metric->persistent_file_name)
