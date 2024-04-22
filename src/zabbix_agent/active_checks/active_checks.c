@@ -381,7 +381,7 @@ out:
 				&nextcheck, &scheduling, &error))
 		{
 			/* first poll of new items without scheduling checks must be done as soon as possible */
-			if (SUCCEED != scheduling)
+			if (SUCCEED == scheduling)
 				metric->nextcheck = nextcheck;
 		}
 		else
