@@ -374,13 +374,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (DNS_QUERY_SHORT == short_answer)
 	{
+		/* DNS_RCODE_NOERROR, not DNS_RCODE_NXDOMAIN */
 		SET_UI64_RESULT(result, DNS_RCODE_NOERROR != res ? 0 : 1);
 		ret = SYSINFO_RET_OK;
 		goto clean_dns;
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (DNS_RCODE_NOERROR != res && DNS_RCODE_NXDOMAIN != res)
+		if (DNS_RCODE_NOERROR != res && DNS_ERROR_RCODE_NAME_ERROR != res)
 		{
 			SET_DBL_RESULT(result, 0.0);
 			goto clean_dns;
