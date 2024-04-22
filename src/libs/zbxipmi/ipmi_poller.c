@@ -29,6 +29,7 @@
 #include "checks_ipmi.h"
 #include "zbxtime.h"
 #include "zbxipmi.h"
+#include "zbxthreads.h"
 
 /******************************************************************************
  *                                                                            *

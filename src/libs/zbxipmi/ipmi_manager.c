@@ -35,6 +35,10 @@
 #include "zbxpreproc.h"
 #include "zbxipmi.h"
 #include "zbxpoller.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxthreads.h"
+#include "zbxtimekeeper.h"
 
 /* IPMI request queued by pollers */
 typedef struct

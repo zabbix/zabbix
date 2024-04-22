@@ -30,6 +30,9 @@
 #include "ipmi.h"
 #include "zbxipmi.h"
 #include "zbxinterface.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *
