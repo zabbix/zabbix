@@ -36,15 +36,6 @@
 #include "zbxipmi.h"
 #include "zbxpoller.h"
 
-#define ZBX_IPMI_MANAGER_DELAY	1
-
-#define ZBX_IPMI_POLLER_INIT		0
-#define ZBX_IPMI_POLLER_READY		1
-#define ZBX_IPMI_POLLER_BUSY		2
-
-#define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_HOUR
-#define ZBX_IPMI_MANAGER_HOST_TTL		SEC_PER_DAY
-
 /* IPMI request queued by pollers */
 typedef struct
 {
@@ -345,6 +336,8 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_
 static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,
 		zbx_get_config_forks_f get_config_forks)
 {
+#define ZBX_IPMI_MANAGER_HOST_TTL		SEC_PER_DAY
+
 	zbx_hashset_iter_t	iter;
 	zbx_ipmi_manager_host_t	*host;
 	zbx_ipmi_poller_t	*poller;
@@ -371,6 +364,7 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef ZBX_IPMI_MANAGER_HOST_TTL
 }
 
 /******************************************************************************
@@ -912,8 +906,10 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 	zbx_thread_ipmi_manager_args	*ipmi_manager_args_in = (zbx_thread_ipmi_manager_args *)
 			((((zbx_thread_args_t *)args))->args);
 
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
+#define	STAT_INTERVAL			5	/* if a process is busy and does not sleep then update status not */
+						/* faster than once in STAT_INTERVAL seconds */
+#define ZBX_IPMI_MANAGER_DELAY		1
+#define ZBX_IPMI_MANAGER_CLEANUP_DELAY	SEC_PER_HOUR
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -1036,6 +1032,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
+#undef ZBX_IPMI_MANAGER_DELAY
 }
 
 #endif

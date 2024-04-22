@@ -30,8 +30,6 @@
 #include "zbxtime.h"
 #include "zbxipmi.h"
 
-#define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
-
 /******************************************************************************
  *                                                                            *
  * Purpose: registers IPMI poller with IPMI manager                           *

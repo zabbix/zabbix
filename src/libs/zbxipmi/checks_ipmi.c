@@ -33,28 +33,7 @@
 /* the maximum, I believe." */
 #define IPMI_SENSOR_ID_SZ	36
 
-/* delete inactive hosts after this period */
-#define INACTIVE_HOST_LIMIT	3 * SEC_PER_HOUR
-
-#define IPMI_THRESHOLDS_NUM	6
 #define MAX_DISCRETE_STATES	15
-
-#define ZBX_IPMI_TAG_ID				"id"
-#define ZBX_IPMI_TAG_NAME			"name"
-#define ZBX_IPMI_TAG_SENSOR			"sensor"
-#define ZBX_IPMI_TAG_READING			"reading"
-#define ZBX_IPMI_TAG_STATE			"state"
-#define ZBX_IPMI_TAG_TYPE			"type"
-#define ZBX_IPMI_TAG_TEXT			"text"
-
-#define ZBX_IPMI_TAG_UNITS			"units"
-#define ZBX_IPMI_TAG_VALUE			"value"
-#define ZBX_IPMI_TAG_THRESHOLD			"threshold"
-#define ZBX_IPMI_TAG_LOWER			"lower"
-#define ZBX_IPMI_TAG_UPPER			"upper"
-#define ZBX_IPMI_TAG_NON_CRIT			"non_crit"
-#define ZBX_IPMI_TAG_CRIT			"crit"
-#define ZBX_IPMI_TAG_NON_RECOVER		"non_recover"
 
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
@@ -103,7 +82,9 @@ typedef struct
 							/* Current, Fan, Physical Security (Chassis Intrusion), etc. */
 	char				*full_name;
 	int				state;
+#define IPMI_THRESHOLDS_NUM	6
 	zbx_ipmi_sensor_threshold_t	thresholds[IPMI_THRESHOLDS_NUM];
+#undef IPMI_THRESHOLDS_NUM
 }
 zbx_ipmi_sensor_t;
 
@@ -656,7 +637,7 @@ out:
 }
 
 /* get sensor units full string*/
-static char *zbx_get_ipmi_units(ipmi_sensor_t *sensor)
+static char	*zbx_get_ipmi_units(ipmi_sensor_t *sensor)
 {
 	const char	*base, *mod_use = "", *modifier = "", *rate;
 
@@ -1648,6 +1629,8 @@ out:
 
 void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 {
+#define INACTIVE_HOST_LIMIT	3 * SEC_PER_HOUR	/* delete inactive hosts after this period */
+
 	zbx_ipmi_host_t	*h = hosts, *prev = NULL, *next;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1676,6 +1659,7 @@ void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef INACTIVE_HOST_LIMIT
 }
 
 /******************************************************************************
@@ -1789,7 +1773,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	return h->ret;
 }
 
-static void add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_sensor_threshold_t *threshold)
+static void	add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_sensor_threshold_t *threshold)
 {
 	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status && 0 != isfinite(threshold->val))
 		zbx_json_addfloat(json, tag, threshold->val);
@@ -1798,6 +1782,23 @@ static void add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_
 int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, signed char authtype,
 		unsigned char privilege, const char *username, const char *password, char **value)
 {
+#define ZBX_IPMI_TAG_ID			"id"
+#define ZBX_IPMI_TAG_NAME		"name"
+#define ZBX_IPMI_TAG_SENSOR		"sensor"
+#define ZBX_IPMI_TAG_READING		"reading"
+#define ZBX_IPMI_TAG_STATE		"state"
+#define ZBX_IPMI_TAG_TYPE		"type"
+#define ZBX_IPMI_TAG_TEXT		"text"
+
+#define ZBX_IPMI_TAG_UNITS		"units"
+#define ZBX_IPMI_TAG_VALUE		"value"
+#define ZBX_IPMI_TAG_THRESHOLD		"threshold"
+#define ZBX_IPMI_TAG_LOWER		"lower"
+#define ZBX_IPMI_TAG_UPPER		"upper"
+#define ZBX_IPMI_TAG_NON_CRIT		"non_crit"
+#define ZBX_IPMI_TAG_CRIT		"crit"
+#define ZBX_IPMI_TAG_NON_RECOVER	"non_recover"
+
 	zbx_ipmi_host_t		*h;
 	int 			i, j;
 	struct zbx_json		json;
@@ -1962,6 +1963,23 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:%s", __func__, ZBX_NULL2EMPTY_STR(*value));
 
 	return SUCCEED;
+
+#undef ZBX_IPMI_TAG_ID
+#undef ZBX_IPMI_TAG_NAME
+#undef ZBX_IPMI_TAG_SENSOR
+#undef ZBX_IPMI_TAG_READING
+#undef ZBX_IPMI_TAG_STATE
+#undef ZBX_IPMI_TAG_TYPE
+#undef ZBX_IPMI_TAG_TEXT
+
+#undef ZBX_IPMI_TAG_UNITS
+#undef ZBX_IPMI_TAG_VALUE
+#undef ZBX_IPMI_TAG_THRESHOLD
+#undef ZBX_IPMI_TAG_LOWER
+#undef ZBX_IPMI_TAG_UPPER
+#undef ZBX_IPMI_TAG_NON_CRIT
+#undef ZBX_IPMI_TAG_CRIT
+#undef ZBX_IPMI_TAG_NON_RECOVER
 }
 
 /* function 'zbx_parse_ipmi_command' requires 'c_name' with size 'ZBX_ITEM_IPMI_SENSOR_LEN_MAX' */
