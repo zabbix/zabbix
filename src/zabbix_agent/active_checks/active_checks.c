@@ -375,13 +375,13 @@ out:
 	if (0 == metric->nextcheck)
 	{
 		char	*error = NULL;
-		int	nextcheck = 0, scheduling = 0;
+		int	nextcheck = 0, scheduling = FAIL;
 
 		if (SUCCEED == zbx_get_agent_item_nextcheck(metric->itemid, metric->delay, (int)time(NULL),
 				&nextcheck, &scheduling, &error))
 		{
 			/* first poll of new items without scheduling checks must be done as soon as possible */
-			if (0 == scheduling)
+			if (SUCCEED != scheduling)
 				metric->nextcheck = nextcheck;
 		}
 		else
@@ -1667,7 +1667,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
 		zbx_uint64_t		lastlogsize_last, lastlogsize_sent;
-		int			mtime_last, mtime_sent, ret, scheduling = 0;
+		int			mtime_last, mtime_sent, ret, scheduling = FAIL;
 		zbx_active_metric_t	*metric = active_metrics.values[i];
 
 		if (metric->nextcheck > now)
