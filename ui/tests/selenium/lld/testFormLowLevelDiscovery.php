@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts
@@ -28,7 +29,20 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 class testFormLowLevelDiscovery extends CWebTest {
 
+	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
+
 	protected static $hostid;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
+		];
+	}
 
 	public function prepareLLDData() {
 		$result = CDataHelper::createHosts([
@@ -47,10 +61,132 @@ class testFormLowLevelDiscovery extends CWebTest {
 				],
 				'discoveryrules' => [
 					[
-						'name' => 'LLD for update test',
-						'key_' => 'vfs.fs.discovery',
+						'name' => 'LLD for delete scenario',
+						'key_' => 'vfs.fs.discovery2',
 						'type' => ITEM_TYPE_ZABBIX,
 						'delay' => 30
+					],
+					[
+						'name' => 'LLD for clone scenario',
+						'key_' => 'vfs.fs.discovery3',
+						'type' => ITEM_TYPE_ZABBIX,
+						'delay' => 30
+					],
+					[
+						'name' => 'LLD for simple update scenario',
+						'key_' => 'update_key',
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => "1h;wd1-2h7-14",
+						'url' => 'https://www.test.com/search',
+						'query_fields' => [['name' => 'test_name1', 'value' => 'value1'], ['name' => '2', 'value' => 'value2']],
+						'request_method' => HTTPCHECK_REQUEST_HEAD,
+						'post_type' => ZBX_POSTTYPE_JSON,
+						'posts' => "{\"zabbix_export\": {\"version\": \"6.0\",\"date\": \"2024-03-20T20:05:14Z\"}}",
+						'headers' => [['name' => 'name1', 'value' => 'value']],
+						'status_codes' => '400, 600',
+						'follow_redirects' => 1,
+						'retrieve_mode' => 1,
+						'http_proxy' => '161.1.1.5',
+						'authtype' => ZBX_HTTP_AUTH_NTLM,
+						'username' => 'user',
+						'password' => 'pass',
+						'verify_peer' => ZBX_HTTP_VERIFY_PEER_ON,
+						'verify_host' => ZBX_HTTP_VERIFY_HOST_ON,
+						'ssl_cert_file' => '/home/test/certdb/ca.crt',
+						'ssl_key_file' => '/home/test/certdb/postgresql-server.crt',
+						'ssl_key_password' => '/home/test/certdb/postgresql-server.key',
+						'timeout' => '10s',
+						'lifetime_type' => 0,
+						'lifetime' => '15d',
+						'enabled_lifetime_type' => 1,
+						'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
+						'trapper_hosts' => '127.0.2.3',
+						'description' => 'LLD for test',
+						'preprocessing' => [['type' => ZBX_PREPROC_STR_REPLACE, 'params' => "a\nb"]],
+						'lld_macro_paths' => ['lld_macro' => '{#MACRO}', 'path' => '$.path'],
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+							'conditions' => [
+								[
+									'macro' => '{#MACRO}',
+									'value' => 'expression',
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP
+								]
+							]
+						],
+						'overrides' => [
+							'name' => 'Override',
+							'step' => 1,
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'formula' => '',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'operator' => CONDITION_OPERATOR_EXISTS
+									]
+								]
+							],
+							'operations' => [
+								'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'value' => 'test',
+								'opstatus' => ['status' => ZBX_PROTOTYPE_DISCOVER]
+							]
+						]
+					],
+					[
+						'name' => 'LLD for cancel scenario',
+						'key_' => 'ssh.run[test]',
+						'type' => ITEM_TYPE_SSH,
+						'delay' => "3h;20s/1-3,00:02-14:30",
+						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+						'username' => 'username',
+						'password' => 'passphrase',
+						'publickey' => '/home/test/public-server.key',
+						'privatekey' => '/home/test/private-server.key',
+						'params' => 'test script',
+						'timeout' => '',
+						'lifetime_type' => 1,
+						'enabled_lifetime_type' => 0,
+						'enabled_lifetime' => '20h',
+						'description' => 'Description for cancel scenario',
+						'preprocessing' => [['type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE, 'params' => '30s']],
+						'lld_macro_paths' => ['lld_macro' => '{#LLDMACRO}', 'path' => '$.path.to.node'],
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+							'conditions' => [
+								[
+									'macro' => '{#FILTERMACRO}',
+									'operator' => CONDITION_OPERATOR_NOT_EXISTS
+								]
+							]
+						],
+						'overrides' => [
+							'name' => 'Cancel override',
+							'step' => 1,
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'formula' => '',
+								'conditions' => [
+									[
+										'macro' => '{#OVERRIDE_MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => 'expression'
+									]
+								]
+							],
+							'operations' => [
+								'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+								'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+								'value' => 'test',
+								'opstatus' => ['status' => ZBX_PROTOTYPE_DISCOVER],
+								'opseverity' => ['severity' => TRIGGER_SEVERITY_HIGH]
+							]
+						]
 					]
 				]
 			]
@@ -458,6 +594,167 @@ class testFormLowLevelDiscovery extends CWebTest {
 					break;
 			}
 		}
+	}
+
+	public function testFormLowLevelDiscovery_SimpleUpdate() {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+		$this->query('link:LLD for simple update scenario')->one()->waitUntilClickable()->click();
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
+		$this->page->assertTitle('Configuration of discovery rules');
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public static function getCancelData() {
+		return [
+			[['action' => 'Add']],
+			[['action' => 'Update']],
+			[['action' => 'Clone']],
+			[['action' => 'Delete']]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testFormLowLevelDiscovery_Cancel($data) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$lld_name = 'LLD for cancel scenario';
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+
+		if ($data['action'] === 'Add') {
+			$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
+		}
+		else {
+			$this->query('link',$lld_name)->one()->waitUntilClickable()->click();
+
+			if ($data['action'] === 'Clone') {
+				$this->query('button:Clone')->one()->waitUntilClickable()->click();
+			}
+
+			if ($data['action'] === 'Delete') {
+				$this->query('button:Delete')->waitUntilClickable()->one()->click();
+				$this->assertTrue($this->page->isAlertPresent());
+				$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
+				$this->page->dismissAlert();
+			}
+		}
+
+		if ($data['action'] !== 'Delete') {
+			$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+
+			$fields = [
+				'lld_fields' => [
+					'Name' => 'Updated LLD for cancel scenario',
+					'Key' => 'new_key',
+					'Type' => 'SSH agent',
+					'Authentication method' => 'Password',
+					'User name' => 'new_user',
+					'Password' => 'new_password',
+					'Executed script' => 'new script',
+					'Update interval' => '2h',
+					'id:delay_flex_0_type' => 'Scheduling',
+					'id:delay_flex_0_schedule' => 'wd2-4h2-5',
+					'id:custom_timeout' => 'Override',
+					'id:timeout' => '25s',
+					'id:lifetime_type' => 'Immediately',
+					'Description' => 'New description',
+					'Enabled' => false
+				],
+				'preprocessing_fields' => [
+					'id:preprocessing_0_type' => 'Prometheus to JSON',
+					'id:preprocessing_0_params_0' => '{label_name!~"name"}'
+				],
+				'lld_macros_fields' => [
+					'id:lld_macro_paths_0_lld_macro' => '{#NEW_LLDMACRO}',
+					'id:lld_macro_paths_0_path' => '$.new.path.to.node',
+				],
+				'filters_fields' => [
+					'id:conditions_0_macro' => '{#NEW_FILTERMACRO}',
+					'name:conditions[0][operator]' => 'does not match',
+					'id:conditions_0_value' => 'new value'
+				],
+				'overrides_fields' => [
+					'filters' => [
+						'Name' => 'New override',
+						'id:overrides_filters_0_macro' => '{#NEW_OVERRIDE_MACRO}',
+						'name:overrides_filters[0][operator]' => 'exists'
+					],
+					'operations' => [
+						'Object' => 'Host prototype',
+						'id:visible_opstatus' => true
+					]
+				]
+			];
+
+			$form->fill($fields['lld_fields']);
+
+			// Change Preprocessing.
+			$form->selectTab('Preprocessing');
+
+			if ($data['action'] === 'Add') {
+				$form->query('id:param_add')->waitUntilClickable()->one()->click();
+			}
+
+			$form->fill($fields['preprocessing_fields']);
+
+			// Change LLD Macros.
+			$form->selectTab('LLD macros');
+			$form->fill($fields['lld_macros_fields']);
+
+			// Change Filters.
+			$form->selectTab('Filters');
+			$form->fill($fields['filters_fields']);
+
+			// Change Filters.
+			$form->selectTab('Overrides');
+
+			if ($data['action'] === 'Add') {
+				$form->getFieldContainer('Overrides')->query('button:Add')->waitUntilClickable()->one()->click();
+			}
+			else {
+				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
+			}
+
+			$overlay_dialog = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$overlay_dialog->fill($fields['overrides_fields']['filters']);
+			$overlay_dialog->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
+			$operation_dialog = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$operation_dialog->fill($fields['overrides_fields']['operations']);
+			$operation_dialog->submit();
+			$operation_dialog->waitUntilNotVisible();
+			$overlay_dialog->submit();
+			$operation_dialog->waitUntilNotVisible();
+		}
+
+		$this->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$this->page->assertTitle('Configuration of discovery rules');
+		$this->assertTrue($this->query('link', $lld_name)->one()->isVisible());
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public function testFormLowLevelDiscovery_Delete() {
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+
+		$lld_name = 'LLD for delete scenario';
+		$this->query('link', $lld_name)->one()->waitUntilClickable()->click();
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+
+		// Check alert.
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
+
+		// Check DB.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($lld_name)));
+
+		// Check frontend table.
+		$this->assertFalse($this->query('link', $lld_name)->exists());
+
+		// Check that user redirected on Proxies page.
+		$this->page->assertTitle('Configuration of discovery rules');
 	}
 
 	/**
