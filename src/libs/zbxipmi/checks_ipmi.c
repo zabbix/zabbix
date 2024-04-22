@@ -195,10 +195,10 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Find element in the global list 'hosts' using parameters as       *
- *          search criteria                                                   *
+ * Purpose: finds element in global list 'hosts' using parameters as search   *
+ *          criteria                                                          *
  *                                                                            *
- * Return value: pointer to list element with host data                       *
+ * Return value: pointer to list element with host data or                    *
  *               NULL if not found                                            *
  *                                                                            *
  ******************************************************************************/
@@ -229,9 +229,9 @@ static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int au
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a new element in the global list 'hosts'                   *
+ * Purpose: creates new element in global list 'hosts'                        *
  *                                                                            *
- * Return value: pointer to the new list element with host data               *
+ * Return value: pointer to new list element with host data                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
@@ -332,13 +332,13 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_full_name(const zbx_ipmi_host_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check if an item name starts from domain name and find the domain *
- *          name length                                                       *
+ * Purpose: checks if item name starts from domain name and find domain name  *
+ *          length                                                            *
  *                                                                            *
  * Parameters: h         - [IN] ipmi host                                     *
  *             full_name - [IN] item name                                     *
  *                                                                            *
- * Return value: 0 or offset for skipping the domain name                     *
+ * Return value: 0 or offset for skipping domain name                         *
  *                                                                            *
  ******************************************************************************/
 static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
@@ -354,11 +354,12 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
 
 	return offset;
 }
+
 /******************************************************************************
  *                                                                            *
- * Purpose:  Converts sensor id to printable string and return id_type        *
+ * Purpose: converts sensor id to printable string and return id_type         *
  *                                                                            *
- * Parameters: sensor    - [IN] ipmi sensor                                   *
+ * Parameters: sensor    - [IN]                                               *
  *             id        - [OUT] sensor id                                    *
  *             sz        - [IN] sensor id buffer length                       *
  *             id_sz     - [OUT] sensor id length                             *
@@ -370,7 +371,7 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
  *                                                                            *
  ******************************************************************************/
 static char *zbx_get_sensor_id(ipmi_sensor_t *sensor, char *id, int sz, int *id_sz, enum ipmi_str_type_e *id_type,
-		char *id_str, int id_str_sz )
+		char *id_str, int id_str_sz)
 {
 	*id_sz = ipmi_sensor_get_id_length(sensor);
 	memset(id, 0, (size_t)sz);
@@ -654,7 +655,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
 
-/*get sensor units full string*/
+/* get sensor units full string*/
 static char *zbx_get_ipmi_units(ipmi_sensor_t *sensor)
 {
 	const char	*base, *mod_use = "", *modifier = "", *rate;
@@ -846,10 +847,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Pass control to OpenIPMI library to process events                *
+ * Purpose: passes control to OpenIPMI library to process events              *
  *                                                                            *
  * Return value: SUCCEED - no errors                                          *
- *               FAIL - an error occurred while processing events             *
+ *               FAIL - error occurred while processing events                *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
@@ -881,7 +882,8 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Pass control to OpenIPMI library to process all internal events   *
+ * Purpose: passes control to OpenIPMI library to process all internal        *
+ *          events                                                            *
  *                                                                            *
  * Parameters: timeout - [IN] timeout (in seconds) for processing single      *
  *                            operation; processing multiple operations may   *
@@ -1036,6 +1038,7 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
+
 /* callback function invoked from OpenIPMI */
 static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *val, void *cb_data)
 {
@@ -1562,7 +1565,7 @@ out:
 	return h;
 }
 
-static ipmi_domain_id_t	domain_id;		/* global variable for passing OpenIPMI domain ID between callbacks */
+static ipmi_domain_id_t	domain_id;		/* Global variable for passing OpenIPMI domain ID between callbacks. */
 static int		domain_id_found;	/* A flag to indicate whether the 'domain_id' carries a valid value. */
 						/* Values: 0 - not found, 1 - found. The flag is used because we */
 						/* cannot set 'domain_id' to NULL. */
@@ -1677,13 +1680,13 @@ void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check if a string starts with one of predefined prefixes and      *
- *          set prefix length                                                 *
+ * Purpose: checks if string starts with one of predefined prefixes and set   *
+ *          prefix length                                                     *
  *                                                                            *
  * Parameters: str        - [IN] string to examine                            *
- *             prefix_len - [OUT] length of the prefix                        *
+ *             prefix_len - [OUT] length of prefix                            *
  *                                                                            *
- * Return value: 1 - the string starts with the name prefix,                  *
+ * Return value: 1 - string starts with name prefix,                          *
  *               0 - otherwise (no prefix or other prefix was found)          *
  *                                                                            *
  ******************************************************************************/
