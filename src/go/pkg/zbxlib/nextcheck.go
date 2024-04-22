@@ -37,7 +37,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 )
 
-func GetNextcheckSeconds(itemid uint64, delay string, from time.Time, prev time.Time) int {
+func GetNextcheckSeconds(itemid uint64, delay string, from time.Time) int {
 	nextcheck, _, nextcheck_err := GetNextcheck(itemid, delay, from)
 
 	if nextcheck_err != nil {

@@ -48,10 +48,9 @@ type Plugin struct {
 }
 
 type metadata struct {
-	key       string
-	params    []string
-	blob      unsafe.Pointer
-	lastcheck time.Time
+	key    string
+	params []string
+	blob   unsafe.Pointer
 }
 
 func init() {
@@ -119,11 +118,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
-	nextcheck := zbxlib.GetNextcheckSeconds(ctx.ItemID(), ctx.Delay(), now, data.lastcheck)
+	nextcheck := zbxlib.GetNextcheckSeconds(ctx.ItemID(), ctx.Delay(), now)
 	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, ctx.ItemID())
-	data.lastcheck = now
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))
