@@ -38,7 +38,7 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 
 		$db_images = DBfetchArray(DBselect('SELECT name FROM images WHERE imagetype=1 LIMIT 5'));
 		if (!$db_images) {
-			$this->zbxTestTextPresent('No data found.');
+			$this->zbxTestTextPresent('No data found');
 		}
 		else {
 			foreach ($db_images as $db_image) {

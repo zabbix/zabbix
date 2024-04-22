@@ -152,17 +152,16 @@ class testPageMonitoringLatestData extends CWebTest {
 			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
 		];
 
+		$table = $this->getTable();
 		foreach ($details_headers as $status => $headers) {
 			$this->query('name:show_details')->one()->asCheckbox()->set($status);
 			$form->submit();
-			$subfilter->waitUntilReloaded();
-			$this->assertEquals($headers, $this->getTable()->getHeadersText());
+			$table->waitUntilReloaded();
+			$this->assertEquals($headers, $table->getHeadersText());
 		}
 
 		// Check that sortable headers are clickable.
-		foreach (['Host', 'Name'] as $header) {
-			$this->assertTrue($this->getTable()->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
-		}
+		$this->assertEquals(['Host', 'Name'], $table->getSortableHeaders()->asText());
 
 		// Subfilter is not visible again after Reset.
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -646,24 +645,35 @@ class testPageMonitoringLatestData extends CWebTest {
 			)
 		];
 
-		$this->page->login()->open('zabbix.php?action=latest.view&state=0');
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		// TODO: should be fixed 'id:state_0' to filed label 'State'
+		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['id:state_0' => 'Normal']);
+		$table = $this->getTable();
+		$this->query('button:Apply')->one()->click();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		foreach ($result as $hosts) {
 			foreach ($hosts as $host) {
 				/*
 				 * Check if hostname is present on page, if not, go to next page.
-				 * Now there are 3 pages for unfiltered Latest data.
+				 * Now there are 2 pages for Latest data with state Normal.
 				 */
-				for ($i = 1; $i < 3; $i++) {
+				for ($i = 1; $i < 2; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
 					$this->query('class:arrow-right')->waitUntilClickable()->one()->click();
 					$this->page->waitUntilReady();
 				}
 
-				$this->query('button:Reset')->waitUntilClickable()->one()->click();
+				$this->query('class:table-paging')->query('link:1')->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
 			}
 		}
+
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 	}
 
 	public static function getItemDescription() {

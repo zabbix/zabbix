@@ -243,7 +243,7 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertTableDataColumn($data['expected']);
 		}
 		else {
-			// Check that 'No data found.' string is returned if no results are expected.
+			// Check that 'No data found' string is returned if no results are expected.
 			$this->assertTableData();
 		}
 

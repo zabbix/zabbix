@@ -197,7 +197,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
 		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
@@ -211,7 +212,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
-			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+			$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+			$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
