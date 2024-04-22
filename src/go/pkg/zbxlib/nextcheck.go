@@ -40,7 +40,7 @@ import (
 func GetNextcheckSeconds(itemid uint64, delay string, from time.Time, prev time.Time) int {
 	nextcheck, _, nextcheck_err := GetNextcheck(itemid, delay, from)
 
-	if nextcheck_err == nil {
+	if nextcheck_err != nil {
 		return 0
 	}
 
