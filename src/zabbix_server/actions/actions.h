@@ -43,7 +43,8 @@ ZBX_PTR_VECTOR_DECL(db_action_ptr, zbx_db_action*)
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task);
 
 int	check_action_condition(zbx_db_event *event, zbx_condition_t *condition);
-void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events);
+void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events,
+		zbx_vector_escalation_new_ptr_t *escalations);
 int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_tasks);
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_db_action_ptr_t *actions);
 void	free_db_action(zbx_db_action *action);

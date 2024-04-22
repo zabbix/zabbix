@@ -25,7 +25,7 @@ zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxdiscoverer/libzbxdiscoverer.a \
-	housekeeper/libzbxhousekeeper.a \
+	housekeeper/libzbxhousekeeper_proxy.a \
 	proxyconfig/libzbxproxyconfig.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
@@ -38,7 +38,7 @@ zabbix_proxy_LDADD = \
 	preproc/libpreproc_proxy.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
-	$(top_builddir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
+	$(top_builddir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
@@ -64,7 +64,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
-	stats/libzbxserver_proxy.a \
+	stats/libzbxstats_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
@@ -73,6 +73,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
 	$(top_builddir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
+	$(top_builddir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -115,6 +116,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
+	$(top_builddir)/src/libs/zbxinterface/libzbxinterface.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -137,7 +139,7 @@ zabbix_proxy_LDFLAGS = $(PROXY_LDFLAGS)
 
 zabbix_proxy_CFLAGS = \
 	-DDEFAULT_SSL_CERT_LOCATION="\"$(CURL_SSL_CERT_LOCATION)\"" \
-	-DDEFAULT_SSL_KEY_LOCATION="\"$(URL_SSL_KEY_LOCATION)\"" \
+	-DDEFAULT_SSL_KEY_LOCATION="\"$(CURL_SSL_KEY_LOCATION)\"" \
 	-DDEFAULT_CONFIG_FILE="\"$(PROXY_CONFIG_FILE)\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
 	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \

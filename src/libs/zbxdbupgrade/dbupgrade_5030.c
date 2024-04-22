@@ -3886,15 +3886,15 @@ static int	DBpatch_5030127(void)
 
 static int	DBpatch_5030128(void)
 {
-#define AUDIT_RESOURCE_APPLICATION	12
+#define ZBX_AUDIT_RESOURCE_APPLICATION	12
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > zbx_db_execute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
+	if (ZBX_DB_OK > zbx_db_execute("delete from auditlog where resourcetype=%d", ZBX_AUDIT_RESOURCE_APPLICATION))
 		return FAIL;
 
 	return SUCCEED;
-#undef AUDIT_RESOURCE_APPLICATION
+#undef ZBX_AUDIT_RESOURCE_APPLICATION
 }
 
 static int	DBpatch_5030129(void)

@@ -195,28 +195,6 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
-const char	*zbx_interface_type_string(zbx_interface_type_t type)
-{
-	switch (type)
-	{
-		case INTERFACE_TYPE_AGENT:
-			return "Zabbix agent";
-		case INTERFACE_TYPE_SNMP:
-			return "SNMP";
-		case INTERFACE_TYPE_IPMI:
-			return "IPMI";
-		case INTERFACE_TYPE_JMX:
-			return "JMX";
-		case INTERFACE_TYPE_OPT:
-			return "optional";
-		case INTERFACE_TYPE_ANY:
-			return "any";
-		case INTERFACE_TYPE_UNKNOWN:
-		default:
-			return "unknown";
-	}
-}
-
 const char	*zbx_sysinfo_ret_string(int ret)
 {
 	switch (ret)

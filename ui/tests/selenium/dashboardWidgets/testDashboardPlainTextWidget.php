@@ -648,7 +648,6 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$form->fill($data['fields']);
 		$values = $form->getValues();
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -660,9 +659,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+
+			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
 		}
 		else {
@@ -690,12 +691,17 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+				? '1 minute'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -710,17 +716,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 			}
 
 			$saved_form->checkValue($data['fields']);
-			$saved_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$dashboard->save();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
-				? '1 minute'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
-			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
 		}
 	}
 

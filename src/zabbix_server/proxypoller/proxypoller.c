@@ -19,8 +19,8 @@
 
 #include "proxypoller.h"
 
-#include "proxyconfigread/proxyconfig_read.h"
-#include "trapper/proxydata.h"
+#include "proxyconfigread/proxyconfigread.h"
+#include "trapper/trapper_server.h"
 #include "cachehistory/cachehistory_server.h"
 #include "discovery/discovery_server.h"
 #include "autoreg/autoreg_server.h"

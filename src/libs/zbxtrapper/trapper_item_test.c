@@ -36,6 +36,7 @@
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "trapper_preproc.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
 {
@@ -155,20 +156,40 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
 	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
-	struct zbx_json_parse		jp_interface, jp_host, jp_details, jp_script_params;
+	struct zbx_json_parse		jp_item, jp_host, jp_steps, jp_interface, jp_details, jp_script_params;
 	AGENT_RESULT			result;
 	int				errcode, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	// item JSON object presence is checked in the calling function
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+	{
+		char	*jp_data_contents = NULL;
+		size_t	offset = 0, alloc = 0;
+
+		zbx_strncpy_alloc(&jp_data_contents, &alloc, &offset,
+				jp_data->start, (size_t)(jp_data->end - jp_data->start + 1));
+		zabbix_log(LOG_LEVEL_WARNING, "unexpected absence of %s tag in item.test data: %s", ZBX_PROTO_TAG_ITEM,
+				jp_data_contents);
+		zbx_free(jp_data_contents);
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
+		jp_steps.end = jp_steps.start = NULL;
 
 	memset(&item, 0, sizeof(item));
 
 	if (NULL == table_items)
 		table_items = zbx_db_get_table("items");
 
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
-	item.key = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_");
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
+	item.key = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_KEY, table_items, "key_");
 
 	if (0 != proxyid && FAIL == zbx_is_item_processed_by_server(item.type, item.key))
 	{
@@ -177,28 +198,28 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		goto out;
 	}
 
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
 			&item.follow_redirects);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_POST_TYPE, table_items, "post_type", &item.post_type);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_RETRIEVE_MODE, table_items, "retrieve_mode", &item.retrieve_mode);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_REQUEST_METHOD, table_items, "request_method", &item.request_method);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_OUTPUT_FORMAT, table_items, "output_format", &item.output_format);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_PEER, table_items, "verify_peer", &item.verify_peer);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_POST_TYPE, table_items, "post_type", &item.post_type);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_RETRIEVE_MODE, table_items, "retrieve_mode", &item.retrieve_mode);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_REQUEST_METHOD, table_items, "request_method", &item.request_method);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_OUTPUT_FORMAT, table_items, "output_format", &item.output_format);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_VERIFY_PEER, table_items, "verify_peer", &item.verify_peer);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
 
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
 			sizeof(item.ipmi_sensor));
 
-	item.snmp_oid = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid");
-	item.params = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PARAMS, table_items, "params");
-	item.username = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_USERNAME, table_items, "username");
-	item.publickey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PUBLICKEY, table_items, "publickey");
-	item.privatekey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey");
-	item.password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PASSWORD, table_items, "password");
-	item.jmx_endpoint = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint");
+	item.snmp_oid = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid");
+	item.params = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PARAMS, table_items, "params");
+	item.username = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_USERNAME, table_items, "username");
+	item.publickey = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PUBLICKEY, table_items, "publickey");
+	item.privatekey = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey");
+	item.password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PASSWORD, table_items, "password");
+	item.jmx_endpoint = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint");
 
 	switch (item.type)
 	{
@@ -212,29 +233,29 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_HTTPAGENT:
-			db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
+			db_string_from_json(&jp_item, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
 					sizeof(item.timeout_orig));
 			break;
 	}
 
-	item.url = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_URL, table_items, "url");
-	item.query_fields = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields");
+	item.url = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_URL, table_items, "url");
+	item.query_fields = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields");
 
-	item.posts = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_POSTS, table_items, "posts");
+	item.posts = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_POSTS, table_items, "posts");
 
-	item.status_codes = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_STATUS_CODES, table_items, "status_codes");
-	item.http_proxy = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_PROXY, table_items, "http_proxy");
+	item.status_codes = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_STATUS_CODES, table_items, "status_codes");
+	item.http_proxy = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_HTTP_PROXY, table_items, "http_proxy");
 
-	item.headers = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
+	item.headers = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
 
-	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items,
+	item.ssl_cert_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items,
 			"ssl_cert_file");
-	item.ssl_key_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
-	item.ssl_key_password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
+	item.ssl_key_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
+	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
 
 	if (ITEM_TYPE_SCRIPT == item.type &&
-			SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
+			SUCCEED == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
 	{
 		item.script_params = zbx_dsprintf(NULL, "%.*s",
 				(int)(jp_script_params.end - jp_script_params.start + 1), jp_script_params.start);
@@ -245,7 +266,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	if (NULL == table_interface)
 		table_interface = zbx_db_get_table("interface");
 
-	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
+	if (FAIL == zbx_json_brackets_by_name(&jp_host, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
 		zbx_json_open("{}", &jp_interface);
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_INTERFACE_ID, tmp, sizeof(tmp), NULL))
@@ -310,9 +331,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	if (NULL == table_hosts)
 		table_hosts = zbx_db_get_table("hosts");
 
-	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
-		zbx_json_open("{}", &jp_host);
-
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item.host.host, sizeof(item.host.host));
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
@@ -324,10 +342,17 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			&item.host.maintenance_status);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
 			&item.host.maintenance_type);
+
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
-		item.host.ipmi_authtype = (char)atoi(tmp);
+	{
+		item.host.ipmi_authtype = (signed char)atoi(tmp);
+	}
 	else
-		item.host.ipmi_authtype = (char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+	{
+		item.host.ipmi_authtype =
+				(signed char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+	}
+
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
 			&item.host.ipmi_privilege);
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
@@ -461,43 +486,88 @@ out:
 	return ret;
 }
 
-void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
-		int config_java_gateway_port, const char *config_externalscripts,
-		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
+static int	try_find_preproc_value(const struct zbx_json_parse *jp_first, const char *name_first,
+		const struct zbx_json_parse *jp_second, const char *name_second, char **value, size_t *value_size)
+{
+	int	ret = zbx_json_value_by_name_dyn(jp_first, name_first, value, value_size, NULL);
+
+	if (FAIL == ret)
+		ret = zbx_json_value_by_name_dyn(jp_second, name_second, value, value_size, NULL);
+
+	return ret;
+}
+
+static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time, unsigned char program_type, const char *progname,
+		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
+		const char *config_ssh_key_location, struct zbx_json *json, char **error)
 {
 	zbx_user_t		user;
-	struct zbx_json_parse	jp_data;
-	struct zbx_json		json;
-	char			tmp[MAX_ID_LEN + 1];
+	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
+	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN], *key = NULL;
 	zbx_uint64_t		proxyid;
-	int			ret;
-	char			*info;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	int			ret = FAIL, state = 0, value_found;
+	size_t			value_size = 0, key_size = 0;
 
 	zbx_user_init(&user);
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
-		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
+		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		char	*error;
-
-		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
-		zbx_send_response(sock, FAIL, error, config_comms->config_timeout);
-		zbx_free(error);
+		*error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
 		goto out;
 	}
 
-	zbx_json_init(&json, 1024);
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+	{
+		*error = zbx_strdup(NULL, "Missing item field.");
+		goto out;
+	}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_OPTIONS, &jp_options))
+		zbx_json_open("{}", &jp_options);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
+		jp_steps.end = jp_steps.start = NULL;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
+		state = atoi(buffer);
+
+	if (ZBX_STATE_NOT_SUPPORTED == state)
+	{
+		value_found = try_find_preproc_value(&jp_options, ZBX_PROTO_TAG_RUNTIME_ERROR, &jp_item,
+				ZBX_PROTO_TAG_VALUE, &value, &value_size);
+	}
+	else
+	{
+		value_found = try_find_preproc_value(&jp_item, ZBX_PROTO_TAG_VALUE, &jp_options,
+				ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size);
+	}
+
+	if (FAIL == value_found)
+	{
+		// Get value from host is not checked, yet no value was provided
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_KEY, &key, &key_size, NULL))
+		{
+			*error = zbx_strdup(NULL, "Value was not provided for the preprocessing test.");
+			goto out;
+		}
+
+		zbx_free(key);
+	}
+	else
+		goto preproc_test;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
 	else
 		proxyid = 0;
@@ -506,17 +576,79 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location);
 
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-	zbx_json_addstring(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
-			ZBX_JSON_TYPE_STRING);
-	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout);
+	if (FAIL == ret)
+		state = ZBX_STATE_NOT_SUPPORTED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json->buffer);
 
-	zbx_free(info);
-	zbx_json_free(&json);
+preproc_test:
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
+
+	if (NULL != info)
+	{
+		size_t	original_size;
+
+		zbx_json_addobject(json, ZBX_PROTO_TAG_ITEM);
+		original_size = zbx_json_addstring_limit(json,
+				SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info, ZBX_JSON_TYPE_STRING,
+				ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+		{
+			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+		}
+
+		zbx_json_addstring(json, ZBX_PROTO_TAG_EOL, NULL != strstr(info, "\r\n") ? "CRLF" : "LF",
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(json);
+
+		value = zbx_strdup(NULL, info);
+		value_size = strlen(value);
+	}
+
+	zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
+	ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, state, json, error);
+	zbx_json_close(json);
 out:
+	zbx_free(value);
+	zbx_free(info);
 	zbx_user_free(&user);
+
+	return ret;
+}
+
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
+{
+	struct zbx_json	json;
+	int		ret;
+	char		*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_json_init(&json, 1024);
+
+	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
+			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
+			get_value_internal_ext_cb, config_ssh_key_location, &json, &error)))
+	{
+		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout))
+			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test response", __func__);
+	}
+	else
+	{
+		if (SUCCEED != zbx_send_response(sock, ret, error, config_comms->config_timeout))
+			zabbix_log(LOG_LEVEL_TRACE, "%s() failed sending item.test error response", __func__);
+
+		zbx_free(error);
+	}
+
+	zbx_json_free(&json);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
