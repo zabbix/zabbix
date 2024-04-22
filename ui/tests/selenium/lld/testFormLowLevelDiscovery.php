@@ -518,14 +518,14 @@ class testFormLowLevelDiscovery extends CWebTest {
 						$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
 					}
 
+					// Check Timeouts link.
+					$this->assertTrue($form->query('link:Timeouts')->one()->isClickable());
+
 					$lifetime_array = [
 						'Never' => ['enabled' => true, 'visible' => false],
 						'Immediately' => ['enabled' => true, 'visible' => false],
 						'After' => ['enabled' => true, 'visible' => true]
 					];
-
-					// Check Timeouts link.
-					$this->assertTrue($form->query('link:Timeouts')->one()->isClickable());
 
 					// Delete lost resources input dependency.
 					foreach ($lifetime_array as $lifetime => $status) {
