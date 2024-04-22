@@ -117,8 +117,7 @@ zbx_ipmi_manager_t;
 static zbx_hash_t	poller_hash_func(const void *d)
 {
 	const zbx_ipmi_poller_t	*poller = *(const zbx_ipmi_poller_t **)d;
-
-	zbx_hash_t hash =  ZBX_DEFAULT_PTR_HASH_FUNC(&poller->client);
+	zbx_hash_t		hash = ZBX_DEFAULT_PTR_HASH_FUNC(&poller->client);
 
 	return hash;
 }
@@ -129,6 +128,7 @@ static int	poller_compare_func(const void *d1, const void *d2)
 	const zbx_ipmi_poller_t	*p2 = *(const zbx_ipmi_poller_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->client, p2->client);
+
 	return 0;
 }
 
@@ -187,9 +187,9 @@ static int	ipmi_request_compare(const void *d1, const void *d2)
 static zbx_ipmi_request_t	*ipmi_request_create(zbx_uint64_t hostid)
 {
 	static zbx_uint64_t	next_requestid = 1;
-	zbx_ipmi_request_t	*request;
 
-	request = (zbx_ipmi_request_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_request_t));
+	zbx_ipmi_request_t	*request = (zbx_ipmi_request_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_request_t));
+
 	memset(request, 0, sizeof(zbx_ipmi_request_t));
 	request->requestid = next_requestid++;
 	request->hostid = hostid;
@@ -290,8 +290,6 @@ static void	ipmi_poller_free_request(zbx_ipmi_poller_t *poller)
  ******************************************************************************/
 static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_f get_config_forks)
 {
-	int			i;
-	zbx_ipmi_poller_t	*poller;
 	zbx_binary_heap_elem_t	elem = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER));
@@ -302,9 +300,9 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_
 
 	manager->next_poller_index = 0;
 
-	for (i = 0; i < get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER); i++)
+	for (int i = 0; i < get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER); i++)
 	{
-		poller = (zbx_ipmi_poller_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_poller_t));
+		zbx_ipmi_poller_t	*poller = (zbx_ipmi_poller_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_poller_t));
 
 		poller->client = NULL;
 		poller->request = NULL;
@@ -333,15 +331,11 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager, zbx_get_config_forks_
  *             get_config_forks - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,
-		zbx_get_config_forks_f get_config_forks)
+static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now, zbx_get_config_forks_f get_config_forks)
 {
 #define ZBX_IPMI_MANAGER_HOST_TTL		SEC_PER_DAY
-
 	zbx_hashset_iter_t	iter;
 	zbx_ipmi_manager_host_t	*host;
-	zbx_ipmi_poller_t	*poller;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER));
 
@@ -355,9 +349,9 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now,
 		}
 	}
 
-	for (i = 0; i < manager->pollers.values_num; i++)
+	for (int i = 0; i < manager->pollers.values_num; i++)
 	{
-		poller = manager->pollers.values[i];
+		zbx_ipmi_poller_t	*poller = manager->pollers.values[i];
 
 		if (NULL != poller->client)
 			zbx_ipc_client_send(poller->client, ZBX_IPC_IPMI_CLEANUP_REQUEST, NULL, 0);
@@ -667,9 +661,8 @@ static void	ipmi_manager_serialize_request(const zbx_dc_item_t *item, zbx_ipc_me
 static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint64_t hostid,
 		zbx_ipmi_request_t *request, int now)
 {
-	zbx_ipmi_manager_host_t	*host;
+	zbx_ipmi_manager_host_t	*host = ipmi_manager_cache_host(manager, hostid, now);
 
-	host = ipmi_manager_cache_host(manager, hostid, now);
 	ipmi_poller_schedule_request(host->poller, request);
 }
 
@@ -689,18 +682,18 @@ static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint6
  *********************************************************************************/
 static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, int config_timeout, int *nextcheck)
 {
-	int			i, num;
+	int			num;
 	zbx_dc_item_t		items[ZBX_MAX_POLLER_ITEMS];
-	zbx_ipmi_request_t	*request;
-	char			*error = NULL;
 
 	num = zbx_dc_config_get_ipmi_poller_items(now, ZBX_MAX_POLLER_ITEMS, config_timeout, items, nextcheck);
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
-		zbx_timespec_t	ts;
-		unsigned char	state = ITEM_STATE_NOTSUPPORTED;
-		int		errcode = CONFIG_ERROR;
+		zbx_timespec_t		ts;
+		unsigned char		state = ITEM_STATE_NOTSUPPORTED;
+		int			errcode = CONFIG_ERROR;
+		zbx_ipmi_request_t	*request;
+		char			*error = NULL;
 
 		if (FAIL == zbx_ipmi_port_expand_macros(items[i].host.hostid, items[i].interface.port_orig,
 				&items[i].interface.port, &error))

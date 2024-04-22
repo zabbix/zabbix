@@ -39,9 +39,7 @@
  ******************************************************************************/
 static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
 {
-	pid_t	ppid;
-
-	ppid = getppid();
+	pid_t	ppid = getppid();
 
 	zbx_ipc_async_socket_send(socket, ZBX_IPC_IPMI_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 }
