@@ -206,6 +206,7 @@ class testFormSetup extends CWebTest {
 			$vaults = [
 				'HashiCorp Vault' => [
 					'Vault API endpoint' => 'https://localhost:8200',
+					'Vault prefix' => '/v1/secret/data/',
 					'Vault secret path' => 'path/to/secret',
 					'Vault authentication token' => ''
 				],
