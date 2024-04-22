@@ -1666,6 +1666,8 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 			metric->error_count = 0;
 
 			zbx_free(error);
+
+			continue;
 		}
 
 		/* for meta information update we need to know if something was sent at all during the check */
