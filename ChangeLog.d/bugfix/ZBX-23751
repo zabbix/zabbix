@@ -1,1 +1,1 @@
-A......... [ZBX-23751] fixed missing defaults for Action object's operation condition operator and filter condition operator (jfreibergs)
+A......... [ZBX-23751] fixed inability to pass an action filter condition without an "operator" property, implying a default value of "Equal" (jfreibergs)

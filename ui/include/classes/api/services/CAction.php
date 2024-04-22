@@ -2204,11 +2204,10 @@ class CAction extends CApiService {
 	 * @param int  $eventsource  Action event source. Possible values:
 	 *                           EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 	 *                           EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-	 * @param bool $update       (optional) Adjust rules for create (false, default) and update (true) flows.
 	 *
 	 * @return array
 	 */
-	private static function getFilterValidationRules(int $eventsource, bool $update = false): array {
+	private static function getFilterValidationRules(int $eventsource): array {
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
 				$value_rules = [
@@ -2224,10 +2223,10 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TEMPLATE], 'type' => API_INT32,'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TEMPLATE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_NAME))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER_SEVERITY))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TIME_PERIOD))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SUPPRESSED))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TIME_PERIOD))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SUPPRESSED))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
@@ -2249,7 +2248,7 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSERVICE_TYPE))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSERVICE_PORT))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSTATUS))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DUPTIME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DUPTIME))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DVALUE))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DRULE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DRULE))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DCHECK], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DCHECK))],
@@ -2265,8 +2264,8 @@ class CAction extends CApiService {
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_PROXY))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_NAME))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_METADATA))]
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_METADATA))]
 				];
 				break;
 
@@ -2295,7 +2294,7 @@ class CAction extends CApiService {
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE_NAME))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
@@ -2304,7 +2303,7 @@ class CAction extends CApiService {
 
 		$condition_fields = [
 			'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::VALID_CONDITION_TYPES[$eventsource])],
-			'operator' =>		['type' => API_MULTIPLE, 'rules' => $operator_rules] + ($update ? [] : ['default' => CONDITION_OPERATOR_EQUAL]),
+			'operator' =>		['type' => API_MULTIPLE, 'rules' => $operator_rules],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => $value_rules],
 			'value2' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value2')],
@@ -2335,11 +2334,10 @@ class CAction extends CApiService {
 	 * @param int  $eventsource  Action event source. Possible values:
 	 *                           EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 	 *                           EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-	 * @param bool $update       (optional) Adjust rules for create (false, default) and update (true) flows.
 	 *
 	 * @return array
 	 */
-	private static function getOperationValidationRules(int $recovery, int $eventsource, bool $update = false): array {
+	private static function getOperationValidationRules(int $recovery, int $eventsource): array {
 		$escalation_fields = [
 			'esc_period' =>		['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('operations', 'esc_period')],
 			'esc_step_from' =>	['type' => API_INT32, 'in' => '1:99999'],
@@ -2413,7 +2411,7 @@ class CAction extends CApiService {
 							'opconditions' =>	['type' => API_OBJECTS, 'uniq' => [['value']], 'fields' => [
 								'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => CONDITION_TYPE_EVENT_ACKNOWLEDGED],
 								'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]), 'length' => DB::getFieldLength('opconditions', 'value')],
-								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL] + ($update ? [] : ['default' => CONDITION_OPERATOR_EQUAL])
+								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
 							]]
 						] + $common_fields;
 
@@ -2588,28 +2586,28 @@ class CAction extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'filter' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_TRIGGERS, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_DISCOVERY, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_AUTOREGISTRATION, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_INTERNAL, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_SERVICE, true)]
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_DISCOVERY)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_AUTOREGISTRATION)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_SERVICE)]
 			]],
 			'operations' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_TRIGGERS, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_DISCOVERY, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_AUTOREGISTRATION, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_INTERNAL, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_SERVICE, true)]
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_DISCOVERY)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_AUTOREGISTRATION)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_SERVICE)]
 			]],
 			'recovery_operations' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_TRIGGERS, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_INTERNAL, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_SERVICE, true)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_SERVICE)],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'update_operations' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_TRIGGERS, true)],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_SERVICE, true)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_SERVICE)],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'notify_if_canceled' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -2729,7 +2727,8 @@ class CAction extends CApiService {
 						}
 					}
 					elseif ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
-						if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
+						if (!array_key_exists('operator', $condition)
+								|| $condition['operator'] == CONDITION_OPERATOR_EQUAL
 								|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
 							continue;
 						}
