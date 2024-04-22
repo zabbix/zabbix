@@ -345,6 +345,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	int		zbx_optind = 0;
 
 	t->task = ZBX_TASK_START;
+#ifdef _WINDOWS
+	t->flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART;
+#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -416,7 +419,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					goto out;
 				}
 
-				t->task = ZBX_TASK_SET_SERVICE_STARTUP_TYPE;
+				if (ZBX_TASK_INSTALL_SERVICE != t->task)
+					t->task = ZBX_TASK_SET_SERVICE_STARTUP_TYPE;
 				break;
 #endif
 			default:
@@ -485,11 +489,13 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* -  T  -  -  -  -  -  -  -	0x080	*/
 	/* -  -  p  -  -  -  -  -  -	0x040	*/
 	/* -  -  -  t  -  -  -  -  -	0x020	*/
+	/* S  -  -  -  i  -  -  -  -	0x110	*/
 	/* -  -  -  -  i  -  -  -  -	0x010	*/
 	/* -  -  -  -  -  d  -  -  -	0x008	*/
 	/* -  -  -  -  -  -  s  -  -	0x004	*/
 	/* -  -  -  -  -  -  -  x  -	0x002	*/
 	/* S  -  -  -  -  -  -  -  m	0x101	*/
+	/* S  -  -  -  i  -  -  -  m	0x111	*/
 	/* -  -  -  -  i  -  -  -  m	0x011	*/
 	/* -  -  -  -  -  d  -  -  m	0x009	*/
 	/* -  -  -  -  -  -  s  -  m	0x005	*/
@@ -532,6 +538,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 0x80:
 		case 0x100:
 		case 0x101:
+		case 0x110:
+		case 0x111:
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
@@ -1118,7 +1126,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 	switch (t->task)
 	{
 		case ZBX_TASK_INSTALL_SERVICE:
-			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, config_file);
+			ret = ZabbixCreateService(name, config_file, t->flags);
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
 			ret = ZabbixRemoveService();

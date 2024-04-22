@@ -209,8 +209,8 @@ static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_ful
 	zbx_free(wpath);
 }
 
-static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t *cmdLine, size_t max_cmdLine,
-		const char *config_file)
+static void	svc_get_command_line(const char *path, unsigned int multiple_agents, wchar_t *cmdLine,
+		size_t max_cmdLine, const char *config_file)
 {
 	wchar_t	path1[MAX_PATH], path2[MAX_PATH];
 
@@ -263,24 +263,88 @@ static int	svc_install_event_source(const char *path)
 	return SUCCEED;
 }
 
-int	ZabbixCreateService(const char *path, int multiple_agents, const char *config_file)
+static DWORD	svc_start_type_get(unsigned int flags) {
+	if (0 == (flags & ZBX_TASK_FLAG_SERVICE_ENABLED))
+		return SERVICE_DISABLED;
+
+	if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART))
+		return SERVICE_AUTO_START;
+	else
+		return SERVICE_DEMAND_START;
+}
+
+static int	svc_delayed_autostart_config(SC_HANDLE service, unsigned int flags)
+{
+	const OSVERSIONINFOEX		*vi;
+	SERVICE_DELAYED_AUTO_START_INFO	scdasi;
+
+	scdasi.fDelayedAutostart = (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED) ? TRUE : FALSE);
+
+	/* SERVICE_CONFIG_DELAYED_AUTO_START_INFO is supported on Windows Server 2008/Vista and onwards */
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		if (TRUE == scdasi.fDelayedAutostart)
+		{
+			zbx_error("cannot retrieve system version to check if delayed auto-start can be configured");
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		if (TRUE == scdasi.fDelayedAutostart)
+		{
+			zbx_error("delayed auto-start can be configured on Windows Server 2008/Vista and onwards");
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	if (0 == ChangeServiceConfig2(service, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, &scdasi))
+	{
+		zbx_error("failed to configure service delayed auto-start %s: %s",
+				(TRUE == scdasi.fDelayedAutostart ? "TRUE" : "FALSE"),
+				zbx_strerror_from_system(GetLastError()));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: creates and installs Zabbix agent Windows service                 *
+ *                                                                            *
+ * Parameters: path        - [IN] path to Zabbix agent 2 binary file          *
+ *             config_file - [IN] path to Zabbix agent 2 config file          *
+ *             flags       - [IN] flags defined by command line options       *
+ *                                                                            *
+ * Return value: SUCCEED - installed and mandatory configuration set          *
+ *               FAIL    - failed to install or configure service             *
+ *                                                                            *
+ ******************************************************************************/
+int	ZabbixCreateService(const char *path, const char *config_file, unsigned int flags)
 {
 	SC_HANDLE		mgr, service;
 	SERVICE_DESCRIPTION	sd;
 	wchar_t			cmdLine[MAX_PATH];
 	wchar_t			*wservice_name;
-	DWORD			code;
-	int			ret = FAIL;
+	DWORD			code, dwStartType;
+	int			ret = SUCCEED;
 
 	if (FAIL == svc_OpenSCManager(&mgr))
-		return ret;
+		return FAIL;
 
-	svc_get_command_line(path, multiple_agents, cmdLine, MAX_PATH, config_file);
+	svc_get_command_line(path, flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, cmdLine, MAX_PATH, config_file);
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
+	dwStartType = svc_start_type_get(flags);
 
 	if (NULL == (service = CreateService(mgr, wservice_name, wservice_name, GENERIC_READ, SERVICE_WIN32_OWN_PROCESS,
-			SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, cmdLine, NULL, NULL, NULL, NULL, NULL)))
+			dwStartType, SERVICE_ERROR_NORMAL, cmdLine, NULL, NULL, NULL, NULL, NULL)))
 	{
 		if (ERROR_SERVICE_EXISTS == (code = GetLastError()))
 			zbx_error("ERROR: service [%s] already exists", ZABBIX_SERVICE_NAME);
@@ -289,12 +353,13 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 			zbx_error("ERROR: cannot create service [%s]: %s", ZABBIX_SERVICE_NAME,
 					zbx_strerror_from_system(code));
 		}
+
+		ret = FAIL;
 	}
 	else
 	{
 		zbx_error("service [%s] installed successfully", ZABBIX_SERVICE_NAME);
 		CloseServiceHandle(service);
-		ret = SUCCEED;
 
 		/* update the service description */
 		if (SUCCEED == svc_OpenService(mgr, &service, SERVICE_CHANGE_CONFIG))
@@ -305,6 +370,10 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 				zbx_error("service description update failed: %s",
 						zbx_strerror_from_system(GetLastError()));
 			}
+
+			if (SERVICE_AUTO_START == dwStartType)
+				ret = svc_delayed_autostart_config(service, flags);
+
 			CloseServiceHandle(service);
 		}
 	}
@@ -461,15 +530,7 @@ int	zbx_service_startup_type_change(unsigned int flags)
 		goto close_mgr;
 	}
 
-	if (0 != (flags & ZBX_TASK_FLAG_SERVICE_ENABLED))
-	{
-		if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART))
-			dwStartType = SERVICE_AUTO_START;
-		else
-			dwStartType = SERVICE_DEMAND_START;
-	}
-	else
-		dwStartType = SERVICE_DISABLED;
+	dwStartType = svc_start_type_get(flags);
 
 	if (0 == ChangeServiceConfig(service, SERVICE_NO_CHANGE, dwStartType, SERVICE_NO_CHANGE, NULL, NULL,
 			NULL, NULL, NULL, NULL, NULL))
@@ -481,43 +542,7 @@ int	zbx_service_startup_type_change(unsigned int flags)
 	}
 
 	if (SERVICE_AUTO_START == dwStartType)
-	{
-		const OSVERSIONINFOEX		*vi;
-		SERVICE_DELAYED_AUTO_START_INFO	scdasi;
-
-		/* SERVICE_DELAYED_AUTO_START_INFO is available on Windows Server 2008/Vista and onwards */
-		if (NULL == (vi = zbx_win_getversion()))
-		{
-			if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED))
-			{
-				zbx_error("cannot retrieve system version to check if delayed auto-start can be"
-						" configured");
-				ret = FAIL;
-			}
-			goto close_service;
-		}
-
-		if (6 > vi->dwMajorVersion)
-		{
-			if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED))
-			{
-				zbx_error("delayed auto-start can be configured on Windows Server 2008/Vista and"
-						" onwards");
-				ret = FAIL;
-			}
-			goto close_service;
-		}
-
-		scdasi.fDelayedAutostart = (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED) ? TRUE : FALSE);
-
-		if (0 == ChangeServiceConfig2(service, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, &scdasi))
-		{
-			zbx_error("failed to set service delayed auto-start flag to %s: %s",
-					(TRUE == scdasi.fDelayedAutostart ? "TRUE" : "FALSE"),
-					zbx_strerror_from_system(GetLastError()));
-			ret = FAIL;
-		}
-	}
+		ret = svc_delayed_autostart_config(service, flags);
 close_service:
 	CloseServiceHandle(service);
 close_mgr:
@@ -548,6 +573,9 @@ void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
  *                                                                            *
  ******************************************************************************/
 int	zbx_service_startup_flags_set(const char *optarg, unsigned int *flags) {
+	*flags &= ~(ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART |
+			ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED);
+
 	if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_AUTOMATIC))
 		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART;
 	else if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_DELAYED))

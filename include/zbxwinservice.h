@@ -35,7 +35,7 @@ typedef void	(*zbx_on_exit_t)(int);
 
 void	zbx_service_start(int flags);
 
-int	ZabbixCreateService(const char *path, int multiple_agents, const char *config_file);
+int	ZabbixCreateService(const char *path, const char *config_file, unsigned int flags);
 int	ZabbixRemoveService(void);
 int	ZabbixStartService(void);
 int	ZabbixStopService(void);
