@@ -163,7 +163,7 @@ class CControllerItemList extends CControllerItem {
 		$result = [];
 
 		foreach ($data as $key => $subfilter) {
-			if (!empty($subfilter['selected'])) {
+			if ($subfilter['selected']) {
 				$result[$key] = array_keys($subfilter['selected']);
 			}
 		}
