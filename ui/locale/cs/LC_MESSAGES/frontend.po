@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-09 20:28+0000\n"
+"PO-Revision-Date: 2024-04-03 19:54+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -83,6 +83,11 @@ msgstr[2] "%1$d dní"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%1$d spojení pro %2$s bylo nalezeno"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -457,6 +462,10 @@ msgstr "ALARM ČASOVAČ"
 #: app/views/administration.user.list.php:137
 msgid "API access"
 msgstr "API přístup"
+
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr "Název hostitele API"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1131,6 +1140,17 @@ msgstr "Rozšířené štítky"
 msgid "Advanced options"
 msgstr "Pokročilá konfigurace"
 
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr "Po"
+
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
+msgstr "Po této změně budou muset uživatelé, kteří si již metody MFA nastavili, dokončit proces registrace znovu, protože klíče TOTP budou resetovány."
+
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
@@ -1591,6 +1611,10 @@ msgstr "V (hodina:minuta)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Musí existovat alespoň jeden server LDAP."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr "Musí existovat alespoň jedna metoda MFA."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2119,6 +2143,18 @@ msgstr "Procento využití CPU. Vrací desetinné číslo"
 msgid "CRLF"
 msgstr "CRLF"
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr "CSRF test"
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr "Test CSRF tokenu"
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr "Ověření CSRF tokenu bylo úspěšné."
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr "CSV na JSON"
@@ -2567,6 +2603,11 @@ msgstr[0] "Nelze smazat API token"
 msgstr[1] "Nelze smazat API tokeny"
 msgstr[2] "Nelze smazat API tokeny"
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr "Metodu MFA \"%1$s\" nelze smazat, protože ji používá skupina uživatelů \"%2$s\"."
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2605,6 +2646,10 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "Dashboard nelze odstranit"
 msgstr[1] "Dashboardy nelze odstranit"
 msgstr[2] "Dashboardy nelze odstranit"
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr "Nelze odstranit výchozí metodu MFA."
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3692,6 +3737,13 @@ msgstr "Nelze odebrat tag se jménem \"%1$s\" a hodnotou \"%2$s\" definovaný v 
 msgid "Cannot rename guest user."
 msgstr "Není možné přejmenovat uživatele guest."
 
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] "Tajný klíč TOTP nelze resetovat"
+msgstr[1] "Tajné klíče TOTP nelze resetovat"
+msgstr[2] "Tajné klíče TOTP nelze resetovat"
+
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
 msgid "Cannot save discovery rule without checks."
@@ -4253,6 +4305,10 @@ msgstr "Nahradit"
 msgid "Change PSK"
 msgstr "Změňte PSK"
 
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr "Změnit tajný klíč klienta"
+
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
 #: widgets/item/includes/WidgetForm.php:252
@@ -4464,6 +4520,14 @@ msgstr "Kliknout a roztáhnout do požadované velikosti."
 msgid "Click to view or edit"
 msgstr "Kliknout pro zobrazení či úpravu"
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr "ID klienta"
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr "Tajný klíč klienta"
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "Hodiny"
@@ -4548,6 +4612,10 @@ msgstr "Zavřít problém"
 msgid "Close problems"
 msgstr "Zavřete problémy"
 
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr "Délka kódu"
+
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -4591,6 +4659,10 @@ msgstr "Barva „%1$s“ není správná: očekává se hexadecimální kód bar
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "Barva (OK)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr "Barevná interpolace"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5631,6 +5703,12 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "Jméno DNS"
 
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr "Univerzální výzva DUO"
+
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/maintenance.timeperiod.edit.php:80 app/views/popup.sla.edit.php:75
@@ -5997,6 +6075,10 @@ msgstr "Výchozí (%1$s)"
 msgid "Default LDAP server must be specified."
 msgstr "Výchozí LDAP server musí být specifikován."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
+msgstr "Musí být zadána výchozí metoda MFA."
+
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
 msgstr "Výchozí přístup k novým UI prvkům"
@@ -6182,6 +6264,11 @@ msgstr "Smazat položku?"
 #: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "Smazat propojení mezi označenými elementy?"
+
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr "Odstranit ztracené zdroje"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6712,6 +6799,11 @@ msgstr "Zakázat hostitele sledované přes vybrané proxy?"
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Zakázat hosty sledované přes vybrané proxy?"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr "Zakázat ztracené zdroje"
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6872,6 +6964,14 @@ msgstr "Zakázat označené scénáře?"
 #: include/views/js/monitoring.sysmaps.js.php:285
 msgid "Disabled"
 msgstr "Zakázáno"
+
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr "Automaticky zakázáno LLD pravidlem."
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -7099,6 +7199,10 @@ msgstr "Zobrazovat spouštěče v stavu OK po dobu"
 msgid "Display graph"
 msgstr "Zobrazit graf"
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr "Zobrazit min/avg/max"
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr "Zobrazení min/max/prům"
@@ -7253,6 +7357,16 @@ msgstr "Rozbalovací nabídka"
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
 msgstr "Možnosti rozbalovací nabídky"
+
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
+msgstr "Stav Duo neodpovídá uloženému stavu."
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7528,6 +7642,10 @@ msgstr "Povolit hosty monitorované vybranými proxy?"
 msgid "Enable internal housekeeping"
 msgstr "Povolit interní údržbu"
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr "Povolit vícefaktorové ověřování"
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7768,6 +7886,10 @@ msgstr "Rozpočet chyb"
 msgctxt "compact table header"
 msgid "Error budget"
 msgstr "Rozpočet chyb"
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
+msgstr "Chyba při dekódování výsledku Duo."
 
 #: include/db.inc.php:554
 #, c-format
@@ -8548,7 +8670,7 @@ msgstr "Povolit frontend zprávy"
 #: app/views/administration.user.edit.php:731
 #: app/views/administration.user.edit.php:826
 msgid "Frontend notifications"
-msgstr ""
+msgstr "Notifikace frontendu"
 
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
@@ -8649,6 +8771,18 @@ msgstr "Globální"
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Globální regulární výraz \"%1$s\" neexistuje."
+
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -8933,6 +9067,12 @@ msgstr "Skupina \"%1$s\" pro hosta \"%2$s\" neexistuje."
 msgid "Group base DN"
 msgstr "Základní skupina DN"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr "Konfigurace skupiny"
@@ -9045,6 +9185,10 @@ msgstr "Hardware (podrobně)"
 #: include/classes/data/CItemData.php:1313
 msgid "Hardware sensor reading. Returns float"
 msgstr "Čtení hardwarového senzoru. Vrátí desetinné číslo"
+
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
+msgstr "Hashovací funkce"
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -9207,6 +9351,10 @@ msgstr "Funkce historie"
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Domů"
+
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr "Honeycomb"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9516,6 +9664,10 @@ msgstr "Metadata hosta"
 msgid "Host name"
 msgstr "Název hosta"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Sítě hosta"
@@ -9593,6 +9745,10 @@ msgstr "Prototypy hostů"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Router hosta"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -11167,6 +11323,11 @@ msgstr "Neplatné LDAT JIT poskytování v konfiguraci pro mapování uživatels
 msgid "Invalid LDAP configuration"
 msgstr "Neplatná konfigurace LDAP"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr "Neplatná konfigurace MFA"
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Neplatné SAML JIT poskytování v konfiguraci pro mapování media typů."
@@ -11681,6 +11842,10 @@ msgstr "Položka je v \"not supported\" stavu"
 msgid "Item list"
 msgstr "Seznam položek"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Položka nevybraná"
@@ -11959,6 +12124,10 @@ msgstr "Server LDAP"
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP autentizace"
+
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr "Ověřování pomocí LDAP je v celém systému zakázáno."
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12417,7 +12586,7 @@ msgstr "Log"
 
 #: app/views/administration.audit.settings.edit.php:50
 msgid "Log changes by low-level discovery, network discovery and autoregistration"
-msgstr ""
+msgstr "Zaznamenávat změny pomocí nízkoúrovňového zjišťování, zjišťování sítě a automatické registrace"
 
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
@@ -12429,7 +12598,7 @@ msgstr "Log monitoring. Vrátí log"
 
 #: app/views/administration.audit.settings.edit.php:49
 msgid "Log system actions"
-msgstr ""
+msgstr "Zaznamenat systémové akce"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12526,6 +12695,19 @@ msgstr "MD2"
 #: include/classes/data/CItemData.php:1639
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 kontrolní součet souboru. Vráti řetězec (MD5 hash souboru)"
+
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr "metoda MFA"
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr "Metoda MFA \"%1$s\" již existuje."
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr "Nastavení MFA"
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -12929,6 +13111,10 @@ msgstr "Maximální úroveň přiblížení"
 msgid "Maximum concurrent checks"
 msgstr "Maximální souběžné kontroly"
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr "Maximální počet souběžných kontrol dle typu"
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Maximální počet otevřených souborů podporovaný OS. Vráti celé číslo"
@@ -12936,6 +13122,11 @@ msgstr "Maximální počet otevřených souborů podporovaný OS. Vráti celé �
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Maximální počet procesů podporovaný OS. Vráti celé číslo"
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
+msgstr "Maximální počet řádků"
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13190,6 +13381,10 @@ msgstr "Zprávy"
 #: include/classes/core/CJsonRpc.php:210
 msgid "Method not found."
 msgstr "Metoda nenalezena."
+
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
+msgstr "Metody"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13464,6 +13659,23 @@ msgstr "Nejkritičtější z podřízených službeb"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr "Vícefaktorový tajný klíč TOTP bude smazán."
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr "Vícefaktorové tajné klíče TOTP budou smazány."
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr "Vícefaktorové ověřování"
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr "Vícefaktorové ověřování je v celém systému zakázáno."
+
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
 msgstr "Násobek"
@@ -13479,7 +13691,7 @@ msgstr "Ztlumit"
 #: jsLoader.php:286
 #, c-format
 msgid "Mute for %1$s"
-msgstr ""
+msgstr "Ztlumit pro %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -13779,6 +13991,10 @@ msgstr "Nový API token"
 #: app/views/popup.ldap.edit.php:315
 msgid "New LDAP server"
 msgstr "Nový LDAP server"
+
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
+msgstr "Nová metoda MFA"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -14418,6 +14634,10 @@ msgstr "Pro zprávu operace akce nejsou zadáni žádní příjemci."
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
 msgstr "Žádná obnova"
+
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
+msgstr "Žádný uložený stav, prosím přihlaste se znovu."
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -15287,6 +15507,14 @@ msgstr "PHP modul ctype"
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP modul ctype chybí (PHP parametr --enable-ctype)."
 
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr "Chybí PHP modul curl."
+
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
 msgstr "PHP - podpora databází"
@@ -15798,6 +16026,10 @@ msgstr "Prosím, vytvořit databázi ručně, a nastav konfigurační parametry 
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Povolte prosím direktivu \"allow_url_fopen\"."
 
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
+msgstr "Naskenujte prosím svůj ověřovací kód a nechte si jej zobrazit v aplikaci pro ověřování."
+
 #: jsLoader.php:261
 msgid "Please select two elements"
 msgstr "Vyberte, prosím, dva prvky"
@@ -15999,6 +16231,15 @@ msgstr "Primární POC telefon B"
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
 msgstr "Primární POC jméno obrazovky"
+
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr "Primární label"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16558,6 +16799,10 @@ msgstr "Obdélník"
 msgid "Reference attribute"
 msgstr "Referenční atribut"
 
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Obnov"
@@ -16990,6 +17235,10 @@ msgstr "Požadované vps"
 msgid "Reset"
 msgstr "Reset"
 
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr "Obnovit tajný kód TOTP"
+
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
 #: app/views/js/administration.housekeeping.edit.js.php:85
@@ -17112,6 +17361,14 @@ msgstr "Výsledek je NEPRAVDA"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "Výsledek je PRAVDA"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17666,6 +17923,10 @@ msgstr "Velikost měřítka"
 msgid "Scan directory"
 msgstr "Skenovat adresář"
 
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr "Naskenujte tento QR kód"
+
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
 msgstr "Scénář"
@@ -17890,6 +18151,15 @@ msgstr "Sekundární POC telefon B"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "Sekundární POC jméno obrazovky"
+
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr "Sekundární label"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18502,6 +18772,10 @@ msgstr "Ukaž nedostupné mapy"
 msgid "Show units"
 msgstr "Zobrazit jednotky"
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr "Ukázat hodnotu"
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr "Zobrazit varování když je Zabbix server vypnutý"
@@ -18513,6 +18787,10 @@ msgstr "Zobrazit praconí dobu"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Sobraz"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr "Zobrazuje se jako název účtu všem uživatelům MFA v ověřovacích aplikacích."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18646,7 +18924,7 @@ msgstr "Odložit"
 #: jsLoader.php:291
 #, c-format
 msgid "Snooze for %1$s"
-msgstr ""
+msgstr "Odložit na %1$s"
 
 #: include/hosts.inc.php:174
 msgid "Software"
@@ -19066,6 +19344,10 @@ msgstr "Subjekt"
 msgid "Submap"
 msgstr "Podmapa"
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr "Odeslat"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr "Odběr"
@@ -19199,6 +19481,10 @@ msgstr "Název hostitelského systému. Návratová hodnota string"
 msgid "System information"
 msgstr "Informace systému"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr "Národní prostředí systému"
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "Systémové statistiky. Návratová hodnota celé číslo nebo plovoucí"
@@ -19237,6 +19523,21 @@ msgstr "TELNET agent"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "CELKEM"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr "TOTP"
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr "Tajný klíč TOTP pro uživatele „%1$s“ byl resetován."
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr "Tajný reset TOTP byl úspěšný."
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19664,6 +19965,20 @@ msgstr "Metoda \"%1$s.%2$s\" musí být zavolaná bez hlavičky autorizace."
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "\"%1$s.%2$s\" metoda musí být nazvána bez \"auth\" parametru."
 
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr "%1$s již není objeven a %2$s, %3$s."
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr "%1$s již není objeven a %2$s."
+
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
 msgstr "URL šablona je použita k načtení a zobrazení vrstvy dlaždic na geografických mapách."
@@ -19791,6 +20106,14 @@ msgstr "Spouštěč již nebyl detekován a bude smazán za %1$s (dne %2$s v %3$
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Trigger již není objevován a bude smazán při dalším objevování."
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr "Hodnota by měla být větší než interval aktualizace pravidla LLD."
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
+msgstr "Ověřovací kód byl nesprávný, zkuste to prosím znovu."
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20788,6 +21111,11 @@ msgstr "Nelze získat stav podpory komprese TimescaleDB."
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Nelze získat verzi TimescaleDB."
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr "Nelze skenovat? Tajný klíč %1$s můžete použít k ruční konfiguraci aplikace pro ověřování:"
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "Není možné vybrat konfiguraci."
@@ -20834,6 +21162,10 @@ msgstr "Odblokovat vybraného uživatele?"
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "Odblokovat vybrané uživatele?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -21041,7 +21373,7 @@ msgstr "Povolit zvuky"
 #: jsLoader.php:293
 #, c-format
 msgid "Unmute for %1$s"
-msgstr ""
+msgstr "Zrušit ztlumení pro %1$s"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -21354,6 +21686,11 @@ msgstr "Uživatel \"%1$s\" je použit v akci \"%2$s\"."
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "Uživatel \"%1$s\" je uživatel za nehož je report \"%2$s\" vytvořen."
+
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
+msgstr "Uživatel \"%1$s\" musí mít heslo, protože je aktivní interní ověřování."
 
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
@@ -22258,6 +22595,11 @@ msgstr "Hodnoty"
 msgid "Values without names are not allowed in form fields."
 msgstr "Hodnotám bez názvů není povoleno tvořit pole."
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr "Proměnná"
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -22319,6 +22661,10 @@ msgstr "Výrobce a verze"
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Upovídaný"
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
+msgstr "Ověřovací kód"
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22907,6 +23253,10 @@ msgstr "Včera"
 msgid "You are logged in as \"%1$s\"."
 msgstr "Jste přihlášeni jako \"%1$s\"."
 
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
+msgstr "Některé z metod MFA si nemůžete vybrat, protože na webovém serveru není nainstalováno rozšíření PHP CURL."
+
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
 #: include/classes/setup/CSetupWizard.php:452
@@ -23008,6 +23358,10 @@ msgstr "Zabbix interní autentizace"
 #: app/views/administration.authentication.edit.php:169
 msgid "Zabbix login form"
 msgstr "Přihlašovací formulář Zabbixu"
+
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -23615,6 +23969,16 @@ msgstr "nemůže být prázdný"
 msgid "cannot be equal to zero without custom intervals"
 msgstr "nemůže být stejné nebo nulové bez vlastního intervalu"
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr "nemůže být větší nebo rovna hodnotě pole \"%1$s\""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr "nemůže být větší nebo rovna hodnotě parametru \"%1$s\""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23761,6 +24125,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - Aktuální datum"
@@ -23790,6 +24158,10 @@ msgstr "výchozí"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - Převede hodnotu z radiánů na stupně"
+
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
+msgstr "oddělovač"
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -23959,6 +24331,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globálně nastavené údržby"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
+
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr "graf"
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr "prototyp grafu se stejným UUID již existuje"
@@ -23984,6 +24364,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr "byl deaktivován"
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr "byl ručně deaktivován"
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24227,6 +24615,10 @@ msgstr "je menší než nebo se rovná"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "není to uzavřeno v {} nebo je to poškozeno"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr "položka"
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -24660,7 +25052,7 @@ msgstr "číslo"
 
 #: include/classes/api/services/CUser.php:852
 msgid "object does not exist"
-msgstr ""
+msgstr "objekt neexistuje"
 
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
@@ -24680,7 +25072,11 @@ msgstr "objekt neexistuje nebo patří jinému objektu"
 #: include/classes/api/services/CTemplate.php:986
 #: include/classes/api/services/CTemplate.php:1066
 msgid "object does not exist, or you have no permissions to it"
-msgstr ""
+msgstr "objekt neexistuje nebo k němu nemáte oprávnění"
+
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
+msgstr "očekává se objekt typu TOTP"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -24773,6 +25169,10 @@ msgstr "power() - Mocnina základní hodnoty na mocininnou hodnotu"
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
 msgstr "vzorec problému"
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
+msgstr "kvalifikátor"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -24872,6 +25272,10 @@ msgstr "right() - Vrátí počet znaků zprava"
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Zaokrouhlí hodnotu na desetinná místa"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -25015,6 +25419,10 @@ msgstr "zadaná pověření nejsou jedinečná"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "značka"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25530,6 +25938,35 @@ msgstr "webový scénář se stejným UUID již existuje"
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
 msgstr "mohou být použity zástupné vzory s '*'"
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr "bude smazáno za %1$s"
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr "budou odstraněny při příštím zpracování pravidla zjišťování"
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr "bude deaktivováno za %1$s"
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr "bude deaktivováno při příštím zpracování pravidla zjišťování"
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr "nebude smazán"
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
+msgstr "nebude deaktivován"
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

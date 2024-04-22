@@ -48,7 +48,7 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 
-	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
+	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&(get_dc_config())->host_inventories,
 			&src_host->hostid)))
 	{
 		dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
@@ -86,7 +86,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
+			numitem = src_item->itemvaluetype.numitem;
 
 			dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
 
@@ -169,6 +169,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 	const ZBX_DC_HOST	*dc_host = NULL;
 	zbx_config_hk_t		config_hk;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
 
@@ -176,7 +177,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(dc_config->items), &itemids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -184,7 +185,8 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(dc_config->hosts),
+					&dc_item->hostid)))
 			{
 				errcodes[i] = FAIL;
 				continue;
@@ -194,7 +196,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 		dc_get_history_sync_host(&items[i].host, dc_host, mode);
 		dc_get_history_sync_item(&items[i], dc_item);
 
-		config_hk = config->config->hk;
+		config_hk = dc_config->config->hk;
 	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
@@ -254,7 +256,7 @@ void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *item
 
 	for (i = 0; i < itemids->values_num; i++)
 	{
-		if (NULL != zbx_hashset_search(&config->items, &itemids->values[i]))
+		if (NULL != zbx_hashset_search(&(get_dc_config())->items, &itemids->values[i]))
 			zbx_vector_uint64_remove_noorder(itemids, i--);
 	}
 
@@ -285,7 +287,8 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&(get_dc_config())->functions,
+				&functionids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -320,7 +323,7 @@ void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t 
 
 	for (size_t i = 0; i < functionids_num; i++)
 	{
-		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&(get_dc_config())->functions,
 				&functionids[i])))
 		{
 			continue;
@@ -358,7 +361,7 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 	{
 		/* skip items which are not in configuration cache and items without triggers */
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])) ||
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &itemids[i])) ||
 				NULL == dc_item->triggers)
 		{
 			continue;
@@ -491,7 +494,7 @@ void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *a
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	zbx_hashset_iter_reset(&config->actions, &iter);
+	zbx_hashset_iter_reset(&(get_dc_config())->actions, &iter);
 
 	while (NULL != (dc_action = (const zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -566,7 +569,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 
 	if (ITEM_VALUE_TYPE_LOG == src_item->value_type)
 	{
-		if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &src_item->itemid)))
+		if (NULL != (logitem = src_item->itemvaluetype.logitem))
 			zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 		else
 			*dst_item->logtimefmt = '\0';
@@ -576,7 +579,8 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	{
 		const ZBX_DC_INTERFACE		*dc_interface;
 
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&(get_dc_config())->interfaces,
+				&src_item->interfaceid);
 
 		DCget_interface(&dst_item->interface, dc_interface);
 	}
@@ -587,8 +591,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	switch (src_item->type)
 	{
 		case ITEM_TYPE_TRAPPER:
-			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems,
-					&src_item->itemid)))
+			if (NULL != (trapitem = src_item->itemtype.trapitem))
 			{
 				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
 			}
@@ -596,8 +599,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 				*dst_item->trapper_hosts = '\0';
 			break;
 		case ITEM_TYPE_HTTPAGENT:
-			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
-					&src_item->itemid)))
+			if (NULL != (httpitem = src_item->itemtype.httpitem))
 			{
 				dst_item->allow_traps = httpitem->allow_traps;
 				zbx_strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
@@ -658,7 +660,7 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 
 		if (NULL == dc_host || dc_host->hostid != items[i].host.hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(get_dc_config())->hosts,
 					&items[i].host.hostid)))
 			{
 				errcodes[i] = FAIL;
@@ -713,7 +715,7 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 		dc_get_history_recv_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
 	}
 
-	maintenances_num = config->maintenances.num_data;
+	maintenances_num = get_dc_config()->maintenances.num_data;
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
@@ -742,6 +744,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
 
@@ -749,7 +752,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(dc_config->items), &itemids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -757,7 +760,8 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 
 		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(dc_config->hosts),
+					&dc_item->hostid)))
 			{
 				errcodes[i] = FAIL;
 				continue;
@@ -768,7 +772,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 		dc_get_history_recv_item(&items[i], dc_item, mode);
 	}
 
-	maintenances_num = config->maintenances.num_data;
+	maintenances_num = get_dc_config()->maintenances.num_data;
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
@@ -805,13 +809,13 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 		if (FAIL == zbx_is_counted_in_item_queue(items[i].type, items[i].key_orig))
 			continue;
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &items[i].itemid)))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &items[i].itemid)))
 			continue;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(get_dc_config())->hosts, &dc_item->hostid)))
 			continue;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
@@ -820,7 +824,8 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 		if (ZBX_LOC_NOWHERE != dc_item->location)
 			continue;
 
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&(get_dc_config())->interfaces,
+				&dc_item->interfaceid);
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		DCitem_nextcheck_update(dc_item, dc_interface, ZBX_ITEM_COLLECTED, values[i].ts.sec,
@@ -842,7 +847,7 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	zbx_hashset_iter_reset(&config->connectors, &iter);
+	zbx_hashset_iter_reset(&(get_dc_config())->connectors, &iter);
 	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_connector_filter_t		connector_filter;
@@ -940,17 +945,18 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	zbx_hashset_iter_t	iter;
 	int			connectors_updated = FAIL, global_macro_updated = FAIL;
 	zbx_uint64_t		global_revision;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
-	if (config->revision.config == *config_revision)
+	if (get_dc_config()->revision.config == *config_revision)
 		return;
 
 	global_revision = *config_revision;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	if (config->revision.connector != *connector_revision)
+	if (get_dc_config()->revision.connector != *connector_revision)
 	{
-		zbx_hashset_iter_reset(&config->connectors, &iter);
+		zbx_hashset_iter_reset(&(dc_config->connectors), &iter);
 		while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
@@ -974,7 +980,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 				connector->time_flush = 0;
 			}
 
-			connector->revision = config->revision.connector;
+			connector->revision = dc_config->revision.connector;
 			connector->protocol = dc_connector->protocol;
 			connector->data_type = dc_connector->data_type;
 			connector->url_orig = zbx_strdup(connector->url_orig, dc_connector->url);
@@ -1009,17 +1015,17 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 					dc_connector->attempt_interval);
 		}
 
-		*connector_revision = config->revision.connector;
+		*connector_revision = dc_config->revision.connector;
 		connectors_updated = SUCCEED;
 	}
 
-	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
+	if (SUCCEED != um_cache_get_host_revision(dc_config->um_cache, 0, &global_revision))
 		global_revision = 0;
 
 	if (global_revision > *config_revision)
 		global_macro_updated = SUCCEED;
 
-	*config_revision = config->revision.config;
+	*config_revision = dc_config->revision.config;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 

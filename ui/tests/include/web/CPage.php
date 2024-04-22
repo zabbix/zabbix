@@ -101,7 +101,8 @@ class CPage {
 				'--enable-font-antialiasing=false',
 				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
 				'--disable-dev-shm-usage',
-				'--autoplay-policy=no-user-gesture-required'
+				'--autoplay-policy=no-user-gesture-required',
+				'--remote-debugging-pipe'
 			]);
 
 			if (defined('PHPUNIT_BROWSER_LOG_DIR')) {
@@ -210,8 +211,8 @@ class CPage {
 
 		if (!$session) {
 			$secret = bin2hex(random_bytes(16));
-			DBexecute('INSERT INTO sessions (sessionid,userid,secret)'.
-				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.zbx_dbstr($secret).')'
+			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,secret)'.
+				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.zbx_dbstr($secret).')'
 			);
 		}
 		elseif ($session['status'] != 0) {	/* ZBX_SESSION_ACTIVE */

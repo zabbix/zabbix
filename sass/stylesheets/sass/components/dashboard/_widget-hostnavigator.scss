@@ -1,0 +1,34 @@
+// Widget configuration form.
+
+form.dashboard-widget-hostnavigator {
+	.host-grouping {
+		line-height: $body-line-height;
+
+		tr:not(.form_row):first-child {
+			line-height: 24px;
+		}
+	}
+}
+
+// Widget view.
+
+div.dashboard-widget-hostnavigator {
+	.host-navigator {
+		.host-navigator-limit {
+			display: flex;
+			justify-content: flex-end;
+			height: 18px;
+			padding: 9px 8px;
+			color: $font-alt-color;
+		}
+
+		.host-navigator-no-data {
+			display: flex;
+			justify-content: center;
+			height: 18px;
+			padding: 9px 8px;
+			color: $font-alt-color;
+			border-bottom: 1px solid $table-border-color;
+		}
+	}
+}

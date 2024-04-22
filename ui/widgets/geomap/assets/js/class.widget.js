@@ -37,17 +37,16 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	promiseReady() {
-		const readiness = [super.promiseReady()];
-
-		if (this._map !== null) {
-			readiness.push(
-				new Promise(resolve => {
-					this._map.whenReady(() => setTimeout(resolve, 300));
-				})
-			);
+		if (this._map === null){
+			return super.promiseReady();
 		}
 
-		return Promise.all(readiness);
+		return new Promise(resolve => {
+			this._map.whenReady(() => {
+				super.promiseReady()
+					.then(() => setTimeout(resolve, 300));
+			});
+		});
 	}
 
 	getUpdateRequestData() {
@@ -72,12 +71,6 @@ class CWidgetGeoMap extends CWidget {
 		}
 
 		this._initial_load = false;
-	}
-
-	updateProperties({name, view_mode, fields}) {
-		this._initial_load = true;
-
-		super.updateProperties({name, view_mode, fields});
 	}
 
 	_addMarkers(hosts) {
@@ -486,37 +479,37 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED, {
 			name: t('Not classified'),
 			abbr: t('N'),
-			class: 'na-bg',
+			class: ZBX_STYLE_NA_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_INFORMATION, {
 			name: t('Information'),
 			abbr: t('I'),
-			class: 'info-bg',
+			class: ZBX_STYLE_INFO_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_INFORMATION]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_WARNING, {
 			name: t('Warning'),
 			abbr: t('W'),
-			class: 'warning-bg',
+			class: ZBX_STYLE_WARNING_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_WARNING]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_AVERAGE, {
 			name: t('Average'),
 			abbr: t('A'),
-			class: 'average-bg',
+			class: ZBX_STYLE_AVERAGE_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_AVERAGE]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_HIGH, {
 			name: t('High'),
 			abbr: t('H'),
-			class: 'high-bg',
+			class: ZBX_STYLE_HIGH_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_HIGH]
 		});
 		this._severity_levels.set(CWidgetGeoMap.SEVERITY_DISASTER, {
 			name: t('Disaster'),
 			abbr: t('D'),
-			class: 'disaster-bg',
+			class: ZBX_STYLE_DISASTER_BG,
 			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
 		});
 

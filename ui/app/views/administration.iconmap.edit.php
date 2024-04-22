@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.iconmap.edit.js.php');
@@ -59,6 +60,7 @@ if ($data['iconmapid'] != 0) {
 $table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setId('iconMapTable')
+	->addClass(ZBX_STYLE_LIST_NUMBERED)
 	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', _('Action')]);
 
 $i = 0;
@@ -66,7 +68,7 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 	$table->addRow(
 		(new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan(($i + 1).':'))->addClass('rowNum'),
+			(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
 				->setValue($mapping['inventory_link'])
 				->addOptions(CSelect::createOptionsFromArray($data['inventory_list'])),
@@ -92,9 +94,7 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 					->addClass('remove_mapping')
 					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('sortable')
-			->setId('iconmapidRow_'.$i)
+		]))->setId('iconmapidRow_'.$i)
 	);
 
 	$i++;

@@ -1,33 +1,6 @@
 -- Activate Zabbix Server, set visible name and make it a more unique name
 UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
--- More media for user 'Admin'
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-24:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00');
-
--- More user scripts
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (4, 0,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
-
--- create an empty host "Template linkage test host"
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (10053, 'Template linkage test host', 'Visible host for template linkage', 0, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10021,10053,1,1,1,'127.0.0.1','','10050');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10022,10053,1,2,1,'127.0.0.1','','161');
-INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (10022, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10023,10053,1,3,1,'127.0.0.1','','623');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10024,10053,1,4,1,'127.0.0.1','','12345');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90278, 10053, 4);
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10030,10084,1,4,1,'127.0.0.1','jmxagent.zabbix.com','10051');
-
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
-
--- Add test graph
-INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (800000,'Test graph 1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
-
--- Add graph items
-INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (800000, 800000, 42213, 1, 1, 'FF5555', 0, 2, 0);
-
 -- Add maps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (3, 'Test map 1', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 
@@ -54,35 +27,6 @@ INSERT INTO sysmap_element_url (sysmapelementurlid, selementid, name, url) VALUE
 INSERT INTO sysmap_shape (sysmap_shapeid, sysmapid, type, x, y, width, height, text, font, font_size, font_color, text_halign, text_valign, border_type, border_width, border_color, background_color, zindex) VALUES (100,3,1,425,257,199,135,'',9,11,'000000',0,0,1,2,'000000','FFCCCC',0);
 INSERT INTO sysmap_shape (sysmap_shapeid, sysmapid, type, x, y, width, height, text, font, font_size, font_color, text_halign, text_valign, border_type, border_width, border_color, background_color, zindex) VALUES (101,3,0,113,82,124,86,'',9,11,'000000',0,0,3,5,'009900','',1);
 INSERT INTO sysmap_shape (sysmap_shapeid, sysmapid, type, x, y, width, height, text, font, font_size, font_color, text_halign, text_valign, border_type, border_width, border_color, background_color, zindex) VALUES (102,3,0,408,0,233,50,'Map name: {MAP.NAME}',10,14,'BB0000',1,2,0,2,'000000','',2);
-
--- Host inventories
-INSERT INTO host_inventory (type,type_full,name,alias,os,os_full,os_short,serialno_a,serialno_b,tag,asset_tag,macaddress_a,macaddress_b,hardware,hardware_full,software,software_full,software_app_a,software_app_b,software_app_c,software_app_d,software_app_e,contact,location,location_lat,location_lon,notes,chassis,model,hw_arch,vendor,contract_number,installer_name,deployment_status,url_a,url_b,url_c,host_networks,host_netmask,host_router,oob_ip,oob_netmask,oob_router,date_hw_purchase,date_hw_install,date_hw_expiry,date_hw_decomm,site_address_a,site_address_b,site_address_c,site_city,site_state,site_country,site_zip,site_rack,site_notes,poc_1_name,poc_1_email,poc_1_phone_a,poc_1_phone_b,poc_1_cell,poc_1_screen,poc_1_notes,poc_2_name,poc_2_email,poc_2_phone_a,poc_2_phone_b,poc_2_cell,poc_2_screen,poc_2_notes,hostid) VALUES ('Type','Type (Full details)','Name','Alias','OS','OS (Full details)','OS (Short)','Serial number A','Serial number B','Tag','Asset tag','MAC address A','MAC address B','Hardware','Hardware (Full details)','Software','Software (Full details)','Software application A','Software application B','Software application C','Software application D','Software application E','Contact','Location','Location latitud','Location longitu','Notes','Chassis','Model','HW architecture','Vendor','Contract number','Installer name','Deployment status','URL A','URL B','URL C','Host networks','Host subnet mask','Host router','OOB IP address','OOB subnet mask','OOB router','Date HW purchased','Date HW installed','Date HW maintenance expires','Date hw decommissioned','Site address A','Site address B','Site address C','Site city','Site state / province','Site country','Site ZIP / postal','Site rack location','Site notes','Primary POC name','Primary POC email','Primary POC phone A','Primary POC phone B','Primary POC cell','Primary POC screen name','Primary POC notes','Secondary POC name','Secondary POC email','Secondary POC phone A','Secondary POC phone B','Secondary POC cell','Secondary POC screen name','Secondary POC notes',10053);
-
--- delete Discovery Rule
-INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags,query_fields, interfaceid, posts, headers) VALUES (22188, 'delete Discovery Rule', 0, 10053, 'rule', 'key', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 1,'', 10021, '', '');
-
--- add some test items
--- first, one that references a non-existent user macro in the key and then references that key parameter in the item name using a positional reference
-INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags,query_fields, interfaceid, posts, headers) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 0, 10053, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0,'', 10021, '', '');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 'ITEM_REFERENCING_A_NON-EXISTENT_USER_MACRO');
-INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid,query_fields, inventory_link, posts, headers) VALUES (23101, 'Item_populating_filed_Type', 0, 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021,'', 1, '', '');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (23101, 'Item_populating_filed_Type', 'ITEM_POPULATING_FILED_TYPE');
-
--- Global macros
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (6,'{$DEFAULT_DELAY}','30','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (7,'{$LOCALIP}','127.0.0.1','Test description 2');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (8,'{$DEFAULT_LINUX_IF}','eth0','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (9,'{$0123456789012345678901234567890123456789012345678901234567890}','012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (10,'{$A}','Some text','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (11,'{$1}','Numeric macro','Test description 1');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (12,'{$_}','Underscore','');
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$WORKING_HOURS}','1-5,09:00-18:00','Test description 3');
-INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (14,'{$X_SECRET_2_SECRET}','This text should stay secret','This text should stay secret', 1);
-INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (15,'{$X_TEXT_2_SECRET}','This text should become secret','This text should become secret', 0);
-INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (16,'{$X_SECRET_2_TEXT}','This text should become visible','This text should become visible', 1);
-INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (17,'{$Y_SECRET_MACRO_REVERT}','Changes value and revert','' , 1);
-INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (18,'{$Y_SECRET_MACRO_2_TEXT_REVERT}','Change value and type and revert','' , 1);
-INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (19,'{$Z_GLOBAL_MACRO_2_RESOLVE}','Value 2 B resolved','' , 0);
 
 -- host, item, trigger  for testing macro resolving in trigger description
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (20006, 'Host for trigger description macros', 'Host for trigger description macros', 0, '');
@@ -767,35 +711,6 @@ INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (933,101
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (934,102,400350,0);
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (935,102,400360,1);
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (936,102,400370,2);
-
--- testZBX6648.eventsFilter
-INSERT INTO hstgrp (groupid,name,type) VALUES (50000,'ZBX6648 Group No Hosts',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50001,'ZBX6648 Disabled Triggers',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50002,'ZBX6648 Enabled Triggers',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50003,'ZBX6648 All Triggers',0);
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50003, 'ZBX6648 Disabled Triggers Host', 'ZBX6648 Disabled Triggers Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50004, 'ZBX6648 Enabled Triggers Host', 'ZBX6648 Enabled Triggers Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50005, 'ZBX6648 All Triggers Host', 'ZBX6648 All Triggers Host', 0, '');
-INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50003,50003,50001);
-INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50004,50004,50002);
-INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (50005,50005,50003);
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50016,50003,1,1,1,'127.0.7.1','','10071');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50017,50004,1,1,1,'127.0.7.1','','10071');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) VALUES (50018,50005,1,1,1,'127.0.7.1','','10071');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400550,0,50003,'zbx6648 item disabled','zbx6648-item-disabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50016,'',0,'','30','','');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400550, 'zbx6648 item disabled', 'ZBX6648 ITEM DISABLED');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400560,0,50004,'zbx6648 item enabled','zbx6648-item-enabled','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50017,'',0,'','30','','');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400560, 'zbx6648 item enabled', 'ZBX6648 ITEM ENABLED');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers) VALUES (400570,0,50005,'zbx6648 item all','zbx6648-item-all','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50018,'',0,'','30','','');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400570, 'zbx6648 item all', 'ZBX6648 ITEM ALL');
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100018,'{100018}=0','zbx6648 trigger disabled','',1,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100019,'{100019}=0','zbx6648 trigger enabled','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100020,'{100020}=0','zbx6648 trigger all enabled','',0,0,0,0,'','',NULL,0,0,0);
-INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100021,'{100021}=0','zbx6648 trigger all disabled','',1,0,0,0,'','',NULL,0,0,0);
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100018,400550,100018,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100019,400560,100019,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100020,400570,100020,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100021,400570,100021,'last','$,#1');
 
 -- testPageItems, testPageTriggers, testPageDiscoveryRules, testPageItemPrototype, testPageTriggerPrototype
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50006, 'Template-layout-test-001', 'Template-layout-test-001', 3, '');
@@ -1533,12 +1448,13 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90007, 100005, 0, 'righty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 100005, 1, 'ds.0.hosts.0', 0, 'Host*');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 100005, 1, 'ds.0.items.0', 0, 'Available memory');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90010, 100005, 1, 'reference', 'LVRTC');
 -- widget "Test cases for update"
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90010, 100004, 0, 'ds.0.axisy', 1, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 1, 'ds.0.color', 0, 'FF465C');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 0, 'ds.0.pointsize', 4, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.0.transparency', 6, '');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 100004, 0, 'ds.0.type', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 0, 'ds.0.axisy', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 1, 'ds.0.color', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.0.pointsize', 4, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 100004, 0, 'ds.0.transparency', 6, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90015, 100004, 0, 'ds.0.type', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90016, 100004, 0, 'lefty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90017, 100004, 0, 'legend_lines', 2, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90018, 100004, 0, 'or.0.pointsize', 1, '');
@@ -1787,18 +1703,16 @@ INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height)
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90081, 100032, 4, 'itemid', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90082, 100032, 1, 'override_hostid._reference', 'DASHBOARD._hostid');
 
--- testFormUserMedia
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,10,'test@jabber.com',0,16,'1-7,00:00-24:00');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,12,'test_account',0,63,'6-7,09:00-18:00');
-
 -- Dashboard for Graph Prototype widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9004, 1400);
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100099, 9004, 'graphprototype', 'Graph prototype widget for update', 0, 0, 16, 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 100099, 7, 'graphid.0', 600003);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905055, 100099, 1, 'reference', 'RZALA');
 
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (120000, 9004, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 16, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905055, 120000, 7, 'graphid.0', 600002);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905056, 120000, 7, 'graphid.0', 600002);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905057, 120000, 1, 'reference', 'MJHNB');
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9005, 1410);

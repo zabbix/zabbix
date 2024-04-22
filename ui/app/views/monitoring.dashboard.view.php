@@ -60,7 +60,6 @@ $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.sortable.js');
 $this->addJsFile('items.js');
 $this->addJsFile('multilineinput.js');
 
@@ -73,7 +72,8 @@ $web_layout_mode = $this->getLayoutMode();
 
 $main_filter_form = null;
 
-if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])
+		|| array_key_exists(CWidgetsData::DATA_TYPE_HOST_IDS, $data['broadcast_requirements'])) {
 	$main_filter_form = (new CForm('get'))
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))

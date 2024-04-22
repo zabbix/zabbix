@@ -17,13 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+const ZBX_COLOR_SCHEME_DARK = 'dark';
+const ZBX_COLOR_SCHEME_LIGHT = 'light';
+
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
+const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_FORM_GRID = 'form-grid';
+
+const ZBX_STYLE_COLOR_WARNING = 'color-warning';
+
+const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
+const ZBX_STYLE_ARROW_RIGHT = 'arrow-right';
 const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
 const ZBX_STYLE_COLLAPSED = 'collapsed';
+const ZBX_STYLE_DRAG_ICON = 'drag-icon';
 const ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';
+const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
+const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 
@@ -53,6 +67,31 @@ const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
+
+const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
+const TRIGGER_SEVERITY_INFORMATION = 1;
+const TRIGGER_SEVERITY_WARNING = 2;
+const TRIGGER_SEVERITY_AVERAGE = 3;
+const TRIGGER_SEVERITY_HIGH = 4;
+const TRIGGER_SEVERITY_DISASTER = 5;
+
+const ZBX_STYLE_NA_BG = 'na-bg';
+const ZBX_STYLE_INFO_BG = 'info-bg';
+const ZBX_STYLE_WARNING_BG = 'warning-bg';
+const ZBX_STYLE_AVERAGE_BG = 'average-bg';
+const ZBX_STYLE_HIGH_BG = 'high-bg';
+const ZBX_STYLE_DISASTER_BG = 'disaster-bg';
+
+const ZBX_STYLE_STATUS_NA_BG = 'status-na-bg';
+const ZBX_STYLE_STATUS_INFO_BG = 'status-info-bg';
+const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
+const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
+const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
+const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+
+const MAINTENANCE_TYPE_NORMAL = 0;
+const MAINTENANCE_TYPE_NODATA = 1;
 
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;
@@ -73,3 +112,12 @@ const PAGE_TYPE_TEXT_RETURN_JSON = 11;
 
 const ZBX_SCRIPT_MANUALINPUT_DISABLED = 0;
 const ZBX_SCRIPT_MANUALINPUT_ENABLED = 1;
+
+const MFA_TYPE_TOTP = 1;
+const MFA_TYPE_DUO = 2;
+
+// IMPORTANT!!! by priority DESC
+const GROUP_GUI_ACCESS_SYSTEM = 0;
+const GROUP_GUI_ACCESS_INTERNAL = 1;
+const GROUP_GUI_ACCESS_LDAP = 2;
+const GROUP_GUI_ACCESS_DISABLED = 3;

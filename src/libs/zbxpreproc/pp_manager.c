@@ -119,13 +119,14 @@ zbx_get_progname_f	preproc_get_progname_cb(void)
  *                                     task (optional)                        *
  *             finished_data    - [IN] callback data (optional)               *
  *             config_source_ip - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, const char *config_source_ip, char **error)
+		void *finished_data, const char *config_source_ip, int config_timeout, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -164,6 +165,9 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)zbx_pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	if (FAIL == zbx_ipc_async_socket_open(&manager->rtc, ZBX_IPC_SERVICE_RTC, config_timeout, error))
+		goto out;
 
 	/* wait for threads to start */
 	time_start = time(NULL);
@@ -239,6 +243,8 @@ static void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 #endif
 	pp_curl_destroy();
 	pp_xml_destroy();
+
+	zbx_ipc_async_socket_close(&manager->rtc);
 
 	zbx_free(manager);
 }
@@ -1203,7 +1209,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	}
 
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
-			(void *)&service, pp_manager_args_in->config_source_ip, &error)))
+			(void *)&service, pp_manager_args_in->config_source_ip, pp_manager_args_in->config_timeout,
+			&error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
@@ -1298,6 +1305,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			processed_num += (unsigned int)tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
+			zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
+					ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
 			zbx_pp_tasks_clear(&tasks);
 		}
 

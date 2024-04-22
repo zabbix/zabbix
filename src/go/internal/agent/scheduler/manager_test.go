@@ -1885,7 +1885,7 @@ func Test_getCapacity(t *testing.T) {
 					Nodes: []interface{}{},
 				},
 			},
-			100,
+			1000,
 		},
 		{
 			"both_cap",
@@ -1916,7 +1916,7 @@ func Test_getCapacity(t *testing.T) {
 			50,
 		},
 		{
-			"depriceted_cap",
+			"deprecated_cap",
 			args{
 				&conf.Node{
 					Name: "Test",
@@ -1957,7 +1957,7 @@ func Test_getCapacity(t *testing.T) {
 		{
 			"nil",
 			args{nil},
-			100,
+			1000,
 		},
 	}
 	for _, tt := range tests {

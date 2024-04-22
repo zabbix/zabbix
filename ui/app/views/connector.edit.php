@@ -150,6 +150,7 @@ $form_grid = (new CFormGrid())
 						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']
 					]
 				])
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setVertical()
 				->setColumns(3)
 		))->addClass('js-field-item-value-types')

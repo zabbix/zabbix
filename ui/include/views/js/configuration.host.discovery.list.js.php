@@ -47,6 +47,12 @@
 					.addEventListener('click', (e) => this.executeNow(e.target));
 			}
 
+			document.querySelectorAll('#filter_lifetime_type, #filter_enabled_lifetime_type').forEach(element => {
+				element.addEventListener('change', () => this.updateLostResourcesFields());
+			});
+
+			this.updateLostResourcesFields();
+
 			this.form.addEventListener('click', (e) => {
 				const target = e.target;
 
@@ -60,6 +66,20 @@
 			const disabled = document.querySelector('[name="filter_state"]:checked').value != -1;
 
 			document.querySelectorAll('[name="filter_status"]').forEach(radio => radio.disabled = disabled);
+		},
+
+		updateLostResourcesFields() {
+			const lifetime_type = document.querySelector('[name="filter_lifetime_type"]:checked').value;
+			const enabled_lifetime_type = document.querySelector('[name="filter_enabled_lifetime_type"]:checked').value;
+
+			document.querySelectorAll('[name="filter_enabled_lifetime_type"]').forEach(radio =>
+				radio.disabled = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>
+			);
+
+			document.getElementById('filter_lifetime').disabled = lifetime_type != <?= ZBX_LLD_DELETE_AFTER ?>;
+			document.getElementById('filter_enabled_lifetime').disabled =
+				enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
+					|| lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
 		},
 
 		editItem(target, data) {

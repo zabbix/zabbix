@@ -43,18 +43,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		];
 	}
 
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
-
 	const DASHBOARD_ID = 1400;
 	const SCREENSHOT_DASHBOARD_ID = 1410;
 
@@ -164,13 +152,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				]
 			]
 		];
-	}
-
-	/**
-	 * TODO remove after DEV-1535 is fixed.
-	 */
-	public function cleanupProfile() {
-		DBexecute('DELETE FROM profiles WHERE idx LIKE \'web.popup.generic.%\'');
 	}
 
 	/**
@@ -459,7 +440,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	 * @param boolean $changes	are there any changes made in widget form
 	 */
 	private function checkDataUnchanged($action, $update = false, $changes = false) {
-		$initial_values = CDBHelper::getHash($this->sql);
+		$initial_values = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
 		$dashboard = CDashboardElement::find()->one();
 
@@ -504,7 +485,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			$this->assertEquals($original_values, $new_values);
 		}
 
-		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
+		$this->assertEquals($initial_values, CDBHelper::getHash(self::SQL));
 	}
 
 	/**

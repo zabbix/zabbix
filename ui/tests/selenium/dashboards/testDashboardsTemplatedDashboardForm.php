@@ -270,9 +270,22 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								]
 							],
 							[
+								'type' => 'piechart',
+								'name' => 'Pie chart widget',
+								'x' => 8,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
+									['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Item'],
+									['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF465C']
+								]
+							],
+							[
 								'type' => 'plaintext',
 								'name' => 'Plain text widget',
-								'x' => 8,
+								'x' => 12,
 								'y' => 8,
 								'width' => 4,
 								'height' => 4,
@@ -287,7 +300,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 12,
+								'x' => 16,
 								'y' => 8,
 								'width' => 4,
 								'height' => 4
@@ -295,7 +308,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 16,
+								'x' => 20,
 								'y' => 8,
 								'width' => 4,
 								'height' => 4
@@ -303,15 +316,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemsbysv',
 								'name' => 'Problems by severity widget',
-								'x' => 20,
-								'y' => 8,
+								'x' => 0,
+								'y' => 12,
 								'width' => 4,
 								'height' => 4
 							],
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 0,
+								'x' => 4,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4,
@@ -331,7 +344,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 4,
+								'x' => 8,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4
@@ -339,7 +352,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 8,
+								'x' => 12,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4,
@@ -354,7 +367,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 12,
+								'x' => 16,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4,
@@ -404,7 +417,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 16,
+								'x' => 20,
 								'y' => 12,
 								'width' => 4,
 								'height' => 4
@@ -412,15 +425,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'trigover',
 								'name' => 'Trigger overview widget',
-								'x' => 20,
-								'y' => 12,
+								'x' => 0,
+								'y' => 16,
 								'width' => 4,
 								'height' => 4
 							],
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 0,
+								'x' => 4,
 								'y' => 16,
 								'width' => 4,
 								'height' => 4,
@@ -435,7 +448,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 4,
+								'x' => 8,
 								'y' => 16,
 								'width' => 4,
 								'height' => 4
@@ -443,7 +456,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'dataover',
 								'name' => 'Data overview widget',
-								'x' => 8,
+								'x' => 12,
 								'y' => 16,
 								'width' => 4,
 								'height' => 4
@@ -2820,11 +2833,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						]
 					],
 					'error_message' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -2856,11 +2869,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'error_message' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -2892,11 +2905,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'error_message' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -3474,8 +3487,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
-						'Maximum time period to display is 730 days.'
-					]
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
 				]
 			],
 			// #51 Item value widget with minimal set of parameters.
@@ -4380,9 +4394,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
-					'Pie chart', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
-					'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator',
+				'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts', 'Problems',
+				'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers', 'Trigger overview',
+				'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}
@@ -4446,6 +4461,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$this->assertEquals($filled_data, $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 				$form->checkValue($reference_data);
 			}
+
+			// Count of days mentioned in error depends ot presence of leap year february in selected period.
+			if (CTestArrayHelper::get($data, 'days_count')) {
+				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
+			}
+
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			$this->closeDialogue();
 		}

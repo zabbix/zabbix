@@ -17,15 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
-#include "zbxdbschema.h"
+#include "zbxdbupgrade.h"
 
-#include "../../zabbix_server/ha/ha.h"
+#include "zbxdbschema.h"
 #include "zbxtime.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
+#include "zbx_ha_constants.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -865,7 +865,7 @@ static int	DBcreate_dbversion_table(void)
 				{
 					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};

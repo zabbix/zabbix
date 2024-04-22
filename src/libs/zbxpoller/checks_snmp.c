@@ -175,6 +175,9 @@ struct zbx_snmp_context
 	char				*snmpv3_privpassphrase;
 	const char			*config_source_ip;
 	unsigned char			snmp_oid_type;
+	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
+	zbx_async_rdns_step_t		step;
+	char				*reverse_dns;
 };
 
 typedef struct
@@ -224,10 +227,10 @@ ZBX_VECTOR_IMPL(engineid_device, zbx_snmp_engineid_device_t)
 
 typedef struct
 {
-	unsigned char					engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
-	size_t							engineid_len;
+	unsigned char			engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
+	size_t				engineid_len;
 	zbx_vector_engineid_device_t	devices;
-	time_t							lastlog;
+	time_t				lastlog;
 }
 zbx_snmp_engineid_record_t;
 
@@ -1154,11 +1157,11 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 static void	zbx_snmp_dump_oid(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len)
 {
-	size_t	i, offset = 0;
+	size_t	offset = 0;
 
 	*buffer = '\0';
 
-	for (i = 0; i < objid_len; i++)
+	for (size_t i = 0; i < objid_len; i++)
 		offset += zbx_snprintf(buffer + offset, buffer_len - offset, ".%lu", (unsigned long)objid[i]);
 }
 
@@ -1652,6 +1655,9 @@ out:
 
 	return ret;
 }
+
+#undef ZBX_OID_INDEX_STRING
+#undef ZBX_OID_INDEX_NUMERIC
 
 static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 		char oids[][ZBX_ITEM_SNMP_OID_LEN_MAX], AGENT_RESULT *results, int *errcodes,
@@ -2277,30 +2283,41 @@ static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 	}
 }
 
+static int	snmp_bulkwalk_parse_param(const char *snmp_oid, zbx_vector_snmp_oid_t *oids_out,
+		char *error, size_t max_error_len)
+{
+	char		oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX], buffer[MAX_OID_LEN];
+	zbx_snmp_oid_t	*root_oid;
+
+	zbx_snmp_translate(oid_translated, snmp_oid, sizeof(oid_translated));
+
+	root_oid = (zbx_snmp_oid_t *)zbx_malloc(NULL, sizeof(zbx_snmp_oid_t));
+	root_oid->root_oid_len = MAX_OID_LEN;
+
+	if (NULL == snmp_parse_oid(oid_translated, root_oid->root_oid, &root_oid->root_oid_len))
+	{
+		zbx_free(root_oid);
+		zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\".",
+				oid_translated);
+		return FAIL;
+	}
+
+	snprint_objid(buffer, sizeof(buffer), root_oid->root_oid, root_oid->root_oid_len);
+	root_oid->str_oid = zbx_strdup(NULL, buffer);
+	zbx_vector_snmp_oid_append(oids_out, root_oid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() oids_num:%d", __func__, oids_out->values_num);
+
+	return SUCCEED;
+}
+
 static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oid_t *oids_out,
 		char *error, size_t max_error_len)
 {
 	for (int i = 0; i < request->nparam; i++)
 	{
-		char		oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX], buffer[MAX_OID_LEN];
-		zbx_snmp_oid_t	*root_oid;
-
-		zbx_snmp_translate(oid_translated, request->params[i], sizeof(oid_translated));
-
-		root_oid = (zbx_snmp_oid_t *)zbx_malloc(NULL, sizeof(zbx_snmp_oid_t));
-		root_oid->root_oid_len = MAX_OID_LEN;
-
-		if (NULL == snmp_parse_oid(oid_translated, root_oid->root_oid, &root_oid->root_oid_len))
-		{
-			zbx_free(root_oid);
-			zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\".",
-					oid_translated);
+		if (FAIL == snmp_bulkwalk_parse_param(request->params[i], oids_out, error, max_error_len))
 			return FAIL;
-		}
-
-		snprint_objid(buffer, sizeof(buffer), root_oid->root_oid, root_oid->root_oid_len);
-		root_oid->str_oid = zbx_strdup(NULL, buffer);
-		zbx_vector_snmp_oid_append(oids_out, root_oid);
 	}
 
 	if (1 < oids_out->values_num)
@@ -2865,6 +2882,14 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
+	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == snmp_context->step)
+	{
+		if (NULL != addr)
+			snmp_context->reverse_dns = zbx_strdup(NULL, addr);
+
+		goto stop;
+	}
+
 	/* initialization */
 	if (0 != event)
 	{
@@ -2984,6 +3009,13 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 
 					snmp_context->results = NULL;
 					snmp_context->item.ret = SUCCEED;
+
+					if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == snmp_context->resolve_reverse_dns)
+					{
+						task_ret = ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+						snmp_context->step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
+					}
+
 					goto stop;
 				}
 			}
@@ -3024,6 +3056,11 @@ zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t 
 	return &snmp_context->item;
 }
 
+char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context)
+{
+	return snmp_context->reverse_dns;
+}
+
 void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context)
 {
 	return snmp_context->arg;
@@ -3043,6 +3080,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context->item.key);
 	zbx_free(snmp_context->item.key_orig);
 	zbx_free(snmp_context->results);
+	zbx_free(snmp_context->reverse_dns);
 	zbx_free_agent_result(&snmp_context->item.result);
 
 	zbx_vector_bulkwalk_context_clear_ext(&snmp_context->bulkwalk_contexts, snmp_bulkwalk_context_free);
@@ -3054,7 +3092,7 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip)
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	int			ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
@@ -3065,6 +3103,11 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 			item->host.host, item->interface.addr);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
+
+	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
+	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
+	snmp_context->reverse_dns = NULL;
+
 	snmp_context->ssp = NULL;
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
@@ -3074,9 +3117,15 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	snmp_context->item.hostid = item->host.hostid;
 	snmp_context->item.value_type = item->value_type;
 	snmp_context->item.flags = item->flags;
-	snmp_context->item.key = item->key;
-	item->key = NULL;
 	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+
+	if (item->key != item->key_orig)
+	{
+		snmp_context->item.key = item->key;
+		item->key = NULL;
+	}
+	else
+		snmp_context->item.key = zbx_strdup(NULL, item->key);
 
 	snmp_context->item.version = item->interface.version;
 
@@ -3111,22 +3160,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
 
 	zbx_init_agent_request(&request);
-
 	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
-
-	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
-		ret = CONFIG_ERROR;
-		goto out;
-	}
-
-	if (0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0])))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameters: at least one OID is expected."));
-		ret = CONFIG_ERROR;
-		goto out;
-	}
 
 	if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 	{
@@ -3148,11 +3182,34 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
-	if (SUCCEED != snmp_bulkwalk_parse_params(&request, &snmp_context->param_oids, error, sizeof(error)))
+	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	if (0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0])))
+	{
+		if (ZBX_SNMP_WALK == snmp_context->snmp_oid_type)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameters: at least one OID is expected."));
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+
+		if (SUCCEED != snmp_bulkwalk_parse_param(item->snmp_oid, &snmp_context->param_oids, error,
+				sizeof(error)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+	}
+	else if (SUCCEED != snmp_bulkwalk_parse_params(&request, &snmp_context->param_oids, error, sizeof(error)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		ret = CONFIG_ERROR;
-
 		goto out;
 	}
 
@@ -3575,7 +3632,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		zbx_set_snmp_bulkwalk_options(progname);
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
-				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip)))
+				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip,
+				ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO)))
 		{
 			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
 			{
@@ -3586,7 +3644,6 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 				SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot process event base"));
 				errcodes[j] = CONFIG_ERROR;
 			}
-
 		}
 
 		evdns_base_free(dnsbase, 0);
@@ -3696,23 +3753,22 @@ out:
  *                                                                            *
  * Parameters: process_type - [IN]                                            *
  *             process_num  - [IN] unique id of process                       *
- *             progname     - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname)
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
-			get_process_type_string(process_type), process_num);
+	if (FAIL != process_num)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
+				get_process_type_string(process_type), process_num);
+	}
 
 	if (0 == zbx_snmp_init_done)
 		return;
 
 	SNMP_MT_INITLOCK;
 
-	zbx_shutdown_snmp(progname);
-
-	if (0 != snmp_rwlock_init_done)
-		zbx_init_library_mt_snmp(progname);
+	shutdown_usm();
 
 	if (ZBX_PROCESS_TYPE_SNMP_POLLER == process_type)
 		zbx_clear_snmp_engineid_cache();

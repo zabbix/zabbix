@@ -24,6 +24,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxinterface.h"
 
 /******************************************************************************
  *                                                                            *
@@ -195,8 +196,7 @@ out:
  *             key_orig           - [IN]                                           *
  *             data               - [IN/OUT] serialized availability data          *
  *             data_alloc         - [IN/OUT] serialized availability data size     *
- *             data_alloc         - [IN/OUT] serialized availability data offset   *
- *             ts                 - [IN] timestamp                                 *
+ *             data_offset        - [IN/OUT] serialized availability data offset   *
  *             unavailable_delay  - [IN]                                           *
  *             unreachable_period - [IN]                                           *
  *             unreachable_delay  - [IN]                                           *

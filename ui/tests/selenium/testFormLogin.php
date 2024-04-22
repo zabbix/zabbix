@@ -123,7 +123,7 @@ class testFormLogin extends CWebTest {
 		}
 		else {
 			$this->page->assertHeader('Global view');
-			$this->query('class:zi-signout')->one()->click();
+			$this->query('class:zi-sign-out')->one()->click();
 			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
 		}
 

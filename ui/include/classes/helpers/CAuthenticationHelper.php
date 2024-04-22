@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Authentication API object.
  */
-class CAuthenticationHelper extends CConfigGeneralHelper {
+class CAuthenticationHelper {
 
 	public const AUTHENTICATION_TYPE = 'authentication_type';
 	public const DISABLED_USER_GROUPID = 'disabled_usrgrpid';
@@ -40,15 +40,11 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const SAML_AUTH_ENABLED = 'saml_auth_enabled';
 	public const SAML_CASE_SENSITIVE = 'saml_case_sensitive';
 	public const SAML_JIT_STATUS = 'saml_jit_status';
+	public const MFA_STATUS = 'mfa_status';
+	public const MFAID = 'mfaid';
 
-	/**
-	 * Authentication API object parameters array.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
-	protected static array $params = [];
+	private static $params = [];
+	private static $params_public = [];
 
 	/**
 	 * Userdirectory API object parameters array.
@@ -60,16 +56,35 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	protected static array $userdirectory_params = [];
 
 	/**
-	 * @inheritdoc
+	 * @throws Exception
+	 *
+	 * @return string
 	 */
-	protected static function loadParams(?string $param = null, bool $is_global = false): void {
+	public static function get(string $field): string {
 		if (!self::$params) {
-			self::$params = API::Authentication()->get(['output' => 'extend']);
+			self::$params = API::Authentication()->get(['output' => CAuthentication::getOutputFields()]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load authentication API parameters.'));
 			}
 		}
+
+		return self::$params[$field];
+	}
+
+	/**
+	 * Get the value of the given Authentication API object's field available to parts of the UI without authentication.
+	 *
+	 * @param string $field
+	 *
+	 * @return string
+	 */
+	public static function getPublic(string $field): string {
+		if (!self::$params_public) {
+			self::$params_public = CAuthentication::getPublic();
+		}
+
+		return self::$params_public[$field];
 	}
 
 	/**

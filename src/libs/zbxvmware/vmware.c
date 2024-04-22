@@ -37,6 +37,7 @@
 #include "zbxstr.h"
 #include "zbxsysinc.h"
 #include "zbxalgo.h"
+#include "zbxcurl.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -147,20 +148,14 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 	if (NULL == str)
 		return NULL;
 
-	ptr = zbx_hashset_search(strpool, str - REFCOUNT_FIELD_SIZE);
+	zbx_uint64_t	sz;
 
-	if (NULL == ptr)
-	{
-		zbx_uint64_t	sz;
+	sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
+	ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE, sz,
+			ZBX_HASHSET_UNIQ_FALSE);
 
-		sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
-		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE);
-
-		*(zbx_uint32_t *)ptr = 0;
-
-		if (NULL != len)
-			*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
-	}
+	if (NULL != len)
+		*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
 
 	(*(zbx_uint32_t *)ptr)++;
 
@@ -922,25 +917,14 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
 					(long)config_vmware_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(easyhandle, error))
 		goto out;
-	}
-#endif
 
 	if (NULL != config_source_ip)
 	{
@@ -1422,7 +1406,7 @@ static int	vmware_cq_instance_id_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort datastore names vector by name           *
+ * Purpose: comparison function to sort datastore names vector by name        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
@@ -1431,6 +1415,19 @@ int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
 	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
 
 	return strcmp(ds1->name, ds2->name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: comparison function to sort Datastore names vector by UUID        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_dsname_compare_uuid(const void *d1, const void *d2)
+{
+	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
+	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
 }
 
 int	zbx_vmware_pnic_compare(const void *v1, const void *v2)

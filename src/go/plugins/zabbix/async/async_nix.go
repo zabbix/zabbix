@@ -34,7 +34,5 @@ func getMetrics() []string {
 		"system.cpu.intr", "Device interrupts.",
 		"system.hw.cpu", "CPU information.",
 		"system.hw.macaddr", "Listing of MAC addresses.",
-		"system.swap.in", "Swap in (from device into memory) statistics.",
-		"system.swap.out", "Swap out (from memory onto device) statistics.",
 	}
 }

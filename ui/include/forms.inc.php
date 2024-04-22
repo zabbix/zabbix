@@ -93,9 +93,12 @@ function getItemFormData(array $item = []) {
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
-		'backurl' => getRequest('backurl')
+		'backurl' => getRequest('backurl'),
+		'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
+		'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
+		'enabled_lifetime_type' => getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type')),
+		'enabled_lifetime' => getRequest('enabled_lifetime', ZBX_LLD_RULE_ENABLED_LIFETIME)
 	];
-
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
 	// Unset empty and inherited tags.
@@ -335,7 +338,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
-		->addClass('list-numbered')
+		->addClass(ZBX_STYLE_LIST_NUMBERED)
+		->setAttribute('data-readonly', $readonly)
 		->addItem(
 			(new CListItem([
 				(new CDiv(_('Name')))->addClass('step-name'),
@@ -346,8 +350,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
 		);
-
-	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
 
@@ -502,11 +504,11 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 				$params = [
 					$step_param_0
-						->setAttribute('placeholder', ',')
+						->setAttribute('placeholder', _('delimiter'))
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
 					$step_param_1
-						->setAttribute('placeholder', '"')
+						->setAttribute('placeholder', _('qualifier'))
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
 					(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
@@ -713,10 +715,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			(new CListItem([
 				(new CDiv([
 					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
-						->addClass(ZBX_STYLE_DRAG_ICON)
-						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
+						->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CDiv($preproc_types_select))
-						->addClass('list-numbered-item')
+						->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
@@ -735,7 +736,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				$on_fail_options
 			]))
 				->addClass('preprocessing-list-item')
-				->addClass('sortable')
 				->setAttribute('data-step', $i)
 		);
 

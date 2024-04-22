@@ -167,7 +167,8 @@ if ($data['change_password']) {
 
 	$current_password = (new CPassBox('current_password'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired();
+		->setAriaRequired()
+		->setAttribute('autocomplete', 'off');
 
 	if ($data['action'] !== 'user.edit') {
 		$current_password->setAttribute('autofocus', 'autofocus');
@@ -187,11 +188,13 @@ if ($data['change_password']) {
 			(new CPassBox('password1', $data['password1']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
 		])
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
 		)
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
@@ -266,15 +269,14 @@ else {
 	setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 
 	if (!function_exists('bindtextdomain')) {
-		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+		$language_error = makeErrorIcon('Translations are unavailable because the PHP gettext module is missing.');
+
 		$lang_select->setReadonly();
 	}
 	elseif (!$all_locales_available) {
-		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
-	}
-
-	if ($language_error) {
-		$language_error = makeErrorIcon($language_error);
+		$language_error = makeWarningIcon(
+			_('You are not able to choose some of the languages, because locales for them are not installed on the web server.')
+		);
 	}
 
 	$timezone_select
@@ -302,13 +304,14 @@ if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== Z
 			->setId('autologout_visible')
 			->setChecked($data['autologout'] !== '0'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('autologout', $autologout))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]);
 }
 
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
-		(new CTextBox('refresh', $data['refresh']))
+		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)

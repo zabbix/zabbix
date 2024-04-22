@@ -31,6 +31,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *
@@ -934,7 +935,7 @@ static inventory_field_t	inventory_fields[] =
 	{MVAR_INVENTORY_POC_SECONDARY_CELL, 67},
 	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, 68},
 	{MVAR_INVENTORY_POC_SECONDARY_NOTES, 69},
-	{NULL}
+	{0}
 };
 
 /******************************************************************************

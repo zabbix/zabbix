@@ -80,47 +80,32 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * @param array $options
-	 * @param bool  $api_call  Flag indicating whether this method called via an API call or from a local PHP file.
-	 *
-	 * @throws APIException if the input is invalid.
-	 *
-	 * @return array
+	 * Get the fields of the Settings API object that are used by parts of the UI where authentication is not required.
 	 */
-	public function getGlobal(array $options, bool $api_call = true): array {
-		if ($api_call) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s.%2$s".', 'settings', 'getglobal')
-			);
-		}
-
-		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
-			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
-			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'x_frame_options', 'default_timezone', 'session_key', 'dbversion_status', 'server_status'
+	public static function getPublic(): array {
+		$output_fields = ['default_theme', 'server_check_interval', 'show_technical_errors', 'severity_color_0',
+			'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5',
+			'custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color',
+			'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'x_frame_options', 'auditlog_enabled'
 		];
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
-		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
+		return DB::select('config', ['output' => $output_fields])[0];
+	}
 
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $output_fields;
-		}
+	/**
+	 * Get the private settings used in UI.
+	 */
+	public static function getPrivate(): array {
+		$output_fields = ['session_key', 'dbversion_status', 'server_status'];
 
-		$db_settings = [];
+		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 
-		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
 
-		while ($row = DBfetch($result)) {
-			$db_settings[] = $row;
-		}
-		$db_settings = $this->unsetExtraFields($db_settings, ['configid'], []);
+		$db_settings['server_status'] = json_decode($db_settings['server_status'], true) ?: [];
+		$db_settings['server_status'] += ['configuration' => ['enable_global_scripts' => true]];
 
-		return $db_settings[0];
+		return $db_settings;
 	}
 
 	/**
