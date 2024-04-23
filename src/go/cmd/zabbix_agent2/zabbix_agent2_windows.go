@@ -31,11 +31,14 @@ import (
 )
 
 const osDependentUsageMessageFormat = //
-`  %[1]s [-c config-file] [-s automatic] [-m]
-  %[1]s [-c config-file] [-s delayed] [-m]
-  %[1]s [-c config-file] [-s manual] [-m]
-  %[1]s [-c config-file] [-s disabled] [-m]
-  %[1]s [-c config-file] -i [-m]
+`  %[1]s [-c config-file] [-m] [-S automatic]
+  %[1]s [-c config-file] [-m] [-S delayed]
+  %[1]s [-c config-file] [-m] [-S manual]
+  %[1]s [-c config-file] [-m] [-S disabled]
+  %[1]s [-c config-file] -i [-m] [-S automatic]
+  %[1]s [-c config-file] -i [-m] [-S delayed]
+  %[1]s [-c config-file] -i [-m] [-S manual]
+  %[1]s [-c config-file] -i [-m] [-S disabled]
   %[1]s [-c config-file] -d [-m]
   %[1]s [-c config-file] -s [-m]
   %[1]s [-c config-file] -x [-m]

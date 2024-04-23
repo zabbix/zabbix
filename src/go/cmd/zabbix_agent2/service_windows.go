@@ -26,12 +26,10 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-	"unsafe"
 
 	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxflag"
-	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -215,7 +213,6 @@ func validateExclusiveFlags(args *Arguments) error {
 			svcUninstallFlag,
 			svcStartFlag,
 			svcStopFlag,
-			svcStartType != "",
 			args.print,
 			args.test != "",
 			args.runtimeCommand != "",
@@ -369,6 +366,30 @@ func getAgentPath() (p string, err error) {
 	return
 }
 
+func svcStartTypeFlagParse() (uint32, bool, error) {
+	var startType uint32
+	var delayedAutoStart bool
+	var err error
+
+	switch svcStartType {
+	case "":
+		startType = mgr.StartAutomatic
+	case startTypeAutomatic:
+		startType = mgr.StartAutomatic
+	case startTypeDelayed:
+		delayedAutoStart = true
+		startType = mgr.StartAutomatic
+	case startTypeManual:
+		startType = mgr.StartManual
+	case startTypeDisabled:
+		startType = mgr.StartDisabled
+	default:
+		err = fmt.Errorf("unknown service start type: '%s'", svcStartType)
+	}
+
+	return startType, delayedAutoStart, err
+}
+
 func svcInstall(conf string) error {
 	exepath, err := getAgentPath()
 	if err != nil {
@@ -387,14 +408,21 @@ func svcInstall(conf string) error {
 		return errors.New("service already exists")
 	}
 
+	startType, delayedAutoStart, err := svcStartTypeFlagParse()
+
+	if err != nil {
+		return errs.Wrap(err, "failed to get new startup type")
+	}
+
 	s, err = m.CreateService(
 		serviceName,
 		exepath,
 		mgr.Config{
-			StartType:      mgr.StartAutomatic,
-			DisplayName:    serviceName,
-			Description:    "Provides system monitoring",
-			BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+			StartType:        startType,
+			DisplayName:      serviceName,
+			Description:      "Provides system monitoring",
+			BinaryPathName:   fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+			DelayedAutoStart: delayedAutoStart,
 		},
 		"-c", conf,
 		"-f=false",
@@ -493,61 +521,39 @@ func svcStop() error {
 }
 
 func svcStartupTypeSet() error {
-	var dwStartType uint32
-	var serviceAutostart, serviceAutostartDelayed bool
 
 	m, err := mgr.Connect()
+
 	if err != nil {
 		return errs.Wrap(err, "failed to connect to service manager")
 	}
+
 	defer m.Disconnect()
 
 	s, err := m.OpenService(serviceName)
+
 	if err != nil {
 		return errs.Wrap(err, "failed to open service")
 	}
+
 	defer s.Close()
 
-	switch svcStartType {
-	case startTypeAutomatic:
-		serviceAutostart = true
-		dwStartType = windows.SERVICE_AUTO_START
-	case startTypeDelayed:
-		serviceAutostart = true
-		serviceAutostartDelayed = true
-		dwStartType = windows.SERVICE_AUTO_START
-	case startTypeManual:
-		dwStartType = windows.SERVICE_DEMAND_START
-	case startTypeDisabled:
-		dwStartType = windows.SERVICE_DISABLED
-	default:
-		return fmt.Errorf("unknown service start type: '%s'", svcStartType)
+	c, err := s.Config()
+
+	if err != nil {
+		return errs.Wrap(err, "failed to retrieve service config")
 	}
 
-	windows.ChangeServiceConfig(
-		s.Handle,
-		windows.SERVICE_NO_CHANGE,
-		dwStartType,
-		windows.SERVICE_NO_CHANGE,
-		nil,
-		nil,
-		nil,
-		nil,
-		nil,
-		nil,
-		nil,
-	)
+	c.StartType, c.DelayedAutoStart, err = svcStartTypeFlagParse()
 
-	if serviceAutostart {
-		var scdasi windows.SERVICE_DELAYED_AUTO_START_INFO
+	if err != nil {
+		return errs.Wrap(err, "failed to get new startup type")
+	}
 
-		if serviceAutostartDelayed {
-			scdasi.IsDelayedAutoStartUp = 1
-		}
+	err = s.UpdateConfig(c)
 
-		windows.ChangeServiceConfig2(
-			s.Handle, windows.SERVICE_CONFIG_DELAYED_AUTO_START_INFO, (*byte)(unsafe.Pointer(&scdasi)),
-		)
+	if err != nil {
+		return errs.Wrap(err, "failed to update service config")
 	}
 
 	return nil
