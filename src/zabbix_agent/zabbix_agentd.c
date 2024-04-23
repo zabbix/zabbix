@@ -172,7 +172,7 @@ static const char	*help_message[] = {
 	"  -m --multiple-agents           For -i -d -s -x functions service name will",
 	"                                 include Hostname parameter specified in",
 	"                                 configuration file",
-	"  -S --startup-type              Set startup type of the Zabbix Windows"
+	"  -S --startup-type              Set startup type of the Zabbix Windows",
 	"                                 agent service to be installed. Allowed values:",
 	"                                 " ZBX_SERVICE_STARTUP_AUTOMATIC " (default), " ZBX_SERVICE_STARTUP_DELAYED
 	", " ZBX_SERVICE_STARTUP_MANUAL ", " ZBX_SERVICE_STARTUP_DISABLED,
