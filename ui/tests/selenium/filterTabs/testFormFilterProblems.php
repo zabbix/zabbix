@@ -174,7 +174,7 @@ class testFormFilterProblems extends testFormFilter {
 				[
 					'expected' => TEST_GOOD,
 					'filter_form' => [
-						'Name' => 'non_exist'
+						'Problem' => 'non_exist'
 					],
 					'filter' => [
 						'Name' => 'simple_name and 0 records',

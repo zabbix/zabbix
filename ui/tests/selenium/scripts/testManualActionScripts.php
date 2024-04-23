@@ -29,6 +29,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testManualActionScripts extends CWebTest {
 
+	const HOST = 'A host for scripts check';
+
 	/**
 	 * Id of host.
 	 *
@@ -49,7 +51,7 @@ class testManualActionScripts extends CWebTest {
 		// Create host and trapper item for manual user input test.
 		$host = CDataHelper::createHosts([
 			[
-				'host' => 'A host for scripts check',
+				'host' => self::HOST,
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -73,7 +75,7 @@ class testManualActionScripts extends CWebTest {
 				]
 			]
 		]);
-		self::$hostid = $host['hostids']['A host for scripts check'];
+		self::$hostid = $host['hostids'][self::HOST];
 
 		CDataHelper::call('trigger.create', [
 			[
@@ -88,7 +90,7 @@ class testManualActionScripts extends CWebTest {
 		CDBHelper::setTriggerProblem('Attention: script execution is needed', TRIGGER_VALUE_TRUE);
 	}
 
-	public function getManualInputData() {
+	public static function getManualInputData() {
 		return [
 			// #0 Host url with {MANUALINPUT} macro, confirmation message and input type - string.
 			[
@@ -110,7 +112,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '0',
 					'prompt' => 'Enter host id',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -197,7 +199,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '0',
 					'prompt' => 'Enter host id',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -233,7 +235,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'a',
 					'prompt' => 'Enter value for parameter A',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -302,7 +304,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '10',
 					'prompt' => 'Enter value for parameter A',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -365,7 +367,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '0',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -446,7 +448,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -475,7 +477,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '11',
 					'prompt' => 'Enter hostname',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -505,7 +507,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '.',
 					'prompt' => 'Enter hostname',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -590,7 +592,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '1',
 					'prompt' => 'Enter port',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -622,7 +624,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '.',
 					'prompt' => 'Enter port',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -712,7 +714,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => 'example1',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
 					'urls' => [
@@ -744,7 +746,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => '.',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
 					'urls' => [
@@ -834,7 +836,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'id',
 					'prompt' => 'Enter host id',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -862,7 +864,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'id',
 					'prompt' => 'Choose host id',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -946,7 +948,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => 'id',
 					'prompt' => 'Enter host id',
 					'confirmation' => 'Confirm selected host?',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -976,7 +978,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => 'id',
 					'prompt' => 'Choose host id',
 					'confirmation' => 'Confirm selected host?',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1067,7 +1069,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '2',
 					'prompt' => 'Enter value for parameter A',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1101,7 +1103,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '3',
 					'prompt' => 'Enter value for parameter A',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1201,7 +1203,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '9',
 					'prompt' => 'Enter value for parameter A',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Parameter A will contain value => 9. Proceed?',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -1237,7 +1239,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'B',
 					'prompt' => 'Enter value for parameter A',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Parameter A will contain value => B. Proceed?',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -1335,7 +1337,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => '6.4',
 					'prompt' => 'Choose supported version',
 					'confirmation' => 'Confirm 6.4 as supported version?',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1364,7 +1366,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => '2',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'confirmation' => 'Ping count: 2',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1391,7 +1393,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '2',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1418,7 +1420,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '7.0',
 					'prompt' => 'Choose supported version',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1551,7 +1553,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'TestHost',
 					'prompt' => 'Enter hostname',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1579,7 +1581,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'TestHost',
 					'prompt' => 'Choose hostname',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1661,7 +1663,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'TestHost',
 					'prompt' => 'Enter hostname',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Hostname is TestHost',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -1691,7 +1693,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'AnyHost',
 					'prompt' => 'Choose hostname',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Hostname is AnyHost',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -1777,7 +1779,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '777',
 					'prompt' => 'Enter port',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1805,7 +1807,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '10050',
 					'prompt' => 'Choose port',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -1889,7 +1891,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '9000',
 					'prompt' => 'Enter port',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Selected port:9000. Proceed?',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -1919,7 +1921,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => '23',
 					'prompt' => 'Choose port',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Selected port:23. Proceed?',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2006,7 +2008,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' => 'gNuSm@s2',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2033,7 +2035,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'IPMI Watchdog',
 					'prompt' => 'Choose particular sensor',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2116,7 +2118,7 @@ class testManualActionScripts extends CWebTest {
 					'manual_input' =>'gNuSm@s2',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Are you sure?',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2145,7 +2147,7 @@ class testManualActionScripts extends CWebTest {
 					],
 					'manual_input' => 'BB +1.05V PCH',
 					'prompt' => 'Choose particular sensor',
-					'host' => 'A host for scripts check',
+					'host' => self::HOST,
 					'confirmation' => 'Selected sensor:BB +1.05V PCH. Proceed?',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2241,9 +2243,11 @@ class testManualActionScripts extends CWebTest {
 			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
 
 			if ($content === 'Latest data') {
-				$this->query('link', $data[$scope])->one()->click();
+				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Hosts' => $data[$scope]]);
+				$table = $this->query('xpath://table[contains(@class, "list-table fixed")]')->asTable()->one();
+				$this->query('button:Apply')->one()->click();
 				$this->page->waitUntilReady();
-				$table = $this->query('xpath://table[@class="list-table fixed"]')->asTable()->one();
+				$table->waitUntilReloaded();
 			}
 			elseif ($content === 'Global view') {
 				$table = CDashboardElement::find()->one()->getWidget('Current problems');
@@ -2297,7 +2301,7 @@ class testManualActionScripts extends CWebTest {
 
 				if ($data['fields']['Type'] === 'URL') {
 					COverlayDialogElement::ensureNotPresent();
-					$host_name = (array_key_exists('host', $data)) ? $data['host'] : 'A host for scripts check';
+					$host_name = (array_key_exists('host', $data)) ? $data['host'] : self::HOST;
 					$this->assertEquals($host_name, $this->query('id:host')->one()->getValue());
 				}
 				else {
@@ -2318,6 +2322,11 @@ class testManualActionScripts extends CWebTest {
 					);
 					$output_dialog->close();
 				}
+			}
+
+			if ($content === 'Latest data') {
+				$this->query('button:Reset')->one()->click();
+				$this->page->waitUntilReady();
 			}
 		}
 	}
