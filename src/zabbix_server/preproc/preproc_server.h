@@ -25,6 +25,7 @@
 #include "zbxtypes.h"
 #include "zbxcachehistory.h"
 
+int	preproc_prepare_value_server(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt);
 void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
 

@@ -37,6 +37,7 @@
 #include "zbxtime.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxinterface.h"
 
 /******************************************************************************
  *                                                                            *

@@ -28,7 +28,8 @@
 
 typedef void	(*zbx_on_exit_t)(int);
 
-void	zbx_service_start(int flags);
+void	zbx_service_start(int flags, zbx_get_config_str_f get_zbx_service_name_f,
+		zbx_get_config_str_f get_zbx_event_source_f);
 
 int	ZabbixCreateService(const char *path, int multiple_agents, const char *config_file);
 int	ZabbixRemoveService(void);

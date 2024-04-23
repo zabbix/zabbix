@@ -32,6 +32,7 @@ typedef struct
 	const char		*config_source_ip;
 	const char		*config_ssh_key_location;
 	zbx_get_config_forks_f	get_process_forks_cb_arg;
+	int			config_enable_global_scripts;
 }
 zbx_thread_escalator_args;
 

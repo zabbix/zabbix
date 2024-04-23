@@ -78,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_result(&param_result);
 
 	zbx_init_library_sysinfo(get_zbx_config_timeout, NULL, NULL, NULL, get_zbx_config_source_ip, NULL, NULL, NULL,
-			NULL);
+			NULL, NULL);
 
 	init_param = zbx_mock_get_parameter_string("in.key");
 

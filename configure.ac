@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0beta3])
+AC_INIT([Zabbix],[7.0.0rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1876,6 +1876,7 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
+		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
@@ -2001,7 +2002,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
-	src/libs/zbxdbconfigworker/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
@@ -2034,6 +2034,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxip/Makefile
+	src/libs/zbxinterface/Makefile
 	src/libs/zbxipcservice/Makefile
 	src/libs/zbxipmi/Makefile
 	src/libs/zbxjson/Makefile
@@ -2050,6 +2051,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxpoller/Makefile
 	src/libs/zbxagentget/Makefile
 	src/libs/zbxpreproc/Makefile
+	src/libs/zbxpreprocbase/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile
 	src/libs/zbxregexp/Makefile
@@ -2092,6 +2094,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
 	src/libs/zbxpinger/Makefile
+	src/libs/zbxescalations/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2118,6 +2121,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/audit/Makefile
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/postinit/Makefile

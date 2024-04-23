@@ -201,7 +201,7 @@ static int	DBpatch_6050013(void)
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -3315,7 +3315,7 @@ static int	DBpatch_6050219(void)
 					{"api_hostname", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, 0, 0},
 					{"clientid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
 					{"client_secret", "", NULL, NULL, 64, ZBX_TYPE_CHAR, 0, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -3351,7 +3351,7 @@ static int	DBpatch_6050223(void)
 					{"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"totp_secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, 0, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -3609,6 +3609,34 @@ static int	DBpatch_6050253(void)
 	/* set DISCOVERY_STATUS_LOST */
 	if (ZBX_DB_OK > zbx_db_execute("update group_discovery set status=1 where ts_delete<>0"))
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050254(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("mfa_totp_secret", &field);
+}
+
+static int	DBpatch_6050255(void)
+{
+	const zbx_db_field_t	field = {"used_codes", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("mfa_totp_secret", &field);
+}
+
+static int	DBpatch_6050256(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -3871,5 +3899,8 @@ DBPATCH_ADD(6050250, 0, 1)
 DBPATCH_ADD(6050251, 0, 1)
 DBPATCH_ADD(6050252, 0, 1)
 DBPATCH_ADD(6050253, 0, 1)
+DBPATCH_ADD(6050254, 0, 1)
+DBPATCH_ADD(6050255, 0, 1)
+DBPATCH_ADD(6050256, 0, 1)
 
 DBPATCH_END()

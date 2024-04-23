@@ -62,13 +62,6 @@ zbx_session_type_t;
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
-#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
-#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
-#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
-#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
-#define ZBX_AGENT_UNKNOWN	255
-#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
-
 typedef struct
 {
 	zbx_uint64_t	interfaceid;
@@ -864,7 +857,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	zbx_dc_config_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
-void	zbx_dc_config_items_apply_changes(const zbx_vector_ptr_t *item_diff);
+void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);
 
 void	zbx_dc_config_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
 int	zbx_dc_get_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
