@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-14 17:30+0000\n"
+"PO-Revision-Date: 2024-04-18 18:01+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -86,7 +86,7 @@ msgstr "%1$d coincidencias para %2$s encontradas"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "Se muestran %1$d de %1$d+ equipos"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -8952,7 +8952,7 @@ msgstr "DN de base del grupo"
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 #: widgets/hostnavigator/includes/WidgetForm.php:102
 msgid "Group by"
-msgstr ""
+msgstr "Agrupar por"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9542,7 +9542,7 @@ msgstr "Nombre de equipo"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
-msgstr ""
+msgstr "Navegador de equipos"
 
 #: include/hosts.inc.php:284
 msgid "Host networks"
@@ -9622,7 +9622,7 @@ msgstr "Enrutador de equipo"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:69
 msgid "Host status"
-msgstr ""
+msgstr "Estado del equipo"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -17212,7 +17212,7 @@ msgstr "RESULTADO is VERDADERO"
 #: app/controllers/CControllerPopupItemTestSend.php:456
 #, c-format
 msgid "Result is truncated due to its size (%1$s)."
-msgstr ""
+msgstr "El resultado está truncado debido a su tamaño (%1$s)."
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -20989,7 +20989,7 @@ msgstr "¿Desbloquear los usuarios seleccionados?"
 
 #: widgets/hostnavigator/Widget.php:38
 msgid "Uncategorized"
-msgstr ""
+msgstr "Sin categoría"
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -25090,7 +25090,7 @@ msgstr "round() - Redondea un valor a un número de decimales"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 msgid "rows must be unique"
-msgstr ""
+msgstr "las filas deben ser únicas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -25237,7 +25237,7 @@ msgstr "etiqueta"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
-msgstr ""
+msgstr "la etiqueta no puede estar vacía"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
