@@ -1171,7 +1171,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function prepareTestData(): array {
 		$data = $this->getItemTestProperties($this->getInputAll(), true);
-		$data = $this->resolveItemPropertyMacros($data);
+		$data['item'] = $this->resolveItemPropertyMacros($data['item']);
 
 		if ($data['item']['type'] == ITEM_TYPE_CALCULATED) {
 			$data['host']['hostid'] = $this->getInput('hostid');
