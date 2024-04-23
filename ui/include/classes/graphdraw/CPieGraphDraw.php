@@ -462,20 +462,10 @@ class CPieGraphDraw extends CGraphDraw {
 		$xc = $x = (int) ($this->sizeX / 2) + $this->shiftXleft;
 		$yc = $y = (int) ($this->sizeY / 2) + $this->shiftY;
 
-		$anglestart = 0;
-		$angleend = 0;
+		$calculated_angles = self::calculatePieAngles($values, $sum);
 
-		foreach ($values as $item => $value) {
-			if ($value == 0) {
-				continue;
-			}
-
-			$angleend += (int) (360 * $value / $sum) + 1;
-			$angleend = ($angleend > 360) ? 360 : $angleend;
-
-			if (($angleend - $anglestart) < 1) {
-				continue;
-			}
+		foreach ($calculated_angles as $item => $value) {
+			[$anglestart, $angleend] = $value;
 
 			if ($this->type == GRAPH_TYPE_EXPLODED) {
 				list($x, $y) = $this->calcExplodedCenter($anglestart, $angleend, $xc, $yc, count($values));
@@ -503,7 +493,6 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->getColor('Black'),
 				IMG_ARC_PIE | IMG_ARC_EDGED | IMG_ARC_NOFILL
 			);
-			$anglestart = $angleend;
 		}
 	}
 
@@ -543,21 +532,10 @@ class CPieGraphDraw extends CGraphDraw {
 		$xc = $x = (int) ($this->sizeX / 2) + $this->shiftXleft;
 		$yc = $y = (int) ($this->sizeY / 2) + $this->shiftY;
 
-		// bottom angle line
-		$anglestart = 0;
-		$angleend = 0;
+		$calculated_angles = self::calculatePieAngles($values, $sum);
 
-		foreach ($values as $item => $value) {
-			if ($value == 0) {
-				continue;
-			}
-
-			$angleend += (int) (360 * $value / $sum) + 1;
-			$angleend = ($angleend > 360) ? 360 : $angleend;
-
-			if (($angleend - $anglestart) < 1) {
-				continue;
-			}
+		foreach ($calculated_angles as $item => $value) {
+			[$anglestart, $angleend] = $value;
 
 			if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 				list($x, $y) = $this->calcExplodedCenter($anglestart, $angleend, $xc, $yc, count($values));
@@ -585,26 +563,14 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->getColor('Black'),
 				IMG_ARC_PIE | IMG_ARC_EDGED | IMG_ARC_NOFILL
 			);
-			$anglestart = $angleend;
 		}
 
 		// 3d effect
 		for ($i = $this->graphheight3d; $i > 0; $i--) {
-			$anglestart = 0;
-			$angleend = 0;
+			foreach ($calculated_angles as $item => $value) {
+				[$anglestart, $angleend] = $value;
 
-			foreach ($values as $item => $value) {
-				if ($value == 0) {
-					continue;
-				}
-
-				$angleend += (int) (360 * $value / $sum) + 1;
-				$angleend = ($angleend > 360) ? 360 : $angleend;
-
-				if (($angleend - $anglestart) < 1) {
-					continue;
-				}
-				elseif ($this->sum == 0) {
+				if ($this->sum == 0) {
 					continue;
 				}
 
@@ -623,24 +589,11 @@ class CPieGraphDraw extends CGraphDraw {
 					$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
 					IMG_ARC_PIE
 				);
-				$anglestart = $angleend;
 			}
 		}
 
-		$anglestart = 0;
-		$angleend = 0;
-
-		foreach ($values as $item => $value) {
-			if ($value == 0) {
-				continue;
-			}
-
-			$angleend += (int) (360 * $value / $sum) + 1;
-			$angleend = ($angleend > 360) ? 360 : $angleend;
-
-			if (($angleend - $anglestart) < 1) {
-				continue;
-			}
+		foreach ($calculated_angles as $item => $value) {
+			[$anglestart, $angleend] = $value;
 
 			if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 				list($x, $y) = $this->calcExplodedCenter($anglestart, $angleend, $xc, $yc, count($values));
@@ -668,8 +621,49 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->getColor('Black'),
 				IMG_ARC_PIE | IMG_ARC_EDGED | IMG_ARC_NOFILL
 			);
-			$anglestart = $angleend;
 		}
+	}
+
+	protected function calculatePieItemAngles(array $values): array {
+		$sum = $this->sum;
+		$positive_values = array_filter($values);
+
+		// Reserve extra 1px for each slice.
+		$space_to_split = 360 - count($positive_values);
+
+		// Because angles must be integers angles are rounded and all values summed may take less then 360 degrees.
+		// Calculate how many angles are missed because of rounding.
+		$rounding_diff = $space_to_split;
+		foreach ($positive_values as $value) {
+			$rounding_diff -= (int) ($space_to_split * $value / $sum);
+		}
+
+		// Rounding difference is evenly added to N largest pie slices.
+		// Find what is considered a largest slice.
+		$values_sorted = $positive_values;
+		arsort($values_sorted);
+		$rounding_boundary = array_slice($values_sorted, $rounding_diff - 1, 1)[0];
+
+		$angle_start = 0;
+		$angle_end = 0;
+		$calculated_angles = [];
+
+		// Calculate start/end angles for each pie slice.
+		foreach ($positive_values as $item => $value) {
+			$angle_end += (int) ($space_to_split * $value / $sum) + 1;
+
+			if ($value >= $rounding_boundary && $rounding_diff > 0) {
+				// Compensate rounding difference.
+				$angle_end += 1;
+				$rounding_diff--;
+			}
+
+			$calculated_angles[$item] = [$angle_start, $angle_end];
+
+			$angle_start = $angle_end;
+		}
+
+		return $calculated_angles;
 	}
 
 	public function draw() {
@@ -822,5 +816,71 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 
 		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
+	}
+
+	protected static function calculatePieAngles(array $values, $sum): array {
+		if ($sum == 0) {
+			return [];
+		}
+
+		$angle_end = 0;
+		$angle_start = 0;
+
+		$visible_values = array_filter($values, function ($value) use (&$angle_end, &$angle_start, $sum) {
+			if ($value == 0 || $angle_end >= 360) {
+				return false;
+			}
+
+			$angle_end += (int) (360 * $value / $sum);
+
+			if (($angle_end - $angle_start) < 1) {
+				return false;
+			}
+
+			$angle_start = $angle_end;
+
+			return true;
+		});
+		unset($angle_start);
+
+		// Reserve extra 1px for each slice.
+		$space_to_split = 360 - count($visible_values);
+
+		// Because angles must be integers angles are rounded and all values summed may take less then 360 degrees.
+		// Calculate how many angles are missed because of rounding.
+		$rounding_diff = $space_to_split;
+		foreach ($visible_values as $value) {
+			$rounding_diff -= (int) ($space_to_split * $value / $sum);
+		}
+
+		// Rounding difference is evenly added to N largest pie slices.
+		// Find what is considered a largest slice.
+		$rounding_boundary = 0;
+		if ($rounding_diff != 0) {
+			$values_sorted = $visible_values;// should it be positive?
+			arsort($values_sorted);
+			$rounding_boundary = array_slice($values_sorted, $rounding_diff - 1, 1)[0];
+		}
+
+		$angle_start = 0;
+		$angle_end = 0;
+		$calculated_angles = [];
+
+		foreach ($visible_values as $item => $value) {
+			$angle_end += (int) ($space_to_split * $value / $sum) + 1;
+			$angle_end = ($angle_end > 360) ? 360 : $angle_end;
+
+			if ($value >= $rounding_boundary && $rounding_diff > 0) {
+				// Compensate rounding difference.
+				$angle_end += 1;
+				$rounding_diff--;
+			}
+
+			$calculated_angles[$item] = [$angle_start, $angle_end];
+
+			$angle_start = $angle_end;
+		}
+
+		return $calculated_angles;
 	}
 }
