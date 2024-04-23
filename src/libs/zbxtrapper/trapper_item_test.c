@@ -435,7 +435,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			case SUCCEED:
 				if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 				{
-					*info = zbx_strdup(NULL, "no value");
+					*info = zbx_strdup(NULL, "No value");
 				}
 				else
 				{
