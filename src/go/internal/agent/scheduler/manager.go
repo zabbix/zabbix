@@ -953,7 +953,7 @@ func getPluginOptions(optsRaw interface{}, pluginName string) (int, int) {
 		capacity = opt.System.Capacity
 	}
 
-	if nil != opt.System.ForceActiveChecksOnStart {
+	if opt.System.ForceActiveChecksOnStart != nil {
 		if *opt.System.ForceActiveChecksOnStart > 1 || *opt.System.ForceActiveChecksOnStart < 0 {
 			log.Warningf(
 				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
