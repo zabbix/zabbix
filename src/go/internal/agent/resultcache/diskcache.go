@@ -28,14 +28,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	_ "github.com/mattn/go-sqlite3"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/version"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 const (

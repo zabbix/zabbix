@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/tlsconfig"
+	"golang.zabbix.com/sdk/tlsconfig"
 )
 
 func Test_getTLSDetails(t *testing.T) {

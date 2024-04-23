@@ -23,7 +23,7 @@ import (
 	"context"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

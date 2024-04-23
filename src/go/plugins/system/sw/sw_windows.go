@@ -23,14 +23,14 @@
 package sw
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
-	"fmt"
 
+	"golang.zabbix.com/sdk/plugin"
 	"golang.org/x/sys/windows/registry"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/win32"
 )
 

@@ -26,10 +26,10 @@ import (
 	"net"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/comms"
 )
 
 const queSize = 100

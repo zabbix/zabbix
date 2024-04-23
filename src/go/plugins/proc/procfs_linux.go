@@ -37,8 +37,8 @@ import (
 	"strings"
 	"syscall"
 
+	"golang.zabbix.com/sdk/log"
 	"zabbix.com/pkg/procfs"
-	"git.zabbix.com/ap/plugin-support/log"
 )
 
 type processUserInfo struct {

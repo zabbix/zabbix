@@ -46,11 +46,12 @@ static void	free_global_regexp(zbx_vector_expression_t *regexps)
 
 */
 import "C"
+
 import (
 	"errors"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func NewGlobalRegexp() (grxp unsafe.Pointer) {

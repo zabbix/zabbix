@@ -25,8 +25,7 @@ import (
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
-
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 const S_FALSE = 0x1

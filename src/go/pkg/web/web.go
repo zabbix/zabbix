@@ -29,9 +29,9 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/transform"
+	"golang.zabbix.com/sdk/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/version"
 )
