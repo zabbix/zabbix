@@ -109,7 +109,7 @@ window.popup_import = new class {
 		overlayDialogue({
 			class: 'position-middle',
 			content: document.createElement('span').innerText = (<?= json_encode(
-				_('By performing this operation some elements will be deleted. Do you want to proceed?')
+				_('Any existing entities not present in the import file will be deleted. Click OK to proceed.')
 			) ?>),
 			buttons: [
 				{
