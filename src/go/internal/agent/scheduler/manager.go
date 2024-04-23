@@ -672,10 +672,7 @@ run:
 }
 
 type pluginOptions struct {
-	/* Plugins.<Name>.Capacity parameter was removed. Use Plugins.<Name>.System.Capacity instead.          */
-	/* It is still here solely to log a warning, if it is configured in a loadable plugin created by user. */
-	Capacity int `conf:"optional"`
-	System   struct {
+	System struct {
 		ForceActiveChecksOnStart *int `conf:"optional"`
 		Capacity                 int  `conf:"optional"`
 	} `conf:"optional"`
@@ -950,12 +947,6 @@ func getPluginOptions(optsRaw interface{}, pluginName string) (int, int) {
 		log.Warningf("invalid plugin %s configuration: %s", pluginName, err)
 
 		return capacity, forceActiveChecksOnStart
-	}
-	if opt.Capacity > 0 {
-		log.Warningf("Plugins.%s.Capacity was removed. Use Plugins.%s.System.Capacity instead.",
-			pluginName,
-			pluginName,
-		)
 	}
 
 	if opt.System.Capacity > 0 {
