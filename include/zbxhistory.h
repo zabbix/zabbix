@@ -72,7 +72,7 @@ zbx_dc_history_t;
 
 ZBX_PTR_VECTOR_DECL(dc_history_ptr, zbx_dc_history_t *)
 
-void	zbx_dc_history_free(zbx_dc_history_t *dc_history);
+void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history);
 
 int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_flush,
 		int config_history_storage_pipelines);

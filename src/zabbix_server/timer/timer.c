@@ -262,13 +262,11 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 
 		if (FAIL == zbx_db_is_null(row[3]))
 		{
-			zbx_tag_t	*tag;
+			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 
-			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
 			zbx_vector_tags_ptr_append(&query->tags, tag);
-
 		}
 	}
 }

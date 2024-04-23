@@ -24,10 +24,10 @@
 
 int	zbx_interface_availability_compare_func(const void *d1, const void *d2)
 {
-	const zbx_interface_availability_t *int_aval_1 = *(const zbx_interface_availability_t **)d1;
-	const zbx_interface_availability_t *int_aval_2 = *(const zbx_interface_availability_t **)d2;
+	const zbx_interface_availability_t	*int_avail_1 = *(const zbx_interface_availability_t **)d1;
+	const zbx_interface_availability_t	*int_avail_2 = *(const zbx_interface_availability_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(int_aval_1->interfaceid, int_aval_2->interfaceid);
+	ZBX_RETURN_IF_NOT_EQUAL(int_avail_1->interfaceid, int_avail_2->interfaceid);
 
 	return 0;
 }

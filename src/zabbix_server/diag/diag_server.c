@@ -160,7 +160,6 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 		if (0 != tops.values_num)
 		{
 			zbx_vector_vc_item_stats_ptr_t	items;
-			int				i;
 
 			zbx_vector_vc_item_stats_ptr_create(&items);
 
@@ -171,7 +170,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 			zbx_json_addobject(json, "top");
 
-			for (i = 0; i < tops.values_num; i++)
+			for (int i = 0; i < tops.values_num; i++)
 			{
 				zbx_diag_map_t	*map = tops.values[i];
 				int		limit;
@@ -289,11 +288,9 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 
 		if (0 != tops.values_num)
 		{
-			int	i;
-
 			zbx_json_addobject(json, "top");
 
-			for (i = 0; i < tops.values_num; i++)
+			for (int i = 0; i < tops.values_num; i++)
 			{
 				zbx_diag_map_t	*map = tops.values[i];
 

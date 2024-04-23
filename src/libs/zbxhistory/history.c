@@ -28,7 +28,7 @@ ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
 ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)
 
-void	zbx_dc_history_free(zbx_dc_history_t *dc_history)
+void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history)
 {
 	zbx_free(dc_history);
 }
@@ -110,7 +110,7 @@ void	zbx_history_destroy(void)
 int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_flush,
 		int config_history_storage_pipelines)
 {
-	int	i, flags = 0;
+	int	flags = 0;
 
 	*ret_flush = FLUSH_SUCCEED;
 
@@ -118,7 +118,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -126,7 +126,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 			flags |= (1 << i);
 	}
 
-	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 

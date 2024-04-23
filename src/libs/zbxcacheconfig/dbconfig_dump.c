@@ -1059,7 +1059,6 @@ static void	DCdump_actions(void)
 
 static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 {
-	int					i;
 	zbx_vector_dc_corr_condition_ptr_t	index;
 
 	zbx_vector_dc_corr_condition_ptr_create(&index);
@@ -1070,7 +1069,7 @@ static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 
-	for (i = 0; i < index.values_num; i++)
+	for (int i = 0; i < index.values_num; i++)
 	{
 		zbx_dc_corr_condition_t	*condition = index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "      conditionid:" ZBX_FS_UI64 " type:%d",
@@ -1103,7 +1102,6 @@ static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 
 static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 {
-	int					i;
 	zbx_vector_dc_corr_operation_ptr_t	index;
 
 	zbx_vector_dc_corr_operation_ptr_create(&index);
@@ -1114,7 +1112,7 @@ static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 
 	zabbix_log(LOG_LEVEL_TRACE, "  operations:");
 
-	for (i = 0; i < index.values_num; i++)
+	for (int i = 0; i < index.values_num; i++)
 	{
 		zbx_dc_corr_operation_t	*operation = (zbx_dc_corr_operation_t *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "      operetionid:" ZBX_FS_UI64 " type:%d",

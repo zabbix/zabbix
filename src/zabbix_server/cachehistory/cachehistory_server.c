@@ -813,7 +813,7 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 
 	vc_flag_duplicates(&history_index, &duplicates);
 
-	zbx_vector_dc_history_ptr_clear_ext(&duplicates, zbx_dc_history_free);
+	zbx_vector_dc_history_ptr_clear_ext(&duplicates, zbx_dc_history_shallow_free);
 	zbx_vector_dc_history_ptr_destroy(&duplicates);
 	zbx_vector_dc_history_ptr_destroy(&history_index);
 

@@ -2645,13 +2645,11 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
-	int	i, j;
-
-	for (i = 0; i < self->rows.values_num; i++)
+	for (int i = 0; i < self->rows.values_num; i++)
 	{
 		zbx_db_value_t	*row = self->rows.values[i];
 
-		for (j = 0; j < self->fields.values_num; j++)
+		for (int j = 0; j < self->fields.values_num; j++)
 		{
 			zbx_db_field_t	*field = self->fields.values[j];
 
@@ -2702,8 +2700,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num)
 {
-	int	i;
-
 	if (0 == fields_num)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -2718,7 +2714,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 
 	self->table = table;
 
-	for (i = 0; i < fields_num; i++)
+	for (int i = 0; i < fields_num; i++)
 		zbx_vector_db_field_ptr_append(&self->fields, (zbx_db_field_t *)fields[i]);
 }
 
