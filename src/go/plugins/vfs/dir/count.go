@@ -69,7 +69,7 @@ const (
 	weekMultiplier = 7
 )
 
-//Plugin -
+// Plugin -
 type Plugin struct {
 	plugin.Base
 }

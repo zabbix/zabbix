@@ -31,7 +31,6 @@ import (
 func TestFileModifyTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-
 	var filetime int64
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
@@ -56,7 +55,6 @@ func TestFileModifyTime(t *testing.T) {
 func TestFileAccessTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-
 	var filetime int64
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
@@ -80,7 +78,6 @@ func TestFileAccessTime(t *testing.T) {
 
 func TestFileChangeTime(t *testing.T) {
 	stdOs = std.NewMockOs()
-
 
 	var filetime int64
 

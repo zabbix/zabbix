@@ -31,7 +31,6 @@ import (
 func TestFileSize(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
 		t.Errorf("vfs.file.size returned error %s", err.Error())

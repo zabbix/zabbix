@@ -42,8 +42,8 @@ import (
 )
 
 type processUserInfo struct {
-	uid	int64
-	gid	int64
+	uid int64
+	gid int64
 }
 
 func read2k(filename string) (data []byte, err error) {
@@ -86,8 +86,8 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 	var pos int
 	var nonvoluntary int64
 	nonvoluntary, proc.Vsize, proc.Rss, proc.Data, proc.Exe, proc.Hwm, proc.Lck, proc.Lib, proc.Peak, proc.Pin,
-			proc.Pte, proc.Stk, proc.Swap, proc.Threads, proc.CtxSwitches =
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+		proc.Pte, proc.Stk, proc.Swap, proc.Threads, proc.CtxSwitches =
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 	s := strings.Split(string(data), "\n")
 	for _, tmp := range s {
 		if pos = strings.IndexRune(tmp, ':'); pos == -1 {
@@ -148,18 +148,18 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 	return nil
 }
 
-func parseStateString(val string, state *string) () {
+func parseStateString(val string, state *string) {
 	posLeft := strings.IndexRune(val, '(')
 	posRight := strings.IndexRune(val, ')')
 
 	if posLeft == -1 || posRight == -1 {
 		*state = val
 	} else {
-		*state = val[posLeft+1:posRight]
+		*state = val[posLeft+1 : posRight]
 	}
 }
 
-func getProcessCalculatedMetrics(pid string, proc *procStatus) () {
+func getProcessCalculatedMetrics(pid string, proc *procStatus) {
 	addNonNegative(&proc.Size, proc.Exe)
 	addNonNegative(&proc.Size, proc.Data)
 	addNonNegative(&proc.Size, proc.Stk)
@@ -173,7 +173,7 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) () {
 	proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
 }
 
-func getProcessCpuTimes(pid string, proc *procStatus) () {
+func getProcessCpuTimes(pid string, proc *procStatus) {
 	var stat procStat
 	getProcessStats(pid, &stat)
 	if stat.err != nil {
@@ -386,7 +386,7 @@ func getThreadIds(pid string) (pids []string, err error) {
 	return getProcfsIds("/proc/" + pid + "/task")
 }
 
-func trimUnit(v string, p *int64) () {
+func trimUnit(v string, p *int64) {
 	var tmperr error
 	var value int64
 	var pos int
@@ -400,7 +400,7 @@ func trimUnit(v string, p *int64) () {
 		return
 	}
 
-	unit := v[pos + 1:]
+	unit := v[pos+1:]
 	switch unit {
 	case "kB":
 		value <<= 10
@@ -417,7 +417,7 @@ func trimUnit(v string, p *int64) () {
 	*p = value
 }
 
-func setInt64(v string, p *int64) () {
+func setInt64(v string, p *int64) {
 	var tmperr error
 	var value int64
 

@@ -94,9 +94,9 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 // Key Qualifier ('Name', 'DeviceID', 'Tag' etc.) is always appended to results which are sorted alphabetically,
 // so it's location is not fixed.
 // The following processing rules will be applied depending on query:
-// * only Key Qualifier column is returned - it means Key Qualifier was explicitly selected and must be returned
-// * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
-//   its Qualifiers_ property list
+//   - only Key Qualifier column is returned - it means Key Qualifier was explicitly selected and must be returned
+//   - Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
+//     its Qualifiers_ property list
 func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 	v, err := oleutil.GetProperty(rs, "Count")
 	if err != nil {
@@ -185,14 +185,14 @@ func variantToValue(v *ole.VARIANT) (result interface{}) {
 // uses the wmi enumerator and can set the WBEM_FLAG_NONSYSTEM_ONLY flag that would filter it. Ole library has only
 // the basic enumerator that cannot set any flags.
 // So that, we end up with these results for wmi.getAll where cases 1 and 2 are inconsistent with agent 1:
-//   1) 1 non-Key qualifier field selected	- key qualifier attached to the result, 2 elements are returned
-//   2) N non-Key qualifier fields selected	- key qualifier attached to the result, N+1 elements are returned
-//   3) Key qualifier field selected		- single key qualifier element is returned
-//   4) 1 non-Key qualifier and 1 Key qualifier elements selected
-//						- 2 elements are returned
-//   5) N fields selected and one of them is a Key-qualifier
-//						- N elements are returned
-//   6) * is selected				- all elements are returned (including the Key-qualifier)
+//  1. 1 non-Key qualifier field selected	- key qualifier attached to the result, 2 elements are returned
+//  2. N non-Key qualifier fields selected	- key qualifier attached to the result, N+1 elements are returned
+//  3. Key qualifier field selected		- single key qualifier element is returned
+//  4. 1 non-Key qualifier and 1 Key qualifier elements selected
+//     - 2 elements are returned
+//  5. N fields selected and one of them is a Key-qualifier
+//     - N elements are returned
+//  6. * is selected				- all elements are returned (including the Key-qualifier)
 func (r *tableResult) write(rs *ole.IDispatch) (err error) {
 	v, err := oleutil.GetProperty(rs, "Count")
 	if err != nil {
@@ -296,7 +296,8 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 
 // QueryValue returns the value of the first column of the first row returned by the query.
 // The value type depends on the column type and can one of the following:
-//   nil, int64, uin64, float64, string
+//
+//	nil, int64, uin64, float64, string
 func QueryValue(namespace string, query string) (value interface{}, err error) {
 	var r valueResult
 	if err = performQuery(namespace, query, &r); err != nil {
