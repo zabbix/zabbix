@@ -4848,8 +4848,8 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "event key reset, key: '" ZBX_FS_UI64 "', last_key: '"
-					ZBX_FS_UI64 "', createdTime: '%d', last_ts: '%d'", key, last_key,
-					(int)xml_event.created_time, (int)last_ts);
+					ZBX_FS_UI64 "', createdTime: '" ZBX_FS_TIME_T "', last_ts: '" ZBX_FS_TIME_T "'",
+					key, last_key, xml_event.created_time, last_ts);
 			*skip_old = 1;
 			goto clean;
 		}
