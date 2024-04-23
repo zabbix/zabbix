@@ -770,13 +770,23 @@ class CUserDirectory extends CApiService {
 					$provision_media += array_intersect_key($db_provision_media, array_flip(['mediatypeid', 'attribute']));
 				}
 
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => ['mediatypeid', 'attribute'], 'fields' => self::getProvisionMediaValidationFields($is_update)];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getProvisionMediaValidationFields($is_update)];
 
 				if (!CApiInputValidator::validate($api_input_rules, $provision_media, $path.'/'.($i2 + 1), $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
 			unset($provision_media);
+
+			$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
+				'mediatypeid' =>	['type' => API_ANY],
+				'attribute' =>		['type' => API_ANY]
+			]];
+			$data = $userdirectory['provision_media'];
+
+			if (!CApiInputValidator::validateUniqueness($api_input_rules, $data, $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
 		}
 		unset($userdirectory);
 	}
