@@ -159,10 +159,15 @@ class CControllerItemList extends CControllerItem {
 		$this->setResponse($response);
 	}
 
-	private function getselectedSubfilters($data) {
+	/**
+	 * @param array $subfilters  Array of subfilter data.
+	 *
+	 * @return array
+	 */
+	private function getselectedSubfilters($subfilters): array {
 		$result = [];
 
-		foreach ($data as $key => $subfilter) {
+		foreach ($subfilters as $key => $subfilter) {
 			if ($subfilter['selected']) {
 				$result[$key] = array_keys($subfilter['selected']);
 			}
