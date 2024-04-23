@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 #include "zbxalgo.h"
+#include "zbxipcservice.h"
 
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);
@@ -33,9 +34,11 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
-int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid);
+int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid,
+		zbx_ipc_async_socket_t *rtc);
 
-int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
+		zbx_vector_escalation_new_ptr_t *escalations);
 void	zbx_clean_events(void);
 void	zbx_reset_event_recovery(void);
 void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,

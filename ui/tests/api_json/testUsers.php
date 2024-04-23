@@ -566,63 +566,6 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'User directory with ID "1234" is not available.'
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user create with MFA TOTP method',
-						'roleid' => 1,
-						'passwd' => 'Z@bb1x1234',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 'mfa_totp_1',
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user create with non-existing MFA TOTP method',
-						'roleid' => 1,
-						'passwd' => 'Z@bb1x1234',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 999,
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/mfa_totp_secrets/1/mfaid": object does not exist.'
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user create with MFA DUO method',
-						'roleid' => 1,
-						'passwd' => 'Z@bb1x1234',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 'mfa_duo_1',
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/mfa_totp_secrets/1/mfaid": object of TOTP type is expected.'
 			]
 		];
 	}
@@ -631,8 +574,6 @@ class testUsers extends CAPITest {
 	 * @dataProvider user_create
 	 */
 	public function testUsers_Create($user, $expected_error) {
-		$this->resolveMfaids($user);
-
 		$result = $this->call('user.create', $user, $expected_error);
 
 		if ($expected_error === null) {
@@ -969,24 +910,6 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'userid' => '16',
-						'username' => 'api-user-for-password-super-admin',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 'mfa_totp_1',
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => null
 			]
 		];
 	}
@@ -1002,8 +925,6 @@ class testUsers extends CAPITest {
 				$oldHashUser = CDBHelper::getHash($sqlUser);
 			}
 		}
-
-		$this->resolveMfaids($users);
 
 		$result = $this->call('user.update', $users, $expected_error);
 
@@ -2874,19 +2795,5 @@ class testUsers extends CAPITest {
 
 	public function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
-	}
-
-	public function resolveMfaids(array &$users): void {
-		foreach ($users as &$user) {
-			if (is_array($user) && array_key_exists('mfa_totp_secrets', $user)) {
-				foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-					if (array_key_exists($mfa_totp_secret['mfaid'], self::$data['mfaids'])) {
-						$mfa_totp_secret['mfaid'] = self::$data['mfaids'][$mfa_totp_secret['mfaid']];
-					}
-				}
-				unset($mfa_totp_secret);
-			}
-		}
-		unset($user);
 	}
 }
