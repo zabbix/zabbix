@@ -46,10 +46,15 @@ class CWidgetHoneycomb extends CWidget {
 	/**
 	 * @type {number}
 	 */
-	#max_items = 1000;
+	#items_max_count = 1000;
+
+	/**
+	 * @type {number}
+	 */
+	#items_loaded_count = 0;
 
 	onActivate() {
-		this.#setMaxItems();
+		this.#items_max_count = this.#getItemsMaxCount();
 	}
 
 	isUserInteracting() {
@@ -63,11 +68,10 @@ class CWidgetHoneycomb extends CWidget {
 
 		clearTimeout(this.#resize_timeout_id);
 
-		const old_max = this.#max_items;
+		const old_items_max_count = this.#items_max_count;
+		this.#items_max_count = this.#getItemsMaxCount();
 
-		this.#setMaxItems();
-
-		if (old_max < this.#max_items) {
+		if (this.#items_max_count > old_items_max_count && this.#items_loaded_count >= old_items_max_count) {
 			this._startUpdating();
 		}
 
@@ -81,7 +85,7 @@ class CWidgetHoneycomb extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			max_items: this.#max_items,
+			max_items: this.#items_max_count,
 			with_config: this.#honeycomb === null ? 1 : undefined
 		};
 	}
@@ -113,6 +117,8 @@ class CWidgetHoneycomb extends CWidget {
 				}, 1000);
 			});
 		}
+
+		this.#items_loaded_count = response.cells.length;
 
 		this.#honeycomb.setValue({
 			cells: response.cells
@@ -168,7 +174,7 @@ class CWidgetHoneycomb extends CWidget {
 		return false;
 	}
 
-	#setMaxItems() {
+	#getItemsMaxCount() {
 		let {width, height} = super._getContentsSize();
 
 		width -= CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H * 2;
@@ -176,6 +182,6 @@ class CWidgetHoneycomb extends CWidget {
 
 		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width, height});
 
-		this.#max_items = max_rows * max_columns;
+		return max_rows * max_columns;
 	}
 }

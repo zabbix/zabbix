@@ -54,7 +54,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'vars' => [
-				'cells' => $this->getCells()
+				'cells' => $this->getCells($this->getInput('max_items', self::MAX_ITEMS) + 1)
 			]
 		];
 
@@ -65,59 +65,51 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getCells(): array {
+	private function getCells(int $limit): array {
 		if ($this->isTemplateDashboard() && !$this->fields_values['hostids']) {
 			return [];
 		}
 
-		$options = [
-			'output' => [],
-			'hostids' => $this->fields_values['hostids'] ?: null,
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		];
-
-		$show_data_in_maintenance = $this->fields_values['maintenance'] == 1;
+		$groupids = null;
+		$evaltype = null;
+		$tags = null;
 
 		if (!$this->isTemplateDashboard()) {
 			if ($this->fields_values['groupids']) {
-				$options['groupids'] = getSubGroups($this->fields_values['groupids']);
+				$groupids = getSubGroups($this->fields_values['groupids']);
 			}
 
 			if ($this->fields_values['host_tags']) {
-				$options['evaltype'] = $this->fields_values['evaltype_host'];
-				$options['tags'] = $this->fields_values['host_tags'];
+				$evaltype = $this->fields_values['evaltype_host'];
+				$tags = $this->fields_values['host_tags'];
 			}
 		}
 
-		if (!$show_data_in_maintenance) {
-			$options['filter'] = [
-				'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF
-			];
+		$hostids = $this->fields_values['hostids'] ?: null;
+		$filter = $this->fields_values['maintenance'] != 1
+			? ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
+			: null;
+
+		if ($groupids !== null || $hostids !== null || $tags !== null || $filter !== null) {
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'groupids' => $groupids,
+				'hostids' => $hostids,
+				'filter' => $filter,
+				'evaltype' => $evaltype,
+				'tags' => $tags,
+				'monitored_hosts' => true,
+				'preservekeys' => true
+			]);
+
+			if (!$db_hosts) {
+				return [];
+			}
+
+			$hostids = array_keys($db_hosts);
 		}
 
-		if ((!$show_data_in_maintenance && $this->isTemplateDashboard())
-				|| (!$this->isTemplateDashboard() && ($this->fields_values['groupids']
-					|| $this->fields_values['hostids'] || $this->fields_values['host_tags']
-					|| !$show_data_in_maintenance))) {
-			$hosts = API::Host()->get($options);
-		}
-		else {
-			$hosts = null;
-		}
-
-		if (!$hosts && $hosts !== null) {
-			return [];
-		}
-
-		if ($show_data_in_maintenance && $this->isTemplateDashboard()) {
-			$hostids = $this->fields_values['hostids'];
-		}
-		else {
-			$hostids = $hosts ? array_keys($hosts) : null;
-		}
-
-		$items = API::Item()->get([
+		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'units', 'value_type'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
@@ -132,34 +124,33 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'searchByAny' => true
 		]);
 
-		if (!$items) {
+		if (!$db_items) {
 			return [];
 		}
 
-		foreach ($items as &$item) {
+		foreach ($db_items as &$item) {
 			$item['hostname'] = $item['hosts'][0]['name'];
 		}
 		unset($item);
 
-		CArrayHelper::sort($items, ['hostname', 'name']);
+		CArrayHelper::sort($db_items, ['hostname', 'name']);
 
-		$limit = $this->getInput('max_items', self::MAX_ITEMS) + 1;
-		$total_items = count($items);
+		$total_items = count($db_items);
 		$batches = ceil($total_items / $limit);
 		$show = array_flip($this->fields_values['show']);
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$cells = [];
 
 		for ($batch = 0; $batch < $batches && count($cells) < $limit; $batch++) {
-			$batch_items = array_slice($items, $batch * $limit, $limit);
-			$history = Manager::History()->getLastValues($batch_items, 1, $history_period);
+			$batch_items = array_slice($db_items, $batch * $limit, $limit);
+			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period);
 
 			foreach ($batch_items as $item) {
-				if (!array_key_exists($item['itemid'], $history)) {
+				if (!array_key_exists($item['itemid'], $db_history)) {
 					continue;
 				}
 
-				$last_value = $history[$item['itemid']][0]['value'];
+				$last_value = $db_history[$item['itemid']][0]['value'];
 
 				$primary_label = array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)
 					? $this->getCellLabel($item, $last_value, [
