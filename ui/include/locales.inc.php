@@ -46,7 +46,7 @@ function getLocales() {
 		'en_GB' => ['name' => _('English (en_GB)'),	'display' => true],
 		'en_US' => ['name' => _('English (en_US)'),	'display' => true],
 		'bg_BG' => ['name' => _('Bulgarian (bg_BG)'),	'display' => false],
-		'ca_ES' => ['name' => _('Catalan (ca_ES)'),	'display' => false],
+		'ca_ES' => ['name' => _('Catalan (ca_ES)'),	'display' => true],
 		'zh_CN' => ['name' => _('Chinese (zh_CN)'),	'display' => true],
 		'zh_TW' => ['name' => _('Chinese (zh_TW)'),	'display' => false],
 		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),	'display' => true],
