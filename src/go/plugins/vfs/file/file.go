@@ -33,7 +33,6 @@ var (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Capacity             int `conf:"optional,range=1:100"`
 }
 
 // Plugin -

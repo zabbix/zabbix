@@ -672,6 +672,8 @@ run:
 }
 
 type pluginOptions struct {
+	/* Plugins.<Name>.Capacity parameter was removed. Use Plugins.<Name>.System.Capacity instead.          */
+	/* It is still here solely to log a warning, if it is configured in a loadable plugin created by user. */
 	Capacity int `conf:"optional"`
 	System   struct {
 		ForceActiveChecksOnStart *int `conf:"optional"`
@@ -934,74 +936,43 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getPluginOptions(
-	optsRaw interface{},
-	name string,
-) (capacity, forceActiveChecksOnStart int) {
-	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(
-		optsRaw,
-		name,
-	)
-
-	if pluginSystemCap > 0 {
-		if pluginCap > 0 {
-			log.Warningf(
-				"both Plugins.%s.Capacity and Plugins.%s.System.Capacity "+
-					"configuration parameters are set, using System.Capacity: %d",
-				name,
-				name,
-				pluginSystemCap,
-			)
-		}
-		capacity = pluginSystemCap
-	} else if pluginCap > 0 {
-		log.Warningf(
-			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
-			name, name, name,
-		)
-		capacity = pluginCap
-	} else {
-		capacity = plugin.DefaultCapacity
-	}
-
-	if nil != pluginForceActiveChecksOnStart {
-		if *pluginForceActiveChecksOnStart > 1 ||
-			*pluginForceActiveChecksOnStart < 0 {
-			log.Warningf(
-				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-				name,
-				*pluginForceActiveChecksOnStart,
-			)
-			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
-		} else {
-			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
-		}
-	} else {
-		forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
-	}
-
-	return
-}
-
-func getPluginOpts(
-	optsRaw interface{},
-	name string,
-) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
+func getPluginOptions(optsRaw interface{}, pluginName string) (int, int) {
 	var opt pluginOptions
 
+	capacity := plugin.DefaultCapacity
+	forceActiveChecksOnStart := agent.Options.ForceActiveChecksOnStart
+
 	if optsRaw == nil {
-		return
+		return capacity, forceActiveChecksOnStart
 	}
 
 	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
-		log.Warningf("invalid plugin %s configuration: %s", name, err)
+		log.Warningf("invalid plugin %s configuration: %s", pluginName, err)
 
-		return
+		return capacity, forceActiveChecksOnStart
+	}
+	if opt.Capacity > 0 {
+		log.Warningf("Plugins.%s.Capacity was removed. Use Plugins.%s.System.Capacity instead.",
+			pluginName,
+			pluginName,
+		)
 	}
 
-	pluginCap = opt.Capacity
-	pluginSystemCap = opt.System.Capacity
-	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
+	if opt.System.Capacity > 0 {
+		capacity = opt.System.Capacity
+	}
 
-	return
+	if nil != opt.System.ForceActiveChecksOnStart {
+		if *opt.System.ForceActiveChecksOnStart > 1 || *opt.System.ForceActiveChecksOnStart < 0 {
+			log.Warningf(
+				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+				pluginName,
+				*opt.System.ForceActiveChecksOnStart,
+			)
+		} else {
+			forceActiveChecksOnStart = *opt.System.ForceActiveChecksOnStart
+		}
+	}
+
+	return capacity, forceActiveChecksOnStart
 }

@@ -1888,51 +1888,6 @@ func Test_getCapacity(t *testing.T) {
 			1000,
 		},
 		{
-			"both_cap",
-			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []interface{}{
-						&conf.Node{
-							Name: "Capacity",
-							Nodes: []interface{}{
-								&conf.Value{Value: []byte("10")},
-							},
-						},
-						&conf.Node{
-							Name: "System",
-							Nodes: []interface{}{
-								&conf.Node{
-									Name: "Capacity",
-									Nodes: []interface{}{
-										&conf.Value{Value: []byte("50")},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			50,
-		},
-		{
-			"deprecated_cap",
-			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []interface{}{
-						&conf.Node{
-							Name: "Capacity",
-							Nodes: []interface{}{
-								&conf.Value{Value: []byte("10")},
-							},
-						},
-					},
-				},
-			},
-			10,
-		},
-		{
 			"system_cap",
 			args{
 				&conf.Node{
