@@ -624,48 +624,6 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 	}
 
-	protected function calculatePieItemAngles(array $values): array {
-		$sum = $this->sum;
-		$positive_values = array_filter($values);
-
-		// Reserve extra 1px for each slice.
-		$space_to_split = 360 - count($positive_values);
-
-		// Because angles must be integers angles are rounded and all values summed may take less then 360 degrees.
-		// Calculate how many angles are missed because of rounding.
-		$rounding_diff = $space_to_split;
-		foreach ($positive_values as $value) {
-			$rounding_diff -= (int) ($space_to_split * $value / $sum);
-		}
-
-		// Rounding difference is evenly added to N largest pie slices.
-		// Find what is considered a largest slice.
-		$values_sorted = $positive_values;
-		arsort($values_sorted);
-		$rounding_boundary = array_slice($values_sorted, $rounding_diff - 1, 1)[0];
-
-		$angle_start = 0;
-		$angle_end = 0;
-		$calculated_angles = [];
-
-		// Calculate start/end angles for each pie slice.
-		foreach ($positive_values as $item => $value) {
-			$angle_end += (int) ($space_to_split * $value / $sum) + 1;
-
-			if ($value >= $rounding_boundary && $rounding_diff > 0) {
-				// Compensate rounding difference.
-				$angle_end += 1;
-				$rounding_diff--;
-			}
-
-			$calculated_angles[$item] = [$angle_start, $angle_end];
-
-			$angle_start = $angle_end;
-		}
-
-		return $calculated_angles;
-	}
-
 	public function draw() {
 		$debug_mode = CWebUser::getDebugMode();
 		if ($debug_mode) {
