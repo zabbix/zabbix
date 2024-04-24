@@ -822,7 +822,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'fields' => [
 						'Name' => 'All fields',
 						'id:discovery_by' => 'Proxy',
-						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Actions',
+						'xpath:.//div[@id="proxyid"]/..' => 'Test Proxy',
 						'IP range' => '192.168.251.253-254',
 						'id:concurrency_max_type' => 'One',
 						'Update interval' => 604800,
@@ -1929,7 +1929,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				$form->fill([
 					'Name' => $new_name,
 					'id:discovery_by' => 'Proxy',
-					'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Actions',
+					'xpath:.//div[@id="proxyid"]/..' => 'Test Proxy',
 					'Update interval' => '15s',
 					'Enabled' => false
 				]);

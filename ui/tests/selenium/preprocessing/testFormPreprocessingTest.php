@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * @backup items
+ *
+ * @dataSource GlobalMacros
  */
 class testFormPreprocessingTest extends CWebTest {
 

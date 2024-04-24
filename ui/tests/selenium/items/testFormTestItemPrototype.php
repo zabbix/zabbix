@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
 /**
  * "Test item prototype" function tests.
  *
- * @dataSource Proxies
+ * @dataSource Proxies, GlobalMacros
  *
  * @backup items
  */

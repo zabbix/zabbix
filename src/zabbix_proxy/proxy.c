@@ -1233,7 +1233,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL, NULL);
 	zbx_init_library_stats(get_zbx_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_progname);
+	zbx_init_library_preproc(preproc_prepare_value_proxy, preproc_flush_value_proxy, get_zbx_progname);
 	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	/* parse the command-line */

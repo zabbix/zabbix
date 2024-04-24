@@ -20,7 +20,7 @@
 #include "trapper_proxy.h"
 
 #include "../taskmanager/taskmanager_proxy.h"
-#include "../proxyconfigwrite/proxyconfig_write.h"
+#include "../proxyconfigwrite/proxyconfigwrite.h"
 
 #include "zbxcommshigh.h"
 #include "zbxtasks.h"
