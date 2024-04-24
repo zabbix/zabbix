@@ -1017,13 +1017,31 @@ static void	zbx_snmp_close_session(zbx_snmp_sess_t	session)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static char	*zbx_sprint_asn_octet_str_dyn(const struct variable_list *var)
+{
+	if (var->type != ASN_OCTET_STR)
+		return NULL;
+
+	char	*strval_dyn = (char *)zbx_malloc(NULL, var->val_len + 1);
+
+	memcpy(strval_dyn, var->val.string, var->val_len);
+	strval_dyn[var->val_len] = '\0';
+
+	if (FAIL == zbx_is_utf8(strval_dyn))
+		zbx_free(strval_dyn);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s'", __func__, strval_dyn);
+
+	return strval_dyn;
+}
+
 static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type,
 		zbx_snmp_asn_octet_str_t snmp_asn_octet_str)
 {
+	struct tree	*subtree;
 	const char	*hint;
 	char		buffer[MAX_BUFFER_LEN];
 	char		*strval_dyn = NULL;
-	struct tree	*subtree;
 	unsigned char	type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1032,21 +1050,14 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 	subtree = get_tree(var->name, var->name_length, get_tree_head());
 	hint = (NULL != subtree ? subtree->hint : NULL);
 
-	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint && var->type == ASN_OCTET_STR)
+	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint)
 	{
-		strval_dyn = (char *)zbx_malloc(strval_dyn, var->val_len + 1);
-		memcpy(strval_dyn, var->val.string, var->val_len);
-		strval_dyn[var->val_len] = '\0';
-		type = ZBX_SNMP_STR_ASCII;
-
 		/* avoid convertion to Hex-STRING for valid UTF-8 strings without hints */
-		if (SUCCEED == zbx_is_utf8(strval_dyn))
+		if (NULL != (strval_dyn = zbx_sprint_asn_octet_str_dyn(var)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s'", __func__, strval_dyn);
+			type = ZBX_SNMP_STR_ASCII;
 			goto end;
 		}
-
-		zbx_free(strval_dyn);
 	}
 
 	/* we will decide if we want the value from var->val or what snprint_value() returned later */
@@ -2483,6 +2494,28 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 
 	if (0 == strncmp(buf, TYPE_STR_HEX_STRING, sizeof(TYPE_STR_HEX_STRING) - 1))
 	{
+		char		*strval_dyn;
+		struct tree	*subtree;
+		const char	*hint;
+
+		subtree = get_tree(var->name, var->name_length, get_tree_head());
+		hint = (NULL != subtree ? subtree->hint : NULL);
+
+		if (NULL == hint && NULL != (strval_dyn = zbx_sprint_asn_octet_str_dyn(var)))
+		{
+			char	*str = NULL;
+			size_t	str_alloc = 0, str_offset = 0;
+
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, buffer, buf - buffer);
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, TYPE_STR_STRING);
+			zbx_strquote_alloc_opt(&str, &str_alloc, &str_offset, strval_dyn, ZBX_STRQUOTE_DEFAULT);
+
+			zbx_strlcpy(buffer, str, buffer_size);
+
+			zbx_free(strval_dyn);
+			zbx_free(str);
+		}
+
 		ret = SUCCEED;
 		goto out;
 	}
