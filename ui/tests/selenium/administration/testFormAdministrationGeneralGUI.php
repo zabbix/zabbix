@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
+ *
+ * @dataSource GlobalMacros
  */
 class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 

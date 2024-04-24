@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 /**
  * @backup dashboard, profiles
  *
- * @dataSource Actions, LoginUsers, AllItemValueTypes, UserPermissions, Proxies
+ * @dataSource Actions, AllItemValueTypes, ItemValueWidget, LoginUsers, Proxies, UserPermissions
  */
 class testDashboardsWidgetsPage extends CWebTest {
 
@@ -151,7 +151,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 20,
+			'Zabbix servers'					=> 19,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];

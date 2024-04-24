@@ -24,7 +24,7 @@
 #endif
 
 #include "postinit/postinit.h"
-#include "dbconfig/dbconfig.h"
+#include "dbconfig/dbconfig_server.h"
 #include "housekeeper/housekeeper_server.h"
 #include "poller/poller_server.h"
 #include "timer/timer.h"
@@ -32,14 +32,11 @@
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
 #include "taskmanager/taskmanager_server.h"
-#include "connector/connector_manager.h"
-#include "connector/connector_worker.h"
-#include "service/service_manager.h"
-#include "housekeeper/trigger_housekeeper.h"
+#include "connector/connector_server.h"
+#include "service/service_server.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
-#include "reporter/report_manager.h"
-#include "reporter/report_writer.h"
+#include "reporter/reporter.h"
 #include "events/events.h"
 #include "ha/ha.h"
 #include "rtc/rtc_server.h"
@@ -1271,7 +1268,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL, NULL);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_server, get_zbx_progname);
+	zbx_init_library_preproc(preproc_prepare_value_server, preproc_flush_value_server, get_zbx_progname);
 	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	/* parse the command-line */
@@ -1526,7 +1523,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
 							config_enable_global_scripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location, trapper_process_request_server,
+							config_ssh_key_location, zbx_trapper_process_request_server,
 							zbx_autoreg_update_host_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,

@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxalgo.h"
-#include "zbxtime.h"
-
 #ifndef ZABBIX_SERVICE_MANAGER_IMPL_H
 #define ZABBIX_SERVICE_MANAGER_IMPL_H
+
+#include "zbxalgo.h"
+#include "zbxtime.h"
 
 #define ZBX_SERVICE_STATUS_OK		-1
 
