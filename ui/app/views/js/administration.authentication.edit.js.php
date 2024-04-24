@@ -28,7 +28,7 @@
 	const view = new class {
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates, mfa_methods, mfa_default_row_index
+				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -38,6 +38,7 @@
 			this.ldap_jit_status = document.getElementById('ldap_jit_status');
 			this.ldap_servers_table = document.getElementById('ldap-servers');
 			this.templates = templates;
+			this.is_http_auth_allowed = is_http_auth_allowed;
 			this.ldap_provisioning_fields = this.form.querySelectorAll(
 				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
 			);
@@ -66,48 +67,50 @@
 		_addEventListeners() {
 			this.#addLdapSettingsEventListeners();
 
-			document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
-				this.form.querySelectorAll('[name^=http_]').forEach(field => {
-					if (!field.isSameNode(e.target)) {
-						field.disabled = !e.target.checked;
+			if (this.is_http_auth_allowed) {
+				document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
+					this.form.querySelectorAll('[name^=http_]').forEach(field => {
+						if (!field.isSameNode(e.target)) {
+							field.disabled = !e.target.checked;
+						}
+					});
+
+					if (e.target.checked) {
+						let form_fields = this.form.querySelectorAll('[name^=http_]');
+
+						const http_auth_enabled = document.getElementById('http_auth_enabled');
+						overlayDialogue({
+							'title': <?= json_encode(_('Confirm changes')) ?>,
+							'class': 'position-middle',
+							'content': document.createElement('span').innerText = <?= json_encode(
+								_('Enable HTTP authentication for all users.')
+							) ?>,
+							'buttons': [
+								{
+									'title': <?= json_encode(_('Cancel')) ?>,
+									'cancel': true,
+									'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+									'action': function () {
+										for (const form_field of form_fields) {
+											if (form_field !== http_auth_enabled) {
+												form_field.disabled = true;
+											}
+										}
+
+										http_auth_enabled.checked = false;
+										document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
+									}
+								},
+								{
+									'title': <?= json_encode(_('Ok')) ?>,
+									'focused': true,
+									'action': function () {}
+								}
+							]
+						}, e.target);
 					}
 				});
-
-				if (e.target.checked) {
-					let form_fields = this.form.querySelectorAll('[name^=http_]');
-
-					const http_auth_enabled = document.getElementById('http_auth_enabled');
-					overlayDialogue({
-						'title': <?= json_encode(_('Confirm changes')) ?>,
-						'class': 'position-middle',
-						'content': document.createElement('span').innerText = <?= json_encode(
-							_('Enable HTTP authentication for all users.')
-						) ?>,
-						'buttons': [
-							{
-								'title': <?= json_encode(_('Cancel')) ?>,
-								'cancel': true,
-								'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-								'action': function () {
-									for (const form_field of form_fields) {
-										if (form_field !== http_auth_enabled) {
-											form_field.disabled = true;
-										}
-									}
-
-									http_auth_enabled.checked = false;
-									document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
-								}
-							},
-							{
-								'title': <?= json_encode(_('Ok')) ?>,
-								'focused': true,
-								'action': function () {}
-							}
-						]
-					}, e.target);
-				}
-			});
+			}
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;

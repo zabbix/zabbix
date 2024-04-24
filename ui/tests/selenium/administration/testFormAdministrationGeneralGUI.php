@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
+ *
+ * @dataSource GlobalMacros
  */
 class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
@@ -91,11 +93,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
-		$this->query('class:zi-i-negative')->one()->click();
+		$this->query('class:zi-i-warning')->one()->click();
 		$this->assertEquals(
 			'You are not able to choose some of the languages,'.
 				' because locales for them are not installed on the web server.',
-			$this->query('class:red')->one()->getText()
+			$this->query('class:hintbox-wrap')->one()->getText()
 		);
 	}
 

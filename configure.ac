@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0beta3])
+AC_INIT([Zabbix],[7.0.0rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -2094,6 +2094,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
 	src/libs/zbxpinger/Makefile
+	src/libs/zbxescalations/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile

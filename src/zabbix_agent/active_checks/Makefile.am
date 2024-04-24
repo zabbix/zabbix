@@ -7,3 +7,5 @@ libzbxactive_checks_a_SOURCES = \
 	active_checks.h
 
 libzbxactive_checks_a_CFLAGS = $(TLS_CFLAGS)
+
+EXTRA_DIST = eventlog_win32

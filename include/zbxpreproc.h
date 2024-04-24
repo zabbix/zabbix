@@ -82,7 +82,10 @@ typedef struct zbx_pp_manager	zbx_pp_manager_t;
 typedef void(*zbx_flush_value_func_t)(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_progname_f get_progname_cb);
+typedef int(*zbx_prepare_value_func_t)(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt);
+
+void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb, zbx_flush_value_func_t flush_value_cb,
+		zbx_get_progname_f get_progname_cb);
 
 void	zbx_pp_value_task_get_data(zbx_pp_task_t *task, unsigned char *value_type, unsigned char *flags,
 		zbx_variant_t **value, zbx_timespec_t *ts, zbx_pp_value_opt_t **value_opt);

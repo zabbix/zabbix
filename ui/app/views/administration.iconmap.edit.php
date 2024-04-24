@@ -60,7 +60,7 @@ if ($data['iconmapid'] != 0) {
 $table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setId('iconMapTable')
-	->addClass('list-numbered')
+	->addClass(ZBX_STYLE_LIST_NUMBERED)
 	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', _('Action')]);
 
 $i = 0;
@@ -68,7 +68,7 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 	$table->addRow(
 		(new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan(':'))->addClass('list-numbered-item'),
+			(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
 				->setValue($mapping['inventory_link'])
 				->addOptions(CSelect::createOptionsFromArray($data['inventory_list'])),
