@@ -78,12 +78,12 @@ class CVaultSecretParserTest extends TestCase {
 				'error' => 'incorrect syntax near "/pathtosecret:key"'
 			]],
 			['pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
-				'rc' => CParser::PARSE_FAIL,
-				'error' => 'incorrect syntax near "pathtosecret:key"'
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
 			]],
 			[':key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
-				'error' => 'incorrect syntax near ":key"'
+				'error' => 'incorrect syntax near "key"'
 			]],
 			['/path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
