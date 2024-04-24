@@ -1031,7 +1031,7 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 	/* find the subtree to get display hint */
 	subtree = get_tree(var->name, var->name_length, get_tree_head());
 	hint = (NULL != subtree ? subtree->hint : NULL);
-	
+
 	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint && var->type == ASN_OCTET_STR)
 	{
 		strval_dyn = (char *)zbx_malloc(strval_dyn, var->val_len + 1);
