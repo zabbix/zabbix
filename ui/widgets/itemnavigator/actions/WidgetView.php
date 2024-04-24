@@ -120,14 +120,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
 		$name_pattern = in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items'];
 
-		if ($resolve_macros) {
-			$options['output'][] = 'name_resolved';
-			$options['search']['name_resolved'] = $name_pattern;
-		}
-		else {
-			$options['output'][] = 'name';
-			$options['search']['name'] = $name_pattern;
-		}
+		$options['output'][] = $resolve_macros ? 'name_resolved' : 'name';
+		$options['search']['name'] = $name_pattern;
 
 		$limit_extended = $this->fields_values['show_lines'] + 1;
 		$selected_items_cnt = 0;
