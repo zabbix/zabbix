@@ -291,11 +291,21 @@
 		doRefresh(body, subfilter = null) {
 			this.getCurrentForm().replaceWith(body);
 
+			const colapsed_tabfilter = document.querySelector('.tabfilter-collapsed');
+
 			if (subfilter !== null) {
 				this.getCurrentSubfilter().innerHTML = subfilter;
+
+				if (colapsed_tabfilter !== null) {
+					colapsed_tabfilter.classList.remove('display-none');
+				}
 			}
 			else {
 				this.getCurrentSubfilter().remove();
+
+				if (colapsed_tabfilter !== null) {
+					colapsed_tabfilter.classList.add('display-none');
+				}
 			}
 
 			chkbxRange.init();
