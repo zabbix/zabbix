@@ -129,7 +129,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$options['search']['name'] = $name_pattern;
 		}
 
-		$limit = $this->fields_values['show_lines'];
+		$limit_extended = $this->fields_values['show_lines'] + 1;
 		$selected_items_cnt = 0;
 		$items = [];
 		$hosts = [];
@@ -137,7 +137,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
 			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
-			$hosts = API::Host()->get([
+			$db_hosts = API::Host()->get([
 				'output' => $group_by_host_name ? ['hostid', 'name'] : [],
 				'groupids' => $groupids,
 				'hostids' => $this->fields_values['hostids'] ?: null,
@@ -151,7 +151,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]);
 		}
 		elseif ($override_hostid !== '') {
-			$hosts = API::Host()->get([
+			$db_hosts = API::Host()->get([
 				'output' => $group_by_host_name ? ['hostid', 'name'] : [],
 				'hostids' => [$override_hostid],
 				'with_items' => true,
@@ -161,61 +161,49 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]);
 		}
 
-		if (!$hosts) {
+		if (!$db_hosts) {
 			return $no_data;
 		}
 
-		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
-			foreach ($hosts as $hostid => &$host) {
-				if ($selected_items_cnt == $limit + 1) {
-					unset($hosts[$hostid]);
-					continue;
-				}
-
-				if ($host_tags_to_keep) {
-					self::filterTags($host, $host_tags_to_keep);
-				}
-
-				$options['limit'] = $limit + 1 - $selected_items_cnt;
-				$options['hostids'] = [$hostid];
-
-				$items += API::Item()->get($options);
-
-				$selected_items_cnt = count($items);
+		foreach ($db_hosts as $hostid => $host) {
+			if ($selected_items_cnt == $limit_extended) {
+				break;
 			}
-			unset($host);
-		}
-		else {
+
 			if ($host_tags_to_keep) {
-				self::filterTags($hosts[array_key_first($hosts)], $host_tags_to_keep);
+				self::filterTags($host, $host_tags_to_keep);
 			}
 
-			$options['hostids'] = [$override_hostid];
-			$options['limit'] = $limit + 1;
+			$hosts[$hostid] = $host;
 
-			$items = API::Item()->get($options);
+			$options['limit'] = $limit_extended - $selected_items_cnt;
+			$options['hostids'] = [$hostid];
+
+			$items += API::Item()->get($options);
+
+			$selected_items_cnt = count($items);
 		}
 
 		if (!$items) {
 			return $no_data;
 		}
 
+		if ($resolve_macros) {
+			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+		}
+
 		CArrayHelper::sort($items, ['name']);
 
 		$is_limit_exceeded = false;
 
-		if (count($items) > $limit) {
+		if (count($items) > $this->fields_values['show_lines']) {
 			$is_limit_exceeded = true;
 
 			array_pop($items);
 		}
 
-		if ($resolve_macros) {
-			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
-		}
-
-		if ($this->fields_values['problems'] !== WidgetForm::PROBLEMS_NONE || $item_tags_to_keep) {
-			if ($this->fields_values['problems'] !== WidgetForm::PROBLEMS_NONE) {
+		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE || $item_tags_to_keep) {
+			if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
 				$triggers = API::Trigger()->get([
 					'output' => [],
 					'selectItems' => ['itemid'],
@@ -230,7 +218,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => array_keys($triggers),
-					'suppressed' => $this->fields_values['problems'] == WidgetForm::PROBLEMS_UNSUPPRESSED ? false : null,
+					'suppressed' => $this->fields_values['problems'] == WidgetForm::PROBLEMS_UNSUPPRESSED
+						? false
+						: null,
 					'symptom' => false
 				]);
 
@@ -244,7 +234,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			foreach ($items as $key => &$item) {
-				if ($this->fields_values['problems'] !== WidgetForm::PROBLEMS_NONE) {
+				if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE) {
 					$item['problem_count'] = array_fill(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT, 0);
 
 					// Count the number of problems (as value) per severity (as key).
@@ -262,11 +252,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($item);
 		}
 
-		$items = array_values($items);
-
 		return [
 			'hosts' => $hosts,
-			'items' => $items,
+			'items' => array_values($items),
 			'is_limit_exceeded' => $is_limit_exceeded
 		];
 	}
@@ -308,10 +296,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	/**
 	 * Filters tags of a given entity (host or item) based on the specified tags to keep.
 	 *
-	 * @param array $entity       The entity (host or item) to filter.
-	 * @param array $tags_to_keep The tags to retain in the entity.
-	 *
-	 * @return void
+	 * @param array $entity        The entity (host or item) to filter.
+	 * @param array $tags_to_keep  The tags to retain in the entity.
 	 */
 	private static function filterTags(array &$entity, array $tags_to_keep): void {
 		$entity['tags'] = array_values(array_filter($entity['tags'], function($tag) use ($tags_to_keep) {
