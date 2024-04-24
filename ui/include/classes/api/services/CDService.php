@@ -279,7 +279,11 @@ class CDService extends CApiService {
 					' AND '.dbConditionId('ds.dserviceid', $dserviceIds).
 					' AND ('.
 						'(h.monitored_by='.ZBX_MONITORED_BY_SERVER.' AND dr.proxyid IS NULL)'.
-						' OR (h.monitored_by='.ZBX_MONITORED_BY_PROXY.' AND dr.proxyid=h.proxyid)'.
+						' OR ('.
+							'h.monitored_by='.ZBX_MONITORED_BY_PROXY.
+							' AND dr.proxyid=h.proxyid'.
+							' AND p.proxy_groupid IS NULL'.
+						')'.
 						' OR (h.monitored_by='.ZBX_MONITORED_BY_PROXY_GROUP.' AND h.proxy_groupid=p.proxy_groupid)'.
 					')'
 			);
