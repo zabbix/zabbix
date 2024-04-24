@@ -2323,11 +2323,6 @@ class testManualActionScripts extends CWebTest {
 					$output_dialog->close();
 				}
 			}
-
-			if ($content === 'Latest data') {
-				$this->query('button:Reset')->one()->click();
-				$this->page->waitUntilReady();
-			}
 		}
 	}
 }
