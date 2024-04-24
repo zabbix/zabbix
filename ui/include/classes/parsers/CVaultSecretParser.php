@@ -68,7 +68,8 @@ class CVaultSecretParser extends CParser {
 
 		$src_size = strlen($source);
 		$namespace_sep = strpos($source, '/');
-		if ($namespace_sep === false || $namespace_sep == 0 || $namespace_sep == $src_size - 1) {
+		if (($namespace_sep === false && !$this->options['with_key']) || $namespace_sep === 0
+				|| $namespace_sep == $src_size - 1) {
 			$this->errorPos($source, 0);
 
 			return self::PARSE_FAIL;
