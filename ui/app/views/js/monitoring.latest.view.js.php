@@ -41,12 +41,12 @@
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, mandatory_filter_set}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
-			this.mandatory_filter_set = mandatory_filter_set;
+			this.filter_set = filter_set;
 
 			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
@@ -57,7 +57,7 @@
 			this.initListActions();
 			this.initItemFormEvents(this.getCurrentForm().get(0));
 
-			if (this.refresh_interval != 0 && this.mandatory_filter_set) {
+			if (this.refresh_interval != 0 && this.filter_set) {
 				this.running = true;
 				this.scheduleRefresh();
 			}

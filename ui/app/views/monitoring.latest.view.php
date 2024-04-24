@@ -56,7 +56,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		->setOptions($data['tabfilter_options'])
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	if ($data['mandatory_filter_set'] && ($data['items'] || $data['subfilter_set'])) {
+	if ($data['mandatory_filter_set'] && $data['items'] || $data['subfilter_set']) {
 		$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
 			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
 		);
@@ -78,7 +78,7 @@ else {
 $html_page
 	->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
 		array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-			'tags', 'maintenances', 'items_rw', 'mandatory_filter_set'
+			'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
 		])
 	)))
 	->show();
@@ -90,7 +90,7 @@ $html_page
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval'],
 		'checkbox_object' => 'itemids',
-		'mandatory_filter_set' => $data['mandatory_filter_set']
+		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set']
 	]).');
 '))
 	->setOnDocumentReady()

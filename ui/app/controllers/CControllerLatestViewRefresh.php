@@ -34,7 +34,8 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$filter_counters = [];
 
 			foreach ($filters as $index => $tabfilter) {
-				if (!$tabfilter['filter_show_counter']) {
+				if (!$tabfilter['filter_show_counter']
+						|| (!self::isMandatoryFilterFieldSet($tabfilter) && !self::isSubfilterSet($tabfilter))) {
 					$filter_counters[$index] = 0;
 
 					continue;
@@ -57,18 +58,18 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
 			$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
+			$subfilter_set = self::isSubfilterSet($filter);
 			$prepared_data = [
 				'hosts' => [],
 				'items' => [],
 				'items_rw' => []
 			];
 
-			if ($mandatory_filter_set) {
+			if ($mandatory_filter_set || $subfilter_set) {
 				$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 			}
 
 			// Prepare subfilter data.
-			$subfilter_set = self::isSubfilterSet($filter);
 			$subfilters_fields = self::getSubfilterFields($filter);
 			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);

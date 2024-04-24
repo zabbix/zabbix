@@ -32,7 +32,7 @@ $table = (new CTableInfo())
 	->addClass(ZBX_STYLE_LIST_TABLE_FIXED)
 	->setPageNavigation($data['paging']);
 
-if (!$data['mandatory_filter_set']) {
+if (!$data['mandatory_filter_set'] && !$data['subfilter_set']) {
 	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
 }
 
