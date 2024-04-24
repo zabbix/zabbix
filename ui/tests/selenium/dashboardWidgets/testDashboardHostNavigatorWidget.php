@@ -56,6 +56,28 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
 
+	/**
+	 * Get 'Group by' table element with mapping set.
+	 *
+	 * @return CMultifieldTable
+	 */
+	protected function getGroupByTable() {
+		return $this->query('id:group_by-table')->asMultifieldTable([
+			'mapping' => [
+				'2' => [
+					'name' => 'attribute',
+					'selector' => 'xpath:./z-select',
+					'class' => 'CDropdownElement'
+				],
+				'3' => [
+					'name' => 'tag',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				]
+			]
+		])->waitUntilVisible()->one();
+	}
+
 	public static function prepareData() {
 		$response = CDataHelper::call('dashboard.create', [
 			[
@@ -116,8 +138,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 		$form->checkValue($default_state);
 		$this->assertEquals(['Host limit'], $form->getRequiredLabels());
 
-		// Check dropdown options.
-		$form->getField('Group by')->query('button:Add')->one()->click();
+//		// Check dropdown options.
+		$this->getGroupByTable()->fill(['attribute' => 'Host group']);
 
 		$options = [
 			'Refresh interval' => ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
@@ -131,9 +153,6 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 		foreach ($options as $field => $values) {
 			$this->assertEquals($values, $form->getField($field)->asDropdown()->getOptions()->asText());
 		}
-
-		// Necessary for inputs check.
-		$form->fill(['id:group_by_0_attribute' => 'Tag value']);
 
 		$inputs = [
 			'Name' => [
