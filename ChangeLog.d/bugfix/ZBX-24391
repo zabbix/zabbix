@@ -1,0 +1,1 @@
+...G...... [ZBX-24391] fixed Zabbix agent to return net.tcp.socket.count result without error if ipv6 is disabled (sboidenko)

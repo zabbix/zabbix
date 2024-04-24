@@ -705,7 +705,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL != strstr(buffer, pattern))
 				listen = 1;
 		}
-out:
+		out:
 		zbx_free(buffer);
 #ifdef HAVE_INET_DIAG
 	}
@@ -836,8 +836,8 @@ static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
 	return SUCCEED;
 }
 
-static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, net_count_info_t *exp_l,
-		net_count_info_t *exp_r, zbx_uint64_t *count, char **error)
+static void	get_proc_net_count_ipv6(const char *filename, unsigned char state, net_count_info_t *exp_l,
+		net_count_info_t *exp_r, zbx_uint64_t *count)
 {
 	char			line[MAX_STRING_LEN], *p;
 	unsigned short		lport, rport;
@@ -847,10 +847,7 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 	struct sockaddr_in6	*sa_l, *sa_r;
 
 	if (NULL == (f = fopen(filename, "r")))
-	{
-		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", filename, zbx_strerror(errno));
-		return FAIL;
-	}
+		return;
 
 	sa_l = (struct sockaddr_in6 *)&sockaddr_l;
 	sa_r = (struct sockaddr_in6 *)&sockaddr_r;
@@ -906,13 +903,11 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 	}
 
 	zbx_fclose(f);
-
-	return SUCCEED;
 }
 #endif
 
-static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
-		net_count_info_t *exp_r, zbx_uint64_t *count, char **error)
+static void	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
+		net_count_info_t *exp_r, zbx_uint64_t *count)
 {
 	char			line[MAX_STRING_LEN], *p;
 	unsigned short		lport, rport;
@@ -923,8 +918,7 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 
 	if (NULL == (f = fopen(filename, "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", filename, zbx_strerror(errno));
-		return FAIL;
+		return;
 	}
 
 	sa_l = (struct sockaddr_in *)&sockaddr_l;
@@ -966,8 +960,6 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 	}
 
 	zbx_fclose(f);
-
-	return SUCCEED;
 }
 
 static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info,
@@ -1133,20 +1125,12 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 		goto err;
 	}
 
-	if (SUCCEED != get_proc_net_count_ipv4(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp" : "/proc/net/udp",
-			state_num, &info_l, &info_r, &count, &error))
-	{
-		SET_MSG_RESULT(result, error);
-		goto err;
-	}
+	get_proc_net_count_ipv4(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp" : "/proc/net/udp",
+			state_num, &info_l, &info_r, &count);
 
 #ifdef HAVE_IPV6
-	if (SUCCEED != get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
-			state_num, &info_l, &info_r,  &count, &error))
-	{
-		SET_MSG_RESULT(result, error);
-		goto err;
-	}
+	get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
+			state_num, &info_l, &info_r,  &count);
 #endif
 
 	SET_UI64_RESULT(result, count);
