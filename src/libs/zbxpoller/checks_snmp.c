@@ -99,6 +99,13 @@
  ******************************************************************************/
 typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
 
+typedef enum
+{
+	ZBX_ASN_OCTET_STR_UTF_8,
+	ZBX_ASN_OCTET_STR_HEX
+}
+zbx_snmp_asn_octet_str_t;
+
 typedef struct
 {
 	char		*addr;
@@ -1010,7 +1017,8 @@ static void	zbx_snmp_close_session(zbx_snmp_sess_t	session)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type)
+static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type,
+		zbx_snmp_asn_octet_str_t snmp_asn_octet_str)
 {
 	const char	*hint;
 	char		buffer[MAX_BUFFER_LEN];
@@ -1023,6 +1031,23 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 	/* find the subtree to get display hint */
 	subtree = get_tree(var->name, var->name_length, get_tree_head());
 	hint = (NULL != subtree ? subtree->hint : NULL);
+	
+	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint && var->type == ASN_OCTET_STR)
+	{
+		strval_dyn = (char *)zbx_malloc(strval_dyn, var->val_len + 1);
+		memcpy(strval_dyn, var->val.string, var->val_len);
+		strval_dyn[var->val_len] = '\0';
+		type = ZBX_SNMP_STR_ASCII;
+
+		/* avoid convertion to Hex-STRING for valid UTF-8 strings without hints */
+		if (SUCCEED == zbx_is_utf8(strval_dyn))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s'", __func__, strval_dyn);
+			goto end;
+		}
+
+		zbx_free(strval_dyn);
+	}
 
 	/* we will decide if we want the value from var->val or what snprint_value() returned later */
 	if (-1 == snprint_value(buffer, sizeof(buffer), var->name, var->name_length, var))
@@ -1060,16 +1085,17 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 		strval_dyn[var->val_len] = '\0';
 		type = ZBX_SNMP_STR_ASCII;
 	}
-
-	if (NULL != string_type)
-		*string_type = type;
 end:
+	if (NULL != string_type && NULL != strval_dyn)
+		*string_type = type;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __func__, ZBX_NULL2STR(strval_dyn));
 
 	return strval_dyn;
 }
 
-static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *result, unsigned char *string_type)
+static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *result, unsigned char *string_type,
+		zbx_snmp_asn_octet_str_t snmp_asn_octet_str)
 {
 	char		*strval_dyn;
 	int		ret = SUCCEED;
@@ -1080,7 +1106,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
 	{
-		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var, string_type)))
+		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var, string_type, snmp_asn_octet_str)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
 			ret = NOTSUPPORTED;
@@ -1601,7 +1627,7 @@ reduce_max_vars:
 				str_res = NULL;
 				zbx_init_agent_result(&snmp_result);
 
-				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
+				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type, ZBX_ASN_OCTET_STR_HEX))
 				{
 					if (ZBX_ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
@@ -1797,9 +1823,9 @@ retry:
 			unsigned char	val_type;
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
-				(void)zbx_snmp_set_result(var, &results[j], &val_type);
+				(void)zbx_snmp_set_result(var, &results[j], &val_type, ZBX_ASN_OCTET_STR_HEX);
 			else
-				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
+				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type, ZBX_ASN_OCTET_STR_HEX);
 
 			if (ZBX_ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
 				zbx_remove_chars(results[j].text, "\r\n");
@@ -2341,7 +2367,7 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_snmp_set_result(var, &result, &val_type))
+	if (SUCCEED == zbx_snmp_set_result(var, &result, &val_type, ZBX_ASN_OCTET_STR_UTF_8))
 	{
 		if (ZBX_ISSET_TEXT(&result) && ZBX_SNMP_STR_HEX == val_type)
 			zbx_remove_chars(result.text, "\r\n");
