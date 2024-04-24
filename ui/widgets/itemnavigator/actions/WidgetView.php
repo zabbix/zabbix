@@ -99,35 +99,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$options = [
-			'output' => ['itemid', 'hostid'],
-			'webitems' => true,
-			'evaltype' => $this->fields_values['item_tags_evaltype'],
-			'tags' => $this->fields_values['item_tags'] ?: null,
-			'filter' => [
-				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL
-					? null
-					: $this->fields_values['state']
-			],
-			'searchWildcardsEnabled' => true,
-			'searchByAny' => true,
-			'selectTags' => $item_tags_to_keep ? ['tag', 'value'] : null,
-			'preservekeys' => true,
-			'sortfield' => 'name',
-			'sortorder' => ZBX_SORT_UP
-		];
-
-		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
-		$name_pattern = in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items'];
-
-		$options['output'][] = $resolve_macros ? 'name_resolved' : 'name';
-		$options['search']['name'] = $name_pattern;
-
-		$limit_extended = $this->fields_values['show_lines'] + 1;
-		$selected_items_cnt = 0;
-		$items = [];
-		$hosts = [];
-
 		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
 			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
@@ -158,6 +129,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$db_hosts) {
 			return $no_data;
 		}
+
+		$options = [
+			'output' => ['itemid', 'hostid'],
+			'webitems' => true,
+			'evaltype' => $this->fields_values['item_tags_evaltype'],
+			'tags' => $this->fields_values['item_tags'] ?: null,
+			'filter' => [
+				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL
+					? null
+					: $this->fields_values['state']
+			],
+			'search' => [
+				'name' => in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items']
+			],
+			'searchWildcardsEnabled' => true,
+			'searchByAny' => true,
+			'selectTags' => $item_tags_to_keep ? ['tag', 'value'] : null,
+			'preservekeys' => true,
+			'sortfield' => 'name',
+			'sortorder' => ZBX_SORT_UP
+		];
+
+		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
+
+		$options['output'][] = $resolve_macros ? 'name_resolved' : 'name';
+
+		$limit_extended = $this->fields_values['show_lines'] + 1;
+		$selected_items_cnt = 0;
+		$items = [];
+		$hosts = [];
 
 		foreach ($db_hosts as $hostid => $host) {
 			if ($selected_items_cnt == $limit_extended) {
