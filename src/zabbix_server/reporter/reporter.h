@@ -16,11 +16,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-#ifndef ZABBIX_REPORT_MANAGER_H
-#define ZABBIX_REPORT_MANAGER_H
+#ifndef ZABBIX_REPORTER_H
+#define ZABBIX_REPORTER_H
 
 #include "zbxthreads.h"
+#include "zbxjson.h"
+
+void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
 
 typedef struct
 {
@@ -29,5 +31,18 @@ typedef struct
 zbx_thread_report_manager_args;
 
 ZBX_THREAD_ENTRY(report_manager_thread, args);
+
+typedef struct
+{
+	char	*config_tls_ca_file;
+	char	*config_tls_cert_file;
+	char	*config_tls_key_file;
+	char	*config_source_ip;
+	char	*config_webservice_url;
+}
+zbx_thread_report_writer_args;
+
+ZBX_THREAD_ENTRY(report_writer_thread, args);
+
 
 #endif

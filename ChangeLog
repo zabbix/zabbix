@@ -1,7 +1,17 @@
+Changes for 7.0.0rc1
+
+New features:
+
+Bug fixes:
+....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0beta3
 
 New features:
-A.F.....S. [ZBXNEXT-8880] added options for disallow script execution and user HTTP authentication (dfofanovs, dgoloscapov)
+..F.I..... [ZBXNEXT-8685] implemented new Host navigator widget (apoga, ddauksa)
+..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that Zabbix server returns to Zabbix frontend (jfreibergs, kprutkovs)
+A.F.....S. [ZBXNEXT-8880] added options for disallowing script execution and user HTTP authentication (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8970] implemented faster action execution on Zabbix server (akozlovs)
 .........T [ZBXCTR-22] refactored JavaScript filter functions for Kubernetes templates (ebbex)
 ...G...... [ZBXNEXT-9026] added Go compiler version to Zabbix agent 2 version output (mprihodko)
@@ -18,6 +28,8 @@ A.F.I...S. [ZBXNEXT-2020,ZBXNEXT-8918] implemented the option to disable no-long
 ..F.I..... [ZBXNEXT-8683] implemented new Honeycomb widget (apoga, ashubin, averza, ddauksa)
 
 Bug fixes:
+..F....... [ZBX-23468] fixed radio button text alignment in network discovery form and modal window resizing when zooming in or out (esekace)
+..F....... [ZBX-24205] fixed the position of warning icon in breadcrumbs for no-longer discovered host (esekace)
 ...G...... [ZBX-23719] updated plugin-support to add duplicate flag handling (rzvejs)
 ....I..... [ZBX-22429] fixed typo in Zabbix proxy automake file (MVekslers)
 .......PS. [ZBX-24089] optimized configuration re-sync after empty initial syncs (wiper)
@@ -39,7 +51,7 @@ A......... [ZBX-24209] fixed missing filtering options for Proxy object (jfreibe
 .........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
 ...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
-A......... [ZBX-23402] fixed web scenario step post type saving in DB (Ivo)
+A......... [ZBX-23402] fixed web scenario step post type saving in DB (averza, dpetra)
 ...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
 .......PS. [ZBX-23868] fixed incomplete JSON data for vmware.vm.snapshot.get item (MVekslers)
 ..F....... [ZBX-24114] added labels to "Tags" and "Value mapping" fields in host configuration form (solonkins)
@@ -637,6 +649,18 @@ Bug fixes:
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.15rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.14
+
+6.4.14rc1 was released as 6.4.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.4.14rc1
 
 New features:
@@ -672,7 +696,7 @@ A......... [ZBX-24209] fixed missing filtering options for Proxy object (jfreibe
 .........T [ZBX-24202] fixed JavaScript in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23478] fixed issue when missing locale error would not be displayed for user under certain conditions (vmurzins)
 ...G...... [ZBX-23853] fixed duplicate agent check timestamps when time shifts back due to system clock synchronization (mprihodko)
-A......... [ZBX-23402] fixed web scenario step post type saving in DB (Ivo)
+A......... [ZBX-23402] fixed web scenario step post type saving in DB (averza, dpetra)
 ........S. [ZBX-24091] fixed user macro resolution in function part of error messages (dgoloscapov)
 ...G...PS. [ZBX-24166] fixed Zabbix not being able to restart due to RTC and sockets not being closed before stopping (dgoloscapov)
 .......PS. [ZBX-23868] fixed incomplete JSON data for vmware.vm.snapshot.get item (MVekslers)
@@ -2371,6 +2395,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.30rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.29
+
+6.0.29rc1 was released as 6.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.29rc1

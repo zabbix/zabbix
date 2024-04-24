@@ -22,13 +22,44 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
+ * @onBefore prepareUserMediaData
+ *
  * @dataSource LoginUsers
+ *
+ * @backup users
  */
 class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
 	public $userRole = 'Super admin role';
+
+	/**
+	 * Data for MassDelete scenario.
+	 */
+	public function prepareUserMediaData() {
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 10, // Discord.
+						'sendto' => 'test@zabbix.com',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 16,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 12, // Jira.
+						'sendto' => 'test_account',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 63,
+						'period' => '6-7,09:00-18:00'
+					]
+				]
+			]
+		]);
+	}
 
 	public static function allUsers() {
 		return CDBHelper::getDataProvider('select * from users');

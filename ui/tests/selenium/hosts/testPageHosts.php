@@ -390,6 +390,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->invalidate();
 		$filter->getField('Name')->fill('%');
 		$filter->submit();
+		$this->page->waitUntilReady();
 		$this->assertTableStats();
 	}
 

@@ -20,11 +20,11 @@
 #include "process_eventslog.h"
 #include "process_eventslog6.h"
 
-#include "../metrics/metrics.h"
+#include "../../metrics/metrics.h"
+#include "../../logfiles/logfiles.h"
 
 #include "module.h"
 #include "zbxalgo.h"
-#include "../logfiles/logfiles.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 
