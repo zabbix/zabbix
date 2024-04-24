@@ -225,7 +225,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Filters' => ['Filters'],
 			'Overrides' => ['Overrides'],
 			'Discovery rule' => ['Name', 'Type', 'Key', 'Host interface', 'Update interval', 'Custom intervals',
-				'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
 			]
 		];
 		foreach ($visible_fields as $tab => $fields) {
@@ -275,7 +275,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
 					$this->assertTrue($filters_field->query('button', ['Add', 'Remove'])->one()->isClickable());
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
-						$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
+							$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
 					);
 
 					$filter_fields = [
@@ -297,7 +297,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					$filters_container = $form->getFieldContainer('Overrides');
 					$this->assertTrue($filters_container->query('button:Add')->one()->isClickable());
 					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
-						$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
+							$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
 					);
 					break;
 			}
@@ -373,7 +373,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Filters' => ['value' => [['macro' => '', 'operator' => 'matches']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
 			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
-				'value' => 'matches'
+					'value' => 'matches'
 			],
 			'id:conditions_0_value' => ['placeholder' => 'regular expression', 'maxlength' => 255],
 
@@ -414,8 +414,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 		$hints = [
 			'SNMP OID' => "Field requirements:".
-				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
-				"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON",
+					"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+					"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON",
 			'Delete lost resources' => 'The value should be greater than LLD rule update interval.',
 			'Disable lost resources' => 'The value should be greater than LLD rule update interval.'
 		];
@@ -451,7 +451,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 				case 'IPMI agent':
 					// Check red interface info message.
 					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')->one()
-						->isVisible()
+							->isVisible()
 					);
 					break;
 
@@ -491,7 +491,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 					foreach ($http_fields as $http_auth => $status) {
 						$this->checkFieldsDependency($form, ['HTTP authentication' => $http_auth],
-							['User name' => $status, 'Password' => $status]
+								['User name' => $status, 'Password' => $status]
 						);
 					}
 
@@ -536,7 +536,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					// Disable lost resources input dependency.
 					foreach ($lifetime_array as $lifetime => $status) {
 						$this->checkFieldsDependency($form, ['id:enabled_lifetime_type' => $lifetime],
-							['id:enabled_lifetime' => $status]
+								['id:enabled_lifetime' => $status]
 						);
 					}
 
@@ -549,7 +549,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					// Disable lost resources visibility dependency.
 					foreach ($disabled_lifetime_array as $disabled_lifetime => $status) {
 						$this->checkFieldsDependency($form, ['id:lifetime_type' => $disabled_lifetime],
-							['id:enabled_lifetime_type' => $status]
+								['id:enabled_lifetime_type' => $status]
 						);
 					}
 
