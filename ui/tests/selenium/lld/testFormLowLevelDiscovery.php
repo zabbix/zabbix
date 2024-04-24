@@ -32,6 +32,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
 
 	protected static $hostid;
+	protected static $interfaces_hostid;
 	protected static $update_lld = 'LLD for update scenario';
 
 	/**
@@ -47,6 +48,57 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 	public function prepareLLDData() {
 		$result = CDataHelper::createHosts([
+			[
+				'host' => 'Host for LLD form test with all interfaces',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					],
+					[
+						'type'=> INTERFACE_TYPE_SNMP,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.2',
+						'dns' => '',
+						'port' => '161',
+						'details' => [
+							'version' => SNMP_V2C,
+							'community' => '{$SNMP_COMMUNITY}',
+							'max_repetitions' => 10
+						]
+					],
+					[
+						'type' => INTERFACE_TYPE_JMX,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_DNS,
+						'ip' => '',
+						'dns' => 'text.jmx.com',
+						'port' => '12345'
+					],
+					[
+						'type' => INTERFACE_TYPE_IPMI,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.4',
+						'dns' => '',
+						'port' => '12345'
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'LLD for update scenario',
+						'key_' => 'vfs.fs.discovery2',
+						'type' => ITEM_TYPE_ZABBIX,
+						'delay' => 30
+					]
+				]
+			],
 			[
 				'host' => 'Host for LLD form test',
 				'groups' => ['groupid' => 4], // Zabbix servers.
@@ -74,7 +126,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'delay' => 30
 					],
 					[
-						'name' => 'LLD for update scenario',
+						'name' => 'LLD for simple update scenario',
 						'key_' => 'update_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
 						'delay' => "1h;wd1-2h7-14",
@@ -194,6 +246,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 		]);
 
 		self::$hostid = $result['hostids']['Host for LLD form test'];
+		self::$interfaces_hostid = $result['hostids']['Host for LLD form test with all interfaces'];
 	}
 
 	public function testFormLowLevelDiscovery_Layout() {
@@ -338,7 +391,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'id:snmp_oid' => ['placeholder' => 'walk[OID1,OID2,...]', 'maxlength' => 512],
 			'id:ipmi_sensor' => ['maxlength' => 128],
 			'Authentication method' => ['options' => ['Password', 'Public key'], 'value' => 'Password'],
-			'id:jmx_endpoint' => ['value' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'maxlength' => 255],
+			'id:jmx_endpoint' => ['value' => ZBX_DEFAULT_JMX_ENDPOINT, 'maxlength' => 255],
 			'id:publickey' => ['maxlength' => 64],
 			'id:privatekey' => ['maxlength' => 64],
 			'id:username' => ['maxlength' => 255],
@@ -600,7 +653,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 	public function testFormLowLevelDiscovery_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
-		$this->query('link', self::$update_lld)->one()->waitUntilClickable()->click();
+		$this->query('link:LLD for simple update scenario')->one()->waitUntilClickable()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		$this->page->assertTitle('Configuration of discovery rules');
@@ -609,15 +662,6 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 	public static function getLLDData() {
 		return [
-			[
-				[
-					'fields' => [
-						'Name' => 'Simple LLD',
-						'Type' => 'Zabbix agent',
-						'Key' => 'new_key'
-					]
-				]
-			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -629,14 +673,384 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'id:custom_timeout' => 'Override',
 						'id:timeout' => ''
 					],
-					'error' => [
+					'error' => 'Page received incorrect data',
+					'error_details' => [
 						'Incorrect value for field "Name": cannot be empty.',
 						'Incorrect value for field "Key": cannot be empty.',
 						'Field "Update interval" is not correct: a time unit is expected',
 						'Field "Timeout" is not correct: a time unit is expected'
 					]
 				]
-			]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'Update interval' => '1M'
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Field "Update interval" is not correct: a time unit is expected'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'Update interval' => '{#LLD}'
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Field "Update interval" is not correct: a time unit is expected'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 1
+					],
+					'error_details' => 'Invalid interval "1".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'qd1-5h9-18'
+					],
+					'error_details' => 'Invalid interval "qd1-5h9-18".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'qd1-8h9-18'
+					],
+					'error_details' => 'Invalid interval "qd1-8h9-18".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'qd1-5h9-25'
+					],
+					'error_details' => 'Invalid interval "qd1-5h9-25".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Flexible',
+						'id:delay_flex_0_delay' => '4w',
+						'id:delay_flex_0_period' => '1-7,00:00-24:00'
+					],
+					'error_details' => 'Invalid parameter "/1/delay": update interval "4w" is longer than period "1-7,00:00-24:00".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Flexible',
+						'id:delay_flex_0_delay' => '60s',
+						'id:delay_flex_0_period' => '1-8,00:00-24:00'
+					],
+					'error_details' => 'Invalid interval "1-8,00:00-24:00".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Scheduling interval validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:delay_flex_0_type' => 'Flexible',
+						'id:delay_flex_0_delay' => '1M',
+						'id:delay_flex_0_period' => '1-8,00:00-24:00'
+					],
+					'error_details' => 'Invalid interval "1M".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Timeout validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => 0
+					],
+					'error_details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Timeout validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => 601
+					],
+					'error_details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Timeout validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => 9999999999
+					],
+					'error_details' => 'Invalid parameter "/1/timeout": a number is too large.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Timeout validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => 'text'
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Field "Timeout" is not correct: a time unit is expected'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation 1',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test1',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => ''
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation 2',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test2',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '1M'
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '{#LLD}'
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => 1
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => 788400001
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => 999999999999
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": a number is too large.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => ''
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => '1M'
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => '{#LLDMACRO}'
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => 1
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => 788400001
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => 999999999999
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": a number is too large.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '1h',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => '1d',
+					],
+					'error_details' => 'Incorrect value for field "Disable lost resources":'.
+							' cannot be greater than or equal to the value of field "Delete lost resources".'
+				]
+			],
+
+
+
+
+
+
+
+
+
+			[
+				[
+					'fields' => [
+						'Name' => 'Simple LLD',
+						'Type' => 'Zabbix agent',
+						'Key' => 'new_key'
+					]
+				]
+			],
 		];
 	}
 
@@ -645,14 +1059,14 @@ class testFormLowLevelDiscovery extends CWebTest {
 	 *
 	 * @backupOnce items
 	 */
-	public function testFormLowLevelDiscovery_Create($data) {
+	public function testFormLowLevelDiscovery_1Create($data) {
 		$this->checkLowLevelDiscoveryForm($data);
 	}
 
 	/**
 	 * @dataProvider getLLDData
 	 */
-	public function testFormLowLevelDiscovery_Update($data) {
+	public function testFormLowLevelDiscovery_1Update($data) {
 		$this->checkLowLevelDiscoveryForm($data, true);
 	}
 
@@ -661,7 +1075,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
+				self::$interfaces_hostid.'&context=host');
 		$this->query($update ? 'link:'.self::$update_lld : 'button:Create discovery rule')->one()
 				->waitUntilClickable()->click();
 
@@ -670,7 +1085,9 @@ class testFormLowLevelDiscovery extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, ('Page received incorrect data'), $data['error']);
+			$this->assertMessage(TEST_BAD, CTestArrayHelper::get($data, 'error',
+					($update ? 'Cannot update discovery rule' : 'Cannot add discovery rule')), $data['error_details']
+			);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
