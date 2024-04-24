@@ -32,6 +32,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
 
 	protected static $hostid;
+	protected static $update_lld = 'LLD for update scenario';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -73,7 +74,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'delay' => 30
 					],
 					[
-						'name' => 'LLD for simple update scenario',
+						'name' => 'LLD for update scenario',
 						'key_' => 'update_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
 						'delay' => "1h;wd1-2h7-14",
@@ -96,9 +97,9 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'ssl_key_file' => '/home/test/certdb/postgresql-server.crt',
 						'ssl_key_password' => '/home/test/certdb/postgresql-server.key',
 						'timeout' => '10s',
-						'lifetime_type' => 0,
+						'lifetime_type' => ZBX_LLD_DELETE_AFTER,
 						'lifetime' => '15d',
-						'enabled_lifetime_type' => 1,
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
 						'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
 						'trapper_hosts' => '127.0.2.3',
 						'description' => 'LLD for test',
@@ -149,8 +150,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'privatekey' => '/home/test/private-server.key',
 						'params' => 'test script',
 						'timeout' => '',
-						'lifetime_type' => 1,
-						'enabled_lifetime_type' => 0,
+						'lifetime_type' => ZBX_LLD_DELETE_NEVER,
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
 						'enabled_lifetime' => '20h',
 						'description' => 'Description for cancel scenario',
 						'preprocessing' => [['type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE, 'params' => '30s']],
@@ -224,7 +225,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Filters' => ['Filters'],
 			'Overrides' => ['Overrides'],
 			'Discovery rule' => ['Name', 'Type', 'Key', 'Host interface', 'Update interval', 'Custom intervals',
-					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+				'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
 			]
 		];
 		foreach ($visible_fields as $tab => $fields) {
@@ -274,7 +275,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
 					$this->assertTrue($filters_field->query('button', ['Add', 'Remove'])->one()->isClickable());
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
-							$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
+						$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
 					);
 
 					$filter_fields = [
@@ -296,7 +297,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					$filters_container = $form->getFieldContainer('Overrides');
 					$this->assertTrue($filters_container->query('button:Add')->one()->isClickable());
 					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
-							$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
+						$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
 					);
 					break;
 			}
@@ -337,7 +338,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'id:snmp_oid' => ['placeholder' => 'walk[OID1,OID2,...]', 'maxlength' => 512],
 			'id:ipmi_sensor' => ['maxlength' => 128],
 			'Authentication method' => ['options' => ['Password', 'Public key'], 'value' => 'Password'],
-			'id:jmx_endpoint' => ['value'=> 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'maxlength' => 255],
+			'id:jmx_endpoint' => ['value' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'maxlength' => 255],
 			'id:publickey' => ['maxlength' => 64],
 			'id:privatekey' => ['maxlength' => 64],
 			'id:username' => ['maxlength' => 255],
@@ -372,7 +373,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Filters' => ['value' => [['macro' => '', 'operator' => 'matches']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
 			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
-					'value' => 'matches'
+				'value' => 'matches'
 			],
 			'id:conditions_0_value' => ['placeholder' => 'regular expression', 'maxlength' => 255],
 
@@ -395,16 +396,16 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'External check' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
 			'Database monitor' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout'],
 			'HTTP agent' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
-					'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
-					'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
-					'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
+				'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
+				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
+				'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
 			],
 			'IPMI agent' => ['Host interface', 'IPMI sensor', 'Update interval', 'Custom intervals'],
 			'SSH agent' => ['Host interface', 'Authentication method', 'User name', 'Password',
-					'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
+				'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
 			],
 			'TELNET agent' => ['Host interface', 'User name', 'Password', 'Executed script',
-					'Update interval', 'Custom intervals', 'Timeout'
+				'Update interval', 'Custom intervals', 'Timeout'
 			],
 			'JMX agent' => ['Host interface', 'JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
 			'Dependent item' => ['Master item'],
@@ -413,8 +414,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 		$hints = [
 			'SNMP OID' => "Field requirements:".
-					"\nwalk[OID1,OID2,...] - to retrieve a subtree".
-					"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON",
+				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+				"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON",
 			'Delete lost resources' => 'The value should be greater than LLD rule update interval.',
 			'Disable lost resources' => 'The value should be greater than LLD rule update interval.'
 		];
@@ -424,19 +425,19 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 			// Get expected visible fields.
 			$form_fields = array_merge($permanent_fields, array_values($fields));
-			usort($form_fields, function($a, $b) {
+			usort($form_fields, function ($a, $b) {
 				return strcasecmp($a, $b);
 			});
 
 			// Get actual visible fields.
 			$present_fields = $form->getLabels()->filter(CElementFilter::VISIBLE)->asText();
-			usort($present_fields, function($a, $b) {
+			usort($present_fields, function ($a, $b) {
 				return strcasecmp($a, $b);
 			});
 
 			$this->assertEquals($form_fields, $present_fields);
 
-			switch($type) {
+			switch ($type) {
 				case 'SNMP agent':
 					// Check hints and texts.
 					foreach ($hints as $label => $hint_text) {
@@ -450,7 +451,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 				case 'IPMI agent':
 					// Check red interface info message.
 					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')->one()
-							->isVisible()
+						->isVisible()
 					);
 					break;
 
@@ -490,7 +491,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 					foreach ($http_fields as $http_auth => $status) {
 						$this->checkFieldsDependency($form, ['HTTP authentication' => $http_auth],
-								['User name' => $status, 'Password' => $status]
+							['User name' => $status, 'Password' => $status]
 						);
 					}
 
@@ -510,7 +511,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					$this->checkFieldsDependency($form, ['id:delay_flex_0_type' => 'Flexible'], $flexible_fields);
 
 					// Timeout fields' dependency.
-					$timeout_array =[
+					$timeout_array = [
 						'Global' => ['enabled' => false, 'visible' => true],
 						'Override' => ['enabled' => true, 'visible' => true],
 					];
@@ -535,7 +536,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					// Disable lost resources input dependency.
 					foreach ($lifetime_array as $lifetime => $status) {
 						$this->checkFieldsDependency($form, ['id:enabled_lifetime_type' => $lifetime],
-								['id:enabled_lifetime' => $status]
+							['id:enabled_lifetime' => $status]
 						);
 					}
 
@@ -548,7 +549,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 					// Disable lost resources visibility dependency.
 					foreach ($disabled_lifetime_array as $disabled_lifetime => $status) {
 						$this->checkFieldsDependency($form, ['id:lifetime_type' => $disabled_lifetime],
-								['id:enabled_lifetime_type' => $status]
+							['id:enabled_lifetime_type' => $status]
 						);
 					}
 
@@ -599,11 +600,66 @@ class testFormLowLevelDiscovery extends CWebTest {
 	public function testFormLowLevelDiscovery_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
-		$this->query('link:LLD for simple update scenario')->one()->waitUntilClickable()->click();
+		$this->query('link', self::$update_lld)->one()->waitUntilClickable()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public static function getLLDData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'Simple LLD',
+						'Key' => 'new_key'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getLLDData
+	 */
+	public function testFormLowLevelDiscovery_Create($data, $update = false) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+		$this->query($update ? 'link:'.self::$update_lld : 'button:Create discovery rule')->one()
+				->waitUntilClickable()->click();
+
+		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+		$form->fill($data['fields']);
+		$form->submit();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, ('Page received incorrect data'), $data['error']);
+
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, $update ? 'Discovery rule updated' : 'Discovery rule created');
+
+			// Remove leading and trailing spaces from data for assertion.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$data = CTestArrayHelper::trim($data);
+			}
+
+			$this->assertEquals(1, CDBHelper::getCount(
+				'SELECT * FROM items'.
+					' WHERE name='.zbx_dbstr( $data['fields']['Name']).
+						'AND flags=1'
+			));
+
+			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
+			$form->invalidate();
+			$form->checkValue($data['fields']);
+		}
 	}
 
 	public static function getCancelData() {
@@ -761,7 +817,6 @@ class testFormLowLevelDiscovery extends CWebTest {
 	 * Check inputs are visible/editable depending on other field's value.
 	 *
 	 * @param array $fields_array    given fields
-	 *
 	 */
 	protected function checkFieldsParameters($fields_array) {
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
