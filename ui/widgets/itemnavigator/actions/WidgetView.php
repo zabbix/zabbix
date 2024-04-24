@@ -117,7 +117,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sortorder' => ZBX_SORT_UP
 		];
 
-		$resolve_macros = $override_hostid !== '' && !$this->isTemplateDashboard();
+		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
 		$name_pattern = in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items'];
 
 		if ($resolve_macros) {
