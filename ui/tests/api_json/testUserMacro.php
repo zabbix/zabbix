@@ -422,7 +422,7 @@ class testUserMacro extends CAPITest {
 					'value' => ':)',
 					'type' => '2'
 				],
-				'expected_error' => 'Invalid parameter "/1/value": incorrect syntax near ":)".'
+				'expected_error' => 'Invalid parameter "/1/value": incorrect syntax near ")".'
 			]
 		];
 	}
