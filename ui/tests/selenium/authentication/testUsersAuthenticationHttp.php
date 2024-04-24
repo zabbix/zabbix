@@ -23,7 +23,12 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup
+ * @onBefore addDefaultAllowAuthKeyToConfig
+ *
  * @onAfter addGuestToDisabledGroup
+ *
+ * @backupConfig
+ *
  * @dataSource LoginUsers
  */
 class testUsersAuthenticationHttp extends CLegacyWebTest {
@@ -619,6 +624,44 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		}
 	}
 
+	public function getHttpAuthData() {
+		return [
+			// HTTP authentication enabled in zabbix.conf.php file.
+			[
+				[
+					'config_string' => '$ALLOW_HTTP_AUTH = true;',
+					'tabs' => ['Authentication', 'HTTP settings', 'LDAP settings', 'SAML settings', 'MFA settings']
+				]
+			],
+			// HTTP authentication disabled in zabbix.conf.php file.
+			[
+				[
+					'config_string' => '$ALLOW_HTTP_AUTH = false;',
+					'tabs' => ['Authentication', 'LDAP settings', 'SAML settings', 'MFA settings']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getHttpAuthData
+	 */
+	public function testUsersAuthenticationHttp_HttpAuthStatusChange($data) {
+		// Update Zabbix frontend config .
+		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$pattern = array('/\/\/ \$ALLOW_HTTP_AUTH = false;/', '/\$ALLOW_HTTP_AUTH = true;/');
+		$content = preg_replace($pattern, $data['config_string'], file_get_contents($file_path), 1);
+		file_put_contents($file_path, $content);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
+
+		// Open authentication configuration form and verify that the HTTP settings tab is/isn't present.
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$this->assertEquals($data['tabs'], $form->getTabs());
+	}
+
 	/**
 	 * Creating a configuration file.
 	 *
@@ -743,8 +786,20 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public  function removeGuestFromDisabledGroup() {
+	public function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	/**
+	 * Add a commented $ALLOW_HTTP_AUTH variable to frontend configuration file to check disabling of HTTP authentication.
+	 */
+	public function addDefaultAllowAuthKeyToConfig() {
+		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+
+		$content = file_get_contents($file_path);
+		$content .= '// $ALLOW_HTTP_AUTH = false;'."\n";
+
+		file_put_contents($file_path, $content);
 	}
 
 	public static function addGuestToDisabledGroup() {
