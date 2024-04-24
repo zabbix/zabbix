@@ -1448,7 +1448,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3469,7 +3469,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''dctemp''].first()'
+                    - '$.[''dctemp'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -3808,6 +3808,58 @@ zabbix_export:
                   value: volume
                 - tag: volume
                   value: '{#NAME}'
+            - uuid: 46ab8b0e5feb439c9085e7eb12a6974d
+              name: 'Volume [{#NAME}]: Health'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes["{#DURABLE.ID}",health]'
+              delay: '0'
+              history: 7d
+              description: 'Volume health status.'
+              valuemap:
+                name: Health
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[''health-numeric'']'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '4'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'hpe.msa.get.volumes["{#NAME}",data]'
+              tags:
+                - tag: component
+                  value: health
+                - tag: component
+                  value: volume
+                - tag: volume
+                  value: '{#NAME}'
+              trigger_prototypes:
+                - uuid: 50c47bfc2b4f43d6990e7d1b81ecc0bf
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=1'
+                  name: 'Volume [{#NAME}]: Volume health is in degraded state'
+                  priority: WARNING
+                  description: 'Volume health is in degraded state.'
+                  tags:
+                    - tag: scope
+                      value: performance
+                - uuid: 2ff830017b814e7ea50313ecbedc9894
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=2'
+                  name: 'Volume [{#NAME}]: Volume health is in fault state'
+                  priority: AVERAGE
+                  description: 'Volume health is in fault state.'
+                  tags:
+                    - tag: scope
+                      value: availability
+                - uuid: 2e8c2a0a40b640d4bf6177171c4af48d
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=3'
+                  name: 'Volume [{#NAME}]: Volume health is in unknown state'
+                  priority: INFO
+                  description: 'Volume health is in unknown state.'
+                  tags:
+                    - tag: scope
+                      value: notice
           graph_prototypes:
             - uuid: 20d2047e3f024e5197362375601415eb
               name: 'Volume [{#NAME}]: Cache usage'
