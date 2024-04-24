@@ -613,7 +613,27 @@ class testFormLowLevelDiscovery extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Simple LLD',
+						'Type' => 'Zabbix agent',
 						'Key' => 'new_key'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '',
+						'Type' => 'Zabbix agent',
+						'Key' => '',
+						'Update interval' => '',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => ''
+					],
+					'error' => [
+						'Incorrect value for field "Name": cannot be empty.',
+						'Incorrect value for field "Key": cannot be empty.',
+						'Field "Update interval" is not correct: a time unit is expected',
+						'Field "Timeout" is not correct: a time unit is expected'
 					]
 				]
 			]
@@ -622,8 +642,21 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * @dataProvider getLLDData
+	 *
+	 * @backupOnce items
 	 */
-	public function testFormLowLevelDiscovery_Create($data, $update = false) {
+	public function testFormLowLevelDiscovery_Create($data) {
+		$this->checkLowLevelDiscoveryForm($data);
+	}
+
+	/**
+	 * @dataProvider getLLDData
+	 */
+	public function testFormLowLevelDiscovery_Update($data) {
+		$this->checkLowLevelDiscoveryForm($data, true);
+	}
+
+	public function checkLowLevelDiscoveryForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
@@ -659,6 +692,11 @@ class testFormLowLevelDiscovery extends CWebTest {
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
+
+			// Write new LLD name for the next case.
+			if ($update) {
+				self::$update_lld = $data['fields']['Name'];
+			}
 		}
 	}
 
