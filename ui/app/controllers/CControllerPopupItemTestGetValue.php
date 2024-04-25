@@ -29,6 +29,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'headers'				=> 'array',
 			'hostid'				=> 'db hosts.hostid',
+			'test_with'				=> 'in '.implode(',', [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]),
 			'proxyid'				=> 'id',
 			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
@@ -143,6 +144,15 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 						));
 					}
 				}
+			}
+
+			if ($this->hasInput('test_with') && $this->getInput('test_with') == self::TEST_WITH_PROXY
+					&& $this->getInput('proxyid', 0) == 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.',
+					_s('%1$s: %2$s', _('Test with'), _('Proxy')), _('cannot be empty')
+				));
+
+				$ret = false;
 			}
 		}
 

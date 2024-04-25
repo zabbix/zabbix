@@ -4,7 +4,8 @@
 ## Overview
 
 This template is designed for the effortless deployment of Apache monitoring by Zabbix via HTTP and doesn't require any external scripts.
-The template `Apache by HTTP` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:  
+
+The template collects metrics by polling [`mod_status`](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:
 
 ```text
 127.0.0.1
@@ -44,7 +45,6 @@ ConnsAsyncWriting: 0
 ConnsAsyncKeepAlive: 5
 ConnsAsyncClosing: 0
 Scoreboard: ...
-
 ```
 
 ## Requirements
@@ -62,9 +62,10 @@ This template has been tested on:
 
 ## Setup
 
-See the setup instructions for [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).
+1. See the setup instructions for [`mod_status`](https://httpd.apache.org/docs/current/mod/mod_status.html).
 
-Check the availability of the module with this command line: `httpd -M 2>/dev/null | grep status_module`
+Check the availability of the module with this command line:
+`httpd -M 2>/dev/null | grep status_module`
 
 This is an example configuration of the Apache web server:
 
@@ -75,13 +76,13 @@ This is an example configuration of the Apache web server:
 </Location>
 ```
 
-If you use another path, then do not forget to change the `{$APACHE.STATUS.PATH}` macro.
-
+2. Set the hostname or IP address of the Apache status page host in the `{$APACHE.STATUS.HOST}` macro. You can also change the status page port in the `{$APACHE.STATUS.PORT}` macro and status page path in the `{$APACHE.STATUS.PATH}` macro if necessary.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$APACHE.STATUS.HOST}|<p>The hostname or IP address of the Apache status page host.</p>|`<SET APACHE HOST>`|
 |{$APACHE.STATUS.PORT}|<p>The port of the Apache status page.</p>|`80`|
 |{$APACHE.STATUS.PATH}|<p>The URL path.</p>|`server-status?auto`|
 |{$APACHE.STATUS.SCHEME}|<p>The request scheme, which may be either HTTP or HTTPS.</p>|`http`|
@@ -92,8 +93,8 @@ If you use another path, then do not forget to change the `{$APACHE.STATUS.PATH}
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page.</p><p>For more information see Apache Module [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).</p>|HTTP agent|apache.get_status<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Apache: Service ping||Simple check|net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Apache: Service response time||Simple check|net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]|
+|Apache: Service ping||Simple check|net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Apache: Service response time||Simple check|net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]|
 |Apache: Total bytes|<p>The total bytes served.</p>|Dependent item|apache.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["Total kBytes"]`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Apache: Bytes per second|<p>It is calculated as a rate of change for total bytes statistics.</p><p>`BytesPerSec` is not used, as it counts the average since the last Apache server start.</p>|Dependent item|apache.bytes.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["Total kBytes"]`</p></li><li><p>Custom multiplier: `1024`</p></li><li>Change per second</li></ul>|
 |Apache: Requests per second|<p>It is calculated as a rate of change for the "Total requests" statistics.</p><p>`ReqPerSec` is not used, as it counts the average since the last Apache server start.</p>|Dependent item|apache.requests.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["Total Accesses"]`</p></li><li>Change per second</li></ul>|
@@ -119,8 +120,8 @@ If you use another path, then do not forget to change the `{$APACHE.STATUS.PATH}
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Apache: Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by HTTP/apache.get_status,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
-|Apache: Service is down||`last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0`|Average|**Manual close**: Yes|
-|Apache: Service response time is too high||`min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
+|Apache: Service is down||`last(/Apache by HTTP/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0`|Average|**Manual close**: Yes|
+|Apache: Service response time is too high||`min(/Apache by HTTP/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
 |Apache: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Apache by HTTP/apache.uptime)<10m`|Info|**Manual close**: Yes|
 |Apache: Version has changed|<p>Apache version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0`|Info|**Manual close**: Yes|
 

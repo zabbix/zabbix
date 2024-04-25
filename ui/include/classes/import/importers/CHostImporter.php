@@ -337,6 +337,23 @@ class CHostImporter extends CImporter {
 			$host['proxyid'] = $proxyid;
 		}
 
+		if (array_key_exists('proxy_group', $host)) {
+			if (!$host['proxy_group']) {
+				$proxy_groupid = 0;
+			}
+			else {
+				$proxy_groupid = $this->referencer->findProxyGroupIdByName($host['proxy_group']['name']);
+
+				if ($proxy_groupid === null) {
+					throw new Exception(_s('Proxy group "%1$s" for host "%2$s" does not exist.',
+						$host['proxy_group']['name'], $host['host']
+					));
+				}
+			}
+
+			$host['proxy_groupid'] = $proxy_groupid;
+		}
+
 		return $host;
 	}
 

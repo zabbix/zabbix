@@ -439,7 +439,7 @@ void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type va
 	if (0 < vector->values_num - before_index)								\
 	{													\
 		memmove(vector->values + before_index + 1, vector->values + before_index,			\
-				(vector->values_num - before_index) * sizeof(__type));				\
+				(size_t)(vector->values_num - before_index) * sizeof(__type));			\
 	}													\
 														\
 	vector->values_num++;											\

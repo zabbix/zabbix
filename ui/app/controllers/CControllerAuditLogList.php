@@ -236,6 +236,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_MFA => _('Multi-factor authentication'),
 			CAudit::RESOURCE_MODULE => _('Module'),
 			CAudit::RESOURCE_PROXY => _('Proxy'),
+			CAudit::RESOURCE_PROXY_GROUP => _('Proxy group'),
 			CAudit::RESOURCE_REGEXP => _('Regular expression'),
 			CAudit::RESOURCE_SCENARIO => _('Web scenario'),
 			CAudit::RESOURCE_SCHEDULED_REPORT => _('Scheduled report'),

@@ -6,7 +6,13 @@
 The template to monitor CockroachDB nodes by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `CockroachDB node by HTTP` — collects metrics by HTTP agent from Prometheus endpoint and health endpoints.
+The template collects metrics by HTTP agent from Prometheus endpoint and health endpoints.
+
+Internal node metrics are collected from Prometheus /_status/vars endpoint.
+Node health metrics are collected from /health and /health?ready=1 endpoints.
+The template doesn't require usage of session token.
+
+**Note**, that some metrics may not be collected depending on your CockroachDB version and configuration.
 
 ## Requirements
 
@@ -15,7 +21,7 @@ Zabbix version: 7.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- CockroachDB 21.2.8 
+- CockroachDB 21.2.8
 
 ## Configuration
 
@@ -23,20 +29,15 @@ This template has been tested on:
 
 ## Setup
 
-Internal node metrics are collected from Prometheus /_status/vars endpoint.
-Node health metrics are collected from /health and /health?ready=1 endpoints.
-Template doesn't require usage of session token.
+Set the hostname or IP address of the the CockroachDB node host in the `{$COCKROACHDB.API.HOST}` macro. You can also change the port in the `{$COCKROACHDB.API.PORT}` macro and the scheme in the `{$COCKROACHDB.API.SCHEME}` macro if necessary.
 
-Don't forget change macros {$COCKROACHDB.API.SCHEME} according to your situation (secure/insecure node).
 Also, see the Macros section for a list of macros used to set trigger values.
-
-*NOTE.* Some metrics may not be collected depending on your CockroachDB version and configuration.
-
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$COCKROACHDB.API.HOST}|<p>The hostname or IP address of the CockroachDB host.</p>|`<SET COCKROACHDB HOST>`|
 |{$COCKROACHDB.API.PORT}|<p>The port of CockroachDB API and Prometheus endpoint.</p>|`8080`|
 |{$COCKROACHDB.API.SCHEME}|<p>Request scheme which may be http or https.</p>|`http`|
 |{$COCKROACHDB.STORE.USED.MIN.WARN}|<p>The warning threshold of the available disk space in percent.</p>|`20`|
@@ -54,7 +55,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |CockroachDB: Get metrics|<p>Get raw metrics from the Prometheus endpoint.</p>|HTTP agent|cockroachdb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |CockroachDB: Get health|<p>Get node /health endpoint</p>|HTTP agent|cockroachdb.get_health<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Regular expression: `HTTP.*\s(\d+) \1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |CockroachDB: Get readiness|<p>Get node /health?ready=1 endpoint</p>|HTTP agent|cockroachdb.get_readiness<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Regular expression: `HTTP.*\s(\d+) \1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|CockroachDB: Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|CockroachDB: Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |CockroachDB: Clock offset|<p>Mean clock offset of the node against the rest of the cluster.</p>|Dependent item|cockroachdb.clock.offset<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(clock_offset_meannanos)`</p></li><li><p>Custom multiplier: `0.000000001`</p></li></ul>|
 |CockroachDB: Version|<p>Build information.</p>|Dependent item|cockroachdb.version<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `build_timestamp` label `tag`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |CockroachDB: CPU: System time|<p>System CPU time.</p>|Dependent item|cockroachdb.cpu.system_time<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(sys_cpu_sys_ns)`</p></li><li>Change per second</li><li><p>Custom multiplier: `0.000000001`</p></li></ul>|
@@ -114,7 +115,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|----------|--------|--------------------------------|
 |CockroachDB: Node is unhealthy|<p>Node's /health endpoint has returned HTTP 500 Internal Server Error which indicates unhealthy mode.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_health) = 500`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
 |CockroachDB: Node is not ready|<p>Node's /health?ready=1 endpoint has returned HTTP 503 Service Unavailable. Possible reasons:<br>- node is in the wait phase of the node shutdown sequence;<br>- node is unable to communicate with a majority of the other nodes in the cluster, likely because the cluster is unavailable due to too many nodes being down.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_readiness) = 503 and last(/CockroachDB by HTTP/cockroachdb.uptime) > 5m`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
-|CockroachDB: Service is down||`last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0`|Average||
+|CockroachDB: Service is down||`last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0`|Average||
 |CockroachDB: Clock offset is too high|<p>Cockroach-measured clock offset is nearing limit (by default, servers kill themselves at 400ms from the mean).</p>|`min(/CockroachDB by HTTP/cockroachdb.clock.offset,5m) > {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN} * 0.001`|Warning||
 |CockroachDB: Version has changed||`last(/CockroachDB by HTTP/cockroachdb.version) <> last(/CockroachDB by HTTP/cockroachdb.version,#2) and length(last(/CockroachDB by HTTP/cockroachdb.version)) > 0`|Info||
 |CockroachDB: Current number of open files is too high|<p>Getting close to open file descriptor limit.</p>|`min(/CockroachDB by HTTP/cockroachdb.descriptors.open,10m) / last(/CockroachDB by HTTP/cockroachdb.descriptors.limit) * 100 > {$COCKROACHDB.OPEN.FDS.MAX.WARN}`|Warning||

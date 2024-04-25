@@ -223,6 +223,18 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
+			'proxy_groups' => [
+				'title' => _('Proxy groups'),
+				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'allowed_src_fields' => 'proxy_groupid,name',
+				'form' => [
+					'name' => 'proxy_groups_form',
+					'id' => 'proxy-groups'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 			'triggers' => [
 				'title' => _('Triggers'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -1614,6 +1626,16 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Proxy()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id']);
+				break;
+
+			case 'proxy_groups':
+				$options += [
+					'output' => ['proxy_groupid', 'name']
+				];
+
+				$records = API::ProxyGroup()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxy_groupid' => 'id']);
 				break;
 
 			case 'roles':

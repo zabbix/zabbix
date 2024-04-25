@@ -3,8 +3,9 @@
 
 ## Overview
 
-Sample device overview page: https://www.hikvision.com/en/products/IP-Products/Network-Cameras/
+This template is designed for the effortless deployment of Hikvision cameras monitoring by Zabbix via HTTP and doesn't require any external scripts.
 
+[`Sample device overview page`](https://www.hikvision.com/en/products/IP-Products/Network-Cameras/)
 
 ## Requirements
 
@@ -38,14 +39,18 @@ This template has been tested on:
 
 ## Setup
 
-Define macros according to your camera configuration
+1. Set the hostname or IP address of the Hikvision ISAPI host in the `{$HIKVISION_ISAPI_HOST}` macro.
 
+2. Set the user name and password in the `{$PASSWORD}` and `{$USER}` macros.
+
+3. Change other macros according to your camera configuration if necessary.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CPU.UTIL.CRIT}||`90`|
+|{$HIKVISION_ISAPI_HOST}|<p>The hostname or IP address of the Hikvision ISAPI host.</p>|`<SET ISAPI HOST>`|
 |{$HIKVISION_ISAPI_PORT}|<p>ISAPI port on device</p>|`80`|
 |{$HIKVISION_MAIN_CHANNEL_ID}|<p>Main video stream ID</p>|`101`|
 |{$HIKVISION_STREAM_HEIGHT}|<p>Main video stream image height</p>|`1080`|

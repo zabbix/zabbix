@@ -240,15 +240,6 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 				}
 
-				if (0 == ZBX_ISSET_VALUE(&agent_context->item.result))
-				{
-					zbx_timespec_t	ts;
-
-					zbx_timespec(&ts);
-					zbx_dc_add_history(agent_context->item.itemid, agent_context->item.value_type,
-							0, &agent_context->item.result, &ts, ITEM_STATE_NORMAL, NULL);
-				}
-
 				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns &&
 						SUCCEED == agent_context->item.ret)
 				{

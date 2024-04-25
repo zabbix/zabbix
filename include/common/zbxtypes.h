@@ -208,6 +208,7 @@ zbx_uint128_t;
 
 typedef struct zbx_variant zbx_variant_t;
 
+#define SUCCEED_PARTIAL	2
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -217,5 +218,8 @@ typedef struct zbx_variant zbx_variant_t;
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
 #define	SIG_ERROR	-8
+#define	CONNECT_ERROR	-9
+#define	SEND_ERROR	-10
+#define	RECV_ERROR	-11
 
 #endif

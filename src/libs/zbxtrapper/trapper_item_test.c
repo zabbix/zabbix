@@ -435,7 +435,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			case SUCCEED:
 				if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 				{
-					*info = zbx_strdup(NULL, "no value");
+					*info = zbx_strdup(NULL, "No value");
 				}
 				else
 				{
@@ -567,7 +567,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	else
 		goto preproc_test;
 
-	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
+	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
 	else
 		proxyid = 0;

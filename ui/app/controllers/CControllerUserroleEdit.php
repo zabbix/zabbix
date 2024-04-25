@@ -68,6 +68,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'ui_administration_general' => 					'in 0,1',
 			'ui_administration_audit_log' =>				'in 0,1',
 			'ui_administration_housekeeping' => 			'in 0,1',
+			'ui_administration_proxy_groups' => 			'in 0,1',
 			'ui_administration_proxies' => 					'in 0,1',
 			'ui_administration_macros' => 					'in 0,1',
 			'ui_administration_authentication' => 			'in 0,1',
