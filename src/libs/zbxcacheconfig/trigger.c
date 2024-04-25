@@ -25,7 +25,8 @@
  *                                                                            *
  * Purpose: get trigger severity name.                                        *
  *                                                                            *
- * Parameters: priority   - [IN] trigger data with priority field;            *
+ * Parameters: item       - [IN] item to process                                 *
+ *             priority   - [IN] trigger data with priority field;            *
  *                               TRIGGER_SEVERITY_*                           *
  *             replace_to - [OUT] pointer to buffer that will receive         *
  *                                null-terminated trigger severity string     *
@@ -36,6 +37,8 @@
  ******************************************************************************/
 int	zbx_config_get_trigger_severity_name(int priority, char **replace_to)
 {
+	ZBX_UNUSED(item);
+
 	zbx_config_t	cfg;
 
 	if (TRIGGER_SEVERITY_COUNT <= priority)

@@ -79,7 +79,8 @@ static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option,
  *                                                                            *
  * Purpose: processes program type (server) specific internal checks          *
  *                                                                            *
- * Parameters: param1  - [IN] first parameter                                 *
+ * Parameters: item    - [IN] item to process                                 *
+ *             param1  - [IN] first parameter                                 *
  *             request - [IN]                                                 *
  *             result  - [OUT]                                                *
  *                                                                            *
@@ -91,7 +92,8 @@ static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option,
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext_server(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, const AGENT_REQUEST *request,
+	AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
 	const char	*param2;
@@ -418,6 +420,58 @@ int	zbx_get_value_internal_ext_server(const char *param1, const AGENT_REQUEST *r
 
 		goto out;
 
+	}
+	else if (0 == strcmp(param1, "host")) /* zabbix["host",*] */
+	{
+		if (3 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		param3 = get_rparam(request, 2);
+
+		if (0 == strcmp(param3, "maintenance"))	/* zabbix["host",,"maintenance"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (param2 = get_rparam(request, 1)) && '\0' != *param2)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			if (HOST_MAINTENANCE_STATUS_ON == item->host.maintenance_status)
+				SET_UI64_RESULT(result, item->host.maintenance_type + 1);
+			else
+				SET_UI64_RESULT(result, 0);
+		}
+		else if (0 == strcmp(param3, "items"))	/* zabbix["host",,"items"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (param2 = get_rparam(request, 1)) && '\0' != *param2)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, DCget_item_count(item->host.hostid));
+		}
+		else if (0 == strcmp(param3, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (param2 = get_rparam(request, 1)) && '\0' != *param2)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
+		}
+		else
+		{
+			ret = FAIL;
+			goto out;
+		}
 	}
 	else
 	{
