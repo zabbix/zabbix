@@ -367,13 +367,18 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_1 for filter']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Proxy_1 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_2 for filter']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Proxy_2 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 3 of 3 found']");
 		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
-		$this->zbxTestLaunchOverlayDialog('Proxies');
-		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');
+
+		$proxies_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('Proxies', $proxies_dialog->getTitle());
+		$proxies_dialog->query('class:list-table')->one()->asTable()->findRow('Name', 'Proxy_1 for filter')->select();
+		$proxies_dialog->asForm()->submit();
+		$proxies_dialog->ensureNotPresent();
+
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");

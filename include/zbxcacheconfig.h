@@ -29,6 +29,7 @@
 #include "zbxregexp.h"
 #include "zbxtagfilter.h"
 #include "zbxautoreg.h"
+#include "zbxpgservice.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -123,6 +124,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxyid;
+	zbx_uint64_t	proxy_groupid;
 	char		host[ZBX_HOSTNAME_BUF_LEN];
 	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
@@ -132,6 +134,7 @@ typedef struct
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[ZBX_HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[ZBX_HOST_IPMI_PASSWORD_LEN_MAX];
+	unsigned char	monitored_by;
 	unsigned char	status;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
@@ -216,6 +219,7 @@ typedef struct
 	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	signed char	inventory_mode;
 	unsigned char	status;
+	unsigned char	monitored_by;
 }
 zbx_history_sync_host_t;
 
@@ -253,6 +257,7 @@ typedef struct
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
+	unsigned char	monitored_by;
 	unsigned char	status;
 	unsigned char	tls_accept;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -353,6 +358,7 @@ ZBX_PTR_VECTOR_DECL(dc_trigger, zbx_dc_trigger_t *)
 typedef struct
 {
 	zbx_uint64_t			proxyid;
+	zbx_uint64_t			proxy_groupid;
 	char				name[ZBX_HOSTNAME_BUF_LEN];
 	time_t				proxy_config_nextcheck;
 	time_t				proxy_data_nextcheck;
@@ -765,14 +771,13 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		const char *config_ssl_key_location);
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
-		zbx_uint64_t conf_cache_size, char **error);
+		zbx_uint64_t conf_cache_size, const char *hostname, char **error);
 void	zbx_free_configuration_cache(void);
 
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
 		int *errcode, size_t num);
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num);
 int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
-int	zbx_dc_config_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	zbx_dc_config_get_hosts_by_hostids(zbx_dc_host_t *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	zbx_dc_config_get_items_by_keys(zbx_dc_item_t *items, zbx_host_key_t *keys, int *errcodes, size_t num);
@@ -880,7 +885,7 @@ int	zbx_dc_config_get_proxypoller_nextcheck(void);
 void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, int proxy_conn_err,
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, char **error);
+		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char **error);
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
 		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat);
 
@@ -940,7 +945,8 @@ void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx
 int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, time_t *lastaccess, char **error);
-int	zbx_proxy_discovery_get(char **data, char **error);
+void	zbx_proxy_discovery_get(char **data);
+int	zbx_proxy_proxy_list_discovery_get(const zbx_vector_uint64_t *proxyids, char **data, char **error);
 
 unsigned int	zbx_dc_get_internal_action_count(void);
 unsigned int	zbx_dc_get_auto_registration_action_count(void);
@@ -1048,13 +1054,16 @@ zbx_session_t;
 
 typedef struct
 {
-	zbx_uint64_t	config;		/* configuration cache revision, increased every sync */
-	zbx_uint64_t	expression;	/* global expression revision */
-	zbx_uint64_t	autoreg_tls;	/* autoregistration tls revision */
-	zbx_uint64_t	drules;		/* drules revision */
-	zbx_uint64_t	upstream;	/* configuration revision received from server */
-	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
+	zbx_uint64_t	config;			/* configuration cache revision, increased every sync */
+	zbx_uint64_t	expression;		/* global expression revision */
+	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
+	zbx_uint64_t	drules;			/* drules revision */
+	zbx_uint64_t	upstream;		/* configuration revision received from server */
+	zbx_uint64_t	upstream_hostmap;	/* host mapping configuration revision received from server */
+	zbx_uint64_t	config_table;		/* the global configuration revision (config table) */
 	zbx_uint64_t	connector;
+	zbx_uint64_t	proxy_group;		/* summary revision of all proxy groups */
+	zbx_uint64_t	proxy;			/* summary revision of all proxies */
 }
 zbx_dc_revision_t;
 
@@ -1260,12 +1269,12 @@ int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
 
-zbx_uint64_t	zbx_dc_get_received_revision(void);
-void	zbx_dc_update_received_revision(zbx_uint64_t revision);
+void	zbx_dc_get_upstream_revision(zbx_uint64_t *config_revision, zbx_uint64_t *hostmap_revision);
+void	zbx_dc_set_upstream_revision(zbx_uint64_t config_revision, zbx_uint64_t hostmap_revision);
 
 void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
-		zbx_vector_uint64_t *httptestids);
+		zbx_vector_uint64_t *httptestids, zbx_uint64_t *proxy_group_revision);
 
 void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vector_uint64_t *updated_hostids,
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, int *global,
@@ -1369,5 +1378,107 @@ zbx_dc_item_type_timeouts_t;
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
 char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
+
+/* proxy group manager local cache support */
+
+/* host-proxy mapping record */
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	proxyid;
+	zbx_uint64_t	revision;
+	zbx_uint64_t	hostproxyid;
+}
+zbx_pg_host_t;
+
+ZBX_VECTOR_DECL(pg_host, zbx_pg_host_t)
+
+/* wrap reference to zbx_pg_host_t structure for hashset storage */
+typedef struct
+{
+	zbx_pg_host_t	*host;
+}
+zbx_pg_host_ref_t;
+
+ZBX_VECTOR_DECL(pg_host_ref_ptr, zbx_pg_host_ref_t *)
+
+typedef struct zbx_pg_group zbx_pg_group_t;
+
+#define ZBX_PG_PROXY_FLAGS_NONE		0x0000
+#define ZBX_PG_PROXY_SYNC_ADDED		0x0100
+#define ZBX_PG_PROXY_SYNC_MODIFIED	0x0200
+
+/* proxy */
+
+#define ZBX_PG_PROXY_FLAGS_NONE		0x0000
+#define ZBX_PG_PROXY_UPDATE_STATE	0x0001
+
+typedef struct
+{
+	zbx_uint64_t			proxyid;
+	zbx_uint64_t			revision;
+	char				*name;
+	int				state;
+	int				version;
+	int				lastaccess;
+	int				firstaccess;
+	time_t				sync_time;	/* sync_time is used to stop collecting potentially infinite */
+							/* host changes into deleted_group_hosts if the proxy was    */
+							/* offline for day+. In this case full proxy group data      */
+							/* resync will be forced                                     */
+	zbx_uint32_t			flags;
+	struct zbx_pg_group		*group;
+	zbx_hashset_t			hosts;		/* references to proxy group manager hostmap entries */
+	zbx_vector_pg_host_t		deleted_group_hosts;
+}
+zbx_pg_proxy_t;
+
+ZBX_PTR_VECTOR_DECL(pg_proxy_ptr, zbx_pg_proxy_t *)
+
+#define ZBX_PG_GROUP_FLAGS_NONE		0x0000
+#define ZBX_PG_GROUP_UPDATE_STATE	0x0001
+#define ZBX_PG_GROUP_UPDATE_HP_MAP	0x0002
+#define ZBX_PG_GROUP_SYNC_ADDED		0x0100
+#define ZBX_PG_GROUP_SYNC_MODIFIED	0x0200
+
+/* proxy group */
+struct zbx_pg_group
+{
+	zbx_uint64_t			proxy_groupid;
+	char				*name;
+	char				*failover_delay;
+	char				*min_online;
+	zbx_uint64_t			revision;
+	zbx_uint64_t			hostmap_revision;
+	zbx_uint64_t			sync_revision;
+	int				state;
+	int				state_time;
+	int				unbalanced;
+	time_t				balance_time;
+	zbx_uint32_t			flags;
+	zbx_vector_pg_proxy_ptr_t	proxies;		/* proxies assigned to host group */
+	zbx_hashset_t			hostids;		/* hostids assigned to proxy group */
+	zbx_vector_uint64_t		unassigned_hostids;	/* hostids to be assigned to proxies */
+};
+
+ZBX_PTR_VECTOR_DECL(pg_group_ptr, zbx_pg_group_t *)
+
+#define ZBX_PG_PROXY_FETCH_REVISION	0
+#define ZBX_PG_PROXY_FETCH_FORCE	1
+
+int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision);
+int	zbx_dc_fetch_proxies(zbx_hashset_t *groups, zbx_hashset_t *proxies, zbx_uint64_t *revision, int flags,
+		zbx_vector_objmove_t *proxy_reloc);
+
+int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		zbx_comms_redirect_t *redirect);
+int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
+		zbx_comms_redirect_t *redirect);
+
+int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint64_t *hostmap_revision);
+void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
+void	zbx_dc_set_proxy_lastonline(int lastonline);
+zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid);
+zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
 
 #endif

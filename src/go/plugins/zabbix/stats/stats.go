@@ -60,7 +60,7 @@ func (p *Plugin) getRemoteZabbixStats(addr string, req []byte, timeout int) ([]b
 	var parse response
 
 	resp, errs, _ := zbxcomms.Exchange(
-		&[]string{addr},
+		zbxcomms.NewAddress(addr),
 		&p.localAddr,
 		time.Duration(timeout)*time.Second,
 		time.Duration(timeout)*time.Second,

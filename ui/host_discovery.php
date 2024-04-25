@@ -281,7 +281,7 @@ $itemid = getRequest('itemid');
 if ($itemid) {
 	$items = API::DiscoveryRule()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['hostid', 'proxyid', 'status', 'name'],
+		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status'],
 		'itemids' => $itemid,
 		'editable' => true
 	]);
@@ -297,7 +297,7 @@ else {
 
 	if ($hostid) {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'proxyid', 'status', 'name'],
+			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status'],
 			'hostids' => $hostid,
 			'templated_hosts' => true,
 			'editable' => true
@@ -686,7 +686,7 @@ if (hasRequest('form')) {
 	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$items = API::DiscoveryRule()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid', 'proxyid', 'name', 'status', 'flags'],
+			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -718,6 +718,11 @@ if (hasRequest('form')) {
 		}
 	}
 
+	if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+		$host['proxyid'] = $host['assigned_proxyid'];
+	}
+	unset($host['monitored_by'], $host['assigned_proxyid']);
+
 	$data = getItemFormData($item);
 
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
@@ -725,10 +730,10 @@ if (hasRequest('form')) {
 	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
-	$data['host'] = $hosts[0];
+	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
-	$data['display_interfaces'] = in_array($hosts[0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
 
 	$default_timeout = DB::getDefault('items', 'timeout');

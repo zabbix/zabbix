@@ -365,7 +365,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	ZBX_UNUSED(events_cbs);
 	ZBX_UNUSED(rtc);
 
-	int				history_num, txn_rc;
+	int				history_num, txn_rc = ZBX_DB_OK;
 	time_t				sync_start;
 	zbx_vector_ptr_t		history_items;
 	zbx_vector_item_diff_ptr_t	item_diff;
