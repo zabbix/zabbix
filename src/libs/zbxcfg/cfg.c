@@ -673,6 +673,7 @@ void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *
 
 		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
 		addr_ptr->port = addr->port;
+		addr_ptr->revision = addr->revision;
 		zbx_vector_addr_ptr_append(addr_to, addr_ptr);
 	}
 }
@@ -717,6 +718,7 @@ int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const c
 
 			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 			addr->ip = NULL;
+			addr->revision = 0;
 
 			if (SUCCEED != zbx_parse_serveractive_element(str, &addr->ip, &addr->port, port))
 			{

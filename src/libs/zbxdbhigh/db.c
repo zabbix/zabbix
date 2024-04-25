@@ -842,7 +842,8 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "trigger_queue") ||
 			0 == strcmp(tablename, "proxy_history") ||
 			0 == strcmp(tablename, "proxy_dhistory") ||
-			0 == strcmp(tablename, "proxy_autoreg_host"))
+			0 == strcmp(tablename, "proxy_autoreg_host") ||
+			0 == strcmp(tablename, "host_proxy"))
 		return zbx_cb_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);

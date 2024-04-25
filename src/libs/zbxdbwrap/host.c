@@ -5909,6 +5909,12 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
+	/* delete host_proxy links */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_proxy where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	/* delete host */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);

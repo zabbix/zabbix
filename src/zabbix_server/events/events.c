@@ -1792,8 +1792,9 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		zbx_dc_host_t	*host;
-		zbx_db_event	*event;
+		zbx_dc_host_t		*host;
+		zbx_db_event		*event;
+		zbx_vector_str_t	groups;
 
 		event = events.values[i];
 
@@ -1868,8 +1869,18 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
+		zbx_vector_str_create(&groups);
 		while (NULL != (row = zbx_db_fetch(result)))
-			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+			zbx_vector_str_append(&groups, zbx_strdup(NULL, row[0]));
+
+		zbx_vector_str_sort(&groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		for (j = 0; j < groups.values_num; j++)
+			zbx_json_addstring(&json, NULL, groups.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_vector_str_clear_ext(&groups, zbx_str_free);
+		zbx_vector_str_destroy(&groups);
+
 		zbx_db_free_result(result);
 
 		zbx_json_close(&json);
