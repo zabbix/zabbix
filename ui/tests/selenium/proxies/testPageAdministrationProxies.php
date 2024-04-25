@@ -76,7 +76,7 @@ class testPageAdministrationProxies extends CWebTest {
 		}
 
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
-		$this->assertEquals(['', 'Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)', 'Host count', 'Item count',
+		$this->assertEquals(['', 'Name', 'Mode', 'Encryption', 'State', 'Version', 'Last seen (age)', 'Item count',
 				'Required vps', 'Hosts'], $table->getHeadersText()
 		);
 
@@ -154,27 +154,36 @@ class testPageAdministrationProxies extends CWebTest {
 				'Mode' => 'Active',
 				'Encryption' => 'None',
 				'Version' => '',
+				'State' => 'Unknown',
 				'Last seen (age)' => 'Never',
-				'Host count' => '',
 				'Item count' => '',
 				'Required vps' => '',
-				'Hosts' => 'enabled_host1'
+				'Hosts' => '1'
 			],
 			[
 				'Name' => 'passive_proxy1',
 				'Mode' => 'Passive',
 				'Encryption' => 'None',
 				'Version' => '',
+				'State' => 'Unknown',
 				'Last seen (age)' => 'Never',
-				'Host count' => '',
 				'Item count' => '',
 				'Required vps' => '',
-				'Hosts' => 'disabled_host1'
+				'Hosts' => '1'
 			]
+		];
+
+		$hosts = [
+			'active_proxy1' => 'enabled_host1',
+			'passive_proxy1' => 'disabled_host1'
 		];
 
 		// Check filtered result.
 		$this->assertTableData($filter_result);
+
+		foreach ($hosts as $proxy_name => $host_name) {
+			$this->assertEquals($host_name, $table->findRow('Name', $proxy_name)->getColumn(10)->getText());
+		}
 
 		// Reset filter and assert row count.
 		$form->query('button:Reset')->one()->click();

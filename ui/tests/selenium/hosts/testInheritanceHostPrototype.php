@@ -83,7 +83,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="proxyid"][@readonly]');
+
+		$monitored_by = $this->query('id:monitored_by')->asSegmentedRadio()->one();
+		$this->assertFalse($monitored_by->isEnabled());
+		$this->assertEquals('Server', $monitored_by->getSelected());
 
 		// Check layout at Groups tab.
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');

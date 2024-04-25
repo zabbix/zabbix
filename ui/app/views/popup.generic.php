@@ -186,6 +186,7 @@ switch ($data['popup_type']) {
 	case 'template_groups':
 	case 'host_groups':
 	case 'proxies':
+	case 'proxy_groups':
 	case 'host_templates':
 	case 'templates':
 	case 'drules':
@@ -901,6 +902,7 @@ $types = [
 	'item_prototypes',
 	'media_types',
 	'proxies',
+	'proxy_groups',
 	'roles',
 	'templates',
 	'users',

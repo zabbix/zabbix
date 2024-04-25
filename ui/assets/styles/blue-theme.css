@@ -1183,7 +1183,7 @@ footer {
   .form-grid .btn-split button[aria-expanded="true"] {
     background-color: #768d99;
     border-color: #768d99; }
-  .form-grid a:not(:first-child),
+  .form-grid .link:not(:first-child),
   .form-grid .btn-icon:not(:first-child),
   .form-grid .btn-link:not(:first-child) {
     margin-left: 5px; }
