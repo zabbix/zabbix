@@ -100,7 +100,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.10+ discovery
 
@@ -118,7 +118,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Exchanges discovery|<p>The metrics for an individual exchange.</p>|Dependent item|rabbitmq.exchanges.discovery|
+|Exchanges discovery|<p>The metrics for an individual exchange.</p>|Dependent item|rabbitmq.exchanges.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Exchanges discovery
 
@@ -211,7 +211,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |RabbitMQ: Service ping||Zabbix agent|net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|RabbitMQ: Get node overview|<p>The HTTP API endpoint that returns cluster-wide metrics.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `\n\s?\n(.*) \1`</p></li></ul>|
+|RabbitMQ: Get node overview|<p>The HTTP API endpoint that returns cluster-wide metrics.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `\n\s?\n(.*) \1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |RabbitMQ: Get nodes|<p>The HTTP API endpoint that returns metrics of the nodes.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `\n\s?\n(.*) \1`</p></li></ul>|
 |RabbitMQ: Get queues|<p>The HTTP API endpoint that returns metrics of the queues metrics.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `\n\s?\n(.*) \1`</p></li></ul>|
 |RabbitMQ: Management plugin version|<p>The version of the management plugin in use.</p>|Dependent item|rabbitmq.node.overview.management_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
@@ -273,7 +273,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.10+ discovery
 
@@ -299,7 +299,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.9- discovery|<p>Specific metrics for the versions: up to and including 3.8.4.</p>|Dependent item|rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Health Check 3.8.9- discovery|<p>Specific metrics for the versions: up to and including 3.8.4.</p>|Dependent item|rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.9- discovery
 
@@ -317,14 +317,14 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Queues discovery|<p>The metrics for an individual queue.</p>|Dependent item|rabbitmq.queues.discovery|
+|Queues discovery|<p>The metrics for an individual queue.</p>|Dependent item|rabbitmq.queues.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Queues discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Get data|<p>The HTTP API endpoint that returns [{#VHOST}][{#QUEUE}] queue metrics</p>|Dependent item|rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].first()`</p></li></ul>|
-|RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages|<p>The count of total messages in the queue.</p>|Dependent item|rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.messages`</p></li></ul>|
+|RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total|<p>The count of total messages in the queue.</p>|Dependent item|rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.messages`</p></li></ul>|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages per second|<p>The count of total messages per second in the queue.</p>|Dependent item|rabbitmq.queue.messages.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.messages_details.rate`</p></li></ul>|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Consumers|<p>The number of consumers.</p>|Dependent item|rabbitmq.queue.consumers["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.consumers`</p></li></ul>|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Memory|<p>The bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.</p>|Dependent item|rabbitmq.queue.memory["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory`</p></li></ul>|
