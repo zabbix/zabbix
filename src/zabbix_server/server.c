@@ -105,7 +105,7 @@
 #include "zbxhttppoller.h"
 #include "zbx_ha_constants.h"
 #include "zbxescalations.h"
-#include "zbxbincommon.h"
+#include "zbxaux.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 

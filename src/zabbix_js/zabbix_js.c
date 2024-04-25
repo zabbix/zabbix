@@ -23,7 +23,7 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 #include "zbxnix.h"
-#include "zbxbincommon.h"
+#include "zbxaux.h"
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 static const char	title_message[] = "zabbix_js";
