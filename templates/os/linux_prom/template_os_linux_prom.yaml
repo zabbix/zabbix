@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-14T13:41:35Z'
+  date: '2024-03-14T12:02:16Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -9,7 +9,16 @@ zabbix_export:
       template: 'Linux by Prom'
       name: 'Linux by Prom'
       description: |
-        Official Linux template using node exporter.
+        This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
+        
+        Setup:
+        
+        1. Set up the node_exporter according to the official documentation:
+        https://prometheus.io/docs/guides/node-exporter/
+        
+        Use node_exporter v0.18.0 or above.
+        
+        2. Set the hostname or IP address of the node_exporter host in the '{$NODE_EXPORTER_HOST}' macro. You can also change the Prometheus endpoint port in the '{$NODE_EXPORTER_PORT}' macro if necessary.
         
         Known Issues:
         
@@ -107,7 +116,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
+          url: 'http://{$NODE_EXPORTER_HOST}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
             - tag: component
               value: raw
@@ -1929,6 +1938,9 @@ zabbix_export:
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^notpresent$
           description: 'Ignore notpresent(1).'
+        - macro: '{$NODE_EXPORTER_HOST}'
+          value: '<SET NODE EXPORTER HOST>'
+          description: 'The hostname or IP address of the node_exporter host.'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'
