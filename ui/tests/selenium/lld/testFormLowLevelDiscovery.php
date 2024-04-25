@@ -1378,6 +1378,10 @@ class testFormLowLevelDiscovery extends CWebTest {
 							['Name' => 'q', 'Value' => 'cat'],
 							['Name' => 'rlz', 'Value' => '1C1GCEU_enLV1043LV1043']
 						]
+					],
+					'Headers' => [
+						['Name' => 'name1', 'Value' => 'value_1'],
+						['Name' => 'name2', 'Value' => 'value_2']
 					]
 				]
 			],
@@ -1424,7 +1428,38 @@ class testFormLowLevelDiscovery extends CWebTest {
 					],
 					'trim' => true
 				]
-			]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Script LLD',
+						'Type' => 'Script',
+						'Key' => 'script_check[1]',
+						'Script' => '  wait(2000).then(() => goToPage());    '
+					],
+					'Parameters' => [
+						['Name' => 'param_1', 'Value' => 'value_1'],
+						['Name' => 'param_2', 'Value' => 'value_2']
+					],
+					'trim' => true
+				]
+			],
+//			[
+//				[
+//					'fields' => [
+//						'Name' => 'Multiline Script LLD',
+//						'Type' => 'Script',
+//						'Key' => 'script_check[2]',
+//						'Script' => "const = 'Hello World!';
+//								\nlet favePhrase = const;
+//								\nconsole.log(favePhrase);"
+//					],
+//					'Parameters' => [
+//						['Name' => 'param_1', 'Value' => 'value_1'],
+//						['Name' => 'param_2', 'Value' => 'value_2']
+//					]
+//				]
+//			]
 		];
 	}
 
@@ -1485,6 +1520,16 @@ class testFormLowLevelDiscovery extends CWebTest {
 					]);
 				}
 			}
+		}
+
+		// Fill headers.
+		if (array_key_exists('Headers', $data)) {
+			$this->fillDraggableFields($data['Headers'], $form, 'Headers');
+		}
+
+		// Fill parameters.
+		if (array_key_exists('Parameters', $data)) {
+			$this->fillDraggableFields($data['Parameters'], $form, 'Parameters');
 		}
 
 		$form->submit();
@@ -1550,6 +1595,16 @@ class testFormLowLevelDiscovery extends CWebTest {
 						]);
 					}
 				}
+			}
+
+			// Check headers.
+			if (array_key_exists('Headers', $data)) {
+				$this->checkDraggableFields($data['Headers'], $form, 'headers');
+			}
+
+			// Check headers.
+			if (array_key_exists('Parameters', $data)) {
+				$this->checkDraggableFields($data['Parameters'], $form, 'parameters');
 			}
 
 			// Write new LLD name for the next case.
@@ -1755,6 +1810,42 @@ class testFormLowLevelDiscovery extends CWebTest {
 			$dependant_field = $form->getField($label);
 			$this->assertTrue($dependant_field->isVisible($status['visible']));
 			$this->assertTrue($dependant_field->isEnabled($status['enabled']));
+		}
+	}
+
+	/**
+	 * Fill complex draggable fields in the view like name => value.
+	 *
+	 * @param array        $data     given array of fields
+	 * @param CFormElement $form     LLD edit form
+	 * @param string       $label    container's label
+	 */
+	protected function fillDraggableFields($data, $form, $label) {
+		foreach ($data as $i => $field) {
+			if ($i > 0) {
+				$form->getFieldContainer($label)->query('button:Add')->waitUntilClickable()->one()->click();
+			}
+
+			$form->fill([
+				'name:'.lcfirst($label).'['.$i.'][name]' => $field['Name'],
+				'name:'.lcfirst($label).'['.$i.'][value]' => $field['Value']
+			]);
+		}
+	}
+
+	/**
+	 * Check complex draggable fields.
+	 *
+	 * @param array        $data       given array of fields
+	 * @param CFormElement $form       LLD edit form
+	 * @param string       $locator    field's locator
+	 */
+	protected function checkDraggableFields($data, $form, $locator) {
+		foreach ($data as $i => $field) {
+			$form->checkValue([
+				'name:'.$locator.'['.$i.'][name]' => $field['Name'],
+				'name:'.$locator.'['.$i.'][value]' => $field['Value']
+			]);
 		}
 	}
 }
