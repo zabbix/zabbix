@@ -1491,8 +1491,9 @@ static void	zbx_db_save_server_status(void)
 	zbx_json_addobject(&json, "configuration");
 	zbx_json_addstring(&json, "enable_global_scripts", (1 == config_enable_global_scripts ? "true" : "false"),
 			ZBX_JSON_TYPE_INT);
-	zbx_json_addstring(&json, "config_allow_software_update_check", (1 == config_allow_software_update_check ? "true" : "false"),
-			ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "allow_software_update_check",
+			(1 == config_allow_software_update_check ? "true" : "false"), ZBX_JSON_TYPE_INT);
+
 	zbx_json_close(&json);
 
 	zbx_json_close(&json);
