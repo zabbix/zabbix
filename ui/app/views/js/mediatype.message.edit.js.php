@@ -67,7 +67,7 @@ window.mediatype_message_popup = new class {
 			};
 		}
 
-		if (media_type == <?= MEDIA_TYPE_EMAIL ?> && message_format == <?= SMTP_MESSAGE_FORMAT_HTML ?>) {
+		if (media_type == <?= MEDIA_TYPE_EMAIL ?> && message_format == <?= ZBX_MEDIA_MESSAGE_FORMAT_HTML ?>) {
 			return {
 				subject: message_templates[message_type]['template']['subject'],
 				message: message_templates[message_type]['template']['html']

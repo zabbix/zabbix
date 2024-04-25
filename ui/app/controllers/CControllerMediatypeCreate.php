@@ -54,7 +54,7 @@ class CControllerMediatypeCreate extends CController {
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
 			'description' =>			'db media_type.description',
-			'content_type' =>			'db media_type.message_format|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'content_type' =>			'db media_type.message_format|in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_templates' =>		'array',
 			'provider' =>				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];

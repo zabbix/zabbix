@@ -271,8 +271,8 @@ $mediatype_form_grid
 		(new CLabel(_('Message format'), 'content_type'))->setId('content_type_label'),
 		(new CFormField(
 			(new CRadioButtonList('content_type', (int) $data['content_type']))
-				->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
-				->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
+				->addValue(_('HTML'), ZBX_MEDIA_MESSAGE_FORMAT_HTML)
+				->addValue(_('Plain text'), ZBX_MEDIA_MESSAGE_FORMAT_TEXT)
 				->setModern()
 		))->setId('content_type_field')
 	])

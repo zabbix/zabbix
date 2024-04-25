@@ -36,7 +36,7 @@ class CControllerMediatypeMessageCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'type' =>			'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'content_type' =>	'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'content_type' =>	'in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_type' =>	'required|in '.implode(',', $this->message_types),
 			'subject' =>		'db media_type_message.subject',
 			'message' =>		'db media_type_message.message'

@@ -220,8 +220,8 @@ $mediatype_formlist
 	->addRow(new CLabel(_('Password'), 'passwd'), $passwd_field)
 	->addRow(new CLabel(_('Message format'), 'content_type'),
 		(new CRadioButtonList('content_type', (int) $data['content_type']))
-			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
-			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
+			->addValue(_('HTML'), ZBX_MEDIA_MESSAGE_FORMAT_HTML)
+			->addValue(_('Plain text'), ZBX_MEDIA_MESSAGE_FORMAT_TEXT)
 			->setModern(true)
 	)
 	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
