@@ -45,9 +45,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	const HOST_ID = 90001;
-	const SELECTOR = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
-
-	private $selector = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
+	const SELECTOR = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
 
 	public static function prepareLLDData() {
 		CDataHelper::createHosts([
