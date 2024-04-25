@@ -988,13 +988,15 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 	size_t		sql_offset = 0;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
+	zbx_host_info_t		*host_info;
+	zbx_hashset_iter_t	iter;
 
 	for (i = 0; i < hostids->values_num; i++)
 	{
-		zbx_host_info_t	host_info = {.hostid = hostids->values[i]};
+		zbx_host_info_t	host_info_new = {.hostid = hostids->values[i]};
 
-		zbx_vector_ptr_create(&host_info.groups);
-		zbx_hashset_insert(hosts_info, &host_info, sizeof(host_info));
+		zbx_vector_ptr_create(&host_info_new.groups);
+		zbx_hashset_insert(hosts_info, &host_info_new, sizeof(host_info_new));
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1010,7 +1012,6 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	hostid;
-		zbx_host_info_t	*host_info;
 
 		ZBX_DBROW2UINT64(hostid, row[0]);
 
@@ -1022,6 +1023,11 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 
 		zbx_vector_ptr_append(&host_info->groups, zbx_strdup(NULL, row[1]));
 	}
+
+	zbx_hashset_iter_reset(hosts_info, &iter);
+	while (NULL != (host_info = (zbx_host_info_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_sort(&host_info->groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
 	zbx_db_free_result(result);
 }
 
