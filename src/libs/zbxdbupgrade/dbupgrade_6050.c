@@ -3648,6 +3648,13 @@ static int	DBpatch_6050257(void)
 	return DBadd_field("config", &field);
 }
 
+static int	DBpatch_6050258(void)
+{
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3910,5 +3917,6 @@ DBPATCH_ADD(6050254, 0, 1)
 DBPATCH_ADD(6050255, 0, 1)
 DBPATCH_ADD(6050256, 0, 1)
 DBPATCH_ADD(6050257, 0, 1)
+DBPATCH_ADD(6050258, 0, 1)
 
 DBPATCH_END()

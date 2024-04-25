@@ -3072,6 +3072,17 @@ return [
 				'length' => 20,
 				'ref_table' => 'mfa',
 				'ref_field' => 'mfaid'
+			],
+			'software_update_checkid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
+			],
+			'software_update_check_data' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
 			]
 		]
 	],
