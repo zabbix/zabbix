@@ -701,6 +701,7 @@ func (m *Manager) init() {
 				agent.Options.Plugins[metric.Plugin.Name()],
 				metric.Plugin.Name(),
 			)
+			log.Infof("[OWLS] capacity = '%v', forceActiveChecksOnStart = '%v'", capacity, forceActiveChecksOnStart)
 			if capacity > metric.Plugin.Capacity() {
 				log.Warningf(
 					"lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",

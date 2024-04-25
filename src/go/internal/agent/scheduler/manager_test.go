@@ -72,7 +72,7 @@ type mockExporterPlugin struct {
 	mockPlugin
 }
 
-func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
 	p.call(key)
 	return
 }
@@ -98,7 +98,7 @@ type mockCollectorExporterPlugin struct {
 	period int
 }
 
-func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
 	p.call(key)
 	return
 }
@@ -130,7 +130,7 @@ type mockPassiveRunnerPlugin struct {
 	mockPlugin
 }
 
-func (p *mockPassiveRunnerPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *mockPassiveRunnerPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
 	return
 }
 func (p *mockPassiveRunnerPlugin) Start() {
@@ -186,14 +186,14 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Item {
 type mockConfiguratorPlugin struct {
 	plugin.Base
 	mockPlugin
-	options interface{}
+	options any
 }
 
-func (p *mockConfiguratorPlugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+func (p *mockConfiguratorPlugin) Configure(global *plugin.GlobalOptions, options any) {
 	p.call("$configure")
 }
 
-func (p *mockConfiguratorPlugin) Validate(options interface{}) (err error) {
+func (p *mockConfiguratorPlugin) Validate(options any) (err error) {
 	return
 }
 
@@ -1787,7 +1787,7 @@ func TestPassiveRunner(t *testing.T) {
 }
 
 type configuratorOption struct {
-	Params interface{} `conf:"optional"`
+	Params any `conf:"optional"`
 }
 
 func TestConfigurator(t *testing.T) {
@@ -1798,7 +1798,7 @@ func TestConfigurator(t *testing.T) {
 	_ = conf.Unmarshal([]byte("Delay=30"), &opt2)
 	_ = conf.Unmarshal([]byte("Delay=60"), &opt3)
 
-	agent.Options.Plugins = map[string]interface{}{
+	agent.Options.Plugins = map[string]any{
 		"Debug1": opt1.Params,
 		"Debug2": opt2.Params,
 		"Debug3": opt3.Params,
@@ -1870,42 +1870,50 @@ func TestConfigurator(t *testing.T) {
 
 func Test_getPluginOptions(t *testing.T) {
 	type args struct {
-		optsRaw interface{}
+		optsRaw any
 	}
 	tests := []struct {
-		name string
-		args args
-		want int
+		name                  string
+		args                  args
+		wantCapacity          int
+		wantForceActiveChecks int
 	}{
 		{
 			"default",
 			args{
 				&conf.Node{
 					Name:  "Test",
-					Nodes: []interface{}{},
+					Nodes: []any{},
 				},
 			},
 			1000,
+			0,
 		},
 		{
-			"system_cap_and_unexpected_param",
+			"system_cap_active_checks_and_unexpected_param",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "Capacity",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Value{Value: []byte("10")},
 							},
 						},
 						&conf.Node{
 							Name: "System",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Node{
 									Name: "Capacity",
-									Nodes: []interface{}{
+									Nodes: []any{
 										&conf.Value{Value: []byte("50")},
+									},
+								},
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("1")},
 									},
 								},
 							},
@@ -1914,16 +1922,17 @@ func Test_getPluginOptions(t *testing.T) {
 				},
 			},
 			50,
+			1,
 		},
 		{
 			"unexpected_param",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "Capacity",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Value{Value: []byte("10")},
 							},
 						},
@@ -1931,19 +1940,20 @@ func Test_getPluginOptions(t *testing.T) {
 				},
 			},
 			1000,
+			0,
 		},
 		{
 			"system_cap",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "System",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Node{
 									Name: "Capacity",
-									Nodes: []interface{}{
+									Nodes: []any{
 										&conf.Value{Value: []byte("50")},
 									},
 								},
@@ -1953,17 +1963,77 @@ func Test_getPluginOptions(t *testing.T) {
 				},
 			},
 			50,
+			0,
+		},
+		{
+			"active_checks",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []any{
+						&conf.Node{
+							Name: "System",
+							Nodes: []any{
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("1")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			1000,
+			1,
+		},
+		{
+			"no_active_checks",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []any{
+						&conf.Node{
+							Name: "System",
+							Nodes: []any{
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("0")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			1000,
+			0,
 		},
 		{
 			"nil",
 			args{nil},
 			1000,
+			0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := getPluginOptions(tt.args.optsRaw, "test"); got != tt.want {
-				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
+			gotCapacity, gotForceActiveChecks := getPluginOptions(tt.args.optsRaw, "test")
+			if gotCapacity != tt.wantCapacity {
+				t.Errorf(
+					"getPluginOptions() got Plugins.<PluginName>.System.Capacity = %v, want %v",
+					gotCapacity,
+					tt.wantCapacity,
+				)
+			}
+			if gotForceActiveChecks != tt.wantForceActiveChecks {
+				t.Errorf(
+					"getPluginOptions() got ForceActiveChecksOnStart = %v, want %v",
+					gotForceActiveChecks,
+					tt.wantForceActiveChecks,
+				)
 			}
 		})
 	}
