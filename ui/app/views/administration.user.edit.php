@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,8 @@ if ($data['change_password']) {
 
 	$password1 = (new CPassBox('password1', $data['password1']))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired();
+		->setAriaRequired()
+		->setAttribute('autocomplete', 'off');
 
 	if ($data['action'] !== 'user.edit') {
 		$password1->setAttribute('autofocus', 'autofocus');
@@ -166,6 +167,7 @@ if ($data['change_password']) {
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
 		)
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
@@ -265,13 +267,14 @@ if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== Z
 			->setId('autologout_visible')
 			->setChecked($data['autologout'] !== '0'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('autologout', $autologout))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]);
 }
 
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
-		(new CTextBox('refresh', $data['refresh']))
+		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,6 +112,7 @@ void	zbx_dbsync_free_env(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
 
 int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);

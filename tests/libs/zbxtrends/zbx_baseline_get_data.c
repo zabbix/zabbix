@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 int	__wrap_DBis_null(const char *field);
 DB_ROW	__wrap_DBfetch(DB_RESULT result);
 DB_RESULT	__wrap_DBselect(const char *fmt, ...);
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group);
 zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end,
 		double *value);
 

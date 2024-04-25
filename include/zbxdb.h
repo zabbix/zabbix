@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,6 +137,7 @@ int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
 
+int		zbx_db_get_row_num(DB_RESULT result);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
 void		DBfree_result(DB_RESULT result);
 int		zbx_db_is_null(const char *field);

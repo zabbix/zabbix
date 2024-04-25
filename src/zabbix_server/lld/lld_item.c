@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4414,9 +4414,9 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	zbx_vector_ptr_create(&items);
 	zbx_hashset_create(&items_index, item_prototypes.values_num * lld_rows->values_num, lld_item_index_hash_func,
 			lld_item_index_compare_func);
-	zbx_db_begin();
+	DBbegin();
 	lld_items_get(&item_prototypes, &items);
-	zbx_db_commit();
+	DBcommit();
 	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 	lld_items_param_make(&item_prototypes, lld_macro_paths, &items, error);

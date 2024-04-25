@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T21:00:10Z'
+  date: '2024-01-22T16:07:11Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -589,10 +589,10 @@ zabbix_export:
                   var result = [];
                   
                   JSON.parse(value).records.forEach(function(chassis) {
-                      chassis.frus.forEach(function(frus) {
-                          frus.chassisId = chassis.id;
-                          result.push(frus);
-                      })
+                  	chassis.frus.forEach(function(frus) {
+                  		frus.chassisId = chassis.id;
+                  		result.push(frus);
+                  	})
                   });
                   
                   return JSON.stringify(result);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,8 +56,9 @@ void	zbx_mock_test_entry(void **state)
 	{
 		if (SUCCEED == expected_result)
 		{
-			fail_msg("Expected the same result but there are differences expected len:%d actual:%d result '%s'",
-					expected_result_buffer_length, strlen(result_buffer), result_buffer);
+			fail_msg("Expected the same result but there are differences expected len:%lu actual:%lu"
+					"result '%s'", expected_result_buffer_length, strlen(result_buffer),
+					result_buffer);
 		}
 
 		zbx_free(expected_result_buffer);

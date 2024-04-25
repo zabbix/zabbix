@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,6 @@ extern int	CONFIG_SERVER_STARTUP_TIME;
 
 int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result);
 
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
+int	zbx_get_value_internal_ext(const DC_ITEM *item, const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif

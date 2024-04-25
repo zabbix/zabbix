@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,5 +31,6 @@ void	zbx_unblock_signals(const sigset_t *orig_mask);
 
 void	zbx_set_exit_on_terminate(void);
 void	zbx_unset_exit_on_terminate(void);
+void	zbx_set_on_exit_args(void *args);
 
 #endif

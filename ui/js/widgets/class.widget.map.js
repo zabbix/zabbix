@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,11 @@ class CWidgetMap extends CWidget {
 		this._initial_load = true;
 
 		this._has_contents = false;
+
+		this._map_created_promise_resolve = null;
+		this._map_created_promise = new Promise(resolve => {
+			this._map_created_promise_resolve = resolve;
+		});
 	}
 
 	_doActivate() {
@@ -162,6 +167,17 @@ class CWidgetMap extends CWidget {
 			});
 	}
 
+	_promiseReady() {
+		const readiness = [super._promiseReady()];
+
+		readiness.push(
+			this._map_created_promise
+				.then(() => this._map_svg.promiseRendered())
+		);
+
+		return Promise.all(readiness);
+	}
+
 	_getUpdateRequestData() {
 		return {
 			...super._getUpdateRequestData(),
@@ -248,6 +264,7 @@ class CWidgetMap extends CWidget {
 		options.container = this._target.querySelector('.sysmap-widget-container');
 
 		this._map_svg = new SVGMap(options);
+		this._map_created_promise_resolve();
 	}
 
 	navigateToSubmap(sysmapid) {

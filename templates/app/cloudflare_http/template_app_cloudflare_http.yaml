@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:44:06Z'
+  date: '2024-04-09T16:23:50Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -190,217 +190,217 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Cloudflare = {
-                params: {},
+            	params: {},
             
-                setParams: function (params) {
-                    ['api_endpoint', 'token', 'zone'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                                || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_endpoint', 'token', 'zone'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            					|| params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            		});
             
-                    Cloudflare.params = params;
-                    if (typeof Cloudflare.params.api_endpoint === 'string') {
-                        if (!Cloudflare.params.api_endpoint.endsWith('/')) {
-                            Cloudflare.params.api_endpoint += '/';
-                        }
-                    }
-                },
+            		Cloudflare.params = params;
+            		if (typeof Cloudflare.params.api_endpoint === 'string') {
+            			if (!Cloudflare.params.api_endpoint.endsWith('/')) {
+            				Cloudflare.params.api_endpoint += '/';
+            			}
+            		}
+            	},
             
-                request: function (method, query, data) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Cloudflare.params.api_endpoint + query;
+            	request: function (method, query, data) {
+            		var response,
+            			request = new HttpRequest(),
+            			url = Cloudflare.params.api_endpoint + query;
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Cloudflare.params.token);
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Cloudflare.params.token);
             
-                    if (typeof data !== 'undefined') {
-                        data = JSON.stringify(data);
-                    }
+            		if (typeof data !== 'undefined') {
+            			data = JSON.stringify(data);
+            		}
             
-                    Zabbix.log(4, '[ Cloudflare ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
+            		Zabbix.log(4, '[ Cloudflare ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
             
-                    switch (method) {
-                        case 'get':
-                            response = request.get(url, data);
-                            break;
+            		switch (method) {
+            			case 'get':
+            				response = request.get(url, data);
+            				break;
             
-                        case 'post':
-                            response = request.post(url, data);
-                            break;
+            			case 'post':
+            				response = request.post(url, data);
+            				break;
             
-                        default:
-                            throw 'Unsupported HTTP request method: ' + method;
-                    }
+            			default:
+            				throw 'Unsupported HTTP request method: ' + method;
+            		}
             
-                    Zabbix.log(4, '[ Cloudflare ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Cloudflare ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Cloudflare. Check debug log for more information.';
-                        }
-                    }
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Cloudflare. Check debug log for more information.';
+            			}
+            		}
             
-                    if (query === 'graphql/' && request.getStatus() == 200 && typeof response.errors !== 'undefined'
-                            && Array.isArray(response.errors)) {
-                        throw 'Request failed with error "' + (getField(response, 'errors.0.message') || 'unknown') + '"';
-                    }
+            		if (query === 'graphql/' && request.getStatus() == 200 && typeof response.errors !== 'undefined'
+            				&& Array.isArray(response.errors)) {
+            			throw 'Request failed with error "' + (getField(response, 'errors.0.message') || 'unknown') + '"';
+            		}
             
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
-                }
+            		return {
+            			status: request.getStatus(),
+            			response: response
+            		};
+            	}
             }
             
             function getField(object, field, def) {
-                var names = field.split('.');
-                var name = names.shift();
+            	var names = field.split('.');
+            	var name = names.shift();
             
-                while (typeof name !== 'undefined') {
-                    if (typeof object === undefined || typeof object[name] === 'undefined') {
-                        return def;
-                    }
+            	while (typeof name !== 'undefined') {
+            		if (typeof object === undefined || typeof object[name] === 'undefined') {
+            			return def;
+            		}
             
-                    object = object[name];
-                    name = names.shift();
-                }
+            		object = object[name];
+            		name = names.shift();
+            	}
             
-                return object;
+            	return object;
             }
             
             try {
-                Cloudflare.setParams(JSON.parse(value));
+            	Cloudflare.setParams(JSON.parse(value));
             
-                var datetime_end = new Date(),
-                    datetime_start = new Date();
+            	var datetime_end = new Date(),
+            		datetime_start = new Date();
             
-                datetime_start.setTime(datetime_end.getTime() - 3600000);
-                datetime_start.setMinutes(0, 0, 0);
-                datetime_end.setTime(datetime_start.getTime());
-                datetime_end.setMinutes(59, 59, 0);
+            	datetime_start.setTime(datetime_end.getTime() - 3600000);
+            	datetime_start.setMinutes(0, 0, 0);
+            	datetime_end.setTime(datetime_start.getTime());
+            	datetime_end.setMinutes(59, 59, 0);
             
-                var datetime_start_str = datetime_start.toISOString(),
-                    datetime_end_str = datetime_end.toISOString();
+            	var datetime_start_str = datetime_start.toISOString(),
+            		datetime_end_str = datetime_end.toISOString();
             
-                var data = {
-                    "query": "{viewer {zones(filter: {zoneTag: \"" + Cloudflare.params.zone + "\"}) {\
-                    httpRequests1hGroups(limit: 100 filter: {\
-                        datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
-                        }) {\
-                            sum{\
-                                requests\
-                                cachedRequests\
-                                encryptedRequests\
-                                responseStatusMap{ requests edgeResponseStatus }\
-                                bytes\
-                                cachedBytes\
-                                encryptedBytes\
-                                threats\
-                                pageViews\
-                            }\
-                            uniq{uniques}\
-                            }\
-                        }}}", "variables": {}
-                }
-                var result = Cloudflare.request('post', 'graphql/', data),
-                    cloudflare = {},
-                    res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0.sum');
+            	var data = {
+            		"query": "{viewer {zones(filter: {zoneTag: \"" + Cloudflare.params.zone + "\"}) {\
+            		httpRequests1hGroups(limit: 100 filter: {\
+            			datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
+            			}) {\
+            				sum{\
+            					requests \
+            					cachedRequests \
+            					encryptedRequests \
+            					responseStatusMap{ requests edgeResponseStatus } \
+            					bytes \
+            					cachedBytes \
+            					encryptedBytes \
+            					threats \
+            					pageViews \
+            				}\
+            				uniq{uniques}\
+            				}\
+            			}}}", "variables": {}
+            	}
+            	var result = Cloudflare.request('post', 'graphql/', data),
+            		cloudflare = {},
+            		res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0.sum');
             
-                if (typeof res === 'object') {
-                    cloudflare = {
-                        requests: {
-                            all: res.requests || 0,
-                            cached: res.cachedRequests || 0,
-                            encrypted: res.encryptedRequests || 0,
-                            cache_hit_ratio: 0,
-                            success_ratio: 0,
-                            others_ratio: 0,
-                            response_100: 0,
-                            response_200: 0,
-                            response_300: 0,
-                            response_400: 0,
-                            response_500: 0
-                        },
-                        bandwidth: {
-                            all: res.bytes || 0,
-                            cached: res.cachedBytes || 0,
-                            cache_hit_ratio: 0,
-                            encrypted: res.encryptedBytes || 0,
-                        },
-                        threats: {
-                            all: res.threats || 0
-                        },
-                        pageviews: {
-                            all: res.pageViews || 0
-                        }
-                    }
+            	if (typeof res === 'object') {
+            		cloudflare = {
+            			requests: {
+            				all: res.requests || 0,
+            				cached: res.cachedRequests || 0,
+            				encrypted: res.encryptedRequests || 0,
+            				cache_hit_ratio: 0,
+            				success_ratio: 0,
+            				others_ratio: 0,
+            				response_100: 0,
+            				response_200: 0,
+            				response_300: 0,
+            				response_400: 0,
+            				response_500: 0
+            			},
+            			bandwidth: {
+            				all: res.bytes || 0,
+            				cached: res.cachedBytes || 0,
+            				cache_hit_ratio: 0,
+            				encrypted: res.encryptedBytes || 0,
+            			},
+            			threats: {
+            				all: res.threats || 0
+            			},
+            			pageviews: {
+            				all: res.pageViews || 0
+            			}
+            		}
             
-                    cloudflare.requests.uncached = res.requests - res.cachedRequests;
-                    cloudflare.requests.unencrypted = cloudflare.requests.all - cloudflare.requests.encrypted;
-                    cloudflare.bandwidth.uncached = cloudflare.bandwidth.all - cloudflare.bandwidth.cached;
-                    cloudflare.bandwidth.unencrypted = cloudflare.bandwidth.all - cloudflare.bandwidth.encrypted;
+            		cloudflare.requests.uncached = res.requests - res.cachedRequests;
+            		cloudflare.requests.unencrypted = cloudflare.requests.all - cloudflare.requests.encrypted;
+            		cloudflare.bandwidth.uncached = cloudflare.bandwidth.all - cloudflare.bandwidth.cached;
+            		cloudflare.bandwidth.unencrypted = cloudflare.bandwidth.all - cloudflare.bandwidth.encrypted;
             
-                    if (Array.isArray(res.responseStatusMap)) {
-                        res.responseStatusMap.forEach(function (element) {
-                            var group = Math.floor((element.edgeResponseStatus / 100)) * 100;
-                            cloudflare.requests['response_' + group] += element.requests;
-                        });
-                    }
+            		if (Array.isArray(res.responseStatusMap)) {
+            			res.responseStatusMap.forEach(function (element) {
+            				var group = Math.floor((element.edgeResponseStatus / 100)) * 100;
+            				cloudflare.requests['response_' + group] += element.requests;
+            			});
+            		}
             
-                    if (cloudflare.requests.all > 0) {
-                        cloudflare.requests.success_ratio = (cloudflare.requests.response_200
-                            / cloudflare.requests.all * 100).toFixed(2);
-                        cloudflare.requests.others_ratio = ((cloudflare.requests.all - cloudflare.requests.response_200)
-                            / cloudflare.requests.all * 100).toFixed(2);
-                        cloudflare.requests.cache_hit_ratio = (cloudflare.requests.cached
-                            / cloudflare.requests.all * 100).toFixed(2);
-                    }
+            		if (cloudflare.requests.all > 0) {
+            			cloudflare.requests.success_ratio = (cloudflare.requests.response_200
+            				/ cloudflare.requests.all * 100).toFixed(2);
+            			cloudflare.requests.others_ratio = ((cloudflare.requests.all - cloudflare.requests.response_200)
+            				/ cloudflare.requests.all * 100).toFixed(2);
+            			cloudflare.requests.cache_hit_ratio = (cloudflare.requests.cached
+            				/ cloudflare.requests.all * 100).toFixed(2);
+            		}
             
-                    if (cloudflare.bandwidth.all > 0) {
-                        cloudflare.bandwidth.cache_hit_ratio = (cloudflare.bandwidth.cached / cloudflare.bandwidth.all * 100).toFixed(2);
-                    }
+            		if (cloudflare.bandwidth.all > 0) {
+            			cloudflare.bandwidth.cache_hit_ratio = (cloudflare.bandwidth.cached / cloudflare.bandwidth.all * 100).toFixed(2);
+            		}
             
-                    res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0.uniq');
+            		res = getField(result.response, 'data.viewer.zones.0.httpRequests1hGroups.0.uniq');
             
-                    if (typeof res === 'object') {
-                        cloudflare.uniques = {
-                            all: res.uniques || 0
-                        }
-                    }
+            		if (typeof res === 'object') {
+            			cloudflare.uniques = {
+            				all: res.uniques || 0
+            			}
+            		}
             
-                    result = Cloudflare.request('get', 'zones/' + encodeURIComponent(Cloudflare.params.zone)
-                        + '/dns_analytics/report?dimensions=queryName&metrics=queryCount,uncachedCount,staleCount&since='
-                        + encodeURIComponent(datetime_start_str) + '&until=' + encodeURIComponent(datetime_end_str));
+            		result = Cloudflare.request('get', 'zones/' + encodeURIComponent(Cloudflare.params.zone)
+            			+ '/dns_analytics/report?dimensions=queryName&metrics=queryCount,uncachedCount,staleCount&since='
+            			+ encodeURIComponent(datetime_start_str) + '&until=' + encodeURIComponent(datetime_end_str));
             
-                    res = getField(result.response, 'result.totals');
+            		res = getField(result.response, 'result.totals');
             
-                    if (typeof result.response.result === 'object') {
-                        cloudflare.dns = {
-                            query: {
-                                all: res.queryCount || 0,
-                                uncached: res.uncachedCount || 0,
-                                stale: res.staleCount || 0
-                            }
-                        }
-                    }
-                }
+            		if (typeof result.response.result === 'object') {
+            			cloudflare.dns = {
+            				query: {
+            					all: res.queryCount || 0,
+            					uncached: res.uncachedCount || 0,
+            					stale: res.staleCount || 0
+            				}
+            			}
+            		}
+            	}
             
-                return JSON.stringify(cloudflare);
+            	return JSON.stringify(cloudflare);
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Cloudflare ] ERROR: ' + error);
-                throw 'Requesting failed: ' + error;
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Cloudflare ] ERROR: ' + error);
+            	throw 'Requesting failed: ' + error;
             }
           description: 'The JSON with result of Cloudflare API request.'
           timeout: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
@@ -705,7 +705,7 @@ zabbix_export:
           value: cloudflare
       macros:
         - macro: '{$CLOUDFLARE.API.TOKEN}'
-          value: '<change>'
+          type: SECRET_TEXT
           description: 'Your Cloudflare API Token.'
         - macro: '{$CLOUDFLARE.API.URL}'
           value: 'https://api.cloudflare.com/client/v4'
@@ -720,7 +720,7 @@ zabbix_export:
           value: 3s
           description: 'Response timeout for Cloudflare API.'
         - macro: '{$CLOUDFLARE.ZONE_ID}'
-          value: '<change>'
+          type: SECRET_TEXT
           description: 'Your Cloudflare Site Zone ID.'
       dashboards:
         - uuid: 51f1013e8a3d492faed27fe80b68fc53

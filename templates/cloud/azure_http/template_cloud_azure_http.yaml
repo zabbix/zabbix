@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-28T08:16:20Z'
+  date: '2024-03-28T12:43:55Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -71,159 +71,159 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Azure = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    Azure.params = params;
-                },
+            		Azure.params = params;
+            	},
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
-                    var response, request = new HttpRequest();
-                    if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
-                        request.setProxy(Azure.params.proxy);
-                    }
-                    if (Azure.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + Azure.token);
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
+            		var response, request = new HttpRequest();
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			request.setProxy(Azure.params.proxy);
+            		}
+            		if (Azure.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + Azure.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                },
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
             
-                nextlink: function (data) {
-                    next_data = data;
-                    while ('nextLink' in next_data) {
-                        next_data = Azure.request(next_data.nextLink);
-                        next_data.value.forEach(function (value) {
-                            data.value.push(value);
-                        });
-                    }
+            	nextlink: function (data) {
+            		next_data = data;
+            		while ('nextLink' in next_data) {
+            			next_data = Azure.request(next_data.nextLink);
+            			next_data.value.forEach(function (value) {
+            				data.value.push(value);
+            			});
+            		}
             
-                    return data;
-                }
+            		return data;
+            	}
             };
             
             var result,
-                data = {},
-                types = [
-                    {"method": "Microsoft.Compute/virtualMachines", "version": "2022-03-01"}, 
-                    {"method": "Microsoft.DBforMySQL/flexibleServers", "version": "2021-05-01"}, 
-                    {"method": "Microsoft.DBforMySQL/servers", "version": "2017-12-01"},
-                    {"method": "Microsoft.DBforPostgreSQL/flexibleServers", "version": "2021-06-01"},
-                    {"method": "Microsoft.DBforPostgreSQL/servers", "version": "2017-12-01"},
-                    {"method": "Microsoft.Sql/servers", "version": "2022-05-01-preview"},
-                    {"method": "Microsoft.DocumentDB/databaseAccounts", "version": "2022-11-15-preview"}
-                ];
-                data['errors'] = {},
-                data['resources'] = {};
-                data.resources.value = [];
+            	data = {},
+            	types = [
+            		{"method": "Microsoft.Compute/virtualMachines", "version": "2022-03-01"},
+            		{"method": "Microsoft.DBforMySQL/flexibleServers", "version": "2021-05-01"},
+            		{"method": "Microsoft.DBforMySQL/servers", "version": "2017-12-01"},
+            		{"method": "Microsoft.DBforPostgreSQL/flexibleServers", "version": "2021-06-01"},
+            		{"method": "Microsoft.DBforPostgreSQL/servers", "version": "2017-12-01"},
+            		{"method": "Microsoft.Sql/servers", "version": "2022-05-01-preview"},
+            		{"method": "Microsoft.DocumentDB/databaseAccounts", "version": "2022-11-15-preview"}
+            	];
+            	data['errors'] = {},
+            	data['resources'] = {};
+            	data.resources.value = [];
             
             try {
-                Azure.setParams(JSON.parse(value));
+            	Azure.setParams(JSON.parse(value));
             
-                try {
-                    result = Azure.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
-                    );
+            	try {
+            		result = Azure.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        Azure.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			Azure.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        for (var i in types) {
-                            if (types[i].method === "Microsoft.Sql/servers") {
-                                mssql_servers = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
+            	if (!('auth' in data.errors)) {
+            		try {
+            			for (var i in types) {
+            				if (types[i].method === "Microsoft.Sql/servers") {
+            					mssql_servers = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
             
-                                if ('nextLink' in mssql_servers) {
-                                    mssql_servers = Azure.nextlink(mssql_servers);
-                                }
+            					if ('nextLink' in mssql_servers) {
+            						mssql_servers = Azure.nextlink(mssql_servers);
+            					}
             
-                                if ('value' in mssql_servers && mssql_servers.value.length > 0) {
-                                    for (j in mssql_servers.value) {
-                                        mssql_dbs = Azure.request('https://management.azure.com' + mssql_servers.value[j].id + '/databases?api-version=' + types[i].version);
+            					if ('value' in mssql_servers && mssql_servers.value.length > 0) {
+            						for (j in mssql_servers.value) {
+            							mssql_dbs = Azure.request('https://management.azure.com' + mssql_servers.value[j].id + '/databases?api-version=' + types[i].version);
             
-                                        if ('nextLink' in mssql_dbs) {
-                                            mssql_dbs = Azure.nextlink(mssql_dbs);
-                                        }
+            							if ('nextLink' in mssql_dbs) {
+            								mssql_dbs = Azure.nextlink(mssql_dbs);
+            							}
             
-                                        mssql_dbs.value.forEach(function (value) {
-                                            raw_data.value.push(value);
-                                        });
-                                    }
-                                }
-                            }
-                            else {
-                                raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
+            							mssql_dbs.value.forEach(function (value) {
+            								raw_data.value.push(value);
+            							});
+            						}
+            					}
+            				}
+            				else {
+            					raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
             
-                                if ('nextLink' in raw_data) {
-                                    raw_data = Azure.nextlink(raw_data);
-                                }
-                            }
+            					if ('nextLink' in raw_data) {
+            						raw_data = Azure.nextlink(raw_data);
+            					}
+            				}
             
-                            raw_data.value.forEach(function (value) {
-                                value.resourceGroup = value.id.split("/")[4];
-                                data.resources.value.push(value);
-                            });
-                        }
-                    }
-                    catch (error) {
-                        data.errors.resources = error.toString();
-                    }
-                }
+            				raw_data.value.forEach(function (value) {
+            					value.resourceGroup = value.id.split("/")[4];
+            					data.resources.value.push(value);
+            				});
+            			}
+            		}
+            		catch (error) {
+            			data.errors.resources = error.toString();
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -253,119 +253,119 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Azure = {
-                params: {},
-                token: '',
+            	params: {},
+            	token: '',
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    Azure.params = params;
-                },
+            		Azure.params = params;
+            	},
             
-                login: function () {
-                    var response, login = new HttpRequest();
-                    if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
-                        login.setProxy(Azure.params.proxy);
-                    }
-                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    response = login.post(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
-                    );
+            	login: function () {
+            		var response, login = new HttpRequest();
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			login.setProxy(Azure.params.proxy);
+            		}
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+            		);
             
-                    if (login.getStatus() !== 200) {
-                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
-                    }
-                    try {
-                        response = JSON.parse(response);
-                        if (!response.hasOwnProperty('access_token')) {
-                            throw null;
-                        }
-                    }
-                    catch (error) {
-                        throw 'Authentication response does not contain access token.';
-                    }
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            		try {
+            			response = JSON.parse(response);
+            			if (!response.hasOwnProperty('access_token')) {
+            				throw null;
+            			}
+            		}
+            		catch (error) {
+            			throw 'Authentication response does not contain access token.';
+            		}
             
-                    Azure.token = response['access_token'];
-                },
+            		Azure.token = response['access_token'];
+            	},
             
-                request: function (url) {
-                    var response, request = new HttpRequest();
-                    if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
-                        request.setProxy(Azure.params.proxy);
-                    }
-                    if (!Azure.token) {
-                        throw 'Request does not contain access token.';
-                    }
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Authorization: Bearer ' + Azure.token);
-                    response = request.get(url);
+            	request: function (url) {
+            		var response, request = new HttpRequest();
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			request.setProxy(Azure.params.proxy);
+            		}
+            		if (!Azure.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Authorization: Bearer ' + Azure.token);
+            		response = request.get(url);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                },
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                getMetricsData: function () {
-                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01'),
-                        data = [];
+            	getMetricsData: function () {
+            		var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01'),
+            			data = [];
             
-                    if (!metric.hasOwnProperty('value')) {
-                        throw 'Failed getting required field. Check debug log for more information.';
-                    }
-                    for (k in metric.value) {
-                        id = Azure.getField(metric.value[k], 'id');
-                        json = {};
-                        input = id.split('/');
-                        for (var i = 1; i < input.length; i += 2) {
-                            json[input[i]] = input[i + 1];
-                        }
-                        data.push({
-                            'name': Azure.getField(metric.value[k], 'name'),
-                            'id': id,
-                            'resourceGroup': Azure.getField(json, 'resourceGroups'),
-                            'location': Azure.getField(metric.value[k], 'location'),
-                            'token': Azure.token
-                        });
-                    }
+            		if (!metric.hasOwnProperty('value')) {
+            			throw 'Failed getting required field. Check debug log for more information.';
+            		}
+            		for (k in metric.value) {
+            			id = Azure.getField(metric.value[k], 'id');
+            			json = {};
+            			input = id.split('/');
+            			for (var i = 1; i < input.length; i += 2) {
+            				json[input[i]] = input[i + 1];
+            			}
+            			data.push({
+            				'name': Azure.getField(metric.value[k], 'name'),
+            				'id': id,
+            				'resourceGroup': Azure.getField(json, 'resourceGroups'),
+            				'location': Azure.getField(metric.value[k], 'location'),
+            				'token': Azure.token
+            			});
+            		}
             
-                    return data;
-                }
+            		return data;
+            	}
             };
             
             try {
-                Azure.setParams(JSON.parse(value));
-                Azure.login();
-                return JSON.stringify(Azure.getMetricsData());
+            	Azure.setParams(JSON.parse(value));
+            	Azure.login();
+            	return JSON.stringify(Azure.getMetricsData());
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Azure ] ERROR: ' + error);
-                return JSON.stringify({'error': error});
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Azure ] ERROR: ' + error);
+            	return JSON.stringify({'error': error});
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
@@ -851,93 +851,93 @@ zabbix_export:
               value_type: TEXT
               params: |
                 var AzureStorage = {
-                    params: {},
+                	params: {},
                 
-                    setParams: function (params) {
-                        ['token', 'id'].forEach(function (field) {
-                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                                throw 'Required param is not set: ' + field + '.';
-                            }
-                        });
+                	setParams: function (params) {
+                		['token', 'id'].forEach(function (field) {
+                			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                				throw 'Required param is not set: ' + field + '.';
+                			}
+                		});
                 
-                        AzureStorage.params = params;
-                    },
+                		AzureStorage.params = params;
+                	},
                 
-                    request: function (url) {
-                        var response, request = new HttpRequest();
-                        if (typeof AzureStorage.params.proxy !== 'undefined' && AzureStorage.params.proxy !== '') {
-                            request.setProxy(AzureStorage.params.proxy);
-                        }
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
-                        Zabbix.log(4, '[ Azure ] Sending request: ' + url);
-                        response = request.get(url);
-                        if (request.getStatus() !== 200) {
-                            throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                        }
-                        try {
-                            return JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from API.';
-                        }
-                    },
+                	request: function (url) {
+                		var response, request = new HttpRequest();
+                		if (typeof AzureStorage.params.proxy !== 'undefined' && AzureStorage.params.proxy !== '') {
+                			request.setProxy(AzureStorage.params.proxy);
+                		}
+                		request.addHeader('Accept: application/json');
+                		request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
+                		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+                		response = request.get(url);
+                		if (request.getStatus() !== 200) {
+                			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                		}
+                		try {
+                			return JSON.parse(response);
+                		}
+                		catch (error) {
+                			throw 'Failed to parse response received from API.';
+                		}
+                	},
                 
-                    getField: function (data, path) {
-                        var steps = path.split('.');
-                        for (var i = 0; i < steps.length; i++) {
-                            var step = steps[i];
-                            if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                                throw 'Required field was not found: ' + path + ' input data: ' + JSON.stringify(data);
-                            }
+                	getField: function (data, path) {
+                		var steps = path.split('.');
+                		for (var i = 0; i < steps.length; i++) {
+                			var step = steps[i];
+                			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                				throw 'Required field was not found: ' + path + ' input data: ' + JSON.stringify(data);
+                			}
                 
-                            data = data[step];
-                        }
+                			data = data[step];
+                		}
                 
-                        return data;
-                    },
+                		return data;
+                	},
                 
-                    getMetricsData: function () {
-                        var data = {};
-                        start_date = new Date((new Date().getTime()) - 4200000).toISOString().replace(/\.\d+/, '');
-                        end_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
-                        endpoints = {
-                            'tableServices': '/tableServices/default/providers/Microsoft.Insights/metrics?metricnames=TableCapacity,TableCount,TableEntityCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                            'blobServices': '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                            'fileServices': '/fileServices/default/providers/Microsoft.Insights/metrics?metricnames=FileCapacity,FileCount,FileShareCount,FileShareSnapshotCount,FileShareSnapshotSize,FileShareCapacityQuota,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                            'storageAccount': '/providers/Microsoft.Insights/metrics?metricnames=UsedCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                            'queueServices': '/queueServices/default/providers/Microsoft.Insights/metrics?metricnames=QueueCapacity,QueueCount,QueueMessageCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date)
-                        };
+                	getMetricsData: function () {
+                		var data = {};
+                		start_date = new Date((new Date().getTime()) - 4200000).toISOString().replace(/\.\d+/, '');
+                		end_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+                		endpoints = {
+                			'tableServices': '/tableServices/default/providers/Microsoft.Insights/metrics?metricnames=TableCapacity,TableCount,TableEntityCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                			'blobServices': '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                			'fileServices': '/fileServices/default/providers/Microsoft.Insights/metrics?metricnames=FileCapacity,FileCount,FileShareCount,FileShareSnapshotCount,FileShareSnapshotSize,FileShareCapacityQuota,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                			'storageAccount': '/providers/Microsoft.Insights/metrics?metricnames=UsedCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                			'queueServices': '/queueServices/default/providers/Microsoft.Insights/metrics?metricnames=QueueCapacity,QueueCount,QueueMessageCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date)
+                		};
                 
-                        Object.keys(endpoints).forEach(function (field) {
-                            data[field] = {};
-                            metrics = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + endpoints[field]);
+                		Object.keys(endpoints).forEach(function (field) {
+                			data[field] = {};
+                			metrics = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + endpoints[field]);
                 
-                            if (!metrics.hasOwnProperty('value')) {
-                                throw 'Failed getting required field. Check debug log for more information.';
-                            }
+                			if (!metrics.hasOwnProperty('value')) {
+                				throw 'Failed getting required field. Check debug log for more information.';
+                			}
                 
-                            for (k in metrics.value) {
-                                key = AzureStorage.getField(metrics.value[k], 'name.value')
-                                if (metrics.value[k].timeseries.length === 0) {
-                                    metrics.value[k].timeseries.push({ 'data': ['nodata'] })
-                                }
-                                data[field][key] = AzureStorage.getField(metrics.value[k], 'timeseries.0.data.0');
-                            }
-                        });
-                        return data
-                    }
+                			for (k in metrics.value) {
+                				key = AzureStorage.getField(metrics.value[k], 'name.value')
+                				if (metrics.value[k].timeseries.length === 0) {
+                					metrics.value[k].timeseries.push({ 'data': ['nodata'] })
+                				}
+                				data[field][key] = AzureStorage.getField(metrics.value[k], 'timeseries.0.data.0');
+                			}
+                		});
+                		return data
+                	}
                 
                 };
                 
                 try {
-                    AzureStorage.setParams(JSON.parse(value));
-                    return JSON.stringify(AzureStorage.getMetricsData());
+                	AzureStorage.setParams(JSON.parse(value));
+                	return JSON.stringify(AzureStorage.getMetricsData());
                 }
                 catch (error) {
-                    error += (String(error).endsWith('.')) ? '' : '.';
-                    Zabbix.log(3, '[ Azure ] ERROR: ' + error);
-                    return JSON.stringify({ 'error': error });
+                	error += (String(error).endsWith('.')) ? '' : '.';
+                	Zabbix.log(3, '[ Azure ] ERROR: ' + error);
+                	return JSON.stringify({ 'error': error });
                 }
               description: 'The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.'
               timeout: '{$AZURE.DATA.TIMEOUT}'
@@ -2193,7 +2193,7 @@ zabbix_export:
               units: B
               description: |
                 The amount of storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.
-                For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue. 
+                For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue.
                 For premium storage accounts and blob storage accounts, it is the same as BlobCapacity or FileCapacity.
               preprocessing:
                 - type: JSONPATH
@@ -2650,126 +2650,126 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureCosmosDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureCosmosDB.params = params;
-                },
+            		AzureCosmosDB.params = params;
+            	},
             
-                login: function () {
-                    var response, login = new HttpRequest();
-                    if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
-                        login.setProxy(AzureCosmosDB.params.proxy);
-                    }
-                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    response = login.post(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmosDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmosDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmosDB.params.password)
-                    );
+            	login: function () {
+            		var response, login = new HttpRequest();
+            		if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
+            			login.setProxy(AzureCosmosDB.params.proxy);
+            		}
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmosDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmosDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmosDB.params.password)
+            		);
             
-                    if (login.getStatus() !== 200) {
-                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
-                    }
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse login session response.';
-                    }
-                    if (!response.hasOwnProperty('access_token')) {
-                        throw 'Authentication response does not contain access token.';
-                    }
-                    AzureCosmosDB.token = response['access_token'];
-                },
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
+            		AzureCosmosDB.token = response['access_token'];
+            	},
             
-                request: function (url) {
-                    var response, request = new HttpRequest();
-                    if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
-                        request.setProxy(AzureCosmosDB.params.proxy);
-                    }
-                    if (!AzureCosmosDB.token) {
-                        throw 'Request does not contain access token.';
-                    }
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Authorization: Bearer ' + AzureCosmosDB.token);
-                    Zabbix.log(4, '[ AzureCosmosDB ] request url: ' + url);
-                    response = request.get(url);
+            	request: function (url) {
+            		var response, request = new HttpRequest();
+            		if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
+            			request.setProxy(AzureCosmosDB.params.proxy);
+            		}
+            		if (!AzureCosmosDB.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Authorization: Bearer ' + AzureCosmosDB.token);
+            		Zabbix.log(4, '[ AzureCosmosDB ] request url: ' + url);
+            		response = request.get(url);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                },
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                getMetricsData: function () {
-                    var data = {};
-                    start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date(new Date().getTime()).toISOString().replace(/\.\d+/, '');
-                    endpoints = {
-                        'availability': '/providers/Microsoft.Insights/metrics?metricnames=ServiceAvailability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                        'requests': '/providers/Microsoft.Insights/metrics?metricnames=DataUsage,IndexUsage,DocumentQuota,AvailableStorage,DocumentCount,NormalizedRUConsumption,PhysicalPartitionThroughputInfo,PhysicalPartitionSizeInfo,AutoscaleMaxThroughput,ProvisionedThroughput,TotalRequests,TotalRequestUnits,MetadataRequests,MongoRequests,MongoRequestCharge,ServerSideLatency,ServerSideLatencyGateway,ServerSideLatencyDirect,ReplicationLatency&api-version=2021-05-01&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                    };
+            	getMetricsData: function () {
+            		var data = {};
+            		start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date(new Date().getTime()).toISOString().replace(/\.\d+/, '');
+            		endpoints = {
+            			'availability': '/providers/Microsoft.Insights/metrics?metricnames=ServiceAvailability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+            			'requests': '/providers/Microsoft.Insights/metrics?metricnames=DataUsage,IndexUsage,DocumentQuota,AvailableStorage,DocumentCount,NormalizedRUConsumption,PhysicalPartitionThroughputInfo,PhysicalPartitionSizeInfo,AutoscaleMaxThroughput,ProvisionedThroughput,TotalRequests,TotalRequestUnits,MetadataRequests,MongoRequests,MongoRequestCharge,ServerSideLatency,ServerSideLatencyGateway,ServerSideLatencyDirect,ReplicationLatency&api-version=2021-05-01&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+            		};
             
-                    Object.keys(endpoints).forEach(function (field) {
-                        data[field] = {};
-                        try {
-                            metrics = AzureCosmosDB.request('https://management.azure.com' + AzureCosmosDB.params.resource_id + endpoints[field]);
-                            if (!metrics.hasOwnProperty('value')) {
-                                throw 'Failed getting required field. Check debug log for more information.';
-                            }
+            		Object.keys(endpoints).forEach(function (field) {
+            			data[field] = {};
+            			try {
+            				metrics = AzureCosmosDB.request('https://management.azure.com' + AzureCosmosDB.params.resource_id + endpoints[field]);
+            				if (!metrics.hasOwnProperty('value')) {
+            					throw 'Failed getting required field. Check debug log for more information.';
+            				}
             
-                            for (k in metrics.value) {
-                                key = AzureCosmosDB.getField(metrics.value[k], 'name.value')
-                                if (metrics.value[k].timeseries.length === 0) {
-                                    metrics.value[k].timeseries.push({ 'data': ['nodata'] })
-                                }
-                                data[field][key] = AzureCosmosDB.getField(metrics.value[k], 'timeseries.0.data.0');
-                            }
-                        }
-                        catch (error) {
-                            data.error = error.toString();
-                        }
-                    });
-                    return data
-                }
+            				for (k in metrics.value) {
+            					key = AzureCosmosDB.getField(metrics.value[k], 'name.value')
+            					if (metrics.value[k].timeseries.length === 0) {
+            						metrics.value[k].timeseries.push({ 'data': ['nodata'] })
+            					}
+            					data[field][key] = AzureCosmosDB.getField(metrics.value[k], 'timeseries.0.data.0');
+            				}
+            			}
+            			catch (error) {
+            				data.error = error.toString();
+            			}
+            		});
+            		return data
+            	}
             
             };
             
             try {
-                AzureCosmosDB.setParams(JSON.parse(value));
-                AzureCosmosDB.login();
-                return JSON.stringify(AzureCosmosDB.getMetricsData());
+            	AzureCosmosDB.setParams(JSON.parse(value));
+            	AzureCosmosDB.login();
+            	return JSON.stringify(AzureCosmosDB.getMetricsData());
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AzureCosmosDB ] ERROR: ' + error);
-                return JSON.stringify({ 'error': error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AzureCosmosDB ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
@@ -3310,171 +3310,181 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureCost = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            		AzureCost.params = params;
+            	},
             
-                    AzureCost.params = params;
-                },
+            	login: function () {
+            		var response,
+            			login = new HttpRequest();
             
-                login: function () {
-                    var response, login = new HttpRequest();
-                    if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
-                        login.setProxy(AzureCost.params.proxy);
-                    }
-                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    response = login.post(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCost.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCost.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCost.params.password)
-                    );
+            		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
+            			login.setProxy(AzureCost.params.proxy);
+            		}
             
-                    if (login.getStatus() !== 200) {
-                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
-                    }
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse login session response.';
-                    }
-                    if (!response.hasOwnProperty('access_token')) {
-                        throw 'Authentication response does not contain access token.';
-                    }
-                    AzureCost.token = response['access_token'];
-                },
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureCost.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCost.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCost.params.password)
+            		);
             
-                request: function (url, body) {
-                    if (typeof body === 'undefined' || body === null) {
-                        body = '';
-                    }
-                    var response,
-                        request = new HttpRequest();
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
             
-                    if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
-                        request.setProxy(AzureCost.params.proxy);
-                    }
-                    if (!AzureCost.token) {
-                        throw 'Request does not contain access token.';
-                    }
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + AzureCost.token);
+            		AzureCost.token = response['access_token'];
+            	},
             
-                    Zabbix.log(4, '[ AzureCost ] request url: ' + url);
+            	request: function (url, body) {
+            		if (typeof body === 'undefined' || body === null) {
+            			body = '';
+            		}
+            		var response,
+            			headers,
+            			regex = /-retry-after":"(\d+)"/,
+            			ratelimit,
+            			request = new HttpRequest();
             
-                    response = request.post(url, body);
+            		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
+            			request.setProxy(AzureCost.params.proxy);
+            		}
+            		if (!AzureCost.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + AzureCost.token);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                },
+            		Zabbix.log(4, '[ AzureCost ] request url: ' + url);
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            		response = request.post(url, body);
+            		headers = JSON.stringify(request.getHeaders());
             
-                        data = data[step];
-                    }
+            		if (headers.match(regex) !== null && request.getStatus() === 429) {
+            			ratelimit = headers.match(regex)[1];
+            			Zabbix.log(4, '[ AzureCost ] Microsoft Cost Management have rate limit requests per 1 minute, retrying after ' + ratelimit + ' seconds');
+            			Zabbix.sleep(ratelimit * 1010);
+            			response = request.post(url, body);
+            		}
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    return data;
-                },
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
             
-                getCost: function () {
-                    var originalData = {},
-                        today = new Date(),
-                        start_date = new Date(today);
-                    start_date.setDate(today.getDate() - 1);
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            			data = data[step];
+            		}
             
-                    body_raw_cost = {
-                        type: 'Usage',
-                        'timeframe': 'Custom',
-                        'timePeriod': {
-                            'from': start_date,
-                            'to': start_date
-                        },
-                        dataset: {
-                            granularity: 'Daily',
-                            aggregation: {
-                                totalCost: {
-                                    name: 'PreTaxCost',
-                                    function: 'Sum'
-                                }
-                            },
-                            grouping: [
-                                {
-                                    type: 'Dimension',
-                                    name: 'Meter',
-                                },
-                                {
-                                    type: 'Dimension',
-                                    name: 'MeterSubcategory',
-                                },
-                                {
-                                    type: 'Dimension',
-                                    name: 'ResourceGroup',
-                                },
-                                {
-                                    type: 'Dimension',
-                                    name: 'ServiceName',
-                                },
-                                {
-                                    type: 'Dimension',
-                                    name: 'ResourceLocation',
-                                }
-                            ]
-                        }
-                    };
-                    originalData = AzureCost.request('https://management.azure.com/subscriptions/' + AzureCost.params.subscription_id + '/providers/Microsoft.CostManagement/query?api-version=2023-03-01', JSON.stringify(body_raw_cost));
+            		return data;
+            	},
             
-                    var columns = AzureCost.getField(originalData, 'properties.columns');
+            	getCost: function () {
+            		var metricData = {},
+            			today = new Date(),
+            			start_date = new Date(today);
+            		start_date.setDate(today.getDate() - 1);
             
-                    transformedData = {
-                        data: AzureCost.getField(originalData, 'properties.rows').map(function (row) {
-                            rowData = {};
+            		bodyRawCost = {
+            			type: 'Usage',
+            			'timeframe': 'Custom',
+            			'timePeriod': {
+            				'from': start_date,
+            				'to': start_date
+            			},
+            			dataset: {
+            				granularity: 'Daily',
+            				aggregation: {
+            					totalCost: {
+            						name: 'PreTaxCost',
+            						function: 'Sum'
+            					}
+            				},
+            				grouping: [
+            					{
+            						type: 'Dimension',
+            						name: 'Meter',
+            					},
+            					{
+            						type: 'Dimension',
+            						name: 'MeterSubcategory',
+            					},
+            					{
+            						type: 'Dimension',
+            						name: 'ResourceGroup',
+            					},
+            					{
+            						type: 'Dimension',
+            						name: 'ServiceName',
+            					},
+            					{
+            						type: 'Dimension',
+            						name: 'ResourceLocation',
+            					}
+            				]
+            			}
+            		};
+            		metricData = AzureCost.request('https://management.azure.com/subscriptions/' + AzureCost.params.subscription_id + '/providers/Microsoft.CostManagement/query?api-version=2023-11-01', JSON.stringify(bodyRawCost));
             
-                            for (i = 0; i < columns.length; i++) {
-                                columnName = columns[i].name;
-                                columnType = columns[i].type;
-                                cellValue = row[i];
+            		var columns = AzureCost.getField(metricData, 'properties.columns');
             
-                                rowData[columnName] = columnType === "Number" ? cellValue.toString() : cellValue;
-                            }
-                            rowData.UsageDate = rowData.UsageDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
-                            return rowData;
-                        })
-                    };
+            		return transformedData = {
+            			data: AzureCost.getField(metricData, 'properties.rows').map(function (row) {
+            				rowData = {};
+            				columns.forEach(function (column, i) {
+            					columnName = columns[i].name;
+            					columnType = columns[i].type;
+            					cellValue = row[i];
+            					rowData[columnName] = column.type === "Number" ? cellValue.toString() : cellValue;
+            				});
+            				rowData.UsageDate = rowData.UsageDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
             
-                    return transformedData;
-            
-                }
+            				return rowData;
+            			})
+            		};
+            	}
             };
             
             try {
-                AzureCost.setParams(JSON.parse(value));
-                AzureCost.login();
-                return JSON.stringify(AzureCost.getCost(), null, 4);
+            	AzureCost.setParams(JSON.parse(value));
+            	AzureCost.login();
             
+            	return JSON.stringify(AzureCost.getCost());
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AzureCost ] ERROR: ' + error);
-                return JSON.stringify({ 'error': error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AzureCost ] ERROR: ' + error);
+            
+            	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
@@ -3502,161 +3512,175 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureCost = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'month'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
-                    AzureCost.params = params;
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'month'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            		AzureCost.params = params;
             
-                    today = new Date();
-                    AzureCost.params.end_date = today.toISOString();
-                    month = today.getMonth();
-                    today.setMonth(month - params.month);
-                    AzureCost.params.start_time = new Date(today.getFullYear(), today.getMonth()).toISOString();
+            		today = new Date();
+            		AzureCost.params.end_date = today.toISOString();
+            		month = today.getMonth();
+            		today.setMonth(month - params.month);
+            		AzureCost.params.start_time = new Date(today.getFullYear(), today.getMonth()).toISOString();
+            	},
             
+            	login: function () {
+            		var response,
+            			login = new HttpRequest();
             
-                },
+            		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
+            			login.setProxy(AzureCost.params.proxy);
+            		}
             
-                login: function () {
-                    var response, login = new HttpRequest();
-                    if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
-                        login.setProxy(AzureCost.params.proxy);
-                    }
-                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    response = login.post(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCost.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCost.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCost.params.password)
-                    );
-                    if (login.getStatus() !== 200) {
-                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
-                    }
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse login session response.';
-                    }
-                    if (!response.hasOwnProperty('access_token')) {
-                        throw 'Authentication response does not contain access token.';
-                    }
-                    AzureCost.token = response['access_token'];
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureCost.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCost.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCost.params.password)
+            		);
             
-                },
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
             
-                request: function (url, body) {
-                    if (typeof body === 'undefined' || body === null) {
-                        body = '';
-                    }
-                    var response,
-                        request = new HttpRequest();
+            		AzureCost.token = response['access_token'];
+            	},
             
-                    if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
-                        request.setProxy(AzureCost.params.proxy);
-                    }
-                    if (!AzureCost.token) {
-                        throw 'Request does not contain access token.';
-                    }
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + AzureCost.token);
+            	request: function (url, body) {
+            		if (typeof body === 'undefined' || body === null) {
+            			body = '';
+            		}
+            		var response,
+            			headers,
+            			regex = /-retry-after":"(\d+)"/,
+            			ratelimit,
+            			request = new HttpRequest();
             
-                    Zabbix.log(4, '[ AzureCost ] request url: ' + url);
-                    
+            		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
+            			request.setProxy(AzureCost.params.proxy);
+            		}
+            		if (!AzureCost.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + AzureCost.token);
             
-                    response = request.post(url, body);
+            		Zabbix.log(4, '[ AzureCost ] request url: ' + url);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                },
+            		response = request.post(url, body);
+            		headers = JSON.stringify(request.getHeaders());
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            		if (headers.match(regex) !== null && request.getStatus() === 429) {
+            			ratelimit = headers.match(regex)[1];
+            			Zabbix.log(4, '[ AzureCost ] Microsoft Cost Management have rate limit requests per 1 minute, retrying after ' + ratelimit + ' seconds');
+            			Zabbix.sleep(ratelimit * 1010);
+            			response = request.post(url, body);
+            		}
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                        data = data[step];
-                    }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
             
-                    return data;
-                },
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            			data = data[step];
+            		}
             
-                getCost: function (grouping) {
-                    var metricData = {},
-                        body_raw_cost = {
-                            type: 'Usage',
-                            timeframe: 'Custom',
-                            timePeriod: {
-                                from: AzureCost.params.start_time,
-                                to: AzureCost.params.end_date
-                            },
-                            dataset: {
-                                aggregation: {
-                                    totalCost: {
-                                        name: 'PreTaxCost',
-                                        function: 'Sum'
-                                    }
-                                },
-                                grouping: [
-                                    {
-                                        type: 'Dimension',
-                                        name: 'BillingMonth'
-                                    },
-                                    {
-                                        type: 'Dimension',
-                                        name: grouping
-                                    },
-                                ]
-                            }
-                        };
-                    metricData = AzureCost.request('https://management.azure.com/subscriptions/' + AzureCost.params.subscription_id + '/providers/Microsoft.CostManagement/query?api-version=2023-03-01', JSON.stringify(body_raw_cost));
+            		return data;
+            	},
             
-                    var columns = AzureCost.getField(metricData, 'properties.columns');
+            	getCost: function (grouping) {
+            		var metricData = {},
+            			bodyRawCost = {
+            				type: 'Usage',
+            				timeframe: 'Custom',
+            				timePeriod: {
+            					from: AzureCost.params.start_time,
+            					to: AzureCost.params.end_date
+            				},
+            				dataset: {
+            					aggregation: {
+            						totalCost: {
+            							name: 'PreTaxCost',
+            							function: 'Sum'
+            						}
+            					},
+            					grouping: [
+            						{
+            							type: 'Dimension',
+            							name: 'BillingMonth'
+            						},
+            						{
+            							type: 'Dimension',
+            							name: grouping
+            						},
+            					]
+            				}
+            			};
             
-                    return transformedData = {
-                        data: AzureCost.getField(metricData, 'properties.rows').map(function (row) {
-                            rowData = {};
-                            columns.forEach(function (column, i) {
-                                columnName = columns[i].name;
-                                cellValue = row[i];
-                                rowData[columnName] = column.type === "Number" ? cellValue.toString() : cellValue;
-                            });
-                            rowData.BillingMonth = rowData.BillingMonth.slice(0, 7);
-                            return rowData;
-                        })
-                    };
-                }
+            		metricData = AzureCost.request('https://management.azure.com/subscriptions/' + AzureCost.params.subscription_id + '/providers/Microsoft.CostManagement/query?api-version=2023-11-01', JSON.stringify(bodyRawCost));
+            
+            		var columns = AzureCost.getField(metricData, 'properties.columns');
+            
+            		return transformedData = {
+            			data: AzureCost.getField(metricData, 'properties.rows').map(function (row) {
+            				rowData = {};
+            				columns.forEach(function (column, i) {
+            					columnName = columns[i].name;
+            					cellValue = row[i];
+            					rowData[columnName] = column.type === "Number" ? cellValue.toString() : cellValue;
+            				});
+            				rowData.BillingMonth = rowData.BillingMonth.slice(0, 7);
+            
+            				return rowData;
+            			})
+            		};
+            	}
             };
             
             try {
-                AzureCost.setParams(JSON.parse(value));
-                AzureCost.login();
-                serviceCost = AzureCost.getCost('ServiceName');
-                resourceGroupCost = AzureCost.getCost('ResourceGroup');
-                resourceLocationCost = AzureCost.getCost('ResourceLocation');
-                monthCost = AzureCost.getCost('SubscriptionId');
+            	AzureCost.setParams(JSON.parse(value));
+            	AzureCost.login();
             
-                return JSON.stringify({ resourceGroupCost, resourceLocationCost, serviceCost, monthCost }, null, 4);
+            	serviceCost = AzureCost.getCost('ServiceName');
+            	resourceGroupCost = AzureCost.getCost('ResourceGroup');
+            	resourceLocationCost = AzureCost.getCost('ResourceLocation');
+            	monthCost = AzureCost.getCost('SubscriptionId');
             
+            	return JSON.stringify({ resourceGroupCost, resourceLocationCost, serviceCost, monthCost });
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AzureCost ] ERROR: ' + error);
-                return JSON.stringify({ 'error': error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AzureCost ] ERROR: ' + error);
+            
+            	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
@@ -4028,7 +4052,7 @@ zabbix_export:
           value: '11'
           description: 'Months to get historical data from Azure Cost Management API, no more than 11 (plus current month). The time period for pulling the data cannot exceed 1 year.'
         - macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 15s
+          value: 60s
           description: 'A response timeout for API.'
         - macro: '{$AZURE.LLD.FILTER.RESOURCE.GROUP.MATCHES}'
           value: '.*'
@@ -4381,177 +4405,177 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureDB.params = params;
-                },
+            		AzureDB.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var response, request = new HttpRequest();
-                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
-                        request.setProxy(AzureDB.params.proxy);
-                    }
-                    if (AzureDB.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                    }
+            		var response, request = new HttpRequest();
+            		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+            			request.setProxy(AzureDB.params.proxy);
+            		}
+            		if (AzureDB.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureDB.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'cpu_percent',
-                'physical_data_read_percent',
-                'log_write_percent',
-                'storage',
-                'connection_successful',
-                'connection_failed',
-                'blocked_by_firewall',
-                'deadlock',
-                'storage_percent',
-                'xtp_storage_percent',
-                'workers_percent',
-                'sessions_percent',
-                'sessions_count',
-                'cpu_limit',
-                'cpu_used',
-                'sqlserver_process_core_percent',
-                'sqlserver_process_memory_percent',
-                'tempdb_data_size',
-                'tempdb_log_size',
-                'tempdb_log_used_percent',
-                'allocated_data_storage'
+            	'cpu_percent',
+            	'physical_data_read_percent',
+            	'log_write_percent',
+            	'storage',
+            	'connection_successful',
+            	'connection_failed',
+            	'blocked_by_firewall',
+            	'deadlock',
+            	'storage_percent',
+            	'xtp_storage_percent',
+            	'workers_percent',
+            	'sessions_percent',
+            	'sessions_count',
+            	'cpu_limit',
+            	'cpu_used',
+            	'sqlserver_process_core_percent',
+            	'sqlserver_process_memory_percent',
+            	'tempdb_data_size',
+            	'tempdb_log_size',
+            	'tempdb_log_used_percent',
+            	'allocated_data_storage'
             ],
-                day_metrics = 'full_backup_size_bytes,diff_backup_size_bytes,log_backup_size_bytes',
-                prepared_metrics = [],
-                data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            	day_metrics = 'full_backup_size_bytes,diff_backup_size_bytes,log_backup_size_bytes',
+            	prepared_metrics = [],
+            	data = {};
+            	data['errors'] = {};
+            	data['metrics'] = {};
             
             try {
-                AzureDB.setParams(JSON.parse(value));
+            	AzureDB.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureDB.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
-                    );
+            	try {
+            		result = AzureDB.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureDB.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureDB.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                    start_date = new Date((new Date().getTime()) - 86400000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    try {
-                        metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + day_metrics + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                        if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                            for (l in metrics_data.value) {
-                                if ('name' in metrics_data.value[l] && typeof metrics_data.value[l].name === 'object' && 'value' in metrics_data.value[l].name && typeof metrics_data.value[l].name.value === 'string' && 'timeseries' in metrics_data.value[l] && Array.isArray(metrics_data.value[l].timeseries) && metrics_data.value[l].timeseries.length > 0 && 'data' in metrics_data.value[l].timeseries[0] && Array.isArray(metrics_data.value[l].timeseries[0].data) && metrics_data.value[l].timeseries[0].data.length > 0) {
-                                    data.metrics[metrics_data.value[l].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[l].timeseries[0].data[metrics_data.value[l].timeseries[0].data.length - 1];
-                                }
-                            }
-                        }
-                    }
-                    catch (error) {
-                        data.errors[day_metrics] = error.toString();
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+            							data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            		start_date = new Date((new Date().getTime()) - 86400000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		try {
+            			metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + day_metrics + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            			if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            				for (l in metrics_data.value) {
+            					if ('name' in metrics_data.value[l] && typeof metrics_data.value[l].name === 'object' && 'value' in metrics_data.value[l].name && typeof metrics_data.value[l].name.value === 'string' && 'timeseries' in metrics_data.value[l] && Array.isArray(metrics_data.value[l].timeseries) && metrics_data.value[l].timeseries.length > 0 && 'data' in metrics_data.value[l].timeseries[0] && Array.isArray(metrics_data.value[l].timeseries[0].data) && metrics_data.value[l].timeseries[0].data.length > 0) {
+            						data.metrics[metrics_data.value[l].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[l].timeseries[0].data[metrics_data.value[l].timeseries[0].data.length - 1];
+            					}
+            				}
+            			}
+            		}
+            		catch (error) {
+            			data.errors[day_metrics] = error.toString();
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -5650,162 +5674,162 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureDB.params = params;
-                },
+            		AzureDB.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
-                    var response, request = new HttpRequest();
-                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
-                        request.setProxy(AzureDB.params.proxy);
-                    }
-                    if (AzureDB.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
+            		var response, request = new HttpRequest();
+            		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+            			request.setProxy(AzureDB.params.proxy);
+            		}
+            		if (AzureDB.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureDB.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'cpu_percent',
-                'physical_data_read_percent',
-                'log_write_percent',
-                'storage',
-                'connection_successful',
-                'connection_failed',
-                'blocked_by_firewall',
-                'deadlock',
-                'storage_percent',
-                'xtp_storage_percent',
-                'workers_percent',
-                'sessions_percent',
-                'cpu_limit',
-                'cpu_used',
-                'sqlserver_process_core_percent',
-                'sqlserver_process_memory_percent',
-                'tempdb_data_size',
-                'tempdb_log_size',
-                'tempdb_log_used_percent',
-                'app_cpu_billed',
-                'app_cpu_percent',
-                'app_memory_percent',
-                'allocated_data_storage'
+            	'cpu_percent',
+            	'physical_data_read_percent',
+            	'log_write_percent',
+            	'storage',
+            	'connection_successful',
+            	'connection_failed',
+            	'blocked_by_firewall',
+            	'deadlock',
+            	'storage_percent',
+            	'xtp_storage_percent',
+            	'workers_percent',
+            	'sessions_percent',
+            	'cpu_limit',
+            	'cpu_used',
+            	'sqlserver_process_core_percent',
+            	'sqlserver_process_memory_percent',
+            	'tempdb_data_size',
+            	'tempdb_log_size',
+            	'tempdb_log_used_percent',
+            	'app_cpu_billed',
+            	'app_cpu_percent',
+            	'app_memory_percent',
+            	'allocated_data_storage'
             ],
-                prepared_metrics = [],
-                data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            	prepared_metrics = [],
+            	data = {};
+            	data['errors'] = {};
+            	data['metrics'] = {};
             
             try {
-                AzureDB.setParams(JSON.parse(value));
+            	AzureDB.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureDB.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
-                    );
+            	try {
+            		result = AzureDB.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureDB.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureDB.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+            							data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -6801,156 +6825,156 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureDB.params = params;
-                },
+            		AzureDB.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var response, request = new HttpRequest();
-                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
-                        request.setProxy(AzureDB.params.proxy);
-                    }
-                    if (AzureDB.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                    }
+            		var response, request = new HttpRequest();
+            		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+            			request.setProxy(AzureDB.params.proxy);
+            		}
+            		if (AzureDB.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureDB.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'cpu_percent',
-                'memory_percent',
-                'network_bytes_egress',
-                'network_bytes_ingress',
-                'active_connections',
-                'total_connections',
-                'aborted_connections',
-                'Queries',
-                'io_consumption_percent',
-                'storage_percent',
-                'storage_used',
-                'storage_limit',
-                'backup_storage_used',
-                'replication_lag',
-                'cpu_credits_remaining',
-                'cpu_credits_consumed'
+            	'cpu_percent',
+            	'memory_percent',
+            	'network_bytes_egress',
+            	'network_bytes_ingress',
+            	'active_connections',
+            	'total_connections',
+            	'aborted_connections',
+            	'Queries',
+            	'io_consumption_percent',
+            	'storage_percent',
+            	'storage_used',
+            	'storage_limit',
+            	'backup_storage_used',
+            	'replication_lag',
+            	'cpu_credits_remaining',
+            	'cpu_credits_consumed'
             ],
-                prepared_metrics = [],
-                data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            	prepared_metrics = [],
+            	data = {};
+            	data['errors'] = {};
+            	data['metrics'] = {};
             
             try {
-                AzureDB.setParams(JSON.parse(value));
+            	AzureDB.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureDB.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
-                    );
+            	try {
+            		result = AzureDB.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureDB.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureDB.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+            							data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -7793,155 +7817,155 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureDB.params = params;
-                },
+            		AzureDB.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var response, request = new HttpRequest();
-                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
-                        request.setProxy(AzureDB.params.proxy);
-                    }
-                    if (AzureDB.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                    }
+            		var response, request = new HttpRequest();
+            		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+            			request.setProxy(AzureDB.params.proxy);
+            		}
+            		if (AzureDB.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureDB.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'cpu_percent',
-                'memory_percent',
-                'io_consumption_percent',
-                'storage_percent',
-                'storage_used',
-                'storage_limit',
-                'serverlog_storage_percent',
-                'serverlog_storage_usage',
-                'serverlog_storage_limit',
-                'active_connections',
-                'connections_failed',
-                'seconds_behind_master',
-                'backup_storage_used',
-                'network_bytes_egress',
-                'network_bytes_ingress'
+            	'cpu_percent',
+            	'memory_percent',
+            	'io_consumption_percent',
+            	'storage_percent',
+            	'storage_used',
+            	'storage_limit',
+            	'serverlog_storage_percent',
+            	'serverlog_storage_usage',
+            	'serverlog_storage_limit',
+            	'active_connections',
+            	'connections_failed',
+            	'seconds_behind_master',
+            	'backup_storage_used',
+            	'network_bytes_egress',
+            	'network_bytes_ingress'
             ],
-                prepared_metrics = [],
-                data = {};
+            	prepared_metrics = [],
+            	data = {};
             data['errors'] = {};
             data['metrics'] = {};
             
             try {
-                AzureDB.setParams(JSON.parse(value));
+            	AzureDB.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureDB.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
-                    );
+            	try {
+            		result = AzureDB.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureDB.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureDB.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+            							data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -8813,169 +8837,169 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureDB.params = params;
-                },
+            		AzureDB.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var response, request = new HttpRequest();
-                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
-                        request.setProxy(AzureDB.params.proxy);
-                    }
-                    if (AzureDB.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                    }
+            		var response, request = new HttpRequest();
+            		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+            			request.setProxy(AzureDB.params.proxy);
+            		}
+            		if (AzureDB.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureDB.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'cpu_percent',
-                'memory_percent',
-                'iops',
-                'disk_queue_depth',
-                'read_throughput',
-                'write_throughput',
-                'read_iops',
-                'write_iops',
-                'network_bytes_egress',
-                'network_bytes_ingress',
-                'active_connections',
-                'connections_failed',
-                'connections_succeeded',
-                'storage_percent',
-                'storage_used',
-                'storage_free',
-                'txlogs_storage_used',
-                'backup_storage_used',
-                'maximum_used_transactionIDs',
-                'cpu_credits_remaining',
-                'cpu_credits_consumed'
+            	'cpu_percent',
+            	'memory_percent',
+            	'iops',
+            	'disk_queue_depth',
+            	'read_throughput',
+            	'write_throughput',
+            	'read_iops',
+            	'write_iops',
+            	'network_bytes_egress',
+            	'network_bytes_ingress',
+            	'active_connections',
+            	'connections_failed',
+            	'connections_succeeded',
+            	'storage_percent',
+            	'storage_used',
+            	'storage_free',
+            	'txlogs_storage_used',
+            	'backup_storage_used',
+            	'maximum_used_transactionIDs',
+            	'cpu_credits_remaining',
+            	'cpu_credits_consumed'
             ],
-                prepared_metrics = [],
-                data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            	prepared_metrics = [],
+            	data = {};
+            	data['errors'] = {};
+            	data['metrics'] = {};
             
             try {
-                AzureDB.setParams(JSON.parse(value));
+            	AzureDB.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureDB.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
-                    );
+            	try {
+            		result = AzureDB.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureDB.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureDB.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                        if (metrics_data.value[k].name.value === 'disk_queue_depth' ||
-                                            metrics_data.value[k].name.value === 'read_throughput' ||
-                                            metrics_data.value[k].name.value === 'write_throughput' ||
-                                            metrics_data.value[k].name.value === 'read_iops' ||
-                                            metrics_data.value[k].name.value === 'write_iops') {
-                                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 6];
-                                        } else {
-                                            data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+            							if (metrics_data.value[k].name.value === 'disk_queue_depth' ||
+            								metrics_data.value[k].name.value === 'read_throughput' ||
+            								metrics_data.value[k].name.value === 'write_throughput' ||
+            								metrics_data.value[k].name.value === 'read_iops' ||
+            								metrics_data.value[k].name.value === 'write_iops') {
+            									data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 6];
+            							} else {
+            								data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+            							}
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -9906,156 +9930,156 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureDB = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureDB.params = params;
-                },
+            		AzureDB.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var response, request = new HttpRequest();
-                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
-                        request.setProxy(AzureDB.params.proxy);
-                    }
-                    if (AzureDB.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                    }
+            		var response, request = new HttpRequest();
+            		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+            			request.setProxy(AzureDB.params.proxy);
+            		}
+            		if (AzureDB.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureDB.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'cpu_percent',
-                'memory_percent',
-                'io_consumption_percent',
-                'storage_percent',
-                'storage_used',
-                'storage_limit',
-                'serverlog_storage_percent',
-                'serverlog_storage_usage',
-                'serverlog_storage_limit',
-                'active_connections',
-                'connections_failed',
-                'backup_storage_used',
-                'network_bytes_egress',
-                'network_bytes_ingress',
-                'pg_replica_log_delay_in_seconds',
-                'pg_replica_log_delay_in_bytes'
+            	'cpu_percent',
+            	'memory_percent',
+            	'io_consumption_percent',
+            	'storage_percent',
+            	'storage_used',
+            	'storage_limit',
+            	'serverlog_storage_percent',
+            	'serverlog_storage_usage',
+            	'serverlog_storage_limit',
+            	'active_connections',
+            	'connections_failed',
+            	'backup_storage_used',
+            	'network_bytes_egress',
+            	'network_bytes_ingress',
+            	'pg_replica_log_delay_in_seconds',
+            	'pg_replica_log_delay_in_bytes'
             ],
-                prepared_metrics = [],
-                data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            	prepared_metrics = [],
+            	data = {};
+            	data['errors'] = {};
+            	data['metrics'] = {};
             
             try {
-                AzureDB.setParams(JSON.parse(value));
+            	AzureDB.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureDB.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
-                    );
+            	try {
+            		result = AzureDB.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureDB.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureDB.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+            							data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -11171,190 +11195,190 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AzureVM = {
-                params: {},
-                token: null,
+            	params: {},
+            	token: null,
             
-                setParams: function (params) {
-                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    AzureVM.params = params;
-                },
+            		AzureVM.params = params;
+            	},
             
             
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (url, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var response, request = new HttpRequest();
-                    if (typeof AzureVM.params.proxy !== 'undefined' && AzureVM.params.proxy !== '') {
-                        request.setProxy(AzureVM.params.proxy);
-                    }
-                    if (AzureVM.token) {
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureVM.token);
-                    }
+            		var response, request = new HttpRequest();
+            		if (typeof AzureVM.params.proxy !== 'undefined' && AzureVM.params.proxy !== '') {
+            			request.setProxy(AzureVM.params.proxy);
+            		}
+            		if (AzureVM.token) {
+            			request.addHeader('Accept: application/json');
+            			request.addHeader('Authorization: Bearer ' + AzureVM.token);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        response = request.post(url, data);
-                    }
-                    else {
-                        response = request.get(url);
-                    }
+            		if (data !== '') {
+            			request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            			response = request.post(url, data);
+            		}
+            		else {
+            			response = request.get(url);
+            		}
             
-                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                }
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	}
             
             };
             
             var metrics = [
-                'Percentage CPU',
-                'Network In',
-                'Network Out',
-                'Disk Read Bytes',
-                'Disk Write Bytes',
-                'Disk Read Operations/Sec',
-                'Disk Write Operations/Sec',
-                'CPU Credits Remaining',
-                'CPU Credits Consumed',
-                'Data Disk Read Bytes/sec',
-                'Data Disk Write Bytes/sec',
-                'Data Disk Read Operations/Sec',
-                'Data Disk Write Operations/Sec',
-                'Data Disk Queue Depth',
-                'Data Disk Bandwidth Consumed Percentage',
-                'Data Disk IOPS Consumed Percentage',
-                'Data Disk Target Bandwidth',
-                'Data Disk Target IOPS',
-                'Data Disk Max Burst Bandwidth',
-                'Data Disk Max Burst IOPS',
-                'Data Disk Used Burst BPS Credits Percentage',
-                'Data Disk Used Burst IO Credits Percentage',
-                'OS Disk Read Bytes/sec',
-                'OS Disk Write Bytes/sec',
-                'OS Disk Read Operations/Sec',
-                'OS Disk Write Operations/Sec',
-                'OS Disk Queue Depth',
-                'OS Disk Bandwidth Consumed Percentage',
-                'OS Disk IOPS Consumed Percentage',
-                'OS Disk Target Bandwidth',
-                'OS Disk Target IOPS',
-                'OS Disk Max Burst Bandwidth',
-                'OS Disk Max Burst IOPS',
-                'OS Disk Used Burst BPS Credits Percentage',
-                'OS Disk Used Burst IO Credits Percentage',
-                'Inbound Flows',
-                'Outbound Flows',
-                'Inbound Flows Maximum Creation Rate',
-                'Outbound Flows Maximum Creation Rate',
-                'Premium Data Disk Cache Read Hit',
-                'Premium Data Disk Cache Read Miss',
-                'Premium OS Disk Cache Read Hit',
-                'Premium OS Disk Cache Read Miss',
-                'VM Cached Bandwidth Consumed Percentage',
-                'VM Cached IOPS Consumed Percentage',
-                'VM Uncached Bandwidth Consumed Percentage',
-                'VM Uncached IOPS Consumed Percentage',
-                'Network In Total',
-                'Network Out Total',
-                'Available Memory Bytes'
+            	'Percentage CPU',
+            	'Network In',
+            	'Network Out',
+            	'Disk Read Bytes',
+            	'Disk Write Bytes',
+            	'Disk Read Operations/Sec',
+            	'Disk Write Operations/Sec',
+            	'CPU Credits Remaining',
+            	'CPU Credits Consumed',
+            	'Data Disk Read Bytes/sec',
+            	'Data Disk Write Bytes/sec',
+            	'Data Disk Read Operations/Sec',
+            	'Data Disk Write Operations/Sec',
+            	'Data Disk Queue Depth',
+            	'Data Disk Bandwidth Consumed Percentage',
+            	'Data Disk IOPS Consumed Percentage',
+            	'Data Disk Target Bandwidth',
+            	'Data Disk Target IOPS',
+            	'Data Disk Max Burst Bandwidth',
+            	'Data Disk Max Burst IOPS',
+            	'Data Disk Used Burst BPS Credits Percentage',
+            	'Data Disk Used Burst IO Credits Percentage',
+            	'OS Disk Read Bytes/sec',
+            	'OS Disk Write Bytes/sec',
+            	'OS Disk Read Operations/Sec',
+            	'OS Disk Write Operations/Sec',
+            	'OS Disk Queue Depth',
+            	'OS Disk Bandwidth Consumed Percentage',
+            	'OS Disk IOPS Consumed Percentage',
+            	'OS Disk Target Bandwidth',
+            	'OS Disk Target IOPS',
+            	'OS Disk Max Burst Bandwidth',
+            	'OS Disk Max Burst IOPS',
+            	'OS Disk Used Burst BPS Credits Percentage',
+            	'OS Disk Used Burst IO Credits Percentage',
+            	'Inbound Flows',
+            	'Outbound Flows',
+            	'Inbound Flows Maximum Creation Rate',
+            	'Outbound Flows Maximum Creation Rate',
+            	'Premium Data Disk Cache Read Hit',
+            	'Premium Data Disk Cache Read Miss',
+            	'Premium OS Disk Cache Read Hit',
+            	'Premium OS Disk Cache Read Miss',
+            	'VM Cached Bandwidth Consumed Percentage',
+            	'VM Cached IOPS Consumed Percentage',
+            	'VM Uncached Bandwidth Consumed Percentage',
+            	'VM Uncached IOPS Consumed Percentage',
+            	'Network In Total',
+            	'Network Out Total',
+            	'Available Memory Bytes'
             ],
-                prepared_metrics = [],
-                data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            	prepared_metrics = [],
+            	data = {};
+            	data['errors'] = {};
+            	data['metrics'] = {};
             
             try {
-                AzureVM.setParams(JSON.parse(value));
+            	AzureVM.setParams(JSON.parse(value));
             
-                try {
-                    result = AzureVM.request(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureVM.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureVM.params.app_id) + '&client_secret=' + encodeURIComponent(AzureVM.params.password)
-                    );
+            	try {
+            		result = AzureVM.request(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(AzureVM.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureVM.params.app_id) + '&client_secret=' + encodeURIComponent(AzureVM.params.password)
+            		);
             
-                    if ('access_token' in result) {
-                        AzureVM.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            		if ('access_token' in result) {
+            			AzureVM.token = result['access_token'];
+            		} else {
+            			throw 'Auth response does not contain access token.';
+            		}
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    try {
-                        health = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
-                            data.health = health.value[0].properties;
-                        }
-                    }
-                    catch (error) {
-                        data.errors.health = error.toString();
-                    }
+            	if (!('auth' in data.errors)) {
+            		try {
+            			health = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+            			if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+            				data.health = health.value[0].properties;
+            			}
+            		}
+            		catch (error) {
+            			data.errors.health = error.toString();
+            		}
             
-                    for (var i = 0; i < metrics.length; i += 20) {
-                        var chunk = metrics.slice(i, i + 20);
+            		for (var i = 0; i < metrics.length; i += 20) {
+            			var chunk = metrics.slice(i, i + 20);
             
-                        prepared_metrics.push(
-                            chunk.map(function (element) {
-                                return encodeURIComponent(element);
-                            }).join(',')
-                        );
-                    }
+            			prepared_metrics.push(
+            				chunk.map(function (element) {
+            					return encodeURIComponent(element);
+            				}).join(',')
+            			);
+            		}
             
-                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
-                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+            		start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+            		end_date = new Date().toISOString().replace(/\.\d+/, '');
             
-                    for (var j in prepared_metrics) {
-                        try {
-                            metrics_data = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                for (k in metrics_data.value) {
-                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 2) {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 3];
-                                    }
-                                }
-                            }
-                        }
-                        catch (error) {
-                            data.errors[prepared_metrics[j]] = error.toString();
-                        }
-                    }
-                }
+            		for (var j in prepared_metrics) {
+            			try {
+            				metrics_data = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+            				if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+            					for (k in metrics_data.value) {
+            						if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 2) {
+            							data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 3];
+            						}
+            					}
+            				}
+            			}
+            			catch (error) {
+            				data.errors[prepared_metrics[j]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);

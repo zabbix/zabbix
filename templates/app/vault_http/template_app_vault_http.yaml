@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-28T08:16:12Z'
+  date: '2024-01-22T15:17:28Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -36,18 +36,18 @@ zabbix_export:
               parameters:
                 - |
                   var name,
-                      output = [];
+                  	output = [];
                   
                   JSON.parse(value).forEach(function (v) {
-                      if (name = v.name.match(/^vault_(rollback_attempt|route_rollback)_(.+?)_count$/)) {
-                          output.push(
-                              {
-                                  '{#MOUNTPOINT}': name[2].replace(/_/g, '/'),
-                                  '{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
-                                  '{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
-                              }
-                          );
-                      }
+                  	if (name = v.name.match(/^vault_(rollback_attempt|route_rollback)_(.+?)_count$/)) {
+                  		output.push(
+                  			{
+                  				'{#MOUNTPOINT}': name[2].replace(/_/g, '/'),
+                  				'{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
+                  				'{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
+                  			}
+                  		);
+                  	}
                   });
                   
                   return JSON.stringify(output);
@@ -104,19 +104,19 @@ zabbix_export:
               parameters:
                 - |
                   var name,
-                      output = [];
+                  	output = [];
                   
                   JSON.parse(value).forEach(function (v) {
-                      if (name = v.name.match(/^vault_((?!barrier).+?)_(get|put|list|delete)_count$/)) {
-                          output.push(
-                              {
-                                  '{#STORAGE}': name[1],
-                                  '{#OPERATION}': name[2].toUpperCase(),
-                                  '{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
-                                  '{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
-                              }
-                          );
-                      }
+                  	if (name = v.name.match(/^vault_((?!barrier).+?)_(get|put|list|delete)_count$/)) {
+                  		output.push(
+                  			{
+                  				'{#STORAGE}': name[1],
+                  				'{#OPERATION}': name[2].toUpperCase(),
+                  				'{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
+                  				'{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
+                  			}
+                  		);
+                  	}
                   });
                   
                   return JSON.stringify(output);
@@ -288,57 +288,57 @@ zabbix_export:
             var params = JSON.parse(value);
             
             params['url'] = params.scheme + '://'
-                + params.host + ':'
-                + params.port + '/v1/auth/token/lookup-accessor';
+            	+ params.host + ':'
+            	+ params.port + '/v1/auth/token/lookup-accessor';
             
             var request = new HttpRequest(),
-                output = [];
+            	output = [];
             
             request.addHeader('X-Vault-Token: ' + params.token);
             
             params.accessors.trim().split(/\x20+/).forEach(function (accessor) {
-                if (!accessor) {
-                    return;
-                }
+            	if (!accessor) {
+            		return;
+            	}
             
-                var response,
-                    data = {},
-                    error_msg = '';
+            	var response,
+            		data = {},
+            		error_msg = '';
             
-                try {
-                    response = request.post(params.url, JSON.stringify({ accessor: accessor }));
-                    Zabbix.log(4, '[ Vault API ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	try {
+            		response = request.post(params.url, JSON.stringify({ accessor: accessor }));
+            		Zabbix.log(4, '[ Vault API ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Vault API. Check debug log for more information.';
-                        }
-                    }
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Vault API. Check debug log for more information.';
+            			}
+            		}
             
-                    if (request.getStatus() !== 200) {
-                        throw response.errors && response.errors[0] || JSON.stringify(response);
-                    }
+            		if (request.getStatus() !== 200) {
+            			throw response.errors && response.errors[0] || JSON.stringify(response);
+            		}
             
-                    if (typeof response !== 'object' || typeof response.data === 'undefined') {
-                        throw 'Cannot lookup token from Vault API. Check debug log for more information.';
-                    }
+            		if (typeof response !== 'object' || typeof response.data === 'undefined') {
+            			throw 'Cannot lookup token from Vault API. Check debug log for more information.';
+            		}
             
-                    data = response.data;
-                }
-                catch (error) {
-                    error_msg = error;
-                }
+            		data = response.data;
+            	}
+            	catch (error) {
+            		error_msg = error;
+            	}
             
-                output.push({
-                    'accessor': accessor,
-                    'token_name': data.display_name || 'null',
-                    'ttl': data.ttl || 0,
-                    'has_ttl': !!data.expire_time,
-                    'error': error_msg.toString()
-                });
+            	output.push({
+            		'accessor': accessor,
+            		'token_name': data.display_name || 'null',
+            		'ttl': data.ttl || 0,
+            		'has_ttl': !!data.expire_time,
+            		'error': error_msg.toString()
+            	});
             });
             
             return JSON.stringify(output);

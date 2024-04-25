@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ const char	*help_message[] = {};
 ZBX_METRIC	parameters_agent[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
 
-void zbx_on_exit(int ret)
+void zbx_on_exit(int ret, void *on_exit_args)
 {
 }
 

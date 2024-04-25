@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -581,6 +581,9 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		}
 	}
 
+	/* It appears that IPv6 specification allows entries like "<IPv6 ADDR>%<NIC NAME>" */
+	/* which do not pass our current IPv6 address validation. In the future, when we   */
+	/* fix our IPv6 address validation we could consider adding it here.               */
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 

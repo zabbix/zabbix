@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,51 +27,73 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testDashboardViewMode extends CLegacyWebTest {
 
+	public static function getCheckLayoutForDifferentUsersData() {
+		return [
+			// #0 Super admin.
+			[
+				[
+					'username' => 'Admin',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55b'
+				]
+			],
+			// #1 Admin.
+			[
+				[
+					'username' => 'admin-zabbix',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55c'
+				]
+			],
+			//#2 User.
+			[
+				[
+					'username' => 'user-zabbix',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55d'
+				]
+			],
+			// #3 Guest.
+			[
+				[
+					'username' => 'guest',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55e'
+				]
+			]
+		];
+	}
+
 	/**
+	 * @dataProvider getCheckLayoutForDifferentUsersData
+	 *
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
 	 */
-	public function testDashboardViewMode_CheckLayoutForDifferentUsers() {
-		$users = ['super-admin', 'admin', 'user', 'guest'];
-		foreach ($users as $user) {
-			switch ($user) {
-				case 'super-admin' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
-					break;
-				case 'admin' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
-					break;
-				case 'user';
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
-					break;
-				case 'guest';
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
-					break;
-			}
-			$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
-			$this->zbxTestCheckTitle('Dashboard');
-			$this->zbxTestCheckHeader('Global view');
-			if ($user !== 'super-admin') {
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
-			}
-			else {
-				$this->zbxTestCheckNoRealHostnames();
-			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
+	public function testDashboardViewMode_CheckLayoutForDifferentUsers($data) {
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($data['username']));
+		$this->authenticateUser($data['sessionid'], $userid);
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+		$this->zbxTestCheckTitle('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
-			// Logout.
-			$this->zbxTestLogout();
-			$this->zbxTestWaitForPageToLoad();
-			$this->webDriver->manage()->deleteAllCookies();
+		if ($data['username'] !== 'Admin') {
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
 		}
+		else {
+			$this->zbxTestCheckNoRealHostnames();
+		}
+
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
+
+		// Logout.
+		$this->zbxTestLogout();
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->manage()->deleteAllCookies();
 	}
 
 	public function testDashboardViewMode_KioskMode() {

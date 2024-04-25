@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@
 
 /**
  * Graph widget form view.
+ *
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
@@ -32,7 +35,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.graph.form.view.js.php')];
 
 // Source.
 $form_list->addRow(
@@ -41,20 +44,14 @@ $form_list->addRow(
 );
 
 // Graph.
-if (array_key_exists('graphid', $fields)) {
-	$field_graphid = CWidgetHelper::getGraph($fields['graphid'], $data['captions']['graphs']['graphid'],
-		$form->getName()
-	);
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['graphid']), $field_graphid);
-	$scripts[] = $field_graphid->getPostJS();
-}
+$field_graphid = CWidgetHelper::getGraph($fields['graphid'], $data['captions']['graphs']['graphid'], $form->getName());
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['graphid']), $field_graphid, null, 'js-row-graphid');
+$scripts[] = $field_graphid->getPostJS();
 
 // Item.
-if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts[] = $field_itemid->getPostJS();
-}
+$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid, null, 'js-row-itemid');
+$scripts[] = $field_itemid->getPostJS();
 
 // Show legend.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelper::getCheckBox($fields['show_legend']));
@@ -64,7 +61,15 @@ if ($data['templateid'] === null) {
 	$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
 }
 
-$form->addItem($form_list);
+$form
+	->addItem($form_list)
+	->addItem(
+		(new CScriptTag('
+			widget_graph_form.init('.json_encode([
+				'form_id' => $form->getId()
+			]).');
+		'))->setOnDocumentReady()
+	);
 
 return [
 	'form' => $form,

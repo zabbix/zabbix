@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -902,13 +902,6 @@ class CControllerPopupGeneric extends CController {
 						'id' => $row['name']
 					];
 					unset($records[$hostid]);
-				}
-				break;
-
-			case 'items':
-				foreach ($records as $itemid => $row) {
-					$records[$row['name']] = ['pattern' => $row['name']] + $row;
-					unset($records[$itemid]);
 				}
 				break;
 

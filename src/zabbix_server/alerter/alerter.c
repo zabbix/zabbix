@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "dbcache.h"
 #include "alerter_protocol.h"
 #include "zbxembed.h"
+#include "zbxserver.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -138,19 +139,44 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
  ******************************************************************************/
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
 {
-	zbx_uint64_t	alertid, mediatypeid, eventid;
+	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
-			*inreplyto;
+			*inreplyto, *expression, *recovery_expression;
 	unsigned short	smtp_port;
 	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
-	int		ret;
+	int		object, source, ret;
 	char		error[MAX_STRING_LEN];
 
-	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &sendto, &subject, &message,
-			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
-			&smtp_verify_host, &smtp_authentication, &username, &password, &content_type);
+	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &source, &object, &objectid,
+			&sendto, &subject, &message, &smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security,
+			&smtp_verify_peer, &smtp_verify_host, &smtp_authentication, &username, &password,
+			&content_type, &expression, &recovery_expression);
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
+
+	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+	{
+		/* fill data required by substitute_simple_macros_unmasked() for MACRO_TYPE_ALERT_EMAIL */
+
+		DB_EVENT	event = {.eventid = eventid, .source = source, .object = object, .objectid = objectid};
+
+		memset(&event.trigger, 0, sizeof(DB_TRIGGER));
+		event.trigger.expression = expression;
+		event.trigger.recovery_expression = recovery_expression;
+
+		substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, &username, MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+		substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, &password, MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+
+		zbx_db_trigger_clean(&event.trigger);
+	}
+	else
+	{
+		zbx_free(expression);
+		zbx_free(recovery_expression);
+	}
+
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
 			content_type, ALARM_ACTION_TIMEOUT, error, sizeof(error));
@@ -373,6 +399,4 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_socket_close(&alerter_socket);
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1368,6 +1368,8 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
 
 	for (i = 0; i < s->num_socks; i++)
 		zbx_socket_close(s->sockets[i]);
+
+	zbx_socket_clean(s);
 }
 
 /******************************************************************************

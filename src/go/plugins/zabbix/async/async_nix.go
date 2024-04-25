@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,5 @@ func getMetrics() []string {
 		"system.hw.cpu", "CPU information.",
 		"system.hw.macaddr", "Listing of MAC addresses.",
 		"system.sw.os", "Operating system information.",
-		"system.swap.in", "Swap in (from device into memory) statistics.",
-		"system.swap.out", "Swap out (from memory onto device) statistics.",
 	}
 }

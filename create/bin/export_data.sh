@@ -14,7 +14,7 @@ schema=$basedir/../src/schema.tmpl
 
 echo "--
 -- Zabbix
--- Copyright (C) 2001-2023 Zabbix SIA
+-- Copyright (C) 2001-2024 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 				continue
 			fi
 		else
-			fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+			fields="${fields}${delim}replace(replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;'),'\t','&tab;') as ${field}"
 		fi
 		delim=','
 

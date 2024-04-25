@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4485,6 +4485,26 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				replace_to = zbx_strdup(replace_to, alert->subject);
 			else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
 				replace_to = zbx_strdup(replace_to, alert->message);
+		}
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ALERT_EMAIL) &&
+				ZBX_TOKEN_USER_MACRO == token.type)
+		{
+			if ((EVENT_SOURCE_INTERNAL == event->source && EVENT_OBJECT_TRIGGER == event->object) ||
+					EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
+					DCget_user_macro(phostids->values, phostids->values_num, m, &replace_to);
+			}
+			else if (EVENT_SOURCE_INTERNAL == event->source && (EVENT_OBJECT_ITEM == event->object ||
+					EVENT_OBJECT_LLDRULE == event->object))
+			{
+				cache_item_hostid(&hostids, event->objectid);
+				DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+			}
+			else
+				DCget_user_macro(NULL, 0, m, &replace_to);
+
+			pos = token.loc.r;
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_JMX_ENDPOINT))
 		{

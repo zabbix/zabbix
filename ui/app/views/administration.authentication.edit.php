@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,7 +190,9 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Search attribute'), 'ldap_search_attribute'))->setAsteriskMark(),
-		(new CTextBox('ldap_search_attribute', $data['ldap_search_attribute']))
+		(new CTextBox('ldap_search_attribute', $data['ldap_search_attribute'], false,
+			DB::getFieldLength('config', 'ldap_search_attribute')
+		))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()

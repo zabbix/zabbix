@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ static void	parent_signal_handler(int sig)
 		case SIGTERM:
 			ZBX_DO_EXIT();
 			zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
-			zbx_on_exit(SUCCEED);
+			zbx_on_exit(SUCCEED, NULL);
 			break;
 	}
 }

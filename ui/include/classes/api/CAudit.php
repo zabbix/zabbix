@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -528,7 +528,7 @@ class CAudit {
 	 * @return bool
 	 */
 	private static function isAuditEnabled(): bool {
-		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
+		return CSettingsHelper::getPublic(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
 	}
 
 	/**

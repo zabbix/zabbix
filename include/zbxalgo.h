@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,13 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 #define ZBX_DEFAULT_UINT64_HASH_FUNC		zbx_hash_splittable64
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
+
+typedef enum
+{
+	ZBX_HASHSET_UNIQ_FALSE,
+	ZBX_HASHSET_UNIQ_TRUE
+}
+zbx_hashset_uniq_t;
 
 typedef int (*zbx_compare_func_t)(const void *d1, const void *d2);
 
@@ -165,7 +172,8 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
-void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset,
+		zbx_hashset_uniq_t uniq);
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);

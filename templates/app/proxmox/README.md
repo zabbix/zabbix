@@ -5,8 +5,9 @@
 
 This template is designed for the effortless deployment of Proxmox VE monitoring by Zabbix via HTTP and doesn't require any external scripts.
 
-Proxmox VE uses a REST like API. The concept is described in (Resource Oriented Architecture - ROA).
-You can explore the API documentation at http://pve.proxmox.com/pve-docs/api-viewer/index.html
+Proxmox VE uses a REST like API. The concept is described in Resource Oriented Architecture (ROA).
+
+Check the [`API documentation`](https://pve.proxmox.com/pve-docs/api-viewer/index.html) for details.
 
 ## Requirements
 
@@ -23,22 +24,23 @@ This template has been tested on:
 
 ## Setup
 
-Create an API token for the monitoring user. Important note: for security reasons, it is recommended to create a separate user (Datacenter - Permissions).
+1. Create an API token for the monitoring user. Important note: for security reasons, it is recommended to create a separate user (Datacenter - Permissions).
 
-Please provide the necessary access levels for both the User and the Token.
+Please provide the necessary access levels for both the User and the Token:
 
 * Check: ["perm","/",["Sys.Audit"]]
-
 * Check: ["perm","/storage",["Datastore.Audit"]]
-
 * Check: ["perm","/vms",["VM.Audit"]]
 
-Copy the resulting Token ID and Secret into host macros.
+2. Copy the resulting Token ID and Secret into the host macros `{$PVE.TOKEN.ID}` and `{$PVE.TOKEN.SECRET}`.
+
+3. Set the hostname or IP address of the Proxmox API VE host in the `{$PVE.URL.HOST}` macro. You can also change the API port in the `{$PVE.URL.PORT}` macro if necessary.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>|`<SET PVE HOST>`|
 |{$PVE.URL.PORT}|<p>The API uses the HTTPS protocol and the server listens to port 8006 by default.</p>|`8006`|
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>|`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`|
@@ -127,7 +129,7 @@ Copy the resulting Token ID and Secret into host macros.
 |Proxmox: Node [{#NODE.NAME}] high root filesystem space usage|<p>Root filesystem space usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.rootused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.roottotal[{#NODE.NAME}]) * 100 >{$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
 |Proxmox: Node [{#NODE.NAME}] high memory usage|<p>Memory usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.memused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.memtotal[{#NODE.NAME}]) * 100 >{$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
 |Proxmox: Node [{#NODE.NAME}] high CPU usage|<p>CPU usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.cpu[{#NODE.NAME}],5m) > {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
-|Proxmox: Node [{#NODE.NAME}] high root filesystem space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0`|Warning||
+|Proxmox: Node [{#NODE.NAME}] high swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0`|Warning||
 
 ### LLD rule Storage discovery
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'Jira '
 					],
-					'result' => ['Jira ServiceDesk', 'Jira with CustomFields']
+					'result' => ['Jira ServiceDesk']
 				]
 			],
 			[
@@ -164,9 +164,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'a w'
+						'Name' => 'a S'
 					],
-					'result' => ['Jira with CustomFields']
+					'result' => ['Jira ServiceDesk']
 				]
 			],
 			// Filter by status.

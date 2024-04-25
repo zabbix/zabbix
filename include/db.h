@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -411,15 +411,9 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *
 
 typedef struct
 {
-	zbx_uint64_t	alertid;
-	zbx_uint64_t 	actionid;
-	int		clock;
-	zbx_uint64_t	mediatypeid;
 	char		*sendto;
 	char		*subject;
 	char		*message;
-	zbx_alert_status_t	status;
-	int		retries;
 }
 DB_ALERT;
 

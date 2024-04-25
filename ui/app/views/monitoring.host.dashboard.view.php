@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ $this->addJsFile('class.widget.problems.js');
 $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
+$this->addJsFile('class.widget.url.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.sortable.js');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -212,6 +212,8 @@ class CMapHelper {
 	 */
 	protected static function resolveMapState(array &$sysmap, array $areas, array $options) {
 		$map_info = getSelementsInfo($sysmap, ['severity_min' => $options['severity_min']]);
+		$sysmap['selements'] = array_column($sysmap['selements'], null, 'selementid');
+
 		processAreasCoordinates($sysmap, $areas, $map_info);
 
 		// Adding element names and removing inaccessible triggers from readable elements.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,18 +43,22 @@ require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
+require_once dirname(__FILE__).'/graphs/testPageGraphPrototypesTemplate.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHostInterfaces.php';
-require_once dirname(__FILE__).'/testPageHostPrototypes.php';
+require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
+require_once dirname(__FILE__).'/hosts/testPageHostPrototypesTemplate.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/items/testPageItems.php';
 require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
+require_once dirname(__FILE__).'/items/testPageItemPrototypesTemplate.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
-require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypes.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypesTemplate.php';
 require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
@@ -149,8 +153,8 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
-require_once dirname(__FILE__).'/triggerDependencies/testHostTriggerDependencies.php';
-require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependencies.php';
+require_once dirname(__FILE__).'/triggers/testHostTriggerDependencies.php';
+require_once dirname(__FILE__).'/triggers/testTemplateTriggerDependencies.php';
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
@@ -185,7 +189,6 @@ require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testUrlUserPermissions.php';
-require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
@@ -257,21 +260,25 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraph');
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testPageGraphPrototypes');
+		$suite->addTestSuite('testPageGraphPrototypesTemplate');
 		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
+		$suite->addTestSuite('testPageHostPrototypesTemplate');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageHostGroups');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageItemPrototypes');
+		$suite->addTestSuite('testPageItemPrototypesTemplate');
 		$suite->addTestSuite('testPageTriggers');
 		$suite->addTestSuite('testPageTriggerDescription');
 		$suite->addTestSuite('testPageTriggerUrl');
 		$suite->addTestSuite('testPageTriggerPrototypes');
+		$suite->addTestSuite('testPageTriggerPrototypesTemplate');
 		$suite->addTestSuite('testPageLatestData');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 		$suite->addTestSuite('testPageMaintenance');
@@ -411,7 +418,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testUrlParameters');
 		$suite->addTestSuite('testUrlUserPermissions');
-		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');

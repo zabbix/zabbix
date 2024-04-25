@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,5 +159,12 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 		$host_link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
+	}
+
+	/**
+	 * @dataProvider getItemsParametersData
+	 */
+	public function testFormPreprocessingItemPrototype_CheckParametersPlaceholders($data) {
+		$this->checkParameters($data);
 	}
 }

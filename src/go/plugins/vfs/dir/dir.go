@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,11 @@ import (
 
 var impl Plugin
 
+type inodeData struct {
+	Dev uint64
+	Ino uint64
+}
+
 type common struct {
 	path          string
 	maxDepth      int
@@ -39,7 +44,7 @@ type common struct {
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
-	files         []fs.FileInfo
+	files         map[inodeData]bool
 }
 
 func init() {

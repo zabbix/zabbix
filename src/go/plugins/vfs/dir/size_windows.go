@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ package dir
 import (
 	"fmt"
 	"io/fs"
-	"os"
 	"syscall"
 
 	"zabbix.com/pkg/win32"
@@ -85,24 +84,63 @@ func (sp *sizeParams) getClusterSize(path string) (uint64, error) {
 	return uint64(clusters.LpSectorsPerCluster) * uint64(clusters.LpBytesPerSector), nil
 }
 
+func hashFromFileInfo(i *syscall.ByHandleFileInformation) uint64 {
+	return uint64(i.FileIndexHigh)<<32 | uint64(i.FileIndexLow)
+}
+
+func getInodeData(path string) (inodeData, bool, error) {
+	uPath, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		return inodeData{}, false, err
+	}
+
+	attributes := uint32(syscall.FILE_FLAG_BACKUP_SEMANTICS | syscall.FILE_FLAG_OPEN_REPARSE_POINT)
+	h, err := syscall.CreateFile(uPath, 0, 0, nil, syscall.OPEN_EXISTING, attributes, 0)
+	if err != nil {
+		return inodeData{}, false, err
+	}
+
+	defer syscall.CloseHandle(h)
+
+	var i syscall.ByHandleFileInformation
+	err = syscall.GetFileInformationByHandle(h, &i)
+	if err != nil {
+		return inodeData{}, false, err
+	}
+
+	if i.NumberOfLinks <= 1 {
+		return inodeData{}, false, nil
+	}
+
+	dev := uint64(i.VolumeSerialNumber)
+	ino := hashFromFileInfo(&i)
+
+	return inodeData{dev, ino}, true, nil
+}
+
 func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	if d.Type() == fs.ModeSymlink {
 		return true
 	}
 
-	i, err := d.Info()
+	iData, ok, err := getInodeData(path)
 	if err != nil {
 		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+
 		return true
 	}
 
-	for _, f := range cp.files {
-		if os.SameFile(f, i) {
-			return true
-		}
+	// inodeData is returned only for files with hardlinks
+	if !ok {
+		return false
 	}
 
-	cp.files = append(cp.files, i)
+	_, found := cp.files[iData]
+	if found {
+		return true
+	}
+
+	cp.files[iData] = true
 
 	return false
 }

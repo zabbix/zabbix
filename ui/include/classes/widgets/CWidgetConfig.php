@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ class CWidgetConfig {
 			WIDGET_SVG_GRAPH			=> 'CWidgetSvgGraph',
 			WIDGET_SYSTEM_INFO			=> 'CWidget',
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
-			WIDGET_URL					=> 'CWidget',
+			WIDGET_URL					=> 'CWidgetUrl',
 			WIDGET_WEB					=> 'CWidget',
 			WIDGET_TOP_HOSTS			=> 'CWidget'
 		];

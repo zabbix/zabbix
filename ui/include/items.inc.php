@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -533,9 +533,9 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				$type = itemTypeInterface($item['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
-					foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $itype) {
-						if (array_key_exists($type, $interfaceids)) {
-							$item['interfaceid'] = $interfaceids[$itype];
+					foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+						if (array_key_exists($interface_type, $interfaceids)) {
+							$item['interfaceid'] = $interfaceids[$interface_type];
 							break;
 						}
 					}

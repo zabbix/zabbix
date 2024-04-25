@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1896,36 +1896,6 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: destroy preprocessing manager                                     *
- *                                                                            *
- * Parameters: manager - [IN] the manager to destroy                          *
- *                                                                            *
- ******************************************************************************/
-static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
-{
-	zbx_preprocessing_direct_request_t	*direct_request;
-	zbx_preprocessing_request_base_t	*base;
-
-	zbx_free(manager->workers);
-
-	/* this is the place where values are lost */
-	while (SUCCEED == zbx_list_pop(&manager->direct_queue, (void **)&direct_request))
-		preprocessor_free_direct_request(direct_request);
-
-	zbx_list_destroy(&manager->direct_queue);
-
-	while (SUCCEED == zbx_list_pop(&manager->queue, (void **)&base))
-		preprocessor_free_request(base);
-
-	zbx_list_destroy(&manager->queue);
-
-	zbx_hashset_destroy(&manager->item_config);
-	zbx_hashset_destroy(&manager->linked_items);
-	zbx_hashset_destroy(&manager->history_cache);
-}
-
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -2051,8 +2021,5 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&service);
-	preprocessor_destroy_manager(&manager);
 #undef STAT_INTERVAL
 }
