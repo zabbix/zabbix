@@ -72,7 +72,7 @@ type mockExporterPlugin struct {
 	mockPlugin
 }
 
-func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
+func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.call(key)
 	return
 }
@@ -98,7 +98,7 @@ type mockCollectorExporterPlugin struct {
 	period int
 }
 
-func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
+func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.call(key)
 	return
 }
@@ -130,7 +130,7 @@ type mockPassiveRunnerPlugin struct {
 	mockPlugin
 }
 
-func (p *mockPassiveRunnerPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
+func (p *mockPassiveRunnerPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	return
 }
 func (p *mockPassiveRunnerPlugin) Start() {
@@ -186,14 +186,14 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Item {
 type mockConfiguratorPlugin struct {
 	plugin.Base
 	mockPlugin
-	options any
+	options interface{}
 }
 
-func (p *mockConfiguratorPlugin) Configure(global *plugin.GlobalOptions, options any) {
+func (p *mockConfiguratorPlugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	p.call("$configure")
 }
 
-func (p *mockConfiguratorPlugin) Validate(options any) (err error) {
+func (p *mockConfiguratorPlugin) Validate(options interface{}) (err error) {
 	return
 }
 
@@ -1787,7 +1787,7 @@ func TestPassiveRunner(t *testing.T) {
 }
 
 type configuratorOption struct {
-	Params any `conf:"optional"`
+	Params interface{} `conf:"optional"`
 }
 
 func TestConfigurator(t *testing.T) {
@@ -1798,7 +1798,7 @@ func TestConfigurator(t *testing.T) {
 	_ = conf.Unmarshal([]byte("Delay=30"), &opt2)
 	_ = conf.Unmarshal([]byte("Delay=60"), &opt3)
 
-	agent.Options.Plugins = map[string]any{
+	agent.Options.Plugins = map[string]interface{}{
 		"Debug1": opt1.Params,
 		"Debug2": opt2.Params,
 		"Debug3": opt3.Params,
@@ -2028,6 +2028,7 @@ func Test_getPluginOptions(t *testing.T) {
 					tt.wantCapacity,
 				)
 			}
+
 			if gotForceActiveChecks != tt.wantForceActiveChecks {
 				t.Errorf(
 					"getPluginOptions() got ForceActiveChecksOnStart = %v, want %v",
