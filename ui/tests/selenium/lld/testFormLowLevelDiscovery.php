@@ -711,6 +711,28 @@ class testFormLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'Macro in key',
+						'Type' => 'Zabbix agent',
+						'Key' => '{$MACRO}'
+					],
+					'error_details' => 'Invalid parameter "/1/key_": incorrect syntax near "{$MACRO}".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '🙂 in key',
+						'Type' => 'Zabbix agent',
+						'Key' => '🙂🙃み け め 𒁥'
+					],
+					'error_details' => 'Invalid parameter "/1/key_": incorrect syntax near "🙂🙃み け め 𒁥".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'Update interval validation',
 						'Type' => 'Zabbix agent',
 						'Key' => 'test',
@@ -1179,6 +1201,20 @@ class testFormLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'HTTP LLD simple 2',
+						'Type' => 'HTTP agent',
+						'Key' => 'http_check[2]',
+						'URL' => 'www.test.com/search',
+						'Request body type' => 'JSON data',
+						'Request body' => ''
+					],
+					'error_details' => 'Invalid parameter "/1/posts": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'HTTP check',
 						'Type' => 'HTTP agent',
 						'Key' => 'http.check',
@@ -1313,6 +1349,16 @@ class testFormLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Name' => 'SNMP LLD 5',
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.test["OID"]',
+						'SNMP OID' => '🙂🙃み け め 𒁥'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
 						'Name' => 'Internal',
 						'Type' => 'Zabbix internal',
 						'Key' => 'zabbix[triggers]'
@@ -1364,6 +1410,30 @@ class testFormLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Name' => 'HTTP JSON',
+						'Type' => 'HTTP agent',
+						'Key' => 'http_check[2]',
+						'URL' => 'www.test.com/search',
+						'Request body type' => 'JSON data',
+						'Request body' => '{"export": {"version": "6.0","date": "2024-03-20T20:05:14Z"}}',
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'HTTP XML',
+						'Type' => 'HTTP agent',
+						'Key' => 'http_check[3]',
+						'URL' => 'www.test.com/search',
+						'Request body type' => 'XML data',
+						'Request body' => '<export><version>6.0</version><date>2024-03-20T20:05:14Z</date></export>',
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
 						'Name' => 'HTTP LLD',
 						'Type' => 'HTTP agent',
 						'Key' => 'http_check[]',
@@ -1392,8 +1462,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'Type' => 'HTTP agent',
 						'Key' => 'key[{$MACRO}]       ',
 						'URL' => '      {$MACRO}     ',
-						'name:query_fields[0][name]' => '          {$MACRO}'         ,
-						'name:query_fields[0][value]' => '        {$MACRO}'            ,
+						'name:query_fields[0][name]' => '          {$MACRO}     ',
+						'name:query_fields[0][value]' => '        {$MACRO}       ',
 						'Request type' => 'POST',
 						'Request body type' => 'JSON data',
 						'Request body' => '         {$MACRO}      ',
@@ -1432,6 +1502,56 @@ class testFormLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Name' => '🙂🙃み け め 𒁥',
+						'Type' => 'HTTP agent',
+						'Key' => 'test[🙂🙃み け め 𒁥]',
+						'URL' => '🙂🙃み け め 𒁥',
+						'name:query_fields[0][name]' => '🙂🙃み け め 𒁥',
+						'name:query_fields[0][value]' => '🙂🙃み け め 𒁥',
+						'Request type' => 'PUT',
+						'Request body type' => 'Raw data',
+						'Request body' => '🙂🙃み け め 𒁥',
+						'name:headers[0][name]' => '🙂🙃み け め 𒁥',
+						'name:headers[0][value]' => '🙂🙃み け め 𒁥',
+						'HTTP proxy' => '🙂🙃み け め 𒁥',
+						'HTTP authentication' => 'Kerberos',
+						'id:http_username' => '🙂🙃み け め 𒁥',
+						'id:http_password' => '🙂🙃み け め 𒁥',
+						'SSL certificate file' => '🙂🙃み け め 𒁥',
+						'SSL key file' => '🙂🙃み け め 𒁥',
+						'SSL key password' => '🙂🙃み け め 𒁥',
+						'Description' => '🙂🙃み け め 𒁥'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '{#LLD_MACRO}',
+						'Type' => 'HTTP agent',
+						'Key' => 'test[{#LLD_MACRO}]',
+						'URL' => '{?EXPRESSION}',
+						'name:query_fields[0][name]' => '{ITEM.KEY}',
+						'name:query_fields[0][value]' => '{ITEM.VALUE}',
+						'Request type' => 'HEAD',
+						'Request body type' => 'Raw data',
+						'Request body' => '{#LLD_MACRO}',
+						'name:headers[0][name]' => '{#LLD_MACRO}',
+						'name:headers[0][value]' => '{#LLD_MACRO}',
+						'HTTP proxy' => '{HOST.HOST}',
+						'HTTP authentication' => 'Kerberos',
+						'id:http_username' => '{#LLD_MACRO}',
+						'id:http_password' => '{?EXPRESSION}',
+						'SSL certificate file' => '{#LLD_MACRO}',
+						'SSL key file' => '{#LLD_MACRO}',
+						'SSL key password' => '{#LLD_MACRO}',
+						'Description' => '{?EXPRESSION}'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
 						'Name' => 'Script LLD',
 						'Type' => 'Script',
 						'Key' => 'script_check[1]',
@@ -1450,9 +1570,9 @@ class testFormLowLevelDiscovery extends CWebTest {
 //						'Name' => 'Multiline Script LLD',
 //						'Type' => 'Script',
 //						'Key' => 'script_check[2]',
-//						'Script' => "const = 'Hello World!';
-//								\nlet favePhrase = const;
-//								\nconsole.log(favePhrase);"
+//						'Script' => "const = 'Hello World!';".
+//								"\nlet favePhrase = const;".
+//								"\nconsole.log(favePhrase);"
 //					],
 //					'Parameters' => [
 //						['Name' => 'param_1', 'Value' => 'value_1'],
