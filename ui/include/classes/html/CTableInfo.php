@@ -43,7 +43,7 @@ class CTableInfo extends CTable {
 			]);
 
 			if ($icon !== null) {
-				$this->addClass(ZBX_STYLE_FULL_HEIGHT);
+				$this->addClass(ZBX_STYLE_NO_DATA);
 				$container->addClass(ZBX_STYLE_NO_DATA_FOUND);
 			}
 		}

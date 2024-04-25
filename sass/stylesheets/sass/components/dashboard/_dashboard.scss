@@ -357,25 +357,6 @@
 
 .dashboard-grid-widget-body {
 	display: contents;
-
-	.list-table.full-height {
-		.nothing-to-show {
-			td {
-				vertical-align: middle;
-			}
-
-			&:last-child {
-				td {
-					border-bottom: 0;
-				}
-			}
-
-			.no-data-found {
-				margin-top: 0;
-				margin-bottom: 0;
-			}
-		}
-	}
 }
 
 .dashboard-grid-widget-debug {
@@ -426,6 +407,33 @@
 
 			tfoot {
 				bottom: -8px;
+			}
+		}
+
+		&.no-data {
+			height: 100%;
+
+			thead {
+				th, td {
+					height: 1%;
+				}
+			}
+
+			.nothing-to-show {
+				td {
+					vertical-align: middle;
+				}
+
+				&:last-child {
+					td {
+						border-bottom: 0;
+					}
+				}
+
+				.no-data-found {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
 			}
 		}
 	}

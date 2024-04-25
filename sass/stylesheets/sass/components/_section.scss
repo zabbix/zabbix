@@ -43,7 +43,7 @@ section {
 	.list-table {
 		border: 0;
 
-		tbody tr:last-child:not(.nothing-to-show) {
+		tbody tr:last-child {
 			td {
 				border-bottom: 1px solid $table-border-color;
 			}
@@ -57,6 +57,14 @@ section {
 
 			&:last-child {
 				padding-right: 10px;
+			}
+		}
+
+		&.no-data {
+			tbody tr:last-child {
+				td {
+					border-bottom: none;
+				}
 			}
 		}
 	}

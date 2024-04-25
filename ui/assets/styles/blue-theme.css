@@ -511,9 +511,6 @@ svg a {
     fill: #0275b8;
     text-decoration: underline; }
 
-.full-height {
-  height: 100%; }
-
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
@@ -1790,13 +1787,6 @@ button {
 
 .dashboard-grid-widget-body {
   display: contents; }
-  .dashboard-grid-widget-body .list-table.full-height .nothing-to-show td {
-    vertical-align: middle; }
-  .dashboard-grid-widget-body .list-table.full-height .nothing-to-show:last-child td {
-    border-bottom: 0; }
-  .dashboard-grid-widget-body .list-table.full-height .nothing-to-show .no-data-found {
-    margin-top: 0;
-    margin-bottom: 0; }
 
 .dashboard-grid-widget-debug .debug-output {
   margin: 8px 10px 0;
@@ -1823,6 +1813,17 @@ button {
       margin-bottom: -8px; }
       .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: -8px; }
+    .dashboard-grid-widget-contents .list-table.no-data {
+      height: 100%; }
+      .dashboard-grid-widget-contents .list-table.no-data thead th, .dashboard-grid-widget-contents .list-table.no-data thead td {
+        height: 1%; }
+      .dashboard-grid-widget-contents .list-table.no-data .nothing-to-show td {
+        vertical-align: middle; }
+      .dashboard-grid-widget-contents .list-table.no-data .nothing-to-show:last-child td {
+        border-bottom: 0; }
+      .dashboard-grid-widget-contents .list-table.no-data .nothing-to-show .no-data-found {
+        margin-top: 0;
+        margin-bottom: 0; }
   .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-debug .debug-output {
     margin: 8px 10px; }
 
@@ -2306,10 +2307,6 @@ button {
   border: 1px solid #dfe4e7; }
   .list-table.fixed {
     table-layout: fixed; }
-  .list-table.full-height {
-    min-height: 100%; }
-    .list-table.full-height thead th, .list-table.full-height thead td {
-      height: 1%; }
   .list-table thead th {
     height: 100%;
     overflow: hidden;
@@ -3337,7 +3334,7 @@ section {
     margin-bottom: 10px; }
   section .list-table {
     border: 0; }
-    section .list-table tbody tr:last-child:not(.nothing-to-show) td {
+    section .list-table tbody tr:last-child td {
       border-bottom: 1px solid #ebeef0; }
     section .list-table td:first-child,
     section .list-table th:first-child {
@@ -3345,6 +3342,8 @@ section {
     section .list-table td:last-child,
     section .list-table th:last-child {
       padding-right: 10px; }
+    section .list-table.no-data tbody tr:last-child td {
+      border-bottom: none; }
 
 .service-info {
   margin: -10px 0;

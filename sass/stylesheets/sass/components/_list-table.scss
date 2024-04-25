@@ -8,16 +8,6 @@
 		table-layout: fixed;
 	}
 
-	&.full-height {
-		min-height: 100%;
-
-		thead {
-			th, td {
-				height: 1%;
-			}
-		}
-	}
-
 	thead {
 		th {
 			height: 100%;

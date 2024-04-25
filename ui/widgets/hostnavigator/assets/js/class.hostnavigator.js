@@ -115,7 +115,7 @@ class CHostNavigator {
 				severity_names: this.#config.severity_names
 			});
 
-			this.#container.classList.remove(ZBX_STYLE_FULL_HEIGHT);
+			this.#container.classList.remove(ZBX_STYLE_NO_DATA);
 			this.#container.appendChild(this.#navigation_tree.getContainer());
 
 			if (is_limit_exceeded) {
@@ -139,7 +139,7 @@ class CHostNavigator {
 			}
 		}
 		else {
-			this.#container.classList.add(ZBX_STYLE_FULL_HEIGHT);
+			this.#container.classList.add(ZBX_STYLE_NO_DATA);
 			this.#container.appendChild(
 				this.#setNoDataMessage(t('No data found'), null, ZBX_ICON_SEARCH_LARGE)
 			);
