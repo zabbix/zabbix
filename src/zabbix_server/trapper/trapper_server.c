@@ -139,7 +139,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	result = zbx_db_select(
 			"select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,smtp_port"
 				",smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions"
-				",maxattempts,attempt_interval,content_type,script,timeout"
+				",maxattempts,attempt_interval,message_format,script,timeout"
 			" from media_type"
 			" where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 

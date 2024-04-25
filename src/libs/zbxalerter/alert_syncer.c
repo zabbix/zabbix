@@ -325,7 +325,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
-				"maxsessions,maxattempts,attempt_interval,content_type,script,timeout,process_tags"
+				"maxsessions,maxattempts,attempt_interval,message_format,script,timeout,process_tags"
 			" from media_type"
 			" where");
 

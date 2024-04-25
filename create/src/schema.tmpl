@@ -353,7 +353,7 @@ FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
 FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
 FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
-FIELD		|content_type	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|message_format	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|script		|t_text		|''	|NOT NULL	|0
 FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|0
 FIELD		|process_tags	|t_integer	|'0'	|NOT NULL	|0
@@ -2279,4 +2279,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050256	|6050256
+ROW		|1		|6050257	|6050257

@@ -1480,7 +1480,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 				"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 					"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
 					"smtp_authentication,maxsessions,maxattempts,attempt_interval,"
-					"content_type,script,timeout"
+					"message_format,script,timeout"
 				" from media_type"
 				" where");
 
