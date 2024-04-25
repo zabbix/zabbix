@@ -1444,40 +1444,19 @@ class testFormNetworkDiscovery extends CWebTest {
 							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
 						],
 						'Host name' => [
-							'DNS name' => true,
+							'DNS name' => false,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
+							'SNMPv1 agent (200) "new test SNMP OID"' => true,
 							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
 						],
 						'Visible name' => [
-							'Host name' => true,
+							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => false,
+							'IP address' => true,
 							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
 						]
 					]
-// TODO: Change expected_radios to commented lines when ZBX-23312 is fixed.
-//					'expected_radios' => [
-//						'Device uniqueness criteria' => [
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-//							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
-//						],
-//						'Host name' => [
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-//							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
-//						],
-//						'Visible name' => [
-//							'Host name' => false,
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => true,
-//							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
-//						]
-//					]
 				]
 			],
 			// #1 Change SNMP to other type of checks.
@@ -1494,49 +1473,36 @@ class testFormNetworkDiscovery extends CWebTest {
 							'index' => 1,
 							'Check type' => 'POP',
 							'Port range' => 2020
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'Check type' => 'Zabbix agent',
+							'Key' => 'test_key'
 						]
 					],
 					'expected_checks' => [
 						'ICMP ping',
 						'POP (2020)',
-						'Telnet (205)'
+						'Zabbix agent "test_key"'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'IP address' => true
+							'IP address' => true,
+							'Zabbix agent "test_key"' => false
 						],
 						'Host name' => [
 							'DNS name' => true,
-							'IP address' => false
+							'IP address' => false,
+							'Zabbix agent "test_key"' => false
 						],
 						'Visible name' => [
-							'Host name' => true,
+							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => false
+							'IP address' => true,
+							'Zabbix agent "test_key"' => false
 						]
 					]
-// TODO: Change expected_radios to commented lines when ZBX-23312 is fixed (probably not needed).
-//					'expected_radios' => [
-//						'Device uniqueness criteria' => [
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-//							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
-//						],
-//						'Host name' => [
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-//							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
-//						],
-//						'Visible name' => [
-//							'Host name' => false,
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => true,
-//							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
-//						]
-//					]
-//					'error_details' => 'Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'
 				]
 			],
 			// #2 Delete two checks, one left.
@@ -1564,28 +1530,11 @@ class testFormNetworkDiscovery extends CWebTest {
 							'IP address' => false
 						],
 						'Visible name' => [
-							'Host name' => true,
+							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => false
+							'IP address' => true
 						]
 					]
-// TODO: Change expected_radios to commented lines when ZBX-23312 is fixed (probably not needed).
-//					'expected_radios' => [
-//						'Device uniqueness criteria' => [
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false
-//						],
-//						'Host name' => [
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => true
-//						],
-//						'Visible name' => [
-//							'Host name' => true,
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false
-//						]
-//					]
 				]
 			],
 			// #3 Add one additional check.
@@ -1615,9 +1564,9 @@ class testFormNetworkDiscovery extends CWebTest {
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Visible name' => [
-							'Host name' => true,
+							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => false,
+							'IP address' => true,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						]
 					]
@@ -1640,9 +1589,9 @@ class testFormNetworkDiscovery extends CWebTest {
 							'IP address' => false
 						],
 						'Visible name' => [
-							'Host name' => true,
+							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => false
+							'IP address' => true
 						]
 					],
 					'error_details' => 'Field "dchecks" is mandatory.'

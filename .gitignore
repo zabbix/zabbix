@@ -259,3 +259,4 @@ ui/locale/frontend.pot
 ui/tests/bootstrap.php
 ui/tests/composer.*
 ui/tests/vendor
+/ui/nbproject/private/
