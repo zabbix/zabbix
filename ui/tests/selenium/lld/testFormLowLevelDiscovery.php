@@ -74,6 +74,18 @@ class testFormLowLevelDiscovery extends CWebTest {
 						]
 					],
 					[
+						'type'=> INTERFACE_TYPE_SNMP,
+						'main' => INTERFACE_SECONDARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.3',
+						'dns' => '',
+						'port' => '161',
+						'details' => [
+							'version' => SNMP_V1,
+							'community' => '{$SNMP_COMMUNITY}'
+						]
+					],
+					[
 						'type' => INTERFACE_TYPE_JMX,
 						'main' => INTERFACE_PRIMARY,
 						'useip' => INTERFACE_USE_DNS,
@@ -712,6 +724,30 @@ class testFormLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'Update intervals validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'Update interval' => 0
+					],
+					'error_details' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Update intervals validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'Update interval' => 86401
+					],
+					'error_details' => 'Invalid parameter "/1/delay": value must be one of 0-86400.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'Scheduling interval validation',
 						'Type' => 'Zabbix agent',
 						'Key' => 'test1',
@@ -915,6 +951,19 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test',
 						'id:lifetime_type' => 'After',
+						'id:lifetime' => 3599
+					],
+					'error_details' => 'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'After',
 						'id:lifetime' => 788400001
 					],
 					'error_details' => 'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
@@ -998,6 +1047,20 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'Key' => 'test',
 						'id:lifetime_type' => 'Never',
 						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => 3599
+					],
+					'error_details' => 'Invalid parameter "/1/enabled_lifetime": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Lifetime fields validation',
+						'Type' => 'Zabbix agent',
+						'Key' => 'test',
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'After',
 						'id:enabled_lifetime' => 788400001
 					],
 					'error_details' => 'Invalid parameter "/1/enabled_lifetime": value must be one of 0, 3600-788400000.'
@@ -1033,6 +1096,116 @@ class testFormLowLevelDiscovery extends CWebTest {
 							' cannot be greater than or equal to the value of field "Delete lost resources".'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP LLD',
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.test',
+						'SNMP OID' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "SNMP OID": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Trapper',
+						'Type' => 'Zabbix trapper',
+						'Key' => 'test[1]',
+						'Allowed hosts' => '::ffff:127.0.0.1'
+					],
+					'error_details' => 'Invalid parameter "/1/trapper_hosts": incorrect address starting from ".0.0.1".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Database monitor',
+						'Type' => 'Database monitor',
+						'Key' => 'db.check',
+						'SQL query' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "SQL query": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "URL": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => 'test',
+						'name:query_fields[0][name]' => '',
+						'name:query_fields[0][value]' => 'test'
+					],
+					'error_details' => 'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => 'test',
+						'name:headers[0][name]' => '',
+						'name:headers[0][value]' => 'test'
+					],
+					'error_details' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => 'test',
+						'Request type' => 'PUT',
+						'Request body type' => 'XML data',
+						'Request body' => ''
+					],
+					'error_details' => 'Invalid parameter "/1/posts": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => 'test',
+						'Request type' => 'PUT',
+						'Request body type' => 'XML data',
+						'Request body' => 'test'
+					],
+					'error_details' => 'Invalid parameter "/1/posts": (4) Start tag expected, '<' not found [Line: 1 | Column: 1].'
+				]
+			],
+
 
 
 
@@ -1047,17 +1220,216 @@ class testFormLowLevelDiscovery extends CWebTest {
 					'fields' => [
 						'Name' => 'Simple LLD',
 						'Type' => 'Zabbix agent',
-						'Key' => 'new_key'
+						'Key' => 'agent'
 					]
 				]
 			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Simple active LLD',
+						'Type' => 'Zabbix agent (active)',
+						'Key' => 'active.agent[]',
+						'Update interval' => 1,
+						'id:delay_flex_0_type' => 'Flexible',
+						'id:delay_flex_0_delay' => '    100s   ',
+						'id:delay_flex_0_period' => '     1-5,00:00-18:00       ',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => 1,
+						'id:lifetime_type' => 'Never',
+						'id:enabled_lifetime_type' => 'Never',
+						'Description' => 'Test description',
+						'Enabled' => false
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Simple check LLD',
+						'Type' => 'Simple check',
+						'Key' => 'simple.check[123, param]',
+						'Update interval' => 86400,
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => '    wd1-3h15-18       ',
+						'id:lifetime_type' => 'Immediately'
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'SNMP LLD 1',
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.test',
+						'Host interface' => '127.0.0.3:161SNMPv1, Community: {$SNMP_COMMUNITY}',
+						'SNMP OID' => '.1.3.6.1.2.1.1.1.0',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '   3601    ',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => '   3600      '
+					],
+					'checked_interface' => '127.0.0.3:161',
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'SNMP LLD 2',
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.test[1]',
+						'SNMP OID' => 'walk[.1.3.6.1.4.1,.1.3.6.1.2.1.1.1.0,.1.3.6.1.2.1.7.3.0]',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => 788400000,
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => 788399999
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'SNMP LLD 3',
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.test[{#MACRO}]      ',
+						'SNMP OID' => '   discovery[{#MACRO1},.1.3.6.1.2.1.1.1.0,{#MACRO2}]   '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'SNMP LLD 4',
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.test[{$MACRO}]',
+						'SNMP OID' => '{$MACRO}'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Internal',
+						'Type' => 'Zabbix internal',
+						'Key' => 'zabbix[triggers]'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Trapper',
+						'Type' => 'Zabbix trapper',
+						'Key' => 'test[1]',
+						'Allowed hosts' => '     127.0.0.2,::/0,0.0.0.0/0,mysqlserver1, zabbix.example.com, {HOST.HOST},'.
+								'192.168.1-10.1-255, ::1,2001:db8::/32, {$MACRO},::ffff, ::         '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'External',
+						'Type' => 'External check',
+						'Key' => 'zabbix[external]'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Database monitor',
+						'Type' => 'Database monitor',
+						'Key' => 'db_check[]',
+						'SQL query' => '   test query    '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'HTTP LLD simple',
+						'Type' => 'HTTP agent',
+						'Key' => 'http_check[1]',
+						'URL' => 'www.test.com/search'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'HTTP LLD',
+						'Type' => 'HTTP agent',
+						'Key' => 'http_check[]',
+						'URL' => 'https://www.test.com/search?q=cat&rlz=1C1GCEU_enLV1043LV1043',
+						'Required status codes' => '200,200-{$M},{$M},200-400',
+						'HTTP authentication' => 'NTLM',
+					],
+					'parse' => true,
+					'parsed' => [
+						'url' => 'https://www.test.com/search',
+						'fields' =>[
+							['Name' => 'q', 'Value' => 'cat'],
+							['Name' => 'rlz', 'Value' => '1C1GCEU_enLV1043LV1043']
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '   {$MACRO}     ',
+						'Type' => 'HTTP agent',
+						'Key' => 'key[{$MACRO}]       ',
+						'URL' => '      {$MACRO}     ',
+						'name:query_fields[0][name]' => '          {$MACRO}'         ,
+						'name:query_fields[0][value]' => '        {$MACRO}'            ,
+						'Request type' => 'POST',
+						'Request body type' => 'JSON data',
+						'Request body' => '         {$MACRO}      ',
+						'name:headers[0][name]' => '     {$MACRO}        ',
+						'name:headers[0][value]' => '     {$MACRO}     ',
+						'Required status codes' => '    {$MACRO}, {$MACRO_2}     ',
+						'Follow redirects' => false,
+						'Retrieve mode' => 'Body and headers',
+						'HTTP proxy' => '      {$MACRO}           ',
+						'HTTP authentication' => 'Basic',
+						'id:http_username' => '         {$MACRO}        ',
+						'id:http_password' => '        {$MACRO}        ',
+						'SSL verify peer' => false,
+						'SSL verify host' => false,
+						'SSL certificate file' => '        {$MACRO}      ',
+						'SSL key file' => '       {$MACRO}          ',
+						'SSL key password' => '              {$MACRO}       ',
+						'Update interval' => '      {$MACRO}      ',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => '       {$MACRO}      ',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '   {$MACRO}    ',
+						'id:enabled_lifetime_type' => 'After',
+						'id:enabled_lifetime' => '   {$MACRO}    ',
+						'Enable trapping' => true,
+						'Allowed hosts' => '     {$MACRO}         ',
+						'Description' => '     {$MACRO}       '
+					],
+					'Custom intervals' => [
+						['Type' => 'Flexible', 'Interval' => '{$MACRO}', 'Period' => '{$MACRO2}'],
+						['Type' => 'Scheduling', 'Interval' => '{$MACRO}']
+					],
+					'trim' => true
+				]
+			]
 		];
 	}
 
 	/**
 	 * @dataProvider getLLDData
-	 *
-	 * @backupOnce items
 	 */
 	public function testFormLowLevelDiscovery_1Create($data) {
 		$this->checkLowLevelDiscoveryForm($data);
@@ -1075,13 +1447,46 @@ class testFormLowLevelDiscovery extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
+		// Make name and key unique for every case.
+		if ($update && $data['fields']['Name'] !== '') {
+			$data['fields']['Name'] = trim($data['fields']['Name']).'_updated';
+			$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
+		}
+
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
 				self::$interfaces_hostid.'&context=host');
 		$this->query($update ? 'link:'.self::$update_lld : 'button:Create discovery rule')->one()
 				->waitUntilClickable()->click();
-
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
 		$form->fill($data['fields']);
+
+		if (CTestArrayHelper::get($data, 'parse', false)) {
+			$this->query('button:Parse')->waitUntilClickable()->one()->click();
+		}
+
+		// Fill custom intervals if there are more than one interval in data provider.
+		if (array_key_exists('Custom intervals', $data)) {
+			foreach ($data['Custom intervals'] as $i => $interval) {
+				if ($i > 0) {
+					$form->getFieldContainer('Custom intervals')->query('button:Add')->waitUntilClickable()->one()->click();
+				}
+
+				if ($interval['Type'] === 'Flexible') {
+					$form->fill([
+						'id:delay_flex_'.$i.'_type' => $interval['Type'],
+						'id:delay_flex_'.$i.'_delay' => $interval['Interval'],
+						'id:delay_flex_'.$i.'_period' => $interval['Period']
+					]);
+				}
+				else {
+					$form->fill([
+						'id:delay_flex_'.$i.'_type' => $interval['Type'],
+						'id:delay_flex_'.$i.'_schedule' => $interval['Interval']
+					]);
+				}
+			}
+		}
+
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -1102,13 +1507,50 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 			$this->assertEquals(1, CDBHelper::getCount(
 				'SELECT * FROM items'.
-					' WHERE name='.zbx_dbstr( $data['fields']['Name']).
+					' WHERE name='.zbx_dbstr($data['fields']['Name']).
 						'AND flags=1'
 			));
 
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
+
+			// Check parsed query fields.
+			if (CTestArrayHelper::get($data, 'parse', false)) {
+				$data['fields']['URL'] = $data['parsed']['url'];
+
+				foreach ($data['parsed']['fields'] as $i => $field) {
+					$form->checkValue([
+						'name:query_fields['.$i.'][name]' => $field['Name'],
+						'name:query_fields['.$i.'][value]' => $field['Value']
+					]);
+				}
+			}
+
+			// Rewrite complex interface value for SNMP.
+			if (CTestArrayHelper::get($data, 'checked_interface', false)) {
+				$data['fields']['Host interface'] = $data['checked_interface'];
+			}
+
 			$form->checkValue($data['fields']);
+
+			// Check custom intervals.
+			if (array_key_exists('Custom intervals', $data)) {
+				foreach ($data['Custom intervals'] as $i => $interval) {
+					if ($interval['Type'] === 'Flexible') {
+						$form->checkValue([
+							'id:delay_flex_'.$i.'_type' => $interval['Type'],
+							'id:delay_flex_'.$i.'_delay' => $interval['Interval'],
+							'id:delay_flex_'.$i.'_period' => $interval['Period']
+						]);
+					}
+					else {
+						$form->checkValue([
+							'id:delay_flex_'.$i.'_type' => $interval['Type'],
+							'id:delay_flex_'.$i.'_schedule' => $interval['Interval']
+						]);
+					}
+				}
+			}
 
 			// Write new LLD name for the next case.
 			if ($update) {
