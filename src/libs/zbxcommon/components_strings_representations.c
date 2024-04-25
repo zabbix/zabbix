@@ -131,7 +131,7 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "proxy group manager";
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
 }
 

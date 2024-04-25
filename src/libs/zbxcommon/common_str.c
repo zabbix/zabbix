@@ -57,7 +57,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args)
 
 	if (0 > (rv = vsnprintf(NULL, 0, fmt, args)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
 
@@ -213,7 +213,7 @@ static int	test_vsnprintf(void)
 
 	zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", res);
 
-	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
 }
 
@@ -280,7 +280,7 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 
 			zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", bytes_written);
 
-			THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 

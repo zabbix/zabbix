@@ -66,7 +66,7 @@ static void	pad(char *input, size_t input_alloc, size_t pad_size, char fill_char
 	{
 		if (pad_size + 1 > input_alloc || input_len + 1 > input_alloc)
 		{
-			THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+			THIS_SHOULD_NEVER_HAPPEN;
 			return;
 		}
 

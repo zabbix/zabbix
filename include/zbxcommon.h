@@ -407,11 +407,6 @@ do														\
 }														\
 while (0)
 
-/* to avoid dependency on libzbxnix.a */
-#define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
-
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
 void	zbx_print_version(const char *title_message);

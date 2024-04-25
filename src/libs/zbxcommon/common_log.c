@@ -91,7 +91,7 @@ static const char	*zabbix_get_log_level_ref_string(int loglevel)
 			return "5 (trace)";
 	}
 
-	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
 }
 
