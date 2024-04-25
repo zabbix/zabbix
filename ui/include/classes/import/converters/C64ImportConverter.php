@@ -191,6 +191,8 @@ class C64ImportConverter extends CConverter {
 				}
 				unset($message_template);
 			}
+
+			$media_type = CArrayHelper::renameKeys($media_type, ['content_type' => 'message_format']);
 		}
 		unset($media_type);
 

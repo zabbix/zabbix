@@ -309,8 +309,8 @@ class CXmlConstantName {
 	const SMTP_AUTHENTICATION_NONE = 'NONE';
 	const SMTP_AUTHENTICATION_PASSWORD = 'PASSWORD';
 
-	const CONTENT_TYPE_TEXT = 'TEXT'; // Duplicate.
-	const CONTENT_TYPE_HTML = 'HTML';
+	const MESSAGE_FORMAT_TEXT = 'TEXT'; // Duplicate.
+	const MESSAGE_FORMAT_HTML = 'HTML';
 
 	const TRIGGERS = 'TRIGGERS';
 	const DISCOVERY = 'DISCOVERY';
