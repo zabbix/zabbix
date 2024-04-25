@@ -572,6 +572,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'Maintenance check',
 						'Show hosts in maintenance' => true,
 						'Show problems' => 'All'
 					]
@@ -804,7 +805,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 
 			$saved_form->submit();
 			COverlayDialogElement::ensureNotPresent();
-			$dashboard->save();
+			$dashboard->waitUntilReady()->save();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
