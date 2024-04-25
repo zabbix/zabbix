@@ -489,7 +489,7 @@ zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_me
 				mt->smtp_helo, mt->smtp_email, mt->exec_path, mt->gsm_modem, mt->username, mt->passwd,
 				mt->smtp_port, mt->smtp_security, mt->smtp_verify_peer, mt->smtp_verify_host,
 				mt->smtp_authentication, mt->maxsessions, mt->maxattempts, mt->attempt_interval,
-				mt->content_type, mt->script, mt->timeout);
+				mt->message_format, mt->script, mt->timeout);
 	}
 
 	return data_offset;
@@ -509,7 +509,7 @@ void	zbx_alerter_deserialize_mediatypes(const unsigned char *data, zbx_am_db_med
 				&mt->smtp_helo, &mt->smtp_email, &mt->exec_path, &mt->gsm_modem, &mt->username,
 				&mt->passwd, &mt->smtp_port, &mt->smtp_security, &mt->smtp_verify_peer,
 				&mt->smtp_verify_host, &mt->smtp_authentication, &mt->maxsessions, &mt->maxattempts,
-				&mt->attempt_interval, &mt->content_type, &mt->script, &mt->timeout);
+				&mt->attempt_interval, &mt->message_format, &mt->script, &mt->timeout);
 
 		(*mediatypes)[i] = mt;
 	}

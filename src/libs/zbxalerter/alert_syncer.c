@@ -256,7 +256,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
-		const char *attempt_interval, unsigned char content_type, const char *script, const char *timeout,
+		const char *attempt_interval, unsigned char message_format, const char *script, const char *timeout,
 		int process_tags)
 {
 	zbx_am_db_mediatype_t	*mediatype;
@@ -294,7 +294,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 
 	ZBX_UPDATE_VALUE(mediatype->maxsessions, maxsessions, ret);
 	ZBX_UPDATE_VALUE(mediatype->maxattempts, maxattempts, ret);
-	ZBX_UPDATE_VALUE(mediatype->content_type, content_type, ret);
+	ZBX_UPDATE_VALUE(mediatype->message_format, message_format, ret);
 
 	ZBX_UPDATE_VALUE(mediatype->process_tags, process_tags, ret);
 
