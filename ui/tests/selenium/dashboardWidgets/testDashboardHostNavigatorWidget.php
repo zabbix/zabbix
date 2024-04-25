@@ -431,7 +431,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "Group by": tag cannot be empty.',
-						'Invalid parameter "Group by": rows must be unique.',
+						'Invalid parameter "Group by": rows must be unique.'
 					]
 				]
 			],
