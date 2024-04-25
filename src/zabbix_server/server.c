@@ -2277,12 +2277,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_db_check_character_set();
 	zbx_check_db();
+
+	if (SUCCEED != zbx_db_update_software_update_checkid(config_allow_software_update_check))
+		exit(EXIT_FAILURE);
+
 	zbx_db_save_server_status();
 
 	if (SUCCEED != zbx_db_check_instanceid())
-		exit(EXIT_FAILURE);
-
-	if (SUCCEED != zbx_db_update_software_update_checkid(config_allow_software_update_check))
 		exit(EXIT_FAILURE);
 
 	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
