@@ -1868,7 +1868,7 @@ func TestConfigurator(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 }
 
-func Test_getCapacity(t *testing.T) {
+func Test_getPluginOptions(t *testing.T) {
 	type args struct {
 		optsRaw interface{}
 	}
@@ -1883,6 +1883,51 @@ func Test_getCapacity(t *testing.T) {
 				&conf.Node{
 					Name:  "Test",
 					Nodes: []interface{}{},
+				},
+			},
+			1000,
+		},
+		{
+			"system_cap_and_unexpected_param",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []interface{}{
+						&conf.Node{
+							Name: "Capacity",
+							Nodes: []interface{}{
+								&conf.Value{Value: []byte("10")},
+							},
+						},
+						&conf.Node{
+							Name: "System",
+							Nodes: []interface{}{
+								&conf.Node{
+									Name: "Capacity",
+									Nodes: []interface{}{
+										&conf.Value{Value: []byte("50")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			50,
+		},
+		{
+			"unexpected_param",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []interface{}{
+						&conf.Node{
+							Name: "Capacity",
+							Nodes: []interface{}{
+								&conf.Value{Value: []byte("10")},
+							},
+						},
+					},
 				},
 			},
 			1000,

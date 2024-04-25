@@ -933,37 +933,39 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getPluginOptions(optsRaw interface{}, pluginName string) (int, int) {
+func getPluginOptions(optsRaw any, pluginName string) (int, int) {
 	var opt pluginOptions
 
 	capacity := plugin.DefaultCapacity
-	forceActiveChecksOnStart := agent.Options.ForceActiveChecksOnStart
 
 	if optsRaw == nil {
-		return capacity, forceActiveChecksOnStart
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
-	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
+	err := conf.Unmarshal(optsRaw, &opt, false)
+	if err != nil {
 		log.Warningf("invalid plugin %s configuration: %s", pluginName, err)
 
-		return capacity, forceActiveChecksOnStart
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
 	if opt.System.Capacity > 0 {
 		capacity = opt.System.Capacity
 	}
 
-	if opt.System.ForceActiveChecksOnStart != nil {
-		if *opt.System.ForceActiveChecksOnStart > 1 || *opt.System.ForceActiveChecksOnStart < 0 {
-			log.Warningf(
-				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-				pluginName,
-				*opt.System.ForceActiveChecksOnStart,
-			)
-		} else {
-			forceActiveChecksOnStart = *opt.System.ForceActiveChecksOnStart
-		}
+	if opt.System.ForceActiveChecksOnStart == nil {
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
-	return capacity, forceActiveChecksOnStart
+	if *opt.System.ForceActiveChecksOnStart > 1 || *opt.System.ForceActiveChecksOnStart < 0 {
+		log.Warningf(
+			"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+			pluginName,
+			*opt.System.ForceActiveChecksOnStart,
+		)
+
+		return capacity, agent.Options.ForceActiveChecksOnStart
+	}
+
+	return capacity, *opt.System.ForceActiveChecksOnStart
 }
