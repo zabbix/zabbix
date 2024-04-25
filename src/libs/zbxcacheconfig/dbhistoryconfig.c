@@ -876,11 +876,11 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 		connector_filter.connectorid = dc_connector->connectorid;
 		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
-		zbx_vector_match_tags_create(&connector_filter.connector_tags);
+		zbx_vector_match_tags_ptr_create(&connector_filter.connector_tags);
 
 		if (0 != dc_connector->tags.values_num)
 		{
-			zbx_vector_match_tags_reserve(&connector_filter.connector_tags,
+			zbx_vector_match_tags_ptr_reserve(&connector_filter.connector_tags,
 					(size_t)dc_connector->tags.values_num);
 
 			for (i = 0; i < dc_connector->tags.values_num; i++)
@@ -893,11 +893,11 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 				connector_tag->value = zbx_strdup(NULL, dc_connector->tags.values[i]->value);
 				connector_tag->op = dc_connector->tags.values[i]->op;
 
-				zbx_vector_match_tags_append(&connector_filter.connector_tags, connector_tag);
+				zbx_vector_match_tags_ptr_append(&connector_filter.connector_tags, connector_tag);
 			}
 		}
 
-		zbx_vector_match_tags_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
+		zbx_vector_match_tags_ptr_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
 
 		zbx_vector_connector_filter_append(connector_filter_dest, connector_filter);
 	}
@@ -908,8 +908,8 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 {
-	zbx_vector_match_tags_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
-	zbx_vector_match_tags_destroy(&connector_filter.connector_tags);
+	zbx_vector_match_tags_ptr_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
+	zbx_vector_match_tags_ptr_destroy(&connector_filter.connector_tags);
 }
 
 static void	substitute_orig_unmasked(const char *orig, char **data)

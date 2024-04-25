@@ -345,7 +345,7 @@ typedef struct _DC_TRIGGER
 
 	unsigned char		flags;
 
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 	zbx_vector_uint64_t	itemids;
 
 	zbx_eval_context_t	*eval_ctx;
@@ -507,6 +507,8 @@ typedef struct
 }
 zbx_inventory_value_t;
 
+ZBX_PTR_VECTOR_DECL(inventory_value_ptr, zbx_inventory_value_t *)
+
 typedef struct
 {
 	char	*tag;
@@ -552,28 +554,38 @@ typedef struct
 }
 zbx_corr_condition_t;
 
+ZBX_PTR_VECTOR_DECL(corr_condition_ptr, zbx_corr_condition_t *)
+
 typedef struct
 {
 	unsigned char	type;
 }
 zbx_corr_operation_t;
 
+ZBX_PTR_VECTOR_DECL(corr_operation_ptr, zbx_corr_operation_t *)
+
+void	zbx_corr_operation_free(zbx_corr_operation_t *corr_operation);
+
 typedef struct
 {
-	zbx_uint64_t		correlationid;
-	char			*name;
-	char			*formula;
-	unsigned char		evaltype;
+	zbx_uint64_t			correlationid;
+	char				*name;
+	char				*formula;
+	unsigned char			evaltype;
 
-	zbx_vector_ptr_t	conditions;
-	zbx_vector_ptr_t	operations;
+	zbx_vector_corr_condition_ptr_t	conditions;
+	zbx_vector_corr_operation_ptr_t	operations;
 }
 zbx_correlation_t;
 
+ZBX_PTR_VECTOR_DECL(correlation_ptr, zbx_correlation_t *)
+
+int	zbx_correlation_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
-	zbx_vector_ptr_t	correlations;
-	zbx_hashset_t		conditions;
+	zbx_vector_correlation_ptr_t	correlations;
+	zbx_hashset_t			conditions;
 
 	/* Configuration synchronization timestamp of the rules. */
 	/* Update the cache if this timestamp is less than the   */
@@ -813,7 +825,36 @@ void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num);
 void	zbx_dc_config_clean_triggers(zbx_dc_trigger_t *triggers, int *errcodes, size_t num);
-int	zbx_dc_config_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
+
+typedef struct zbx_hc_data
+{
+	zbx_history_value_t	value;
+	zbx_uint64_t		lastlogsize;
+	zbx_timespec_t		ts;
+	int			mtime;
+	unsigned char		value_type;
+	unsigned char		flags;
+	unsigned char		state;
+
+	struct zbx_hc_data	*next;
+}
+zbx_hc_data_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	unsigned char	status;
+	int		values_num;
+
+	zbx_hc_data_t	*tail;
+	zbx_hc_data_t	*head;
+}
+zbx_hc_item_t;
+
+ZBX_PTR_VECTOR_DECL(hc_item_ptr, zbx_hc_item_t *)
+
+int	zbx_dc_config_lock_triggers_by_history_items(zbx_vector_hc_item_ptr_t *history_items,
+		zbx_vector_uint64_t *triggerids);
 void	zbx_dc_config_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in,
 		zbx_vector_uint64_t *triggerids_out);
 void	zbx_dc_config_unlock_triggers(const zbx_vector_uint64_t *triggerids);
@@ -861,10 +902,10 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
-void	zbx_dc_config_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
+void	zbx_dc_config_triggers_apply_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff);
 void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);
 
-void	zbx_dc_config_update_inventory_values(const zbx_vector_ptr_t *inventory_values);
+void	zbx_dc_config_update_inventory_values(const zbx_vector_inventory_value_ptr_t *inventory_values);
 int	zbx_dc_get_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
 int	zbx_dc_get_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx);
 
@@ -963,7 +1004,7 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 
 void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags);
 
-int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
+int	zbx_dc_get_interfaces_availability(zbx_vector_availability_ptr_t *interfaces, int *ts);
 void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
 
 void	zbx_set_availability_diff_ts(int ts);
@@ -975,31 +1016,6 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
-
-typedef struct zbx_hc_data
-{
-	zbx_history_value_t	value;
-	zbx_uint64_t		lastlogsize;
-	zbx_timespec_t		ts;
-	int			mtime;
-	unsigned char		value_type;
-	unsigned char		flags;
-	unsigned char		state;
-
-	struct zbx_hc_data	*next;
-}
-zbx_hc_data_t;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	unsigned char	status;
-	int		values_num;
-
-	zbx_hc_data_t	*tail;
-	zbx_hc_data_t	*head;
-}
-zbx_hc_item_t;
 
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag);
 
@@ -1037,7 +1053,11 @@ typedef struct
 }
 zbx_trigger_dep_t;
 
-void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
+ZBX_PTR_VECTOR_DECL(trigger_dep_ptr, zbx_trigger_dep_t *)
+
+int	zbx_trigger_dep_compare_func(const void *d1, const void *d2);
+
+void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_trigger_dep_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
 
@@ -1105,7 +1125,7 @@ typedef struct
 	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
 	zbx_uint64_t			triggerid;		/* [-] triggerid */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
-	zbx_vector_tags_t		tags;			/* [IN] event tags */
+	zbx_vector_tags_ptr_t		tags;			/* [IN] event tags */
 	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenance data for the event in */
 								/* (maintenanceid, suppress_until) pairs */
 }
@@ -1181,12 +1201,14 @@ typedef struct
 }
 zbx_trigger_timer_t;
 
-void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
-void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit);
-void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers);
+ZBX_PTR_VECTOR_DECL(trigger_timer_ptr, zbx_trigger_timer_t *)
+
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now);
+void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, int soft_limit, int hard_limit);
+void	zbx_dc_clear_timer_queue(zbx_vector_trigger_timer_ptr_t *timers);
 void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order,
-		const zbx_vector_ptr_t *timers);
-void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
+		const zbx_vector_trigger_timer_ptr_t *timers);
+void	zbx_dc_free_timers(zbx_vector_trigger_timer_ptr_t *timers);
 
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
 

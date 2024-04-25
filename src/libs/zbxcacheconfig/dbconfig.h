@@ -763,6 +763,10 @@ typedef struct
 }
 zbx_dc_corr_condition_t;
 
+ZBX_PTR_VECTOR_DECL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
+
+int     zbx_dc_corr_condition_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
 	zbx_uint64_t	corr_operationid;
@@ -771,15 +775,19 @@ typedef struct
 }
 zbx_dc_corr_operation_t;
 
+ZBX_PTR_VECTOR_DECL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
+
+int     zbx_dc_corr_operation_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
-	zbx_uint64_t		correlationid;
-	const char		*name;
-	const char		*formula;
-	unsigned char		evaltype;
+	zbx_uint64_t				correlationid;
+	const char				*name;
+	const char				*formula;
+	unsigned char				evaltype;
 
-	zbx_vector_ptr_t	conditions;
-	zbx_vector_ptr_t	operations;
+	zbx_vector_dc_corr_condition_ptr_t	conditions;
+	zbx_vector_dc_corr_operation_ptr_t	operations;
 }
 zbx_dc_correlation_t;
 

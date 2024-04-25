@@ -939,9 +939,6 @@ out:
 	return ret;
 }
 
-ZBX_PTR_VECTOR_DECL(db_value_ptr, zbx_db_value_t *)
-ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
-
 /******************************************************************************
  *                                                                            *
  * Purpose: insert new rows                                                   *

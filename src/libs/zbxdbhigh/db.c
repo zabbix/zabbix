@@ -65,8 +65,10 @@
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
-
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
+ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
+ZBX_PTR_VECTOR_IMPL(db_field_ptr, zbx_db_field_t *)
+ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
@@ -79,6 +81,16 @@ int	zbx_item_diff_compare_func(const void *d1, const void *d2)
 	const zbx_item_diff_t    *id_2 = *(const zbx_item_diff_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(id_1->itemid, id_2->itemid);
+
+	return 0;
+}
+
+int	zbx_trigger_diff_compare_func(const void *d1, const void *d2)
+{
+	const zbx_trigger_diff_t    *id_1 = *(const zbx_trigger_diff_t **)d1;
+	const zbx_trigger_diff_t    *id_2 = *(const zbx_trigger_diff_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(id_1->triggerid, id_2->triggerid);
 
 	return 0;
 }
@@ -2634,15 +2646,13 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
-	int	i, j;
-
-	for (i = 0; i < self->rows.values_num; i++)
+	for (int i = 0; i < self->rows.values_num; i++)
 	{
-		zbx_db_value_t	*row = (zbx_db_value_t *)self->rows.values[i];
+		zbx_db_value_t	*row = self->rows.values[i];
 
-		for (j = 0; j < self->fields.values_num; j++)
+		for (int j = 0; j < self->fields.values_num; j++)
 		{
-			zbx_db_field_t	*field = (zbx_db_field_t *)self->fields.values[j];
+			zbx_db_field_t	*field = self->fields.values[j];
 
 			switch (field->type)
 			{
@@ -2660,9 +2670,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 		zbx_free(row);
 	}
 
-	zbx_vector_ptr_destroy(&self->rows);
+	zbx_vector_db_value_ptr_destroy(&self->rows);
 
-	zbx_vector_ptr_destroy(&self->fields);
+	zbx_vector_db_field_ptr_destroy(&self->fields);
 }
 
 /******************************************************************************
@@ -2691,8 +2701,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num)
 {
-	int	i;
-
 	if (0 == fields_num)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -2702,13 +2710,13 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 	self->autoincrement = -1;
 	self->lastid = 0;
 
-	zbx_vector_ptr_create(&self->fields);
-	zbx_vector_ptr_create(&self->rows);
+	zbx_vector_db_field_ptr_create(&self->fields);
+	zbx_vector_db_value_ptr_create(&self->rows);
 
 	self->table = table;
 
-	for (i = 0; i < fields_num; i++)
-		zbx_vector_ptr_append(&self->fields, (zbx_db_field_t *)fields[i]);
+	for (int i = 0; i < fields_num; i++)
+		zbx_vector_db_field_ptr_append(&self->fields, (zbx_db_field_t *)fields[i]);
 }
 
 /******************************************************************************
@@ -2789,7 +2797,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		zbx_db_field_t		*field = (zbx_db_field_t *)self->fields.values[i];
+		zbx_db_field_t		*field = self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
@@ -2819,7 +2827,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 		}
 	}
 
-	zbx_vector_ptr_append(&self->rows, row);
+	zbx_vector_db_value_ptr_append(&self->rows, row);
 }
 
 /******************************************************************************
@@ -2994,7 +3002,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	}
 #ifdef HAVE_MYSQL
 	/* MySQL workaround - explicitly add missing text fields with '' default value */
-	for (field = (const zbx_db_field_t *)self->table->fields; NULL != field->name; field++)
+	for (field = self->table->fields; NULL != field->name; field++)
 	{
 		switch (field->type)
 		{
@@ -3003,7 +3011,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
-				if (FAIL != zbx_vector_ptr_search(&self->fields, (void *)field,
+				if (FAIL != zbx_vector_db_field_ptr_search(&self->fields, (void *)field,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
 					continue;
